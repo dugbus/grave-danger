@@ -58,9 +58,6 @@ stream = ExtResource("9_s8m4m")
 volume_db = -6.0
 autoplay = true
 
-[node name="GoldCoinPile" parent="." unique_id=547819824 instance=ExtResource("10_k3jcj")]
-coin_count = 15
-
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2049292617]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 12.135629, 0)
 layers = 2
@@ -71,6 +68,13 @@ shadow_enabled = true
 transform = Transform3D(0.80160874, 0, -0.597849, 0, 1, 0, 0.597849, 0, 0.80160874, 0.078243256, 0, 0.33029175)
 
 [node name="Scenery" type="Node" parent="LevelLayout" unique_id=1023042671]
+
+[node name="GoldCoinPile" parent="LevelLayout/Scenery" unique_id=547819824 instance=ExtResource("10_k3jcj")]
+coin_count = 15
+
+[node name="GoldCoinPile2" parent="LevelLayout/Scenery" unique_id=800208275 instance=ExtResource("10_k3jcj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0.481)
+coin_count = 15
 
 [node name="coffin2" parent="LevelLayout/Scenery" unique_id=1560930840 instance=ExtResource("1_2jwxh")]
 transform = Transform3D(0.80160874, 0, -0.597849, 0, 1, 0, 0.597849, 0, 0.80160874, 0.078243256, 0, 0.33029175)
@@ -113,7 +117,3 @@ mesh = SubResource("BoxMesh_rxxet")
 surface_material_override/0 = SubResource("StandardMaterial3D_2d15w")
 
 [node name="Player" parent="." unique_id=244343110 instance=ExtResource("6_gsvtp")]
-
-[node name="GoldCoinPile2" parent="." unique_id=800208275 instance=ExtResource("10_k3jcj")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0.481)
-coin_count = 15
