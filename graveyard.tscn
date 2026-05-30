@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://c260mfg7r0cor" path="res://Assets/debris-wood.glb" id="7_c0g2f"]
 [ext_resource type="Texture2D" uid="uid://w4ywm1e6jlu7" path="res://Assets/Textures/floor-texture.png" id="8_2d15w"]
 [ext_resource type="AudioStream" uid="uid://bcd4h7b10r85q" path="res://Assets/music-track.mp3" id="9_s8m4m"]
+[ext_resource type="PackedScene" path="res://gold_coin_pile.tscn" id="10_k3jcj"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_8ccgg"]
 
@@ -19,8 +20,8 @@ sky_material = SubResource("ProceduralSkyMaterial_8ccgg")
 
 [sub_resource type="Environment" id="Environment_siodt"]
 background_mode = 2
-sky = SubResource("Sky_2jwxh")
 background_energy_multiplier = 0.045
+sky = SubResource("Sky_2jwxh")
 ambient_light_color = Color(0.025, 0.025, 0.04, 1)
 ambient_light_energy = 0.06
 tonemap_exposure = 0.82
@@ -52,16 +53,19 @@ script = ExtResource("2_5v18t")
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=800182039]
 environment = SubResource("Environment_siodt")
 
-[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=1607896681]
 stream = ExtResource("9_s8m4m")
 volume_db = -6.0
 autoplay = true
 
+[node name="GoldCoinPile" parent="." unique_id=547819824 instance=ExtResource("10_k3jcj")]
+coin_count = 15
+
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2049292617]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 12.135629, 0)
-shadow_enabled = true
 layers = 2
 light_energy = 0.65
+shadow_enabled = true
 
 [node name="LevelLayout" type="Node3D" parent="." unique_id=863965489]
 transform = Transform3D(0.80160874, 0, -0.597849, 0, 1, 0, 0.597849, 0, 0.80160874, 0.078243256, 0, 0.33029175)
@@ -103,9 +107,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
 shape = SubResource("BoxShape3D_rxxet")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=451156980]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0047671795, -2.3841858e-07, -0.002604723)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0045878887, 0.0047996044, 0.0010025501)
 layers = 3
 mesh = SubResource("BoxMesh_rxxet")
 surface_material_override/0 = SubResource("StandardMaterial3D_2d15w")
 
 [node name="Player" parent="." unique_id=244343110 instance=ExtResource("6_gsvtp")]
+
+[node name="GoldCoinPile2" parent="." unique_id=800208275 instance=ExtResource("10_k3jcj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0.481)
+coin_count = 15
