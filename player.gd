@@ -1,28 +1,49 @@
 extends CharacterBody3D
 
 
-const SPEED = 5.0
-const JUMP_VELOCITY = 4.5
+# Player stays as the public API for other gameplay objects.
+# Coins and flame areas still talk to this CharacterBody3D, while the actual
+# behavior is split into focused child components below.
+@onready var movement: Node = $PlayerMovement
+@onready var gold_inventory: Node = $PlayerGoldInventory
+@onready var animation_controller: Node = $PlayerAnimation
+@onready var death_controller: Node = $PlayerDeath
+
+
+func _ready() -> void:
+	# Randomness is currently used by the pickup sound pitch/volume variation.
+	randomize()
 
 
 func _physics_process(delta: float) -> void:
-	# Add the gravity.
-	if not is_on_floor():
-		velocity += get_gravity() * delta
+	# Death owns the top-level state gate. A dead player still falls and slides to
+	# a stop, but input, pickup, dropping, and walk animation stop immediately.
+	if death_controller.is_dead:
+		movement.update_dead_motion(delta)
+		move_and_slide()
+		return
 
-	# Handle jump.
-	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
-		velocity.y = JUMP_VELOCITY
+	# Keep the frame order explicit:
+	# gravity/jump first, then repeatable drop input, then horizontal movement,
+	# then animation from the final input strength.
+	movement.apply_gravity_and_jump(delta, gold_inventory)
+	gold_inventory.update_drop_input(delta)
 
-	# Get the input direction and handle the movement/deceleration.
-	# As good practice, you should replace UI actions with custom gameplay actions.
-	var input_dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
-	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-	if direction:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
+	var input_strength: float = movement.update_walk(delta, gold_inventory)
+	animation_controller.update_movement(input_strength, gold_inventory)
 
 	move_and_slide()
+
+
+func try_collect_gold_coin(gold_coin: Node3D) -> bool:
+	# Gold coins call this on the player body. The inventory component decides
+	# whether the coin is collectible, but death always rejects pickup first.
+	if death_controller.is_dead:
+		return false
+
+	return gold_inventory.try_collect_gold_coin(gold_coin)
+
+
+func die_from_flames() -> void:
+	# FlameBoundary calls this on any body that exposes the method.
+	death_controller.die_from_flames()

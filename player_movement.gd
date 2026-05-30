@@ -1,0 +1,121 @@
+extends Node
+
+
+# Movement is a child component of Player. It writes to the parent
+# CharacterBody3D velocity, but leaves move_and_slide() to player.gd so every
+# feature contributes to one final physics move each frame.
+
+# Base movement tuning for an unloaded character.
+const SPEED = 5.0
+const JUMP_VELOCITY = 4.5
+const ROTATION_SPEED = 12.0
+const ACCELERATION = 18.0
+const DECELERATION = 22.0
+
+# How much analogue stick input is needed before the player starts walking.
+const WALK_INPUT_THRESHOLD = 0.05
+
+# Lowest movement multipliers when carrying the maximum number of coins.
+const MIN_WEIGHT_SPEED_MULTIPLIER = 0.35
+const MIN_WEIGHT_ACCELERATION_MULTIPLIER = 0.28
+const MIN_WEIGHT_DECELERATION_MULTIPLIER = 0.2
+const MIN_WEIGHT_ROTATION_MULTIPLIER = 0.35
+const MIN_WEIGHT_JUMP_MULTIPLIER = 0.4
+
+
+@export var pivot_path: NodePath = ^"../Pivot"
+
+@onready var player := get_parent() as CharacterBody3D
+@onready var pivot: Node3D = get_node_or_null(pivot_path)
+
+
+func apply_gravity_and_jump(delta: float, gold_inventory: Node) -> void:
+	# Vertical motion is handled before horizontal movement so jumping and
+	# falling are independent of analogue stick direction.
+	if player == null:
+		return
+
+	if not player.is_on_floor():
+		player.velocity += player.get_gravity() * delta
+
+	if Input.is_action_just_pressed("jump") and player.is_on_floor():
+		# Carrying coins makes jumps shorter through the inventory weight curve.
+		player.velocity.y = JUMP_VELOCITY * gold_inventory.weight_multiplier(1.0, MIN_WEIGHT_JUMP_MULTIPLIER)
+
+
+func update_walk(delta: float, gold_inventory: Node) -> float:
+	# Returns input strength so the animation component can match walk playback
+	# speed to the same analogue input used for movement.
+	if player == null:
+		return 0.0
+
+	# Input.get_vector gives a normalized keyboard direction and preserves
+	# partial analogue stick tilt for slower movement.
+	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var input_strength := clampf(input_dir.length(), 0.0, 1.0)
+	var direction := _get_camera_relative_direction(input_dir)
+
+	# Only the X/Z velocity is steered here. Y velocity is owned by gravity/jump.
+	var horizontal_velocity := Vector2(player.velocity.x, player.velocity.z)
+
+	# The inventory component owns the carrying-weight curve; movement only asks
+	# for the multiplier it needs for each tuning value.
+	var speed: float = SPEED * gold_inventory.weight_multiplier(1.0, MIN_WEIGHT_SPEED_MULTIPLIER)
+	var acceleration: float = ACCELERATION * gold_inventory.weight_multiplier(1.0, MIN_WEIGHT_ACCELERATION_MULTIPLIER)
+	var deceleration: float = DECELERATION * gold_inventory.weight_multiplier(1.0, MIN_WEIGHT_DECELERATION_MULTIPLIER)
+	var rotation_speed: float = ROTATION_SPEED * gold_inventory.weight_multiplier(1.0, MIN_WEIGHT_ROTATION_MULTIPLIER)
+
+	if input_strength > WALK_INPUT_THRESHOLD:
+		# Full stick tilt reaches full speed. Partial tilt creates a slower
+		# walk without needing a separate "walk" button.
+		var target_velocity: Vector2 = Vector2(direction.x, direction.z) * speed * input_strength
+		horizontal_velocity = horizontal_velocity.move_toward(target_velocity, acceleration * delta)
+
+		if pivot != null:
+			# The visual pivot rotates toward movement while the physics body
+			# keeps its authored collision orientation.
+			pivot.rotation.y = lerp_angle(pivot.rotation.y, atan2(direction.x, direction.z), rotation_speed * delta)
+	else:
+		horizontal_velocity = horizontal_velocity.move_toward(Vector2.ZERO, deceleration * delta)
+
+	player.velocity.x = horizontal_velocity.x
+	player.velocity.z = horizontal_velocity.y
+
+	return input_strength
+
+
+func update_dead_motion(delta: float) -> void:
+	# Dead players no longer accept input, but they still decelerate and obey
+	# gravity so the body settles naturally after the death trigger.
+	if player == null:
+		return
+
+	player.velocity.x = move_toward(player.velocity.x, 0.0, DECELERATION * delta)
+	player.velocity.z = move_toward(player.velocity.z, 0.0, DECELERATION * delta)
+
+	if not player.is_on_floor():
+		player.velocity += player.get_gravity() * delta
+
+
+func _get_camera_relative_direction(input_dir: Vector2) -> Vector3:
+	# Converts 2D movement input into world-space X/Z movement using the active
+	# camera. This keeps controls intuitive as the follow camera rotates.
+	if input_dir.is_zero_approx():
+		return Vector3.ZERO
+
+	var camera := get_viewport().get_camera_3d()
+	if camera == null:
+		# Fallback for tests or scenes without a camera.
+		return Vector3(input_dir.x, 0.0, input_dir.y).normalized()
+
+	# Flatten the camera basis so input never adds vertical movement.
+	var camera_forward := -camera.global_transform.basis.z
+	camera_forward.y = 0.0
+	camera_forward = camera_forward.normalized()
+
+	var camera_right := camera.global_transform.basis.x
+	camera_right.y = 0.0
+	camera_right = camera_right.normalized()
+
+	# In this project pressing up should move deeper into the camera view.
+	return (camera_right * input_dir.x - camera_forward * input_dir.y).normalized()

@@ -1,16 +1,72 @@
-[gd_scene format=3 uid="uid://pqtcng2uw3dw"]
+[gd_scene load_steps=9 format=3 uid="uid://pqtcng2uw3dw"]
 
 [ext_resource type="PackedScene" uid="uid://bg1o6o88d6aih" path="res://Assets/character-keeper.glb" id="1_4flbx"]
 [ext_resource type="Script" uid="uid://dtq13owafx466" path="res://player.gd" id="1_onrkg"]
+[ext_resource type="Script" path="res://player_movement.gd" id="3_i5lcx"]
+[ext_resource type="Script" path="res://player_gold_inventory.gd" id="4_nltvg"]
+[ext_resource type="Script" path="res://player_animation.gd" id="5_8mhfk"]
+[ext_resource type="Script" path="res://player_death.gd" id="6_7xubc"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_4flbx"]
 
+[sub_resource type="Shader" id="Shader_player_shadow"]
+code = "shader_type spatial;
+render_mode unshaded, blend_mix, depth_draw_never, cull_disabled;
+
+uniform vec4 shadow_color : source_color = vec4(0.0, 0.0, 0.0, 0.34);
+
+void fragment() {
+	vec2 centered_uv = UV * 2.0 - 1.0;
+	float distance_from_center = length(centered_uv);
+	float shadow_alpha = (1.0 - smoothstep(0.2, 1.0, distance_from_center)) * shadow_color.a;
+
+	ALBEDO = shadow_color.rgb;
+	ALPHA = shadow_alpha;
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_player_shadow"]
+render_priority = -1
+shader = SubResource("Shader_player_shadow")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_player_shadow"]
+size = Vector2(1.2, 0.75)
+
 [node name="Player" type="CharacterBody3D" unique_id=244343110]
+collision_layer = 2
+collision_mask = 1
 script = ExtResource("1_onrkg")
+
+[node name="PlayerMovement" type="Node" parent="."]
+script = ExtResource("3_i5lcx")
+
+[node name="PlayerGoldInventory" type="Node" parent="."]
+script = ExtResource("4_nltvg")
+
+[node name="PlayerAnimation" type="Node" parent="."]
+script = ExtResource("5_8mhfk")
+
+[node name="PlayerDeath" type="Node" parent="."]
+script = ExtResource("6_7xubc")
 
 [node name="Pivot" type="Node3D" parent="." unique_id=2026899053]
 
 [node name="Character" parent="Pivot" unique_id=2053546351 instance=ExtResource("1_4flbx")]
+
+[node name="PlayerShadow" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0.06)
+layers = 3
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_player_shadow")
+surface_material_override/0 = SubResource("ShaderMaterial_player_shadow")
+
+[node name="PlayerLight" type="OmniLight3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 1.42, 0.34)
+layers = 1
+shadow_enabled = true
+light_color = Color(1, 0.8, 0.55, 1)
+light_energy = 1.8
+omni_range = 6.0
+omni_attenuation = 1.35
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=837824967]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.486421, 0)
