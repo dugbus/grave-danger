@@ -6,6 +6,7 @@ const GAME_SCENE := "res://graveyard.tscn"
 
 # Image shown full-screen behind the title screen.
 @export var title_texture: Texture2D
+@export var fade_in_duration := 0.8
 
 # Prevent multiple scene changes from repeated input events.
 var starting := false
@@ -15,6 +16,7 @@ func _ready() -> void:
 	# This runs once when the title screen enters the scene.
 
 	_create_title_image()
+	_fade_in_title()
 	set_process_unhandled_input(true)
 
 
@@ -49,3 +51,15 @@ func _start_game() -> void:
 
 	starting = true
 	get_tree().change_scene_to_file(GAME_SCENE)
+
+
+func _fade_in_title() -> void:
+	var fade := ColorRect.new()
+	fade.color = Color.BLACK
+	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fade.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(fade)
+
+	var tween := create_tween()
+	tween.tween_property(fade, "color:a", 0.0, fade_in_duration)
+	tween.finished.connect(fade.queue_free)
