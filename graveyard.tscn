@@ -4,13 +4,10 @@
 [ext_resource type="Script" uid="uid://c35f6deqohs1y" path="res://graveyard.gd" id="1_3ihgk"]
 [ext_resource type="Script" uid="uid://c6wa53llemsd" path="res://flame_boundary.gd" id="2_0b1xw"]
 [ext_resource type="Script" uid="uid://bov7w0cyy2jl7" path="res://follow_camera.gd" id="2_5v18t"]
-[ext_resource type="PackedScene" uid="uid://cl5lyop1cwwpw" path="res://Assets/border-pillar.glb" id="2_siodt"]
-[ext_resource type="PackedScene" uid="uid://mhko8agd6yd" path="res://Assets/candle-multiple.glb" id="3_uujvg"]
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player.tscn" id="6_gsvtp"]
-[ext_resource type="PackedScene" uid="uid://bl1fpg6tucgvl" path="res://Assets/crypt-a.glb" id="6_p5nu3"]
-[ext_resource type="PackedScene" uid="uid://c260mfg7r0cor" path="res://Assets/debris-wood.glb" id="7_c0g2f"]
 [ext_resource type="Texture2D" uid="uid://w4ywm1e6jlu7" path="res://Assets/Textures/floor-texture.png" id="8_2d15w"]
 [ext_resource type="AudioStream" uid="uid://bcd4h7b10r85q" path="res://Assets/music-track.mp3" id="9_s8m4m"]
+[ext_resource type="PackedScene" uid="uid://qt8f7q0lnp35" path="res://Assets/brick-wall.glb" id="10_15rbh"]
 [ext_resource type="PackedScene" path="res://gold_coin_pile.tscn" id="10_k3jcj"]
 [ext_resource type="Script" uid="uid://c7jjnllrvj053" path="res://flame_boundary_waypoint.gd" id="11_6q3mv"]
 
@@ -77,29 +74,8 @@ coin_count = 15
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0.481)
 coin_count = 15
 
-[node name="coffin2" parent="LevelLayout/Scenery" unique_id=1560930840 instance=ExtResource("1_2jwxh")]
-transform = Transform3D(0.80160874, 0, -0.597849, 0, 1, 0, 0.597849, 0, 0.80160874, 0.078243256, 0, 0.33029175)
-
-[node name="border-pillar2" parent="LevelLayout/Scenery" unique_id=605227327 instance=ExtResource("2_siodt")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.98066056, 0, -1.015085)
-
-[node name="border-pillar3" parent="LevelLayout/Scenery" unique_id=2032568549 instance=ExtResource("2_siodt")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9746562, 0, 1.9822965)
-
-[node name="border-pillar4" parent="LevelLayout/Scenery" unique_id=423260 instance=ExtResource("2_siodt")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3495034, 0, 2.0163536)
-
-[node name="border-pillar5" parent="LevelLayout/Scenery" unique_id=374269030 instance=ExtResource("2_siodt")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0108728, 0, -0.92589307)
-
-[node name="candle-multiple2" parent="LevelLayout/Scenery" unique_id=1435284010 instance=ExtResource("3_uujvg")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15564492, 0, 1.1398866)
-
-[node name="crypt-a2" parent="LevelLayout/Scenery" unique_id=407113570 instance=ExtResource("6_p5nu3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4595792, 0, 0.80967265)
-
-[node name="debris-wood2" parent="LevelLayout/Scenery" unique_id=194614021 instance=ExtResource("7_c0g2f")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7672001, 0, 1.1834766)
+[node name="coffin3" parent="LevelLayout/Scenery" unique_id=1894824003 instance=ExtResource("1_2jwxh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8926046, -5.9604645e-08, 0.2696401)
 
 [node name="FlameBoundary" type="Node3D" parent="LevelLayout" unique_id=851573800]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -0.26018506, 0, -0.2179871)
@@ -107,7 +83,6 @@ script = ExtResource("2_0b1xw")
 loop = true
 near_flame_audio_min_db = -55.0
 near_flame_audio_max_db = 4.0
-near_flame_audio_curve = null
 
 [node name="FlameBoundaryWaypoint0" type="Marker3D" parent="LevelLayout/FlameBoundary" unique_id=1568815649]
 script = ExtResource("11_6q3mv")
@@ -162,3 +137,27 @@ mesh = SubResource("BoxMesh_rxxet")
 surface_material_override/0 = SubResource("StandardMaterial3D_2d15w")
 
 [node name="Player" parent="." unique_id=244343110 instance=ExtResource("6_gsvtp")]
+
+[node name="brick-wall3" parent="." unique_id=438288081 instance=ExtResource("10_15rbh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1)
+
+[node name="brick-wall4" parent="." unique_id=1842184285 instance=ExtResource("10_15rbh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
+
+[node name="brick-wall5" parent="." unique_id=240831549 instance=ExtResource("10_15rbh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 2)
+
+[node name="brick-wall6" parent="." unique_id=1753555295 instance=ExtResource("10_15rbh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+
+[node name="brick-wall7" parent="." unique_id=1794273199 instance=ExtResource("10_15rbh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 2)
+
+[node name="brick-wall2" parent="." unique_id=1457191187 instance=ExtResource("10_15rbh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1)
+
+[node name="brick-wall8" parent="." unique_id=1523200121 instance=ExtResource("10_15rbh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -1)
+
+[node name="brick-wall9" parent="." unique_id=1461145394 instance=ExtResource("10_15rbh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 2)
