@@ -7,6 +7,14 @@ extends RigidBody3D
 # Coins below this height are assumed to have fallen out of the world.
 @export var despawn_below_y := -5.0
 
+# How far a coin is allowed to travel while tipped onto its edge before it is
+# treated like a rounded-edge coin and settled back onto a face.
+@export var max_edge_roll_distance := 1.0
+
+@export_range(0.0, 1.0, 0.01) var edge_roll_up_dot := 0.45
+@export var edge_roll_min_speed := 0.08
+@export var edge_roll_horizontal_damping := 0.25
+
 # Area used to detect players close enough to collect the coin.
 @onready var pickup_area: Area3D = $PickupArea
 
@@ -21,6 +29,10 @@ var is_being_collected := false
 
 # Bodies currently inside the pickup area.
 var candidate_bodies: Array[Node3D] = []
+
+# Horizontal position where the current edge-roll stretch started.
+var edge_roll_start_position := Vector2.ZERO
+var is_tracking_edge_roll := false
 
 
 func _ready() -> void:
@@ -43,6 +55,8 @@ func _physics_process(_delta: float) -> void:
 		queue_free()
 		return
 
+	_limit_edge_roll_distance()
+
 	if not can_be_collected or is_being_collected:
 		return
 
@@ -64,8 +78,51 @@ func throw_from(spawn_transform: Transform3D, impulse: Vector3) -> void:
 	global_transform = spawn_transform
 	linear_velocity = Vector3.ZERO
 	angular_velocity = Vector3.ZERO
+	is_tracking_edge_roll = false
 	_block_pickup_for(pickup_delay)
 	apply_impulse(impulse)
+
+
+func _limit_edge_roll_distance() -> void:
+	var coin_up_alignment := absf(global_transform.basis.y.normalized().dot(Vector3.UP))
+	var horizontal_velocity := Vector2(linear_velocity.x, linear_velocity.z)
+	var is_edge_rolling := coin_up_alignment < edge_roll_up_dot and horizontal_velocity.length() > edge_roll_min_speed
+
+	if not is_edge_rolling:
+		is_tracking_edge_roll = false
+		return
+
+	var horizontal_position := Vector2(global_position.x, global_position.z)
+	if not is_tracking_edge_roll:
+		edge_roll_start_position = horizontal_position
+		is_tracking_edge_roll = true
+		return
+
+	if edge_roll_start_position.distance_to(horizontal_position) < max_edge_roll_distance:
+		return
+
+	_settle_flat_from_edge_roll()
+
+
+func _settle_flat_from_edge_roll() -> void:
+	var transform := global_transform
+	var x_axis := transform.basis.x
+	x_axis.y = 0.0
+	if x_axis.length_squared() <= 0.0001:
+		x_axis = Vector3.RIGHT
+	else:
+		x_axis = x_axis.normalized()
+
+	var y_axis := Vector3.UP
+	var z_axis := x_axis.cross(y_axis).normalized()
+	transform.basis = Basis(x_axis, y_axis, z_axis).orthonormalized()
+	global_transform = transform
+
+	linear_velocity.x *= edge_roll_horizontal_damping
+	linear_velocity.z *= edge_roll_horizontal_damping
+	angular_velocity.x = 0.0
+	angular_velocity.z = 0.0
+	is_tracking_edge_roll = false
 
 
 func _on_pickup_area_body_entered(body: Node3D) -> void:

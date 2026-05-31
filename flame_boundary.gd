@@ -1,17 +1,18 @@
+@tool
 extends Node3D
 
 
-# A list of rectangle states.
-# Each state says:
-# - where the flame rectangle starts from
-# - how wide and deep it is
-# - what time it should reach that state
-@export var level_states: Array[Dictionary] = [
-	{"origin": Vector2(0.0, 0.0), "xsize": 5.0, "ysize": 5.0, "time": 0.0},
-	{"origin": Vector2(1.5, 0.75), "xsize": 10.0, "ysize": 10.0, "time": 8.0},
-	{"origin": Vector2(-12.0, 1.5), "xsize": 4.5, "ysize": 5.5, "time": 16.0},
-	{"origin": Vector2(-8.0, -2.5), "xsize": 7.0, "ysize": 7.0, "time": 32.0},
-]
+const PATH_PREVIEW_CONTAINER_NAME := "EditorPathPreview"
+const PATH_DOT_SPACING := 0.45
+const PATH_DOT_RADIUS := 0.07
+const PATH_PREVIEW_Y_OFFSET := 0.08
+
+# Child FlameBoundaryWaypoint nodes define the flame rectangle path.
+@export var waypoint_parent_path: NodePath = ^"."
+
+# When enabled, the final waypoint returns to the first one using the first
+# waypoint's time/easing settings.
+@export var loop := false
 
 # How thick the flame wall is for collision purposes.
 @export var flame_thickness := 0.18
@@ -23,8 +24,8 @@ extends Node3D
 @export var flame_y := 0.0
 
 
-# Which timed state we are currently between.
-var state_index := 0
+# The waypoint currently being moved from.
+var waypoint_index := 0
 
 # The current centre/origin of the flame rectangle.
 var current_origin := Vector2.ZERO
@@ -44,28 +45,57 @@ var flame_material: ShaderMaterial
 # How long this object has been running.
 var elapsed_time := 0.0
 
+# How long we have spent on the current segment.
+var segment_elapsed := 0.0
+
+# Editor-placed waypoints used by the flame controller.
+var waypoints: Array[Node] = []
+
 # The on-screen text showing the timer.
 var time_label: Label
+
+# Last editor path state used to avoid rebuilding the preview every frame.
+var editor_path_snapshot := ""
 
 
 func _ready() -> void:
 	# This runs once when the node enters the scene.
 
+	if Engine.is_editor_hint():
+		_refresh_editor_path_preview()
+		set_process(true)
+		return
+
 	_create_flame_material()
 	_create_strips()
 	_create_time_label()
+	_collect_waypoints()
 
-	if level_states.is_empty():
+	if waypoints.is_empty():
 		_disable_flames()
 		return
 
-	# Start using the first state in the list.
-	_apply_state(_get_state(0))
+	# Start using the first waypoint in the list.
+	_apply_state(_get_waypoint_state(0))
+
+
+func _process(_delta: float) -> void:
+	if not Engine.is_editor_hint():
+		return
+
+	var snapshot := _get_editor_path_snapshot()
+	if snapshot == editor_path_snapshot:
+		return
+
+	_refresh_editor_path_preview(snapshot)
 
 
 func _physics_process(delta: float) -> void:
 	# This runs repeatedly during the game.
 	# delta is the amount of time since the previous physics frame.
+
+	if Engine.is_editor_hint():
+		return
 
 	_update_state(delta)
 	_update_time_label()
@@ -74,59 +104,65 @@ func _physics_process(delta: float) -> void:
 func _update_state(delta: float) -> void:
 	# Move and resize the flame rectangle over time.
 
-	if level_states.is_empty():
+	if waypoints.is_empty():
 		_disable_flames()
 		return
 
 	elapsed_time += delta
 
-	# If there is only one state, just use that forever.
-	if level_states.size() == 1:
-		_apply_state(_get_state(0))
+	# If there is only one waypoint, just use that forever.
+	if waypoints.size() == 1:
+		_apply_state(_get_waypoint_state(0))
 		return
 
-	# If we have gone past the final timed state,
-	# stay fixed at the final state.
-	var last_state := _get_state(level_states.size() - 1)
-	if elapsed_time >= last_state["time"]:
-		_apply_state(last_state)
+	segment_elapsed += delta
+	var next_index := _get_next_waypoint_index()
+
+	while next_index != -1:
+		var duration := _get_segment_duration(next_index)
+		if segment_elapsed < duration:
+			break
+
+		segment_elapsed -= duration
+		waypoint_index = next_index
+		next_index = _get_next_waypoint_index()
+
+	if next_index == -1:
+		_apply_state(_get_waypoint_state(waypoints.size() - 1))
 		return
 
-	# Find the two states we are currently between.
-	for i in range(level_states.size() - 1):
-		var from_state := _get_state(i)
-		var to_state := _get_state(i + 1)
+	var from_state := _get_waypoint_state(waypoint_index)
+	var to_state := _get_waypoint_state(next_index)
 
-		# Skip this pair if the current time is not between them.
-		if elapsed_time < from_state["time"] or elapsed_time > to_state["time"]:
-			continue
+	var t := clampf(segment_elapsed / _get_segment_duration(next_index), 0.0, 1.0)
+	var eased_t := _ease_segment(t, next_index)
 
-		# Work out how far we are between the two states.
-		# 0.0 means at the first state.
-		# 1.0 means at the second state.
-		var duration := maxf(to_state["time"] - from_state["time"], 0.001)
-		var t := clampf((elapsed_time - from_state["time"]) / duration, 0.0, 1.0)
-
-		# Smoothly blend the flame rectangle position and size.
-		current_origin = from_state["origin"].lerp(to_state["origin"], t)
-		current_size = from_state["size"].lerp(to_state["size"], t)
-
-		state_index = i
-
-		# Apply the new rectangle to the visible flames and collisions.
-		_update_rect()
-		return
+	current_origin = from_state["origin"].lerp(to_state["origin"], eased_t)
+	current_size = from_state["size"].lerp(to_state["size"], eased_t)
+	_update_rect()
 
 
-func _get_state(index: int) -> Dictionary:
-	# Read one state from level_states and convert it into a consistent format.
-	# This also provides safe default values if a field is missing.
+func _collect_waypoints() -> void:
+	waypoints.clear()
 
-	var state := level_states[index]
+	var waypoint_parent := get_node_or_null(waypoint_parent_path)
+	if waypoint_parent == null:
+		waypoint_parent = self
+
+	for child in waypoint_parent.get_children():
+		if child.has_method("get_flame_boundary_origin") and child.has_method("get_flame_boundary_size"):
+			waypoints.append(child)
+
+
+func _get_waypoint_state(index: int) -> Dictionary:
+	# Read one waypoint and convert it into a consistent format.
+
+	var waypoint := waypoints[index]
+	var local_position: Vector3 = global_transform.affine_inverse() * waypoint.global_position
 	return {
-		"origin": state.get("origin", Vector2.ZERO),
-		"size": Vector2(float(state.get("xsize", 5.0)), float(state.get("ysize", 5.0))),
-		"time": float(state.get("time", 0.0)),
+		"origin": Vector2(local_position.x, local_position.z),
+		"size": waypoint.get_flame_boundary_size(),
+		"time": float(waypoint.get("time")),
 	}
 
 
@@ -144,6 +180,140 @@ func get_bounds_center() -> Vector3:
 
 func get_bounds_size() -> Vector2:
 	return current_size
+
+
+func _get_next_waypoint_index() -> int:
+	var next_index := waypoint_index + 1
+	if next_index < waypoints.size():
+		return next_index
+
+	if loop:
+		return 0
+
+	return -1
+
+
+func _get_segment_duration(target_index: int) -> float:
+	var state := _get_waypoint_state(target_index)
+	return maxf(float(state["time"]), 0.001)
+
+
+func _ease_segment(t: float, target_index: int) -> float:
+	var target := waypoints[target_index]
+	if target.has_method("ease_value"):
+		return target.ease_value(t)
+
+	return t
+
+
+func _refresh_editor_path_preview(snapshot := "") -> void:
+	if not Engine.is_editor_hint() or not is_inside_tree():
+		return
+
+	_collect_waypoints()
+	editor_path_snapshot = snapshot if not snapshot.is_empty() else _get_editor_path_snapshot()
+
+	var preview_container := _get_or_create_path_preview_container()
+	for child in preview_container.get_children(true):
+		preview_container.remove_child(child)
+		child.free()
+
+	if waypoints.size() < 2:
+		return
+
+	var material := _create_path_preview_material()
+	for index in waypoints.size() - 1:
+		_add_dotted_path_segment(
+			preview_container,
+			_get_waypoint_preview_position(waypoints[index]),
+			_get_waypoint_preview_position(waypoints[index + 1]),
+			material
+		)
+
+	if loop:
+		_add_dotted_path_segment(
+			preview_container,
+			_get_waypoint_preview_position(waypoints[waypoints.size() - 1]),
+			_get_waypoint_preview_position(waypoints[0]),
+			material
+		)
+
+
+func _get_editor_path_snapshot() -> String:
+	_collect_waypoints()
+
+	var parts: Array[String] = ["loop=%s" % loop]
+	for waypoint in waypoints:
+		var local_position := _get_waypoint_preview_position(waypoint)
+		parts.append("%s:%.3f,%.3f,%.3f" % [waypoint.name, local_position.x, local_position.y, local_position.z])
+
+	return "|".join(parts)
+
+
+func _get_waypoint_preview_position(waypoint: Node) -> Vector3:
+	var waypoint_3d := waypoint as Node3D
+	if waypoint_3d == null:
+		return Vector3.ZERO
+
+	var local_position: Vector3 = global_transform.affine_inverse() * waypoint_3d.global_position
+	local_position.y = flame_y + PATH_PREVIEW_Y_OFFSET
+	return local_position
+
+
+func _add_dotted_path_segment(parent: Node3D, start: Vector3, end: Vector3, material: Material) -> void:
+	var segment := end - start
+	var length := segment.length()
+	if length <= 0.001:
+		return
+
+	var direction := segment / length
+	var dot_count := maxi(2, int(ceil(length / PATH_DOT_SPACING)) + 1)
+	for index in dot_count:
+		var t := float(index) / float(dot_count - 1)
+		var dot := MeshInstance3D.new()
+		dot.name = "PathDot"
+		dot.mesh = _create_path_dot_mesh()
+		dot.material_override = material
+		dot.position = start + direction * length * t
+		parent.add_child(dot, false, Node.INTERNAL_MODE_BACK)
+		_lock_editor_preview_node(dot)
+		dot.owner = null
+
+
+func _get_or_create_path_preview_container() -> Node3D:
+	var existing := get_node_or_null(PATH_PREVIEW_CONTAINER_NAME) as Node3D
+	if existing != null:
+		return existing
+
+	var preview_container := Node3D.new()
+	preview_container.name = PATH_PREVIEW_CONTAINER_NAME
+	add_child(preview_container, false, Node.INTERNAL_MODE_BACK)
+	_lock_editor_preview_node(preview_container)
+	preview_container.owner = null
+	return preview_container
+
+
+func _create_path_dot_mesh() -> SphereMesh:
+	var mesh := SphereMesh.new()
+	mesh.radius = PATH_DOT_RADIUS
+	mesh.height = PATH_DOT_RADIUS * 2.0
+	mesh.radial_segments = 8
+	mesh.rings = 4
+	return mesh
+
+
+func _create_path_preview_material() -> StandardMaterial3D:
+	var material := StandardMaterial3D.new()
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.albedo_color = Color(1.0, 0.85, 0.12, 0.8)
+	material.emission_enabled = true
+	material.emission = Color(1.0, 0.55, 0.04)
+	material.emission_energy_multiplier = 1.2
+	return material
+
+
+func _lock_editor_preview_node(node: Node) -> void:
+	node.set_meta("_edit_lock_", true)
 
 
 func _create_flame_material() -> void:
@@ -297,7 +467,7 @@ func _update_rect() -> void:
 		var spec: Dictionary = strip_specs[i]
 
 		var area := strip_collisions[i].get_parent() as Area3D
-		area.global_position = spec["position"]
+		area.position = spec["position"]
 
 		(strip_collisions[i].shape as BoxShape3D).size = spec["collision_size"]
 		(strip_meshes[i].mesh as QuadMesh).size = spec["visual_size"]

@@ -17,6 +17,8 @@ const PREVIEW_CONTAINER_NAME := "EditorPreviewCoins"
 
 @export_range(0.0, 10.0, 0.05) var spawn_height := 1.0
 
+@export_range(0.0, 300.0, 0.05) var trigger_time := 0.0
+
 @export_range(0.0, 1.0, 0.005) var spawn_interval := 0.01
 
 # Leave this as 0 for a different coin scatter each run.
@@ -26,7 +28,10 @@ const PREVIEW_CONTAINER_NAME := "EditorPreviewCoins"
 		_refresh_preview_when_editing()
 
 var spawn_elapsed := 0.0
+var trigger_elapsed := 0.0
 var spawned_coins := 0
+var spawn_started := false
+var spawn_all_queued := false
 var rng := RandomNumberGenerator.new()
 var preview_mesh: CylinderMesh
 
@@ -41,15 +46,24 @@ func _ready() -> void:
 	else:
 		rng.seed = random_seed
 
-	if spawn_interval <= 0.0:
-		call_deferred("_spawn_all_and_free")
+	spawn_started = trigger_time <= 0.0
+	if spawn_started and spawn_interval <= 0.0:
+		_queue_spawn_all()
 
 
 func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
 
+	if not spawn_started:
+		trigger_elapsed += delta
+		if trigger_elapsed < trigger_time:
+			return
+
+		spawn_started = true
+
 	if spawn_interval <= 0.0:
+		_queue_spawn_all()
 		return
 
 	if spawned_coins >= coin_count:
@@ -60,6 +74,14 @@ func _physics_process(delta: float) -> void:
 	while spawn_elapsed >= spawn_interval and spawned_coins < coin_count:
 		spawn_elapsed -= spawn_interval
 		_spawn_gold_coin()
+
+
+func _queue_spawn_all() -> void:
+	if spawn_all_queued:
+		return
+
+	spawn_all_queued = true
+	call_deferred("_spawn_all_and_free")
 
 
 func _spawn_all_and_free() -> void:
