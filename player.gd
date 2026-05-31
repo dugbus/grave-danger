@@ -13,6 +13,7 @@ extends CharacterBody3D
 func _ready() -> void:
 	# Randomness is currently used by the pickup sound pitch/volume variation.
 	randomize()
+	add_to_group("flame_vulnerable")
 
 
 func _physics_process(delta: float) -> void:
@@ -47,3 +48,11 @@ func try_collect_gold_coin(gold_coin: Node3D) -> bool:
 func die_from_flames() -> void:
 	# FlameBoundary calls this on any body that exposes the method.
 	death_controller.die_from_flames()
+
+
+func apply_flame_damage(amount: float) -> void:
+	death_controller.apply_flame_damage(amount)
+
+
+func drain_flame_energy() -> void:
+	death_controller.drain_flame_energy()

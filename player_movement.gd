@@ -22,11 +22,33 @@ const MIN_WEIGHT_DECELERATION_MULTIPLIER = 0.2
 const MIN_WEIGHT_ROTATION_MULTIPLIER = 0.35
 const MIN_WEIGHT_JUMP_MULTIPLIER = 0.4
 
+const FOOTSTEP_SOUND_PATHS: Array[String] = [
+	"res://Assets/footstep1.wav",
+	"res://Assets/footstep2.wav",
+	"res://Assets/footstep3.wav",
+	"res://Assets/footstep4.wav",
+]
 
 @export var pivot_path: NodePath = ^"../Pivot"
+@export var footstep_speed_threshold := 0.35
+@export var footstep_distance := 0.7
+@export var footstep_distance_variance := 0.18
+@export var footstep_pitch_min := 0.92
+@export var footstep_pitch_max := 1.08
+@export var footstep_volume_min_db := 0.0
+@export var footstep_volume_max_db := 4.0
 
 @onready var player := get_parent() as CharacterBody3D
 @onready var pivot: Node3D = get_node_or_null(pivot_path)
+
+var footstep_sounds: Array[AudioStream] = []
+var footstep_distance_accumulator := 0.0
+var next_footstep_distance := 1.0
+
+
+func _ready() -> void:
+	_load_footstep_sounds()
+	_randomize_next_footstep_distance()
 
 
 func apply_gravity_and_jump(delta: float, gold_inventory: Node) -> void:
@@ -81,6 +103,8 @@ func update_walk(delta: float, gold_inventory: Node) -> float:
 	player.velocity.x = horizontal_velocity.x
 	player.velocity.z = horizontal_velocity.y
 
+	_update_footsteps(delta, horizontal_velocity.length())
+
 	return input_strength
 
 
@@ -92,9 +116,58 @@ func update_dead_motion(delta: float) -> void:
 
 	player.velocity.x = move_toward(player.velocity.x, 0.0, DECELERATION * delta)
 	player.velocity.z = move_toward(player.velocity.z, 0.0, DECELERATION * delta)
+	footstep_distance_accumulator = 0.0
 
 	if not player.is_on_floor():
 		player.velocity += player.get_gravity() * delta
+
+
+func _load_footstep_sounds() -> void:
+	footstep_sounds.clear()
+
+	for sound_path in FOOTSTEP_SOUND_PATHS:
+		var stream := load(sound_path) as AudioStream
+		if stream != null:
+			footstep_sounds.append(stream)
+
+
+func _update_footsteps(delta: float, horizontal_speed: float) -> void:
+	if footstep_sounds.is_empty():
+		return
+
+	if player == null or not player.is_on_floor() or player.velocity.y > 0.05 or horizontal_speed < footstep_speed_threshold:
+		footstep_distance_accumulator = 0.0
+		return
+
+	footstep_distance_accumulator += horizontal_speed * delta
+	if footstep_distance_accumulator < next_footstep_distance:
+		return
+
+	footstep_distance_accumulator = 0.0
+	_randomize_next_footstep_distance()
+	_play_footstep(horizontal_speed)
+
+
+func _randomize_next_footstep_distance() -> void:
+	var variance := maxf(footstep_distance_variance, 0.0)
+	next_footstep_distance = maxf(0.1, footstep_distance + randf_range(-variance, variance))
+
+
+func _play_footstep(horizontal_speed: float) -> void:
+	var sound_player := AudioStreamPlayer3D.new()
+	sound_player.name = "FootstepAudio"
+	sound_player.stream = footstep_sounds.pick_random()
+	sound_player.pitch_scale = randf_range(footstep_pitch_min, footstep_pitch_max)
+	var speed_volume_boost := clampf((horizontal_speed - footstep_speed_threshold) / maxf(SPEED - footstep_speed_threshold, 0.001), 0.0, 1.0)
+	sound_player.volume_db = lerpf(footstep_volume_min_db, footstep_volume_max_db, speed_volume_boost) + randf_range(-1.0, 1.0)
+	sound_player.finished.connect(sound_player.queue_free)
+
+	if player != null:
+		player.add_child(sound_player)
+	else:
+		add_child(sound_player)
+
+	sound_player.play()
 
 
 func _get_camera_relative_direction(input_dir: Vector2) -> Vector3:

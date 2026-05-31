@@ -6,6 +6,7 @@ const PATH_PREVIEW_CONTAINER_NAME := "EditorPathPreview"
 const PATH_DOT_SPACING := 0.45
 const PATH_DOT_RADIUS := 0.07
 const PATH_PREVIEW_Y_OFFSET := 0.08
+const NEAR_FLAMES_SOUND_PATH := "res://Assets/near-the-flames.mp3"
 
 # Child FlameBoundaryWaypoint nodes define the flame rectangle path.
 @export var waypoint_parent_path: NodePath = ^"."
@@ -22,6 +23,18 @@ const PATH_PREVIEW_Y_OFFSET := 0.08
 
 # The height above the ground where the flames start.
 @export var flame_y := 0.0
+
+@export_group("Flame Damage")
+@export var flame_damage_per_second := 35.0
+@export var flame_damage_inner_depth := 0.35
+@export var lethal_flame_depth := 0.8
+
+@export_group("Near Flame Audio")
+@export var near_flame_audio_distance := 4.0
+@export var near_flame_audio_min_db := -45.0
+@export var near_flame_audio_max_db := 8.0
+@export_range(0.1, 3.0, 0.05) var near_flame_audio_curve := 0.45
+@export var near_flame_audio_lag := 8.0
 
 
 # The waypoint currently being moved from.
@@ -54,6 +67,12 @@ var waypoints: Array[Node] = []
 # The on-screen text showing the timer.
 var time_label: Label
 
+# Looping audio that rises as the player nears the flame boundary.
+var near_flame_audio_player: AudioStreamPlayer
+
+# Bodies currently intersecting a flame strip.
+var flame_touching_bodies: Array[Node3D] = []
+
 # Last editor path state used to avoid rebuilding the preview every frame.
 var editor_path_snapshot := ""
 
@@ -69,6 +88,7 @@ func _ready() -> void:
 	_create_flame_material()
 	_create_strips()
 	_create_time_label()
+	_create_near_flame_audio()
 	_collect_waypoints()
 
 	if waypoints.is_empty():
@@ -98,6 +118,8 @@ func _physics_process(delta: float) -> void:
 		return
 
 	_update_state(delta)
+	_apply_flame_heat(delta)
+	_update_near_flame_audio(delta)
 	_update_time_label()
 
 
@@ -379,9 +401,10 @@ func _create_strips() -> void:
 		# It only detects bodies on collision layer 2.
 		area.collision_mask = 2
 
-		# When something enters the flame area,
-		# call _on_flame_body_entered().
+		# Track bodies currently brushing a flame strip. Damage is applied
+		# continuously in _apply_flame_heat().
 		area.body_entered.connect(_on_flame_body_entered)
+		area.body_exited.connect(_on_flame_body_exited)
 
 		add_child(area)
 
@@ -396,6 +419,22 @@ func _create_strips() -> void:
 		mesh_instance.material_override = flame_material
 		area.add_child(mesh_instance)
 		strip_meshes.append(mesh_instance)
+
+
+func _create_near_flame_audio() -> void:
+	var stream := load(NEAR_FLAMES_SOUND_PATH) as AudioStream
+	if stream == null:
+		return
+
+	near_flame_audio_player = AudioStreamPlayer.new()
+	near_flame_audio_player.name = "NearFlameAudio"
+	var loop_stream := stream.duplicate() as AudioStream
+	if loop_stream is AudioStreamMP3:
+		(loop_stream as AudioStreamMP3).loop = true
+	near_flame_audio_player.stream = loop_stream
+	near_flame_audio_player.volume_db = near_flame_audio_min_db
+	add_child(near_flame_audio_player)
+	near_flame_audio_player.play()
 
 
 func _create_time_label() -> void:
@@ -423,6 +462,89 @@ func _update_time_label() -> void:
 
 	if time_label != null:
 		time_label.text = "Time %.1fs" % elapsed_time
+
+
+func _apply_flame_heat(delta: float) -> void:
+	for body in get_tree().get_nodes_in_group("flame_vulnerable"):
+		if not body is Node3D:
+			continue
+
+		var body_3d := body as Node3D
+		if not is_instance_valid(body_3d):
+			continue
+
+		var outside_depth := _get_outside_flame_depth(body_3d.global_position)
+		if outside_depth >= lethal_flame_depth:
+			if body_3d.has_method("drain_flame_energy"):
+				body_3d.drain_flame_energy()
+			elif body_3d.has_method("die_from_flames"):
+				body_3d.die_from_flames()
+			continue
+
+		var touching_flames := flame_touching_bodies.has(body_3d)
+		if not touching_flames and outside_depth <= 0.0:
+			var inside_edge_distance := _get_inside_edge_distance(body_3d.global_position)
+			touching_flames = inside_edge_distance <= flame_damage_inner_depth
+
+		if not touching_flames and outside_depth <= 0.0:
+			continue
+
+		var damage_multiplier := 1.0
+		if outside_depth > 0.0:
+			damage_multiplier += clampf(outside_depth / maxf(lethal_flame_depth, 0.001), 0.0, 1.0)
+
+		if body_3d.has_method("apply_flame_damage"):
+			body_3d.apply_flame_damage(flame_damage_per_second * damage_multiplier * delta)
+		elif body_3d.has_method("die_from_flames"):
+			body_3d.die_from_flames()
+
+
+func _update_near_flame_audio(delta: float) -> void:
+	if near_flame_audio_player == null:
+		return
+
+	var closest_distance := INF
+	for body in get_tree().get_nodes_in_group("flame_vulnerable"):
+		if not body is Node3D:
+			continue
+
+		var body_3d := body as Node3D
+		if not is_instance_valid(body_3d):
+			continue
+
+		closest_distance = minf(closest_distance, _get_distance_to_flames(body_3d.global_position))
+
+	var target_volume := near_flame_audio_min_db
+	if closest_distance < INF:
+		var closeness := 1.0 - clampf(closest_distance / maxf(near_flame_audio_distance, 0.001), 0.0, 1.0)
+		closeness = pow(closeness, near_flame_audio_curve)
+		target_volume = lerpf(near_flame_audio_min_db, near_flame_audio_max_db, closeness)
+
+	var t := 1.0 - exp(-near_flame_audio_lag * delta)
+	near_flame_audio_player.volume_db = lerpf(near_flame_audio_player.volume_db, target_volume, t)
+
+
+func _get_distance_to_flames(world_position: Vector3) -> float:
+	var outside_depth := _get_outside_flame_depth(world_position)
+	if outside_depth > 0.0:
+		return 0.0
+
+	return maxf(_get_inside_edge_distance(world_position), 0.0)
+
+
+func _get_inside_edge_distance(world_position: Vector3) -> float:
+	var local_position: Vector3 = global_transform.affine_inverse() * world_position
+	var offset := Vector2(local_position.x - current_origin.x, local_position.z - current_origin.y)
+	var half_size := current_size * 0.5
+	return minf(half_size.x - absf(offset.x), half_size.y - absf(offset.y))
+
+
+func _get_outside_flame_depth(world_position: Vector3) -> float:
+	var local_position: Vector3 = global_transform.affine_inverse() * world_position
+	var offset := Vector2(local_position.x - current_origin.x, local_position.z - current_origin.y)
+	var half_size := current_size * 0.5
+	var outside := Vector2(maxf(absf(offset.x) - half_size.x, 0.0), maxf(absf(offset.y) - half_size.y, 0.0))
+	return outside.length()
 
 
 func _disable_flames() -> void:
@@ -474,10 +596,9 @@ func _update_rect() -> void:
 		strip_meshes[i].rotation = Vector3(0.0, spec["rotation"], 0.0)
 
 func _on_flame_body_entered(body: Node3D) -> void:
-	# This runs when a body enters one of the flame collision areas.
-	#
-	# If that body has a function called die_from_flames(),
-	# call it. This lets player/enemy objects decide what dying means.
+	if not flame_touching_bodies.has(body):
+		flame_touching_bodies.append(body)
 
-	if body.has_method("die_from_flames"):
-		body.die_from_flames()
+
+func _on_flame_body_exited(body: Node3D) -> void:
+	flame_touching_bodies.erase(body)

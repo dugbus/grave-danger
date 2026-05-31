@@ -105,6 +105,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7672001, 0, 1.1834766)
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -0.26018506, 0, -0.2179871)
 script = ExtResource("2_0b1xw")
 loop = true
+near_flame_audio_min_db = -55.0
+near_flame_audio_max_db = 4.0
+near_flame_audio_curve = null
 
 [node name="FlameBoundaryWaypoint0" type="Marker3D" parent="LevelLayout/FlameBoundary" unique_id=1568815649]
 script = ExtResource("11_6q3mv")

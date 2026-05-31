@@ -8,12 +8,35 @@ extends Node
 @export var title_scene := "res://title_screen.tscn"
 @export var return_delay := 1.5
 @export var fade_out_duration := 0.8
+@export var max_flame_energy := 100.0
 
 @onready var player := get_parent() as CharacterBody3D
 @onready var animation_controller: Node = get_node_or_null(animation_controller_path)
 
 var is_dead := false
 var returning_to_title := false
+var flame_energy := 100.0
+
+
+func _ready() -> void:
+	flame_energy = max_flame_energy
+
+
+func apply_flame_damage(amount: float) -> void:
+	if is_dead:
+		return
+
+	flame_energy = maxf(flame_energy - maxf(amount, 0.0), 0.0)
+	if flame_energy <= 0.0:
+		die_from_flames()
+
+
+func drain_flame_energy() -> void:
+	if is_dead:
+		return
+
+	flame_energy = 0.0
+	die_from_flames()
 
 
 func die_from_flames() -> void:
