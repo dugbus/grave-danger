@@ -37,6 +37,11 @@ const FOOTSTEP_SOUND_PATHS: Array[String] = [
 @export var footstep_pitch_max := 1.08
 @export var footstep_volume_min_db := 0.0
 @export var footstep_volume_max_db := 4.0
+@export var squeeze_probe_height := 0.35
+@export var squeeze_probe_distance := 0.85
+@export var squeeze_min_gap_width := 0.72
+@export var squeeze_full_speed_gap_width := 1.35
+@export var squeeze_min_speed_multiplier := 0.45
 
 @onready var player := get_parent() as CharacterBody3D
 @onready var pivot: Node3D = get_node_or_null(pivot_path)
@@ -75,6 +80,7 @@ func update_walk(delta: float, gold_inventory: Node) -> float:
 	# partial analogue stick tilt for slower movement.
 	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var input_strength := clampf(input_dir.length(), 0.0, 1.0)
+	var effective_input_strength := input_strength
 	var direction := _get_camera_relative_direction(input_dir)
 
 	# Only the X/Z velocity is steered here. Y velocity is owned by gravity/jump.
@@ -88,9 +94,12 @@ func update_walk(delta: float, gold_inventory: Node) -> float:
 	var rotation_speed: float = ROTATION_SPEED * gold_inventory.weight_multiplier(1.0, MIN_WEIGHT_ROTATION_MULTIPLIER)
 
 	if input_strength > WALK_INPUT_THRESHOLD:
+		var squeeze_speed_multiplier := _get_squeeze_speed_multiplier(direction)
+		effective_input_strength *= squeeze_speed_multiplier
+
 		# Full stick tilt reaches full speed. Partial tilt creates a slower
 		# walk without needing a separate "walk" button.
-		var target_velocity: Vector2 = Vector2(direction.x, direction.z) * speed * input_strength
+		var target_velocity: Vector2 = Vector2(direction.x, direction.z) * speed * effective_input_strength
 		horizontal_velocity = horizontal_velocity.move_toward(target_velocity, acceleration * delta)
 
 		if pivot != null:
@@ -105,7 +114,7 @@ func update_walk(delta: float, gold_inventory: Node) -> float:
 
 	_update_footsteps(delta, horizontal_velocity.length())
 
-	return input_strength
+	return effective_input_strength
 
 
 func update_dead_motion(delta: float) -> void:
@@ -168,6 +177,48 @@ func _play_footstep(horizontal_speed: float) -> void:
 		add_child(sound_player)
 
 	sound_player.play()
+
+
+func _get_squeeze_speed_multiplier(direction: Vector3) -> float:
+	if player == null or direction.is_zero_approx() or squeeze_probe_distance <= 0.0:
+		return 1.0
+
+	var side := Vector3(-direction.z, 0.0, direction.x).normalized()
+	var origin := player.global_position + Vector3.UP * squeeze_probe_height
+	var left_clearance := _probe_side_clearance(origin, side)
+	var right_clearance := _probe_side_clearance(origin, -side)
+
+	if left_clearance >= squeeze_probe_distance or right_clearance >= squeeze_probe_distance:
+		return 1.0
+
+	var gap_width := left_clearance + right_clearance
+	var min_gap_width := maxf(squeeze_min_gap_width, 0.01)
+	var full_speed_gap_width := maxf(squeeze_full_speed_gap_width, min_gap_width + 0.01)
+	var gap_factor := clampf((gap_width - min_gap_width) / (full_speed_gap_width - min_gap_width), 0.0, 1.0)
+	var min_multiplier := clampf(squeeze_min_speed_multiplier, 0.05, 1.0)
+
+	return lerpf(min_multiplier, 1.0, gap_factor)
+
+
+func _probe_side_clearance(origin: Vector3, direction: Vector3) -> float:
+	var world := player.get_world_3d()
+	if world == null:
+		return squeeze_probe_distance
+
+	var query := PhysicsRayQueryParameters3D.create(
+		origin,
+		origin + direction * squeeze_probe_distance,
+		player.collision_mask,
+		[player.get_rid()]
+	)
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+
+	var hit := world.direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return squeeze_probe_distance
+
+	return origin.distance_to(hit["position"])
 
 
 func _get_camera_relative_direction(input_dir: Vector2) -> Vector3:
