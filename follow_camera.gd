@@ -56,7 +56,7 @@ var death_target: Node3D
 func _ready() -> void:
 	# This runs once when the camera enters the scene.
 
-	current = true
+	#current = true
 	projection = Camera3D.PROJECTION_PERSPECTIVE
 	fov = field_of_view
 

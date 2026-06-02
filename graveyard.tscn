@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://w4ywm1e6jlu7" path="res://Assets/Textures/floor-texture.png" id="8_2d15w"]
 [ext_resource type="AudioStream" uid="uid://bcd4h7b10r85q" path="res://Assets/music-track.mp3" id="9_s8m4m"]
 [ext_resource type="PackedScene" path="res://gold_coin_pile.tscn" id="10_k3jcj"]
+[ext_resource type="PackedScene" path="res://flame_boundary.tscn" id="11_5vn3g"]
 [ext_resource type="Script" uid="uid://b4l0y5awllv2n" path="res://level_scenery_generator.gd" id="12_o5p27"]
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://coin_deposit.gd" id="13_l5igj"]
 [ext_resource type="Script" uid="uid://5kig63v451pl" path="res://score_hud.gd" id="14_ovw42"]
@@ -39,6 +40,14 @@ size = Vector3(60, 2, 60)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2d15w"]
 albedo_texture = ExtResource("8_2d15w")
 uv1_scale = Vector3(60, 60, 1)
+
+[sub_resource type="Curve3D" id="Curve3D_15rbh"]
+closed = true
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 1.3385433, 0, 0.8017891, 0.32808685, 0, 0.92860794, -0.32808685, 0, -0.92860794, -1.3186508, 0, -1.690186, 0.77569926, 0, 1.1231618, -0.77569926, 0, -1.1231618, -1.5210278, 0, -5.4651356, 0, 0, 0, 0, 0, 0, -4.8648467, 0, -8.833408, 0, 0, 0, 0, 0, 0, -6.486372, 0, -11.601995, 0, 0, 0, 0, 0, 0, -8.090784, 0, -13.086683, -0.7401066, 0, -1.1773424, 0.7401066, 0, 1.1773424, -11.435463, 0, -16.919283, 0, 0, 0, 0, 0, 0, -11.469518, 0, -13.854713, 0, 0, 0, 0, 0, 0, -8.37648, 0, -8.524214, -0.99753046, 0, -0.6034055, 0.99753046, 0, 0.6034055, -6.89056, 0, -4.075595, 0, 0, 0, 0, 0, 0, -9.398226, 0, -1.3270582, -0.07279968, 0, -1.0545772, 0.07279968, 0, 1.0545772, -10.578386, 0, 1.396391, 0, 0, 0, 0, 0, 0, -9.352835, 0, 3.7567146, 0, 0, 0, 0, 0, 0, -6.1032043, 0, 3.1730146, 0, 0, 0, 0, 0, 0, -2.9556575, 0, 4.6148696, 0, 0, 0, 0, 0, 0, -4.3144507, 0, 7.614936, 0.8141365, 0, -0.38178062, -0.8141365, 0, 0.38178062, -4.7229667, 0, 9.748308, 0, 0, 0, 0, 0, 0, -2.7919497, 0, 10.71823, 0.7641754, 0, 0.52040195, -0.7641754, 0, -0.52040195, -0.64380264, 0, 6.687929, -0.3133316, 0, 0.7101879, 0.3133316, 0, -0.7101879, -0.65706825, 0, 9.82861, 0, 0, 0, 0, 0, 0, 3.2707996, 0, 8.586998, 0, 0, 0, 0, 0, 0, 5.38222, 0, 5.1407084, 0, 0, 0, 0, 0, 0, 5.426932, 0, 6.6818624, 0, 0, 0, 0, 0, 0, 7.2048516, 0, 5.522174, 0, 0, 0, 0, 0, 0, 9.810469, 0, 4.7887135, 0, 0, 0, 0, 0, 0, 11.628897, 0, 3.0627253, 0.8494868, 0, 0.38483477, -0.8494868, 0, -0.38483477, 6.219325, 0, 2.1477044, 1.0232735, 0, -0.38072443, -1.0232735, 0, 0.38072443, 11.525019, 0, -0.7751944, 0.421772, 0, 0.87788916, -0.421772, 0, -0.87788916, 11.364962, 0, -4.42379, -0.16983414, 0, 1.356168, 0.16983414, 0, -1.356168, 8.163307, 0, -5.2903557, 0.45619583, 0, 0.7037863, -0.45619583, 0, -0.7037863, 8.584677, 0, -7.7921443, 0, 0, 0, 0, 0, 0, 8.232898, -0.023876667, -10.260768, 0, 0, 0, 0, 0, 0, 4.739001, -0.023925781, -7.772686, 0, 0, 0, 0, 0, 0, 3.62143, -0.023925781, -5.501492, -0.07210159, 0, -0.8111403, 0.07210159, 0, 0.8111403, 1.9090217, -0.023925781, -3.4285774, 0, 0, 0, 0, 0, 0, -2.5977154, -0.023925781, 0.2018969, -0.09012413, 0, -0.9733689, 0.09012413, 0, 0.9733689, -2.4411979, -0.023925781, 2.5715714),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 37
 
 [node name="Graveyard" type="Node3D" unique_id=1224200127]
 script = ExtResource("1_3ihgk")
@@ -75,13 +84,26 @@ transform = Transform3D(0.80160874, 0, -0.597849, 0, 1, 0, 0.597849, 0, 0.801608
 script = ExtResource("12_o5p27")
 
 [node name="coffin3" parent="LevelLayout/Scenery" unique_id=1894824003 instance=ExtResource("1_2jwxh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8926046, -5.9604645e-08, 0.2696401)
-metadata/_edit_lock_ = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.085945, -5.9604645e-08, -0.09869373)
 
 [node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin3" unique_id=894045105]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("13_l5igj")
 metadata/_edit_lock_ = true
+
+[node name="coffin4" parent="LevelLayout/Scenery" unique_id=600896566 instance=ExtResource("1_2jwxh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.267612, -5.9604645e-08, -15.682046)
+
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin4" unique_id=91261711]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+script = ExtResource("13_l5igj")
+
+[node name="coffin5" parent="LevelLayout/Scenery" unique_id=868622373 instance=ExtResource("1_2jwxh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.777405, -5.9604645e-08, -9.22204)
+
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin5" unique_id=1240180796]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+script = ExtResource("13_l5igj")
 
 [node name="Ground" type="StaticBody3D" parent="." unique_id=1401381437]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
@@ -134,3 +156,18 @@ coin_count = 64
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.076741, 0, -2.5086772)
 coin_count = 20
 pile_radius = 2.0
+
+[node name="Path3D" type="Path3D" parent="." unique_id=1726317079]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+curve = SubResource("Curve3D_15rbh")
+
+[node name="PathFollow3D" type="PathFollow3D" parent="Path3D" unique_id=1869308244]
+transform = Transform3D(0.99999315, 0, 0, 0, 0.99999976, 0, 0, 0, 0.99999315, 1.3385433, 0, 0.8017891)
+rotation_mode = 0
+
+[node name="Follow Camera" type="Camera3D" parent="Path3D/PathFollow3D" unique_id=960100831]
+transform = Transform3D(1.0000068, 0, 0, 0, 0.62231344, 0.782769, 0, -0.7827755, 0.6223145, 0, 4.3923645, 3.3936167)
+current = true
+
+[node name="FlameBoundary" parent="Path3D/PathFollow3D" unique_id=422290054 instance=ExtResource("11_5vn3g")]
+transform = Transform3D(1.0000066, 0, 0, 0, 1.0000002, 0, 0, 0, 1.0000066, -0.7175453, -1.0000002, 0.124682665)

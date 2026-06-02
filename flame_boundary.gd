@@ -123,7 +123,7 @@ func _play_start_animation() -> void:
 	if animation_player == null or not animation_player.has_animation(animation_name):
 		return
 
-	animation_player.play(animation_name)
+	#animation_player.play(animation_name)
 
 
 func _ensure_boundary_nodes() -> void:
