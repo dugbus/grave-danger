@@ -17,9 +17,10 @@ extends Camera3D
 @export var follow_lag := 4.0
 
 # Current and allowed camera distance.
-@export var zoom_distance := 5.6
+@export var zoom_distance := 18.0
 @export var min_zoom_distance := 4.2
 @export var max_zoom_distance := 18.0
+@export var manual_zoom_speed := 8.0
 
 # Perspective and safe-area fitting settings.
 @export var field_of_view := 34.0
@@ -80,8 +81,10 @@ func _physics_process(delta: float) -> void:
 	if controls_enabled:
 		_update_camera_controls(delta)
 
-	# Zoom is automatic so the whole flame boundary remains visible.
-	_update_boundary_zoom(delta)
+	if _has_flame_boundary():
+		_update_boundary_zoom(delta)
+	elif controls_enabled:
+		_update_manual_zoom(delta)
 
 	# Smoothly lag the camera focus behind the desired point.
 	var t := 1.0 - exp(-follow_lag * delta)
@@ -99,10 +102,21 @@ func _update_camera_controls(delta: float) -> void:
 	camera_yaw += rotate_input * rotation_speed * delta
 
 
+func _update_manual_zoom(delta: float) -> void:
+	var zoom_input := Input.get_axis("camera_zoom_in", "camera_zoom_out")
+	zoom_input = 0.0 if absf(zoom_input) < camera_input_deadzone else zoom_input
+
+	zoom_distance = clampf(
+		zoom_distance + zoom_input * manual_zoom_speed * delta,
+		min_zoom_distance,
+		max_zoom_distance
+	)
+
+
 func _update_boundary_zoom(delta: float) -> void:
 	# Adjust zoom so the current flame rectangle fits in the viewport.
 
-	if flame_boundary == null or not flame_boundary.has_method("get_bounds_size"):
+	if not _has_flame_boundary():
 		return
 
 	var bounds_size := flame_boundary.get_bounds_size() as Vector2
@@ -130,10 +144,19 @@ func _get_desired_focus_position() -> Vector3:
 	# Follow the flame boundary centre when available,
 	# otherwise fall back to the player.
 
-	if flame_boundary != null and flame_boundary.has_method("get_bounds_center"):
+	if _has_flame_boundary():
 		return flame_boundary.get_bounds_center()
 
 	return target.global_position
+
+
+func _has_flame_boundary() -> bool:
+	return (
+		flame_boundary != null
+		and is_instance_valid(flame_boundary)
+		and flame_boundary.has_method("get_bounds_size")
+		and flame_boundary.has_method("get_bounds_center")
+	)
 
 
 func _update_camera_transform() -> void:

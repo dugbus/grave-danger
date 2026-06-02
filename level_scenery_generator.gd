@@ -1,3 +1,4 @@
+@tool
 extends Node
 
 const GENERATED_ROOT_NAME := "GeneratedScenery"
@@ -18,13 +19,38 @@ const WEST := 8
 ]
 @export var tile_size := 1.0
 @export var center_map := true
+@export var generate_in_editor := true:
+	set(value):
+		generate_in_editor = value
+		if not Engine.is_editor_hint() or not is_inside_tree():
+			return
+
+		if generate_in_editor:
+			call_deferred("generate")
+		else:
+			call_deferred("_clear_generated_root")
+
+@export var refresh_editor_preview := false:
+	set(value):
+		refresh_editor_preview = false
+		if value and Engine.is_editor_hint() and is_inside_tree():
+			call_deferred("generate")
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		if generate_in_editor:
+			call_deferred("generate")
+		return
+
 	generate()
 
 
 func generate() -> void:
+	if Engine.is_editor_hint() and not generate_in_editor:
+		_clear_generated_root()
+		return
+
 	var map_data := _load_map_data()
 	if map_data.is_empty():
 		return
@@ -94,6 +120,15 @@ func _get_or_create_generated_root() -> Node3D:
 	generated_root.name = GENERATED_ROOT_NAME
 	add_child(generated_root)
 	return generated_root
+
+
+func _clear_generated_root() -> void:
+	var generated_root := get_node_or_null(GENERATED_ROOT_NAME)
+	if generated_root == null:
+		return
+
+	remove_child(generated_root)
+	generated_root.queue_free()
 
 
 func _clear_children(parent: Node) -> void:

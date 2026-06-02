@@ -45,6 +45,17 @@ func try_collect_gold_coin(gold_coin: Node3D) -> bool:
 	return gold_inventory.try_collect_gold_coin(gold_coin)
 
 
+func spend_carried_gold_coin() -> bool:
+	if death_controller.is_dead:
+		return false
+
+	return gold_inventory.spend_carried_gold_coin()
+
+
+func get_carried_gold_coins() -> int:
+	return gold_inventory.get_carried_gold_coins()
+
+
 func die_from_flames() -> void:
 	# FlameBoundary calls this on any body that exposes the method.
 	death_controller.die_from_flames()

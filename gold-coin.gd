@@ -147,12 +147,46 @@ func _try_collect(body: Node3D) -> bool:
 		return false
 
 	if body.try_collect_gold_coin(self):
-		is_being_collected = true
-		can_be_collected = false
+		_deactivate_after_collection()
 		queue_free()
 		return true
 
 	return false
+
+
+func _deactivate_after_collection() -> void:
+	is_being_collected = true
+	can_be_collected = false
+	candidate_bodies.clear()
+	remove_from_group("gold_coin")
+
+	linear_velocity = Vector3.ZERO
+	angular_velocity = Vector3.ZERO
+	freeze = true
+	collision_layer = 0
+	collision_mask = 0
+	visible = false
+
+	_disable_pickup_area()
+	_disable_collision_shapes(self)
+
+
+func _disable_pickup_area() -> void:
+	if pickup_area == null:
+		return
+
+	pickup_area.monitoring = false
+	pickup_area.monitorable = false
+	pickup_area.collision_layer = 0
+	pickup_area.collision_mask = 0
+
+
+func _disable_collision_shapes(node: Node) -> void:
+	if node is CollisionShape3D:
+		(node as CollisionShape3D).disabled = true
+
+	for child in node.get_children():
+		_disable_collision_shapes(child)
 
 
 func _block_pickup_for(seconds: float) -> void:

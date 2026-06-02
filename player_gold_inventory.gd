@@ -26,6 +26,8 @@ const DROP_NUDGE_IMPULSE = 0.025
 const GOLD_COIN_SCENE := preload("res://gold_coin.tscn")
 const COIN_PICKUP_SOUND := preload("res://Assets/coin-pickup.mp3")
 
+signal carried_gold_coins_changed(carried_count: int)
+
 
 @export var pivot_path: NodePath = ^"../Pivot"
 
@@ -61,8 +63,22 @@ func try_collect_gold_coin(gold_coin: Node3D) -> bool:
 		return false
 
 	carried_gold_coins += 1
+	carried_gold_coins_changed.emit(carried_gold_coins)
 	_play_coin_pickup_sound()
 	return true
+
+
+func spend_carried_gold_coin() -> bool:
+	if carried_gold_coins <= 0:
+		return false
+
+	carried_gold_coins -= 1
+	carried_gold_coins_changed.emit(carried_gold_coins)
+	return true
+
+
+func get_carried_gold_coins() -> int:
+	return carried_gold_coins
 
 
 func weight_multiplier(empty_value: float, full_value: float) -> float:
@@ -83,6 +99,7 @@ func _drop_carried_gold_coin() -> void:
 	var spawn_position := _find_drop_position(player.global_position + back * DROP_BACK_DISTANCE, back)
 
 	carried_gold_coins -= 1
+	carried_gold_coins_changed.emit(carried_gold_coins)
 
 	var gold_coin := GOLD_COIN_SCENE.instantiate()
 
