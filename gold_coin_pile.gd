@@ -51,6 +51,10 @@ func _ready() -> void:
 		_queue_spawn_all()
 
 
+func get_max_coin_count() -> int:
+	return coin_count
+
+
 func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		return

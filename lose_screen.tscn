@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://bvdv2d8npbqry"]
+
+[ext_resource type="Script" uid="uid://dnexl1obwimwr" path="res://result_screen.gd" id="1_result"]
+[ext_resource type="Texture2D" uid="uid://d2c675psprgm" path="res://Assets/Textures/lose-screen.png" id="2_texture"]
+
+[node name="LoseScreen" type="Control" unique_id=98674996]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_result")
+result_texture = ExtResource("2_texture")
+coins_rect = Rect2(585, 456, 376, 88)
+percentage_rect = Rect2(586, 623, 376, 88)

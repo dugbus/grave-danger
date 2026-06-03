@@ -5,7 +5,7 @@ extends Node
 # component owns the one-way transition into the death state.
 
 @export var animation_controller_path: NodePath = ^"../PlayerAnimation"
-@export var title_scene := "res://title_screen.tscn"
+@export var lose_scene := "res://lose_screen.tscn"
 @export var return_delay := 1.5
 @export var fade_out_duration := 0.8
 @export var max_flame_energy := 100.0
@@ -14,7 +14,7 @@ extends Node
 @onready var animation_controller: Node = get_node_or_null(animation_controller_path)
 
 var is_dead := false
-var returning_to_title := false
+var showing_lose_screen := false
 var flame_energy := 100.0
 
 
@@ -61,14 +61,14 @@ func die_from_flames() -> void:
 	if camera != null and camera.has_method("focus_on_dead_player"):
 		camera.focus_on_dead_player(player)
 
-	_return_to_title_after_death()
+	_show_lose_screen_after_death()
 
 
-func _return_to_title_after_death() -> void:
-	if returning_to_title:
+func _show_lose_screen_after_death() -> void:
+	if showing_lose_screen:
 		return
 
-	returning_to_title = true
+	showing_lose_screen = true
 	await get_tree().create_timer(return_delay).timeout
 
 	var fade := _create_fade_overlay()
@@ -76,7 +76,7 @@ func _return_to_title_after_death() -> void:
 	tween.tween_property(fade, "color:a", 1.0, fade_out_duration)
 	await tween.finished
 
-	get_tree().change_scene_to_file(title_scene)
+	get_tree().change_scene_to_file(lose_scene)
 
 
 func _create_fade_overlay() -> ColorRect:
