@@ -81,10 +81,12 @@ func _return_to_title_after_death() -> void:
 
 func _create_fade_overlay() -> ColorRect:
 	var layer := CanvasLayer.new()
+	layer.name = "DeathFadeLayer"
 	layer.layer = 100
 	add_child(layer)
 
 	var fade := ColorRect.new()
+	fade.name = "DeathFade"
 	fade.color = Color(0.0, 0.0, 0.0, 0.0)
 	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	fade.set_anchors_preset(Control.PRESET_FULL_RECT)

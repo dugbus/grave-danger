@@ -38,6 +38,7 @@ func _create_title_image() -> void:
 	# Create a full-screen image using the exported title texture.
 
 	var title_image := TextureRect.new()
+	title_image.name = "TitleImage"
 	title_image.texture = title_texture
 	title_image.set_anchors_preset(Control.PRESET_FULL_RECT)
 	title_image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -55,6 +56,7 @@ func _start_game() -> void:
 
 func _fade_in_title() -> void:
 	var fade := ColorRect.new()
+	fade.name = "TitleFade"
 	fade.color = Color.BLACK
 	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	fade.set_anchors_preset(Control.PRESET_FULL_RECT)

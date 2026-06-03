@@ -111,8 +111,21 @@ func get_bounds_center() -> Vector3:
 	return _get_center_node().global_transform * Vector3(0.0, flame_y, 0.0)
 
 
+func get_bounds_transform() -> Transform3D:
+	if not is_inside_tree():
+		return Transform3D(global_basis, get_bounds_center())
+
+	var bounds_transform := _get_center_node().global_transform
+	bounds_transform.origin = bounds_transform * Vector3(0.0, flame_y, 0.0)
+	return bounds_transform
+
+
 func get_bounds_size() -> Vector2:
 	return bounds_size
+
+
+func get_bounds_height() -> float:
+	return flame_height
 
 
 func _play_start_animation() -> void:
@@ -341,6 +354,7 @@ func _create_strips() -> void:
 		strip_areas.append(area)
 
 		var collision := CollisionShape3D.new()
+		collision.name = "FlameCollision%d" % i
 		collision.shape = BoxShape3D.new()
 		area.add_child(collision)
 		strip_collisions.append(collision)
@@ -427,10 +441,12 @@ func _create_near_flame_audio() -> void:
 
 func _create_time_label() -> void:
 	var canvas_layer := CanvasLayer.new()
+	canvas_layer.name = "FlameTimerLayer"
 	canvas_layer.layer = 20
 	add_child(canvas_layer)
 
 	time_label = Label.new()
+	time_label.name = "FlameTimerLabel"
 	time_label.position = Vector2(16.0, 48.0)
 	time_label.add_theme_font_size_override("font_size", 22)
 	time_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.55))

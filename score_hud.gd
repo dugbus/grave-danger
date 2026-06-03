@@ -21,6 +21,7 @@ func add_score(amount: int) -> void:
 
 func _create_label() -> void:
 	score_label = Label.new()
+	score_label.name = "ScoreLabel"
 	score_label.position = label_position
 	score_label.add_theme_font_size_override("font_size", font_size)
 	score_label.add_theme_color_override("font_color", Color(1.0, 0.82, 0.22))

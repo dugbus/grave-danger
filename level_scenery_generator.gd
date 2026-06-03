@@ -337,10 +337,10 @@ func _add_box_collision(node: Node3D) -> void:
 func _calculate_local_mesh_bounds(root: Node3D) -> AABB:
 	var has_bounds := false
 	var combined_bounds := AABB()
-	var root_inverse := root.global_transform.affine_inverse()
 
 	for mesh_instance in _find_mesh_instances(root):
-		var mesh_bounds := _transform_aabb(root_inverse * mesh_instance.global_transform, mesh_instance.get_aabb())
+		var mesh_transform := _get_transform_relative_to_root(mesh_instance, root)
+		var mesh_bounds := _transform_aabb(mesh_transform, mesh_instance.get_aabb())
 		if not has_bounds:
 			combined_bounds = mesh_bounds
 			has_bounds = true
@@ -350,6 +350,24 @@ func _calculate_local_mesh_bounds(root: Node3D) -> AABB:
 	if not has_bounds:
 		return AABB()
 	return combined_bounds
+
+
+func _get_transform_relative_to_root(node: Node3D, root: Node3D) -> Transform3D:
+	var relative_transform := Transform3D.IDENTITY
+	var current: Node = node
+
+	while current != root:
+		if not current is Node3D:
+			push_warning("Skipping non-Node3D ancestor while calculating bounds for %s." % node.name)
+			return Transform3D.IDENTITY
+
+		relative_transform = (current as Node3D).transform * relative_transform
+		current = current.get_parent()
+		if current == null:
+			push_warning("Mesh %s is not a descendant of %s." % [node.name, root.name])
+			return Transform3D.IDENTITY
+
+	return relative_transform
 
 
 func _find_mesh_instances(root: Node) -> Array[MeshInstance3D]:

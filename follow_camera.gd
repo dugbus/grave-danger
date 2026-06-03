@@ -4,7 +4,7 @@ extends Camera3D
 # The character this camera normally follows.
 @export var target_path: NodePath = ^"../Player"
 
-# The flame boundary controls the zoom so the safe area stays visible.
+# When present, the flame boundary controls only zoom so the safe area stays visible.
 @export var flame_boundary_path: NodePath = ^"../LevelLayout/FlameBoundary"
 
 # Base 2.5D camera offset before rotation and zoom scaling are applied.
@@ -26,6 +26,8 @@ extends Camera3D
 @export var field_of_view := 34.0
 @export var boundary_padding := 1.25
 @export var boundary_zoom_lag := 3.0
+@export var max_boundary_zoom_distance := 80.0
+@export_range(4, 24, 1) var boundary_fit_iterations := 12
 
 # Right stick rotation settings.
 @export var rotation_speed := 1.8
@@ -56,7 +58,7 @@ var death_target: Node3D
 func _ready() -> void:
 	# This runs once when the camera enters the scene.
 
-	#current = true
+	current = true
 	projection = Camera3D.PROJECTION_PERSPECTIVE
 	fov = field_of_view
 
@@ -81,14 +83,15 @@ func _physics_process(delta: float) -> void:
 	if controls_enabled:
 		_update_camera_controls(delta)
 
+	# Smoothly lag the camera focus behind the desired point.
+	var t := 1.0 - exp(-follow_lag * delta)
+	focus_position = focus_position.lerp(_get_desired_focus_position(), t)
+
 	if _has_flame_boundary():
 		_update_boundary_zoom(delta)
 	elif controls_enabled:
 		_update_manual_zoom(delta)
 
-	# Smoothly lag the camera focus behind the desired point.
-	var t := 1.0 - exp(-follow_lag * delta)
-	focus_position = focus_position.lerp(_get_desired_focus_position(), t)
 	_update_camera_transform()
 
 
@@ -122,15 +125,42 @@ func _update_boundary_zoom(delta: float) -> void:
 	var bounds_size := flame_boundary.get_bounds_size() as Vector2
 	var desired_distance := _get_distance_for_bounds(bounds_size * boundary_padding)
 	var t := 1.0 - exp(-boundary_zoom_lag * delta)
-	zoom_distance = lerpf(zoom_distance, clampf(desired_distance, min_zoom_distance, max_zoom_distance), t)
+	zoom_distance = lerpf(zoom_distance, maxf(desired_distance, min_zoom_distance), t)
 
 
 func _get_distance_for_bounds(bounds_size: Vector2) -> float:
-	# Work out the camera distance needed to see a rectangle of this size.
-	#
-	# The result checks both vertical and horizontal field of view,
-	# then uses whichever distance is larger.
+	# Work out the camera distance needed to see the flame rectangle as if the
+	# camera focus were centered in the boundary. The actual camera can still
+	# follow the player, but the target zoom stays stable as the player moves.
 
+	var points := _get_boundary_fit_points(bounds_size)
+	if points.is_empty():
+		return min_zoom_distance
+
+	var fit_focus := _get_boundary_fit_focus()
+	var low := min_zoom_distance
+	var high := maxf(zoom_distance, low)
+	high = maxf(high, _get_initial_bounds_distance(bounds_size))
+	high = minf(high, max_boundary_zoom_distance)
+
+	while not _can_see_points_at_distance(points, high, fit_focus) and high < max_boundary_zoom_distance:
+		low = high
+		high = minf(high * 1.5 + 1.0, max_boundary_zoom_distance)
+
+	if not _can_see_points_at_distance(points, high, fit_focus):
+		return high
+
+	for i in boundary_fit_iterations:
+		var midpoint := (low + high) * 0.5
+		if _can_see_points_at_distance(points, midpoint, fit_focus):
+			high = midpoint
+		else:
+			low = midpoint
+
+	return high
+
+
+func _get_initial_bounds_distance(bounds_size: Vector2) -> float:
 	var viewport_size := get_viewport().get_visible_rect().size
 	var aspect := viewport_size.x / maxf(viewport_size.y, 1.0)
 	var vertical_fov := deg_to_rad(fov)
@@ -140,13 +170,57 @@ func _get_distance_for_bounds(bounds_size: Vector2) -> float:
 	return maxf(required_vertical, required_horizontal)
 
 
+func _get_boundary_fit_points(bounds_size: Vector2) -> Array[Vector3]:
+	var bounds_transform := Transform3D(Basis.IDENTITY, flame_boundary.get_bounds_center())
+	if flame_boundary.has_method("get_bounds_transform"):
+		bounds_transform = flame_boundary.get_bounds_transform()
+
+	var height := 0.0
+	if flame_boundary.has_method("get_bounds_height"):
+		height = maxf(flame_boundary.get_bounds_height(), 0.0)
+
+	var half_x := bounds_size.x * 0.5
+	var half_z := bounds_size.y * 0.5
+	var points: Array[Vector3] = []
+
+	for x in [-half_x, half_x]:
+		for z in [-half_z, half_z]:
+			points.append(bounds_transform * Vector3(x, 0.0, z))
+			if height > 0.0:
+				points.append(bounds_transform * Vector3(x, height, z))
+
+	return points
+
+
+func _get_boundary_fit_focus() -> Vector3:
+	return flame_boundary.get_bounds_center()
+
+
+func _can_see_points_at_distance(points: Array[Vector3], distance: float, fit_focus: Vector3) -> bool:
+	var camera_transform := _get_camera_transform_for_distance(distance, fit_focus)
+	var inverse_transform := camera_transform.affine_inverse()
+	var viewport_size := get_viewport().get_visible_rect().size
+	var aspect := viewport_size.x / maxf(viewport_size.y, 1.0)
+	var vertical_tan := tan(deg_to_rad(fov) * 0.5)
+	var horizontal_tan := vertical_tan * aspect
+
+	for point in points:
+		var local_point := inverse_transform * point
+		var depth := -local_point.z
+		if depth <= near:
+			return false
+
+		if absf(local_point.y) > depth * vertical_tan:
+			return false
+
+		if absf(local_point.x) > depth * horizontal_tan:
+			return false
+
+	return true
+
+
 func _get_desired_focus_position() -> Vector3:
-	# Follow the flame boundary centre when available,
-	# otherwise fall back to the player.
-
-	if _has_flame_boundary():
-		return flame_boundary.get_bounds_center()
-
+	# The camera always follows the player. Boundary mode only changes zoom.
 	return target.global_position
 
 
@@ -167,17 +241,27 @@ func _update_camera_transform() -> void:
 
 
 func _get_rotated_camera_offset() -> Vector3:
+	return _get_rotated_camera_offset_for_distance(zoom_distance)
+
+
+func _get_rotated_camera_offset_for_distance(distance: float) -> Vector3:
 	# Rotate the base offset around the Y axis and scale it by zoom_distance.
 
 	var base_horizontal_distance := Vector2(camera_offset.x, camera_offset.z).length()
 	var base_distance := Vector3(camera_offset.x, camera_offset.y, camera_offset.z).length()
-	var distance_scale := zoom_distance / base_distance
+	var distance_scale := distance / base_distance
 	var horizontal_distance := base_horizontal_distance * distance_scale
 	return Vector3(
 		sin(camera_yaw) * horizontal_distance,
 		camera_offset.y * distance_scale,
 		cos(camera_yaw) * horizontal_distance
 	)
+
+
+func _get_camera_transform_for_distance(distance: float, fit_focus: Vector3) -> Transform3D:
+	var camera_position := fit_focus + _get_rotated_camera_offset_for_distance(distance)
+	var look_position := fit_focus + look_ahead
+	return Transform3D(Basis.IDENTITY, camera_position).looking_at(look_position, Vector3.UP)
 
 
 func focus_on_dead_player(player: Node3D) -> void:
