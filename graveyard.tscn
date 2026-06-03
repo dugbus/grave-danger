@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://coin_deposit.gd" id="13_l5igj"]
 [ext_resource type="Script" uid="uid://5kig63v451pl" path="res://score_hud.gd" id="14_ovw42"]
 [ext_resource type="Script" uid="uid://cyr67ggw4yark" path="res://editor_preview_lighting.gd" id="15_r4s8m"]
+[ext_resource type="Script" uid="uid://de147agwnjnqt" path="res://energy_hud.gd" id="16_a6vit"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_8ccgg"]
 
@@ -64,7 +65,7 @@ metadata/_edit_lock_ = true
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=800182039]
 environment = SubResource("Environment_siodt")
 
-[node name="EditorPreviewLighting" type="Node3D" parent="."]
+[node name="EditorPreviewLighting" type="Node3D" parent="." unique_id=1246828141]
 script = ExtResource("15_r4s8m")
 
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=1607896681]
@@ -74,6 +75,11 @@ autoplay = true
 
 [node name="ScoreHud" type="CanvasLayer" parent="." unique_id=831668248]
 script = ExtResource("14_ovw42")
+
+[node name="EnergyHud" type="CanvasLayer" parent="." unique_id=358766660]
+script = ExtResource("16_a6vit")
+bar_width = 700.0
+bar_height = 80.0
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2049292617]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 12.135629, 0)

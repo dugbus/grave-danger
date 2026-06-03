@@ -43,7 +43,9 @@ const NEAR_FLAMES_SOUND_PATH := "res://Assets/near-the-flames.mp3"
 @export_group("Flame Damage")
 @export var flame_damage_per_second := 35.0
 @export var flame_damage_inner_depth := 0.35
-@export var lethal_flame_depth := 0.8
+@export var outside_damage_ramp_depth := 0.65
+@export var max_outside_damage_multiplier := 6.0
+@export var flame_damage_vertical_margin := 0.75
 
 @export_group("Near Flame Audio")
 @export var near_flame_audio_distance := 4.0
@@ -471,14 +473,10 @@ func _apply_flame_heat(delta: float) -> void:
 		if not is_instance_valid(body_3d):
 			continue
 
-		var outside_depth := _get_outside_flame_depth(body_3d.global_position)
-		if outside_depth >= lethal_flame_depth:
-			if body_3d.has_method("drain_flame_energy"):
-				body_3d.drain_flame_energy()
-			elif body_3d.has_method("die_from_flames"):
-				body_3d.die_from_flames()
+		if not _is_inside_flame_damage_height(body_3d.global_position):
 			continue
 
+		var outside_depth := _get_outside_flame_depth(body_3d.global_position)
 		var touching_flames := flame_touching_bodies.has(body_3d)
 		if not touching_flames and outside_depth <= 0.0:
 			var inside_edge_distance := _get_inside_edge_distance(body_3d.global_position)
@@ -489,7 +487,8 @@ func _apply_flame_heat(delta: float) -> void:
 
 		var damage_multiplier := 1.0
 		if outside_depth > 0.0:
-			damage_multiplier += clampf(outside_depth / maxf(lethal_flame_depth, 0.001), 0.0, 1.0)
+			var outside_ratio := clampf(outside_depth / maxf(outside_damage_ramp_depth, 0.001), 0.0, 1.0)
+			damage_multiplier = lerpf(1.0, maxf(max_outside_damage_multiplier, 1.0), outside_ratio)
 
 		if body_3d.has_method("apply_flame_damage"):
 			body_3d.apply_flame_damage(flame_damage_per_second * damage_multiplier * delta)
@@ -541,6 +540,12 @@ func _get_outside_flame_depth(world_position: Vector3) -> float:
 	var half_size := bounds_size * 0.5
 	var outside := Vector2(maxf(absf(local_position.x) - half_size.x, 0.0), maxf(absf(local_position.z) - half_size.y, 0.0))
 	return outside.length()
+
+
+func _is_inside_flame_damage_height(world_position: Vector3) -> bool:
+	var local_position: Vector3 = _get_center_node().global_transform.affine_inverse() * world_position
+	var margin := maxf(flame_damage_vertical_margin, 0.0)
+	return local_position.y >= flame_y - margin and local_position.y <= flame_y + flame_height + margin
 
 
 func _on_flame_body_entered(body: Node3D) -> void:
