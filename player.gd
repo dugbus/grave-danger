@@ -56,6 +56,10 @@ func get_carried_gold_coins() -> int:
 	return gold_inventory.get_carried_gold_coins()
 
 
+func is_dead() -> bool:
+	return death_controller != null and death_controller.is_dead
+
+
 func die_from_flames() -> void:
 	# FlameBoundary calls this on any body that exposes the method.
 	death_controller.die_from_flames()

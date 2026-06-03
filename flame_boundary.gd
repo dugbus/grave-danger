@@ -40,6 +40,27 @@ const NEAR_FLAMES_SOUND_PATH := "res://Assets/near-the-flames.mp3"
 		flame_y = value
 		_sync_boundary()
 
+@export_group("Player Blocking")
+@export var player_blocking_enabled := true:
+	set(value):
+		player_blocking_enabled = value
+		_sync_boundary()
+
+@export_range(0.0, 3.0, 0.01) var player_blocking_outset := 1.0:
+	set(value):
+		player_blocking_outset = maxf(value, 0.0)
+		_sync_boundary()
+
+@export_range(0.01, 3.0, 0.01) var player_blocking_thickness := 0.75:
+	set(value):
+		player_blocking_thickness = maxf(value, 0.01)
+		_sync_boundary()
+
+@export_range(0.05, 10.0, 0.05) var player_blocking_height := 1.6:
+	set(value):
+		player_blocking_height = maxf(value, 0.05)
+		_sync_boundary()
+
 @export_group("Flame Damage")
 @export var flame_damage_per_second := 35.0
 @export var flame_damage_inner_depth := 0.35
@@ -61,11 +82,15 @@ const NEAR_FLAMES_SOUND_PATH := "res://Assets/near-the-flames.mp3"
 var strip_areas: Array[Area3D] = []
 var strip_collisions: Array[CollisionShape3D] = []
 var strip_meshes: Array[MeshInstance3D] = []
+var blocker_bodies: Array[StaticBody3D] = []
+var blocker_collisions: Array[CollisionShape3D] = []
 var preview_meshes: Array[MeshInstance3D] = []
+var blocker_preview_meshes: Array[MeshInstance3D] = []
 var flame_touching_bodies: Array[Node3D] = []
 
 var flame_material: ShaderMaterial
 var preview_material: StandardMaterial3D
+var blocker_preview_material: StandardMaterial3D
 var elapsed_time := 0.0
 var time_label: Label
 var near_flame_audio_player: AudioStreamPlayer
@@ -102,6 +127,7 @@ func _physics_process(delta: float) -> void:
 	elapsed_time += delta
 	_sync_boundary()
 	_apply_flame_heat(delta)
+	_update_player_blockers_enabled()
 	_update_near_flame_audio(delta)
 	_update_time_label()
 
@@ -295,13 +321,25 @@ func _create_preview_material() -> StandardMaterial3D:
 	return material
 
 
+func _create_blocker_preview_material() -> StandardMaterial3D:
+	var material := StandardMaterial3D.new()
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.albedo_color = Color(0.15, 0.6, 1.0, 0.28)
+	material.emission_enabled = true
+	material.emission = Color(0.05, 0.35, 0.9)
+	material.emission_energy_multiplier = 0.35
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	return material
+
+
 func _ensure_editor_preview() -> void:
 	if not Engine.is_editor_hint() or not is_inside_tree():
 		return
 
 	preview_material = _create_preview_material()
+	blocker_preview_material = _create_blocker_preview_material()
 	var preview_container := _get_or_create_editor_preview_container()
-	if preview_meshes.is_empty():
+	if preview_meshes.is_empty() and blocker_preview_meshes.is_empty():
 		for child in preview_container.get_children(true):
 			preview_container.remove_child(child)
 			child.queue_free()
@@ -322,6 +360,16 @@ func _ensure_editor_preview() -> void:
 	center_mesh.radius = 0.18
 	center_mesh.height = 0.36
 	preview_meshes[4].mesh = center_mesh
+
+	while blocker_preview_meshes.size() < 4:
+		var blocker_mesh := MeshInstance3D.new()
+		blocker_mesh.name = "PlayerBlockerPreview%d" % blocker_preview_meshes.size()
+		blocker_mesh.mesh = BoxMesh.new()
+		blocker_mesh.material_override = blocker_preview_material
+		preview_container.add_child(blocker_mesh, false, Node.INTERNAL_MODE_BACK)
+		_lock_editor_preview_node(blocker_mesh)
+		blocker_mesh.owner = null
+		blocker_preview_meshes.append(blocker_mesh)
 
 
 func _get_or_create_editor_preview_container() -> Node3D:
@@ -368,6 +416,24 @@ func _create_strips() -> void:
 		area.add_child(mesh_instance)
 		strip_meshes.append(mesh_instance)
 
+	_create_player_blockers(center)
+
+
+func _create_player_blockers(center: Node3D) -> void:
+	for i in 4:
+		var body := StaticBody3D.new()
+		body.name = "PlayerBlocker%d" % i
+		body.collision_layer = 1
+		body.collision_mask = 0
+		center.add_child(body)
+		blocker_bodies.append(body)
+
+		var collision := CollisionShape3D.new()
+		collision.name = "PlayerBlockerCollision%d" % i
+		collision.shape = BoxShape3D.new()
+		body.add_child(collision)
+		blocker_collisions.append(collision)
+
 
 func _sync_boundary() -> void:
 	if not is_inside_tree():
@@ -382,6 +448,9 @@ func _sync_boundary() -> void:
 	if strip_collisions.size() == 4 and strip_meshes.size() == 4:
 		_update_runtime_rect()
 
+	if blocker_collisions.size() == 4:
+		_update_runtime_blockers()
+
 
 func _update_preview_rect() -> void:
 	if preview_meshes.size() < 5:
@@ -391,9 +460,19 @@ func _update_preview_rect() -> void:
 	_apply_rect_to_meshes(preview_meshes, no_collisions)
 	preview_meshes[4].position = Vector3(0.0, flame_y + 0.18, 0.0)
 
+	if blocker_preview_meshes.size() == 4:
+		var no_blocker_collisions: Array[CollisionShape3D] = []
+		_apply_player_blockers_to_meshes(blocker_preview_meshes, no_blocker_collisions)
+
 
 func _update_runtime_rect() -> void:
 	_apply_rect_to_meshes(strip_meshes, strip_collisions)
+
+
+func _update_runtime_blockers() -> void:
+	var no_meshes: Array[MeshInstance3D] = []
+	_apply_player_blockers_to_meshes(no_meshes, blocker_collisions)
+	_update_player_blockers_enabled()
 
 
 func _apply_rect_to_meshes(meshes: Array[MeshInstance3D], collisions: Array[CollisionShape3D]) -> void:
@@ -423,6 +502,56 @@ func _apply_rect_to_meshes(meshes: Array[MeshInstance3D], collisions: Array[Coll
 		area.position = spec["position"]
 		mesh_instance.position = Vector3.ZERO
 		(collision.shape as BoxShape3D).size = spec["collision_size"]
+
+
+func _apply_player_blockers_to_meshes(meshes: Array[MeshInstance3D], collisions: Array[CollisionShape3D]) -> void:
+	var half_x := bounds_size.x * 0.5
+	var half_z := bounds_size.y * 0.5
+	var blocker_inner_gap := flame_thickness * 0.5 + player_blocking_outset
+	var blocker_center_offset := blocker_inner_gap + player_blocking_thickness * 0.5
+	var overlap_extension := (flame_thickness + player_blocking_outset + player_blocking_thickness) * 2.0
+	var center := Vector3(0.0, flame_y + player_blocking_height * 0.5, 0.0)
+
+	var blocker_specs: Array[Dictionary] = [
+		{"position": center + Vector3(0.0, 0.0, -half_z - blocker_center_offset), "size": Vector3(bounds_size.x + overlap_extension, player_blocking_height, player_blocking_thickness)},
+		{"position": center + Vector3(0.0, 0.0, half_z + blocker_center_offset), "size": Vector3(bounds_size.x + overlap_extension, player_blocking_height, player_blocking_thickness)},
+		{"position": center + Vector3(-half_x - blocker_center_offset, 0.0, 0.0), "size": Vector3(player_blocking_thickness, player_blocking_height, bounds_size.y + overlap_extension)},
+		{"position": center + Vector3(half_x + blocker_center_offset, 0.0, 0.0), "size": Vector3(player_blocking_thickness, player_blocking_height, bounds_size.y + overlap_extension)},
+	]
+
+	for i in 4:
+		var spec: Dictionary = blocker_specs[i]
+		if not meshes.is_empty():
+			var mesh_instance := meshes[i]
+			mesh_instance.visible = player_blocking_enabled
+			mesh_instance.position = spec["position"]
+			(mesh_instance.mesh as BoxMesh).size = spec["size"]
+
+		if collisions.is_empty():
+			continue
+
+		var collision := collisions[i]
+		var body := collision.get_parent() as StaticBody3D
+		body.position = spec["position"]
+		(collision.shape as BoxShape3D).size = spec["size"]
+
+
+func _update_player_blockers_enabled() -> void:
+	var disabled := not player_blocking_enabled or _has_dead_flame_vulnerable_body()
+	for collision in blocker_collisions:
+		if is_instance_valid(collision):
+			collision.disabled = disabled
+
+
+func _has_dead_flame_vulnerable_body() -> bool:
+	for body in get_tree().get_nodes_in_group("flame_vulnerable"):
+		if not is_instance_valid(body):
+			continue
+
+		if body.has_method("is_dead") and bool(body.call("is_dead")):
+			return true
+
+	return false
 
 
 func _create_near_flame_audio() -> void:
