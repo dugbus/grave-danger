@@ -81,6 +81,10 @@ func get_carried_gold_coins() -> int:
 	return carried_gold_coins
 
 
+func get_max_carried_gold_coins() -> int:
+	return MAX_CARRIED_GOLD_COINS
+
+
 func weight_multiplier(empty_value: float, full_value: float) -> float:
 	# Shared carrying-weight curve. Callers provide their empty/full values so
 	# speed, acceleration, jump, rotation, and animation can scale differently.
