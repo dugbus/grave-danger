@@ -29,6 +29,7 @@ const COIN_PICKUP_SOUND := preload("res://Assets/coin-pickup.mp3")
 signal carried_gold_coins_changed(carried_count: int)
 
 
+## Visual pivot used to determine pickup facing and drop direction.
 @export var pivot_path: NodePath = ^"../Pivot"
 
 @onready var player := get_parent() as CharacterBody3D

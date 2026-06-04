@@ -10,72 +10,95 @@ const ANIMATION_PLAYER_NAME := "AnimationPlayer"
 const NEAR_FLAMES_SOUND_PATH := "res://Assets/near-the-flames.mp3"
 
 @export_group("Motion")
+## PathFollow3D node that carries the moving boundary center.
 @export var path_follow_path: NodePath = ^"MovementPath/BoundaryCenter":
 	set(value):
 		path_follow_path = value
 		_sync_boundary()
 
+## AnimationPlayer used for boundary movement animation.
 @export var animation_player_path: NodePath = ^"AnimationPlayer"
+## Animation name to play on start when movement playback is enabled.
 @export var animation_name := "flame_boundary"
+## Starts the configured boundary animation automatically at runtime.
 @export var play_animation_on_start := true
 
 @export_group("Boundary")
+## Width and depth of the rectangular flame boundary, in world units.
 @export var bounds_size := Vector2(8.0, 8.0):
 	set(value):
 		bounds_size = Vector2(maxf(value.x, 0.1), maxf(value.y, 0.1))
 		_sync_boundary()
 
+## Thickness of each visible flame strip, in world units.
 @export_range(0.01, 5.0, 0.01) var flame_thickness := 0.18:
 	set(value):
 		flame_thickness = maxf(value, 0.01)
 		_sync_boundary()
 
+## Height of the flame mesh and damage volume.
 @export_range(0.05, 10.0, 0.05) var flame_height := 1.15:
 	set(value):
 		flame_height = maxf(value, 0.05)
 		_sync_boundary()
 
+## Local Y offset of the flame boundary relative to its center path node.
 @export var flame_y := 0.0:
 	set(value):
 		flame_y = value
 		_sync_boundary()
 
 @export_group("Player Blocking")
+## Enables invisible collision walls around the flame boundary.
 @export var player_blocking_enabled := true:
 	set(value):
 		player_blocking_enabled = value
 		_sync_boundary()
 
+## Extra distance outside the flame boundary where blocker walls are placed.
 @export_range(0.0, 3.0, 0.01) var player_blocking_outset := 1.0:
 	set(value):
 		player_blocking_outset = maxf(value, 0.0)
 		_sync_boundary()
 
+## Thickness of the invisible player-blocking walls.
 @export_range(0.01, 3.0, 0.01) var player_blocking_thickness := 0.75:
 	set(value):
 		player_blocking_thickness = maxf(value, 0.01)
 		_sync_boundary()
 
+## Height of the invisible player-blocking walls.
 @export_range(0.05, 10.0, 0.05) var player_blocking_height := 1.6:
 	set(value):
 		player_blocking_height = maxf(value, 0.05)
 		_sync_boundary()
 
 @export_group("Flame Damage")
+## Flame energy drained per second while the player is inside the flames.
 @export var flame_damage_per_second := 35.0
+## Distance inside the boundary edge that still counts as flame damage.
 @export var flame_damage_inner_depth := 0.35
+## Distance outside the boundary over which damage ramps up.
 @export var outside_damage_ramp_depth := 0.65
+## Highest outside-boundary damage multiplier after the ramp reaches full depth.
 @export var max_outside_damage_multiplier := 6.0
+## Extra vertical tolerance above and below the flame damage volume.
 @export var flame_damage_vertical_margin := 0.75
 
 @export_group("Near Flame Audio")
+## Distance from flames where the near-flame audio starts fading in.
 @export var near_flame_audio_distance := 4.0
+## Audio volume at the far edge of the near-flame range, in decibels.
 @export var near_flame_audio_min_db := -45.0
+## Audio volume when the player is at or inside the flame edge, in decibels.
 @export var near_flame_audio_max_db := 8.0
+## Curve applied to distance-based near-flame volume; lower values rise sooner.
 @export_range(0.1, 3.0, 0.05) var near_flame_audio_curve := 0.45
+## Responsiveness of near-flame volume smoothing; higher values react faster.
 @export var near_flame_audio_lag := 8.0
 
 @export_group("HUD")
+## Shows an elapsed-time label while the flame boundary is active.
 @export var show_timer := true
 
 

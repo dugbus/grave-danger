@@ -2,25 +2,31 @@ extends CanvasLayer
 
 const HudStatusBarScene := preload("res://hud_status_bar.gd")
 
+## Node that owns flame energy and death state values for the hitpoints bar.
 @export var death_controller_path: NodePath = ^"../Player/PlayerDeath"
+## Node that owns carried coin counts for the coins-held bar.
 @export var gold_inventory_path: NodePath = ^"../Player/PlayerGoldInventory"
 
 @export_group("Bars")
+## Width of each HUD status bar, in screen pixels.
 @export_range(120.0, 900.0, 1.0, "suffix:px") var bar_width := 420.0:
 	set(value):
 		bar_width = maxf(value, 120.0)
 		_apply_bar_layout()
 
+## Height of each HUD status bar, in screen pixels.
 @export_range(12.0, 80.0, 1.0, "suffix:px") var bar_height := 26.0:
 	set(value):
 		bar_height = maxf(value, 12.0)
 		_apply_bar_layout()
 
+## Vertical spacing between the hitpoints and coins-held bars.
 @export_range(0.0, 80.0, 1.0, "suffix:px") var bar_gap := 10.0:
 	set(value):
 		bar_gap = maxf(value, 0.0)
 		_apply_bar_layout()
 
+## Distance from the top of the viewport to the first status bar.
 @export_range(0.0, 160.0, 1.0, "suffix:px") var top_offset := 20.0:
 	set(value):
 		top_offset = maxf(value, 0.0)

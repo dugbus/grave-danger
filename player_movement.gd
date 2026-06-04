@@ -29,18 +29,31 @@ const FOOTSTEP_SOUND_PATHS: Array[String] = [
 	"res://Assets/footstep4.wav",
 ]
 
+## Visual pivot rotated toward the current movement direction.
 @export var pivot_path: NodePath = ^"../Pivot"
+## Minimum horizontal speed required to play footstep sounds.
 @export var footstep_speed_threshold := 0.35
+## Base travel distance between footstep sounds.
 @export var footstep_distance := 0.7
+## Random distance added or subtracted from each footstep interval.
 @export var footstep_distance_variance := 0.18
+## Lowest random pitch scale used for each footstep.
 @export var footstep_pitch_min := 0.92
+## Highest random pitch scale used for each footstep.
 @export var footstep_pitch_max := 1.08
+## Footstep volume at the speed threshold, in decibels.
 @export var footstep_volume_min_db := 0.0
+## Footstep volume near full walking speed, in decibels.
 @export var footstep_volume_max_db := 4.0
+## Height above the player origin used by sideways squeeze probes.
 @export var squeeze_probe_height := 0.35
+## Maximum side clearance distance checked while moving through gaps.
 @export var squeeze_probe_distance := 0.85
+## Gap width that applies the minimum squeeze speed multiplier.
 @export var squeeze_min_gap_width := 0.72
+## Gap width at which no squeeze speed reduction is applied.
 @export var squeeze_full_speed_gap_width := 1.35
+## Slowest movement multiplier allowed while squeezing through tight gaps.
 @export var squeeze_min_speed_multiplier := 0.45
 
 @onready var player := get_parent() as CharacterBody3D

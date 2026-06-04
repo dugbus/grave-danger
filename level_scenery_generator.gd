@@ -7,18 +7,26 @@ const EAST := 2
 const SOUTH := 4
 const WEST := 8
 
+## JSON tile map used to place generated scenery and fence pieces.
 @export_file("*.json") var map_file_path := "res://map-01.json"
+## Scene used for straight fence segments.
 @export var straight_fence_scene: PackedScene = preload("res://Assets/iron-fence.glb")
+## Scene used for curved or corner fence segments.
 @export var corner_fence_scene: PackedScene = preload("res://Assets/iron-fence-curve.glb")
+## Scene used for isolated 2x2 obstacle blocks.
 @export var crypt_large_scene: PackedScene = preload("res://Assets/rocks-tall.glb")
+## Scenes randomly selected for isolated single obstacle tiles.
 @export var isolated_scenery_scenes: Array[PackedScene] = [
 	preload("res://Assets/altar-wood.glb"),
 	preload("res://Assets/altar-stone.glb"),
 	preload("res://Assets/cross-column.glb"),
 	preload("res://Assets/rocks-tall.glb")
 ]
+## World-space size of one tile in the source JSON map.
 @export var tile_size := 1.0
+## Offsets generated scenery so the map is centered around this node.
 @export var center_map := true
+## Regenerates scenery automatically while editing when enabled.
 @export var generate_in_editor := true:
 	set(value):
 		generate_in_editor = value
@@ -30,6 +38,7 @@ const WEST := 8
 		else:
 			call_deferred("_clear_generated_root")
 
+## One-shot editor button property; enable it to regenerate the preview.
 @export var refresh_editor_preview := false:
 	set(value):
 		refresh_editor_preview = false

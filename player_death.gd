@@ -4,10 +4,15 @@ extends Node
 # Death is isolated so hazards only need one public Player method while the
 # component owns the one-way transition into the death state.
 
+## Node that receives death animation playback requests.
 @export var animation_controller_path: NodePath = ^"../PlayerAnimation"
+## Scene loaded after the death delay and fade complete.
 @export var lose_scene := "res://lose_screen.tscn"
+## Seconds to wait after death before starting the lose-screen fade.
 @export var return_delay := 1.5
+## Seconds used for the black fade before loading the lose screen.
 @export var fade_out_duration := 0.8
+## Flame energy available before the player dies.
 @export var max_flame_energy := 100.0
 
 @onready var player := get_parent() as CharacterBody3D

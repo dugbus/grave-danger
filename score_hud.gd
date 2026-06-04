@@ -1,6 +1,8 @@
 extends CanvasLayer
 
+## Screen position of the top-left corner of the score label.
 @export var label_position := Vector2(16.0, 12.0)
+## Font size used for the score label.
 @export var font_size := 90
 
 var score := 0

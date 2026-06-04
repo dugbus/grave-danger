@@ -4,8 +4,9 @@ extends Control
 # Scene loaded when the player starts the game.
 const GAME_SCENE := "res://graveyard.tscn"
 
-# Image shown full-screen behind the title screen.
+## Image shown full-screen behind the title screen.
 @export var title_texture: Texture2D
+## Seconds used for the black overlay to fade out when the title screen opens.
 @export var fade_in_duration := 0.8
 
 # Prevent multiple scene changes from repeated input events.

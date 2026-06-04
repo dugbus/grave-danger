@@ -1,18 +1,20 @@
 extends RigidBody3D
 
 
-# How long a newly spawned or dropped coin must wait before pickup is allowed.
+## Seconds a newly spawned or dropped coin waits before pickup is allowed.
 @export var pickup_delay := 0.35
 
-# Coins below this height are assumed to have fallen out of the world.
+## World Y position below which the coin is treated as fallen out of bounds.
 @export var despawn_below_y := -5.0
 
-# How far a coin is allowed to travel while tipped onto its edge before it is
-# treated like a rounded-edge coin and settled back onto a face.
+## Distance a tipped coin may roll on its edge before being settled flat.
 @export var max_edge_roll_distance := 1.0
 
+## Maximum up-axis alignment still considered edge rolling; lower is more tipped.
 @export_range(0.0, 1.0, 0.01) var edge_roll_up_dot := 0.45
+## Minimum horizontal speed required before edge-roll limiting starts tracking.
 @export var edge_roll_min_speed := 0.08
+## Horizontal velocity multiplier applied when an edge-rolling coin is settled.
 @export var edge_roll_horizontal_damping := 0.25
 
 # Area used to detect players close enough to collect the coin.

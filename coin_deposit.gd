@@ -4,14 +4,23 @@ const COIN_PICKUP_SOUND := preload("res://Assets/coin-pickup.mp3")
 
 signal coin_absorbed(count: int)
 
+## Radius around the deposit that accepts players carrying coins.
 @export var detection_radius := 1.4
+## Minimum seconds between coins being pulled from a player.
 @export var deposit_interval := 0.12
+## Extra vertical height added to the arcing deposit coin animation.
 @export var launch_height := 1.25
+## Seconds a visual coin takes to fly from the player to the deposit.
 @export var flight_time := 0.45
+## Random landing offset radius around the deposit target point.
 @export var landing_spread_radius := 0.16
+## Physics mask used by the generated deposit trigger area to detect players.
 @export var player_collision_mask := 2
+## Node that wobbles when a coin is absorbed; defaults to the parent.
 @export var wobble_node_path: NodePath = ^".."
+## Peak wobble rotation, in degrees, applied when a coin lands.
 @export var wobble_angle_degrees := 5.0
+## Total seconds for the deposit wobble animation.
 @export var wobble_duration := 0.18
 
 var candidate_bodies: Array[Node3D] = []

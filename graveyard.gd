@@ -2,6 +2,7 @@ extends Node3D
 
 const WIN_SCENE := "res://win_screen.tscn"
 
+## Seconds used for the black transition before loading the win screen.
 @export var win_fade_out_duration := 0.8
 
 var coins_collected := 0

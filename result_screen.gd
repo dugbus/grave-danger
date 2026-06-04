@@ -3,11 +3,17 @@ extends Control
 
 const TITLE_SCENE := "res://title_screen.tscn"
 
+## Background image displayed behind the final result values.
 @export var result_texture: Texture2D
+## Seconds used by both fade-in and return-to-title fade transitions.
 @export var fade_duration := 0.8
+## Rectangle, in source image pixels, where the collected coin count is drawn.
 @export var coins_rect := Rect2(581.0, 522.0, 382.0, 90.0)
+## Rectangle, in source image pixels, where the completion percentage is drawn.
 @export var percentage_rect := Rect2(581.0, 609.0, 382.0, 90.0)
+## Color used for result value text.
 @export var text_color := Color(0.96, 0.89, 0.63)
+## Color used for result value text shadow.
 @export var shadow_color := Color(0.0, 0.0, 0.0, 0.9)
 
 var returning_to_title := false

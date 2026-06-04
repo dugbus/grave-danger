@@ -5,23 +5,28 @@ extends Node3D
 const GOLD_COIN_SCENE := preload("res://gold_coin.tscn")
 const PREVIEW_CONTAINER_NAME := "EditorPreviewCoins"
 
+## Total number of coins this pile will spawn.
 @export_range(0, 500, 1) var coin_count := 200:
 	set(value):
 		coin_count = maxi(value, 0)
 		_refresh_preview_when_editing()
 
+## Radius of the circular spawn area around this node.
 @export_range(0.05, 10.0, 0.05) var pile_radius := 0.5:
 	set(value):
 		pile_radius = maxf(value, 0.05)
 		_refresh_preview_when_editing()
 
+## Height above this node where spawned coins initially appear.
 @export_range(0.0, 10.0, 0.05) var spawn_height := 1.0
 
+## Seconds after scene start before this pile begins spawning coins.
 @export_range(0.0, 300.0, 0.05) var trigger_time := 0.0
 
+## Seconds between individual coin spawns; zero queues the whole pile at once.
 @export_range(0.0, 1.0, 0.005) var spawn_interval := 0.01
 
-# Leave this as 0 for a different coin scatter each run.
+## Random seed for repeatable scatter; use 0 for a different scatter each run.
 @export var random_seed := 0:
 	set(value):
 		random_seed = value

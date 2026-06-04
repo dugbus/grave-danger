@@ -21,6 +21,7 @@ const WALK_ANIMATION_CANDIDATES = ["walk", "sprint", "move-forward"]
 const DEATH_ANIMATION_CANDIDATES = ["death", "die", "fall"]
 
 
+## Imported character subtree that contains meshes and animation players.
 @export var character_path: NodePath = ^"../Pivot/Character"
 
 @onready var character: Node = get_node_or_null(character_path)
