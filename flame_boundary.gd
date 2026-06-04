@@ -8,6 +8,7 @@ const MOVEMENT_PATH_NAME := "MovementPath"
 const BOUNDARY_CENTER_NAME := "BoundaryCenter"
 const ANIMATION_PLAYER_NAME := "AnimationPlayer"
 const NEAR_FLAMES_SOUND_PATH := "res://Assets/near-the-flames.mp3"
+const PLAYER_BLOCKER_COLLISION_LAYER := 8
 
 @export_group("Motion")
 ## PathFollow3D node that carries the moving boundary center.
@@ -446,7 +447,7 @@ func _create_player_blockers(center: Node3D) -> void:
 	for i in 4:
 		var body := StaticBody3D.new()
 		body.name = "PlayerBlocker%d" % i
-		body.collision_layer = 1
+		body.collision_layer = PLAYER_BLOCKER_COLLISION_LAYER
 		body.collision_mask = 0
 		center.add_child(body)
 		blocker_bodies.append(body)
