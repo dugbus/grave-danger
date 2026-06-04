@@ -21,7 +21,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	const move_speed := 1.0
-	$Path3D/PathFollow3D.progress += move_speed * delta
+	$LongRoad/PathFollow3D.progress += move_speed * delta
 
 
 func _on_coin_absorbed(count: int) -> void:
