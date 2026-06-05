@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://qt8f7q0lnp35"
-path="res://.godot/imported/brick-wall.glb-e8b6694283300674b3f844db5ff1c90f.scn"
+path="res://.godot/imported/brick-wall.glb-0ae21e22062cc6fa4e01f30fbdee6bd8.scn"
 
 [deps]
 
-source_file="res://Assets/brick-wall.glb"
-dest_files=["res://.godot/imported/brick-wall.glb-e8b6694283300674b3f844db5ff1c90f.scn"]
+source_file="res://Assets/kenney-graveyard/brick-wall.glb"
+dest_files=["res://.godot/imported/brick-wall.glb-0ae21e22062cc6fa4e01f30fbdee6bd8.scn"]
 
 [params]
 

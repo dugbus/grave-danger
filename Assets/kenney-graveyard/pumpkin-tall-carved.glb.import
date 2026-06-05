@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cejv6dfovd4lf"
-path="res://.godot/imported/pumpkin-tall-carved.glb-d2bf836cc9e6fa3b14791b4d12c0a94a.scn"
+path="res://.godot/imported/pumpkin-tall-carved.glb-8c2ec7a18321466e2622aa7993ec7569.scn"
 
 [deps]
 
-source_file="res://Assets/pumpkin-tall-carved.glb"
-dest_files=["res://.godot/imported/pumpkin-tall-carved.glb-d2bf836cc9e6fa3b14791b4d12c0a94a.scn"]
+source_file="res://Assets/kenney-graveyard/pumpkin-tall-carved.glb"
+dest_files=["res://.godot/imported/pumpkin-tall-carved.glb-8c2ec7a18321466e2622aa7993ec7569.scn"]
 
 [params]
 

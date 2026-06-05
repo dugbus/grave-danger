@@ -1,11 +1,11 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/coffin.glb" id="1_coffin"]
-[ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player.tscn" id="2_player"]
-[ext_resource type="PackedScene" path="res://gold_coin_pile.tscn" id="3_coinpile"]
-[ext_resource type="PackedScene" path="res://flame_boundary.tscn" id="4_flame"]
-[ext_resource type="Script" uid="uid://b4l0y5awllv2n" path="res://level_scenery_generator.gd" id="5_scenery"]
-[ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://coin_deposit.gd" id="6_deposit"]
+[ext_resource type="PackedScene" path="res://Assets/kenney-graveyard/coffin.glb" id="1_coffin"]
+[ext_resource type="PackedScene" path="res://player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
+[ext_resource type="PackedScene" path="res://levels/common/flame_boundary.tscn" id="4_flame"]
+[ext_resource type="Script" path="res://levels/common/level_scenery_generator.gd" id="5_scenery"]
+[ext_resource type="Script" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
 
 [sub_resource type="Curve3D" id="Curve3D_15rbh"]
 closed = true
@@ -31,7 +31,7 @@ transform = Transform3D(0.80160874, 0, -0.597849, 0, 1, 0, 0.597849, 0, 0.801608
 
 [node name="Scenery" type="Node" parent="LevelLayout" unique_id=1023042671]
 script = ExtResource("5_scenery")
-map_file_path = "res://map-06.json"
+map_file_path = "res://levels/6/map-06.json"
 
 [node name="coffin3" parent="LevelLayout/Scenery" unique_id=1894824003 instance=ExtResource("1_coffin")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.085945, -5.9604645e-08, -0.09869373)

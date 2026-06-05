@@ -1,6 +1,6 @@
 extends Control
 
-const SCREEN_FADE := preload("res://screen_fade.gd")
+const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 
 const GRID_COLUMNS := 4
 const ANALOG_TRIGGER_THRESHOLD := 0.62
@@ -9,7 +9,7 @@ const ANALOG_RELEASE_THRESHOLD := 0.25
 ## Image shown full-screen behind the level select screen.
 @export var background_texture: Texture2D
 ## Scene loaded after a level slot is selected.
-@export var game_scene := "res://graveyard.tscn"
+@export var game_scene := "res://game/graveyard.tscn"
 ## Seconds used for the black overlay to fade out when the screen opens.
 @export var fade_in_duration := 0.35
 

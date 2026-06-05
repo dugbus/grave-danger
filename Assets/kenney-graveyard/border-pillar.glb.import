@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cl5lyop1cwwpw"
-path="res://.godot/imported/border-pillar.glb-6601d0b9113a7ff15873b76bd6144629.scn"
+path="res://.godot/imported/border-pillar.glb-6e58fd94f181802df5030ce324a5396b.scn"
 
 [deps]
 
-source_file="res://Assets/border-pillar.glb"
-dest_files=["res://.godot/imported/border-pillar.glb-6601d0b9113a7ff15873b76bd6144629.scn"]
+source_file="res://Assets/kenney-graveyard/border-pillar.glb"
+dest_files=["res://.godot/imported/border-pillar.glb-6e58fd94f181802df5030ce324a5396b.scn"]
 
 [params]
 

@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3]
 
-[ext_resource type="Script" path="res://gold-coin.gd" id="2_y4swq"]
+[ext_resource type="Script" path="res://collectibles/gold-coin.gd" id="2_y4swq"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jb4t0"]
 albedo_color = Color(1, 0.72, 0.08, 1)

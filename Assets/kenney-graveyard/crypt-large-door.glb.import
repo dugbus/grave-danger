@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://sko432a1foi6"
-path="res://.godot/imported/crypt-large-door.glb-bb137e833041126409f1d0cf34f37e9d.scn"
+path="res://.godot/imported/crypt-large-door.glb-e4d386e9c581fcf157ff60f52742d3d5.scn"
 
 [deps]
 
-source_file="res://Assets/crypt-large-door.glb"
-dest_files=["res://.godot/imported/crypt-large-door.glb-bb137e833041126409f1d0cf34f37e9d.scn"]
+source_file="res://Assets/kenney-graveyard/crypt-large-door.glb"
+dest_files=["res://.godot/imported/crypt-large-door.glb-e4d386e9c581fcf157ff60f52742d3d5.scn"]
 
 [params]
 

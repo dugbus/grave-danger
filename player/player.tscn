@@ -1,11 +1,11 @@
 [gd_scene load_steps=9 format=3 uid="uid://pqtcng2uw3dw"]
 
-[ext_resource type="PackedScene" uid="uid://bg1o6o88d6aih" path="res://Assets/character-keeper.glb" id="1_4flbx"]
-[ext_resource type="Script" uid="uid://dtq13owafx466" path="res://player.gd" id="1_onrkg"]
-[ext_resource type="Script" path="res://player_movement.gd" id="3_i5lcx"]
-[ext_resource type="Script" path="res://player_gold_inventory.gd" id="4_nltvg"]
-[ext_resource type="Script" path="res://player_animation.gd" id="5_8mhfk"]
-[ext_resource type="Script" path="res://player_death.gd" id="6_7xubc"]
+[ext_resource type="PackedScene" path="res://Assets/kenney-graveyard/character-keeper.glb" id="1_4flbx"]
+[ext_resource type="Script" path="res://player/player.gd" id="1_onrkg"]
+[ext_resource type="Script" path="res://player/player_movement.gd" id="3_i5lcx"]
+[ext_resource type="Script" path="res://player/player_gold_inventory.gd" id="4_nltvg"]
+[ext_resource type="Script" path="res://player/player_animation.gd" id="5_8mhfk"]
+[ext_resource type="Script" path="res://player/player_death.gd" id="6_7xubc"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_4flbx"]
 radius = 0.34

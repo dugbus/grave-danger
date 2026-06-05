@@ -23,10 +23,10 @@ const MIN_WEIGHT_ROTATION_MULTIPLIER = 0.35
 const MIN_WEIGHT_JUMP_MULTIPLIER = 0.4
 
 const FOOTSTEP_SOUND_PATHS: Array[String] = [
-	"res://Assets/footstep1.wav",
-	"res://Assets/footstep2.wav",
-	"res://Assets/footstep3.wav",
-	"res://Assets/footstep4.wav",
+	"res://Assets/audio/footstep1.wav",
+	"res://Assets/audio/footstep2.wav",
+	"res://Assets/audio/footstep3.wav",
+	"res://Assets/audio/footstep4.wav",
 ]
 
 ## Visual pivot rotated toward the current movement direction.

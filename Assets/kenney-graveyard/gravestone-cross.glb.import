@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://7w6a5gv7qnm8"
-path="res://.godot/imported/gravestone-cross.glb-d1e77953c847b7aae7cd32429cee7ddf.scn"
+path="res://.godot/imported/gravestone-cross.glb-87a5446fffe8b4042efbcb636da90bc5.scn"
 
 [deps]
 
-source_file="res://Assets/gravestone-cross.glb"
-dest_files=["res://.godot/imported/gravestone-cross.glb-d1e77953c847b7aae7cd32429cee7ddf.scn"]
+source_file="res://Assets/kenney-graveyard/gravestone-cross.glb"
+dest_files=["res://.godot/imported/gravestone-cross.glb-87a5446fffe8b4042efbcb636da90bc5.scn"]
 
 [params]
 

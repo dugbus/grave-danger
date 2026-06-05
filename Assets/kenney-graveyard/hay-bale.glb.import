@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dyskt2rdh85oy"
-path="res://.godot/imported/hay-bale.glb-d5c40791880776b34bcbe39bd6b936d0.scn"
+path="res://.godot/imported/hay-bale.glb-5608b456eadba01a77c21d93b5b79329.scn"
 
 [deps]
 
-source_file="res://Assets/hay-bale.glb"
-dest_files=["res://.godot/imported/hay-bale.glb-d5c40791880776b34bcbe39bd6b936d0.scn"]
+source_file="res://Assets/kenney-graveyard/hay-bale.glb"
+dest_files=["res://.godot/imported/hay-bale.glb-5608b456eadba01a77c21d93b5b79329.scn"]
 
 [params]
 

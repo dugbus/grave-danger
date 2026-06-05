@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cql87f5x34tjl"
-path="res://.godot/imported/shovel.glb-e069a9ada12d60d291a92f11f2cb0c76.scn"
+path="res://.godot/imported/shovel.glb-ebdf23c3a2a524e6ca071572a4b6ca79.scn"
 
 [deps]
 
-source_file="res://Assets/shovel.glb"
-dest_files=["res://.godot/imported/shovel.glb-e069a9ada12d60d291a92f11f2cb0c76.scn"]
+source_file="res://Assets/kenney-graveyard/shovel.glb"
+dest_files=["res://.godot/imported/shovel.glb-ebdf23c3a2a524e6ca071572a4b6ca79.scn"]
 
 [params]
 

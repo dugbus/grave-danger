@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bw7vkr22fi8lo"
-path="res://.godot/imported/pumpkin.glb-d1a722a40c9d377f6e6199dfd27acd89.scn"
+path="res://.godot/imported/pumpkin.glb-de6a1376843eb76b8d2f0d036d9e8bb4.scn"
 
 [deps]
 
-source_file="res://Assets/pumpkin.glb"
-dest_files=["res://.godot/imported/pumpkin.glb-d1a722a40c9d377f6e6199dfd27acd89.scn"]
+source_file="res://Assets/kenney-graveyard/pumpkin.glb"
+dest_files=["res://.godot/imported/pumpkin.glb-de6a1376843eb76b8d2f0d036d9e8bb4.scn"]
 
 [params]
 

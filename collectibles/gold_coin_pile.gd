@@ -2,7 +2,7 @@
 extends Node3D
 
 
-const GOLD_COIN_SCENE := preload("res://gold_coin.tscn")
+const GOLD_COIN_SCENE := preload("res://collectibles/gold_coin.tscn")
 const PREVIEW_CONTAINER_NAME := "EditorPreviewCoins"
 
 ## Total number of coins this pile will spawn.

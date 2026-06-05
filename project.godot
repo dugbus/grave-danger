@@ -11,15 +11,15 @@ config_version=5
 [application]
 
 config/name="Grave Danger"
-run/main_scene="res://title_screen.tscn"
+run/main_scene="res://ui/screens/title_screen.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://Assets/frontend/icon.svg"
 
 [autoload]
 
-quick_exit="*uid://umpymd57w318"
-ResultStats="*res://result_stats.gd"
-LevelSelection="*res://level_selection.gd"
+quick_exit="*res://autoload/quick_exit.gd"
+ResultStats="*res://autoload/result_stats.gd"
+LevelSelection="*res://autoload/level_selection.gd"
 
 [display]
 

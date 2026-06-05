@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://buugsbqp4semy"
-path="res://.godot/imported/pillar-square.glb-efe45221685aab34b30cfe1af1d14bd8.scn"
+path="res://.godot/imported/pillar-square.glb-164b46aca44b86c9e23cdc428314e937.scn"
 
 [deps]
 
-source_file="res://Assets/pillar-square.glb"
-dest_files=["res://.godot/imported/pillar-square.glb-efe45221685aab34b30cfe1af1d14bd8.scn"]
+source_file="res://Assets/kenney-graveyard/pillar-square.glb"
+dest_files=["res://.godot/imported/pillar-square.glb-164b46aca44b86c9e23cdc428314e937.scn"]
 
 [params]
 

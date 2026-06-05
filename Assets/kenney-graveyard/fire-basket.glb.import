@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b0dsbvwv1p1rv"
-path="res://.godot/imported/fire-basket.glb-23c9e01cb6cd6ff4842d4642cf1bcbab.scn"
+path="res://.godot/imported/fire-basket.glb-6a1d57d102e5d9002620ee666332d84f.scn"
 
 [deps]
 
-source_file="res://Assets/fire-basket.glb"
-dest_files=["res://.godot/imported/fire-basket.glb-23c9e01cb6cd6ff4842d4642cf1bcbab.scn"]
+source_file="res://Assets/kenney-graveyard/fire-basket.glb"
+dest_files=["res://.godot/imported/fire-basket.glb-6a1d57d102e5d9002620ee666332d84f.scn"]
 
 [params]
 

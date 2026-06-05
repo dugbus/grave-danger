@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bylnbh4g1184g"
-path="res://.godot/imported/gravestone-debris.glb-0e8e6f7b923640366ec1f61c75378ce2.scn"
+path="res://.godot/imported/gravestone-debris.glb-5539315da53123a2046a2fce9201e54f.scn"
 
 [deps]
 
-source_file="res://Assets/gravestone-debris.glb"
-dest_files=["res://.godot/imported/gravestone-debris.glb-0e8e6f7b923640366ec1f61c75378ce2.scn"]
+source_file="res://Assets/kenney-graveyard/gravestone-debris.glb"
+dest_files=["res://.godot/imported/gravestone-debris.glb-5539315da53123a2046a2fce9201e54f.scn"]
 
 [params]
 

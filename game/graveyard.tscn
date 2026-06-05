@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://wpfx5jihl62q"]
 
-[ext_resource type="Script" uid="uid://c35f6deqohs1y" path="res://graveyard.gd" id="1_graveyard"]
-[ext_resource type="PackedScene" path="res://level_common.tscn" id="2_common"]
-[ext_resource type="PackedScene" path="res://level_01.tscn" id="3_level1"]
+[ext_resource type="Script" path="res://game/graveyard.gd" id="1_graveyard"]
+[ext_resource type="PackedScene" path="res://levels/common/level_common.tscn" id="2_common"]
+[ext_resource type="PackedScene" path="res://levels/1/level_01.tscn" id="3_level1"]
 
 [node name="Graveyard" type="Node3D" unique_id=1224200127]
 script = ExtResource("1_graveyard")

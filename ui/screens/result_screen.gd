@@ -1,8 +1,8 @@
 extends Control
 
 
-const TITLE_SCENE := "res://title_screen.tscn"
-const SCREEN_FADE := preload("res://screen_fade.gd")
+const TITLE_SCENE := "res://ui/screens/title_screen.tscn"
+const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 const VALUE_LAYER_NAME := "ValueLayer"
 const VALUE_LAYER_INDEX := 20
 const FADE_LAYER_NAME := "ResultFadeLayer"

@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c55rppucq6mqv"
-path="res://.godot/imported/character-ghost.glb-0130bc3b1c8ae5a40790857e08cec8ce.scn"
+path="res://.godot/imported/character-ghost.glb-304c9a014311c92c822ec5392b4bc7e4.scn"
 
 [deps]
 
-source_file="res://Assets/character-ghost.glb"
-dest_files=["res://.godot/imported/character-ghost.glb-0130bc3b1c8ae5a40790857e08cec8ce.scn"]
+source_file="res://Assets/kenney-graveyard/character-ghost.glb"
+dest_files=["res://.godot/imported/character-ghost.glb-304c9a014311c92c822ec5392b4bc7e4.scn"]
 
 [params]
 

@@ -2,8 +2,8 @@ extends Control
 
 
 # Scene loaded when the player leaves the title screen.
-const LEVEL_SELECT_SCENE := "res://level_select_screen.tscn"
-const SCREEN_FADE := preload("res://screen_fade.gd")
+const LEVEL_SELECT_SCENE := "res://ui/screens/level_select_screen.tscn"
+const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 
 ## Image shown full-screen behind the title screen.
 @export var title_texture: Texture2D

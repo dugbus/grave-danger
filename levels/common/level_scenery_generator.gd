@@ -8,19 +8,19 @@ const SOUTH := 4
 const WEST := 8
 
 ## JSON tile map used to place generated scenery and fence pieces.
-@export_file("*.json") var map_file_path := "res://map-01.json"
+@export_file("*.json") var map_file_path := "res://levels/1/map-01.json"
 ## Scene used for straight fence segments.
-@export var straight_fence_scene: PackedScene = preload("res://Assets/iron-fence.glb")
+@export var straight_fence_scene: PackedScene = preload("res://Assets/kenney-graveyard/iron-fence.glb")
 ## Scene used for curved or corner fence segments.
-@export var corner_fence_scene: PackedScene = preload("res://Assets/iron-fence-curve.glb")
+@export var corner_fence_scene: PackedScene = preload("res://Assets/kenney-graveyard/iron-fence-curve.glb")
 ## Scene used for isolated 2x2 obstacle blocks.
-@export var crypt_large_scene: PackedScene = preload("res://Assets/rocks-tall.glb")
+@export var crypt_large_scene: PackedScene = preload("res://Assets/kenney-graveyard/rocks-tall.glb")
 ## Scenes randomly selected for isolated single obstacle tiles.
 @export var isolated_scenery_scenes: Array[PackedScene] = [
-	preload("res://Assets/altar-wood.glb"),
-	preload("res://Assets/altar-stone.glb"),
-	preload("res://Assets/cross-column.glb"),
-	preload("res://Assets/rocks-tall.glb")
+	preload("res://Assets/kenney-graveyard/altar-wood.glb"),
+	preload("res://Assets/kenney-graveyard/altar-stone.glb"),
+	preload("res://Assets/kenney-graveyard/cross-column.glb"),
+	preload("res://Assets/kenney-graveyard/rocks-tall.glb")
 ]
 ## World-space size of one tile in the source JSON map.
 @export var tile_size := 1.0

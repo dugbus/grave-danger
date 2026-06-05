@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cq4oo8o2dslsq"
-path="res://.godot/imported/cross-wood.glb-94f7a1e905ecce2404ccbdb2dafee885.scn"
+path="res://.godot/imported/cross-wood.glb-8cabf935f281f73f9a4befb39eea1e2d.scn"
 
 [deps]
 
-source_file="res://Assets/cross-wood.glb"
-dest_files=["res://.godot/imported/cross-wood.glb-94f7a1e905ecce2404ccbdb2dafee885.scn"]
+source_file="res://Assets/kenney-graveyard/cross-wood.glb"
+dest_files=["res://.godot/imported/cross-wood.glb-8cabf935f281f73f9a4befb39eea1e2d.scn"]
 
 [params]
 

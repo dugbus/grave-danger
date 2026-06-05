@@ -3,12 +3,12 @@
 importer="mp3"
 type="AudioStreamMP3"
 uid="uid://fgsflvf8iurw"
-path="res://.godot/imported/coin-pickup.mp3-0bfc67f40b294a3ad519fc2a901ef4c2.mp3str"
+path="res://.godot/imported/coin-pickup.mp3-e8d56b487ca2f2adb6812e19b304f1df.mp3str"
 
 [deps]
 
-source_file="res://Assets/coin-pickup.mp3"
-dest_files=["res://.godot/imported/coin-pickup.mp3-0bfc67f40b294a3ad519fc2a901ef4c2.mp3str"]
+source_file="res://Assets/audio/coin-pickup.mp3"
+dest_files=["res://.godot/imported/coin-pickup.mp3-e8d56b487ca2f2adb6812e19b304f1df.mp3str"]
 
 [params]
 

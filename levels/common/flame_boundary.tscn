@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3]
 
-[ext_resource type="Script" path="res://flame_boundary.gd" id="1_6xnpe"]
+[ext_resource type="Script" path="res://levels/common/flame_boundary.gd" id="1_6xnpe"]
 
 [sub_resource type="Curve3D" id="Curve3D_6xnpe"]
 _data = {

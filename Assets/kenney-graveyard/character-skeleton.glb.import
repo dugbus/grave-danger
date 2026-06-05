@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://db4sw3igtono3"
-path="res://.godot/imported/character-skeleton.glb-21b40a86cd980e5f0cab8909454132b7.scn"
+path="res://.godot/imported/character-skeleton.glb-44ae01eebaa7afa5d0d56531cc27a2fe.scn"
 
 [deps]
 
-source_file="res://Assets/character-skeleton.glb"
-dest_files=["res://.godot/imported/character-skeleton.glb-21b40a86cd980e5f0cab8909454132b7.scn"]
+source_file="res://Assets/kenney-graveyard/character-skeleton.glb"
+dest_files=["res://.godot/imported/character-skeleton.glb-44ae01eebaa7afa5d0d56531cc27a2fe.scn"]
 
 [params]
 

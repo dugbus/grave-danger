@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dathjrgpejj8w"
-path="res://.godot/imported/rocks-tall.glb-0a71a8b53eba97cd4006e295f8211c9b.scn"
+path="res://.godot/imported/rocks-tall.glb-7483dacccfaeff620c5780efb0f1e5bb.scn"
 
 [deps]
 
-source_file="res://Assets/rocks-tall.glb"
-dest_files=["res://.godot/imported/rocks-tall.glb-0a71a8b53eba97cd4006e295f8211c9b.scn"]
+source_file="res://Assets/kenney-graveyard/rocks-tall.glb"
+dest_files=["res://.godot/imported/rocks-tall.glb-7483dacccfaeff620c5780efb0f1e5bb.scn"]
 
 [params]
 

@@ -23,8 +23,8 @@ const DROP_CLEAR_RADIUS = 0.18
 const DROP_NUDGE_RADIUS = 0.35
 const DROP_NUDGE_IMPULSE = 0.025
 
-const GOLD_COIN_SCENE := preload("res://gold_coin.tscn")
-const COIN_PICKUP_SOUND := preload("res://Assets/coin-pickup.mp3")
+const GOLD_COIN_SCENE := preload("res://collectibles/gold_coin.tscn")
+const COIN_PICKUP_SOUND := preload("res://Assets/audio/coin-pickup.mp3")
 
 signal carried_gold_coins_changed(carried_count: int)
 

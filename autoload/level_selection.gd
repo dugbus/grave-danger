@@ -2,14 +2,14 @@ extends Node
 
 const RESULTS_PATH := "user://level_results.json"
 const LEVELS := [
-	{"name": "Level 1", "scene_path": "res://level_01.tscn", "available": true},
-	{"name": "Level 2", "scene_path": "res://level_02.tscn", "available": true},
-	{"name": "Level 3", "scene_path": "res://level_03.tscn", "available": true},
-	{"name": "Level 4", "scene_path": "res://level_04.tscn", "available": true},
-	{"name": "Level 5", "scene_path": "res://level_05.tscn", "available": true},
-	{"name": "Level 6", "scene_path": "res://level_06.tscn", "available": true},
-	{"name": "Level 7", "scene_path": "res://level_07.tscn", "available": true},
-	{"name": "Level 8", "scene_path": "res://level_08.tscn", "available": true},
+	{"name": "Level 1", "scene_path": "res://levels/1/level_01.tscn", "available": true},
+	{"name": "Level 2", "scene_path": "res://levels/2/level_02.tscn", "available": true},
+	{"name": "Level 3", "scene_path": "res://levels/3/level_03.tscn", "available": true},
+	{"name": "Level 4", "scene_path": "res://levels/4/level_04.tscn", "available": true},
+	{"name": "Level 5", "scene_path": "res://levels/5/level_05.tscn", "available": true},
+	{"name": "Level 6", "scene_path": "res://levels/6/level_06.tscn", "available": true},
+	{"name": "Level 7", "scene_path": "res://levels/7/level_07.tscn", "available": true},
+	{"name": "Level 8", "scene_path": "res://levels/8/level_08.tscn", "available": true},
 ]
 
 var selected_level_index := 0

@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://di3wiymg8aryc"
-path="res://.godot/imported/bench-damaged.glb-291ac04b2e0f2fc8bbc4434879a51bbd.scn"
+path="res://.godot/imported/bench-damaged.glb-80dfaa588ba9eaf5d99e8fccf069a607.scn"
 
 [deps]
 
-source_file="res://Assets/bench-damaged.glb"
-dest_files=["res://.godot/imported/bench-damaged.glb-291ac04b2e0f2fc8bbc4434879a51bbd.scn"]
+source_file="res://Assets/kenney-graveyard/bench-damaged.glb"
+dest_files=["res://.godot/imported/bench-damaged.glb-80dfaa588ba9eaf5d99e8fccf069a607.scn"]
 
 [params]
 

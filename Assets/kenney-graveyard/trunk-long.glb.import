@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bpt7rmjblpptk"
-path="res://.godot/imported/trunk-long.glb-d98a9da32e32f84eb2524e5aa8dfa1e4.scn"
+path="res://.godot/imported/trunk-long.glb-8203020689b485a63b251b254f99fa8b.scn"
 
 [deps]
 
-source_file="res://Assets/trunk-long.glb"
-dest_files=["res://.godot/imported/trunk-long.glb-d98a9da32e32f84eb2524e5aa8dfa1e4.scn"]
+source_file="res://Assets/kenney-graveyard/trunk-long.glb"
+dest_files=["res://.godot/imported/trunk-long.glb-8203020689b485a63b251b254f99fa8b.scn"]
 
 [params]
 

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cjhiqmscotkmp"]
 
-[ext_resource type="Script" uid="uid://dnexl1obwimwr" path="res://result_screen.gd" id="1_result"]
-[ext_resource type="Texture2D" uid="uid://t5fqmobact4n" path="res://Assets/Textures/win-screen.png" id="2_texture"]
+[ext_resource type="Script" path="res://ui/screens/result_screen.gd" id="1_result"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/win-screen.png" id="2_texture"]
 
 [node name="WinScreen" type="Control" unique_id=966754097]
 layout_mode = 3

@@ -1,6 +1,6 @@
 extends Node
 
-const SCREEN_FADE := preload("res://screen_fade.gd")
+const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 
 
 # Death is isolated so hazards only need one public Player method while the
@@ -9,7 +9,7 @@ const SCREEN_FADE := preload("res://screen_fade.gd")
 ## Node that receives death animation playback requests.
 @export var animation_controller_path: NodePath = ^"../PlayerAnimation"
 ## Scene loaded after the death delay and fade complete.
-@export var lose_scene := "res://lose_screen.tscn"
+@export var lose_scene := "res://ui/screens/lose_screen.tscn"
 ## Seconds to wait after death before starting the lose-screen fade.
 @export var return_delay := 1.5
 ## Seconds used for the black fade before loading the lose screen.

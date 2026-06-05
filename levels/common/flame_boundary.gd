@@ -7,7 +7,7 @@ const EDITOR_PREVIEW_CONTAINER_NAME := "EditorPreview"
 const MOVEMENT_PATH_NAME := "MovementPath"
 const BOUNDARY_CENTER_NAME := "BoundaryCenter"
 const ANIMATION_PLAYER_NAME := "AnimationPlayer"
-const NEAR_FLAMES_SOUND_PATH := "res://Assets/near-the-flames.mp3"
+const NEAR_FLAMES_SOUND_PATH := "res://Assets/audio/near-the-flames.mp3"
 const PLAYER_BLOCKER_COLLISION_LAYER := 8
 
 @export_group("Motion")

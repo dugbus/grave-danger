@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b3f7etg0tonsh"
-path="res://.godot/imported/iron-fence-curve.glb-9fa1ed466f50ec10c9404626d92de9f4.scn"
+path="res://.godot/imported/iron-fence-curve.glb-e82218af103a750ffeead9cf1c6ab53b.scn"
 
 [deps]
 
-source_file="res://Assets/iron-fence-curve.glb"
-dest_files=["res://.godot/imported/iron-fence-curve.glb-9fa1ed466f50ec10c9404626d92de9f4.scn"]
+source_file="res://Assets/kenney-graveyard/iron-fence-curve.glb"
+dest_files=["res://.godot/imported/iron-fence-curve.glb-e82218af103a750ffeead9cf1c6ab53b.scn"]
 
 [params]
 

@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://ff8hx6w74hh4"
-path="res://.godot/imported/lantern-glass.glb-6c7cd2eb2ea66ce5bccc288f272b8a3e.scn"
+path="res://.godot/imported/lantern-glass.glb-0191a4ab50a13f45c2976b12ae9248f1.scn"
 
 [deps]
 
-source_file="res://Assets/lantern-glass.glb"
-dest_files=["res://.godot/imported/lantern-glass.glb-6c7cd2eb2ea66ce5bccc288f272b8a3e.scn"]
+source_file="res://Assets/kenney-graveyard/lantern-glass.glb"
+dest_files=["res://.godot/imported/lantern-glass.glb-0191a4ab50a13f45c2976b12ae9248f1.scn"]
 
 [params]
 

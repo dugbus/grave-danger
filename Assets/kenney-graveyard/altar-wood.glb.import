@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c2n81t67pxrta"
-path="res://.godot/imported/altar-wood.glb-d5a7984dc42424207da90f79fbeb5fdb.scn"
+path="res://.godot/imported/altar-wood.glb-69fcd9258e9ddc22623ffcfabc101a7c.scn"
 
 [deps]
 
-source_file="res://Assets/altar-wood.glb"
-dest_files=["res://.godot/imported/altar-wood.glb-d5a7984dc42424207da90f79fbeb5fdb.scn"]
+source_file="res://Assets/kenney-graveyard/altar-wood.glb"
+dest_files=["res://.godot/imported/altar-wood.glb-69fcd9258e9ddc22623ffcfabc101a7c.scn"]
 
 [params]
 

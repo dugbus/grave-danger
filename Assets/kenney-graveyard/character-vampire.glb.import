@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cuw8pgsfdjuxm"
-path="res://.godot/imported/character-vampire.glb-b6f6105b04af12ee3abaff79483ba4cc.scn"
+path="res://.godot/imported/character-vampire.glb-e4ada9e3bcfb8bb2fa4c2d40a56b21ac.scn"
 
 [deps]
 
-source_file="res://Assets/character-vampire.glb"
-dest_files=["res://.godot/imported/character-vampire.glb-b6f6105b04af12ee3abaff79483ba4cc.scn"]
+source_file="res://Assets/kenney-graveyard/character-vampire.glb"
+dest_files=["res://.godot/imported/character-vampire.glb-e4ada9e3bcfb8bb2fa4c2d40a56b21ac.scn"]
 
 [params]
 

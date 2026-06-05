@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bg1o6o88d6aih"
-path="res://.godot/imported/character-keeper.glb-6bfc7147e376ddec7ba85663cf516e2f.scn"
+path="res://.godot/imported/character-keeper.glb-dfdb29f035cb7a105a68115ef2588aa7.scn"
 
 [deps]
 
-source_file="res://Assets/character-keeper.glb"
-dest_files=["res://.godot/imported/character-keeper.glb-6bfc7147e376ddec7ba85663cf516e2f.scn"]
+source_file="res://Assets/kenney-graveyard/character-keeper.glb"
+dest_files=["res://.godot/imported/character-keeper.glb-dfdb29f035cb7a105a68115ef2588aa7.scn"]
 
 [params]
 

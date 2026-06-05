@@ -1,7 +1,7 @@
 extends Node3D
 
-const WIN_SCENE := "res://win_screen.tscn"
-const SCREEN_FADE := preload("res://screen_fade.gd")
+const WIN_SCENE := "res://ui/screens/win_screen.tscn"
+const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 
 const CURRENT_LEVEL_NAME := "CurrentLevel"
 

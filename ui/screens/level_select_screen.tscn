@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://pmuofl7veu10"]
 
-[ext_resource type="Script" uid="uid://todmlhvnf50e" path="res://level_select_screen.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://ba0bqdkt340fe" path="res://Assets/Textures/level-select.png" id="2_texture"]
+[ext_resource type="Script" path="res://ui/screens/level_select_screen.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/level-select.png" id="2_texture"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_normal"]
 bg_color = Color(0.08, 0.07, 0.08, 0.82)

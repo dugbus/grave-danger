@@ -1,6 +1,6 @@
 extends Node3D
 
-const COIN_PICKUP_SOUND := preload("res://Assets/coin-pickup.mp3")
+const COIN_PICKUP_SOUND := preload("res://Assets/audio/coin-pickup.mp3")
 
 signal coin_absorbed(count: int)
 

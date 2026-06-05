@@ -1,6 +1,6 @@
 extends CanvasLayer
 
-const HudStatusBarScene := preload("res://hud_status_bar.gd")
+const HudStatusBarScene := preload("res://ui/hud/hud_status_bar.gd")
 
 ## Node that owns flame energy and death state values for the hitpoints bar.
 @export var death_controller_path: NodePath = ^"../Player/PlayerDeath"

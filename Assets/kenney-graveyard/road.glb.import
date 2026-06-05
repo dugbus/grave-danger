@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c11rw16yini7b"
-path="res://.godot/imported/road.glb-dfff93c1d40d27047247689f786e833f.scn"
+path="res://.godot/imported/road.glb-f7372e1af8dd1b5d1e36089c6e8d494f.scn"
 
 [deps]
 
-source_file="res://Assets/road.glb"
-dest_files=["res://.godot/imported/road.glb-dfff93c1d40d27047247689f786e833f.scn"]
+source_file="res://Assets/kenney-graveyard/road.glb"
+dest_files=["res://.godot/imported/road.glb-f7372e1af8dd1b5d1e36089c6e8d494f.scn"]
 
 [params]
 
