@@ -12,3 +12,15 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_gki0x")
 title_texture = ExtResource("2_q1cc5")
+
+[node name="TitleImage" type="TextureRect" parent="." unique_id=1523877498]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_q1cc5")
+expand_mode = 1
+stretch_mode = 6

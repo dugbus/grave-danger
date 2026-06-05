@@ -6,6 +6,10 @@ const HudStatusBarScene := preload("res://hud_status_bar.gd")
 @export var death_controller_path: NodePath = ^"../Player/PlayerDeath"
 ## Node that owns carried coin counts for the coins-held bar.
 @export var gold_inventory_path: NodePath = ^"../Player/PlayerGoldInventory"
+## Existing editor-placed hitpoints bar. If missing, a fallback bar is created.
+@export var energy_bar_path: NodePath = ^"EnergyBar"
+## Existing editor-placed carried-coins bar. If missing, a fallback bar is created.
+@export var coins_bar_path: NodePath = ^"CoinsHeldBar"
 
 @export_group("Bars")
 ## Width of each HUD status bar, in screen pixels.
@@ -41,22 +45,7 @@ var coins_bar: Control
 func _ready() -> void:
 	layer = 35
 
-	energy_bar = HudStatusBarScene.new()
-	energy_bar.name = "EnergyBar"
-	energy_bar.configure_label("Hitpoints")
-	add_child(energy_bar)
-
-	coins_bar = HudStatusBarScene.new()
-	coins_bar.name = "CoinsHeldBar"
-	coins_bar.warning_enabled = false
-	coins_bar.spark_enabled = false
-	coins_bar.configure_label("Coins Held")
-	coins_bar.configure_fill(
-		Color(1.0, 0.76, 0.2),
-		Color(1.0, 0.92, 0.34),
-		Color(0.72, 1.0, 0.62)
-	)
-	add_child(coins_bar)
+	_bind_bars()
 
 	_apply_bar_layout()
 	_resolve_references()
@@ -72,6 +61,10 @@ func set_runtime_references(death_controller_node: Node, gold_inventory_node: No
 
 
 func _process(_delta: float) -> void:
+	if energy_bar == null or coins_bar == null:
+		_bind_bars()
+		_apply_bar_layout()
+
 	if not is_instance_valid(death_controller) or not is_instance_valid(gold_inventory):
 		_resolve_references()
 		_connect_inventory_signal()
@@ -94,6 +87,41 @@ func _connect_inventory_signal() -> void:
 	gold_inventory.carried_gold_coins_changed.connect(_on_carried_gold_coins_changed)
 
 
+func _bind_bars() -> void:
+	energy_bar = get_node_or_null(energy_bar_path) as Control
+	if energy_bar == null:
+		energy_bar = HudStatusBarScene.new()
+		energy_bar.name = "EnergyBar"
+		add_child(energy_bar)
+
+	coins_bar = get_node_or_null(coins_bar_path) as Control
+	if coins_bar == null:
+		coins_bar = HudStatusBarScene.new()
+		coins_bar.name = "CoinsHeldBar"
+		add_child(coins_bar)
+
+	_configure_default_bars()
+
+
+func _configure_default_bars() -> void:
+	if energy_bar != null and energy_bar.has_method("configure_label"):
+		energy_bar.configure_label("Hitpoints")
+
+	if coins_bar == null:
+		return
+
+	coins_bar.set("warning_enabled", false)
+	coins_bar.set("spark_enabled", false)
+	if coins_bar.has_method("configure_label"):
+		coins_bar.configure_label("Coins Held")
+	if coins_bar.has_method("configure_fill"):
+		coins_bar.configure_fill(
+			Color(1.0, 0.76, 0.2),
+			Color(1.0, 0.92, 0.34),
+			Color(0.72, 1.0, 0.62)
+		)
+
+
 func _on_carried_gold_coins_changed(_carried_count: int) -> void:
 	_update_coins_bar()
 
@@ -110,7 +138,8 @@ func _update_energy_bar() -> void:
 		var dead_value = death_controller.get("is_dead")
 		is_dead = dead_value is bool and dead_value
 
-	energy_bar.set_ratio(energy_ratio, is_dead)
+	if energy_bar != null and energy_bar.has_method("set_ratio"):
+		energy_bar.set_ratio(energy_ratio, is_dead)
 
 
 func _update_coins_bar() -> void:
@@ -122,17 +151,22 @@ func _update_coins_bar() -> void:
 		if gold_inventory.has_method("get_max_carried_gold_coins"):
 			max_count = maxi(gold_inventory.get_max_carried_gold_coins(), 1)
 
-	coins_bar.set_ratio(float(carried_count) / float(max_count))
+	if coins_bar != null and coins_bar.has_method("set_ratio"):
+		coins_bar.set_ratio(float(carried_count) / float(max_count))
 
 
 func _apply_bar_layout() -> void:
 	if energy_bar == null or coins_bar == null:
 		return
 
-	energy_bar.configure_size(bar_width, bar_height, top_offset)
-	coins_bar.configure_size(bar_width, bar_height, top_offset + bar_height + bar_gap)
+	if energy_bar.has_method("configure_size"):
+		energy_bar.configure_size(bar_width, bar_height, top_offset)
+	if coins_bar.has_method("configure_size"):
+		coins_bar.configure_size(bar_width, bar_height, top_offset + bar_height + bar_gap)
 
 	var label_size := int(clampf(bar_height * 0.28 + 2.0, 14.0, 22.0))
 	var label_width := clampf(bar_width * 0.24, 96.0, 150.0)
-	energy_bar.configure_label("Hitpoints", label_size, label_width)
-	coins_bar.configure_label("Coins Held", label_size, label_width)
+	if energy_bar.has_method("configure_label"):
+		energy_bar.configure_label("Hitpoints", label_size, label_width)
+	if coins_bar.has_method("configure_label"):
+		coins_bar.configure_label("Coins Held", label_size, label_width)

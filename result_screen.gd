@@ -3,35 +3,48 @@ extends Control
 
 const TITLE_SCENE := "res://title_screen.tscn"
 const SCREEN_FADE := preload("res://screen_fade.gd")
+const VALUE_LAYER_NAME := "ValueLayer"
+const VALUE_LAYER_INDEX := 20
+const FADE_LAYER_NAME := "ResultFadeLayer"
+const FADE_LAYER_INDEX := 100
 
 ## Background image displayed behind the final result values.
 @export var result_texture: Texture2D
 ## Seconds used by both fade-in and return-to-title fade transitions.
 @export var fade_duration := 0.8
-## Rectangle, in source image pixels, where the collected coin count is drawn.
+## Fallback rectangle, in source image pixels, used only if the scene has no CoinsValue label.
 @export var coins_rect := Rect2(581.0, 522.0, 382.0, 90.0)
-## Rectangle, in source image pixels, where the completion percentage is drawn.
+## Fallback rectangle, in source image pixels, used only if the scene has no PercentageValue label.
 @export var percentage_rect := Rect2(581.0, 609.0, 382.0, 90.0)
 ## Color used for result value text.
 @export var text_color := Color(0.96, 0.89, 0.63)
 ## Color used for result value text shadow.
 @export var shadow_color := Color(0.0, 0.0, 0.0, 0.9)
+## Padding kept inside editable value boxes when fitting dynamic text.
+@export var value_padding := Vector2(16.0, 10.0)
 
 var returning_to_title := false
 var result_image: TextureRect
+var value_layer: CanvasLayer
 var coins_label: Label
 var percentage_label: Label
+var value_overlay: ResultValueOverlay
 
 
 func _ready() -> void:
-	_create_result_image()
-	_create_labels()
+	_prepare_screen_root()
+	_bind_result_image()
+	_bind_value_layer()
+	_bind_labels()
+	_bind_value_overlay()
 	_record_level_result()
 	_update_result_text()
-	_layout_labels()
+	_layout_value_labels()
+	call_deferred("_layout_value_labels")
 	_fade_in()
 	set_process_unhandled_input(true)
-	resized.connect(_layout_labels)
+	resized.connect(_layout_value_labels)
+	get_viewport().size_changed.connect(_sync_screen_layout)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -43,36 +56,114 @@ func _unhandled_input(event: InputEvent) -> void:
 		_return_to_title()
 
 
-func _create_result_image() -> void:
-	result_image = TextureRect.new()
-	result_image.name = "ResultImage"
-	result_image.texture = result_texture
+func _prepare_screen_root() -> void:
+	var project_size := Vector2(
+		float(ProjectSettings.get_setting("display/window/size/viewport_width", 1920)),
+		float(ProjectSettings.get_setting("display/window/size/viewport_height", 1080))
+	)
+	var viewport_size := get_viewport_rect().size
+
+	position = Vector2.ZERO
+	size = Vector2(maxf(viewport_size.x, project_size.x), maxf(viewport_size.y, project_size.y))
+	set_anchors_preset(Control.PRESET_FULL_RECT)
+
+
+func _bind_result_image() -> void:
+	result_image = get_node_or_null("ResultImage") as TextureRect
+	if result_image == null:
+		result_image = TextureRect.new()
+		result_image.name = "ResultImage"
+		add_child(result_image)
+	else:
+		move_child(result_image, 0)
+
+	if result_texture != null:
+		result_image.texture = result_texture
+	result_image.z_index = -10
 	result_image.set_anchors_preset(Control.PRESET_FULL_RECT)
 	result_image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	result_image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	result_image.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(result_image)
 
 
-func _create_labels() -> void:
-	coins_label = _create_value_label("CoinsValue")
-	percentage_label = _create_value_label("PercentageValue")
-	add_child(coins_label)
-	add_child(percentage_label)
+func _bind_value_layer() -> void:
+	value_layer = get_node_or_null(VALUE_LAYER_NAME) as CanvasLayer
+	if value_layer == null:
+		value_layer = CanvasLayer.new()
+		value_layer.name = VALUE_LAYER_NAME
+		add_child(value_layer)
+
+	value_layer.layer = VALUE_LAYER_INDEX
+
+
+func _bind_labels() -> void:
+	coins_label = value_layer.get_node_or_null("CoinsValue") as Label
+	if coins_label == null:
+		coins_label = get_node_or_null("CoinsValue") as Label
+	if coins_label == null:
+		coins_label = _create_value_label("CoinsValue")
+		value_layer.add_child(coins_label)
+	else:
+		_reparent_value_label_to_layer(coins_label)
+		_configure_value_label(coins_label)
+
+	percentage_label = value_layer.get_node_or_null("PercentageValue") as Label
+	if percentage_label == null:
+		percentage_label = get_node_or_null("PercentageValue") as Label
+	if percentage_label == null:
+		percentage_label = _create_value_label("PercentageValue")
+		value_layer.add_child(percentage_label)
+	else:
+		_reparent_value_label_to_layer(percentage_label)
+		_configure_value_label(percentage_label)
+
+	coins_label.visible = false
+	percentage_label.visible = false
+
+
+func _bind_value_overlay() -> void:
+	value_overlay = value_layer.get_node_or_null("ValueOverlay") as ResultValueOverlay
+	if value_overlay == null:
+		value_overlay = ResultValueOverlay.new()
+		value_overlay.name = "ValueOverlay"
+		value_layer.add_child(value_overlay)
+
+	value_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	value_overlay.z_index = 100
+	value_overlay.position = Vector2.ZERO
+	value_overlay.size = size
+
+
+func _reparent_value_label_to_layer(label: Label) -> void:
+	if label.get_parent() == value_layer:
+		return
+
+	var global_label_position := label.global_position
+	label.reparent(value_layer)
+	label.global_position = global_label_position
 
 
 func _create_value_label(label_name: String) -> Label:
 	var label := Label.new()
 	label.name = label_name
+	_configure_value_label(label)
+	return label
+
+
+func _configure_value_label(label: Label) -> void:
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.clip_text = true
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.add_theme_color_override("font_color", text_color)
-	label.add_theme_color_override("font_shadow_color", shadow_color)
-	label.add_theme_constant_override("shadow_offset_x", 3)
-	label.add_theme_constant_override("shadow_offset_y", 3)
-	return label
+	label.z_index = 10
+	if not label.has_theme_color_override("font_color"):
+		label.add_theme_color_override("font_color", text_color)
+	if not label.has_theme_color_override("font_shadow_color"):
+		label.add_theme_color_override("font_shadow_color", shadow_color)
+	if not label.has_theme_constant_override("shadow_offset_x"):
+		label.add_theme_constant_override("shadow_offset_x", 3)
+	if not label.has_theme_constant_override("shadow_offset_y"):
+		label.add_theme_constant_override("shadow_offset_y", 3)
 
 
 func _update_result_text() -> void:
@@ -80,10 +171,14 @@ func _update_result_text() -> void:
 	if stats == null:
 		coins_label.text = "0"
 		percentage_label.text = "0"
+		_update_value_overlay_text()
+		_layout_value_labels()
 		return
 
 	coins_label.text = "%d" % stats.coins_collected
 	percentage_label.text = "%d" % stats.get_completion_percentage()
+	_update_value_overlay_text()
+	_layout_value_labels()
 
 
 func _record_level_result() -> void:
@@ -99,19 +194,57 @@ func _record_level_result() -> void:
 		)
 
 
-func _layout_labels() -> void:
-	if result_texture == null or coins_label == null or percentage_label == null:
+func _sync_screen_layout() -> void:
+	_prepare_screen_root()
+	_layout_value_labels()
+
+
+func _layout_value_labels() -> void:
+	_place_label_from_source_rect(coins_label, coins_rect)
+	_place_label_from_source_rect(percentage_label, percentage_rect)
+	_fit_value_labels()
+	_layout_value_overlay()
+
+
+func _layout_value_overlay() -> void:
+	if value_overlay == null:
 		return
 
-	_place_label(coins_label, coins_rect)
-	_place_label(percentage_label, percentage_rect)
+	value_overlay.size = size
+	value_overlay.set_value_layout(
+		_image_rect_to_screen_rect(coins_rect),
+		_image_rect_to_screen_rect(percentage_rect),
+		value_padding,
+		_resolve_label_color(coins_label, "font_color", text_color),
+		_resolve_label_color(coins_label, "font_shadow_color", shadow_color),
+		Vector2(
+			float(coins_label.get_theme_constant("shadow_offset_x")),
+			float(coins_label.get_theme_constant("shadow_offset_y"))
+		)
+	)
 
 
-func _place_label(label: Label, image_rect: Rect2) -> void:
+func _update_value_overlay_text() -> void:
+	if value_overlay != null:
+		value_overlay.set_value_text(coins_label.text, percentage_label.text)
+
+
+func _resolve_label_color(label: Label, color_name: StringName, fallback: Color) -> Color:
+	if label != null and label.has_theme_color_override(color_name):
+		return label.get_theme_color(color_name)
+
+	return fallback
+
+
+func _place_label_from_source_rect(label: Label, image_rect: Rect2) -> void:
+	if label == null:
+		return
+	if result_texture == null:
+		return
+
 	var screen_rect := _image_rect_to_screen_rect(image_rect)
 	label.position = screen_rect.position
 	label.size = screen_rect.size
-	_fit_label_font_size(label, screen_rect.size)
 
 
 func _image_rect_to_screen_rect(image_rect: Rect2) -> Rect2:
@@ -124,12 +257,21 @@ func _image_rect_to_screen_rect(image_rect: Rect2) -> Rect2:
 	return Rect2(image_offset + image_rect.position * scale, image_rect.size * scale)
 
 
-func _fit_label_font_size(label: Label, box_size: Vector2) -> void:
+func _fit_value_labels() -> void:
+	_fit_label_font_size(coins_label)
+	_fit_label_font_size(percentage_label)
+
+
+func _fit_label_font_size(label: Label) -> void:
+	if label == null:
+		return
+
 	var font := label.get_theme_default_font()
 	if font == null:
 		return
 
-	var available_size := box_size - Vector2(16.0, 10.0)
+	var box_size := label.size
+	var available_size := box_size - value_padding
 	var best_size := 1
 	var low := 1
 	var high := maxi(1, floori(box_size.y))
@@ -147,12 +289,12 @@ func _fit_label_font_size(label: Label, box_size: Vector2) -> void:
 
 
 func _fade_in() -> void:
-	SCREEN_FADE.fade_in(self, "ResultFade", fade_duration)
+	SCREEN_FADE.fade_in(self, "ResultFade", fade_duration, Color.BLACK, FADE_LAYER_NAME, FADE_LAYER_INDEX)
 
 
 func _return_to_title() -> void:
 	returning_to_title = true
-	var tween := SCREEN_FADE.fade_out(self, "ResultFade", fade_duration)
+	var tween := SCREEN_FADE.fade_out(self, "ResultFade", fade_duration, FADE_LAYER_NAME, FADE_LAYER_INDEX)
 	await tween.finished
 
 	get_tree().change_scene_to_file(TITLE_SCENE)
@@ -178,3 +320,81 @@ func _is_primary_event(event: InputEvent) -> bool:
 		)
 
 	return false
+
+
+class ResultValueOverlay:
+	extends Control
+
+	var coins_text := ""
+	var percentage_text := ""
+	var coins_box := Rect2()
+	var percentage_box := Rect2()
+	var value_padding := Vector2(16.0, 10.0)
+	var text_color := Color.WHITE
+	var shadow_color := Color(0.0, 0.0, 0.0, 0.9)
+	var shadow_offset := Vector2(3.0, 3.0)
+
+
+	func set_value_text(next_coins_text: String, next_percentage_text: String) -> void:
+		coins_text = next_coins_text
+		percentage_text = next_percentage_text
+		queue_redraw()
+
+
+	func set_value_layout(
+		next_coins_box: Rect2,
+		next_percentage_box: Rect2,
+		next_padding: Vector2,
+		next_text_color: Color,
+		next_shadow_color: Color,
+		next_shadow_offset: Vector2
+	) -> void:
+		coins_box = next_coins_box
+		percentage_box = next_percentage_box
+		value_padding = next_padding
+		text_color = next_text_color
+		shadow_color = next_shadow_color
+		shadow_offset = next_shadow_offset
+		queue_redraw()
+
+
+	func _draw() -> void:
+		_draw_centered_value(coins_text, coins_box)
+		_draw_centered_value(percentage_text, percentage_box)
+
+
+	func _draw_centered_value(value: String, box: Rect2) -> void:
+		if value.is_empty() or box.size.x <= 0.0 or box.size.y <= 0.0:
+			return
+
+		var font := ThemeDB.fallback_font
+		if font == null:
+			return
+
+		var font_size := _fit_font_size(font, value, box.size)
+		var text_size := font.get_string_size(value, HORIZONTAL_ALIGNMENT_CENTER, -1.0, font_size)
+		var text_position := box.position + Vector2(
+			(box.size.x - text_size.x) * 0.5,
+			(box.size.y - text_size.y) * 0.5 + font.get_ascent(font_size)
+		)
+
+		draw_string(font, text_position + shadow_offset, value, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, shadow_color)
+		draw_string(font, text_position, value, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, text_color)
+
+
+	func _fit_font_size(font: Font, value: String, box_size: Vector2) -> int:
+		var available_size := box_size - value_padding
+		var best_size := 1
+		var low := 1
+		var high := maxi(1, floori(box_size.y))
+
+		while low <= high:
+			var test_size := (low + high) / 2
+			var text_size := font.get_string_size(value, HORIZONTAL_ALIGNMENT_CENTER, -1.0, test_size)
+			if text_size.x <= available_size.x and text_size.y <= available_size.y:
+				best_size = test_size
+				low = test_size + 1
+			else:
+				high = test_size - 1
+
+		return best_size

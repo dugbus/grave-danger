@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://5kig63v451pl" path="res://score_hud.gd" id="4_score"]
 [ext_resource type="Script" uid="uid://cyr67ggw4yark" path="res://editor_preview_lighting.gd" id="5_preview"]
 [ext_resource type="Script" uid="uid://de147agwnjnqt" path="res://energy_hud.gd" id="6_energy"]
+[ext_resource type="Script" path="res://hud_status_bar.gd" id="7_status"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_8ccgg"]
 
@@ -71,6 +72,18 @@ autoplay = true
 [node name="ScoreHud" type="CanvasLayer" parent="." unique_id=831668248]
 script = ExtResource("4_score")
 
+[node name="ScoreLabel" type="Label" parent="ScoreHud"]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 402.0
+offset_bottom = 126.0
+theme_override_colors/font_color = Color(1, 0.82, 0.22, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 90
+text = "Coins 0"
+
 
 [node name="EnergyHud" type="CanvasLayer" parent="." unique_id=358766660]
 script = ExtResource("6_energy")
@@ -78,6 +91,37 @@ death_controller_path = NodePath("../../CurrentLevel/Player/PlayerDeath")
 gold_inventory_path = NodePath("../../CurrentLevel/Player/PlayerGoldInventory")
 bar_width = 700.0
 bar_height = 80.0
+
+[node name="EnergyBar" type="Control" parent="EnergyHud"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 700.0
+offset_bottom = 80.0
+mouse_filter = 2
+script = ExtResource("7_status")
+bar_width = 700.0
+bar_height = 80.0
+label_text = "Hitpoints"
+label_font_size = 22
+
+[node name="CoinsHeldBar" type="Control" parent="EnergyHud"]
+layout_mode = 3
+anchors_preset = 0
+offset_top = 90.0
+offset_right = 700.0
+offset_bottom = 170.0
+mouse_filter = 2
+script = ExtResource("7_status")
+bar_width = 700.0
+bar_height = 80.0
+bar_top = 110.0
+warning_enabled = false
+fill_start_color = Color(1, 0.76, 0.2, 1)
+fill_mid_color = Color(1, 0.92, 0.34, 1)
+fill_end_color = Color(0.72, 1, 0.62, 1)
+spark_enabled = false
+label_text = "Coins Held"
+label_font_size = 22
 
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2049292617]
@@ -102,4 +146,3 @@ layers = 3
 mesh = SubResource("BoxMesh_rxxet")
 surface_material_override/0 = SubResource("StandardMaterial3D_2d15w")
 metadata/_edit_lock_ = true
-

@@ -14,6 +14,11 @@ const ANALOG_RELEASE_THRESHOLD := 0.25
 @export var fade_in_duration := 0.35
 
 var starting := false
+var background: TextureRect
+var shade: ColorRect
+var panel: VBoxContainer
+var grid: GridContainer
+var level_button_template: Button
 var level_buttons: Array[Button] = []
 var selected_button_index := 0
 var analog_x_armed := true
@@ -21,8 +26,9 @@ var analog_y_armed := true
 
 
 func _ready() -> void:
-	_create_background()
-	_create_level_grid()
+	_bind_background()
+	_bind_level_grid()
+	_populate_level_grid()
 	_focus_first_available_level()
 	SCREEN_FADE.fade_in(self, "LevelSelectFade", fade_in_duration)
 	set_process_input(true)
@@ -46,58 +52,87 @@ func _unhandled_input(event: InputEvent) -> void:
 		_start_level(selected_button_index)
 
 
-func _create_background() -> void:
-	var background := TextureRect.new()
-	background.name = "Background"
-	background.texture = background_texture
+func _bind_background() -> void:
+	background = get_node_or_null("Background") as TextureRect
+	if background == null:
+		background = TextureRect.new()
+		background.name = "Background"
+		add_child(background)
+
+	if background_texture != null:
+		background.texture = background_texture
 	background.set_anchors_preset(Control.PRESET_FULL_RECT)
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(background)
 
-	var shade := ColorRect.new()
-	shade.name = "Shade"
-	shade.color = Color(0.0, 0.0, 0.0, 0.44)
+	shade = get_node_or_null("Shade") as ColorRect
+	if shade == null:
+		shade = ColorRect.new()
+		shade.name = "Shade"
+		shade.color = Color(0.0, 0.0, 0.0, 0.44)
+		add_child(shade)
+
 	shade.set_anchors_preset(Control.PRESET_FULL_RECT)
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(shade)
 
 
-func _create_level_grid() -> void:
-	var panel := VBoxContainer.new()
-	panel.name = "LevelSelectPanel"
-	panel.set_anchors_preset(Control.PRESET_CENTER)
-	panel.offset_left = -920.0
-	panel.offset_top = -450.0
-	panel.offset_right = 920.0
-	panel.offset_bottom = 450.0
-	panel.alignment = BoxContainer.ALIGNMENT_CENTER
-	panel.add_theme_constant_override("separation", 48)
-	add_child(panel)
+func _bind_level_grid() -> void:
+	panel = get_node_or_null("LevelSelectPanel") as VBoxContainer
+	if panel == null:
+		panel = VBoxContainer.new()
+		panel.name = "LevelSelectPanel"
+		panel.set_anchors_preset(Control.PRESET_CENTER)
+		panel.offset_left = -920.0
+		panel.offset_top = -450.0
+		panel.offset_right = 920.0
+		panel.offset_bottom = 450.0
+		panel.alignment = BoxContainer.ALIGNMENT_CENTER
+		panel.add_theme_constant_override("separation", 48)
+		add_child(panel)
 
-	var title := Label.new()
-	title.name = "Title"
-	title.text = "Select Level"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 96)
-	title.add_theme_color_override("font_color", Color(1.0, 0.86, 0.35))
-	title.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.85))
-	title.add_theme_constant_override("shadow_offset_x", 3)
-	title.add_theme_constant_override("shadow_offset_y", 3)
-	panel.add_child(title)
+	var title := panel.get_node_or_null("Title") as Label
+	if title == null:
+		title = Label.new()
+		title.name = "Title"
+		title.text = "Select Level"
+		title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		title.add_theme_font_size_override("font_size", 96)
+		title.add_theme_color_override("font_color", Color(1.0, 0.86, 0.35))
+		title.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.85))
+		title.add_theme_constant_override("shadow_offset_x", 3)
+		title.add_theme_constant_override("shadow_offset_y", 3)
+		panel.add_child(title)
 
-	var grid := GridContainer.new()
-	grid.name = "LevelGrid"
-	grid.columns = GRID_COLUMNS
-	grid.add_theme_constant_override("h_separation", 32)
-	grid.add_theme_constant_override("v_separation", 32)
-	panel.add_child(grid)
+	grid = panel.get_node_or_null("LevelGrid") as GridContainer
+	if grid == null:
+		grid = GridContainer.new()
+		grid.name = "LevelGrid"
+		grid.columns = GRID_COLUMNS
+		grid.add_theme_constant_override("h_separation", 32)
+		grid.add_theme_constant_override("v_separation", 32)
+		panel.add_child(grid)
+	else:
+		grid.columns = GRID_COLUMNS
 
+	level_button_template = grid.get_node_or_null("LevelButtonTemplate") as Button
+	if level_button_template == null:
+		level_button_template = _create_fallback_level_button_template()
+		grid.add_child(level_button_template)
+
+
+func _populate_level_grid() -> void:
 	var level_selection := get_node_or_null("/root/LevelSelection")
 	var level_count := 8
 	if level_selection != null and level_selection.has_method("get_level_count"):
 		level_count = level_selection.get_level_count()
+
+	level_button_template.hide()
+	level_buttons.clear()
+
+	for child in grid.get_children():
+		if child != level_button_template and child.get_meta("runtime_level_button", false):
+			child.queue_free()
 
 	for index in level_count:
 		var button := _create_level_button(index)
@@ -113,17 +148,39 @@ func _create_level_button(index: int) -> Button:
 		level_data = level_selection.get_level_data(index)
 		available = level_selection.is_level_available(index)
 
-	var button := Button.new()
-	button.custom_minimum_size = Vector2(420.0, 264.0)
+	var button := level_button_template.duplicate() as Button
+	button.name = "LevelButton%d" % (index + 1)
+	button.show()
+	button.set_meta("runtime_level_button", true)
 	button.disabled = not available
 	button.focus_mode = Control.FOCUS_ALL if available else Control.FOCUS_NONE
+	button.pressed.connect(_start_level.bind(index))
+	button.focus_entered.connect(_on_button_focused.bind(index))
+
+	var title := button.get_node_or_null("Content/Title") as Label
+	if title != null:
+		title.text = String(level_data.get("name", "Level %d" % (index + 1)))
+		title.modulate = Color.WHITE if available else Color(0.62, 0.58, 0.48)
+		title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var result := button.get_node_or_null("Content/Result") as Label
+	if result != null:
+		result.text = _get_result_text(index, available)
+		result.modulate = Color.WHITE if available else Color(0.54, 0.52, 0.46)
+		result.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	return button
+
+
+func _create_fallback_level_button_template() -> Button:
+	var button := Button.new()
+	button.name = "LevelButtonTemplate"
+	button.custom_minimum_size = Vector2(420.0, 264.0)
 	button.add_theme_stylebox_override("normal", _create_button_style(Color(0.08, 0.07, 0.08, 0.82), Color(0.86, 0.68, 0.32, 0.48), 2))
 	button.add_theme_stylebox_override("hover", _create_button_style(Color(0.15, 0.12, 0.11, 0.92), Color(1.0, 0.78, 0.28, 0.72), 3))
 	button.add_theme_stylebox_override("pressed", _create_button_style(Color(0.20, 0.13, 0.08, 0.98), Color(1.0, 0.88, 0.42, 0.9), 3))
 	button.add_theme_stylebox_override("focus", _create_button_style(Color(0.18, 0.12, 0.08, 0.25), Color(0.72, 1.0, 0.62, 0.95), 4))
 	button.add_theme_stylebox_override("disabled", _create_button_style(Color(0.04, 0.04, 0.045, 0.70), Color(0.45, 0.43, 0.38, 0.32), 2))
-	button.pressed.connect(_start_level.bind(index))
-	button.focus_entered.connect(_on_button_focused.bind(index))
 
 	var content := VBoxContainer.new()
 	content.name = "Content"
@@ -139,10 +196,10 @@ func _create_level_button(index: int) -> Button:
 
 	var title := Label.new()
 	title.name = "Title"
-	title.text = String(level_data.get("name", "Level %d" % (index + 1)))
+	title.text = "Level Name"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 68)
-	title.add_theme_color_override("font_color", Color(1.0, 0.86, 0.35) if available else Color(0.62, 0.58, 0.48))
+	title.add_theme_color_override("font_color", Color(1.0, 0.86, 0.35))
 	title.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.86))
 	title.add_theme_constant_override("shadow_offset_x", 2)
 	title.add_theme_constant_override("shadow_offset_y", 2)
@@ -151,11 +208,11 @@ func _create_level_button(index: int) -> Button:
 
 	var result := Label.new()
 	result.name = "Result"
-	result.text = _get_result_text(index, available)
+	result.text = "Best: --\nComplete: --"
 	result.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	result.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	result.add_theme_font_size_override("font_size", 40)
-	result.add_theme_color_override("font_color", Color(0.9, 0.86, 0.72) if available else Color(0.48, 0.46, 0.40))
+	result.add_theme_color_override("font_color", Color(0.9, 0.86, 0.72))
 	result.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.8))
 	result.add_theme_constant_override("shadow_offset_x", 1)
 	result.add_theme_constant_override("shadow_offset_y", 1)

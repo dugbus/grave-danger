@@ -1,9 +1,84 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://pmuofl7veu10"]
 
-[ext_resource type="Script" path="res://level_select_screen.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://todmlhvnf50e" path="res://level_select_screen.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://ba0bqdkt340fe" path="res://Assets/Textures/level-select.png" id="2_texture"]
 
-[node name="LevelSelectScreen" type="Control"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_normal"]
+bg_color = Color(0.08, 0.07, 0.08, 0.82)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.86, 0.68, 0.32, 0.48)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.32)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_pressed"]
+bg_color = Color(0.2, 0.13, 0.08, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.88, 0.42, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.32)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_hover"]
+bg_color = Color(0.15, 0.12, 0.11, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.78, 0.28, 0.72)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.32)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_disabled"]
+bg_color = Color(0.04, 0.04, 0.045, 0.7)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.43, 0.38, 0.32)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.32)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_focus"]
+bg_color = Color(0.18, 0.12, 0.08, 0.25)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.72, 1, 0.62, 0.95)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.32)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[node name="LevelSelectScreen" type="Control" unique_id=1744003434]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,3 +87,101 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 background_texture = ExtResource("2_texture")
+
+[node name="Background" type="TextureRect" parent="." unique_id=773270236]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_texture")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Shade" type="ColorRect" parent="." unique_id=981206661]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.44)
+
+[node name="LevelSelectPanel" type="VBoxContainer" parent="." unique_id=421454747]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -920.0
+offset_top = -450.0
+offset_right = 920.0
+offset_bottom = 450.0
+theme_override_constants/separation = 48
+alignment = 1
+
+[node name="Title" type="Label" parent="LevelSelectPanel" unique_id=1487271135]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.35, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 96
+text = "Select Level"
+horizontal_alignment = 1
+
+[node name="LevelGrid" type="GridContainer" parent="LevelSelectPanel" unique_id=1831174116]
+layout_mode = 2
+theme_override_constants/h_separation = 32
+theme_override_constants/v_separation = 32
+columns = 4
+
+[node name="LevelButtonTemplate" type="Button" parent="LevelSelectPanel/LevelGrid" unique_id=1842819667]
+custom_minimum_size = Vector2(420, 264)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_level_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_level_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_level_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_level_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_level_focus")
+
+[node name="Content" type="VBoxContainer" parent="LevelSelectPanel/LevelGrid/LevelButtonTemplate" unique_id=2025176603]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+offset_top = 24.0
+offset_right = -28.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Title" type="Label" parent="LevelSelectPanel/LevelGrid/LevelButtonTemplate/Content" unique_id=2115129994]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.35, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 68
+text = "Level Name"
+horizontal_alignment = 1
+
+[node name="Result" type="Label" parent="LevelSelectPanel/LevelGrid/LevelButtonTemplate/Content" unique_id=1992305327]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.86, 0.72, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 40
+text = "Best: --
+Complete: --"
+horizontal_alignment = 1
+autowrap_mode = 3

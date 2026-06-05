@@ -5,12 +5,60 @@
 
 [node name="LoseScreen" type="Control" unique_id=98674996]
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_result")
 result_texture = ExtResource("2_texture")
 coins_rect = Rect2(585, 456, 376, 88)
 percentage_rect = Rect2(586, 623, 376, 88)
+
+[node name="ResultImage" type="TextureRect" parent="." unique_id=1387477389]
+z_index = -10
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_texture")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ValueLayer" type="CanvasLayer" parent="." unique_id=1108771390]
+layer = 20
+
+[node name="CoinsValue" type="Label" parent="ValueLayer" unique_id=1156512226]
+z_index = 10
+offset_left = 775.0
+offset_top = 419.0
+offset_right = 1274.0
+offset_bottom = 551.0
+theme_override_colors/font_color = Color(0.96, 0.89, 0.63, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 96
+text = "000"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="PercentageValue" type="Label" parent="ValueLayer" unique_id=1986082415]
+z_index = 10
+offset_left = 779.0
+offset_top = 636.0
+offset_right = 1278.0
+offset_bottom = 768.0
+theme_override_colors/font_color = Color(0.96, 0.89, 0.63, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 96
+text = "000"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true

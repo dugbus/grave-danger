@@ -3,8 +3,8 @@ extends RefCounted
 const DEFAULT_LAYER := 100
 
 
-static func fade_in(owner: Node, fade_name: String, duration: float, start_color := Color.BLACK) -> Tween:
-	var fade := create_overlay(owner, fade_name, start_color)
+static func fade_in(owner: Node, fade_name: String, duration: float, start_color := Color.BLACK, layer_name := "", layer_index := DEFAULT_LAYER) -> Tween:
+	var fade := create_overlay(owner, fade_name, start_color, layer_name, layer_index)
 	var tween := tween_alpha(owner, fade, 0.0, duration)
 	tween.finished.connect(fade.queue_free)
 	return tween
