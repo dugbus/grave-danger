@@ -1,0 +1,105 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://bov7w0cyy2jl7" path="res://follow_camera.gd" id="1_camera"]
+[ext_resource type="Texture2D" uid="uid://w4ywm1e6jlu7" path="res://Assets/Textures/floor-texture.png" id="2_floor"]
+[ext_resource type="AudioStream" uid="uid://bcd4h7b10r85q" path="res://Assets/music-track.mp3" id="3_music"]
+[ext_resource type="Script" uid="uid://5kig63v451pl" path="res://score_hud.gd" id="4_score"]
+[ext_resource type="Script" uid="uid://cyr67ggw4yark" path="res://editor_preview_lighting.gd" id="5_preview"]
+[ext_resource type="Script" uid="uid://de147agwnjnqt" path="res://energy_hud.gd" id="6_energy"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_8ccgg"]
+
+
+[sub_resource type="Sky" id="Sky_2jwxh"]
+sky_material = SubResource("ProceduralSkyMaterial_8ccgg")
+
+
+[sub_resource type="Environment" id="Environment_siodt"]
+background_mode = 2
+background_energy_multiplier = 0.045
+sky = SubResource("Sky_2jwxh")
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 0.0
+tonemap_exposure = 0.82
+glow_enabled = true
+glow_intensity = 0.45
+glow_strength = 1.05
+glow_bloom = 0.15
+glow_hdr_threshold = 0.75
+
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rxxet"]
+size = Vector3(60, 2, 60)
+
+
+[sub_resource type="BoxMesh" id="BoxMesh_rxxet"]
+size = Vector3(60, 2, 60)
+
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2d15w"]
+albedo_texture = ExtResource("2_floor")
+uv1_scale = Vector3(60, 60, 1)
+
+
+[node name="LevelCommon" type="Node3D"]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=802023927]
+transform = Transform3D(1, 0, 0, 0, 0.7331114, 0.68010825, 0, -0.68010825, 0.7331114, 0, 5.2, 5.6)
+current = true
+fov = 34.0
+script = ExtResource("1_camera")
+target_path = NodePath("../../CurrentLevel/Player")
+flame_boundary_path = NodePath("../../CurrentLevel/LongRoad/PathFollow3D/FlameBoundary")
+metadata/_edit_lock_ = true
+
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=800182039]
+environment = SubResource("Environment_siodt")
+
+
+[node name="EditorPreviewLighting" type="Node3D" parent="." unique_id=1246828141]
+script = ExtResource("5_preview")
+
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=1607896681]
+stream = ExtResource("3_music")
+volume_db = -6.0
+autoplay = true
+
+
+[node name="ScoreHud" type="CanvasLayer" parent="." unique_id=831668248]
+script = ExtResource("4_score")
+
+
+[node name="EnergyHud" type="CanvasLayer" parent="." unique_id=358766660]
+script = ExtResource("6_energy")
+death_controller_path = NodePath("../../CurrentLevel/Player/PlayerDeath")
+gold_inventory_path = NodePath("../../CurrentLevel/Player/PlayerGoldInventory")
+bar_width = 700.0
+bar_height = 80.0
+
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2049292617]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 12.135629, 0)
+layers = 2
+light_energy = 0.65
+shadow_enabled = true
+metadata/_edit_lock_ = true
+
+
+[node name="Ground" type="StaticBody3D" parent="." unique_id=1401381437]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+metadata/_edit_lock_ = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=1229036037]
+shape = SubResource("BoxShape3D_rxxet")
+metadata/_edit_lock_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=451156980]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.004836321, 0.041427374, 0.022817373)
+layers = 3
+mesh = SubResource("BoxMesh_rxxet")
+surface_material_override/0 = SubResource("StandardMaterial3D_2d15w")
+metadata/_edit_lock_ = true
+

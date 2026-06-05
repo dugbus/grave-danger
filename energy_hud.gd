@@ -63,6 +63,14 @@ func _ready() -> void:
 	_connect_inventory_signal()
 
 
+func set_runtime_references(death_controller_node: Node, gold_inventory_node: Node) -> void:
+	death_controller = death_controller_node
+	gold_inventory = gold_inventory_node
+	_connect_inventory_signal()
+	_update_energy_bar()
+	_update_coins_bar()
+
+
 func _process(_delta: float) -> void:
 	if not is_instance_valid(death_controller) or not is_instance_valid(gold_inventory):
 		_resolve_references()

@@ -1,5 +1,7 @@
 extends Node
 
+const SCREEN_FADE := preload("res://screen_fade.gd")
+
 
 # Death is isolated so hazards only need one public Player method while the
 # component owns the one-way transition into the death state.
@@ -76,25 +78,7 @@ func _show_lose_screen_after_death() -> void:
 	showing_lose_screen = true
 	await get_tree().create_timer(return_delay).timeout
 
-	var fade := _create_fade_overlay()
-	var tween := create_tween()
-	tween.tween_property(fade, "color:a", 1.0, fade_out_duration)
+	var tween := SCREEN_FADE.fade_out(self, "DeathFade", fade_out_duration, "DeathFadeLayer")
 	await tween.finished
 
 	get_tree().change_scene_to_file(lose_scene)
-
-
-func _create_fade_overlay() -> ColorRect:
-	var layer := CanvasLayer.new()
-	layer.name = "DeathFadeLayer"
-	layer.layer = 100
-	add_child(layer)
-
-	var fade := ColorRect.new()
-	fade.name = "DeathFade"
-	fade.color = Color(0.0, 0.0, 0.0, 0.0)
-	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	fade.set_anchors_preset(Control.PRESET_FULL_RECT)
-	layer.add_child(fade)
-
-	return fade

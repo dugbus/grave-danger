@@ -2,6 +2,7 @@ extends Control
 
 
 const TITLE_SCENE := "res://title_screen.tscn"
+const SCREEN_FADE := preload("res://screen_fade.gd")
 
 ## Background image displayed behind the final result values.
 @export var result_texture: Texture2D
@@ -25,6 +26,7 @@ var percentage_label: Label
 func _ready() -> void:
 	_create_result_image()
 	_create_labels()
+	_record_level_result()
 	_update_result_text()
 	_layout_labels()
 	_fade_in()
@@ -84,6 +86,19 @@ func _update_result_text() -> void:
 	percentage_label.text = "%d" % stats.get_completion_percentage()
 
 
+func _record_level_result() -> void:
+	var stats := get_node_or_null("/root/ResultStats")
+	if stats == null or stats.max_coins_collected <= 0:
+		return
+
+	var level_selection := get_node_or_null("/root/LevelSelection")
+	if level_selection != null and level_selection.has_method("record_selected_level_result"):
+		level_selection.record_selected_level_result(
+			stats.coins_collected,
+			stats.get_completion_percentage()
+		)
+
+
 func _layout_labels() -> void:
 	if result_texture == null or coins_label == null or percentage_label == null:
 		return
@@ -132,30 +147,15 @@ func _fit_label_font_size(label: Label, box_size: Vector2) -> void:
 
 
 func _fade_in() -> void:
-	var fade := _create_fade_overlay(Color.BLACK)
-	var tween := create_tween()
-	tween.tween_property(fade, "color:a", 0.0, fade_duration)
-	tween.finished.connect(fade.queue_free)
+	SCREEN_FADE.fade_in(self, "ResultFade", fade_duration)
 
 
 func _return_to_title() -> void:
 	returning_to_title = true
-	var fade := _create_fade_overlay(Color(0.0, 0.0, 0.0, 0.0))
-	var tween := create_tween()
-	tween.tween_property(fade, "color:a", 1.0, fade_duration)
+	var tween := SCREEN_FADE.fade_out(self, "ResultFade", fade_duration)
 	await tween.finished
 
 	get_tree().change_scene_to_file(TITLE_SCENE)
-
-
-func _create_fade_overlay(color: Color) -> ColorRect:
-	var fade := ColorRect.new()
-	fade.name = "ResultFade"
-	fade.color = color
-	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	fade.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(fade)
-	return fade
 
 
 func _is_primary_event(event: InputEvent) -> bool:

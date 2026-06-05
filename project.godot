@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 quick_exit="*uid://umpymd57w318"
 ResultStats="*res://result_stats.gd"
+LevelSelection="*res://level_selection.gd"
 
 [display]
 

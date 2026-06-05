@@ -32,11 +32,23 @@ const PREVIEW_CONTAINER_NAME := "EditorPreviewCoins"
 		random_seed = value
 		_refresh_preview_when_editing()
 
+@export_group("Runtime Culling")
+## Wait until the pile is close to the camera view before creating physics coins.
+@export var spawn_when_near_camera := true
+## Extra screen area around the camera frustum where piles may begin spawning.
+@export_range(0.0, 2000.0, 1.0, "suffix:px") var spawn_screen_margin := 420.0
+## Extra world-space radius tested around the pile center for visibility checks.
+@export_range(0.0, 20.0, 0.05) var spawn_visibility_radius := 2.0
+## Seconds between visibility checks before this pile starts spawning.
+@export_range(0.02, 2.0, 0.01) var visibility_check_interval := 0.15
+
 var spawn_elapsed := 0.0
 var trigger_elapsed := 0.0
 var spawned_coins := 0
 var spawn_started := false
 var spawn_all_queued := false
+var spawn_area_active := false
+var visibility_check_elapsed := 0.0
 var rng := RandomNumberGenerator.new()
 var preview_mesh: CylinderMesh
 
@@ -52,7 +64,7 @@ func _ready() -> void:
 		rng.seed = random_seed
 
 	spawn_started = trigger_time <= 0.0
-	if spawn_started and spawn_interval <= 0.0:
+	if not spawn_when_near_camera and spawn_started and spawn_interval <= 0.0:
 		_queue_spawn_all()
 
 
@@ -62,6 +74,9 @@ func get_max_coin_count() -> int:
 
 func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint():
+		return
+
+	if not _is_spawn_area_active(delta):
 		return
 
 	if not spawn_started:
@@ -123,6 +138,46 @@ func _spawn_gold_coin() -> void:
 		rng.randf_range(-2.0, 2.0),
 		rng.randf_range(-2.0, 2.0)
 	)
+
+
+func _is_spawn_area_active(delta: float) -> bool:
+	if not spawn_when_near_camera or spawn_area_active:
+		return true
+
+	visibility_check_elapsed -= delta
+	if visibility_check_elapsed > 0.0:
+		return false
+
+	visibility_check_elapsed = visibility_check_interval
+	spawn_area_active = _is_near_camera_view()
+	return spawn_area_active
+
+
+func _is_near_camera_view() -> bool:
+	var camera := get_viewport().get_camera_3d()
+	if camera == null:
+		return true
+
+	var viewport_rect := Rect2(Vector2.ZERO, get_viewport().get_visible_rect().size).grow(spawn_screen_margin)
+	for point in _get_visibility_probe_points():
+		if camera.is_position_behind(point):
+			continue
+
+		if viewport_rect.has_point(camera.unproject_position(point)):
+			return true
+
+	return false
+
+
+func _get_visibility_probe_points() -> Array[Vector3]:
+	var radius := maxf(spawn_visibility_radius, pile_radius)
+	return [
+		global_position,
+		global_position + Vector3(radius, 0.0, 0.0),
+		global_position + Vector3(-radius, 0.0, 0.0),
+		global_position + Vector3(0.0, 0.0, radius),
+		global_position + Vector3(0.0, 0.0, -radius),
+	]
 
 
 func _random_local_spawn_offset(source_rng: RandomNumberGenerator, height: float) -> Vector3:

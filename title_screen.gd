@@ -1,8 +1,9 @@
 extends Control
 
 
-# Scene loaded when the player starts the game.
-const GAME_SCENE := "res://graveyard.tscn"
+# Scene loaded when the player leaves the title screen.
+const LEVEL_SELECT_SCENE := "res://level_select_screen.tscn"
+const SCREEN_FADE := preload("res://screen_fade.gd")
 
 ## Image shown full-screen behind the title screen.
 @export var title_texture: Texture2D
@@ -49,20 +50,11 @@ func _create_title_image() -> void:
 
 
 func _start_game() -> void:
-	# Switch from the title screen to the playable graveyard scene.
+	# Switch from the title screen to the level selection scene.
 
 	starting = true
-	get_tree().change_scene_to_file(GAME_SCENE)
+	get_tree().change_scene_to_file(LEVEL_SELECT_SCENE)
 
 
 func _fade_in_title() -> void:
-	var fade := ColorRect.new()
-	fade.name = "TitleFade"
-	fade.color = Color.BLACK
-	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	fade.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(fade)
-
-	var tween := create_tween()
-	tween.tween_property(fade, "color:a", 0.0, fade_in_duration)
-	tween.finished.connect(fade.queue_free)
+	SCREEN_FADE.fade_in(self, "TitleFade", fade_in_duration)

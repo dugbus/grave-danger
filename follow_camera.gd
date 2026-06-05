@@ -80,6 +80,17 @@ func _ready() -> void:
 		_update_camera_transform()
 
 
+func set_runtime_targets(target_node: Node, flame_boundary_node: Node) -> void:
+	target = target_node as Node3D
+	flame_boundary = flame_boundary_node
+	death_target = null
+	controls_enabled = true
+
+	if target != null:
+		focus_position = target.global_position
+		_update_camera_transform()
+
+
 func _physics_process(delta: float) -> void:
 	# This runs repeatedly during the physics step.
 
