@@ -1,6 +1,7 @@
 extends Node
 
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
+const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 
 
 # Death is isolated so hazards only need one public Player method while the
@@ -83,6 +84,7 @@ func die_from_flames() -> void:
 		if tween != null and tween.is_valid():
 			tween.kill()
 	active_heal_tweens.clear()
+	_play_death_scream()
 
 	if player != null:
 		# Stop active movement immediately; movement component will handle later
@@ -99,6 +101,20 @@ func die_from_flames() -> void:
 		camera.focus_on_dead_player(player)
 
 	_show_lose_screen_after_death()
+
+
+func _play_death_scream() -> void:
+	var sound_player := AudioStreamPlayer.new()
+	sound_player.name = "DeathScreamAudio"
+	sound_player.stream = WILHELM_SCREAM
+	sound_player.volume_db = 2.0
+	sound_player.finished.connect(sound_player.queue_free)
+
+	var audio_parent := get_tree().current_scene
+	if audio_parent == null:
+		audio_parent = player if player != null else self
+	audio_parent.add_child(sound_player)
+	sound_player.play()
 
 
 func _show_lose_screen_after_death() -> void:
