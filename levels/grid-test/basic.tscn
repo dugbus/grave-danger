@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://fjwkdn50tjmw"]
+
+[ext_resource type="Texture2D" uid="uid://bw2xp7u25uxco" path="res://levels/grid-test/grid.png" id="1_m8v83"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_csgli"]
+albedo_texture = ExtResource("1_m8v83")
+uv1_triplanar = true
+uv1_world_triplanar = true
+
+[node name="Basic" type="Node3D" unique_id=575103169]
+
+[node name="CSGCombiner3D" type="CSGCombiner3D" parent="." unique_id=778073462]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="CSGCombiner3D" unique_id=238238161]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 1.5)
+size = Vector3(13, 1, 13)
+material = SubResource("StandardMaterial3D_csgli")
