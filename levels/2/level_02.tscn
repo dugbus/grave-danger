@@ -6,7 +6,9 @@
 [ext_resource type="PackedScene" path="res://levels/common/flame_boundary.tscn" id="4_flame"]
 [ext_resource type="Script" uid="uid://b4l0y5awllv2n" path="res://levels/common/level_scenery_generator.gd" id="5_scenery"]
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
-[ext_resource type="PackedScene" uid="uid://oded1b06ns1i" path="res://Assets/environment/test-block.glb" id="7_uvomc"]
+[ext_resource type="PackedScene" uid="uid://cwvqjbmgnv10k" path="res://Assets/environment/flask.glb" id="7_kfk4x"]
+[ext_resource type="PackedScene" uid="uid://bsrb8v5grm3qf" path="res://Assets/environment/corner.glb" id="8_okamq"]
+[ext_resource type="PackedScene" uid="uid://cv2akr3u8qtrf" path="res://Assets/environment/wall.glb" id="9_e6m62"]
 
 [sub_resource type="Curve3D" id="Curve3D_15rbh"]
 closed = true
@@ -329,5 +331,41 @@ rotation_mode = 0
 [node name="FlameBoundary" parent="LongRoad/PathFollow3D" unique_id=422290054 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 0.18119812, 0, -0.41855812)
 
-[node name="test-block" parent="." unique_id=254414470 instance=ExtResource("7_uvomc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 17)
+[node name="flask" parent="." unique_id=1944729092 instance=ExtResource("7_kfk4x")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 17)
+
+[node name="corner" parent="." unique_id=1880579883 instance=ExtResource("8_okamq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 19)
+
+[node name="corner2" parent="." unique_id=1503013503 instance=ExtResource("8_okamq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 19)
+
+[node name="corner3" parent="." unique_id=131270397 instance=ExtResource("8_okamq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 16)
+
+[node name="corner4" parent="." unique_id=1331392258 instance=ExtResource("8_okamq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 16)
+
+[node name="corner5" parent="." unique_id=336498360 instance=ExtResource("8_okamq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 16)
+
+[node name="wall" parent="." unique_id=491232453 instance=ExtResource("9_e6m62")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -2, 0, 19)
+
+[node name="wall2" parent="." unique_id=1850983395 instance=ExtResource("9_e6m62")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1, 0, 19)
+
+[node name="wall3" parent="." unique_id=723037942 instance=ExtResource("9_e6m62")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 19)
+
+[node name="wall6" parent="." unique_id=1353517037 instance=ExtResource("9_e6m62")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 16)
+
+[node name="wall7" parent="." unique_id=1961007690 instance=ExtResource("9_e6m62")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2, 0, 16)
+
+[node name="wall4" parent="." unique_id=483011115 instance=ExtResource("9_e6m62")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 18)
+
+[node name="wall5" parent="." unique_id=1639307929 instance=ExtResource("9_e6m62")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 17)
