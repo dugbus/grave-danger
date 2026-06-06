@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bsrb8v5grm3qf"
-path="res://.godot/imported/corner.glb-b72bbe2abbfea755176dd20bcae5ffac.scn"
+uid="uid://4q05y6j5pec"
+path="res://.godot/imported/wall-tee.glb-053b39afbe6d6ed0f5cd41f272244d7d.scn"
 
 [deps]
 
-source_file="res://Assets/environment/corner.glb"
-dest_files=["res://.godot/imported/corner.glb-b72bbe2abbfea755176dd20bcae5ffac.scn"]
+source_file="res://Assets/environment/wall-tee.glb"
+dest_files=["res://.godot/imported/wall-tee.glb-053b39afbe6d6ed0f5cd41f272244d7d.scn"]
 
 [params]
 
@@ -39,7 +39,19 @@ materials/extract_format=0
 materials/extract_path=""
 _subresources={
 "nodes": {
+"PATH:Cube_001": {
+"generate/physics": true
+},
 "PATH:Cube_002": {
+"generate/physics": true
+},
+"PATH:Cube_003": {
+"generate/physics": true
+},
+"PATH:Cube_004": {
+"generate/physics": true
+},
+"PATH:Cube_005": {
 "generate/physics": true
 }
 }

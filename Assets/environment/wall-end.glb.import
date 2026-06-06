@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://oded1b06ns1i"
-path="res://.godot/imported/test-block.glb-2ff2949bea3c33e5c592e3b846ed1488.scn"
+uid="uid://bpwil0k54c3st"
+path="res://.godot/imported/wall-end.glb-d4f4cb32aa4746220bf8d8b6fd2e77cf.scn"
 
 [deps]
 
-source_file="res://Assets/environment/test-block.glb"
-dest_files=["res://.godot/imported/test-block.glb-2ff2949bea3c33e5c592e3b846ed1488.scn"]
+source_file="res://Assets/environment/wall-end.glb"
+dest_files=["res://.godot/imported/wall-end.glb-d4f4cb32aa4746220bf8d8b6fd2e77cf.scn"]
 
 [params]
 
@@ -39,7 +39,13 @@ materials/extract_format=0
 materials/extract_path=""
 _subresources={
 "nodes": {
-"PATH:Cube": {
+"PATH:Cube_001": {
+"generate/physics": true
+},
+"PATH:Cube_002": {
+"generate/physics": true
+},
+"PATH:Cube_003": {
 "generate/physics": true
 }
 }
