@@ -23,6 +23,7 @@ const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 var is_dead := false
 var showing_lose_screen := false
 var flame_energy := 100.0
+var active_heal_tweens: Array[Tween] = []
 
 
 func _ready() -> void:
@@ -46,6 +47,31 @@ func drain_flame_energy() -> void:
 	die_from_flames()
 
 
+func can_receive_healing() -> bool:
+	return not is_dead and flame_energy < max_flame_energy
+
+
+func heal_percent_over_time(percent_of_max: float, duration: float) -> bool:
+	if not can_receive_healing() or max_flame_energy <= 0.0:
+		return false
+
+	var heal_amount := max_flame_energy * maxf(percent_of_max, 0.0) * 0.01
+	if heal_amount <= 0.0:
+		return false
+
+	var previous_applied_amount := [0.0]
+	var tween := create_tween()
+	var apply_heal := func(applied_amount: float) -> void:
+		var delta_amount := applied_amount - float(previous_applied_amount[0])
+		previous_applied_amount[0] = applied_amount
+		flame_energy = minf(flame_energy + delta_amount, max_flame_energy)
+
+	active_heal_tweens.append(tween)
+	tween.tween_method(apply_heal, 0.0, heal_amount, maxf(duration, 0.01))
+	tween.finished.connect(func() -> void: active_heal_tweens.erase(tween))
+	return true
+
+
 func die_from_flames() -> void:
 	# Multiple flame areas can report the body in the same frame, so death must
 	# be idempotent.
@@ -53,6 +79,10 @@ func die_from_flames() -> void:
 		return
 
 	is_dead = true
+	for tween in active_heal_tweens:
+		if tween != null and tween.is_valid():
+			tween.kill()
+	active_heal_tweens.clear()
 
 	if player != null:
 		# Stop active movement immediately; movement component will handle later

@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cwvqjbmgnv10k"
-path="res://.godot/imported/flask.glb-833b701463e18687d4d410858ad1cc64.scn"
+path="res://.godot/imported/health-flask.glb-6b93b824a6d092460c0bcc1bfaf4f13a.scn"
 
 [deps]
 
-source_file="res://Assets/environment/flask.glb"
-dest_files=["res://.godot/imported/flask.glb-833b701463e18687d4d410858ad1cc64.scn"]
+source_file="res://Assets/environment/health-flask.glb"
+dest_files=["res://.godot/imported/health-flask.glb-6b93b824a6d092460c0bcc1bfaf4f13a.scn"]
 
 [params]
 

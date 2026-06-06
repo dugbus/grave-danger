@@ -45,6 +45,13 @@ func try_collect_gold_coin(gold_coin: Node3D) -> bool:
 	return gold_inventory.try_collect_gold_coin(gold_coin)
 
 
+func try_collect_health_flask(_health_flask: Node3D, heal_percent_of_max: float, heal_duration: float) -> bool:
+	if death_controller.is_dead:
+		return false
+
+	return death_controller.heal_percent_over_time(heal_percent_of_max, heal_duration)
+
+
 func spend_carried_gold_coin() -> bool:
 	if death_controller.is_dead:
 		return false
