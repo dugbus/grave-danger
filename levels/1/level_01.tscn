@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://bjaedujt8lx6q"]
+[gd_scene format=3 uid="uid://bpewmtap4wln7"]
 
 [ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/kenney-graveyard/coffin.glb" id="1_coffin"]
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
@@ -330,3 +330,27 @@ transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 0.18119812, 0
 
 [node name="HealthPotion" parent="." unique_id=921123679 instance=ExtResource("7_rihgm")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.377432, 0, -19.600279)
+
+[node name="HealthPotion2" parent="." unique_id=1524696757 instance=ExtResource("7_rihgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.377432, 0, -0.60027885)
+
+[node name="HealthPotion3" parent="." unique_id=275333655 instance=ExtResource("7_rihgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.377432, 0, 12.399721)
+
+[node name="HealthPotion4" parent="." unique_id=178355704 instance=ExtResource("7_rihgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.622568, 0, 18.399721)
+
+[node name="HealthPotion5" parent="." unique_id=570599910 instance=ExtResource("7_rihgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.622568, 0, 2.3997211)
+
+[node name="HealthPotion6" parent="." unique_id=367448646 instance=ExtResource("7_rihgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.622568, 0, -8.600279)
+
+[node name="HealthPotion7" parent="." unique_id=265825628 instance=ExtResource("7_rihgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6225681, 0, -0.60027885)
+
+[node name="HealthPotion8" parent="." unique_id=321249204 instance=ExtResource("7_rihgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.622568, 0, -18.600279)
+
+[node name="HealthPotion9" parent="." unique_id=708260411 instance=ExtResource("7_rihgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.377432, 0, -15.600279)
