@@ -7,6 +7,8 @@
 [ext_resource type="Script" uid="uid://b4l0y5awllv2n" path="res://levels/common/level_scenery_generator.gd" id="5_scenery"]
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
 [ext_resource type="PackedScene" path="res://collectibles/health_flask.tscn" id="7_rihgm"]
+[ext_resource type="PackedScene" uid="uid://dd2mdep1tl58x" path="res://Assets/environment/fence.glb" id="8_krp6k"]
+[ext_resource type="PackedScene" uid="uid://1d53djdqyqo8" path="res://Assets/environment/fence-corner.glb" id="9_13h2c"]
 
 [sub_resource type="Curve3D" id="Curve3D_15rbh"]
 closed = true
@@ -357,3 +359,60 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.622568, 0, -18.600279)
 
 [node name="HealthPotion9" parent="." unique_id=708260411 instance=ExtResource("7_rihgm")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.377432, 0, -15.600279)
+
+[node name="fence" parent="." unique_id=88889587 instance=ExtResource("8_krp6k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -23.5, 0, -25.5)
+
+[node name="fence2" parent="." unique_id=844844153 instance=ExtResource("8_krp6k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -16.5, 0, -25.5)
+
+[node name="fence3" parent="." unique_id=1836783898 instance=ExtResource("8_krp6k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -13.5, 0, -25.5)
+
+[node name="fence4" parent="." unique_id=1378074308 instance=ExtResource("8_krp6k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -10.5, 0, -25.5)
+
+[node name="fence5" parent="." unique_id=631423864 instance=ExtResource("8_krp6k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -7.5, 0, -25.5)
+
+[node name="fence6" parent="." unique_id=1827414180 instance=ExtResource("8_krp6k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -4.5, 0, -25.5)
+
+[node name="fence7" parent="." unique_id=1285715140 instance=ExtResource("8_krp6k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.5, 0, -25.5)
+
+[node name="fence8" parent="." unique_id=919260940 instance=ExtResource("8_krp6k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 1.5, 0, -25.5)
+
+[node name="fence9" parent="." unique_id=1219282516 instance=ExtResource("8_krp6k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 4.5, 0, -25.5)
+
+[node name="fence10" parent="." unique_id=44136886 instance=ExtResource("8_krp6k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 7.5, 0, -25.5)
+
+[node name="fence11" parent="." unique_id=455618305 instance=ExtResource("8_krp6k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10.5, 0, -25.5)
+
+[node name="fence12" parent="." unique_id=551465219 instance=ExtResource("8_krp6k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 13.5, 0, -25.5)
+
+[node name="fence13" parent="." unique_id=1296858702 instance=ExtResource("8_krp6k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 16.5, 0, -25.5)
+
+[node name="fence14" parent="." unique_id=1345709741 instance=ExtResource("8_krp6k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 19.5, 0, -25.5)
+
+[node name="fence15" parent="." unique_id=1829732397 instance=ExtResource("8_krp6k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 22.5, 0, -25.5)
+
+[node name="fence-corner" parent="." unique_id=652735731 instance=ExtResource("9_13h2c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.5, 0, -25.5)
+
+[node name="fence-corner2" parent="." unique_id=408950136 instance=ExtResource("9_13h2c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.5, 0, -25.5)
+
+[node name="fence-corner3" parent="." unique_id=1556064888 instance=ExtResource("9_13h2c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.5, 0, -25.5)
+
+[node name="fence-corner4" parent="." unique_id=1750183597 instance=ExtResource("9_13h2c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.5, 0, -25.5)
