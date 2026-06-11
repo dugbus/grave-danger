@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/brick-wall.glb-0ae21e22062cc6fa4e01f30fbdee6b
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="brick-wall"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

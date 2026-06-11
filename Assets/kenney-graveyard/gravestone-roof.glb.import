@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/gravestone-roof.glb-175b90937b1aa0e3407a2875c
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="gravestone-roof"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

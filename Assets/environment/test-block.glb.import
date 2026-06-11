@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/test-block.glb-2ff2949bea3c33e5c592e3b846ed14
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="test-block"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

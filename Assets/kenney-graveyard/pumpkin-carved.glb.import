@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/pumpkin-carved.glb-72a11acbdfd843caa2b4b5faa4
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="pumpkin-carved"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

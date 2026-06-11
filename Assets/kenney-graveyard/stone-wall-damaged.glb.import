@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/stone-wall-damaged.glb-086d7fc8cba2bb9e18e80c
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="stone-wall-damaged"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

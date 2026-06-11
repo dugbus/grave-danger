@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/bench-damaged.glb-80dfaa588ba9eaf5d99e8fccf06
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="bench-damaged"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

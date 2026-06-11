@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/lightpost-double.glb-56a7c9d0a4ad96a01f24d18d
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="lightpost-double"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

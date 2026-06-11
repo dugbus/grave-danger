@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/gravestone-cross-large.glb-0ab9aa0c2504a645bc
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="gravestone-cross-large"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

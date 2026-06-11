@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/stone-wall-curve.glb-68d2081dbbe882e4bcf09ffe
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="stone-wall-curve"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

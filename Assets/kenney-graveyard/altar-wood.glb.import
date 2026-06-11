@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/altar-wood.glb-69fcd9258e9ddc22623ffcfabc101a
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="altar-wood"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="PNGToGridMapSettings" format=3 uid="uid://cwq58i4v4blh8"]
+
+[ext_resource type="Script" uid="uid://sqp5sti0kxob" path="res://addons/png_to_gridmap/png_to_gridmap_color_mapping.gd" id="1_jal17"]
+[ext_resource type="Script" uid="uid://bhrpqhaebhdyj" path="res://addons/png_to_gridmap/png_to_gridmap_settings.gd" id="1_qv7gf"]
+
+[sub_resource type="Resource" id="Resource_jal17"]
+script = ExtResource("1_jal17")
+colour = Color(0, 0, 0, 1)
+display_name = "#000000FF"
+base_item_ref = "wall"
+base_rotation_offset = 1
+autotile_enabled = true
+end_item_ref = "wall-end"
+end_rotation_offset = 3
+corner_item_ref = "wall-corner"
+corner_rotation_offset = 2
+tee_item_ref = "wall-tee"
+tee_rotation_offset = 2
+cross_item_ref = "wall-tee"
+
+[resource]
+script = ExtResource("1_qv7gf")
+png_path = "res://test.png"
+export_png_path = "res://test.png"
+target_gridmap_path = NodePath("PNGGridMap")
+mesh_library_path = "res://grid_map_mesh_library.tres"
+export_size = Vector2i(32, 32)
+color_mappings = Array[Resource]([SubResource("Resource_jal17")])

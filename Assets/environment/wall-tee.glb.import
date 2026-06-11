@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/wall-tee.glb-053b39afbe6d6ed0f5cd41f272244d7d
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="wall-tee"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/crypt-large-roof.glb-f4c5a69259e54429e68ac1bc
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="crypt-large-roof"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

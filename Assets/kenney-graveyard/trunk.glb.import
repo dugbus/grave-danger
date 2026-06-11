@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/trunk.glb-8fa2c8135cf2c08d00f0b5a8996cd988.sc
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="trunk"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

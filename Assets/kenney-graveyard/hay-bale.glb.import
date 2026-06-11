@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/hay-bale.glb-5608b456eadba01a77c21d93b5b79329
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="hay-bale"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

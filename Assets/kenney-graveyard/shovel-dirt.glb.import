@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/shovel-dirt.glb-dcf642b1f4853045bff68b74c4c6c
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="shovel-dirt"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

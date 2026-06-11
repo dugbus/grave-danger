@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/crypt-door.glb-80a58b0eef266eb7c1a4fd992aa325
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="crypt-door"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

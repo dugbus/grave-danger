@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/pine-crooked.glb-7b80f57d692563b6acdd577fc0c6
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="pine-crooked"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/gravestone-debris.glb-5539315da53123a2046a2fc
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="gravestone-debris"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

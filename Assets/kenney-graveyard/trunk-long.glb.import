@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/trunk-long.glb-8203020689b485a63b251b254f99fa
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="trunk-long"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

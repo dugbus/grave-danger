@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/urn-square.glb-9d1bc861279cdd2569b8c54a4caadd
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="urn-square"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

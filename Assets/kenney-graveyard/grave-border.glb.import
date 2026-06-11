@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/grave-border.glb-e921576f850e5240c2ff31d6d647
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="grave-border"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

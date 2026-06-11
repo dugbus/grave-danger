@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/iron-fence-border.glb-5d9af3e7b2f2d4f84e94d57
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="iron-fence-border"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

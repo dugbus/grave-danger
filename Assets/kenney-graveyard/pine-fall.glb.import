@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/pine-fall.glb-3fa904e674cb0c14c4f2d9b39620a5a
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="pine-fall"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

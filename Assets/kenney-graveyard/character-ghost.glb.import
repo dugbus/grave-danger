@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/character-ghost.glb-304c9a014311c92c822ec5392
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="character-ghost"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

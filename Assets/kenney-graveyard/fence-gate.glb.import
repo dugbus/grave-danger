@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/fence-gate.glb-29621750eb0e7cdafd89d481c54699
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="fence-gate"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

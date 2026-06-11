@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/detail-plate.glb-eb97a63211cc3ea88d5a080e4819
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="detail-plate"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

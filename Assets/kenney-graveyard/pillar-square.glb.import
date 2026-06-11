@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/pillar-square.glb-164b46aca44b86c9e23cdc42831
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="pillar-square"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/rocks-tall.glb-7483dacccfaeff620c5780efb0f1e5
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="rocks-tall"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

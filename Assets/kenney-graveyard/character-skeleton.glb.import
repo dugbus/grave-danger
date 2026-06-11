@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/character-skeleton.glb-44ae01eebaa7afa5d0d565
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="character-skeleton"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

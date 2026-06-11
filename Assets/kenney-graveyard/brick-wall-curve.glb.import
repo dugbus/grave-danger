@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/brick-wall-curve.glb-54455d8426574fe9d8d90bc9
 [params]
 
 nodes/root_type=""
-nodes/root_name=""
+nodes/root_name="brick-wall-curve"
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0
