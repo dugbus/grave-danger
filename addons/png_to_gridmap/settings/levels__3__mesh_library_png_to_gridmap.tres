@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="PNGToGridMapSettings" format=3 uid="uid://chs7r02532pyg"]
+
+[ext_resource type="Script" uid="uid://bhrpqhaebhdyj" path="res://addons/png_to_gridmap/png_to_gridmap_settings.gd" id="1_gorp3"]
+[ext_resource type="Script" uid="uid://sqp5sti0kxob" path="res://addons/png_to_gridmap/png_to_gridmap_color_mapping.gd" id="1_i5gtm"]
+
+[sub_resource type="Resource" id="Resource_wvr8r"]
+script = ExtResource("1_i5gtm")
+colour = Color(0, 0, 0, 1)
+display_name = "#000000FF"
+base_item_ref = "wall"
+base_rotation_offset = 1
+autotile_enabled = true
+end_item_ref = "wall-end"
+end_rotation_offset = 3
+corner_item_ref = "wall-corner"
+corner_rotation_offset = 2
+tee_item_ref = "wall-tee"
+tee_rotation_offset = 2
+cross_item_ref = "wall"
+
+[resource]
+script = ExtResource("1_gorp3")
+png_path = "C:/Godot/grave-danger/level_03.png"
+target_gridmap_path = NodePath("GridMap")
+mesh_library_path = "res://levels/3/mesh_library.tres"
+export_origin = Vector2i(-150, -10)
+export_size = Vector2i(300, 20)
+color_mappings = Array[Resource]([SubResource("Resource_wvr8r")])

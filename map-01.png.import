@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://xr016ym2s7f6"
-path="res://.godot/imported/dave-brown-map-from-json.png-d056fef77749213ed9970ae45f3236bc.ctex"
+uid="uid://x7s04wedgg6p"
+path="res://.godot/imported/map-01.png-ae34580825bdb292ba6ba687811ee062.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://dave-brown-map-from-json.png"
-dest_files=["res://.godot/imported/dave-brown-map-from-json.png-d056fef77749213ed9970ae45f3236bc.ctex"]
+source_file="res://map-01.png"
+dest_files=["res://.godot/imported/map-01.png-ae34580825bdb292ba6ba687811ee062.ctex"]
 
 [params]
 

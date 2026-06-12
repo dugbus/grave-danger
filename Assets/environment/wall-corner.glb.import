@@ -38,18 +38,15 @@ materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
 _subresources={
-"nodes": {
-"PATH:Cube_001": {
-"generate/physics": true
-},
-"PATH:Cube_002": {
-"generate/physics": true
-},
-"PATH:Cube_003": {
-"generate/physics": true
-},
-"PATH:Cube_004": {
-"generate/physics": true
+"meshes": {
+"wall-corner_wall-corner": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/wall-corner.tres",
+"save_to_file/path": "uid://qg5ntmk12lhw"
 }
 }
 }

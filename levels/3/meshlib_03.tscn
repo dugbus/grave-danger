@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://dsy57adbc6gby"]
+
+[ext_resource type="ArrayMesh" uid="uid://b8a1qcsxmdstq" path="res://Assets/environment/wall-corner.tres" id="1_ij5tp"]
+[ext_resource type="ArrayMesh" uid="uid://erbvk17gif1b" path="res://Assets/environment/wall-cross.tres" id="2_thwe0"]
+[ext_resource type="ArrayMesh" uid="uid://bgftxf6a10khf" path="res://Assets/environment/wall-end.tres" id="3_v1eh3"]
+[ext_resource type="ArrayMesh" uid="uid://bgkekdirpunvj" path="res://Assets/environment/wall-tee.tres" id="4_p2imy"]
+[ext_resource type="ArrayMesh" uid="uid://dmpclul80fqvk" path="res://Assets/environment/wall.tres" id="5_6a3c6"]
+
+[node name="Node3D" type="Node3D" unique_id=1452049625]
+
+[node name="WallCorner" type="MeshInstance3D" parent="." unique_id=385415603]
+mesh = ExtResource("1_ij5tp")
+
+[node name="WallCross" type="MeshInstance3D" parent="." unique_id=412630251]
+mesh = ExtResource("2_thwe0")
+
+[node name="WallEnd" type="MeshInstance3D" parent="." unique_id=1372018677]
+mesh = ExtResource("3_v1eh3")
+
+[node name="WallTee" type="MeshInstance3D" parent="." unique_id=816014875]
+mesh = ExtResource("4_p2imy")
+
+[node name="Wall" type="MeshInstance3D" parent="." unique_id=1082128221]
+mesh = ExtResource("5_6a3c6")

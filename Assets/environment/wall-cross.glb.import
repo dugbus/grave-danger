@@ -3,18 +3,18 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cv2akr3u8qtrf"
-path="res://.godot/imported/wall.glb-e6d28de3034a212337a615fd29e6db66.scn"
+uid="uid://cthcw87a6vfyh"
+path="res://.godot/imported/wall-cross.glb-6d5d78ca3b8e68f8ae5ac0e2eb96379b.scn"
 
 [deps]
 
-source_file="res://Assets/environment/wall.glb"
-dest_files=["res://.godot/imported/wall.glb-e6d28de3034a212337a615fd29e6db66.scn"]
+source_file="res://Assets/environment/wall-cross.glb"
+dest_files=["res://.godot/imported/wall-cross.glb-6d5d78ca3b8e68f8ae5ac0e2eb96379b.scn"]
 
 [params]
 
 nodes/root_type=""
-nodes/root_name="wall"
+nodes/root_name=""
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0
@@ -39,14 +39,14 @@ materials/extract_format=0
 materials/extract_path=""
 _subresources={
 "meshes": {
-"wall_wall": {
+"wall-cross_Cube_006": {
 "generate/lightmap_uv": 0,
 "generate/lods": 0,
 "generate/shadow_meshes": 0,
 "lods/normal_merge_angle": 20.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://Assets/environment/wall.tres",
-"save_to_file/path": "uid://cedv8e4bwukfv"
+"save_to_file/fallback_path": "res://Assets/environment/wall-cross.tres",
+"save_to_file/path": "uid://b36drb4ytbdrm"
 }
 }
 }
