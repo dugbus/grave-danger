@@ -1,4 +1,4 @@
-[gd_resource type="ArrayMesh" format=4 uid="uid://bgftxf6a10khf"]
+[gd_resource type="ArrayMesh" format=4 uid="uid://bf46ghjvrnt7k"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1jw36"]
 vertex_color_use_as_albedo = true
