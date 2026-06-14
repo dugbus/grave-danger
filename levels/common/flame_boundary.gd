@@ -9,6 +9,7 @@ const BOUNDARY_CENTER_NAME := "BoundaryCenter"
 const ANIMATION_PLAYER_NAME := "AnimationPlayer"
 const NEAR_FLAMES_SOUND_PATH := "res://Assets/audio/near-the-flames.mp3"
 const PLAYER_BLOCKER_COLLISION_LAYER := 8
+const FLAME_SHADER := preload("res://levels/common/flame_boundary.gdshader")
 
 @export_group("Motion")
 ## PathFollow3D node that carries the moving boundary center.
@@ -37,8 +38,14 @@ const PLAYER_BLOCKER_COLLISION_LAYER := 8
 		flame_thickness = maxf(value, 0.01)
 		_sync_boundary()
 
+## Depth of the volumetric fire, independent of its damage collision thickness.
+@export_range(0.1, 3.0, 0.05) var flame_visual_depth := 0.7:
+	set(value):
+		flame_visual_depth = maxf(value, 0.1)
+		_sync_boundary()
+
 ## Height of the flame mesh and damage volume.
-@export_range(0.05, 10.0, 0.05) var flame_height := 1.15:
+@export_range(0.05, 10.0, 0.05) var flame_height := 1.55:
 	set(value):
 		flame_height = maxf(value, 0.05)
 		_sync_boundary()
@@ -295,43 +302,24 @@ func _get_center_node() -> Node3D:
 
 
 func _create_flame_material() -> void:
-	var shader := Shader.new()
-	shader.code = """
-shader_type spatial;
-render_mode unshaded, blend_add, cull_disabled;
-
-uniform vec4 ember_color : source_color = vec4(1.0, 0.16, 0.01, 0.58);
-uniform vec4 flame_color : source_color = vec4(1.0, 0.92, 0.12, 0.88);
-
-float hash(vec2 p) {
-	return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-}
-
-float noise(vec2 p) {
-	vec2 i = floor(p);
-	vec2 f = fract(p);
-	vec2 u = f * f * (3.0 - 2.0 * f);
-	return mix(
-		mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), u.x),
-		mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
-		u.y
-	);
-}
-
-void fragment() {
-	float vertical = UV.y;
-	float edge_fade = smoothstep(0.0, 0.14, vertical) * (1.0 - smoothstep(0.86, 1.0, vertical));
-	float lick = noise(vec2(UV.x * 7.0, vertical * 3.0 - TIME * 2.6));
-	float tongue = smoothstep(0.22, 0.92, lick + vertical * 0.32);
-	vec3 color = mix(ember_color.rgb, flame_color.rgb, tongue);
-	ALBEDO = color;
-	EMISSION = color * (3.2 + tongue * 3.8);
-	ALPHA = edge_fade * mix(ember_color.a, flame_color.a, tongue);
-}
-"""
-
 	flame_material = ShaderMaterial.new()
-	flame_material.shader = shader
+	flame_material.shader = FLAME_SHADER
+
+	var noise := FastNoiseLite.new()
+	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+	noise.frequency = 0.08
+	noise.fractal_octaves = 4
+	noise.fractal_lacunarity = 2.0
+	noise.fractal_gain = 0.52
+
+	var noise_texture := NoiseTexture3D.new()
+	noise_texture.width = 64
+	noise_texture.height = 64
+	noise_texture.depth = 64
+	noise_texture.seamless = true
+	noise_texture.normalize = true
+	noise_texture.noise = noise
+	flame_material.set_shader_parameter("sample_noise", noise_texture)
 
 
 func _create_preview_material() -> StandardMaterial3D:
@@ -378,7 +366,8 @@ func _ensure_editor_preview() -> void:
 		preview_meshes.append(mesh_instance)
 
 	for i in 4:
-		preview_meshes[i].mesh = QuadMesh.new()
+		preview_meshes[i].mesh = BoxMesh.new()
+		preview_meshes[i].material_override = flame_material
 
 	var center_mesh := SphereMesh.new()
 	center_mesh.radius = 0.18
@@ -435,8 +424,9 @@ func _create_strips() -> void:
 
 		var mesh_instance := MeshInstance3D.new()
 		mesh_instance.name = "FlameMesh%d" % i
-		mesh_instance.mesh = QuadMesh.new()
+		mesh_instance.mesh = BoxMesh.new()
 		mesh_instance.material_override = flame_material
+		mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		area.add_child(mesh_instance)
 		strip_meshes.append(mesh_instance)
 
@@ -503,18 +493,25 @@ func _apply_rect_to_meshes(meshes: Array[MeshInstance3D], collisions: Array[Coll
 	var half_x := bounds_size.x * 0.5
 	var half_z := bounds_size.y * 0.5
 	var center := Vector3(0.0, flame_y + flame_height * 0.5, 0.0)
+	var horizontal_visual_size := Vector3(bounds_size.x + flame_visual_depth, flame_height, flame_visual_depth)
+	var vertical_visual_size := Vector3(bounds_size.y + flame_visual_depth, flame_height, flame_visual_depth)
 
 	var strip_specs: Array[Dictionary] = [
-		{"position": center + Vector3(0.0, 0.0, -half_z), "collision_size": Vector3(bounds_size.x, flame_height, flame_thickness), "visual_size": Vector2(bounds_size.x, flame_height), "rotation": 0.0},
-		{"position": center + Vector3(0.0, 0.0, half_z), "collision_size": Vector3(bounds_size.x, flame_height, flame_thickness), "visual_size": Vector2(bounds_size.x, flame_height), "rotation": 0.0},
-		{"position": center + Vector3(-half_x, 0.0, 0.0), "collision_size": Vector3(flame_thickness, flame_height, bounds_size.y), "visual_size": Vector2(bounds_size.y, flame_height), "rotation": PI * 0.5},
-		{"position": center + Vector3(half_x, 0.0, 0.0), "collision_size": Vector3(flame_thickness, flame_height, bounds_size.y), "visual_size": Vector2(bounds_size.y, flame_height), "rotation": PI * 0.5},
+		{"position": center + Vector3(0.0, 0.0, -half_z), "collision_size": Vector3(bounds_size.x, flame_height, flame_thickness), "visual_size": horizontal_visual_size, "segment_half_length": half_x, "inside_sign": 1.0, "noise_sign": 1.0, "noise_offset": half_x, "rotation": 0.0},
+		{"position": center + Vector3(0.0, 0.0, half_z), "collision_size": Vector3(bounds_size.x, flame_height, flame_thickness), "visual_size": horizontal_visual_size, "segment_half_length": half_x, "inside_sign": -1.0, "noise_sign": -1.0, "noise_offset": bounds_size.x * 1.5 + bounds_size.y, "rotation": 0.0},
+		{"position": center + Vector3(-half_x, 0.0, 0.0), "collision_size": Vector3(flame_thickness, flame_height, bounds_size.y), "visual_size": vertical_visual_size, "segment_half_length": half_z, "inside_sign": 1.0, "noise_sign": 1.0, "noise_offset": bounds_size.x * 2.0 + bounds_size.y + half_z, "rotation": PI * 0.5},
+		{"position": center + Vector3(half_x, 0.0, 0.0), "collision_size": Vector3(flame_thickness, flame_height, bounds_size.y), "visual_size": vertical_visual_size, "segment_half_length": half_z, "inside_sign": -1.0, "noise_sign": -1.0, "noise_offset": bounds_size.x + half_z, "rotation": PI * 0.5},
 	]
 
 	for i in 4:
 		var spec: Dictionary = strip_specs[i]
 		var mesh_instance := meshes[i]
-		(mesh_instance.mesh as QuadMesh).size = spec["visual_size"]
+		(mesh_instance.mesh as BoxMesh).size = spec["visual_size"]
+		mesh_instance.set_instance_shader_parameter("fire_size", spec["visual_size"])
+		mesh_instance.set_instance_shader_parameter("segment_half_length", spec["segment_half_length"])
+		mesh_instance.set_instance_shader_parameter("miter_inside_sign", spec["inside_sign"])
+		mesh_instance.set_instance_shader_parameter("noise_along_sign", spec["noise_sign"])
+		mesh_instance.set_instance_shader_parameter("noise_along_offset", spec["noise_offset"])
 		mesh_instance.rotation = Vector3(0.0, spec["rotation"], 0.0)
 
 		if collisions.is_empty():
