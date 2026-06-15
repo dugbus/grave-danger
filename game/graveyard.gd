@@ -19,6 +19,7 @@ var current_level: Node
 
 func _ready() -> void:
 	_load_selected_level()
+	_configure_ground_for_level()
 	_configure_common_runtime_references()
 	_configure_flame_boundary_animation()
 	max_coins_collected = _calculate_max_coins_collected()
@@ -91,6 +92,55 @@ func _get_selected_level_scene() -> PackedScene:
 			return selected_scene
 
 	return default_level_scene
+
+
+func _configure_ground_for_level() -> void:
+	if current_level == null:
+		return
+
+	var grid := current_level.get_node_or_null("GridMap") as GridMap
+	var ground := get_node_or_null("LevelCommon/Ground") as StaticBody3D
+	if grid == null or ground == null:
+		return
+
+	var cells := grid.get_used_cells()
+	if cells.is_empty():
+		return
+
+	var minimum := cells[0]
+	var maximum := cells[0]
+	for cell in cells:
+		minimum.x = mini(minimum.x, cell.x)
+		minimum.z = mini(minimum.z, cell.z)
+		maximum.x = maxi(maximum.x, cell.x)
+		maximum.z = maxi(maximum.z, cell.z)
+
+	var floor_size := Vector2(
+		float(maximum.x - minimum.x + 1) * grid.cell_size.x,
+		float(maximum.z - minimum.z + 1) * grid.cell_size.z
+	)
+	var first_cell := grid.map_to_local(Vector3i(minimum.x, 0, minimum.z))
+	var last_cell := grid.map_to_local(Vector3i(maximum.x, 0, maximum.z))
+	var floor_center_global := grid.to_global((first_cell + last_cell) * 0.5)
+	var floor_center := ground.get_parent_node_3d().to_local(floor_center_global)
+	ground.position = Vector3(floor_center.x, -1.0, floor_center.z)
+
+	var collision := ground.get_node_or_null("CollisionShape3D") as CollisionShape3D
+	if collision != null and collision.shape is BoxShape3D:
+		collision.shape = collision.shape.duplicate()
+		(collision.shape as BoxShape3D).size = Vector3(floor_size.x, 2.0, floor_size.y)
+
+	var mesh_instance := ground.get_node_or_null("MeshInstance3D") as MeshInstance3D
+	if mesh_instance == null or not mesh_instance.mesh is BoxMesh:
+		return
+
+	mesh_instance.mesh = mesh_instance.mesh.duplicate()
+	(mesh_instance.mesh as BoxMesh).size = Vector3(floor_size.x, 2.0, floor_size.y)
+	var material := mesh_instance.get_active_material(0) as StandardMaterial3D
+	if material != null:
+		material = material.duplicate()
+		material.uv1_scale = Vector3(floor_size.x, floor_size.y, 1.0)
+		mesh_instance.set_surface_override_material(0, material)
 
 
 func _configure_common_runtime_references() -> void:

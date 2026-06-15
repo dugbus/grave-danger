@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://dsy57adbc6gby"]
 
-[ext_resource type="ArrayMesh" uid="uid://b8a1qcsxmdstq" path="res://Assets/environment/wall-corner.tres" id="1_ij5tp"]
-[ext_resource type="ArrayMesh" uid="uid://erbvk17gif1b" path="res://Assets/environment/wall-cross.tres" id="2_thwe0"]
-[ext_resource type="ArrayMesh" uid="uid://bgftxf6a10khf" path="res://Assets/environment/wall-end.tres" id="3_v1eh3"]
-[ext_resource type="ArrayMesh" uid="uid://bgkekdirpunvj" path="res://Assets/environment/wall-tee.tres" id="4_p2imy"]
-[ext_resource type="ArrayMesh" uid="uid://dmpclul80fqvk" path="res://Assets/environment/wall.tres" id="5_6a3c6"]
+[ext_resource type="ArrayMesh" path="res://Assets/environment/wall-corner.res" id="1_ij5tp"]
+[ext_resource type="ArrayMesh" path="res://Assets/environment/wall-cross.res" id="2_thwe0"]
+[ext_resource type="ArrayMesh" path="res://Assets/environment/wall-end.res" id="3_v1eh3"]
+[ext_resource type="ArrayMesh" path="res://Assets/environment/wall-tee.res" id="4_p2imy"]
+[ext_resource type="ArrayMesh" path="res://Assets/environment/wall.res" id="5_6a3c6"]
 
 [node name="Node3D" type="Node3D" unique_id=1452049625]
 

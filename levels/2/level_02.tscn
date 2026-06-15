@@ -6,10 +6,6 @@
 [ext_resource type="PackedScene" path="res://levels/common/flame_boundary.tscn" id="4_flame"]
 [ext_resource type="Script" uid="uid://b4l0y5awllv2n" path="res://levels/common/level_scenery_generator.gd" id="5_scenery"]
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
-[ext_resource type="PackedScene" uid="uid://c3omh4jch3a1e" path="res://Assets/environment/wall-corner.glb" id="7_okamq"]
-[ext_resource type="PackedScene" uid="uid://bpwil0k54c3st" path="res://Assets/environment/wall-end.glb" id="9_a6u7l"]
-[ext_resource type="PackedScene" uid="uid://cv2akr3u8qtrf" path="res://Assets/environment/wall.glb" id="9_e6m62"]
-[ext_resource type="PackedScene" uid="uid://oded1b06ns1i" path="res://Assets/environment/test-block.glb" id="10_b3h6c"]
 
 [sub_resource type="Curve3D" id="Curve3D_15rbh"]
 closed = true
@@ -68,7 +64,6 @@ tracks/2/keys = {
 _data = {
 &"flame_boundary": SubResource("Animation_flame_boundary")
 }
-
 
 [node name="Level2" type="Node3D" unique_id=1192405132]
 
@@ -373,33 +368,9 @@ boundary_animation = SubResource("Animation_flame_boundary")
 playback_duration = 475.27316
 
 [node name="BoundaryCenter" parent="FlameBoundary3D" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.321892, 0, -22.004309)
+transform = Transform3D(0.9999972, 0, 0, 0, 1, 0, 0, 0, 0.9999972, -21.321892, 0, -22.004309)
 
 [node name="BoundaryAnimationPlayer" parent="FlameBoundary3D" index="1"]
 libraries/ = SubResource("AnimationLibrary_flame_boundary")
 
 [editable path="FlameBoundary3D"]
-
-[node name="wall-corner" parent="." unique_id=501201768 instance=ExtResource("7_okamq")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 19.5)
-
-[node name="wall-corner2" parent="." unique_id=1272993401 instance=ExtResource("7_okamq")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -3.5, 0, 19.5)
-
-[node name="wall" parent="." unique_id=1038319768 instance=ExtResource("9_e6m62")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -1.5, 0, 19.5)
-
-[node name="wall3" parent="." unique_id=1738083799 instance=ExtResource("9_e6m62")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -2.5, 0, 19.5)
-
-[node name="wall2" parent="." unique_id=1896443608 instance=ExtResource("9_e6m62")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 20.5)
-
-[node name="wall-end" parent="." unique_id=159431615 instance=ExtResource("9_a6u7l")]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -3.5, 0, 20.5)
-
-[node name="wall-end2" parent="." unique_id=951916884 instance=ExtResource("9_a6u7l")]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.5, 0, 21.5)
-
-[node name="test-block" parent="." unique_id=1549330556 instance=ExtResource("10_b3h6c")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, 20.5)
