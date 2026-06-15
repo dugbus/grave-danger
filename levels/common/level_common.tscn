@@ -1,12 +1,13 @@
 [gd_scene format=3 uid="uid://3w0dhwvg7s4a"]
 
 [ext_resource type="Script" uid="uid://bov7w0cyy2jl7" path="res://game/follow_camera.gd" id="1_camera"]
-[ext_resource type="Texture2D" uid="uid://w4ywm1e6jlu7" path="res://Assets/environment/floor-texture.png" id="2_floor"]
+[ext_resource type="Texture2D" uid="uid://cj5phhpf53e7v" path="res://Assets/environment/floor-albedo.png" id="2_floor_albedo"]
 [ext_resource type="AudioStream" uid="uid://bcd4h7b10r85q" path="res://Assets/audio/music-track.mp3" id="3_music"]
 [ext_resource type="Script" uid="uid://5kig63v451pl" path="res://ui/hud/score_hud.gd" id="4_score"]
 [ext_resource type="Script" uid="uid://cyr67ggw4yark" path="res://tools/editor_preview_lighting.gd" id="5_preview"]
 [ext_resource type="Script" uid="uid://de147agwnjnqt" path="res://ui/hud/energy_hud.gd" id="6_energy"]
 [ext_resource type="Script" uid="uid://bror4xqpcudhg" path="res://ui/hud/hud_status_bar.gd" id="7_status"]
+[ext_resource type="Texture2D" uid="uid://e2lt84xdo8rg" path="res://Assets/environment/floor-normal.png" id="8_floor_normal"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_8ccgg"]
 
@@ -34,7 +35,12 @@ size = Vector3(60, 2, 60)
 size = Vector3(60, 2, 60)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2d15w"]
-albedo_texture = ExtResource("2_floor")
+albedo_texture = ExtResource("2_floor_albedo")
+metallic_specular = 0.62
+roughness = 0.8
+normal_enabled = true
+normal_scale = 3.07
+normal_texture = ExtResource("8_floor_normal")
 uv1_scale = Vector3(60, 60, 1)
 
 [node name="LevelCommon" type="Node3D" unique_id=555773272]
@@ -107,7 +113,6 @@ metadata/_edit_lock_ = true
 
 [node name="Ground" type="StaticBody3D" parent="." unique_id=1401381437]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
-visible = false
 metadata/_edit_lock_ = true
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=1229036037]
@@ -116,7 +121,6 @@ metadata/_edit_lock_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=451156980]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.004836321, 0.041427374, 0.022817373)
-layers = 3
 mesh = SubResource("BoxMesh_rxxet")
 surface_material_override/0 = SubResource("StandardMaterial3D_2d15w")
 metadata/_edit_lock_ = true

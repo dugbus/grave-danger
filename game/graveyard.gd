@@ -2,6 +2,7 @@ extends Node3D
 
 const WIN_SCENE := "res://ui/screens/win_screen.tscn"
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
+const FLAME_BOUNDARY_SCRIPT := preload("res://levels/common/flame_boundary.gd")
 
 const CURRENT_LEVEL_NAME := "CurrentLevel"
 
@@ -9,8 +10,6 @@ const CURRENT_LEVEL_NAME := "CurrentLevel"
 @export var win_fade_out_duration := 0.8
 ## Level scene used when nothing has been selected yet.
 @export var default_level_scene: PackedScene
-## Speed used to move the active level's flame boundary along its authored path.
-@export var flame_boundary_speed := 1.0
 
 var coins_collected := 0
 var max_coins_collected := 0
@@ -21,18 +20,13 @@ var current_level: Node
 func _ready() -> void:
 	_load_selected_level()
 	_configure_common_runtime_references()
+	_configure_flame_boundary_animation()
 	max_coins_collected = _calculate_max_coins_collected()
 	_store_result_stats()
 
 	for deposit in _get_coin_deposits():
 		if deposit.has_signal("coin_absorbed"):
 			deposit.coin_absorbed.connect(_on_coin_absorbed)
-
-
-func _physics_process(delta: float) -> void:
-	var path_follow := _get_flame_path_follow()
-	if path_follow != null:
-		path_follow.progress += flame_boundary_speed * delta
 
 
 func _on_coin_absorbed(count: int) -> void:
@@ -104,7 +98,7 @@ func _configure_common_runtime_references() -> void:
 		return
 
 	var player := current_level.get_node_or_null("Player")
-	var flame_boundary := current_level.get_node_or_null("LongRoad/PathFollow3D/FlameBoundary")
+	var flame_boundary := _get_flame_boundary()
 	var camera := get_node_or_null("LevelCommon/Camera3D")
 	if camera != null and camera.has_method("set_runtime_targets"):
 		camera.set_runtime_targets(player, flame_boundary)
@@ -117,6 +111,23 @@ func _configure_common_runtime_references() -> void:
 		)
 
 
+func _configure_flame_boundary_animation() -> void:
+	var flame_boundary := _get_flame_boundary()
+	if flame_boundary != null:
+		flame_boundary.play_runtime_animation()
+
+
+func _get_flame_boundary() -> Node:
+	if current_level == null:
+		return null
+
+	if current_level.get_script() == FLAME_BOUNDARY_SCRIPT:
+		return current_level
+	for node in _get_descendants(current_level):
+		if node.get_script() == FLAME_BOUNDARY_SCRIPT:
+			return node
+	return null
+
 func _get_coin_deposits() -> Array[Node]:
 	if current_level == null:
 		return []
@@ -126,14 +137,6 @@ func _get_coin_deposits() -> Array[Node]:
 		if node.has_signal("coin_absorbed"):
 			deposits.append(node)
 	return deposits
-
-
-func _get_flame_path_follow() -> PathFollow3D:
-	if current_level == null:
-		return null
-
-	return current_level.get_node_or_null("LongRoad/PathFollow3D") as PathFollow3D
-
 
 func _show_win_screen() -> void:
 	if showing_result:

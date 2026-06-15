@@ -14,8 +14,6 @@ uniform vec3 color_outer : source_color = vec3(0.48, 0.008, 0.001);
 
 instance uniform vec3 fire_size = vec3(8.0, 1.15, 0.7);
 instance uniform float segment_half_length = 4.0;
-instance uniform float miter_inside_sign = 1.0;
-instance uniform float noise_along_sign = 1.0;
 instance uniform float noise_along_offset = 4.0;
 
 varying vec3 local_vertex;
@@ -43,13 +41,13 @@ float fire_density(vec3 local_position) {
 	vec3 half_size = fire_size * 0.5;
 	vec3 normalized_position = local_position / fire_size + vec3(0.5);
 	float height = clamp(normalized_position.y, 0.0, 1.0);
-	float miter_extent = segment_half_length - miter_inside_sign * local_position.z;
-	float miter_mask = smoothstep(0.0, 0.045, miter_extent - abs(local_position.x));
-	float perimeter_position = local_position.x * noise_along_sign + noise_along_offset;
-	float inward_position = local_position.z * miter_inside_sign;
+	float endpoint_distance = max(abs(local_position.x) - segment_half_length, 0.0);
+	float segment_distance = length(vec2(endpoint_distance, local_position.z));
+	float segment_mask = 1.0 - smoothstep(half_size.z * 0.55, half_size.z, segment_distance);
+	float perimeter_position = local_position.x + noise_along_offset;
 
 	float animated_time = TIME * time_scale;
-	vec3 fire_coordinates = vec3(perimeter_position, local_position.y, inward_position);
+	vec3 fire_coordinates = vec3(perimeter_position, local_position.y, local_position.z);
 	vec3 broad_coordinates = fire_coordinates * broad_noise_scale;
 	broad_coordinates.y -= animated_time * 0.34;
 	float broad_noise = texture(sample_noise, fract(broad_coordinates)).r;
@@ -65,12 +63,10 @@ float fire_density(vec3 local_position) {
 	float breakup_threshold = mix(0.24, 0.61, pow(height, 0.72));
 	float broken_flame = smoothstep(breakup_threshold, breakup_threshold + 0.2, turbulence);
 
-	float depth_from_center = abs(local_position.z) / max(half_size.z, 0.001);
-	float depth_fade = 1.0 - smoothstep(0.58, 1.0, depth_from_center);
 	float bottom_fade = smoothstep(0.025, 0.2, height);
 	bottom_fade *= bottom_fade;
-	float shaped_flame = broken_flame * vertical_shape * depth_fade;
-	return shaped_flame * bottom_fade * miter_mask;
+	float shaped_flame = broken_flame * vertical_shape;
+	return shaped_flame * bottom_fade * segment_mask;
 }
 
 
