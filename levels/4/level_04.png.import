@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b4y1pqvjxbrhi"
-path="res://.godot/imported/splat-map.png-4c723f68e034015d11fec5d2210f94c8.ctex"
+uid="uid://ulskiivortvn"
+path="res://.godot/imported/level_04.png-0dbd0d56c8d1f0de6ac6f8793ef12034.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://splat-map.png"
-dest_files=["res://.godot/imported/splat-map.png-4c723f68e034015d11fec5d2210f94c8.ctex"]
+source_file="res://levels/4/level_04.png"
+dest_files=["res://.godot/imported/level_04.png-0dbd0d56c8d1f0de6ac6f8793ef12034.ctex"]
 
 [params]
 

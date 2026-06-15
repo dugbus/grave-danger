@@ -7,6 +7,8 @@ extends Resource
 @export var base_item_ref := ""
 @export_range(0, 3, 1) var base_rotation_offset := 0
 @export var autotile_enabled := false
+@export var solo_item_ref := ""
+@export_range(0, 3, 1) var solo_rotation_offset := 0
 @export var end_item_ref := ""
 @export_range(0, 3, 1) var end_rotation_offset := 0
 @export var corner_item_ref := ""

@@ -8,6 +8,7 @@ const SOUTH := 4
 const WEST := 8
 
 const VARIANT_BASE := "base"
+const VARIANT_SOLO := "solo"
 const VARIANT_END := "end"
 const VARIANT_CORNER := "corner"
 const VARIANT_TEE := "tee"
@@ -15,6 +16,7 @@ const VARIANT_CROSS := "cross"
 
 const VARIANTS := [
 	VARIANT_BASE,
+	VARIANT_SOLO,
 	VARIANT_END,
 	VARIANT_CORNER,
 	VARIANT_TEE,
@@ -44,6 +46,8 @@ static func is_corner_mask(mask: int) -> bool:
 ## Chooses the autotile variant that should represent a same-colour neighbour mask.
 static func variant_for_mask(mask: int) -> String:
 	var neighbours := bit_count(mask)
+	if neighbours == 0:
+		return VARIANT_SOLO
 	if neighbours == 4:
 		return VARIANT_CROSS
 	if neighbours == 3:
@@ -67,6 +71,8 @@ static func rotation_radians_for_mask(mask: int) -> float:
 
 ## Returns the unrotated connection mask expected by the naming convention.
 static func default_mask_for_variant(variant: String) -> int:
+	if variant == VARIANT_SOLO:
+		return 0
 	if variant == VARIANT_END:
 		return WEST
 	if variant == VARIANT_CORNER:
@@ -104,11 +110,14 @@ static func basis_for_variant(
 ) -> Basis:
 	var base_rotation := rotation_radians_for_mask(mask) if use_autotile_rotation else 0.0
 	var offset := rotation_offset_for_mapping(mapping, variant)
-	return Basis.IDENTITY.rotated(Vector3.UP, base_rotation + (PI * 0.5 * float(offset)))
+	# PNG clockwise turns are negative rotations around Godot's positive Y axis.
+	return Basis.IDENTITY.rotated(Vector3.UP, -base_rotation + (PI * 0.5 * float(offset)))
 
 
 ## Reads the item reference assigned to one mapping variant.
 static func variant_ref_for_mapping(mapping: Resource, variant: String) -> String:
+	if variant == VARIANT_SOLO:
+		return mapping.solo_item_ref
 	if variant == VARIANT_END:
 		return mapping.end_item_ref
 	if variant == VARIANT_CORNER:
@@ -122,7 +131,9 @@ static func variant_ref_for_mapping(mapping: Resource, variant: String) -> Strin
 
 ## Writes the item reference assigned to one mapping variant.
 static func set_variant_ref_for_mapping(mapping: Resource, variant: String, item_ref: String) -> void:
-	if variant == VARIANT_END:
+	if variant == VARIANT_SOLO:
+		mapping.solo_item_ref = item_ref
+	elif variant == VARIANT_END:
 		mapping.end_item_ref = item_ref
 	elif variant == VARIANT_CORNER:
 		mapping.corner_item_ref = item_ref
@@ -136,6 +147,8 @@ static func set_variant_ref_for_mapping(mapping: Resource, variant: String, item
 
 ## Reads the quarter-turn offset assigned to one mapping variant.
 static func rotation_offset_for_mapping(mapping: Resource, variant: String) -> int:
+	if variant == VARIANT_SOLO:
+		return int(mapping.get("solo_rotation_offset"))
 	if variant == VARIANT_END:
 		return int(mapping.get("end_rotation_offset"))
 	if variant == VARIANT_CORNER:
@@ -150,7 +163,9 @@ static func rotation_offset_for_mapping(mapping: Resource, variant: String) -> i
 ## Writes a normalized quarter-turn offset to one mapping variant.
 static func set_rotation_offset_for_mapping(mapping: Resource, variant: String, offset: int) -> void:
 	var normalized_offset := wrapi(offset, 0, 4)
-	if variant == VARIANT_END:
+	if variant == VARIANT_SOLO:
+		mapping.set("solo_rotation_offset", normalized_offset)
+	elif variant == VARIANT_END:
 		mapping.set("end_rotation_offset", normalized_offset)
 	elif variant == VARIANT_CORNER:
 		mapping.set("corner_rotation_offset", normalized_offset)
@@ -164,6 +179,7 @@ static func set_rotation_offset_for_mapping(mapping: Resource, variant: String, 
 
 ## Clears all derived variant references when a mapping base changes.
 static func clear_derived_variant_refs(mapping: Resource) -> void:
+	mapping.solo_item_ref = ""
 	mapping.end_item_ref = ""
 	mapping.corner_item_ref = ""
 	mapping.tee_item_ref = ""
@@ -185,6 +201,8 @@ static func infer_variant_ref(base_ref: String, suffix: String, available_refs: 
 static func auto_fill_mapping_variants(mapping: Resource, available_refs: Array[String]) -> void:
 	if mapping.base_item_ref == "":
 		return
+	if mapping.solo_item_ref == "":
+		mapping.solo_item_ref = infer_variant_ref(mapping.base_item_ref, "solo", available_refs)
 	if mapping.end_item_ref == "":
 		mapping.end_item_ref = infer_variant_ref(mapping.base_item_ref, "end", available_refs)
 	if mapping.corner_item_ref == "":

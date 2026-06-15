@@ -95,6 +95,7 @@ transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 21.181198, 0,
 curve = SubResource("Curve3D_rihgm")
 boundary_animation = SubResource("Animation_h616y")
 playback_duration = 475.27316
+camera_fit_scale_limit = null
 
 [node name="BoundaryCenter" parent="FlameBoundary3D" index="0"]
 transform = Transform3D(0.9999972, 0, 0, 0, 1, 0, 0, 0, 0.9999972, -21.321892, 0, -22.004309)

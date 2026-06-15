@@ -98,7 +98,7 @@ func _configure_ground_for_level() -> void:
 	if current_level == null:
 		return
 
-	var grid := current_level.get_node_or_null("GridMap") as GridMap
+	var grid := _find_grid_map(current_level)
 	var ground := get_node_or_null("LevelCommon/Ground") as StaticBody3D
 	if grid == null or ground == null:
 		return
@@ -131,16 +131,33 @@ func _configure_ground_for_level() -> void:
 		(collision.shape as BoxShape3D).size = Vector3(floor_size.x, 2.0, floor_size.y)
 
 	var mesh_instance := ground.get_node_or_null("MeshInstance3D") as MeshInstance3D
-	if mesh_instance == null or not mesh_instance.mesh is BoxMesh:
+	if mesh_instance == null or not mesh_instance.mesh is PlaneMesh:
 		return
 
 	mesh_instance.mesh = mesh_instance.mesh.duplicate()
-	(mesh_instance.mesh as BoxMesh).size = Vector3(floor_size.x, 2.0, floor_size.y)
+	(mesh_instance.mesh as PlaneMesh).size = floor_size
 	var material := mesh_instance.get_active_material(0) as StandardMaterial3D
 	if material != null:
 		material = material.duplicate()
 		material.uv1_scale = Vector3(floor_size.x, floor_size.y, 1.0)
 		mesh_instance.set_surface_override_material(0, material)
+
+	var edge_mesh := ground.get_node_or_null("EdgeMesh") as MeshInstance3D
+	if edge_mesh != null and edge_mesh.mesh is BoxMesh:
+		edge_mesh.mesh = edge_mesh.mesh.duplicate()
+		(edge_mesh.mesh as BoxMesh).size = Vector3(floor_size.x, 2.0, floor_size.y)
+
+
+func _find_grid_map(root: Node) -> GridMap:
+	if root is GridMap:
+		return root as GridMap
+
+	for child in root.get_children():
+		var grid := _find_grid_map(child)
+		if grid != null:
+			return grid
+
+	return null
 
 
 func _configure_common_runtime_references() -> void:

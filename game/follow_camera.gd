@@ -193,7 +193,9 @@ func _get_initial_bounds_distance(bounds_size: Vector2) -> float:
 
 func _get_boundary_fit_points(bounds_size: Vector2) -> Array[Vector3]:
 	var bounds_transform := Transform3D(Basis.IDENTITY, flame_boundary.get_bounds_center())
-	if flame_boundary.has_method("get_bounds_transform"):
+	if flame_boundary.has_method("get_camera_fit_transform"):
+		bounds_transform = flame_boundary.get_camera_fit_transform()
+	elif flame_boundary.has_method("get_bounds_transform"):
 		bounds_transform = flame_boundary.get_bounds_transform()
 
 	var height := 0.0

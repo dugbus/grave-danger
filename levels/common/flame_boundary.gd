@@ -42,6 +42,10 @@ const MAX_SHAPE_INDEX := 1
 		bounds_size = Vector2(maxf(value.x, 0.1), maxf(value.y, 0.1))
 		_sync_boundary()
 
+## Largest horizontal BoundaryCenter scale the camera will try to keep fully visible.
+## The flame boundary itself may grow beyond this without forcing further zoom-out.
+@export_range(0.1, 20.0, 0.05, "or_greater") var camera_fit_scale_limit := 1.75
+
 ## Shape index and interpolation: rectangle = 0, circle = 1.
 ## Future shapes can be added as successive indices in _get_shape_profile_point().
 @export_range(0.0, 8.0, 0.001) var shape_morph := 0.0:
@@ -208,6 +212,14 @@ func get_bounds_transform() -> Transform3D:
 	return bounds_transform
 
 
+func get_camera_fit_transform() -> Transform3D:
+	var fit_transform := get_bounds_transform()
+	var scale_limit := maxf(camera_fit_scale_limit, 0.1)
+	fit_transform.basis.x = fit_transform.basis.x.normalized() * minf(fit_transform.basis.x.length(), scale_limit)
+	fit_transform.basis.z = fit_transform.basis.z.normalized() * minf(fit_transform.basis.z.length(), scale_limit)
+	return fit_transform
+
+
 func get_bounds_size() -> Vector2:
 	return bounds_size
 
@@ -348,6 +360,8 @@ func _sync_movement_to_animation() -> void:
 		return
 
 	var animation := animation_player.get_animation(DEFAULT_ANIMATION_NAME)
+	if animation_player.current_animation.is_empty():
+		return
 	var animation_position := animation_player.current_animation_position
 	if not Engine.is_editor_hint() and animation_player.is_playing() and animation_position + 0.001 < last_animation_position:
 		movement_cycle_distance += _calculate_travel_distance(animation, animation.length)

@@ -4,18 +4,10 @@
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
 [ext_resource type="PackedScene" path="res://levels/common/flame_boundary.tscn" id="4_flame"]
-[ext_resource type="Script" uid="uid://b4l0y5awllv2n" path="res://levels/common/level_scenery_generator.gd" id="5_scenery"]
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
+[ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="6_e2jp1"]
 
-[sub_resource type="Curve3D" id="Curve3D_15rbh"]
-closed = true
-_data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 1.3385433, 0, 0.8017891, 0.32808685, 0, 0.92860794, -0.32808685, 0, -0.92860794, -1.3186508, 0, -1.690186, 0.77569926, 0, 1.1231618, -0.77569926, 0, -1.1231618, -1.5210278, 0, -5.4651356, 0, 0, 0, 0, 0, 0, -4.8648467, 0, -8.833408, 0, 0, 0, 0, 0, 0, -6.486372, 0, -11.601995, 0, 0, 0, 0, 0, 0, -8.090784, 0, -13.086683, -0.7401066, 0, -1.1773424, 0.7401066, 0, 1.1773424, -11.435463, 0, -16.919283, 0, 0, 0, 0, 0, 0, -11.469518, 0, -13.854713, 0, 0, 0, 0, 0, 0, -8.37648, 0, -8.524214, -0.99753046, 0, -0.6034055, 0.99753046, 0, 0.6034055, -6.89056, 0, -4.075595, 0, 0, 0, 0, 0, 0, -9.398226, 0, -1.3270582, -0.07279968, 0, -1.0545772, 0.07279968, 0, 1.0545772, -10.578386, 0, 1.396391, 0, 0, 0, 0, 0, 0, -9.352835, 0, 3.7567146, 0, 0, 0, 0, 0, 0, -6.1032043, 0, 3.1730146, 0, 0, 0, 0, 0, 0, -2.9556575, 0, 4.6148696, 0, 0, 0, 0, 0, 0, -4.3144507, 0, 7.614936, 0.8141365, 0, -0.38178062, -0.8141365, 0, 0.38178062, -4.7229667, 0, 9.748308, 0, 0, 0, 0, 0, 0, -2.7919497, 0, 10.71823, 0.7641754, 0, 0.52040195, -0.7641754, 0, -0.52040195, -0.64380264, 0, 6.687929, -0.3133316, 0, 0.7101879, 0.3133316, 0, -0.7101879, -0.65706825, 0, 9.82861, 0, 0, 0, 0, 0, 0, 3.2707996, 0, 8.586998, 0, 0, 0, 0, 0, 0, 5.38222, 0, 5.1407084, 0, 0, 0, 0, 0, 0, 5.426932, 0, 6.6818624, 0, 0, 0, 0, 0, 0, 7.2048516, 0, 5.522174, 0, 0, 0, 0, 0, 0, 9.810469, 0, 4.7887135, 0, 0, 0, 0, 0, 0, 11.628897, 0, 3.0627253, 0.8494868, 0, 0.38483477, -0.8494868, 0, -0.38483477, 6.219325, 0, 2.1477044, 1.0232735, 0, -0.38072443, -1.0232735, 0, 0.38072443, 11.525019, 0, -0.7751944, 0.421772, 0, 0.87788916, -0.421772, 0, -0.87788916, 11.364962, 0, -4.42379, -0.16983414, 0, 1.356168, 0.16983414, 0, -1.356168, 8.163307, 0, -5.2903557, 0.45619583, 0, 0.7037863, -0.45619583, 0, -0.7037863, 8.584677, 0, -7.7921443, 0, 0, 0, 0, 0, 0, 8.232898, -0.023876667, -10.260768, 0, 0, 0, 0, 0, 0, 4.739001, -0.023925781, -7.772686, 0, 0, 0, 0, 0, 0, 3.62143, -0.023925781, -5.501492, -0.07210159, 0, -0.8111403, 0.07210159, 0, 0.8111403, 1.9090217, -0.023925781, -3.4285774, 0, 0, 0, 0, 0, 0, -2.5977154, -0.023925781, 0.2018969, -0.09012413, 0, -0.9733689, 0.09012413, 0, 0.9733689, -2.4411979, -0.023925781, 2.5715714),
-"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-}
-point_count = 37
-
-[sub_resource type="Curve3D" id="Curve3D_g0rc6"]
+[sub_resource type="Curve3D" id="Curve3D_uvomc"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -21.321892, 0, -22.004309, 0, 0, 0, 0, 0, 0, -20.485313, 0, -21.962996, 0, 0, 0, 0, 0, 0, -22.778164, 0, -17.45992, 0, 0, 0, 0, 0, 0, -15.900345, 0, -22.754658, 0, 0, 0, 0, 0, 0, -8.613056, 0, -22.754658, 0, 0, 0, 0, 0, 0, -11.756594, 0, -18.496595, 0, 0, 0, 0, 0, 0, -12.213835, 0, -14.181377, 0, 0, 0, 0, 0, 0, -18.243708, 0, -14.124222, 0, 0, 0, 0, 0, 0, -20.186985, 0, -14.781507, 0, 0, 0, 0, 0, 0, -20.301296, 0, -12.038057, 0, 0, 0, 0, 0, 0, -16.271852, 0, -12.638186, 0, 0, 0, 0, 0, 0, -12.442455, 0, -12.209523, 0, 0, 0, 0, 0, 0, -9.89905, 0, -9.5518055, 0, 0, 0, 0, 0, 0, -12.185257, 0, -6.6654687, 0, 0, 0, 0, 0, 0, -15.443104, 0, -9.437495, 0, 0, 0, 0, 0, 0, -20.501339, 0, -9.294608, 0, 0, 0, 0, 0, 0, -20.501339, 0, -0.86421686, 0, 0, 0, 0, 0, 0, -21.244356, 0, -9.123142, 0, 0, 0, 0, 0, 0, -17.843622, 0, -7.179867, 0, 0, 0, 0, 0, 0, -14.271421, 0, -5.7795644, 0, 0, 0, 0, 0, 0, -16.900562, 0, -2.1216316, 0, 0, 0, 0, 0, 0, -14.299999, 0, 0.9647493, 0, 0, 0, 0, 0, 0, -14.52862, 0, 2.850872, 0, 0, 0, 0, 0, 0, -21.044312, 0, 2.9937599, 0, 0, 0, 0, 0, 0, -21.1872, 0, 8.223459, 0, 0, 0, 0, 0, 0, -20.615648, 0, 3.851087, 0, 0, 0, 0, 0, 0, -15.471682, 0, 3.6510441, 0, 0, 0, 0, 0, 0, -14.042801, 0, 8.394928, 0, 0, 0, 0, 0, 0, -20.529917, 0, 12.224326, 0, 0, 0, 0, 0, 0, -22.987589, 0, 16.56812, 0, 0, 0, 0, 0, 0, -18.358019, 0, 21.19769, 0, 0, 0, 0, 0, 0, -21.93022, 0, 21.026222, 0, 0, 0, 0, 0, 0, -14.271421, 0, 19.082949, 0, 0, 0, 0, 0, 0, -10.670645, 0, 21.283424, 0, 0, 0, 0, 0, 0, -9.584694, 0, 12.195748, 0, 0, 0, 0, 0, 0, -5.926764, 0, 17.911264, 0, 0, 0, 0, 0, 0, -2.8118043, 0, 22.312218, 0, 0, 0, 0, 0, 0, 3.0466018, 0, 21.226267, 0, 0, 0, 0, 0, 0, 6.675958, 0, 20.94049, 0, 0, 0, 0, 0, 0, 8.219149, 0, 21.997864, 0, 0, 0, 0, 0, 0, 6.3044524, 0, 22.597992, 0, 0, 0, 0, 0, 0, 11.04833, 0, 22.51226, 0, 0, 0, 0, 0, 0, 14.591955, 0, 19.711655, 0, 0, 0, 0, 0, 0, 17.306826, 0, 22.369371, 0, 0, 0, 0, 0, 0, 21.964975, 0, 22.798037, 0, 0, 0, 0, 0, 0, 20.33605, 0, 18.654285, 0, 0, 0, 0, 0, 0, 16.763853, 0, 13.538894, 0, 0, 0, 0, 0, 0, 21.507734, 0, 12.853032, 0, 0, 0, 0, 0, 0, 21.357784, 0, 6.480995, 0, 0, 0, 0, 0, 0, 21.38636, 0, -14.352075, 0, 0, 0, 0, 0, 0, 20.197063, 0, -20.079802, 0, 0, 0, 0, 0, 0, 16.91064, 0, -17.164886, 0, 0, 0, 0, 0, 0, 13.967152, 0, -21.794456, 0, 0, 0, 0, 0, 0, 9.480465, 0, -20.279846, 0, 0, 0, 0, 0, 0, 5.508179, 0, -23.709156, 0, 0, 0, 0, 0, 0, 1.5930486, 0, -23.023293, 0, 0, 0, 0, 0, 0, 3.2505498, 0, -14.8501, 0, 0, 0, 0, 0, 0, 7.822968, 0, -9.563246, 0, 0, 0, 0, 0, 0, 11.309429, 0, -7.991477, 0, 0, 0, 0, 0, 0, 13.05267, 0, -3.0475504, 0, 0, 0, 0, 0, 0, 13.173797, 0, 1.1922086, 0, 0, 0, 0, 0, 0, 11.316253, 0, 6.5362177, 0, 0, 0, 0, 0, 0, 10.344611, 0, 10.222731, 0, 0, 0, 0, 0, 0, 9.715903, 0, 14.109284, 0, 0, 0, 0, 0, 0, 2.0856848, 0, 13.79493, 0, 0, 0, 0, 0, 0, -4.3728533, 0, 13.137644, 0, 0, 0, 0, 0, 0, -5.515956, 0, 12.594669, 0, 0, 0, 0, 0, 0, -9.831172, 0, 6.3933296, 0, 0, 0, 0, 0, 0, -11.374362, 0, 1.1636297, 0, 0, 0, 0, 0, 0, -5.487378, 0, 2.4210443, 0, 0, 0, 0, 0, 0, -1.9437532, 0, 5.8217783, 0, 0, 0, 0, 0, 0, 3.600299, 0, 5.507425, 0, 0, 0, 0, 0, 0, 7.6583204, 0, 1.3922517, 0, 0, 0, 0, 0, 0, 10.058841, 0, -2.40857, 0, 0, 0, 0, 0, 0, 3.6574545, 0, -7.295339, 0, 0, 0, 0, 0, 0, 2.028533, 0, -1.6655515, 0, 0, 0, 0, 0, 0, -4.7729387, 0, -2.3799922, 0, 0, 0, 0, 0, 0, -6.887681, 0, -1.6083964, 0, 0, 0, 0, 0, 0, -4.6586275, 0, -4.580467, 0, 0, 0, 0, 0, 0, -11.917338, 0, -3.6659844, 0, 0, 0, 0, 0, 0, -2.5724611, 0, -9.581547, 0, 0, 0, 0, 0, 0, -2.6581964, 0, -23.38453, 0, 0, 0, 0, 0, 0, -5.973197, 0, -22.812977, 0, 0, 0, 0, 0, 0, -7.3735, 0, -15.554265, 0, 0, 0, 0, 0, 0, -12.488891, 0, -19.469395, 0, 0, 0, 0, 0, 0, -10.145528, 0, -22.212845, 0, 0, 0, 0, 0, 0, -15.803891, 0, -21.81276, 0, 0, 0, 0, 0, 0, -20.082123, 0, -24.155224),
@@ -23,7 +15,7 @@ _data = {
 }
 point_count = 88
 
-[sub_resource type="Animation" id="Animation_flame_boundary"]
+[sub_resource type="Animation" id="Animation_djuj5"]
 resource_local_to_scene = true
 resource_name = "flame_boundary"
 length = 475.27316
@@ -60,317 +52,310 @@ tracks/2/keys = {
 "values": [0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_flame_boundary"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_kfk4x"]
 _data = {
-&"flame_boundary": SubResource("Animation_flame_boundary")
+&"flame_boundary": SubResource("Animation_djuj5")
 }
 
 [node name="Level2" type="Node3D" unique_id=1192405132]
 
 [node name="LevelLayout" type="Node3D" parent="." unique_id=863965489]
-transform = Transform3D(0.80160874, 0, -0.597849, 0, 1, 0, 0.597849, 0, 0.80160874, 0.078243256, 0, 0.33029175)
+transform = Transform3D(0.80160874, 0, -0.597849, 0, 1, 0, 0.597849, 0, 0.80160874, 1.8679178, 0, -1.1031954)
 
-[node name="Scenery" type="Node" parent="LevelLayout" unique_id=1023042671]
-script = ExtResource("5_scenery")
-map_file_path = "res://levels/2/map-02.json"
+[node name="coffin3" parent="LevelLayout" unique_id=1894824003 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -5.999345, -5.9604645e-08, 3.9392242)
 
-[node name="coffin3" parent="LevelLayout/Scenery" unique_id=1894824003 instance=ExtResource("1_coffin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.085945, -5.9604645e-08, -0.09869373)
-
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin3" unique_id=894045105]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin3" unique_id=894045105]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
 
-[node name="coffin4" parent="LevelLayout/Scenery" unique_id=600896566 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.48329768, 0, 0.8754561, 0, 1, 0, -0.8754561, 0, 0.48329768, -9.267612, -5.9604645e-08, -15.682046)
+[node name="coffin4" parent="LevelLayout" unique_id=600896566 instance=ExtResource("1_coffin")]
+transform = Transform3D(-0.13597488, 0, 0.9907123, 0, 1, 0, -0.9907123, 0, -0.13597488, -17.06468, -5.9604645e-08, -7.248219)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin4" unique_id=91261711]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin4" unique_id=91261711]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin5" parent="LevelLayout/Scenery" unique_id=868622373 instance=ExtResource("1_coffin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.777405, -5.9604645e-08, -9.22204)
+[node name="coffin5" parent="LevelLayout" unique_id=868622373 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -1.1423547, -5.9604645e-08, -11.06447)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin5" unique_id=1240180796]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin5" unique_id=1240180796]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin6" parent="LevelLayout/Scenery" unique_id=2051800972 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.40229937, 0, -0.91550815, 0, 1, 0, 0.91550815, 0, 0.40229937, -17.646578, -5.9604645e-08, -1.0837994)
+[node name="coffin6" parent="LevelLayout" unique_id=2051800972 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.8698223, 0, -0.49336505, 0, 1, 0, 0.49336505, 0, 0.8698223, -15.053784, -5.9604645e-08, 9.463219)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin6" unique_id=54787116]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin6" unique_id=54787116]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin25" parent="LevelLayout/Scenery" unique_id=1601046856 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.99999964, 0, 0.0009599328, 0, 1, 0, -0.0009599328, 0, 0.99999964, -22.934593, -5.9604645e-08, -3.882729)
+[node name="coffin25" parent="LevelLayout" unique_id=1601046856 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.80103457, 0, 0.59861827, 0, 1, 0, -0.59861827, 0, 0.80103457, -20.966042, -5.9604645e-08, 10.381007)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin25" unique_id=995087480]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin25" unique_id=995087480]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin7" parent="LevelLayout/Scenery" unique_id=2027677637 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.44472897, 0, 0.89566517, 0, 1, 0, -0.89566517, 0, 0.44472897, -19.432016, -5.9604645e-08, 10.420668)
+[node name="coffin7" parent="LevelLayout" unique_id=2027677637 instance=ExtResource("1_coffin")]
+transform = Transform3D(-0.17897388, 0, 0.9838538, 0, 1, 0, -0.9838538, 0, -0.17897388, -9.607073, -5.9604645e-08, 19.752724)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin7" unique_id=891446467]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin7" unique_id=891446467]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin24" parent="LevelLayout/Scenery" unique_id=502835946 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.99265003, 0, -0.121020496, 0, 1, 0, 0.121020496, 0, 0.99265003, -12.935608, -5.9604645e-08, 6.733516)
+[node name="coffin24" parent="LevelLayout" unique_id=502835946 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.86806893, 0, 0.49644375, 0, 1, 0, -0.49644375, 0, 0.86806893, -6.603855, -5.9604645e-08, 12.913198)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin24" unique_id=341637864]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin24" unique_id=341637864]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin23" parent="LevelLayout/Scenery" unique_id=1329291622 instance=ExtResource("1_coffin")]
-transform = Transform3D(-0.48375595, 0, 0.8752029, 0, 1, 0, -0.8752029, 0, -0.48375595, -17.019213, -5.9604645e-08, 18.244072)
+[node name="coffin23" parent="LevelLayout" unique_id=1329291622 instance=ExtResource("1_coffin")]
+transform = Transform3D(-0.9110222, 0, 0.41235727, 0, 1, 0, -0.41235727, 0, -0.9110222, -2.995734, -5.9604645e-08, 24.58154)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin23" unique_id=1729369881]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin23" unique_id=1729369881]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin8" parent="LevelLayout/Scenery" unique_id=1850102587 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.32922924, 0, -0.94425005, 0, 1, 0, 0.94425005, 0, 0.32922924, -6.9960976, -5.9604645e-08, 21.73866)
+[node name="coffin8" parent="LevelLayout" unique_id=1850102587 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.82843196, 0, -0.5600897, 0, 1, 0, 0.5600897, 0, 0.82843196, 7.128119, -5.9604645e-08, 21.390524)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin8" unique_id=1095241424]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin8" unique_id=1095241424]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin9" parent="LevelLayout/Scenery" unique_id=1291365494 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.32922924, 0, -0.94425005, 0, 1, 0, 0.94425005, 0, 0.32922924, 5.3881836, -5.9604645e-08, 21.73866)
+[node name="coffin9" parent="LevelLayout" unique_id=1291365494 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.82843196, 0, -0.5600897, 0, 1, 0, 0.5600897, 0, 0.82843196, 17.055468, -5.9604645e-08, 13.986594)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin9" unique_id=1994220810]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin9" unique_id=1994220810]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin10" parent="LevelLayout/Scenery" unique_id=2126768573 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.36365774, 0, 0.93153256, 0, 1, 0, -0.93153256, 0, 0.36365774, 16.074047, -5.9604645e-08, 18.978733)
+[node name="coffin10" parent="LevelLayout" unique_id=2126768573 instance=ExtResource("1_coffin")]
+transform = Transform3D(-0.26540458, 0, 0.9641371, 0, 1, 0, -0.9641371, 0, -0.26540458, 23.971329, -5.9604645e-08, 5.3856783)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin10" unique_id=71785300]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin10" unique_id=71785300]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin11" parent="LevelLayout/Scenery" unique_id=37510148 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.36365774, 0, 0.93153256, 0, 1, 0, -0.93153256, 0, 0.36365774, 22.08926, -5.9604645e-08, 23.083239)
+[node name="coffin11" parent="LevelLayout" unique_id=37510148 instance=ExtResource("1_coffin")]
+transform = Transform3D(-0.26540458, 0, 0.9641371, 0, 1, 0, -0.9641371, 0, -0.26540458, 31.24705, -5.9604645e-08, 5.0796957)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin11" unique_id=1264859161]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin11" unique_id=1264859161]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin12" parent="LevelLayout/Scenery" unique_id=557072321 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.9998123, 0, 0.019371837, 0, 1, 0, -0.019371837, 0, 0.9998123, 19.930859, -5.9604645e-08, 9.283611)
+[node name="coffin12" parent="LevelLayout" unique_id=557072321 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.7898769, 0, 0.6132654, 0, 1, 0, -0.6132654, 0, 0.7898769, 21.266762, -5.9604645e-08, -4.691807)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin12" unique_id=667941352]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin12" unique_id=667941352]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin13" parent="LevelLayout/Scenery" unique_id=782746036 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.9998123, 0, 0.019371837, 0, 1, 0, -0.019371837, 0, 0.9998123, 11.863387, -5.9604645e-08, 8.009802)
+[node name="coffin13" parent="LevelLayout" unique_id=782746036 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.7898769, 0, 0.6132654, 0, 1, 0, -0.6132654, 0, 0.7898769, 14.038261, -5.9604645e-08, -0.8897739)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin13" unique_id=383798219]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin13" unique_id=383798219]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin14" parent="LevelLayout/Scenery" unique_id=37830806 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.9998123, 0, 0.019371837, 0, 1, 0, -0.019371837, 0, 0.9998123, 18.373985, -5.9604645e-08, -5.2944536)
+[node name="coffin14" parent="LevelLayout" unique_id=37830806 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.7898769, 0, 0.6132654, 0, 1, 0, -0.6132654, 0, 0.7898769, 11.303278, -5.9604645e-08, -15.446936)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin14" unique_id=1896814200]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin14" unique_id=1896814200]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin15" parent="LevelLayout/Scenery" unique_id=1703037237 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.623402, 0, -0.7819015, 0, 1, 0, 0.7819015, 0, 0.623402, 22.620018, -5.9604645e-08, -20.75711)
+[node name="coffin15" parent="LevelLayout" unique_id=1703037237 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.9671835, 0, -0.2540788, 0, 1, 0, 0.2540788, 0, 0.9671835, 5.4626007, -5.9604645e-08, -30.380424)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin15" unique_id=1551282622]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin15" unique_id=1551282622]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin17" parent="LevelLayout/Scenery" unique_id=1138384471 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.9993207, 0, -0.036853135, 0, 1, 0, 0.036853135, 0, 0.9993207, 9.669605, -5.9604645e-08, -23.092434)
+[node name="coffin17" parent="LevelLayout" unique_id=1138384471 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.8230968, 0, 0.5679011, 0, 1, 0, -0.5679011, 0, 0.8230968, -6.314734, -5.9604645e-08, -24.510048)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin17" unique_id=1058906827]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin17" unique_id=1058906827]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin18" parent="LevelLayout/Scenery" unique_id=975916250 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.0067368373, 0, -0.9999773, 0, 1, 0, 0.9999773, 0, 0.0067368373, -1.122406, -5.9604645e-08, -13.39731)
+[node name="coffin18" parent="LevelLayout" unique_id=975916250 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.6032357, 0, -0.79756296, 0, 1, 0, 0.79756296, 0, 0.6032357, -9.169485, -5.9604645e-08, -10.286359)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin18" unique_id=1864563174]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin18" unique_id=1864563174]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin19" parent="LevelLayout/Scenery" unique_id=396706901 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.63097376, 0, -0.77580434, 0, 1, 0, 0.77580434, 0, 0.63097376, -5.7222786, -5.9604645e-08, -22.773981)
+[node name="coffin19" parent="LevelLayout" unique_id=396706901 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.96960795, 0, -0.24466452, 0, 1, 0, 0.24466452, 0, 0.96960795, -18.462616, -5.9604645e-08, -15.052752)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin19" unique_id=463839353]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin19" unique_id=463839353]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin20" parent="LevelLayout/Scenery" unique_id=1842326328 instance=ExtResource("1_coffin")]
-transform = Transform3D(-0.054044068, 0, -0.9985386, 0, 1, 0, 0.9985386, 0, -0.054044068, -18.77885, -5.9604645e-08, -21.394018)
+[node name="coffin20" parent="LevelLayout" unique_id=1842326328 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.5536531, 0, -0.83274746, 0, 1, 0, 0.83274746, 0, 0.5536531, -28.103868, -5.9604645e-08, -6.1407013)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin20" unique_id=806444074]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin20" unique_id=806444074]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin21" parent="LevelLayout/Scenery" unique_id=960388081 instance=ExtResource("1_coffin")]
-transform = Transform3D(-0.054044068, 0, -0.9985386, 0, 1, 0, 0.9985386, 0, -0.054044068, -2.7854404, -5.9604645e-08, -5.0467663)
+[node name="coffin21" parent="LevelLayout" unique_id=960388081 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.5536531, 0, -0.83274746, 0, 1, 0, 0.83274746, 0, 0.5536531, -5.510223, -5.9604645e-08, -2.598246)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin21" unique_id=976198342]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin21" unique_id=976198342]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin22" parent="LevelLayout/Scenery" unique_id=5946835 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.71849054, 0, -0.69553685, 0, 1, 0, 0.69553685, 0, 0.71849054, -8.942198, -5.9604645e-08, -4.9406157)
+[node name="coffin22" parent="LevelLayout" unique_id=5946835 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.9917743, 0, -0.12799954, 0, 1, 0, 0.12799954, 0, 0.9917743, -10.3820715, -5.9604645e-08, 1.1676564)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin22" unique_id=1052803318]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin22" unique_id=1052803318]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="coffin16" parent="LevelLayout/Scenery" unique_id=1825766928 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.45740837, 0, 0.8892567, 0, 1, 0, -0.8892567, 0, 0.45740837, 14.411007, -5.9604645e-08, -13.786531)
+[node name="coffin16" parent="LevelLayout" unique_id=1825766928 instance=ExtResource("1_coffin")]
+transform = Transform3D(-0.16497871, 0, 0.98629713, 0, 1, 0, -0.98629713, 0, -0.16497871, 3.0495408, -5.9604645e-08, -19.884998)
 
-[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Scenery/coffin16" unique_id=649242765]
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/coffin16" unique_id=649242765]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
+
+[node name="GoldCoinPile" parent="LevelLayout" unique_id=1305244581 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -7.361232, 0, 3.2469397)
+coin_count = 10
+
+[node name="GoldCoinPile25" parent="LevelLayout" unique_id=1129076963 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -23.052967, 0, -8.9618225)
+coin_count = 10
+
+[node name="GoldCoinPile26" parent="LevelLayout" unique_id=95235736 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -15.814636, 0, -0.34408575)
+coin_count = 10
+
+[node name="GoldCoinPile2" parent="LevelLayout" unique_id=2006825687 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -6.629609, 0, -0.06717019)
+coin_count = 10
+
+[node name="GoldCoinPile22" parent="LevelLayout" unique_id=2015703996 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 11.777692, 0, -1.5314012)
+coin_count = 10
+
+[node name="GoldCoinPile23" parent="LevelLayout" unique_id=1198355647 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 19.785591, 0, -6.3682146)
+coin_count = 10
+
+[node name="GoldCoinPile3" parent="LevelLayout" unique_id=1309464412 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -2.7133858, 0, -2.4576194)
+coin_count = 15
+
+[node name="GoldCoinPile4" parent="LevelLayout" unique_id=1462296258 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 0.78517216, 0, -12.508842)
+coin_count = 10
+pile_radius = 2.0
+
+[node name="GoldCoinPile5" parent="LevelLayout" unique_id=122153076 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -7.709321, 0, -12.70768)
+coin_count = 10
+
+[node name="GoldCoinPile6" parent="LevelLayout" unique_id=1364329950 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -13.11548, 0, -10.897264)
+coin_count = 10
+
+[node name="GoldCoinPile7" parent="LevelLayout" unique_id=1440141592 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -18.110302, 0, -6.4015303)
+coin_count = 10
+
+[node name="GoldCoinPile9" parent="LevelLayout" unique_id=691761814 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -24.14842, 0, 6.1920547)
+coin_count = 10
+
+[node name="GoldCoinPile27" parent="LevelLayout" unique_id=599318615 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -28.553738, 0, 1.3218393)
+coin_count = 10
+
+[node name="GoldCoinPile24" parent="LevelLayout" unique_id=1145272006 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 12.990402, 0, -16.33633)
+coin_count = 10
+
+[node name="GoldCoinPile10" parent="LevelLayout" unique_id=880519627 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -17.211449, 0, 7.9678383)
+coin_count = 10
+
+[node name="GoldCoinPile11" parent="LevelLayout" unique_id=2016635951 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -17.418297, 0, 15.241049)
+coin_count = 10
+
+[node name="GoldCoinPile12" parent="LevelLayout" unique_id=601058255 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -3.932769, 0, 11.857482)
+coin_count = 10
+
+[node name="GoldCoinPile13" parent="LevelLayout" unique_id=621262923 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -7.5371323, 0, 22.39389)
+coin_count = 10
+
+[node name="GoldCoinPile14" parent="LevelLayout" unique_id=1528887053 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -4.366312, 0, 30.137299)
+coin_count = 10
+
+[node name="GoldCoinPile15" parent="LevelLayout" unique_id=2045258749 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 5.878022, 0, 12.741844)
+coin_count = 10
+
+[node name="GoldCoinPile16" parent="LevelLayout" unique_id=89848146 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 5.586075, 0, 23.950642)
+coin_count = 10
+
+[node name="GoldCoinPile17" parent="LevelLayout" unique_id=1483082274 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 15.193735, 0, 17.005846)
+coin_count = 10
+
+[node name="GoldCoinPile18" parent="LevelLayout" unique_id=1964026963 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 18.546848, 0, 12.209733)
+coin_count = 10
+
+[node name="GoldCoinPile19" parent="LevelLayout" unique_id=1948470944 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 9.858389, 0, 3.6376712)
+coin_count = 10
+
+[node name="GoldCoinPile20" parent="LevelLayout" unique_id=716572566 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 22.634243, 0, -2.4918642)
+coin_count = 10
+
+[node name="GoldCoinPile21" parent="LevelLayout" unique_id=1977483895 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 29.475483, 0, 0.88089174)
+coin_count = 10
+
+[node name="GoldCoinPile8" parent="LevelLayout" unique_id=1123125425 instance=ExtResource("3_coinpile")]
+transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 7.119217, 0, -8.851183)
+coin_count = 20
+pile_radius = 2.0
 
 [node name="Player" parent="." unique_id=244343110 instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.364414, 12, -23.739996)
 
-[node name="GoldCoinPile" parent="." unique_id=1305244581 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.763764, 0, -1.467838)
-coin_count = 10
-
-[node name="GoldCoinPile25" parent="." unique_id=1129076963 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.043398, 0, -20.635777)
-coin_count = 10
-
-[node name="GoldCoinPile26" parent="." unique_id=95235736 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.393196, 0, -9.400295)
-coin_count = 10
-
-[node name="GoldCoinPile2" parent="." unique_id=2006825687 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.1959515, 0, -3.6870577)
-coin_count = 10
-
-[node name="GoldCoinPile22" parent="." unique_id=2015703996 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.434891, 0, 6.1439886)
-coin_count = 10
-
-[node name="GoldCoinPile23" parent="." unique_id=1198355647 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.745777, 0, 7.0542717)
-coin_count = 10
-
-[node name="GoldCoinPile3" parent="." unique_id=1309464412 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62754524, 0, -3.2619526)
-coin_count = 15
-
-[node name="GoldCoinPile4" parent="." unique_id=1462296258 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.186043, 0, -9.227491)
-coin_count = 10
-pile_radius = 2.0
-
-[node name="GoldCoinPile5" parent="." unique_id=122153076 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4956579, 0, -14.465305)
-coin_count = 10
-
-[node name="GoldCoinPile6" parent="." unique_id=1364329950 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.9203222, 0, -16.246126)
-coin_count = 10
-
-[node name="GoldCoinPile7" parent="." unique_id=1440141592 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.611984, 0, -15.628457)
-coin_count = 10
-
-[node name="GoldCoinPile9" parent="." unique_id=691761814 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.981255, 0, -9.143212)
-coin_count = 10
-
-[node name="GoldCoinPile27" parent="." unique_id=599318615 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.600943, 0, -15.680934)
-coin_count = 10
-
-[node name="GoldCoinPile24" parent="." unique_id=1145272006 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.258121, 0, -4.9987545)
-coin_count = 10
-
-[node name="GoldCoinPile10" parent="." unique_id=880519627 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.482168, 0, -3.5724669)
-coin_count = 10
-
-[node name="GoldCoinPile11" parent="." unique_id=2016635951 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.996262, 0, 2.1341386)
-coin_count = 10
-
-[node name="GoldCoinPile12" parent="." unique_id=601058255 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.163282, 0, 7.484151)
-coin_count = 10
-
-[node name="GoldCoinPile13" parent="." unique_id=621262923 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.351751, 0, 13.775362)
-coin_count = 10
-
-[node name="GoldCoinPile14" parent="." unique_id=1528887053 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.439384, 0, 21.87822)
-coin_count = 10
-
-[node name="GoldCoinPile15" parent="." unique_id=2045258749 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8275814, 0, 14.058435)
-coin_count = 10
-
-[node name="GoldCoinPile16" parent="." unique_id=89848146 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.762777, 0, 22.868965)
-coin_count = 10
-
-[node name="GoldCoinPile17" parent="." unique_id=1483082274 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.090746, 0, 23.045885)
-coin_count = 10
-
-[node name="GoldCoinPile18" parent="." unique_id=1964026963 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6459827, 0, 21.205935)
-coin_count = 10
-
-[node name="GoldCoinPile19" parent="." unique_id=1948470944 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.806036, 0, 9.140109)
-coin_count = 10
-
-[node name="GoldCoinPile20" parent="." unique_id=716572566 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.71181, 0, 11.864652)
-coin_count = 10
-
-[node name="GoldCoinPile21" parent="." unique_id=1977483895 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.179407, 0, 18.65831)
-coin_count = 10
-
-[node name="GoldCoinPile8" parent="." unique_id=1123125425 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.076741, 0, -2.5086772)
-coin_count = 20
-pile_radius = 2.0
-
-[node name="Path3D" type="Path3D" parent="." unique_id=1726317079]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-visible = false
-curve = SubResource("Curve3D_15rbh")
-
-[node name="PathFollow3D" type="PathFollow3D" parent="Path3D" unique_id=1869308244]
-transform = Transform3D(0.99999315, 0, 0, 0, 0.99999976, 0, 0, 0, 0.99999315, 1.3385433, 0, 0.8017891)
-rotation_mode = 0
-
-[node name="Follow Camera" type="Camera3D" parent="Path3D/PathFollow3D" unique_id=960100831]
-transform = Transform3D(1.0000068, 1.16642465e-08, -9.273241e-09, 0, 0.62231255, 0.7827692, 1.4901262e-08, -0.7827743, 0.62231666, -3.5762787e-07, 4.3923645, 3.3936152)
-
 [node name="FlameBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 0.18119812, 0, -0.41855812)
-curve = SubResource("Curve3D_g0rc6")
-boundary_animation = SubResource("Animation_flame_boundary")
+curve = SubResource("Curve3D_uvomc")
+boundary_animation = SubResource("Animation_djuj5")
 playback_duration = 475.27316
+camera_fit_scale_limit = null
 
 [node name="BoundaryCenter" parent="FlameBoundary3D" index="0"]
 transform = Transform3D(0.9999972, 0, 0, 0, 1, 0, 0, 0, 0.9999972, -21.321892, 0, -22.004309)
 
 [node name="BoundaryAnimationPlayer" parent="FlameBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_flame_boundary")
+libraries/ = SubResource("AnimationLibrary_kfk4x")
+
+[node name="PNGGridMap" type="GridMap" parent="." unique_id=99293623]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.5, 0, -24.5)
+mesh_library = ExtResource("6_e2jp1")
+cell_size = Vector3(1, 1, 1)
+data = {
+"cells": PackedInt32Array(0, 49, 0, 1, 49, 5, 2, 49, 5, 3, 49, 655362, 6, 49, 2, 7, 49, 5, 8, 49, 5, 9, 49, 5, 10, 49, 5, 11, 49, 5, 12, 49, 5, 13, 49, 5, 14, 49, 5, 15, 49, 5, 16, 49, 4, 17, 49, 4, 18, 49, 5, 19, 49, 5, 20, 49, 5, 21, 49, 5, 22, 49, 5, 23, 49, 5, 24, 49, 5, 25, 49, 5, 26, 49, 5, 27, 49, 5, 28, 49, 5, 29, 49, 5, 30, 49, 5, 31, 49, 5, 32, 49, 5, 33, 49, 5, 34, 49, 4, 35, 49, 4, 36, 49, 5, 37, 49, 4, 38, 49, 4, 39, 49, 5, 40, 49, 4, 41, 49, 5, 42, 49, 5, 43, 49, 5, 44, 49, 5, 45, 49, 5, 46, 49, 5, 47, 49, 5, 48, 49, 5, 49, 49, 1048576, 0, 48, 1048581, 16, 48, 1441796, 17, 48, 1048580, 34, 48, 1441796, 35, 48, 1048580, 37, 48, 1441796, 38, 48, 1048580, 40, 48, 1048581, 49, 48, 1048581, 0, 47, 1048581, 13, 47, 1048578, 16, 47, 1441796, 17, 47, 1048580, 20, 47, 0, 21, 47, 655362, 23, 47, 2, 24, 47, 1048576, 29, 47, 1048578, 34, 47, 1441792, 35, 47, 1048580, 37, 47, 1441796, 38, 47, 655360, 40, 47, 1441794, 44, 47, 6, 47, 47, 6, 49, 47, 1048581, 0, 46, 1048581, 3, 46, 6, 10, 46, 0, 11, 46, 5, 12, 46, 5, 13, 46, 655364, 14, 46, 655362, 16, 46, 1441796, 17, 46, 1048580, 20, 46, 1048581, 24, 46, 1048581, 29, 46, 1048581, 35, 46, 1441794, 37, 46, 1441794, 41, 46, 6, 45, 46, 6, 49, 46, 1048581, 0, 45, 1048581, 5, 45, 2, 6, 45, 655362, 10, 45, 1048581, 16, 45, 1441796, 17, 45, 1048580, 20, 45, 1048581, 22, 45, 6, 24, 45, 1048581, 29, 45, 1441792, 30, 45, 1048576, 42, 45, 6, 46, 45, 6, 49, 45, 1048581, 0, 44, 1048581, 3, 44, 6, 9, 44, 0, 10, 44, 655360, 16, 44, 1441796, 17, 44, 1048580, 20, 44, 1048581, 24, 44, 1048581, 30, 44, 1441792, 31, 44, 1048576, 43, 44, 6, 47, 44, 6, 49, 44, 1048581, 0, 43, 1048581, 8, 43, 0, 9, 43, 655360, 15, 43, 0, 16, 43, 1, 17, 43, 655360, 20, 43, 1048581, 22, 43, 6, 24, 43, 1048581, 31, 43, 1441792, 32, 43, 1048576, 44, 43, 6, 49, 43, 1048581, 0, 42, 1441796, 1, 42, 5, 2, 42, 5, 3, 42, 5, 4, 42, 4, 5, 42, 4, 6, 42, 5, 7, 42, 5, 8, 42, 655360, 12, 42, 1048578, 14, 42, 2, 15, 42, 655364, 16, 42, 655360, 20, 42, 1048581, 24, 42, 1048581, 32, 42, 1441792, 33, 42, 1048576, 40, 42, 6, 45, 42, 6, 49, 42, 1048581, 0, 41, 1048581, 4, 41, 1441796, 5, 41, 1048580, 11, 41, 2, 12, 41, 1048580, 20, 41, 1048581, 22, 41, 6, 24, 41, 1048581, 28, 41, 0, 29, 41, 1048576, 33, 41, 1441792, 34, 41, 5, 35, 41, 655362, 39, 41, 6, 46, 41, 6, 49, 41, 1048581, 0, 40, 1048581, 2, 40, 6, 4, 40, 1441796, 5, 40, 1048580, 8, 40, 1048578, 12, 40, 1441794, 20, 40, 1048581, 24, 40, 1048581, 28, 40, 1441792, 29, 40, 655360, 31, 40, 6, 38, 40, 6, 42, 40, 1048578, 47, 40, 6, 49, 40, 1048581, 0, 39, 1048581, 4, 39, 1441796, 5, 39, 1048580, 8, 39, 1441794, 20, 39, 1048581, 22, 39, 6, 24, 39, 1048581, 37, 39, 6, 41, 39, 2, 42, 39, 1, 43, 39, 655362, 49, 39, 1048581, 0, 38, 1048581, 2, 38, 6, 4, 38, 1441792, 5, 38, 655360, 9, 38, 2, 10, 38, 5, 11, 38, 655362, 13, 38, 0, 14, 38, 1048576, 17, 38, 1048578, 20, 38, 1048581, 24, 38, 1048581, 28, 38, 0, 29, 38, 1048576, 31, 38, 0, 32, 38, 1048576, 42, 38, 1441794, 49, 38, 1048581, 0, 37, 1048581, 13, 37, 1441792, 14, 37, 655360, 17, 37, 1048581, 20, 37, 1048581, 22, 37, 6, 24, 37, 1048581, 28, 37, 1441792, 29, 37, 655360, 31, 37, 1441792, 32, 37, 655360, 34, 37, 0, 35, 37, 1048576, 39, 37, 6, 45, 37, 6, 49, 37, 1048581, 0, 36, 1048581, 7, 36, 0, 8, 36, 655362, 17, 36, 1048581, 20, 36, 1048581, 24, 36, 1048581, 34, 36, 1441792, 35, 36, 655360, 40, 36, 6, 44, 36, 1048578, 49, 36, 1048581, 0, 35, 1441796, 1, 35, 5, 2, 35, 5, 3, 35, 5, 4, 35, 5, 5, 35, 5, 6, 35, 5, 7, 35, 1048580, 12, 35, 2, 13, 35, 1048576, 17, 35, 1048581, 20, 35, 1441792, 21, 35, 655362, 23, 35, 2, 24, 35, 655360, 29, 35, 0, 30, 35, 1048576, 41, 35, 1048578, 44, 35, 1048581, 49, 35, 1048581, 0, 34, 1048581, 7, 34, 1441794, 13, 34, 1048581, 16, 34, 2, 17, 34, 655364, 18, 34, 655362, 29, 34, 1441792, 30, 34, 655360, 36, 34, 2, 37, 34, 5, 38, 34, 5, 39, 34, 5, 40, 34, 5, 41, 34, 655364, 42, 34, 655362, 44, 34, 1048581, 46, 34, 2, 47, 34, 5, 48, 34, 5, 49, 34, 1048580, 0, 33, 1048581, 11, 33, 2, 12, 33, 5, 13, 33, 655360, 44, 33, 1048581, 49, 33, 1048581, 0, 32, 1048581, 3, 32, 1048578, 9, 32, 1048578, 21, 32, 2, 22, 32, 5, 23, 32, 5, 24, 32, 5, 25, 32, 5, 26, 32, 5, 27, 32, 1048576, 40, 32, 6, 44, 32, 1048581, 49, 32, 1048581, 0, 31, 1048581, 2, 31, 2, 3, 31, 1048580, 5, 31, 1048578, 8, 31, 2, 9, 31, 655360, 17, 31, 6, 27, 31, 1048581, 30, 31, 0, 31, 31, 1048576, 34, 31, 0, 35, 31, 1048576, 39, 31, 6, 44, 31, 1441796, 45, 31, 5, 46, 31, 5, 47, 31, 655362, 49, 31, 1048581, 0, 30, 1048581, 3, 30, 1048581, 5, 30, 1441792, 6, 30, 655362, 11, 30, 0, 12, 30, 1048576, 15, 30, 0, 16, 30, 1048576, 19, 30, 1048578, 21, 30, 0, 22, 30, 5, 23, 30, 5, 24, 30, 5, 25, 30, 1048576, 27, 30, 1048581, 30, 30, 1441796, 31, 30, 1048580, 34, 30, 1441792, 35, 30, 655360, 38, 30, 6, 44, 30, 1048581, 49, 30, 1048581, 0, 29, 1441796, 1, 29, 655362, 3, 29, 1048581, 9, 29, 1048578, 11, 29, 1441792, 12, 29, 655360, 15, 29, 1441792, 16, 29, 655360, 19, 29, 1048581, 21, 29, 1048581, 25, 29, 1048581, 27, 29, 1048581, 30, 29, 1441796, 31, 29, 1048580, 37, 29, 6, 44, 29, 1048581, 49, 29, 1048581, 0, 28, 1048581, 3, 28, 1048581, 5, 28, 1048578, 8, 28, 2, 9, 28, 655360, 19, 28, 1048581, 21, 28, 1048581, 23, 28, 1048578, 25, 28, 1048581, 27, 28, 1048581, 30, 28, 1441796, 31, 28, 1048580, 44, 28, 1048581, 46, 28, 2, 47, 28, 5, 48, 28, 5, 49, 28, 1048580, 0, 27, 1048581, 2, 27, 2, 3, 27, 1048580, 5, 27, 1441792, 6, 27, 655362, 19, 27, 1048581, 21, 27, 1048581, 23, 27, 1441794, 25, 27, 1441794, 27, 27, 1048581, 30, 27, 1441796, 31, 27, 1048580, 39, 27, 6, 44, 27, 1048581, 49, 27, 1048581, 0, 26, 1048581, 3, 26, 1048581, 9, 26, 1048578, 13, 26, 0, 14, 26, 1048576, 19, 26, 1048581, 21, 26, 1048581, 27, 26, 1048581, 30, 26, 1441796, 31, 26, 1048580, 40, 26, 6, 44, 26, 1441794, 49, 26, 1048581, 0, 25, 1441796, 1, 25, 655362, 3, 25, 1048581, 8, 25, 2, 9, 25, 655360, 13, 25, 1441792, 14, 25, 655360, 19, 25, 1048581, 21, 25, 1441792, 22, 25, 5, 23, 25, 5, 24, 25, 655362, 27, 25, 1048581, 30, 25, 1441792, 31, 25, 655360, 41, 25, 1048578, 45, 25, 2, 46, 25, 5, 47, 25, 655362, 49, 25, 1048581, 0, 24, 1048581, 3, 24, 1441796, 4, 24, 4, 5, 24, 4, 6, 24, 1048576, 19, 24, 1048581, 27, 24, 1048581, 34, 24, 2, 35, 24, 5, 36, 24, 5, 37, 24, 5, 38, 24, 5, 39, 24, 5, 40, 24, 5, 41, 24, 655364, 42, 24, 655362, 49, 24, 1048581, 0, 23, 1048581, 2, 23, 2, 3, 23, 655364, 4, 23, 655364, 5, 23, 655364, 6, 23, 655364, 7, 23, 5, 8, 23, 655362, 19, 23, 1441792, 20, 23, 5, 21, 23, 5, 22, 23, 5, 23, 23, 5, 24, 23, 5, 25, 23, 5, 26, 23, 5, 27, 23, 655360, 49, 23, 1048581, 0, 22, 1048581, 12, 22, 1048578, 15, 22, 6, 40, 22, 6, 45, 22, 1048578, 47, 22, 1048578, 49, 22, 1048581, 0, 21, 1441796, 1, 21, 5, 2, 21, 1048576, 12, 21, 1048581, 14, 21, 6, 18, 21, 0, 19, 21, 1048576, 22, 21, 0, 23, 21, 5, 24, 21, 4, 25, 21, 5, 26, 21, 1048576, 30, 21, 6, 33, 21, 2, 34, 21, 655362, 39, 21, 6, 45, 21, 1048581, 47, 21, 1048581, 49, 21, 1048581, 0, 20, 1048581, 2, 20, 1441792, 3, 20, 1048576, 6, 20, 2, 7, 20, 5, 8, 20, 1048576, 12, 20, 1441794, 15, 20, 1048578, 18, 20, 1441792, 19, 20, 655360, 22, 20, 1048581, 24, 20, 1048581, 26, 20, 1048581, 29, 20, 6, 38, 20, 6, 45, 20, 1048581, 47, 20, 1048581, 49, 20, 1048581, 0, 19, 1048581, 3, 19, 1048581, 8, 19, 1048581, 14, 19, 2, 15, 19, 655360, 22, 19, 1441794, 24, 19, 1441794, 26, 19, 1441794, 30, 19, 6, 37, 19, 6, 43, 19, 2, 44, 19, 5, 45, 19, 655360, 47, 19, 1048581, 49, 19, 1048581, 0, 18, 1048581, 3, 18, 1048581, 6, 18, 2, 7, 18, 5, 8, 18, 655360, 31, 18, 6, 47, 18, 1048581, 49, 18, 1048581, 0, 17, 1048581, 2, 17, 2, 3, 17, 655360, 13, 17, 1048578, 18, 17, 0, 19, 17, 1048576, 22, 17, 1048578, 24, 17, 1048578, 26, 17, 1048578, 32, 17, 6, 34, 17, 0, 35, 17, 4, 36, 17, 4, 37, 17, 1048576, 47, 17, 1441794, 49, 17, 1048581, 0, 16, 1048581, 13, 16, 1441792, 14, 16, 655362, 17, 16, 0, 18, 16, 1, 19, 16, 655360, 22, 16, 1048581, 24, 16, 1048581, 26, 16, 1048581, 34, 16, 1441792, 35, 16, 655364, 36, 16, 655364, 37, 16, 655360, 42, 16, 2, 43, 16, 5, 44, 16, 5, 45, 16, 1048576, 49, 16, 1048581, 0, 15, 1048581, 3, 15, 2, 4, 15, 655362, 6, 15, 2, 7, 15, 5, 8, 15, 5, 9, 15, 5, 10, 15, 655362, 16, 15, 0, 17, 15, 1, 18, 15, 655360, 22, 15, 1441792, 23, 15, 5, 24, 15, 655364, 25, 15, 5, 26, 15, 655360, 40, 15, 1048578, 45, 15, 1048581, 47, 15, 1048578, 49, 15, 1048581, 0, 14, 1441796, 1, 14, 5, 2, 14, 655362, 11, 14, 6, 16, 14, 1441792, 17, 14, 655360, 28, 14, 6, 40, 14, 1048581, 45, 14, 1048581, 47, 14, 1048581, 49, 14, 1048581, 0, 13, 1048581, 3, 13, 2, 4, 13, 5, 5, 13, 5, 6, 13, 5, 7, 13, 655362, 9, 13, 2, 10, 13, 655362, 23, 13, 6, 29, 13, 6, 32, 13, 0, 33, 13, 4, 34, 13, 4, 35, 13, 1048576, 40, 13, 1441792, 41, 13, 5, 42, 13, 1048576, 45, 13, 1048581, 47, 13, 1441794, 49, 13, 1048581, 0, 12, 1048581, 12, 12, 0, 13, 12, 1048576, 21, 12, 1048578, 25, 12, 1048578, 28, 12, 6, 32, 12, 1441792, 33, 12, 655364, 34, 12, 655364, 35, 12, 655360, 42, 12, 1441792, 43, 12, 5, 44, 12, 5, 45, 12, 655360, 49, 12, 1048581, 0, 11, 1048581, 2, 11, 1048578, 6, 11, 1048578, 12, 11, 1441792, 13, 11, 655360, 21, 11, 1048581, 25, 11, 1048581, 29, 11, 6, 49, 11, 1048581, 0, 10, 1048581, 2, 10, 1441792, 3, 10, 5, 4, 10, 4, 5, 10, 5, 6, 10, 655360, 21, 10, 1441794, 25, 10, 1441794, 28, 10, 6, 49, 10, 1048581, 0, 9, 1048581, 4, 9, 1048581, 13, 9, 0, 14, 9, 1048576, 18, 9, 1048578, 22, 9, 2, 23, 9, 5, 24, 9, 655362, 29, 9, 6, 31, 9, 6, 33, 9, 6, 35, 9, 6, 37, 9, 6, 41, 9, 2, 42, 9, 5, 43, 9, 4, 44, 9, 4, 45, 9, 5, 46, 9, 4, 47, 9, 4, 48, 9, 5, 49, 9, 1048580, 0, 8, 1048581, 4, 8, 1048581, 7, 8, 0, 8, 8, 1048576, 13, 8, 1441796, 14, 8, 1048580, 17, 8, 0, 18, 8, 655360, 30, 8, 6, 32, 8, 6, 34, 8, 6, 36, 8, 6, 43, 8, 1441796, 44, 8, 1048580, 46, 8, 1441796, 47, 8, 1048580, 49, 8, 1048581, 0, 7, 1048581, 4, 7, 1048581, 7, 7, 1441792, 8, 7, 655360, 11, 7, 1048578, 13, 7, 1441796, 14, 7, 1048580, 16, 7, 2, 17, 7, 655360, 41, 7, 1048578, 43, 7, 1441792, 44, 7, 655360, 46, 7, 1441792, 47, 7, 655360, 49, 7, 1048581, 0, 6, 1048581, 4, 6, 1048581, 10, 6, 0, 11, 6, 1048580, 13, 6, 1441796, 14, 6, 1048580, 19, 6, 0, 20, 6, 1048576, 25, 6, 0, 26, 6, 1048576, 36, 6, 0, 37, 6, 1048576, 40, 6, 0, 41, 6, 1048580, 49, 6, 1048581, 0, 5, 1048581, 2, 5, 0, 3, 5, 5, 4, 5, 655364, 5, 5, 5, 6, 5, 5, 7, 5, 655362, 10, 5, 1441796, 11, 5, 1048580, 13, 5, 1441792, 14, 5, 655360, 19, 5, 1441792, 20, 5, 655360, 25, 5, 1441792, 26, 5, 655360, 36, 5, 1441792, 37, 5, 1, 38, 5, 1048576, 40, 5, 1441792, 41, 5, 655360, 46, 5, 0, 47, 5, 1048576, 49, 5, 1048581, 0, 4, 1048581, 2, 4, 1048581, 10, 4, 1441796, 11, 4, 1048580, 16, 4, 1048578, 22, 4, 0, 23, 4, 1048576, 29, 4, 0, 30, 4, 5, 31, 4, 5, 32, 4, 5, 33, 4, 1048576, 37, 4, 1441792, 38, 4, 655360, 43, 4, 0, 44, 4, 1048576, 46, 4, 1441792, 47, 4, 655360, 49, 4, 1048581, 0, 3, 1048581, 2, 3, 1048581, 7, 3, 1048578, 10, 3, 1441796, 11, 3, 1048580, 16, 3, 1048581, 18, 3, 1048578, 22, 3, 1441792, 23, 3, 655360, 26, 3, 1048578, 29, 3, 1048581, 33, 3, 1048581, 43, 3, 1441792, 44, 3, 655360, 49, 3, 1048581, 0, 2, 1048581, 2, 2, 1441792, 3, 2, 5, 4, 2, 5, 5, 2, 5, 6, 2, 5, 7, 2, 655360, 10, 2, 1441796, 11, 2, 1048580, 16, 2, 1441796, 17, 2, 4, 18, 2, 655360, 26, 2, 1048581, 29, 2, 1048581, 33, 2, 1441794, 37, 2, 0, 38, 2, 1048576, 46, 2, 0, 47, 2, 1048576, 49, 2, 1048581, 0, 1, 1048581, 10, 1, 1441796, 11, 1, 1048580, 16, 1, 1441796, 17, 1, 1048580, 26, 1, 1048581, 29, 1, 1048581, 37, 1, 1441796, 38, 1, 1048580, 41, 1, 1048578, 46, 1, 1441796, 47, 1, 1048580, 49, 1, 1048581, 0, 0, 1441792, 1, 0, 5, 2, 0, 5, 3, 0, 5, 4, 0, 5, 5, 0, 5, 6, 0, 5, 7, 0, 5, 8, 0, 5, 9, 0, 5, 10, 0, 655364, 11, 0, 655364, 12, 0, 5, 13, 0, 5, 14, 0, 5, 15, 0, 5, 16, 0, 655364, 17, 0, 655364, 18, 0, 5, 19, 0, 5, 20, 0, 5, 21, 0, 5, 22, 0, 5, 23, 0, 5, 24, 0, 5, 25, 0, 5, 26, 0, 655364, 27, 0, 5, 28, 0, 5, 29, 0, 655364, 30, 0, 5, 31, 0, 5, 32, 0, 5, 33, 0, 5, 34, 0, 5, 35, 0, 5, 36, 0, 5, 37, 0, 655364, 38, 0, 655364, 39, 0, 5, 40, 0, 5, 41, 0, 655364, 42, 0, 5, 43, 0, 5, 44, 0, 5, 45, 0, 5, 46, 0, 655364, 47, 0, 655364, 48, 0, 5, 49, 0, 655360)
+}
 
 [editable path="FlameBoundary3D"]

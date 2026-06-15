@@ -146,8 +146,9 @@ static func pixel_to_cell(
 	size: Vector2i,
 	flip_y_to_world_negative_z: bool
 ) -> Vector3i:
+	var x_offset := size.x - 1 - pixel.x if flip_y_to_world_negative_z else pixel.x
 	var z_offset := size.y - 1 - pixel.y if flip_y_to_world_negative_z else pixel.y
-	return Vector3i(origin.x + pixel.x, 0, origin.y + z_offset)
+	return Vector3i(origin.x + x_offset, 0, origin.y + z_offset)
 
 
 ## Converts a GridMap cell coordinate into a PNG pixel coordinate.
@@ -157,7 +158,8 @@ static func cell_to_pixel(
 	size: Vector2i,
 	flip_y_to_world_negative_z: bool
 ) -> Vector2i:
-	var x := cell.x - origin.x
+	var x_offset := cell.x - origin.x
 	var z_offset := cell.z - origin.y
+	var x := size.x - 1 - x_offset if flip_y_to_world_negative_z else x_offset
 	var y := size.y - 1 - z_offset if flip_y_to_world_negative_z else z_offset
 	return Vector2i(x, y)

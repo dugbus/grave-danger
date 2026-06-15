@@ -245,7 +245,7 @@ func _build_advanced() -> void:
 	)
 	grid.add_child(_cell_size_spin)
 	_center_check = _check("Centre Gridmap at Origin", "center_cells")
-	_flip_y_check = _check("Flip PNG Y to world -Z", "flip_y_to_world_negative_z")
+	_flip_y_check = _check("Rotate PNG 180 degrees to world -Z", "flip_y_to_world_negative_z")
 	_ignore_transparent_check = _check("Ignore fully transparent pixels", "ignore_fully_transparent")
 
 
@@ -364,6 +364,7 @@ func _colour_row(key: String) -> Control:
 	header.add_child(autotile)
 	content.add_child(_variant_row(mapping, PNGToGridMapAutotile.VARIANT_BASE, "Base"))
 	if mapping.autotile_enabled:
+		content.add_child(_variant_row(mapping, PNGToGridMapAutotile.VARIANT_SOLO, "Solo"))
 		content.add_child(_variant_row(mapping, PNGToGridMapAutotile.VARIANT_END, "End"))
 		content.add_child(_variant_row(mapping, PNGToGridMapAutotile.VARIANT_CORNER, "Corner"))
 		content.add_child(_variant_row(mapping, PNGToGridMapAutotile.VARIANT_TEE, "Tee"))

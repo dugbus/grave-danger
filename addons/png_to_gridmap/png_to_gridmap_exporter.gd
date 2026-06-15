@@ -175,6 +175,8 @@ func _append_cell_validation(
 	var expected_ref := _mapping_variant_ref(mapping, variant, item_aliases)
 	var expected_id := int(ref_to_id.get(expected_ref, -1))
 	var expected_basis := PNGToGridMapAutotile.basis_for_variant(mapping, variant, mask, mapping.autotile_enabled)
+	if flip_y_to_world_negative_z:
+		expected_basis = expected_basis.rotated(Vector3.UP, PI)
 	var expected_orientation := grid_map.get_orthogonal_index_from_basis(expected_basis)
 	if item_id != expected_id:
 		errors.append("Cell %s uses %s, expected %s." % [cell, PNGToGridMapMeshCatalog.item_debug_name(grid_map.mesh_library, item_id), _item_display_name(expected_ref, item_display_names)])

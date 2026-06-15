@@ -1,0 +1,54 @@
+[gd_resource type="Resource" script_class="PNGToGridMapSettings" format=3 uid="uid://d1x24166hbt70"]
+
+[ext_resource type="Script" uid="uid://sqp5sti0kxob" path="res://addons/png_to_gridmap/png_to_gridmap_color_mapping.gd" id="1_kvfjf"]
+[ext_resource type="Script" uid="uid://bhrpqhaebhdyj" path="res://addons/png_to_gridmap/png_to_gridmap_settings.gd" id="2_8r5vs"]
+
+[sub_resource type="Resource" id="Resource_2sf17"]
+script = ExtResource("1_kvfjf")
+colour = Color(0.9529412, 0.9529412, 0.9529412, 1)
+display_name = "#F3F3F3FF"
+
+[sub_resource type="Resource" id="Resource_eq3mc"]
+script = ExtResource("1_kvfjf")
+colour = Color(0.11764706, 0.12156863, 0.12156863, 1)
+display_name = "#1E1F1FFF"
+base_item_ref = "Wall"
+autotile_enabled = true
+end_item_ref = "WallEnd"
+corner_item_ref = "WallCorner"
+tee_item_ref = "WallTee"
+cross_item_ref = "WallCross"
+
+[sub_resource type="Resource" id="Resource_2s3yr"]
+script = ExtResource("1_kvfjf")
+colour = Color(0.73333335, 0.78431374, 0.654902, 1)
+display_name = "#BBC8A7FF"
+
+[sub_resource type="Resource" id="Resource_7hgml"]
+script = ExtResource("1_kvfjf")
+colour = Color(0.41960785, 0.72156864, 0.6039216, 0.99607843)
+display_name = "#6BB89AFE"
+
+[sub_resource type="Resource" id="Resource_kvfjf"]
+script = ExtResource("1_kvfjf")
+colour = Color(0, 0, 0, 1)
+display_name = "#000000FF"
+base_item_ref = "Wall"
+autotile_enabled = true
+solo_item_ref = "WallSolo"
+end_item_ref = "WallEnd"
+end_rotation_offset = 2
+corner_item_ref = "WallCorner"
+corner_rotation_offset = 3
+tee_item_ref = "WallTee"
+tee_rotation_offset = 2
+cross_item_ref = "WallCross"
+
+[resource]
+script = ExtResource("2_8r5vs")
+png_path = "/Users/delliott/grave-danger/levels/6/level_06.png"
+target_gridmap_path = NodePath("PNGGridMap")
+mesh_library_path = "res://Assets/environment/graveyard.res"
+flip_y_to_world_negative_z = false
+export_size = Vector2i(50, 50)
+color_mappings = Array[Resource]([SubResource("Resource_2sf17"), SubResource("Resource_eq3mc"), SubResource("Resource_2s3yr"), SubResource("Resource_7hgml"), SubResource("Resource_kvfjf")])

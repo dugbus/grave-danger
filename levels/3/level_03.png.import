@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c5wc6yrtgl57f"
-path="res://.godot/imported/dave-brown-map-from-json.png-d056fef77749213ed9970ae45f3236bc.ctex"
+uid="uid://navu7mdvfhpu"
+path="res://.godot/imported/level_03.png-db219dcc98f25f446f78fb0af35d238d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://dave-brown-map-from-json.png"
-dest_files=["res://.godot/imported/dave-brown-map-from-json.png-d056fef77749213ed9970ae45f3236bc.ctex"]
+source_file="res://levels/3/level_03.png"
+dest_files=["res://.godot/imported/level_03.png-db219dcc98f25f446f78fb0af35d238d.ctex"]
 
 [params]
 

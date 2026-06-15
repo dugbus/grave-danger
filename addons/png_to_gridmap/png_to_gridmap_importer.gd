@@ -108,6 +108,8 @@ func _place_cells(
 			var item_ref := _mapping_variant_ref(mapping, variant, item_aliases)
 			var item_id := int(ref_to_id[item_ref])
 			var basis := PNGToGridMapAutotile.basis_for_variant(mapping, variant, mask, mapping.autotile_enabled)
+			if settings.flip_y_to_world_negative_z:
+				basis = basis.rotated(Vector3.UP, PI)
 			var orientation := grid_map.get_orthogonal_index_from_basis(basis)
 			var cell := PNGToGridMapImageGrid.pixel_to_cell(Vector2i(x, y), import_origin, import_size, settings.flip_y_to_world_negative_z)
 			grid_map.set_cell_item(cell, item_id, orientation)

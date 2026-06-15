@@ -31,8 +31,8 @@ glow_hdr_threshold = 0.75
 [sub_resource type="BoxShape3D" id="BoxShape3D_rxxet"]
 size = Vector3(60, 2, 60)
 
-[sub_resource type="BoxMesh" id="BoxMesh_rxxet"]
-size = Vector3(60, 2, 60)
+[sub_resource type="PlaneMesh" id="PlaneMesh_rxxet"]
+size = Vector2(60, 60)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2d15w"]
 albedo_texture = ExtResource("2_floor_albedo")
@@ -42,6 +42,14 @@ normal_enabled = true
 normal_scale = 3.07
 normal_texture = ExtResource("8_floor_normal")
 uv1_scale = Vector3(60, 60, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor_edges"]
+size = Vector3(60, 2, 60)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor_edges"]
+albedo_color = Color(0, 0, 0, 1)
+metallic_specular = 0.0
+roughness = 1.0
 
 [node name="LevelCommon" type="Node3D" unique_id=555773272]
 
@@ -120,7 +128,13 @@ shape = SubResource("BoxShape3D_rxxet")
 metadata/_edit_lock_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=451156980]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.004836321, 0.041427374, 0.022817373)
-mesh = SubResource("BoxMesh_rxxet")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("PlaneMesh_rxxet")
 surface_material_override/0 = SubResource("StandardMaterial3D_2d15w")
+metadata/_edit_lock_ = true
+
+[node name="EdgeMesh" type="MeshInstance3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, 0)
+mesh = SubResource("BoxMesh_floor_edges")
+surface_material_override/0 = SubResource("StandardMaterial3D_floor_edges")
 metadata/_edit_lock_ = true
