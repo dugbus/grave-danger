@@ -251,6 +251,7 @@ func _has_flame_boundary() -> bool:
 	return (
 		flame_boundary != null
 		and is_instance_valid(flame_boundary)
+		and (not flame_boundary is Node3D or (flame_boundary as Node3D).is_visible_in_tree())
 		and flame_boundary.has_method("get_bounds_size")
 		and flame_boundary.has_method("get_bounds_center")
 	)

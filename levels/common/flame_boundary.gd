@@ -170,11 +170,22 @@ func _ready() -> void:
 		set_process(true)
 		return
 
+	if not _runtime_effects_enabled():
+		_set_runtime_effects_enabled(false)
+		return
+
 	_create_strips()
 	if show_timer:
 		_create_time_label()
 	_create_near_flame_audio()
 	_sync_boundary()
+
+
+func _notification(what: int) -> void:
+	if Engine.is_editor_hint() or what != NOTIFICATION_VISIBILITY_CHANGED or not is_inside_tree():
+		return
+
+	_set_runtime_effects_enabled(_runtime_effects_enabled())
 
 
 func _process(_delta: float) -> void:
@@ -187,6 +198,11 @@ func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
 
+	if not _runtime_effects_enabled():
+		_set_runtime_effects_enabled(false)
+		return
+
+	_ensure_runtime_effect_nodes()
 	elapsed_time += delta
 	_sync_movement_to_animation()
 	_sync_boundary()
@@ -228,13 +244,62 @@ func get_bounds_height() -> float:
 	return flame_height
 
 
+func _runtime_effects_enabled() -> bool:
+	return is_visible_in_tree()
+
+
+func _ensure_runtime_effect_nodes() -> void:
+	if strip_areas.is_empty():
+		_create_strips()
+	if show_timer and time_label == null:
+		_create_time_label()
+	if near_flame_audio_player == null:
+		_create_near_flame_audio()
+
+
+func _set_runtime_effects_enabled(enabled: bool) -> void:
+	for area in strip_areas:
+		if is_instance_valid(area):
+			area.monitoring = enabled
+
+	for collision in strip_collisions:
+		if is_instance_valid(collision):
+			collision.disabled = not enabled
+
+	for mesh in strip_meshes:
+		if is_instance_valid(mesh):
+			mesh.visible = enabled
+
+	if not enabled:
+		flame_touching_bodies.clear()
+
+	for collision in blocker_collisions:
+		if is_instance_valid(collision):
+			collision.disabled = true if not enabled else not player_blocking_enabled
+
+	var animation_player := get_node_or_null(ANIMATION_PLAYER_NAME) as AnimationPlayer
+	if animation_player != null:
+		if enabled and autoplay_boundary_animation and animation_player.has_animation(DEFAULT_ANIMATION_NAME) and not animation_player.is_playing():
+			animation_player.play(DEFAULT_ANIMATION_NAME)
+		elif not enabled and animation_player.is_playing():
+			animation_player.stop()
+
+	if near_flame_audio_player != null:
+		near_flame_audio_player.stream_paused = not enabled
+		if not enabled:
+			near_flame_audio_player.volume_db = near_flame_audio_min_db
+
+	if time_label != null:
+		time_label.visible = enabled
+
+
 func begin_runtime_animation() -> void:
 	_sync_boundary()
 	play_runtime_animation()
 
 
 func play_runtime_animation() -> void:
-	if not autoplay_boundary_animation:
+	if not autoplay_boundary_animation or not _runtime_effects_enabled():
 		return
 
 	var animation_player := get_node_or_null(ANIMATION_PLAYER_NAME) as AnimationPlayer
@@ -617,6 +682,10 @@ func _sync_boundary() -> void:
 		_update_preview_boundary()
 		return
 
+	if not _runtime_effects_enabled():
+		_set_runtime_effects_enabled(false)
+		return
+
 	_ensure_runtime_segment_count()
 	if strip_collisions.size() == boundary_segments and strip_meshes.size() == boundary_segments:
 		_update_runtime_boundary()
@@ -741,7 +810,7 @@ func _get_shape_profile_point(shape_index: int, perimeter_ratio: float) -> Vecto
 
 
 func _update_player_blockers_enabled() -> void:
-	var disabled := not player_blocking_enabled or _has_dead_flame_vulnerable_body()
+	var disabled := not _runtime_effects_enabled() or not player_blocking_enabled or _has_dead_flame_vulnerable_body()
 	for collision in blocker_collisions:
 		if is_instance_valid(collision):
 			collision.disabled = disabled
@@ -798,6 +867,9 @@ func _update_time_label() -> void:
 
 
 func _apply_flame_heat(delta: float) -> void:
+	if not _runtime_effects_enabled():
+		return
+
 	for body in get_tree().get_nodes_in_group("flame_vulnerable"):
 		if not body is Node3D:
 			continue
@@ -831,6 +903,10 @@ func _apply_flame_heat(delta: float) -> void:
 
 func _update_near_flame_audio(delta: float) -> void:
 	if near_flame_audio_player == null:
+		return
+
+	if not _runtime_effects_enabled():
+		near_flame_audio_player.volume_db = near_flame_audio_min_db
 		return
 
 	var closest_distance := INF

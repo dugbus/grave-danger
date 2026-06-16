@@ -7,8 +7,17 @@
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
 [ext_resource type="PackedScene" path="res://collectibles/health_flask.tscn" id="7_rihgm"]
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="8_h616y"]
+[ext_resource type="PackedScene" path="res://enemies/zombie.tscn" id="9_zombie"]
 
-[sub_resource type="Curve3D" id="Curve3D_rihgm"]
+[sub_resource type="Curve3D" id="Curve3D_h616y"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -5.5478525, -0.61502314, 3.3527384, 0, 0, 0, 0, 0, 0, -1.5608768, 0, 4.4078684),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[sub_resource type="Curve3D" id="Curve3D_krp6k"]
 resource_local_to_scene = true
 closed = true
 _data = {
@@ -17,7 +26,7 @@ _data = {
 }
 point_count = 13
 
-[sub_resource type="Animation" id="Animation_h616y"]
+[sub_resource type="Animation" id="Animation_13h2c"]
 resource_local_to_scene = true
 resource_name = "flame_boundary"
 length = 475.27316
@@ -54,9 +63,9 @@ tracks/2/keys = {
 "values": [0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_krp6k"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_a5y6d"]
 _data = {
-&"flame_boundary": SubResource("Animation_h616y")
+&"flame_boundary": SubResource("Animation_13h2c")
 }
 
 [node name="Level1" type="Node3D" unique_id=753330713]
@@ -241,6 +250,18 @@ pile_radius = 1.0
 trigger_time = 63.0
 random_seed = 18
 
+[node name="StartZombie" parent="." unique_id=1332419429 instance=ExtResource("9_zombie")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0354786, -0.015777588, 2.3562365)
+curve = SubResource("Curve3D_h616y")
+shuffle_speed = 0.55
+loop_patrol = false
+
+[node name="PathFollow3D" parent="StartZombie" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5478525, -0.61502314, 3.3527384)
+
+[node name="ZombieLight" parent="StartZombie/PathFollow3D/DropPivot/Pivot" index="1"]
+visible = false
+
 [node name="Player" parent="." unique_id=244343110 instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 12, 2)
 
@@ -254,8 +275,8 @@ data = {
 
 [node name="FlameBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 21.266586, 0, 23.496054)
-curve = SubResource("Curve3D_rihgm")
-boundary_animation = SubResource("Animation_h616y")
+curve = SubResource("Curve3D_krp6k")
+boundary_animation = SubResource("Animation_13h2c")
 playback_duration = 475.27316
 
 [node name="BoundaryCenter" parent="FlameBoundary3D" index="0"]
@@ -263,6 +284,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.7143855, 0, -15.529614)
 progress = 31.326347
 
 [node name="BoundaryAnimationPlayer" parent="FlameBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_krp6k")
+libraries/ = SubResource("AnimationLibrary_a5y6d")
 
+[editable path="StartZombie"]
 [editable path="FlameBoundary3D"]
