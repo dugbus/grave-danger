@@ -1,14 +1,22 @@
-[gd_scene load_steps=9 format=3 uid="uid://pqtcng2uw3dw"]
+[gd_scene format=3 uid="uid://pqtcng2uw3dw"]
 
-[ext_resource type="PackedScene" path="res://Assets/kenney-graveyard/character-keeper.glb" id="1_4flbx"]
-[ext_resource type="Script" path="res://player/player.gd" id="1_onrkg"]
-[ext_resource type="Script" path="res://player/player_movement.gd" id="3_i5lcx"]
-[ext_resource type="Script" path="res://player/player_gold_inventory.gd" id="4_nltvg"]
-[ext_resource type="Script" path="res://player/player_animation.gd" id="5_8mhfk"]
-[ext_resource type="Script" path="res://player/player_death.gd" id="6_7xubc"]
+[ext_resource type="PackedScene" uid="uid://bg1o6o88d6aih" path="res://Assets/kenney-graveyard/character-keeper.glb" id="1_4flbx"]
+[ext_resource type="Script" uid="uid://dtq13owafx466" path="res://player/player.gd" id="1_onrkg"]
+[ext_resource type="Script" uid="uid://clsohtxpkv21k" path="res://player/player_movement.gd" id="3_i5lcx"]
+[ext_resource type="Script" uid="uid://dqoggh4x1rg7s" path="res://player/player_gold_inventory.gd" id="4_nltvg"]
+[ext_resource type="Script" uid="uid://bxk737ajabv3s" path="res://player/player_animation.gd" id="5_8mhfk"]
+[ext_resource type="Script" uid="uid://bufcsm6qtgk23" path="res://player/player_death.gd" id="6_7xubc"]
+[ext_resource type="Script" uid="uid://c5fw58ydmf4o0" path="res://player/player_light.gd" id="7_boad6"]
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_4flbx"]
-radius = 0.34
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_boad6"]
+noise_type = 0
+frequency = 1.0
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_rgyib"]
+noise = SubResource("FastNoiseLite_boad6")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_player_shadow"]
+size = Vector2(1.2, 0.75)
 
 [sub_resource type="Shader" id="Shader_player_shadow"]
 code = "shader_type spatial;
@@ -28,46 +36,48 @@ void fragment() {
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_player_shadow"]
 render_priority = -1
 shader = SubResource("Shader_player_shadow")
+shader_parameter/shadow_color = Color(0, 0, 0, 0.34)
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_player_shadow"]
-size = Vector2(1.2, 0.75)
+[sub_resource type="SphereShape3D" id="SphereShape3D_4flbx"]
+radius = 0.34
 
 [node name="Player" type="CharacterBody3D" unique_id=244343110]
 collision_layer = 2
 collision_mask = 9
 script = ExtResource("1_onrkg")
 
-[node name="PlayerMovement" type="Node" parent="."]
+[node name="PlayerMovement" type="Node" parent="." unique_id=630278148]
 script = ExtResource("3_i5lcx")
 
-[node name="PlayerGoldInventory" type="Node" parent="."]
+[node name="PlayerGoldInventory" type="Node" parent="." unique_id=113501706]
 script = ExtResource("4_nltvg")
 
-[node name="PlayerAnimation" type="Node" parent="."]
+[node name="PlayerAnimation" type="Node" parent="." unique_id=1906804184]
 script = ExtResource("5_8mhfk")
 
-[node name="PlayerDeath" type="Node" parent="."]
+[node name="PlayerDeath" type="Node" parent="." unique_id=360054101]
 script = ExtResource("6_7xubc")
 
 [node name="Pivot" type="Node3D" parent="." unique_id=2026899053]
 
 [node name="Character" parent="Pivot" unique_id=2053546351 instance=ExtResource("1_4flbx")]
 
-[node name="PlayerShadow" type="MeshInstance3D" parent="."]
+[node name="PlayerLight" type="OmniLight3D" parent="Pivot" unique_id=994237452]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 1.42, 0.34)
+light_color = Color(0.8842759, 0.4890548, 0.27783498, 1)
+light_energy = 2.0
+shadow_enabled = true
+omni_range = 6.0
+omni_attenuation = 1.35
+script = ExtResource("7_boad6")
+noise = SubResource("NoiseTexture3D_rgyib")
+
+[node name="PlayerShadow" type="MeshInstance3D" parent="." unique_id=2006376189]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0.06)
 layers = 3
 cast_shadow = 0
 mesh = SubResource("PlaneMesh_player_shadow")
 surface_material_override/0 = SubResource("ShaderMaterial_player_shadow")
-
-[node name="PlayerLight" type="OmniLight3D" parent="Pivot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 1.42, 0.34)
-layers = 1
-shadow_enabled = true
-light_color = Color(1, 0.8, 0.55, 1)
-light_energy = 1.8
-omni_range = 6.0
-omni_attenuation = 1.35
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=837824967]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.34, 0)
