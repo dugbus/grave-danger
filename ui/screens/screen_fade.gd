@@ -25,7 +25,7 @@ static func create_overlay(owner: Node, fade_name: String, color: Color, layer_n
 		parent = layer
 
 	var fade := ColorRect.new()
-	fade.name = fade_name
+	fade.name = fade_name if not fade_name.is_empty() else "ScreenFade"
 	fade.color = color
 	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	fade.set_anchors_preset(Control.PRESET_FULL_RECT)

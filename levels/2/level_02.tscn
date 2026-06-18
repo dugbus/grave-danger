@@ -348,6 +348,7 @@ camera_fit_scale_limit = null
 transform = Transform3D(0.9999972, 0, 0, 0, 1, 0, 0, 0, 0.9999972, -21.321892, 0, -22.004309)
 
 [node name="BoundaryAnimationPlayer" parent="FlameBoundary3D" index="1"]
+root_node = NodePath("..")
 libraries/ = SubResource("AnimationLibrary_kfk4x")
 
 [node name="PNGGridMap" type="GridMap" parent="." unique_id=99293623]

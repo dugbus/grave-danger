@@ -5,6 +5,7 @@ const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 const FLAME_BOUNDARY_SCRIPT := preload("res://levels/common/flame_boundary.gd")
 
 const CURRENT_LEVEL_NAME := "CurrentLevel"
+const COMMON_WORLD_ENVIRONMENT_PATH := "LevelCommon/WorldEnvironment"
 
 ## Seconds used for the black transition before loading the win screen.
 @export var win_fade_out_duration := 0.8
@@ -19,6 +20,7 @@ var current_level: Node
 
 func _ready() -> void:
 	_load_selected_level()
+	_configure_world_environment()
 	_configure_ground_for_level()
 	_configure_common_runtime_references()
 	_configure_flame_boundary_animation()
@@ -92,6 +94,30 @@ func _get_selected_level_scene() -> PackedScene:
 			return selected_scene
 
 	return default_level_scene
+
+
+func _configure_world_environment() -> void:
+	var common_world_environment := get_node_or_null(COMMON_WORLD_ENVIRONMENT_PATH) as WorldEnvironment
+	if common_world_environment == null:
+		return
+
+	var level_world_environment := _find_world_environment(current_level)
+	if level_world_environment != null and level_world_environment.environment != null:
+		common_world_environment.environment = level_world_environment.environment
+
+
+func _find_world_environment(root: Node) -> WorldEnvironment:
+	if root == null:
+		return null
+	if root is WorldEnvironment:
+		return root as WorldEnvironment
+
+	for child in root.get_children():
+		var world_environment := _find_world_environment(child)
+		if world_environment != null:
+			return world_environment
+
+	return null
 
 
 func _configure_ground_for_level() -> void:
@@ -174,7 +200,7 @@ func _configure_common_runtime_references() -> void:
 	if energy_hud != null and energy_hud.has_method("set_runtime_references") and player != null:
 		energy_hud.set_runtime_references(
 			player.get_node_or_null("PlayerDeath"),
-			player.get_node_or_null("PlayerGoldInventory")
+			player.get_node_or_null("PlayerInventory")
 		)
 
 

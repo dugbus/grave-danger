@@ -5,7 +5,7 @@ extends CharacterBody3D
 # Coins and flame areas still talk to this CharacterBody3D, while the actual
 # behavior is split into focused child components below.
 @onready var movement: Node = $PlayerMovement
-@onready var gold_inventory: Node = $PlayerGoldInventory
+@onready var inventory: Node = $PlayerInventory
 @onready var animation_controller: Node = $PlayerAnimation
 @onready var death_controller: Node = $PlayerDeath
 
@@ -27,22 +27,24 @@ func _physics_process(delta: float) -> void:
 	# Keep the frame order explicit:
 	# gravity/jump first, then repeatable drop input, then horizontal movement,
 	# then animation from the final input strength.
-	movement.apply_gravity_and_jump(delta, gold_inventory)
-	gold_inventory.update_drop_input(delta)
+	movement.apply_gravity_and_jump(delta, inventory)
+	inventory.update_drop_input(delta)
 
-	var input_strength: float = movement.update_walk(delta, gold_inventory)
-	animation_controller.update_movement(input_strength, gold_inventory)
+	var input_strength: float = movement.update_walk(delta, inventory)
+	animation_controller.update_movement(input_strength, inventory)
 
 	move_and_slide()
 
 
 func try_collect_gold_coin(gold_coin: Node3D) -> bool:
-	# Gold coins call this on the player body. The inventory component decides
-	# whether the coin is collectible, but death always rejects pickup first.
+	return try_collect_carried_item(gold_coin)
+
+
+func try_collect_carried_item(pickup: Node3D) -> bool:
 	if death_controller.is_dead:
 		return false
 
-	return gold_inventory.try_collect_gold_coin(gold_coin)
+	return inventory.try_collect_item_pickup(pickup)
 
 
 func try_collect_health_flask(_health_flask: Node3D, heal_percent_of_max: float, heal_duration: float) -> bool:
@@ -56,11 +58,22 @@ func spend_carried_gold_coin() -> bool:
 	if death_controller.is_dead:
 		return false
 
-	return gold_inventory.spend_carried_gold_coin()
+	return inventory.spend_carried_gold_coin()
 
 
 func get_carried_gold_coins() -> int:
-	return gold_inventory.get_carried_gold_coins()
+	return inventory.get_carried_gold_coins()
+
+
+func take_carried_item_of_type(item_type: StringName):
+	if death_controller.is_dead:
+		return null
+
+	return inventory.take_item_of_type(item_type)
+
+
+func take_bronze_key():
+	return take_carried_item_of_type(&"bronze_key")
 
 
 func is_dead() -> bool:

@@ -79,6 +79,7 @@ shape_morph = 1.0
 transform = Transform3D(2, 0, 0, 0, 1, 0, 0, 0, 2, -15.122086, 0.01753807, -21.473944)
 
 [node name="BoundaryAnimationPlayer" parent="FlameBoundary3D" index="1"]
+root_node = NodePath("..")
 libraries/ = SubResource("AnimationLibrary_w5hhs")
 
 [node name="PNGGridMap" type="GridMap" parent="." unique_id=1498944449]

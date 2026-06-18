@@ -3,17 +3,26 @@
 [ext_resource type="PackedScene" uid="uid://bg1o6o88d6aih" path="res://Assets/kenney-graveyard/character-keeper.glb" id="1_4flbx"]
 [ext_resource type="Script" uid="uid://dtq13owafx466" path="res://player/player.gd" id="1_onrkg"]
 [ext_resource type="Script" uid="uid://clsohtxpkv21k" path="res://player/player_movement.gd" id="3_i5lcx"]
-[ext_resource type="Script" uid="uid://dqoggh4x1rg7s" path="res://player/player_gold_inventory.gd" id="4_nltvg"]
+[ext_resource type="Script" path="res://player/player_inventory.gd" id="4_nltvg"]
 [ext_resource type="Script" uid="uid://bxk737ajabv3s" path="res://player/player_animation.gd" id="5_8mhfk"]
 [ext_resource type="Script" uid="uid://bufcsm6qtgk23" path="res://player/player_death.gd" id="6_7xubc"]
 [ext_resource type="Script" uid="uid://c5fw58ydmf4o0" path="res://player/player_light.gd" id="7_boad6"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_boad6"]
-noise_type = 0
-frequency = 1.0
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_fast"]
+noise_type = 1
+frequency = 0.8
+fractal_octaves = 4
 
-[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_rgyib"]
-noise = SubResource("FastNoiseLite_boad6")
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_slow"]
+noise_type = 1
+frequency = 0.3
+fractal_octaves = 4
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_fast"]
+noise = SubResource("FastNoiseLite_fast")
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_slow"]
+noise = SubResource("FastNoiseLite_slow")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_player_shadow"]
 size = Vector2(1.2, 0.75)
@@ -49,7 +58,7 @@ script = ExtResource("1_onrkg")
 [node name="PlayerMovement" type="Node" parent="." unique_id=630278148]
 script = ExtResource("3_i5lcx")
 
-[node name="PlayerGoldInventory" type="Node" parent="." unique_id=113501706]
+[node name="PlayerInventory" type="Node" parent="." unique_id=113501706]
 script = ExtResource("4_nltvg")
 
 [node name="PlayerAnimation" type="Node" parent="." unique_id=1906804184]
@@ -70,7 +79,8 @@ shadow_enabled = true
 omni_range = 6.0
 omni_attenuation = 1.35
 script = ExtResource("7_boad6")
-noise = SubResource("NoiseTexture3D_rgyib")
+noise_fast = SubResource("NoiseTexture3D_fast")
+noise_slow = SubResource("NoiseTexture3D_slow")
 
 [node name="PlayerShadow" type="MeshInstance3D" parent="." unique_id=2006376189]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0.06)

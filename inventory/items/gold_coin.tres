@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://inventory/carried_item.gd" id="1_item"]
+[ext_resource type="AudioStream" path="res://Assets/audio/coin-pickup.mp3" id="2_sound"]
+
+[resource]
+script = ExtResource("1_item")
+item_type = &"gold_coin"
+display_name = "Gold Coin"
+max_count = 100
+weight = 1.0
+drop_order = 0
+world_scene_path = "res://collectibles/gold_coin.tscn"
+require_facing_for_pickup = true
+pickup_sound = ExtResource("2_sound")
+drop_sound = ExtResource("2_sound")

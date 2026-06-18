@@ -145,7 +145,7 @@ func _reparent_value_label_to_layer(label: Label) -> void:
 
 func _create_value_label(label_name: String) -> Label:
 	var label := Label.new()
-	label.name = label_name
+	label.name = label_name if not label_name.is_empty() else "ValueLabel"
 	_configure_value_label(label)
 	return label
 

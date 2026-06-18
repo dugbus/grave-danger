@@ -346,6 +346,7 @@ playback_duration = 475.27316
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.321892, 0, -22.004309)
 
 [node name="BoundaryAnimationPlayer" parent="FlameBoundary3D" index="1"]
+root_node = NodePath("..")
 libraries/ = SubResource("AnimationLibrary_3tqij")
 
 [editable path="FlameBoundary3D"]

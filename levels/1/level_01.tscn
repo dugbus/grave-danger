@@ -11,11 +11,12 @@
 [ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="9_krp6k"]
 [ext_resource type="PackedScene" path="res://enemies/zombie.tscn" id="9_zombie"]
 [ext_resource type="PackedScene" uid="uid://fv3hosp0q8wg" path="res://Assets/kenney-graveyard/coffin-old.glb" id="10_a5y6d"]
-[ext_resource type="ArrayMesh" uid="uid://dr7b1es6egk2f" path="res://Assets/kenney-graveyard/road.res" id="11_a5y6d"]
+[ext_resource type="ArrayMesh" uid="uid://bsinmmogwhh0m" path="res://Assets/kenney-graveyard/road.res" id="11_a5y6d"]
 [ext_resource type="Shader" uid="uid://bi3o8elbtqoni" path="res://addons/simplegrasstextured/shaders/grass.gdshader" id="13_3m1bw"]
 [ext_resource type="Texture2D" uid="uid://c4ggdp0kg5wjk" path="res://addons/simplegrasstextured/textures/grassbushcc008.png" id="14_w2m8w"]
 [ext_resource type="ArrayMesh" uid="uid://sptcpdx6wtm8" path="res://addons/simplegrasstextured/default_mesh.tres" id="15_wjj06"]
 [ext_resource type="Script" uid="uid://2juaclm8gc1n" path="res://addons/simplegrasstextured/grass.gd" id="16_86xts"]
+[ext_resource type="PackedScene" path="res://collectibles/key.tscn" id="17_w2m8w"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_hbbog"]
 
@@ -28,7 +29,7 @@ noise = SubResource("FastNoiseLite_hbbog")
 albedo_color = Color(0.458067, 0.3769966, 0.4041335, 1)
 roughness_texture = SubResource("NoiseTexture2D_cpq2e")
 
-[sub_resource type="Curve3D" id="Curve3D_hbbog"]
+[sub_resource type="Curve3D" id="Curve3D_w2m8w"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -5.5478525, -0.61502314, 3.3527384, 0, 0, 0, 0, 0, 0, -1.5608768, 0, 4.4078684),
@@ -36,7 +37,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_cpq2e"]
+[sub_resource type="Curve3D" id="Curve3D_wjj06"]
 resource_local_to_scene = true
 closed = true
 _data = {
@@ -45,7 +46,7 @@ _data = {
 }
 point_count = 13
 
-[sub_resource type="Animation" id="Animation_fj3n0"]
+[sub_resource type="Animation" id="Animation_86xts"]
 resource_local_to_scene = true
 resource_name = "flame_boundary"
 length = 475.27316
@@ -82,19 +83,19 @@ tracks/2/keys = {
 "values": [0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_4ve4p"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1y300"]
 _data = {
-&"flame_boundary": SubResource("Animation_fj3n0")
+&"flame_boundary": SubResource("Animation_86xts")
 }
 
 [sub_resource type="Environment" id="Environment_3m1bw"]
+background_mode = 1
 ambient_light_color = Color(1, 1, 1, 1)
-volumetric_fog_enabled = true
-volumetric_fog_density = 0.3663
+volumetric_fog_density = 0.025
 volumetric_fog_albedo = Color(0.8604339, 0.6221017, 0.4884559, 1)
-volumetric_fog_emission = Color(0.42753822, 0.16661811, 0.12887701, 1)
+volumetric_fog_emission = Color(0.08, 0.035, 0.025, 1)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_1y300"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_uie34"]
 render_priority = 0
 shader = ExtResource("13_3m1bw")
 shader_parameter/albedo = Color(1, 1, 1, 1)
@@ -360,7 +361,7 @@ transform = Transform3D(1.2024131, 0, 0.8967735, 0, 1.5, 0, -0.8967735, 0, 1.202
 
 [node name="StartZombie" parent="." unique_id=1332419429 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0354786, -0.015777588, 2.3562365)
-curve = SubResource("Curve3D_hbbog")
+curve = SubResource("Curve3D_w2m8w")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -383,16 +384,16 @@ data = {
 
 [node name="FlameBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 21.266586, 0, 23.496054)
-curve = SubResource("Curve3D_cpq2e")
-boundary_animation = SubResource("Animation_fj3n0")
+curve = SubResource("Curve3D_wjj06")
+boundary_animation = SubResource("Animation_86xts")
 playback_duration = 475.27316
 
 [node name="BoundaryCenter" parent="FlameBoundary3D" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.7143855, 0, -15.529614)
-progress = 31.326347
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.7371883, 0, -19.252388)
+progress = 20.716991
 
 [node name="BoundaryAnimationPlayer" parent="FlameBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_4ve4p")
+libraries/ = SubResource("AnimationLibrary_1y300")
 
 [node name="coffin-old" parent="." unique_id=876962173 instance=ExtResource("10_a5y6d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.549681, 0, 14.97021)
@@ -401,7 +402,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.549681, 0, 14.97021)
 environment = SubResource("Environment_3m1bw")
 
 [node name="SimpleGrassTextured" type="MultiMeshInstance3D" parent="." unique_id=1267581101]
-material_override = SubResource("ShaderMaterial_1y300")
+material_override = SubResource("ShaderMaterial_uie34")
 multimesh = SubResource("MultiMesh_3m1bw")
 script = ExtResource("16_86xts")
 scale_h = 0.25
@@ -428,6 +429,9 @@ use_collision = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, -0.5, 10)
 size = Vector3(20, 1, 20)
 material = SubResource("StandardMaterial3D_13h2c")
+
+[node name="Key" parent="." unique_id=1585175688 instance=ExtResource("17_w2m8w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.6740446, 0.024999011, 4.835276)
 
 [editable path="StartZombie"]
 [editable path="FlameBoundary3D"]

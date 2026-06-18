@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://inventory/carried_item.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+item_type = &"bronze_key"
+display_name = "Bronze Key"
+max_count = 99
+weight = 5.0
+drop_order = 10
+world_scene_path = "res://collectibles/key.tscn"
+require_facing_for_pickup = true

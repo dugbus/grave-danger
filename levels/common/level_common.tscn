@@ -90,7 +90,7 @@ text = "Coins 0"
 [node name="EnergyHud" type="CanvasLayer" parent="." unique_id=358766660]
 script = ExtResource("6_energy")
 death_controller_path = NodePath("../../CurrentLevel/Player/PlayerDeath")
-gold_inventory_path = NodePath("../../CurrentLevel/Player/PlayerGoldInventory")
+gold_inventory_path = NodePath("../../CurrentLevel/Player/PlayerInventory")
 bar_width = 700.0
 bar_height = 80.0
 

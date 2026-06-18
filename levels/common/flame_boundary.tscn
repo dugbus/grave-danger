@@ -58,3 +58,4 @@ near_flame_audio_max_db = 4.0
 rotation_mode = 0
 
 [node name="BoundaryAnimationPlayer" type="AnimationPlayer" parent="."]
+root_node = NodePath("..")
