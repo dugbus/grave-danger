@@ -1,7 +1,67 @@
 [gd_scene format=3 uid="uid://bvdv2d8npbqry"]
 
-[ext_resource type="Script" path="res://ui/screens/result_screen.gd" id="1_result"]
+[ext_resource type="Script" path="res://ui/screens/lose_screen.gd" id="1_lose"]
 [ext_resource type="Texture2D" path="res://Assets/frontend/lose-screen.png" id="2_texture"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_normal"]
+bg_color = Color(0.08, 0.07, 0.08, 0.88)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.86, 0.68, 0.32, 0.62)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.42)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_pressed"]
+bg_color = Color(0.2, 0.13, 0.08, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.88, 0.42, 0.95)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.42)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_hover"]
+bg_color = Color(0.15, 0.12, 0.11, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.78, 0.28, 0.86)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.42)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_focus"]
+bg_color = Color(0.18, 0.12, 0.08, 0.38)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.72, 1, 0.62, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0.25, 0.98, 0.34, 0.32)
+shadow_size = 12
+shadow_offset = Vector2(0, 0)
 
 [node name="LoseScreen" type="Control" unique_id=98674996]
 layout_mode = 3
@@ -10,7 +70,7 @@ offset_right = 1920.0
 offset_bottom = 1080.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_result")
+script = ExtResource("1_lose")
 result_texture = ExtResource("2_texture")
 coins_rect = Rect2(585, 456, 376, 88)
 percentage_rect = Rect2(586, 623, 376, 88)
@@ -46,6 +106,60 @@ text = "000"
 horizontal_alignment = 1
 vertical_alignment = 1
 clip_text = true
+
+[node name="ButtonsLayer" type="CanvasLayer" parent="." unique_id=1974546693]
+layer = 30
+
+[node name="ActionButtons" type="HBoxContainer" parent="ButtonsLayer" unique_id=1045238104]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -328.0
+offset_top = -218.0
+offset_right = 328.0
+offset_bottom = -112.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="BackButton" type="Button" parent="ButtonsLayer/ActionButtons" unique_id=1627401960]
+custom_minimum_size = Vector2(308, 96)
+layout_mode = 2
+focus_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.35, 1)
+theme_override_colors/font_focus_color = Color(1, 0.94, 0.62, 1)
+theme_override_colors/font_hover_color = Color(1, 0.9, 0.48, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.94, 0.62, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxFlat_action_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_action_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_action_focus")
+text = "Back"
+
+[node name="RetryButton" type="Button" parent="ButtonsLayer/ActionButtons" unique_id=1921377068]
+custom_minimum_size = Vector2(308, 96)
+layout_mode = 2
+focus_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.35, 1)
+theme_override_colors/font_focus_color = Color(1, 0.94, 0.62, 1)
+theme_override_colors/font_hover_color = Color(1, 0.9, 0.48, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.94, 0.62, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxFlat_action_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_action_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_action_focus")
+text = "Retry"
 
 [node name="PercentageValue" type="Label" parent="ValueLayer" unique_id=1986082415]
 z_index = 10
