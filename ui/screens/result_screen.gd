@@ -1,4 +1,5 @@
 extends Control
+class_name GDResultScreen
 
 
 const TITLE_SCENE := "res://ui/screens/title_screen.tscn"

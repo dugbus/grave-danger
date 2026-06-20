@@ -1,8 +1,9 @@
 extends OmniLight3D
+class_name GDPlayerLight
 
-@export var base_energy := 2.0
-@export var dip_amount := 1.45     # how far below base it can drop
-@export var peak_amount := 0.65    # how far above base it can rise
+@export var base_energy := 4.2
+@export var dip_amount := 1.0     # how far below base it can drop
+@export var peak_amount := 0.9    # how far above base it can rise
 @export var flicker_speed := 7.5
 @export var noise_fast: NoiseTexture3D
 @export var noise_slow: NoiseTexture3D
@@ -12,7 +13,11 @@ var time_passed := 0.0
 func _process(delta: float) -> void:
 	time_passed += delta
 
-	# Fast flutter — the constant quick flicker of flame
+	if noise_fast == null or noise_fast.noise == null or noise_slow == null or noise_slow.noise == null:
+		light_energy = base_energy
+		return
+
+	# Fast flutter — the constant quick flicker of flame.
 	var fast := noise_fast.noise.get_noise_1d(time_passed * flicker_speed)
 
 	# Slow swell — occasional bigger dips / surges

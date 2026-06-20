@@ -1,5 +1,6 @@
 @tool
 extends Node3D
+class_name GDGoldCoinPile
 
 
 const GOLD_COIN_SCENE := preload("res://collectibles/gold_coin.tscn")

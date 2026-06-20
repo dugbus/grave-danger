@@ -1,4 +1,5 @@
 extends Control
+class_name GDTitleScreen
 
 
 # Scene loaded when the player leaves the title screen.

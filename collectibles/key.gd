@@ -1,4 +1,5 @@
 extends "res://inventory/inventory_pickup.gd"
+class_name GDKey
 
 
 const KEY_ITEM := preload("res://inventory/items/key.tres")

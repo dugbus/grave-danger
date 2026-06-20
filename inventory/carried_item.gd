@@ -1,4 +1,5 @@
 extends Resource
+class_name GDCarriedItem
 
 
 ## Stable identifier used by gameplay code, for example &"gold_coin" or &"key".

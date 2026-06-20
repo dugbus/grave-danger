@@ -222,10 +222,14 @@ func _on_mapping_changed() -> void:
 
 ## Loads a PNG image and rebuilds colour mappings from its palette.
 func _load_png(path: String, save_profile: bool) -> void:
-	var image := Image.new()
-	var error := image.load(path)
-	if error != OK:
-		_update_dock_state("Could not load PNG: %s. Error: %s" % [path, error])
+	var texture := ResourceLoader.load(path) as Texture2D
+	if texture == null:
+		_update_dock_state("Could not load PNG: %s." % path)
+		return
+
+	var image := texture.get_image()
+	if image == null:
+		_update_dock_state("Could not read image data from PNG: %s." % path)
 		return
 	_image = image
 	_settings.png_path = path

@@ -1,4 +1,5 @@
 extends Control
+class_name GDLevelSelectScreen
 
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 

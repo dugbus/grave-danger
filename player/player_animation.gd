@@ -1,4 +1,5 @@
 extends Node
+class_name GDPlayerAnimation
 
 
 # Animation owns imported-character setup and playback decisions. It searches

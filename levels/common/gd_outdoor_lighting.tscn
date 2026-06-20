@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://levels/common/gd_outdoor_lighting.gd" id="1_script"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_outdoor"]
+sky_horizon_color = Color(0.52, 0.46, 0.66, 1)
+ground_horizon_color = Color(0.24, 0.21, 0.28, 1)
+
+[sub_resource type="Sky" id="Sky_outdoor"]
+sky_material = SubResource("ProceduralSkyMaterial_outdoor")
+
+[sub_resource type="Environment" id="Environment_outdoor"]
+background_mode = 2
+sky = SubResource("Sky_outdoor")
+ambient_light_source = 2
+ambient_light_color = Color(0.78, 0.84, 1, 1)
+ambient_light_energy = 0.35
+reflected_light_source = 1
+tonemap_exposure = 1.0
+
+[node name="GDOutdoorLighting" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_outdoor")
+
+[node name="SunLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.52991927, 0.20516141, -0.82285744, 0, 0.9702957, 0.2419219, 0.8480481, -0.12819907, 0.5141784, 0, 0, 0)
+light_color = Color(0.96, 0.88, 0.68, 1)
+light_energy = 1.65
+shadow_enabled = true
+shadow_opacity = 0.48

@@ -1,5 +1,6 @@
 @tool
 extends Node3D
+class_name GDLevel05
 
 const TERRAIN_BODY_NAME := "RollingHillsTerrain"
 const TERRAIN_MESH_NAME := "TerrainMesh"
@@ -128,7 +129,7 @@ const DEFAULT_SKY_COLOR := Color(0.52, 0.46, 0.66, 1.0)
 		direct_run_camera_offset = value
 		_queue_rebuild()
 
-@export var direct_run_camera_profile: FollowCameraProfile:
+@export var direct_run_camera_profile: Resource:
 	set(value):
 		direct_run_camera_profile = value
 		_queue_rebuild()
@@ -145,22 +146,6 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	_rebuild_level()
-
-
-func uses_custom_ground() -> bool:
-	return true
-
-
-func uses_custom_lighting() -> bool:
-	return true
-
-
-func uses_common_level_settings() -> bool:
-	return false
-
-
-func uses_player_light() -> bool:
-	return false
 
 
 func _queue_rebuild() -> void:
@@ -296,9 +281,14 @@ func _get_height_map_image() -> Image:
 		if _height_map_image != null:
 			return _height_map_image
 
-	var image := Image.new()
-	var error := image.load(height_map_path)
-	if error != OK:
+	var loaded_texture := load(height_map_path) as Texture2D
+	if loaded_texture != null:
+		_height_map_image = loaded_texture.get_image()
+		if _height_map_image != null:
+			return _height_map_image
+
+	var image := Image.load_from_file(ProjectSettings.globalize_path(height_map_path))
+	if image == null:
 		_height_map_load_failed = true
 		push_warning("Unable to load Level 5 height map: %s" % height_map_path)
 		return null
@@ -417,12 +407,6 @@ func _configure_world_environment() -> void:
 		environment.ambient_light_energy = DEFAULT_AMBIENT_LIGHT_ENERGY
 
 
-func get_custom_environment() -> Environment:
-	_configure_world_environment()
-	var world_environment := get_node_or_null(WORLD_ENVIRONMENT_NAME) as WorldEnvironment
-	return world_environment.environment if world_environment != null else null
-
-
 func _configure_direct_run_camera(force_current := false) -> void:
 	var preview_camera := _get_or_create_level_camera()
 	if not enable_direct_run_camera and not force_current:
@@ -472,9 +456,13 @@ func _find_reusable_camera(root: Node) -> Camera3D:
 
 
 func _configure_reusable_camera(camera: Camera3D, player: Node3D) -> void:
-	if camera.has_method("set_runtime_targets"):
+	if camera.get_script() == null:
+		camera.set_script(FOLLOW_CAMERA_SCRIPT)
+
+	if not Engine.is_editor_hint() and camera.has_method("set_runtime_targets"):
 		camera.set_runtime_targets(player, null)
-	if direct_run_camera_profile != null and camera.has_method("apply_camera_profile"):
+
+	if not Engine.is_editor_hint() and direct_run_camera_profile != null and camera.has_method("apply_camera_profile"):
 		camera.apply_camera_profile(direct_run_camera_profile)
 	else:
 		_set_property_if_available(camera, "camera_offset", direct_run_camera_offset)

@@ -1,4 +1,5 @@
 extends RefCounted
+class_name GDScreenFade
 
 const DEFAULT_LAYER := 100
 

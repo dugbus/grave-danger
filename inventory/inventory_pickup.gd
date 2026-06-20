@@ -1,4 +1,5 @@
 extends RigidBody3D
+class_name GDInventoryPickup
 
 
 ## Item definition added to the player's inventory when collected.
@@ -123,8 +124,8 @@ func _disable_pickup_area() -> void:
 	if pickup_area == null:
 		return
 
-	pickup_area.monitoring = false
-	pickup_area.monitorable = false
+	pickup_area.set_deferred("monitoring", false)
+	pickup_area.set_deferred("monitorable", false)
 	pickup_area.collision_layer = 0
 	pickup_area.collision_mask = 0
 

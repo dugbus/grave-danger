@@ -1,6 +1,12 @@
 extends Node3D
+class_name GDCoinDeposit
 
 const COIN_PICKUP_SOUND := preload("res://Assets/audio/coin-pickup.mp3")
+const COIN_SOUND_VOLUME_OFFSET_DB := -2.5
+const COIN_SOUND_PITCH_MIN := 0.82
+const COIN_SOUND_PITCH_MAX := 0.98
+const COIN_SOUND_VOLUME_MIN_DB := -3.0
+const COIN_SOUND_VOLUME_MAX_DB := 1.0
 
 signal coin_absorbed(count: int)
 
@@ -189,8 +195,11 @@ func _play_absorb_sound() -> void:
 	var sound_player := AudioStreamPlayer3D.new()
 	sound_player.name = "CoinAbsorbAudio"
 	sound_player.stream = COIN_PICKUP_SOUND
-	sound_player.pitch_scale = randf_range(0.88, 1.05)
-	sound_player.volume_db = randf_range(-3.0, 1.0)
+	sound_player.pitch_scale = randf_range(COIN_SOUND_PITCH_MIN, COIN_SOUND_PITCH_MAX)
+	sound_player.volume_db = randf_range(
+		COIN_SOUND_VOLUME_MIN_DB + COIN_SOUND_VOLUME_OFFSET_DB,
+		COIN_SOUND_VOLUME_MAX_DB + COIN_SOUND_VOLUME_OFFSET_DB
+	)
 	sound_player.finished.connect(sound_player.queue_free)
 	add_child(sound_player)
 	sound_player.global_position = global_position

@@ -1,5 +1,6 @@
 @tool
 extends Node3D
+class_name GDLevel05TreeSurround
 
 const RENDER_ROOT_NAME := "TreeChunks"
 const COLLISION_BODY_NAME := "TreeBlockers"

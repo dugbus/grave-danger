@@ -1,4 +1,5 @@
 extends Node
+class_name GDLevelSelection
 
 const RESULTS_PATH := "user://level_results.json"
 const LEVELS := [

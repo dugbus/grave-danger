@@ -1,4 +1,5 @@
 extends CanvasLayer
+class_name GDEnergyHud
 
 const HudStatusBarScene := preload("res://ui/hud/hud_status_bar.gd")
 

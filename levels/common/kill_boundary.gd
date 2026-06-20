@@ -1,6 +1,6 @@
 @tool
 extends Path3D
-class_name KillBoundary3D
+class_name GDKillBoundary3D
 
 
 const EDITOR_PREVIEW_CONTAINER_NAME := "EditorPreview"
@@ -460,7 +460,7 @@ func _ensure_boundary_nodes() -> void:
 		add_child(center)
 		_set_authored_owner(center)
 
-	center.rotation_mode = 0
+	center.rotation_mode = PathFollow3D.ROTATION_NONE
 	center.loop = true
 
 	var animation_player := get_node_or_null(ANIMATION_PLAYER_NAME) as AnimationPlayer
@@ -486,10 +486,10 @@ func _set_authored_owner(node: Node) -> void:
 
 
 func _create_default_curve() -> Curve3D:
-	var curve := Curve3D.new()
-	curve.add_point(Vector3.ZERO)
-	curve.add_point(Vector3(4.0, 0.0, 0.0))
-	return curve
+	var default_curve := Curve3D.new()
+	default_curve.add_point(Vector3.ZERO)
+	default_curve.add_point(Vector3(4.0, 0.0, 0.0))
+	return default_curve
 
 
 func _configure_path_follow() -> void:
@@ -497,7 +497,7 @@ func _configure_path_follow() -> void:
 	if path_follow == null:
 		return
 
-	path_follow.rotation_mode = 0
+	path_follow.rotation_mode = PathFollow3D.ROTATION_NONE
 	path_follow.loop = true
 
 

@@ -1,4 +1,5 @@
 extends CanvasLayer
+class_name GDScoreHud
 
 ## Screen position of the top-left corner of the score label.
 @export var label_position := Vector2(16.0, 12.0)

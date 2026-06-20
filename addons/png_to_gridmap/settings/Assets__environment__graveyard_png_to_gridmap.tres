@@ -46,7 +46,7 @@ cross_item_ref = "WallCross"
 
 [resource]
 script = ExtResource("2_8r5vs")
-png_path = "/Users/delliott/grave-danger/levels/6/level_06.png"
+png_path = "res://levels/6/level_06.png"
 target_gridmap_path = NodePath("PNGGridMap")
 mesh_library_path = "res://Assets/environment/graveyard.res"
 flip_y_to_world_negative_z = false

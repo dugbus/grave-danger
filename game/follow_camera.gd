@@ -1,4 +1,5 @@
 extends Camera3D
+class_name GDFollowCamera
 
 
 ## Character or focus node this camera normally follows.
@@ -8,7 +9,7 @@ extends Camera3D
 @export var kill_boundary_path: NodePath = ^"../LevelLayout/KillBoundary3D"
 
 ## Optional reusable set of camera tuning values for level-specific cameras.
-@export var camera_profile: FollowCameraProfile:
+@export var camera_profile: Resource:
 	set(value):
 		camera_profile = value
 		if camera_profile != null:
@@ -45,7 +46,8 @@ extends Camera3D
 ## Responsiveness of boundary auto-zoom; higher values settle faster.
 @export var boundary_zoom_lag := 3.0
 ## Farthest distance allowed while trying to fit the kill boundary.
-@export var max_boundary_zoom_distance := 80.0
+## Keep this near max_zoom_distance so large flames do not force excessive zoom-out.
+@export var max_boundary_zoom_distance := 18.0
 ## Binary-search iterations used to solve the boundary fit distance.
 @export_range(4, 24, 1) var boundary_fit_iterations := 12
 
@@ -95,11 +97,14 @@ func _ready() -> void:
 		_update_camera_transform()
 
 
-func apply_camera_profile(profile: FollowCameraProfile) -> void:
+func apply_camera_profile(profile: Resource) -> void:
 	camera_profile = profile
 
 
-func _apply_camera_profile_values(profile: FollowCameraProfile) -> void:
+func _apply_camera_profile_values(profile: Resource) -> void:
+	if profile == null:
+		return
+
 	camera_offset = profile.camera_offset
 	view_elevation_degrees = profile.view_elevation_degrees
 	look_ahead = profile.look_ahead

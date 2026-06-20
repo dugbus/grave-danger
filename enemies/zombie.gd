@@ -1,4 +1,5 @@
 extends Path3D
+class_name GDZombiePath
 
 
 const FOOTSTEP_SOUND_PATHS: Array[String] = [

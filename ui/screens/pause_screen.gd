@@ -1,4 +1,5 @@
 extends CanvasLayer
+class_name GDPauseScreen
 
 
 func _ready() -> void:

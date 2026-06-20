@@ -1,4 +1,5 @@
 extends CharacterBody3D
+class_name GDPlayer
 
 
 # Player stays as the public API for other gameplay objects.

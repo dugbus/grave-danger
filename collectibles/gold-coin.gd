@@ -1,4 +1,5 @@
 extends "res://inventory/inventory_pickup.gd"
+class_name GDGoldCoin
 
 
 const GOLD_COIN_ITEM := preload("res://inventory/items/gold_coin.tres")
@@ -64,8 +65,8 @@ func _limit_edge_roll_distance() -> void:
 
 
 func _settle_flat_from_edge_roll() -> void:
-	var transform := global_transform
-	var x_axis := transform.basis.x
+	var current_transform := global_transform
+	var x_axis := current_transform.basis.x
 	x_axis.y = 0.0
 	if x_axis.length_squared() <= 0.0001:
 		x_axis = Vector3.RIGHT
@@ -74,8 +75,8 @@ func _settle_flat_from_edge_roll() -> void:
 
 	var y_axis := Vector3.UP
 	var z_axis := x_axis.cross(y_axis).normalized()
-	transform.basis = Basis(x_axis, y_axis, z_axis).orthonormalized()
-	global_transform = transform
+	current_transform.basis = Basis(x_axis, y_axis, z_axis).orthonormalized()
+	global_transform = current_transform
 
 	linear_velocity.x *= edge_roll_horizontal_damping
 	linear_velocity.z *= edge_roll_horizontal_damping

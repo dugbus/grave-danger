@@ -1,4 +1,5 @@
 extends Node3D
+class_name GDHealthFlask
 
 const DRINKING_SOUND := preload("res://Assets/audio/drinking-liquid.mp3")
 const HEAL_PERCENT_SETTING := "gameplay/health_flask_heal_percent"

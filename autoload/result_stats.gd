@@ -1,4 +1,5 @@
 extends Node
+class_name GDResultStats
 
 
 var coins_collected := 0

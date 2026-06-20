@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://wpfx5jihl62q"]
 
 [ext_resource type="Script" path="res://game/graveyard.gd" id="1_graveyard"]
-[ext_resource type="PackedScene" path="res://levels/common/level_common.tscn" id="2_common"]
+[ext_resource type="PackedScene" path="res://game/game_runtime.tscn" id="2_runtime"]
 [ext_resource type="PackedScene" path="res://levels/1/level_01.tscn" id="3_level1"]
 [ext_resource type="PackedScene" path="res://ui/screens/pause_screen.tscn" id="4_pause"]
 
@@ -9,7 +9,7 @@
 script = ExtResource("1_graveyard")
 default_level_scene = ExtResource("3_level1")
 
-[node name="LevelCommon" parent="." instance=ExtResource("2_common")]
+[node name="GameRuntime" parent="." instance=ExtResource("2_runtime")]
 
 [node name="CurrentLevel" parent="." instance=ExtResource("3_level1")]
 

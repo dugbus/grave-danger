@@ -1,5 +1,5 @@
 extends Control
-class_name HudStatusBar
+class_name GDHudStatusBar
 
 const TRACK_BACKGROUND := Color(0.0, 0.0, 0.0, 0.0025)
 const SHELL_BORDER := Color(0.92, 0.83, 0.58, 0.58)

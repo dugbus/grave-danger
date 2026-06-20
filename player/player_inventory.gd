@@ -1,4 +1,5 @@
 extends Node
+class_name GDPlayerInventory
 
 
 const GOLD_COIN_ITEM_TYPE := &"gold_coin"
@@ -18,6 +19,13 @@ const DROP_REPEAT_INTERVAL = 0.02
 const DROP_CLEAR_RADIUS = 0.18
 const DROP_NUDGE_RADIUS = 0.35
 const DROP_NUDGE_IMPULSE = 0.025
+const COIN_SOUND_VOLUME_OFFSET_DB := -2.5
+const COIN_SOUND_PITCH_MIN := 0.86
+const COIN_SOUND_PITCH_MAX := 1.0
+const ITEM_SOUND_PITCH_MIN := 0.92
+const ITEM_SOUND_PITCH_MAX := 1.1
+const ITEM_SOUND_VOLUME_MIN_DB := -4.0
+const ITEM_SOUND_VOLUME_MAX_DB := 0.5
 
 signal item_count_changed(item_type: StringName, carried_count: int)
 signal carried_gold_coins_changed(carried_count: int)
@@ -63,7 +71,7 @@ func try_collect_item_pickup(pickup: Node3D) -> bool:
 		return _drop_unstored_pickup(item)
 
 	_add_item(item)
-	_play_item_sound(_item_pickup_sound(item), "PickupItemAudio")
+	_play_item_sound(item, _item_pickup_sound(item), "PickupItemAudio")
 	return true
 
 
@@ -84,7 +92,7 @@ func drop_item_of_type(item_type: StringName) -> bool:
 		return false
 
 	take_item(item_type)
-	_play_item_sound(_item_drop_sound(item), "DropItemAudio")
+	_play_item_sound(item, _item_drop_sound(item), "DropItemAudio")
 	return true
 
 
@@ -208,7 +216,7 @@ func _add_item(item: Resource) -> void:
 
 
 func _get_next_drop_item() -> Resource:
-	var best_item: Resource
+	var best_item: Resource = null
 	for item_type in carried_items.keys():
 		var item: Resource = peek_item_of_type(item_type)
 		if item == null or get_item_count(_item_type(item)) <= 0:
@@ -240,12 +248,12 @@ func _drop_unstored_pickup(item: Resource) -> bool:
 	if not _spawn_dropped_item(item):
 		return false
 
-	_play_item_sound(_item_drop_sound(item), "DropItemAudio")
+	_play_item_sound(item, _item_drop_sound(item), "DropItemAudio")
 	return true
 
 
 func _get_next_auto_shed_item(incoming_item: Resource) -> Resource:
-	var best_item: Resource
+	var best_item: Resource = null
 	var incoming_drop_order := _item_drop_order(incoming_item)
 	for item_type in carried_items.keys():
 		var item: Resource = peek_item_of_type(item_type)
@@ -374,15 +382,22 @@ func _item_drop_sound(item: Resource) -> AudioStream:
 	return item.get("drop_sound") as AudioStream if item != null else null
 
 
-func _play_item_sound(sound: AudioStream, player_name: String) -> void:
+func _play_item_sound(item: Resource, sound: AudioStream, player_name: String) -> void:
 	if sound == null:
 		return
 
 	var sound_player := AudioStreamPlayer.new()
 	sound_player.name = player_name if not player_name.is_empty() else "InventoryItemAudio"
 	sound_player.stream = sound
-	sound_player.pitch_scale = randf_range(0.92, 1.1)
-	sound_player.volume_db = randf_range(-4.0, 0.5)
+	if _item_type(item) == GOLD_COIN_ITEM_TYPE:
+		sound_player.pitch_scale = randf_range(COIN_SOUND_PITCH_MIN, COIN_SOUND_PITCH_MAX)
+		sound_player.volume_db = randf_range(
+			ITEM_SOUND_VOLUME_MIN_DB + COIN_SOUND_VOLUME_OFFSET_DB,
+			ITEM_SOUND_VOLUME_MAX_DB + COIN_SOUND_VOLUME_OFFSET_DB
+		)
+	else:
+		sound_player.pitch_scale = randf_range(ITEM_SOUND_PITCH_MIN, ITEM_SOUND_PITCH_MAX)
+		sound_player.volume_db = randf_range(ITEM_SOUND_VOLUME_MIN_DB, ITEM_SOUND_VOLUME_MAX_DB)
 	sound_player.finished.connect(sound_player.queue_free)
 
 	if player != null:

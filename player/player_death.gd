@@ -1,4 +1,5 @@
 extends Node
+class_name GDPlayerDeath
 
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
@@ -110,9 +111,12 @@ func _play_death_scream() -> void:
 	sound_player.volume_db = 2.0
 	sound_player.finished.connect(sound_player.queue_free)
 
-	var audio_parent := get_tree().current_scene
+	var audio_parent: Node = get_tree().current_scene
 	if audio_parent == null:
-		audio_parent = player if player != null else self
+		if player != null:
+			audio_parent = player
+		else:
+			audio_parent = self
 	audio_parent.add_child(sound_player)
 	sound_player.play()
 

@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://3w0dhwvg7s4a"]
+
+[ext_resource type="Script" uid="uid://bov7w0cyy2jl7" path="res://game/follow_camera.gd" id="1_camera"]
+[ext_resource type="AudioStream" uid="uid://bcd4h7b10r85q" path="res://Assets/audio/music-track.mp3" id="3_music"]
+[ext_resource type="Script" uid="uid://5kig63v451pl" path="res://ui/hud/score_hud.gd" id="4_score"]
+[ext_resource type="Script" uid="uid://cyr67ggw4yark" path="res://tools/editor_preview_lighting.gd" id="5_preview"]
+[ext_resource type="Script" uid="uid://de147agwnjnqt" path="res://ui/hud/energy_hud.gd" id="6_energy"]
+[ext_resource type="Script" uid="uid://bror4xqpcudhg" path="res://ui/hud/hud_status_bar.gd" id="7_status"]
+
+[node name="GameRuntime" type="Node3D" unique_id=555773272]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=802023927]
+transform = Transform3D(1, 0, 0, 0, 0.7331114, 0.68010825, 0, -0.68010825, 0.7331114, 0, 5.2, 5.6)
+current = true
+fov = 34.0
+script = ExtResource("1_camera")
+target_path = NodePath("../../CurrentLevel/Player")
+kill_boundary_path = NodePath("../../CurrentLevel/LongRoad/PathFollow3D/KillBoundary3D")
+metadata/_edit_lock_ = true
+
+[node name="EditorPreviewLighting" type="Node3D" parent="." unique_id=1246828141]
+script = ExtResource("5_preview")
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=1607896681]
+stream = ExtResource("3_music")
+volume_db = -6.0
+autoplay = true
+
+[node name="ScoreHud" type="CanvasLayer" parent="." unique_id=831668248]
+script = ExtResource("4_score")
+
+[node name="ScoreLabel" type="Label" parent="ScoreHud" unique_id=761518826]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 402.0
+offset_bottom = 126.0
+theme_override_colors/font_color = Color(1, 0.82, 0.22, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 90
+text = "Coins 0"
+
+[node name="EnergyHud" type="CanvasLayer" parent="." unique_id=358766660]
+script = ExtResource("6_energy")
+death_controller_path = NodePath("../../CurrentLevel/Player/PlayerDeath")
+inventory_path = NodePath("../../CurrentLevel/Player/PlayerInventory")
+bar_width = 700.0
+bar_height = 80.0
+
+[node name="EnergyBar" type="Control" parent="EnergyHud" unique_id=1086669459]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 700.0
+offset_bottom = 80.0
+mouse_filter = 2
+script = ExtResource("7_status")
+
+[node name="CoinsHeldBar" type="Control" parent="EnergyHud" unique_id=2118200883]
+layout_mode = 3
+anchors_preset = 0
+offset_top = 90.0
+offset_right = 700.0
+offset_bottom = 170.0
+mouse_filter = 2
+script = ExtResource("7_status")

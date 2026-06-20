@@ -1,4 +1,5 @@
 extends Node
+class_name GDPlayerMovement
 
 
 # Movement is a child component of Player. It writes to the parent

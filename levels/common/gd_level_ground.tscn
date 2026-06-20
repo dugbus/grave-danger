@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://levels/common/gd_level_ground.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://Assets/environment/floor-albedo.png" id="2_floor_albedo"]
+[ext_resource type="Texture2D" path="res://Assets/environment/floor-normal.png" id="3_floor_normal"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+resource_local_to_scene = true
+size = Vector3(80, 2, 80)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+resource_local_to_scene = true
+size = Vector2(80, 80)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_texture = ExtResource("2_floor_albedo")
+roughness = 0.84
+normal_enabled = true
+normal_scale = 2.0
+normal_texture = ExtResource("3_floor_normal")
+uv1_scale = Vector3(40, 40, 1)
+
+[node name="GDLevelGround" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="GroundBody" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GroundBody"]
+position = Vector3(0, -1, 0)
+shape = SubResource("BoxShape3D_ground")
+
+[node name="FloorMesh" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.002, 0)
+mesh = SubResource("PlaneMesh_ground")
+surface_material_override/0 = SubResource("StandardMaterial3D_ground")
