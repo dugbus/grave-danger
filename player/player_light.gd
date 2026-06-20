@@ -1,9 +1,9 @@
 extends OmniLight3D
 
-@export var base_energy := 2.5
-@export var dip_amount := 1.2      # how far below base it can drop
-@export var peak_amount := 0.5     # how far above base it can rise
-@export var flicker_speed := 6.0
+@export var base_energy := 2.0
+@export var dip_amount := 1.45     # how far below base it can drop
+@export var peak_amount := 0.65    # how far above base it can rise
+@export var flicker_speed := 7.5
 @export var noise_fast: NoiseTexture3D
 @export var noise_slow: NoiseTexture3D
 

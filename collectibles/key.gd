@@ -1,14 +1,14 @@
 extends "res://inventory/inventory_pickup.gd"
 
 
-const BRONZE_KEY_ITEM := preload("res://inventory/items/bronze_key.tres")
+const KEY_ITEM := preload("res://inventory/items/key.tres")
 
 @export var key_material: Material
 
 
 func _ready() -> void:
 	if carried_item == null:
-		carried_item = BRONZE_KEY_ITEM
+		carried_item = KEY_ITEM
 	if key_material != null:
 		_apply_material(self)
 	super._ready()

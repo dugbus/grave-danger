@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="FollowCameraProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/follow_camera_profile.gd" id="1_profile"]
+
+[resource]
+script = ExtResource("1_profile")
+camera_offset = Vector3(0, 9, 12)
+view_elevation_degrees = 28.0
+forward_look_ahead = 0.0
+zoom_distance = 15.0
+max_zoom_distance = 18.0
+field_of_view = 42.0

@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/kenney-graveyard/coffin.glb" id="1_coffin"]
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
-[ext_resource type="PackedScene" path="res://levels/common/flame_boundary.tscn" id="4_flame"]
+[ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="4_flame"]
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
 
 [sub_resource type="Curve3D" id="Curve3D_xr0ak"]
@@ -16,7 +16,7 @@ point_count = 88
 
 [sub_resource type="Animation" id="Animation_iglv7"]
 resource_local_to_scene = true
-resource_name = "flame_boundary"
+resource_name = "kill_boundary"
 length = 475.27316
 loop_mode = 1
 tracks/0/type = "value"
@@ -53,7 +53,7 @@ tracks/2/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_7lci8"]
 _data = {
-&"flame_boundary": SubResource("Animation_iglv7")
+&"kill_boundary": SubResource("Animation_iglv7")
 }
 
 [node name="Level7" type="Node3D" unique_id=1808988836]
@@ -336,17 +336,17 @@ pile_radius = 2.0
 [node name="Player" parent="." unique_id=244343110 instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.364414, 12, -23.739996)
 
-[node name="FlameBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
+[node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 0.18119812, 0, -0.41855812)
 curve = SubResource("Curve3D_xr0ak")
 boundary_animation = SubResource("Animation_iglv7")
 playback_duration = 475.27316
 
-[node name="BoundaryCenter" parent="FlameBoundary3D" index="0"]
+[node name="BoundaryCenter" parent="KillBoundary3D" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.321892, 0, -22.004309)
 
-[node name="BoundaryAnimationPlayer" parent="FlameBoundary3D" index="1"]
+[node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
 root_node = NodePath("..")
 libraries/ = SubResource("AnimationLibrary_7lci8")
 
-[editable path="FlameBoundary3D"]
+[editable path="KillBoundary3D"]

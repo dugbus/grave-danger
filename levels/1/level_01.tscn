@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/kenney-graveyard/coffin.glb" id="1_coffin"]
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
-[ext_resource type="PackedScene" path="res://levels/common/flame_boundary.tscn" id="4_flame"]
+[ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="4_flame"]
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
 [ext_resource type="PackedScene" uid="uid://d1cnibtr25vmw" path="res://Assets/kenney-graveyard/urn-round.glb" id="6_hbbog"]
 [ext_resource type="PackedScene" path="res://collectibles/health_flask.tscn" id="7_rihgm"]
@@ -48,7 +48,7 @@ point_count = 13
 
 [sub_resource type="Animation" id="Animation_86xts"]
 resource_local_to_scene = true
-resource_name = "flame_boundary"
+resource_name = "kill_boundary"
 length = 475.27316
 loop_mode = 1
 tracks/0/type = "value"
@@ -85,7 +85,7 @@ tracks/2/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_1y300"]
 _data = {
-&"flame_boundary": SubResource("Animation_86xts")
+&"kill_boundary": SubResource("Animation_86xts")
 }
 
 [sub_resource type="Environment" id="Environment_3m1bw"]
@@ -382,17 +382,18 @@ data = {
 "cells": PackedInt32Array(0, 0, 2, 1, 0, 655365, 2, 0, 655365, 3, 0, 655365, 4, 0, 5, 0, 2, 1441794, 0, 3, 1441797, 0, 4, 1441797, 0, 5, 1441797, 0, 6, 1441797, 0, 7, 1441797, 0, 8, 1441797, 0, 9, 1441797, 0, 10, 1441797, 0, 11, 1441797, 0, 12, 1441797, 0, 13, 1441797, 0, 14, 1441797, 0, 15, 1441797, 0, 16, 1441797, 0, 17, 1441797, 0, 18, 1441796, 0, 19, 0, 5, 0, 5, 6, 0, 5, 7, 0, 5, 8, 0, 655364, 9, 0, 5, 10, 0, 5, 11, 0, 655364, 12, 0, 5, 13, 0, 5, 14, 0, 5, 15, 0, 5, 16, 0, 5, 17, 0, 5, 18, 0, 5, 19, 0, 655360, 19, 1, 1048581, 19, 2, 1048581, 19, 3, 1048581, 19, 4, 1048581, 19, 5, 1048581, 19, 6, 1048581, 19, 7, 1048581, 19, 8, 1048581, 19, 9, 1048581, 19, 10, 1048581, 19, 11, 1048581, 19, 12, 1048581, 19, 13, 1048581, 19, 14, 1048581, 19, 15, 1048581, 19, 16, 1048581, 19, 17, 1048581, 19, 18, 1048581, 19, 19, 1048576, 18, 19, 5, 17, 19, 5, 16, 19, 5, 15, 19, 5, 14, 19, 5, 13, 19, 5, 12, 19, 5, 11, 19, 5, 10, 19, 5, 9, 19, 5, 8, 19, 5, 7, 19, 5, 6, 19, 5, 5, 19, 5, 4, 19, 5, 3, 19, 5, 2, 19, 5, 1, 19, 4, 1, 18, 655360, 3, 17, 2, 4, 17, 655362, 3, 15, 1048578, 3, 14, 1048581, 3, 13, 1441792, 4, 13, 655365, 5, 13, 655360, 5, 14, 0, 6, 14, 5, 7, 14, 655360, 7, 15, 1048581, 7, 16, 1048581, 7, 17, 1048578, 17, 17, 655362, 16, 17, 0, 16, 16, 1441797, 16, 15, 1441797, 16, 14, 1441794, 13, 17, 1048578, 11, 17, 1048578, 12, 16, 5, 11, 16, 1441792, 13, 16, 655360, 16, 11, 1048578, 16, 6, 1441794, 16, 7, 1441797, 16, 8, 1441797, 16, 9, 1441797, 16, 10, 1441797, 13, 9, 1441797, 13, 10, 1048578, 13, 8, 655360, 12, 8, 2, 10, 8, 655362, 10, 10, 655362, 9, 8, 655365, 9, 10, 655365, 8, 9, 1048581, 8, 10, 0, 8, 8, 1441792, 6, 9, 1048578, 4, 9, 1048578, 2, 9, 1048578, 2, 7, 1441794, 4, 7, 1441794, 6, 7, 1441794, 2, 8, 1441797, 4, 8, 1441797, 6, 8, 1441797, 4, 3, 1441793, 4, 4, 1441797, 3, 3, 655365, 5, 3, 655365, 4, 2, 1048581, 4, 1, 1441794, 6, 3, 655362, 4, 5, 1048578, 2, 3, 2, 8, 1, 1048581, 8, 2, 1048578, 8, 4, 1441794, 8, 5, 1048578, 11, 1, 1048581, 11, 2, 1048581, 11, 3, 1048581, 11, 4, 1048581, 11, 5, 1048578, 13, 3, 2, 15, 1, 1441794, 17, 3, 655362, 15, 5, 1048578, 15, 3, 1048577, 15, 4, 1048581, 15, 2, 1048581, 16, 3, 5, 14, 3, 5, 12, 13, 5, 13, 13, 5, 11, 13, 2, 14, 13, 655362, 9, 13, 655366, 7, 12, 655366, 5, 11, 655366, 3, 11, 655366, 13, 6, 655366, 9, 6, 1441794, 9, 7, 1048578)
 }
 
-[node name="FlameBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
+[node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 21.266586, 0, 23.496054)
 curve = SubResource("Curve3D_wjj06")
 boundary_animation = SubResource("Animation_86xts")
 playback_duration = 475.27316
+render_effect = 1
 
-[node name="BoundaryCenter" parent="FlameBoundary3D" index="0"]
+[node name="BoundaryCenter" parent="KillBoundary3D" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.7371883, 0, -19.252388)
 progress = 20.716991
 
-[node name="BoundaryAnimationPlayer" parent="FlameBoundary3D" index="1"]
+[node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
 libraries/ = SubResource("AnimationLibrary_1y300")
 
 [node name="coffin-old" parent="." unique_id=876962173 instance=ExtResource("10_a5y6d")]
@@ -434,4 +435,4 @@ material = SubResource("StandardMaterial3D_13h2c")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.6740446, 0.024999011, 4.835276)
 
 [editable path="StartZombie"]
-[editable path="FlameBoundary3D"]
+[editable path="KillBoundary3D"]

@@ -4,8 +4,8 @@
 
 [resource]
 script = ExtResource("1_item")
-item_type = &"bronze_key"
-display_name = "Bronze Key"
+item_type = &"key"
+display_name = "Key"
 max_count = 99
 weight = 5.0
 drop_order = 10

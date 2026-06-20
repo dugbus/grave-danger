@@ -1,19 +1,24 @@
 @tool
 extends Path3D
-class_name FlameBoundary3D
+class_name KillBoundary3D
 
 
 const EDITOR_PREVIEW_CONTAINER_NAME := "EditorPreview"
 const BOUNDARY_CENTER_NAME := "BoundaryCenter"
 const ANIMATION_PLAYER_NAME := "BoundaryAnimationPlayer"
-const DEFAULT_ANIMATION_NAME := &"flame_boundary"
+const DEFAULT_ANIMATION_NAME := &"kill_boundary"
 const MOVEMENT_SPEED_TRACK_PATH := ^".:movement_speed"
 const NEAR_FLAMES_SOUND_PATH := "res://Assets/audio/near-the-flames.mp3"
 const PLAYER_BLOCKER_COLLISION_LAYER := 8
-const FLAME_SHADER := preload("res://levels/common/flame_boundary.gdshader")
+const FLAME_SHADER := preload("res://levels/common/kill_boundary_effects/kill_boundary_flame_effect.gdshader")
+const GHOST_SHADER := preload("res://levels/common/kill_boundary_effects/kill_boundary_ghost_effect.gdshader")
+const GHOST_TEXTURE := preload("res://Assets/ghost1.png")
 const SHAPE_RECTANGLE := 0
 const SHAPE_CIRCLE := 1
 const MAX_SHAPE_INDEX := 1
+const EFFECT_FLAME := 0
+const EFFECT_GHOST := 1
+const EFFECT_NONE := 2
 
 @export_group("Animation")
 ## Animation controlling path progress, scale, shape morph, and future properties.
@@ -43,7 +48,7 @@ const MAX_SHAPE_INDEX := 1
 		_sync_boundary()
 
 ## Largest horizontal BoundaryCenter scale the camera will try to keep fully visible.
-## The flame boundary itself may grow beyond this without forcing further zoom-out.
+## The kill boundary itself may grow beyond this without forcing further zoom-out.
 @export_range(0.1, 20.0, 0.05, "or_greater") var camera_fit_scale_limit := 1.75
 
 ## Shape index and interpolation: rectangle = 0, circle = 1.
@@ -57,6 +62,12 @@ const MAX_SHAPE_INDEX := 1
 @export_range(8, 128, 1) var boundary_segments := 32:
 	set(value):
 		boundary_segments = maxi(value, 8)
+		_sync_boundary()
+
+## Visual effect rendered around the kill boundary. Damage, audio, and blockers are independent of this.
+@export_enum("Flame", "Ghost", "None") var render_effect := EFFECT_FLAME:
+	set(value):
+		render_effect = clampi(value, EFFECT_FLAME, EFFECT_NONE)
 		_sync_boundary()
 
 ## Thickness of each visible flame strip, in world units.
@@ -77,20 +88,136 @@ const MAX_SHAPE_INDEX := 1
 		flame_height = maxf(value, 0.05)
 		_sync_boundary()
 
-## Local Y offset of the flame boundary relative to its center path node.
+## Local Y offset of the kill boundary relative to its center path node.
 @export var flame_y := 0.0:
 	set(value):
 		flame_y = value
 		_sync_boundary()
 
+@export_group("Flame Effect")
+## Opacity multiplier for the flame effect only.
+@export_range(0.0, 1.0, 0.01) var flame_effect_opacity := 1.0:
+	set(value):
+		flame_effect_opacity = clampf(value, 0.0, 1.0)
+		_sync_boundary()
+
+## Volumetric density multiplier for the flame effect.
+@export_range(0.1, 8.0, 0.05) var flame_effect_density := 3.1:
+	set(value):
+		flame_effect_density = maxf(value, 0.1)
+		_sync_boundary()
+
+## Emission strength for the flame effect.
+@export_range(0.0, 20.0, 0.1) var flame_effect_emission := 7.0:
+	set(value):
+		flame_effect_emission = maxf(value, 0.0)
+		_sync_boundary()
+
+## Animation speed for flame turbulence.
+@export_range(0.0, 2.0, 0.01) var flame_effect_time_scale := 0.72:
+	set(value):
+		flame_effect_time_scale = maxf(value, 0.0)
+		_sync_boundary()
+
+@export var flame_effect_core_color := Color(1.0, 0.92, 0.42):
+	set(value):
+		flame_effect_core_color = value
+		_sync_boundary()
+
+@export var flame_effect_mid_color := Color(1.0, 0.28, 0.015):
+	set(value):
+		flame_effect_mid_color = value
+		_sync_boundary()
+
+@export var flame_effect_outer_color := Color(0.48, 0.008, 0.001):
+	set(value):
+		flame_effect_outer_color = value
+		_sync_boundary()
+
+@export_group("Ghost Effect")
+@export var ghost_effect_color := Color(0.58, 0.9, 1.0):
+	set(value):
+		ghost_effect_color = value
+		_sync_boundary()
+
+@export_range(0.0, 20.0, 0.1) var ghost_effect_emission := 6.2:
+	set(value):
+		ghost_effect_emission = maxf(value, 0.0)
+		_sync_boundary()
+
+@export_range(0.0, 1.0, 0.01) var ghost_effect_edge_softness := 0.28:
+	set(value):
+		ghost_effect_edge_softness = clampf(value, 0.0, 1.0)
+		_sync_boundary()
+
+## Number of ghost ribbons spawned along each boundary segment.
+@export_range(0, 8, 1) var ghost_ribbons_per_segment := 5:
+	set(value):
+		ghost_ribbons_per_segment = maxi(value, 0)
+		_sync_boundary()
+
+## Randomized height range for each spirit ribbon, in world units.
+@export var ghost_height_range := Vector2(2.0, 3.45):
+	set(value):
+		ghost_height_range = _sanitize_positive_range(value, 0.1)
+		_sync_boundary()
+
+## Randomized width range for each spirit ribbon, in world units.
+@export var ghost_width_range := Vector2(0.22, 0.52):
+	set(value):
+		ghost_width_range = _sanitize_positive_range(value, 0.01)
+		_sync_boundary()
+
+## Extra vertical travel before a spirit fades out.
+@export_range(0.0, 4.0, 0.05) var ghost_rise_distance := 1.3:
+	set(value):
+		ghost_rise_distance = maxf(value, 0.0)
+		_sync_boundary()
+
+## Maximum sideways sine bend applied to each spirit.
+@export_range(0.0, 2.0, 0.01) var ghost_wave_amplitude := 0.14:
+	set(value):
+		ghost_wave_amplitude = maxf(value, 0.0)
+		_sync_boundary()
+
+@export var ghost_opacity_range := Vector2(0.92, 1.18):
+	set(value):
+		ghost_opacity_range = _sanitize_positive_range(value, 0.0)
+		_sync_boundary()
+
+@export var ghost_rise_speed_range := Vector2(0.075, 0.18):
+	set(value):
+		ghost_rise_speed_range = _sanitize_positive_range(value, 0.0)
+		_sync_boundary()
+
+@export var ghost_wave_frequency_range := Vector2(3.4, 8.6):
+	set(value):
+		ghost_wave_frequency_range = _sanitize_positive_range(value, 0.01)
+		_sync_boundary()
+
+@export var ghost_wave_speed_range := Vector2(0.7, 1.9):
+	set(value):
+		ghost_wave_speed_range = _sanitize_positive_range(value, 0.0)
+		_sync_boundary()
+
+@export var ghost_lean_range := Vector2(-0.28, 0.28):
+	set(value):
+		ghost_lean_range = Vector2(minf(value.x, value.y), maxf(value.x, value.y))
+		_sync_boundary()
+
+@export var ghost_emerge_depth_ratio_range := Vector2(0.72, 1.02):
+	set(value):
+		ghost_emerge_depth_ratio_range = _sanitize_positive_range(value, 0.0)
+		_sync_boundary()
+
 @export_group("Player Blocking")
-## Enables invisible collision walls around the flame boundary.
+## Enables invisible collision walls around the kill boundary.
 @export var player_blocking_enabled := true:
 	set(value):
 		player_blocking_enabled = value
 		_sync_boundary()
 
-## Extra distance outside the flame boundary where blocker walls are placed.
+## Extra distance outside the kill boundary where blocker walls are placed.
 @export_range(0.0, 3.0, 0.01) var player_blocking_outset := 1.0:
 	set(value):
 		player_blocking_outset = maxf(value, 0.0)
@@ -140,14 +267,18 @@ const MAX_SHAPE_INDEX := 1
 var strip_areas: Array[Area3D] = []
 var strip_collisions: Array[CollisionShape3D] = []
 var strip_meshes: Array[MeshInstance3D] = []
+var ghost_meshes: Array[MeshInstance3D] = []
 var blocker_bodies: Array[StaticBody3D] = []
 var blocker_collisions: Array[CollisionShape3D] = []
 var preview_meshes: Array[MeshInstance3D] = []
+var preview_ghost_meshes: Array[MeshInstance3D] = []
 var blocker_preview_meshes: Array[MeshInstance3D] = []
 var flame_touching_bodies: Array[Node3D] = []
 var preview_center_mesh: MeshInstance3D
 
 var flame_material: ShaderMaterial
+var ghost_material: ShaderMaterial
+var ghost_mesh: ArrayMesh
 var preview_material: StandardMaterial3D
 var blocker_preview_material: StandardMaterial3D
 var elapsed_time := 0.0
@@ -163,6 +294,7 @@ func _ready() -> void:
 	_sync_animation_player()
 	_sync_movement_to_animation()
 	_create_flame_material()
+	_create_ghost_material()
 
 	if Engine.is_editor_hint():
 		_ensure_editor_preview()
@@ -206,6 +338,7 @@ func _physics_process(delta: float) -> void:
 	elapsed_time += delta
 	_sync_movement_to_animation()
 	_sync_boundary()
+	_update_ghost_billboards()
 	_apply_flame_heat(delta)
 	_update_player_blockers_enabled()
 	_update_near_flame_audio(delta)
@@ -268,7 +401,11 @@ func _set_runtime_effects_enabled(enabled: bool) -> void:
 
 	for mesh in strip_meshes:
 		if is_instance_valid(mesh):
-			mesh.visible = enabled
+			mesh.visible = enabled and _is_flame_effect_active()
+
+	for mesh in ghost_meshes:
+		if is_instance_valid(mesh):
+			mesh.visible = enabled and _is_ghost_effect_active()
 
 	if not enabled:
 		flame_touching_bodies.clear()
@@ -514,15 +651,98 @@ func _create_flame_material() -> void:
 	noise_texture.normalize = true
 	noise_texture.noise = noise
 	flame_material.set_shader_parameter("sample_noise", noise_texture)
+	_apply_flame_effect_parameters()
+
+
+func _create_ghost_material() -> void:
+	ghost_material = ShaderMaterial.new()
+	ghost_material.shader = GHOST_SHADER
+	ghost_material.set_shader_parameter("ghost_texture", GHOST_TEXTURE)
+	_apply_ghost_effect_material_parameters()
+
+
+func _is_flame_effect_active() -> bool:
+	return render_effect == EFFECT_FLAME
+
+
+func _is_ghost_effect_active() -> bool:
+	return render_effect == EFFECT_GHOST
+
+
+func _apply_effect_material_parameters() -> void:
+	_apply_flame_effect_parameters()
+	_apply_ghost_effect_material_parameters()
+
+
+func _apply_flame_effect_parameters() -> void:
+	if flame_material == null:
+		return
+
+	flame_material.set_shader_parameter("density_multiplier", flame_effect_density)
+	flame_material.set_shader_parameter("opacity_multiplier", flame_effect_opacity)
+	flame_material.set_shader_parameter("emission_strength", flame_effect_emission)
+	flame_material.set_shader_parameter("time_scale", flame_effect_time_scale)
+	flame_material.set_shader_parameter("color_core", _color_to_vec3(flame_effect_core_color))
+	flame_material.set_shader_parameter("color_mid", _color_to_vec3(flame_effect_mid_color))
+	flame_material.set_shader_parameter("color_outer", _color_to_vec3(flame_effect_outer_color))
+
+
+func _apply_ghost_effect_material_parameters() -> void:
+	if ghost_material == null:
+		return
+
+	ghost_material.set_shader_parameter("ghost_texture", GHOST_TEXTURE)
+	ghost_material.set_shader_parameter("ghost_color", _color_to_vec3(ghost_effect_color))
+	ghost_material.set_shader_parameter("emission_strength", ghost_effect_emission)
+	ghost_material.set_shader_parameter("edge_softness", ghost_effect_edge_softness)
+
+
+func _color_to_vec3(color: Color) -> Vector3:
+	return Vector3(color.r, color.g, color.b)
+
+
+func _get_ghost_mesh() -> ArrayMesh:
+	if ghost_mesh != null:
+		return ghost_mesh
+
+	const RIBBON_SEGMENTS := 18
+	var vertices := PackedVector3Array()
+	var uvs := PackedVector2Array()
+	var indices := PackedInt32Array()
+	for i in RIBBON_SEGMENTS + 1:
+		var y := float(i) / float(RIBBON_SEGMENTS)
+		vertices.append(Vector3(-1.0, y, 0.0))
+		uvs.append(Vector2(0.0, y))
+		vertices.append(Vector3(1.0, y, 0.0))
+		uvs.append(Vector2(1.0, y))
+
+	for i in RIBBON_SEGMENTS:
+		var base := i * 2
+		indices.append(base)
+		indices.append(base + 1)
+		indices.append(base + 2)
+		indices.append(base + 1)
+		indices.append(base + 3)
+		indices.append(base + 2)
+
+	var arrays := []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = vertices
+	arrays[Mesh.ARRAY_TEX_UV] = uvs
+	arrays[Mesh.ARRAY_INDEX] = indices
+
+	ghost_mesh = ArrayMesh.new()
+	ghost_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	return ghost_mesh
 
 
 func _create_preview_material() -> StandardMaterial3D:
 	var material := StandardMaterial3D.new()
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	material.albedo_color = Color(1.0, 0.52, 0.04, 0.55)
+	material.albedo_color = Color(0.55, 0.9, 1.0, 0.38)
 	material.emission_enabled = true
-	material.emission = Color(1.0, 0.4, 0.02)
-	material.emission_energy_multiplier = 1.0
+	material.emission = Color(0.45, 0.85, 1.0)
+	material.emission_energy_multiplier = 0.55
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	return material
 
@@ -545,7 +765,7 @@ func _ensure_editor_preview() -> void:
 	preview_material = _create_preview_material()
 	blocker_preview_material = _create_blocker_preview_material()
 	var preview_container := _get_or_create_editor_preview_container()
-	if preview_meshes.is_empty() and blocker_preview_meshes.is_empty():
+	if preview_meshes.is_empty() and preview_ghost_meshes.is_empty() and blocker_preview_meshes.is_empty():
 		for child in preview_container.get_children(true):
 			preview_container.remove_child(child)
 			child.queue_free()
@@ -563,6 +783,23 @@ func _ensure_editor_preview() -> void:
 	while preview_meshes.size() > boundary_segments:
 		var removed_preview: MeshInstance3D = preview_meshes.pop_back()
 		removed_preview.queue_free()
+
+	var target_ghost_count := boundary_segments * ghost_ribbons_per_segment
+	while preview_ghost_meshes.size() < target_ghost_count:
+		var ghost_preview := MeshInstance3D.new()
+		ghost_preview.name = "GhostPreview%d" % preview_ghost_meshes.size()
+		ghost_preview.mesh = _get_ghost_mesh()
+		ghost_preview.material_override = ghost_material
+		ghost_preview.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		ghost_preview.extra_cull_margin = maxf(ghost_height_range.y + ghost_rise_distance + ghost_wave_amplitude, 1.0)
+		preview_container.add_child(ghost_preview, false, Node.INTERNAL_MODE_BACK)
+		_lock_editor_preview_node(ghost_preview)
+		ghost_preview.owner = null
+		preview_ghost_meshes.append(ghost_preview)
+
+	while preview_ghost_meshes.size() > target_ghost_count:
+		var removed_ghost_preview: MeshInstance3D = preview_ghost_meshes.pop_back()
+		removed_ghost_preview.queue_free()
 
 	if preview_center_mesh == null:
 		preview_center_mesh = MeshInstance3D.new()
@@ -647,7 +884,29 @@ func _ensure_runtime_segment_count() -> void:
 		strip_meshes.pop_back()
 		removed_area.queue_free()
 
+	_ensure_ghost_ribbon_count(center)
 	_ensure_player_blocker_count(center)
+
+
+func _ensure_ghost_ribbon_count(center: Node3D) -> void:
+	if ghost_material == null:
+		_create_ghost_material()
+
+	var target_count := boundary_segments * ghost_ribbons_per_segment
+	while ghost_meshes.size() < target_count:
+		var i := ghost_meshes.size()
+		var mesh_instance := MeshInstance3D.new()
+		mesh_instance.name = "GhostRibbon%d" % i
+		mesh_instance.mesh = _get_ghost_mesh()
+		mesh_instance.material_override = ghost_material
+		mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mesh_instance.extra_cull_margin = maxf(ghost_height_range.y + ghost_rise_distance + ghost_wave_amplitude, 1.0)
+		center.add_child(mesh_instance)
+		ghost_meshes.append(mesh_instance)
+
+	while ghost_meshes.size() > target_count:
+		var removed_mesh: MeshInstance3D = ghost_meshes.pop_back()
+		removed_mesh.queue_free()
 
 
 func _ensure_player_blocker_count(center: Node3D) -> void:
@@ -676,8 +935,11 @@ func _sync_boundary() -> void:
 	if not is_inside_tree():
 		return
 
+	_apply_effect_material_parameters()
+
 	if Engine.is_editor_hint():
-		if preview_meshes.size() != boundary_segments or blocker_preview_meshes.size() != boundary_segments:
+		var target_ghost_count := boundary_segments * ghost_ribbons_per_segment
+		if preview_meshes.size() != boundary_segments or preview_ghost_meshes.size() != target_ghost_count or blocker_preview_meshes.size() != boundary_segments:
 			_ensure_editor_preview()
 		_update_preview_boundary()
 		return
@@ -690,6 +952,9 @@ func _sync_boundary() -> void:
 	if strip_collisions.size() == boundary_segments and strip_meshes.size() == boundary_segments:
 		_update_runtime_boundary()
 
+	if ghost_meshes.size() == boundary_segments * ghost_ribbons_per_segment:
+		_update_ghost_boundary()
+
 	if blocker_collisions.size() == boundary_segments:
 		_update_runtime_blockers()
 
@@ -700,6 +965,8 @@ func _update_preview_boundary() -> void:
 
 	var no_collisions: Array[CollisionShape3D] = []
 	_apply_boundary_to_segments(preview_meshes, no_collisions)
+	if preview_ghost_meshes.size() == boundary_segments * ghost_ribbons_per_segment:
+		_apply_ghosts_to_boundary(preview_ghost_meshes)
 	if preview_center_mesh != null:
 		preview_center_mesh.position = Vector3(0.0, flame_y + 0.18, 0.0)
 
@@ -710,6 +977,11 @@ func _update_preview_boundary() -> void:
 
 func _update_runtime_boundary() -> void:
 	_apply_boundary_to_segments(strip_meshes, strip_collisions)
+
+
+func _update_ghost_boundary() -> void:
+	_apply_ghosts_to_boundary(ghost_meshes)
+	_update_ghost_billboards()
 
 
 func _update_runtime_blockers() -> void:
@@ -729,6 +1001,7 @@ func _apply_boundary_to_segments(meshes: Array[MeshInstance3D], collisions: Arra
 		var midpoint := (start + finish) * 0.5
 		var visual_size := Vector3(segment_length + flame_visual_depth, flame_height, flame_visual_depth)
 		var mesh_instance := meshes[i]
+		mesh_instance.visible = _is_flame_effect_active()
 		(mesh_instance.mesh as BoxMesh).size = visual_size
 		mesh_instance.set_instance_shader_parameter("fire_size", visual_size)
 		mesh_instance.set_instance_shader_parameter("segment_half_length", segment_length * 0.5)
@@ -747,6 +1020,83 @@ func _apply_boundary_to_segments(meshes: Array[MeshInstance3D], collisions: Arra
 			mesh_instance.rotation = Vector3.ZERO
 			(collision.shape as BoxShape3D).size = Vector3(segment_length + flame_thickness, flame_height, flame_thickness)
 		perimeter_offset += segment_length
+
+
+func _apply_ghosts_to_boundary(meshes: Array[MeshInstance3D]) -> void:
+	if meshes.is_empty():
+		return
+
+	var points := _get_boundary_points()
+	var ghost_index := 0
+	var spirits_visible := _is_ghost_effect_active() and ghost_ribbons_per_segment > 0
+	for i in boundary_segments:
+		var start := points[i]
+		var finish := points[(i + 1) % boundary_segments]
+		var delta := finish - start
+		var outward := Vector2(delta.y, -delta.x).normalized()
+		for slot in ghost_ribbons_per_segment:
+			var mesh_instance := meshes[ghost_index]
+			var rng := _create_ghost_rng(ghost_index)
+			var along := (float(slot) + rng.randf_range(0.12, 0.88)) / float(ghost_ribbons_per_segment)
+			var ground_position := start.lerp(finish, clampf(along, 0.0, 1.0))
+			ground_position += outward * rng.randf_range(-flame_visual_depth * 0.35, flame_visual_depth * 0.35)
+
+			mesh_instance.visible = spirits_visible
+			mesh_instance.position = Vector3(ground_position.x, flame_y, ground_position.y)
+			mesh_instance.rotation = Vector3.ZERO
+			mesh_instance.extra_cull_margin = maxf(ghost_height_range.y + ghost_rise_distance + ghost_wave_amplitude, 1.0)
+			_configure_ghost_ribbon(mesh_instance, rng)
+			ghost_index += 1
+
+
+func _configure_ghost_ribbon(mesh_instance: MeshInstance3D, rng: RandomNumberGenerator) -> void:
+	var height := rng.randf_range(ghost_height_range.x, ghost_height_range.y)
+	var width := rng.randf_range(ghost_width_range.x, ghost_width_range.y)
+	var size_ratio := 0.0 if is_equal_approx(ghost_height_range.x, ghost_height_range.y) else inverse_lerp(ghost_height_range.x, ghost_height_range.y, height)
+	mesh_instance.set_instance_shader_parameter("ghost_width", width)
+	mesh_instance.set_instance_shader_parameter("ghost_height", height)
+	mesh_instance.set_instance_shader_parameter("rise_distance", ghost_rise_distance * rng.randf_range(0.72, 1.18))
+	mesh_instance.set_instance_shader_parameter("emerge_depth", height * rng.randf_range(ghost_emerge_depth_ratio_range.x, ghost_emerge_depth_ratio_range.y))
+	mesh_instance.set_instance_shader_parameter("rise_speed", rng.randf_range(ghost_rise_speed_range.x, ghost_rise_speed_range.y))
+	mesh_instance.set_instance_shader_parameter("cycle_offset", rng.randf())
+	mesh_instance.set_instance_shader_parameter("wave_phase", rng.randf_range(0.0, TAU))
+	mesh_instance.set_instance_shader_parameter("wave_amplitude", ghost_wave_amplitude * rng.randf_range(0.45, 1.3) * lerpf(0.85, 1.15, size_ratio))
+	mesh_instance.set_instance_shader_parameter("wave_frequency", rng.randf_range(ghost_wave_frequency_range.x, ghost_wave_frequency_range.y))
+	mesh_instance.set_instance_shader_parameter("wave_speed", rng.randf_range(ghost_wave_speed_range.x, ghost_wave_speed_range.y))
+	mesh_instance.set_instance_shader_parameter("lean", rng.randf_range(ghost_lean_range.x, ghost_lean_range.y))
+	mesh_instance.set_instance_shader_parameter("opacity", rng.randf_range(ghost_opacity_range.x, ghost_opacity_range.y))
+
+
+func _update_ghost_billboards() -> void:
+	if ghost_meshes.is_empty() or not _is_ghost_effect_active():
+		return
+
+	var camera := get_viewport().get_camera_3d()
+	if camera == null:
+		return
+
+	for mesh_instance in ghost_meshes:
+		if not is_instance_valid(mesh_instance) or not mesh_instance.visible:
+			continue
+
+		var target := camera.global_position
+		target.y = mesh_instance.global_position.y
+		if mesh_instance.global_position.distance_squared_to(target) <= 0.0001:
+			continue
+
+		mesh_instance.look_at(target, Vector3.UP)
+
+
+func _create_ghost_rng(index: int) -> RandomNumberGenerator:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 918273 + index * 104729
+	return rng
+
+
+func _sanitize_positive_range(value: Vector2, minimum: float) -> Vector2:
+	var low := maxf(minf(value.x, value.y), minimum)
+	var high := maxf(maxf(value.x, value.y), low)
+	return Vector2(low, high)
 
 
 func _apply_player_blockers_to_segments(meshes: Array[MeshInstance3D], collisions: Array[CollisionShape3D]) -> void:

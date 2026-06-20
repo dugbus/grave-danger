@@ -2,7 +2,7 @@ extends CharacterBody3D
 
 
 # Player stays as the public API for other gameplay objects.
-# Coins and flame areas still talk to this CharacterBody3D, while the actual
+# Coins and kill-boundary areas still talk to this CharacterBody3D, while the actual
 # behavior is split into focused child components below.
 @onready var movement: Node = $PlayerMovement
 @onready var inventory: Node = $PlayerInventory
@@ -72,8 +72,8 @@ func take_carried_item_of_type(item_type: StringName):
 	return inventory.take_item_of_type(item_type)
 
 
-func take_bronze_key():
-	return take_carried_item_of_type(&"bronze_key")
+func take_key():
+	return take_carried_item_of_type(&"key")
 
 
 func is_dead() -> bool:
@@ -81,7 +81,7 @@ func is_dead() -> bool:
 
 
 func die_from_flames() -> void:
-	# FlameBoundary calls this on any body that exposes the method.
+	# KillBoundary calls this on any body that exposes the method.
 	death_controller.die_from_flames()
 
 

@@ -5,7 +5,7 @@ const HudStatusBarScene := preload("res://ui/hud/hud_status_bar.gd")
 ## Node that owns flame energy and death state values for the hitpoints bar.
 @export var death_controller_path: NodePath = ^"../Player/PlayerDeath"
 ## Node that owns carried coin counts for the coins-held bar.
-@export var gold_inventory_path: NodePath = ^"../Player/PlayerInventory"
+@export var inventory_path: NodePath = ^"../Player/PlayerInventory"
 ## Existing editor-placed hitpoints bar. If missing, a fallback bar is created.
 @export var energy_bar_path: NodePath = ^"EnergyBar"
 ## Existing editor-placed carried-coins bar. If missing, a fallback bar is created.
@@ -75,7 +75,7 @@ func _process(_delta: float) -> void:
 
 func _resolve_references() -> void:
 	death_controller = get_node_or_null(death_controller_path)
-	gold_inventory = get_node_or_null(gold_inventory_path)
+	gold_inventory = get_node_or_null(inventory_path)
 
 
 func _connect_inventory_signal() -> void:

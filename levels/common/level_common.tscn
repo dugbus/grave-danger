@@ -58,7 +58,7 @@ current = true
 fov = 34.0
 script = ExtResource("1_camera")
 target_path = NodePath("../../CurrentLevel/Player")
-flame_boundary_path = NodePath("../../CurrentLevel/LongRoad/PathFollow3D/FlameBoundary")
+kill_boundary_path = NodePath("../../CurrentLevel/LongRoad/PathFollow3D/KillBoundary3D")
 metadata/_edit_lock_ = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=800182039]
@@ -90,7 +90,7 @@ text = "Coins 0"
 [node name="EnergyHud" type="CanvasLayer" parent="." unique_id=358766660]
 script = ExtResource("6_energy")
 death_controller_path = NodePath("../../CurrentLevel/Player/PlayerDeath")
-gold_inventory_path = NodePath("../../CurrentLevel/Player/PlayerInventory")
+inventory_path = NodePath("../../CurrentLevel/Player/PlayerInventory")
 bar_width = 700.0
 bar_height = 80.0
 

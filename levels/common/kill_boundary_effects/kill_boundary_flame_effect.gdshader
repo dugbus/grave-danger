@@ -5,6 +5,7 @@ uniform sampler3D sample_noise : repeat_enable, filter_linear_mipmap;
 uniform int raymarch_steps : hint_range(4, 12) = 6;
 uniform float time_scale : hint_range(0.0, 2.0) = 0.72;
 uniform float density_multiplier : hint_range(0.1, 8.0) = 3.1;
+uniform float opacity_multiplier : hint_range(0.0, 1.0) = 1.0;
 uniform float emission_strength : hint_range(0.0, 20.0) = 7.0;
 uniform float broad_noise_scale : hint_range(0.02, 1.0) = 0.18;
 uniform float detail_noise_scale : hint_range(0.05, 2.0) = 0.48;
@@ -117,5 +118,5 @@ void fragment() {
 
 	ALBEDO = accumulated_color / max(accumulated_alpha, 0.001);
 	EMISSION = ALBEDO * emission_strength;
-	ALPHA = accumulated_alpha;
+	ALPHA = accumulated_alpha * opacity_multiplier;
 }
