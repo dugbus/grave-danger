@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://b3lclyc0nspja"
-path="res://.godot/imported/key.blend-e206bb4718ec02dddbd3056910366d44.scn"
+uid="uid://br2wu6goijuf3"
+path="res://.godot/imported/grass-small.blend-eea961e1ad7a0282b7b40edbfd9d30cc.scn"
 
 [deps]
 
-source_file="res://blender/key.blend"
-dest_files=["res://.godot/imported/key.blend-e206bb4718ec02dddbd3056910366d44.scn"]
+source_file="res://Assets/environment/grass-small.blend"
+dest_files=["res://.godot/imported/grass-small.blend-eea961e1ad7a0282b7b40edbfd9d30cc.scn"]
 
 [params]
 
@@ -39,14 +39,26 @@ import_script/path=""
 materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
-_subresources={}
+_subresources={
+"meshes": {
+"grass-small_Plane_005": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/grass-small.res",
+"save_to_file/path": "uid://bnp6ud7heja8"
+}
+}
+}
 blender/nodes/visible=0
 blender/nodes/active_collection_only=false
 blender/nodes/punctual_lights=true
 blender/nodes/cameras=true
 blender/nodes/custom_properties=true
 blender/nodes/modifiers=1
-blender/meshes/vertex_colors=2
+blender/meshes/vertex_colors=1
 blender/meshes/uvs=true
 blender/meshes/normals=true
 blender/meshes/export_geometry_nodes_instances=false
@@ -60,4 +72,4 @@ blender/animation/limit_playback=true
 blender/animation/always_sample=true
 blender/animation/group_tracks=true
 gltf/naming_version=2
-gltf/texture_map_mode=0
+gltf/texture_map_mode=1
