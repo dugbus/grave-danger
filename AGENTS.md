@@ -16,3 +16,33 @@
 
 - No absolute paths, the team members use different os's.
 
+## Project target
+- Target Godot 4.7+ unless project.godot or CI says otherwise.
+- Prefer current Godot 4.x APIs. Do not use Godot 3.x APIs.
+
+## GDScript style
+- Follow the Godot 4.6 GDScript style guide.
+- Use spaces, not tabs.
+- Use snake_case for files, functions, variables, and signals.
+- Use PascalCase for class_name and node names.
+- Prefer `:=` when the type is clear from the right side; write explicit types when inference is ambiguous, especially `get_node()` results.
+- Order scripts as: @tool/@icon, class_name, extends, doc comment, signals, enums, constants, exports, vars, @onready vars, lifecycle callbacks, public methods, private methods.
+
+## Code generation rules
+- Preserve existing scene/resource paths.
+- Do not hand-edit `.tscn`, `.tres`, `.import`, or `project.godot` unless the task requires it.
+- Prefer small, composable scenes and scripts over large inheritance trees.
+- Use signals or typed dependencies for decoupling; avoid global singletons unless already established.
+- Do not invent nodes, autoloads, input actions, groups, or resources without checking existing files first.
+
+## Unit testing
+
+- Whereever possible add long lived tests to protect existing functionality and prevent regressions.
+
+## Validation
+Run the relevant checks after code changes:
+
+```bash
+godot --headless --editor --import --quit --path .
+godot --headless --check-only --quit --path .
+```
