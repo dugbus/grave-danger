@@ -18,7 +18,9 @@
 [ext_resource type="PackedScene" uid="uid://d6b03xve1ge1" path="res://Assets/kenney-graveyard/gravestone-bevel.glb" id="18_nm4ms"]
 [ext_resource type="PackedScene" uid="uid://cdji1pfixqhem" path="res://Assets/kenney-graveyard/gravestone-cross-large.glb" id="19_tys11"]
 [ext_resource type="PackedScene" uid="uid://smiw7occsaas" path="res://Assets/kenney-graveyard/pillar-obelisk.glb" id="20_xj8vh"]
+[ext_resource type="ArrayMesh" uid="uid://cqqygn2bs5no7" path="res://Assets/environment/church-small.res" id="21_tys11"]
 [ext_resource type="PackedScene" uid="uid://bjuxf3v3gaxby" path="res://Assets/kenney-graveyard/rocks.glb" id="22_7rxge"]
+[ext_resource type="Material" uid="uid://cu5fhcmgsc4va" path="res://Assets/environment/road.material" id="22_xj8vh"]
 [ext_resource type="PackedScene" uid="uid://dathjrgpejj8w" path="res://Assets/kenney-graveyard/rocks-tall.glb" id="23_vcbxs"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hill_grass"]
@@ -151,3 +153,8 @@ view_elevation_degrees = 28.0
 zoom_distance = 15.0
 field_of_view = 42.0
 metadata/_edit_lock_ = true
+
+[node name="ChurchSmall" type="MeshInstance3D" parent="." unique_id=1791504597]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4601972, 0.63985896, 10.523843)
+mesh = ExtResource("21_tys11")
+surface_material_override/0 = ExtResource("22_xj8vh")
