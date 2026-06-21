@@ -388,10 +388,16 @@ func get_camera_fit_transform() -> Transform3D:
 
 
 func get_bounds_size() -> Vector2:
+	if boundary_removed_for_level:
+		return Vector2.ZERO
+
 	return bounds_size * runtime_bounds_multiplier
 
 
 func get_bounds_height() -> float:
+	if boundary_removed_for_level:
+		return 0.0
+
 	return flame_height
 
 
@@ -433,7 +439,7 @@ func expand_runtime_bounds_percent_for(percent: float, active_seconds: float, tr
 	return true
 
 
-func remove_for_level() -> bool:
+func remove_for_level(sink_seconds := 1.0, sink_distance := 3.0) -> bool:
 	if boundary_removed_for_level:
 		return false
 
@@ -441,10 +447,10 @@ func remove_for_level() -> bool:
 	runtime_pause_token += 1
 	if runtime_bounds_tween != null and runtime_bounds_tween.is_valid():
 		runtime_bounds_tween.kill()
-	_set_runtime_effects_enabled(false)
+	_set_runtime_effects_enabled(false, true)
 	set_process(false)
 	set_physics_process(false)
-	call_deferred("queue_free")
+	_sink_removed_boundary(sink_seconds, sink_distance)
 	return true
 
 
@@ -461,7 +467,7 @@ func _ensure_runtime_effect_nodes() -> void:
 		_create_near_flame_audio()
 
 
-func _set_runtime_effects_enabled(enabled: bool) -> void:
+func _set_runtime_effects_enabled(enabled: bool, keep_visuals := false) -> void:
 	if boundary_removed_for_level and enabled:
 		return
 
@@ -475,11 +481,11 @@ func _set_runtime_effects_enabled(enabled: bool) -> void:
 
 	for mesh in strip_meshes:
 		if is_instance_valid(mesh):
-			mesh.visible = enabled and _is_flame_effect_active()
+			mesh.visible = (enabled or keep_visuals) and _is_flame_effect_active()
 
 	for mesh in ghost_meshes:
 		if is_instance_valid(mesh):
-			mesh.visible = enabled and _is_ghost_effect_active()
+			mesh.visible = (enabled or keep_visuals) and _is_ghost_effect_active()
 
 	if not enabled:
 		flame_touching_bodies.clear()
@@ -1414,6 +1420,19 @@ func _update_near_flame_audio(delta: float) -> void:
 
 	var t := 1.0 - exp(-near_flame_audio_lag * delta)
 	near_flame_audio_player.volume_db = lerpf(near_flame_audio_player.volume_db, target_volume, t)
+
+
+func _sink_removed_boundary(seconds: float, distance: float) -> void:
+	var duration := maxf(seconds, 0.05)
+	var drop_distance := maxf(distance, 0.1)
+	var tween := create_tween()
+	tween.tween_property(
+		self,
+		"position",
+		position + Vector3.DOWN * drop_distance,
+		duration
+	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	tween.finished.connect(queue_free)
 
 
 func _set_runtime_motion_paused(paused: bool) -> void:

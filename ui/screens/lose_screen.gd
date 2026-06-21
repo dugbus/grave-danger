@@ -92,7 +92,7 @@ func _select_button(action: LoseAction) -> void:
 
 
 func _choose_selected_action() -> void:
-    if selected_button_index == LoseAction.BACK:
+    if selected_button_index == int(LoseAction.BACK):
         _choose_action(LoseAction.BACK)
     else:
         _choose_action(LoseAction.RETRY)

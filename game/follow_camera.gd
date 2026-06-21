@@ -192,6 +192,9 @@ func _update_boundary_zoom(delta: float) -> void:
 		return
 
 	var bounds_size := kill_boundary.get_bounds_size() as Vector2
+	if bounds_size.x <= 0.0 or bounds_size.y <= 0.0:
+		return
+
 	var desired_distance := _get_distance_for_bounds(bounds_size * boundary_padding)
 	var t := 1.0 - exp(-boundary_zoom_lag * delta)
 	zoom_distance = lerpf(zoom_distance, maxf(desired_distance, min_zoom_distance), t)

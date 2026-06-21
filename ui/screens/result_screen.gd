@@ -30,9 +30,15 @@ var value_layer: CanvasLayer
 var coins_label: Label
 var percentage_label: Label
 var value_overlay: ResultValueOverlay
+var authored_coins_rect := Rect2()
+var authored_percentage_rect := Rect2()
+var has_authored_coins_rect := false
+var has_authored_percentage_rect := false
+var authored_screen_size := Vector2(1920.0, 1080.0)
 
 
 func _ready() -> void:
+	authored_screen_size = _get_current_screen_size()
 	_prepare_screen_root()
 	_bind_result_image()
 	_bind_value_layer()
@@ -105,6 +111,8 @@ func _bind_labels() -> void:
 		coins_label = _create_value_label("CoinsValue")
 		value_layer.add_child(coins_label)
 	else:
+		authored_coins_rect = _screen_rect_to_image_rect(_get_label_rect(coins_label), authored_screen_size)
+		has_authored_coins_rect = true
 		_reparent_value_label_to_layer(coins_label)
 		_configure_value_label(coins_label)
 
@@ -115,6 +123,8 @@ func _bind_labels() -> void:
 		percentage_label = _create_value_label("PercentageValue")
 		value_layer.add_child(percentage_label)
 	else:
+		authored_percentage_rect = _screen_rect_to_image_rect(_get_label_rect(percentage_label), authored_screen_size)
+		has_authored_percentage_rect = true
 		_reparent_value_label_to_layer(percentage_label)
 		_configure_value_label(percentage_label)
 
@@ -201,8 +211,8 @@ func _sync_screen_layout() -> void:
 
 
 func _layout_value_labels() -> void:
-	_place_label_from_source_rect(coins_label, coins_rect)
-	_place_label_from_source_rect(percentage_label, percentage_rect)
+	_place_label_in_rect(coins_label, _get_coins_value_rect())
+	_place_label_in_rect(percentage_label, _get_percentage_value_rect())
 	_fit_value_labels()
 	_layout_value_overlay()
 
@@ -213,8 +223,8 @@ func _layout_value_overlay() -> void:
 
 	value_overlay.size = size
 	value_overlay.set_value_layout(
-		_image_rect_to_screen_rect(coins_rect),
-		_image_rect_to_screen_rect(percentage_rect),
+		_get_coins_value_rect(),
+		_get_percentage_value_rect(),
 		value_padding,
 		_resolve_label_color(coins_label, "font_color", text_color),
 		_resolve_label_color(coins_label, "font_shadow_color", shadow_color),
@@ -243,19 +253,65 @@ func _place_label_from_source_rect(label: Label, image_rect: Rect2) -> void:
 	if result_texture == null:
 		return
 
-	var screen_rect := _image_rect_to_screen_rect(image_rect)
+	_place_label_in_rect(label, _image_rect_to_screen_rect(image_rect))
+
+
+func _place_label_in_rect(label: Label, screen_rect: Rect2) -> void:
+	if label == null:
+		return
+
 	label.position = screen_rect.position
 	label.size = screen_rect.size
+
+
+func _get_label_rect(label: Label) -> Rect2:
+	return Rect2(label.position, label.size)
+
+
+func _get_coins_value_rect() -> Rect2:
+	if has_authored_coins_rect:
+		return _image_rect_to_screen_rect(authored_coins_rect)
+
+	return _image_rect_to_screen_rect(coins_rect)
+
+
+func _get_percentage_value_rect() -> Rect2:
+	if has_authored_percentage_rect:
+		return _image_rect_to_screen_rect(authored_percentage_rect)
+
+	return _image_rect_to_screen_rect(percentage_rect)
+
+
+func _get_current_screen_size() -> Vector2:
+	if size.x > 0.0 and size.y > 0.0:
+		return size
+
+	return Vector2(
+		float(ProjectSettings.get_setting("display/window/size/viewport_width", 1920)),
+		float(ProjectSettings.get_setting("display/window/size/viewport_height", 1080))
+	)
+
+
+func _screen_rect_to_image_rect(screen_rect: Rect2, screen_size: Vector2) -> Rect2:
+	if result_texture == null:
+		return screen_rect
+
+	var texture_size := result_texture.get_size()
+	var image_scale := maxf(screen_size.x / texture_size.x, screen_size.y / texture_size.y)
+	var image_size := texture_size * image_scale
+	var image_offset := (screen_size - image_size) * 0.5
+
+	return Rect2((screen_rect.position - image_offset) / image_scale, screen_rect.size / image_scale)
 
 
 func _image_rect_to_screen_rect(image_rect: Rect2) -> Rect2:
 	var texture_size := result_texture.get_size()
 	var viewport_size := size
-	var scale := maxf(viewport_size.x / texture_size.x, viewport_size.y / texture_size.y)
-	var image_size := texture_size * scale
+	var image_scale := maxf(viewport_size.x / texture_size.x, viewport_size.y / texture_size.y)
+	var image_size := texture_size * image_scale
 	var image_offset := (viewport_size - image_size) * 0.5
 
-	return Rect2(image_offset + image_rect.position * scale, image_rect.size * scale)
+	return Rect2(image_offset + image_rect.position * image_scale, image_rect.size * image_scale)
 
 
 func _fit_value_labels() -> void:
@@ -278,7 +334,7 @@ func _fit_label_font_size(label: Label) -> void:
 	var high := maxi(1, floori(box_size.y))
 
 	while low <= high:
-		var test_size := (low + high) / 2
+		var test_size := floori(float(low + high) / 2.0)
 		var text_size := font.get_string_size(label.text, HORIZONTAL_ALIGNMENT_CENTER, -1.0, test_size)
 		if text_size.x <= available_size.x and text_size.y <= available_size.y:
 			best_size = test_size
@@ -374,9 +430,10 @@ class ResultValueOverlay:
 
 		var font_size := _fit_font_size(font, value, box.size)
 		var text_size := font.get_string_size(value, HORIZONTAL_ALIGNMENT_CENTER, -1.0, font_size)
+		var text_height := font.get_ascent(font_size) + font.get_descent(font_size)
 		var text_position := box.position + Vector2(
 			(box.size.x - text_size.x) * 0.5,
-			(box.size.y - text_size.y) * 0.5 + font.get_ascent(font_size)
+			(box.size.y - text_height) * 0.5 + font.get_ascent(font_size)
 		)
 
 		draw_string(font, text_position + shadow_offset, value, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, shadow_color)
@@ -390,9 +447,10 @@ class ResultValueOverlay:
 		var high := maxi(1, floori(box_size.y))
 
 		while low <= high:
-			var test_size := (low + high) / 2
+			var test_size := floori(float(low + high) / 2.0)
 			var text_size := font.get_string_size(value, HORIZONTAL_ALIGNMENT_CENTER, -1.0, test_size)
-			if text_size.x <= available_size.x and text_size.y <= available_size.y:
+			var text_height := font.get_ascent(test_size) + font.get_descent(test_size)
+			if text_size.x <= available_size.x and text_height <= available_size.y:
 				best_size = test_size
 				low = test_size + 1
 			else:
