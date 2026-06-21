@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://cyr67ggw4yark" path="res://tools/editor_preview_lighting.gd" id="5_preview"]
 [ext_resource type="Script" uid="uid://de147agwnjnqt" path="res://ui/hud/energy_hud.gd" id="6_energy"]
 [ext_resource type="Script" uid="uid://bror4xqpcudhg" path="res://ui/hud/hud_status_bar.gd" id="7_status"]
+[ext_resource type="Script" path="res://ui/hud/active_flask_hud.gd" id="8_active_flask"]
 
 [node name="GameRuntime" type="Node3D" unique_id=555773272]
 
@@ -64,3 +65,13 @@ offset_right = 700.0
 offset_bottom = 170.0
 mouse_filter = 2
 script = ExtResource("7_status")
+
+[node name="ActiveFlaskHud" type="Control" parent="EnergyHud"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("8_active_flask")

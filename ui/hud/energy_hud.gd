@@ -2,6 +2,7 @@ extends CanvasLayer
 class_name GDEnergyHud
 
 const HudStatusBarScene := preload("res://ui/hud/hud_status_bar.gd")
+const ActiveFlaskHudScene := preload("res://ui/hud/active_flask_hud.gd")
 
 ## Node that owns flame energy and death state values for the hitpoints bar.
 @export var death_controller_path: NodePath = ^"../Player/PlayerDeath"
@@ -39,24 +40,30 @@ const HudStatusBarScene := preload("res://ui/hud/hud_status_bar.gd")
 
 var death_controller: Node
 var gold_inventory: Node
+var player: Node
 var energy_bar: Control
 var coins_bar: Control
+var active_flask_hud: Control
 
 
 func _ready() -> void:
 	layer = 35
 
 	_bind_bars()
+	_bind_active_flask_hud()
 
 	_apply_bar_layout()
 	_resolve_references()
 	_connect_inventory_signal()
+	_connect_player_signal()
 
 
 func set_runtime_references(death_controller_node: Node, gold_inventory_node: Node) -> void:
 	death_controller = death_controller_node
 	gold_inventory = gold_inventory_node
+	player = death_controller.get_parent() if death_controller != null else null
 	_connect_inventory_signal()
+	_connect_player_signal()
 	_update_energy_bar()
 	_update_coins_bar()
 
@@ -65,10 +72,13 @@ func _process(_delta: float) -> void:
 	if energy_bar == null or coins_bar == null:
 		_bind_bars()
 		_apply_bar_layout()
+	if active_flask_hud == null:
+		_bind_active_flask_hud()
 
 	if not is_instance_valid(death_controller) or not is_instance_valid(gold_inventory):
 		_resolve_references()
 		_connect_inventory_signal()
+		_connect_player_signal()
 
 	_update_energy_bar()
 	_update_coins_bar()
@@ -77,6 +87,7 @@ func _process(_delta: float) -> void:
 func _resolve_references() -> void:
 	death_controller = get_node_or_null(death_controller_path)
 	gold_inventory = get_node_or_null(inventory_path)
+	player = death_controller.get_parent() if death_controller != null else null
 
 
 func _connect_inventory_signal() -> void:
@@ -86,6 +97,15 @@ func _connect_inventory_signal() -> void:
 		return
 
 	gold_inventory.carried_gold_coins_changed.connect(_on_carried_gold_coins_changed)
+
+
+func _connect_player_signal() -> void:
+	if player == null or not player.has_signal("flask_effect_started"):
+		return
+	if player.flask_effect_started.is_connected(_on_flask_effect_started):
+		return
+
+	player.flask_effect_started.connect(_on_flask_effect_started)
 
 
 func _bind_bars() -> void:
@@ -102,6 +122,16 @@ func _bind_bars() -> void:
 		add_child(coins_bar)
 
 	_configure_default_bars()
+
+
+func _bind_active_flask_hud() -> void:
+	active_flask_hud = get_node_or_null("ActiveFlaskHud") as Control
+	if active_flask_hud != null:
+		return
+
+	active_flask_hud = ActiveFlaskHudScene.new()
+	active_flask_hud.name = "ActiveFlaskHud"
+	add_child(active_flask_hud)
 
 
 func _configure_default_bars() -> void:
@@ -125,6 +155,12 @@ func _configure_default_bars() -> void:
 
 func _on_carried_gold_coins_changed(_carried_count: int) -> void:
 	_update_coins_bar()
+
+
+func _on_flask_effect_started(effect_id: StringName, liquid_color: Color, duration: float) -> void:
+	_bind_active_flask_hud()
+	if active_flask_hud != null and active_flask_hud.has_method("show_flask_effect"):
+		active_flask_hud.show_flask_effect(effect_id, liquid_color, duration)
 
 
 func _update_energy_bar() -> void:

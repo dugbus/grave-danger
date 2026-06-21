@@ -40,6 +40,7 @@ signal carried_gold_coins_changed(carried_count: int)
 
 var carried_items := {}
 var drop_cooldown := 0.0
+var bonus_inventory_space := 0
 
 
 func update_drop_input(delta: float) -> void:
@@ -65,7 +66,7 @@ func try_collect_item_pickup(pickup: Node3D) -> bool:
 		return false
 	if _item_requires_facing_for_pickup(item) and not _is_facing(pickup.global_position):
 		return false
-	if get_item_count(item_type) >= _item_max_count(item):
+	if get_item_count(item_type) >= _get_effective_item_max_count(item):
 		return _drop_unstored_pickup(item)
 	if not _make_room_for_item(item):
 		return _drop_unstored_pickup(item)
@@ -197,13 +198,24 @@ func get_carried_gold_coins() -> int:
 func get_max_carried_gold_coins() -> int:
 	var item: Resource = peek_item_of_type(GOLD_COIN_ITEM_TYPE)
 	if item != null:
-		return _item_max_count(item)
+		return _get_effective_item_max_count(item)
 
-	return _item_max_count(DEFAULT_GOLD_COIN_ITEM)
+	return _get_effective_item_max_count(DEFAULT_GOLD_COIN_ITEM)
 
 
 func weight_multiplier(empty_value: float, full_value: float) -> float:
 	return lerpf(empty_value, full_value, _weight_ratio())
+
+
+func increase_inventory_space(extra_space: int) -> bool:
+	extra_space = maxi(extra_space, 0)
+	if extra_space <= 0:
+		return false
+
+	bonus_inventory_space += extra_space
+	max_carry_weight += float(extra_space)
+	_emit_item_count_changed(GOLD_COIN_ITEM_TYPE)
+	return true
 
 
 func _add_item(item: Resource) -> void:
@@ -356,6 +368,13 @@ func _item_type(item: Resource) -> StringName:
 
 func _item_max_count(item: Resource) -> int:
 	return maxi(int(item.get("max_count")), 1) if item != null else 1
+
+
+func _get_effective_item_max_count(item: Resource) -> int:
+	var max_count := _item_max_count(item)
+	if _item_type(item) == GOLD_COIN_ITEM_TYPE:
+		max_count += bonus_inventory_space
+	return max_count
 
 
 func _item_weight(item: Resource) -> float:

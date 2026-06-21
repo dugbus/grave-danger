@@ -26,6 +26,8 @@ func _ready() -> void:
 	if carried_item == null:
 		carried_item = GOLD_COIN_ITEM
 	add_to_group("gold_coin")
+	add_to_group("pickup_radius_scalable")
+	set_pickup_radius_multiplier(_get_runtime_pickup_radius_multiplier())
 	super._ready()
 
 

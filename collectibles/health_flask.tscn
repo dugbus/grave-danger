@@ -1,24 +1,8 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://collectibles/health_flask.gd" id="1_health_flask"]
-[ext_resource type="PackedScene" path="res://Assets/environment/health-flask.glb" id="2_health_flask"]
+[ext_resource type="PackedScene" path="res://collectibles/flask_base.tscn" id="1_base"]
+[ext_resource type="Script" path="res://collectibles/health_flask.gd" id="2_script"]
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_health_flask"]
-radius = 0.55
-
-[node name="HealthPotion" type="Node3D"]
-script = ExtResource("1_health_flask")
-
-[node name="Visual" type="Node3D" parent="."]
-
-[node name="HealthFlask" parent="Visual" instance=ExtResource("2_health_flask")]
-transform = Transform3D(1.35, 0, 0, 0, 1.35, 0, 0, 0, 1.35, 0, 0, 0)
-
-[node name="PickupArea" type="Area3D" parent="."]
-collision_layer = 0
-collision_mask = 2
-monitorable = false
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="PickupArea"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.34, 0)
-shape = SubResource("SphereShape3D_health_flask")
+[node name="GDHealthFlask" instance=ExtResource("1_base")]
+script = ExtResource("2_script")
+liquid_color = Color(0.95, 0.05, 0.02, 1)

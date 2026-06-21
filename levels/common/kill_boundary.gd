@@ -19,6 +19,7 @@ const MAX_SHAPE_INDEX := 1
 const EFFECT_FLAME := 0
 const EFFECT_GHOST := 1
 const EFFECT_NONE := 2
+const EDITOR_SCRUB_TIME_EPSILON := 0.05
 
 @export_group("Animation")
 ## Animation controlling path progress, scale, shape morph, and future properties.
@@ -286,22 +287,35 @@ var time_label: Label
 var near_flame_audio_player: AudioStreamPlayer
 var movement_cycle_distance := 0.0
 var last_animation_position := 0.0
+var runtime_bounds_multiplier := 1.0
+var runtime_effect_time := 0.0
+var runtime_pause_token := 0
+var boundary_removed_for_level := false
+var runtime_bounds_tween: Tween
+var permanent_runtime_bounds_multiplier := 1.0
+var active_runtime_bounds_multipliers: Array[float] = []
+var editor_preview_initialized := false
+var editor_preview_time := 0.0
+var editor_preview_animation: Animation
+var is_syncing_boundary := false
 
 
 func _ready() -> void:
+	add_to_group("kill_boundary")
 	_ensure_boundary_nodes()
 	_configure_path_follow()
 	_sync_animation_player()
-	_sync_movement_to_animation()
 	_create_flame_material()
 	_create_ghost_material()
 
 	if Engine.is_editor_hint():
 		_ensure_editor_preview()
+		_sync_editor_preview_animation()
 		_sync_boundary()
 		set_process(true)
 		return
 
+	_sync_movement_to_animation()
 	if not _runtime_effects_enabled():
 		_set_runtime_effects_enabled(false)
 		return
@@ -317,12 +331,15 @@ func _notification(what: int) -> void:
 	if Engine.is_editor_hint() or what != NOTIFICATION_VISIBILITY_CHANGED or not is_inside_tree():
 		return
 
-	_set_runtime_effects_enabled(_runtime_effects_enabled())
+	if boundary_removed_for_level:
+		return
+
+	_set_runtime_effects_enabled(visible)
 
 
 func _process(_delta: float) -> void:
 	if Engine.is_editor_hint():
-		_sync_movement_to_animation()
+		_sync_editor_preview_animation()
 		_sync_boundary()
 
 
@@ -336,6 +353,7 @@ func _physics_process(delta: float) -> void:
 
 	_ensure_runtime_effect_nodes()
 	elapsed_time += delta
+	runtime_effect_time += delta
 	_sync_movement_to_animation()
 	_sync_boundary()
 	_update_ghost_billboards()
@@ -370,15 +388,68 @@ func get_camera_fit_transform() -> Transform3D:
 
 
 func get_bounds_size() -> Vector2:
-	return bounds_size
+	return bounds_size * runtime_bounds_multiplier
 
 
 func get_bounds_height() -> float:
 	return flame_height
 
 
+func pause_runtime_for(seconds: float) -> bool:
+	if boundary_removed_for_level or not _runtime_effects_enabled():
+		return false
+
+	runtime_pause_token += 1
+	_set_runtime_motion_paused(true)
+	_resume_runtime_motion_after(runtime_pause_token, maxf(seconds, 0.01))
+	return true
+
+
+func expand_runtime_bounds_percent(percent: float) -> bool:
+	if boundary_removed_for_level or not _runtime_effects_enabled():
+		return false
+
+	var multiplier := 1.0 + maxf(percent, 0.0) * 0.01
+	if multiplier <= 1.0:
+		return false
+
+	permanent_runtime_bounds_multiplier *= multiplier
+	runtime_bounds_multiplier = _get_target_runtime_bounds_multiplier()
+	_sync_boundary()
+	return true
+
+
+func expand_runtime_bounds_percent_for(percent: float, active_seconds: float, transition_seconds: float) -> bool:
+	if boundary_removed_for_level or not _runtime_effects_enabled():
+		return false
+
+	var multiplier := 1.0 + maxf(percent, 0.0) * 0.01
+	if multiplier <= 1.0:
+		return false
+
+	active_runtime_bounds_multipliers.append(multiplier)
+	_animate_runtime_bounds_multiplier(_get_target_runtime_bounds_multiplier(), transition_seconds)
+	_restore_runtime_bounds_after(multiplier, active_seconds, transition_seconds)
+	return true
+
+
+func remove_for_level() -> bool:
+	if boundary_removed_for_level:
+		return false
+
+	boundary_removed_for_level = true
+	runtime_pause_token += 1
+	if runtime_bounds_tween != null and runtime_bounds_tween.is_valid():
+		runtime_bounds_tween.kill()
+	_set_runtime_effects_enabled(false)
+	set_process(false)
+	set_physics_process(false)
+	call_deferred("queue_free")
+	return true
+
+
 func _runtime_effects_enabled() -> bool:
-	return is_visible_in_tree()
+	return not boundary_removed_for_level and is_inside_tree() and visible
 
 
 func _ensure_runtime_effect_nodes() -> void:
@@ -391,6 +462,9 @@ func _ensure_runtime_effect_nodes() -> void:
 
 
 func _set_runtime_effects_enabled(enabled: bool) -> void:
+	if boundary_removed_for_level and enabled:
+		return
+
 	for area in strip_areas:
 		if is_instance_valid(area):
 			area.monitoring = enabled
@@ -572,6 +646,61 @@ func _sync_movement_to_animation() -> void:
 	last_animation_position = animation_position
 
 
+func _sync_editor_preview_animation() -> void:
+	if not Engine.is_editor_hint() or not is_inside_tree():
+		return
+
+	var animation_player := get_node_or_null(ANIMATION_PLAYER_NAME) as AnimationPlayer
+	var center := _get_center_node() as PathFollow3D
+	if animation_player == null or center == null or not animation_player.has_animation(DEFAULT_ANIMATION_NAME):
+		return
+
+	var animation := animation_player.get_animation(DEFAULT_ANIMATION_NAME)
+	if animation_player.current_animation != DEFAULT_ANIMATION_NAME:
+		animation_player.current_animation = DEFAULT_ANIMATION_NAME
+	if animation_player.is_playing():
+		animation_player.stop(true)
+
+	var preview_time := _get_editor_preview_time(animation_player, animation)
+	center.progress = _calculate_travel_distance(animation, preview_time)
+	last_animation_position = preview_time
+
+	animation_player.seek(preview_time, true)
+	animation_player.stop(true)
+
+
+func _get_editor_preview_time(animation_player: AnimationPlayer, animation: Animation) -> float:
+	if editor_preview_animation != animation:
+		editor_preview_animation = animation
+		editor_preview_initialized = false
+
+	if not editor_preview_initialized:
+		editor_preview_time = _get_first_animation_key_time(animation)
+		editor_preview_initialized = true
+
+	if (
+		animation_player.current_animation == DEFAULT_ANIMATION_NAME
+		and absf(animation_player.current_animation_position - editor_preview_time) >= EDITOR_SCRUB_TIME_EPSILON
+	):
+		editor_preview_time = animation_player.current_animation_position
+
+	return clampf(editor_preview_time, 0.0, animation.length)
+
+
+func _get_first_animation_key_time(animation: Animation) -> float:
+	var first_key_time := INF
+	for track_index in animation.get_track_count():
+		if animation.track_get_key_count(track_index) == 0:
+			continue
+
+		first_key_time = minf(first_key_time, animation.track_get_key_time(track_index, 0))
+
+	if is_inf(first_key_time):
+		return 0.0
+
+	return clampf(first_key_time, 0.0, animation.length)
+
+
 func _calculate_travel_distance(animation: Animation, time: float) -> float:
 	var speed_track := animation.find_track(MOVEMENT_SPEED_TRACK_PATH, Animation.TYPE_VALUE)
 	if speed_track < 0:
@@ -678,6 +807,7 @@ func _apply_flame_effect_parameters() -> void:
 	if flame_material == null:
 		return
 
+	flame_material.set_shader_parameter("boundary_time", runtime_effect_time)
 	flame_material.set_shader_parameter("density_multiplier", flame_effect_density)
 	flame_material.set_shader_parameter("opacity_multiplier", flame_effect_opacity)
 	flame_material.set_shader_parameter("emission_strength", flame_effect_emission)
@@ -692,6 +822,7 @@ func _apply_ghost_effect_material_parameters() -> void:
 		return
 
 	ghost_material.set_shader_parameter("ghost_texture", GHOST_TEXTURE)
+	ghost_material.set_shader_parameter("boundary_time", runtime_effect_time)
 	ghost_material.set_shader_parameter("ghost_color", _color_to_vec3(ghost_effect_color))
 	ghost_material.set_shader_parameter("emission_strength", ghost_effect_emission)
 	ghost_material.set_shader_parameter("edge_softness", ghost_effect_edge_softness)
@@ -932,9 +1063,10 @@ func _ensure_player_blocker_count(center: Node3D) -> void:
 
 
 func _sync_boundary() -> void:
-	if not is_inside_tree():
+	if not is_inside_tree() or boundary_removed_for_level or is_syncing_boundary:
 		return
 
+	is_syncing_boundary = true
 	_apply_effect_material_parameters()
 
 	if Engine.is_editor_hint():
@@ -942,10 +1074,12 @@ func _sync_boundary() -> void:
 		if preview_meshes.size() != boundary_segments or preview_ghost_meshes.size() != target_ghost_count or blocker_preview_meshes.size() != boundary_segments:
 			_ensure_editor_preview()
 		_update_preview_boundary()
+		is_syncing_boundary = false
 		return
 
 	if not _runtime_effects_enabled():
 		_set_runtime_effects_enabled(false)
+		is_syncing_boundary = false
 		return
 
 	_ensure_runtime_segment_count()
@@ -957,6 +1091,8 @@ func _sync_boundary() -> void:
 
 	if blocker_collisions.size() == boundary_segments:
 		_update_runtime_blockers()
+
+	is_syncing_boundary = false
 
 
 func _update_preview_boundary() -> void:
@@ -1145,7 +1281,7 @@ func _get_boundary_points() -> PackedVector2Array:
 func _get_shape_profile_point(shape_index: int, perimeter_ratio: float) -> Vector2:
 	var angle := perimeter_ratio * TAU + PI * 0.25
 	var direction := Vector2(cos(angle), sin(angle))
-	var half_size := bounds_size * 0.5
+	var half_size := bounds_size * runtime_bounds_multiplier * 0.5
 	match shape_index:
 		SHAPE_RECTANGLE:
 			var ray_scale := minf(
@@ -1278,6 +1414,56 @@ func _update_near_flame_audio(delta: float) -> void:
 
 	var t := 1.0 - exp(-near_flame_audio_lag * delta)
 	near_flame_audio_player.volume_db = lerpf(near_flame_audio_player.volume_db, target_volume, t)
+
+
+func _set_runtime_motion_paused(paused: bool) -> void:
+	var animation_player := get_node_or_null(ANIMATION_PLAYER_NAME) as AnimationPlayer
+	if animation_player == null:
+		return
+
+	animation_player.speed_scale = 0.0 if paused else 1.0
+	if not paused and autoplay_boundary_animation and _runtime_effects_enabled() and not animation_player.is_playing():
+		animation_player.play(DEFAULT_ANIMATION_NAME)
+
+
+func _resume_runtime_motion_after(token: int, seconds: float) -> void:
+	await get_tree().create_timer(seconds).timeout
+	if token == runtime_pause_token and is_inside_tree() and not boundary_removed_for_level:
+		_set_runtime_motion_paused(false)
+
+
+func _animate_runtime_bounds_multiplier(target_multiplier: float, seconds: float) -> void:
+	if boundary_removed_for_level:
+		return
+
+	if runtime_bounds_tween != null and runtime_bounds_tween.is_valid():
+		runtime_bounds_tween.kill()
+
+	runtime_bounds_tween = create_tween()
+	runtime_bounds_tween.tween_method(
+		func(value: float) -> void:
+			if boundary_removed_for_level:
+				return
+			runtime_bounds_multiplier = maxf(value, 0.01)
+			_sync_boundary(),
+		runtime_bounds_multiplier,
+		maxf(target_multiplier, 0.01),
+		maxf(seconds, 0.01)
+	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+
+func _restore_runtime_bounds_after(multiplier: float, active_seconds: float, transition_seconds: float) -> void:
+	await get_tree().create_timer(maxf(active_seconds, 0.01)).timeout
+	if is_inside_tree() and not boundary_removed_for_level:
+		active_runtime_bounds_multipliers.erase(multiplier)
+		_animate_runtime_bounds_multiplier(_get_target_runtime_bounds_multiplier(), transition_seconds)
+
+
+func _get_target_runtime_bounds_multiplier() -> float:
+	var multiplier := permanent_runtime_bounds_multiplier
+	for active_multiplier in active_runtime_bounds_multipliers:
+		multiplier *= active_multiplier
+	return maxf(multiplier, 0.01)
 
 
 func _get_distance_to_flames(world_position: Vector3) -> float:

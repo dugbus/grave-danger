@@ -2,6 +2,7 @@ shader_type spatial;
 render_mode unshaded, blend_add, depth_draw_never, cull_disabled, fog_disabled;
 
 uniform sampler2D ghost_texture : source_color, filter_linear_mipmap, repeat_disable;
+uniform float boundary_time = 0.0;
 uniform vec3 ghost_color : source_color = vec3(0.58, 0.9, 1.0);
 uniform float emission_strength : hint_range(0.0, 20.0) = 6.2;
 uniform float edge_softness : hint_range(0.0, 1.0) = 0.28;
@@ -25,16 +26,16 @@ varying float height_progress;
 
 void vertex() {
 	height_progress = UV.y;
-	float age = fract(TIME * rise_speed + cycle_offset);
+	float age = fract(boundary_time * rise_speed + cycle_offset);
 	float side = VERTEX.x;
 	float taper = mix(1.0, 0.55, smoothstep(0.7, 1.0, height_progress));
 	float height_wave_fade = smoothstep(0.04, 0.35, height_progress) * (1.0 - smoothstep(0.78, 1.0, height_progress));
-	float sway = sin(height_progress * wave_frequency + TIME * wave_speed + wave_phase) * wave_amplitude * height_wave_fade;
+	float sway = sin(height_progress * wave_frequency + boundary_time * wave_speed + wave_phase) * wave_amplitude * height_wave_fade;
 
 	vec3 local_offset;
 	local_offset.x = side * ghost_width * taper + sway + lean * height_progress * height_progress;
 	local_offset.y = height_progress * ghost_height + age * (rise_distance + emerge_depth) - emerge_depth;
-	local_offset.z = cos(height_progress * wave_frequency * 0.72 + TIME * wave_speed * 0.58 + wave_phase) * wave_amplitude * 0.18 * height_wave_fade;
+	local_offset.z = cos(height_progress * wave_frequency * 0.72 + boundary_time * wave_speed * 0.58 + wave_phase) * wave_amplitude * 0.18 * height_wave_fade;
 
 	VERTEX = local_offset;
 

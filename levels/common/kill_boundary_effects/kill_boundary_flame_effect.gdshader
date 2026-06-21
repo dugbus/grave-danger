@@ -2,6 +2,7 @@ shader_type spatial;
 render_mode unshaded, blend_mix, depth_draw_never, cull_back, fog_disabled;
 
 uniform sampler3D sample_noise : repeat_enable, filter_linear_mipmap;
+uniform float boundary_time = 0.0;
 uniform int raymarch_steps : hint_range(4, 12) = 6;
 uniform float time_scale : hint_range(0.0, 2.0) = 0.72;
 uniform float density_multiplier : hint_range(0.1, 8.0) = 3.1;
@@ -47,7 +48,7 @@ float fire_density(vec3 local_position) {
 	float segment_mask = 1.0 - smoothstep(half_size.z * 0.55, half_size.z, segment_distance);
 	float perimeter_position = local_position.x + noise_along_offset;
 
-	float animated_time = TIME * time_scale;
+	float animated_time = boundary_time * time_scale;
 	vec3 fire_coordinates = vec3(perimeter_position, local_position.y, local_position.z);
 	vec3 broad_coordinates = fire_coordinates * broad_noise_scale;
 	broad_coordinates.y -= animated_time * 0.34;

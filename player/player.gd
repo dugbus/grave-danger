@@ -2,6 +2,8 @@ extends CharacterBody3D
 class_name GDPlayer
 
 
+signal flask_effect_started(effect_id: StringName, liquid_color: Color, duration: float)
+
 # Player stays as the public API for other gameplay objects.
 # Coins and kill-boundary areas still talk to this CharacterBody3D, while the actual
 # behavior is split into focused child components below.
@@ -9,6 +11,8 @@ class_name GDPlayer
 @onready var inventory: Node = $PlayerInventory
 @onready var animation_controller: Node = $PlayerAnimation
 @onready var death_controller: Node = $PlayerDeath
+
+var pickup_radius_multiplier := 1.0
 
 
 func _ready() -> void:
@@ -53,6 +57,41 @@ func try_collect_health_flask(_health_flask: Node3D, heal_percent_of_max: float,
 		return false
 
 	return death_controller.heal_percent_over_time(heal_percent_of_max, heal_duration)
+
+
+func increase_inventory_space(extra_space: int) -> bool:
+	if death_controller.is_dead:
+		return false
+
+	return inventory.increase_inventory_space(extra_space)
+
+
+func apply_temporary_poison_damage(damage_points: float, restore_after_seconds: float) -> bool:
+	if death_controller.is_dead:
+		return false
+
+	return death_controller.apply_temporary_damage(damage_points, restore_after_seconds)
+
+
+func increase_pickup_radius_percent(percent: float) -> bool:
+	if death_controller.is_dead:
+		return false
+
+	var multiplier := 1.0 + maxf(percent, 0.0) * 0.01
+	if multiplier <= 1.0:
+		return false
+
+	pickup_radius_multiplier *= multiplier
+	get_tree().call_group("pickup_radius_scalable", "set_pickup_radius_multiplier", pickup_radius_multiplier)
+	return true
+
+
+func get_pickup_radius_multiplier() -> float:
+	return pickup_radius_multiplier
+
+
+func show_flask_effect_countdown(effect_id: StringName, liquid_color: Color, duration: float) -> void:
+	flask_effect_started.emit(effect_id, liquid_color, duration)
 
 
 func spend_carried_gold_coin() -> bool:

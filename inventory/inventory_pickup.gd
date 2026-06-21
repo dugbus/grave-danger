@@ -17,6 +17,7 @@ var pickup_area: Area3D
 var can_be_collected := false
 var is_being_collected := false
 var candidate_bodies: Array[Node3D] = []
+var pickup_radius_multiplier := 1.0
 
 
 func _ready() -> void:
@@ -50,6 +51,11 @@ func throw_from(spawn_transform: Transform3D, impulse: Vector3) -> void:
 	apply_impulse(impulse)
 
 
+func set_pickup_radius_multiplier(multiplier: float) -> void:
+	pickup_radius_multiplier = maxf(multiplier, 0.01)
+	_apply_pickup_radius_multiplier()
+
+
 func _bind_or_create_pickup_area() -> void:
 	pickup_area = get_node_or_null(pickup_area_path) as Area3D
 	if pickup_area == null:
@@ -57,6 +63,7 @@ func _bind_or_create_pickup_area() -> void:
 
 	pickup_area.body_entered.connect(_on_pickup_area_body_entered)
 	pickup_area.body_exited.connect(_on_pickup_area_body_exited)
+	_apply_pickup_radius_multiplier()
 
 
 func _create_pickup_area() -> Area3D:
@@ -144,3 +151,26 @@ func _block_pickup_for(seconds: float) -> void:
 	await get_tree().create_timer(seconds).timeout
 	if not is_being_collected:
 		can_be_collected = true
+
+
+func _apply_pickup_radius_multiplier() -> void:
+	if pickup_area == null:
+		return
+
+	for child in pickup_area.get_children():
+		if not child is CollisionShape3D:
+			continue
+
+		var collision_shape := child as CollisionShape3D
+		if not collision_shape.has_meta("base_pickup_scale"):
+			collision_shape.set_meta("base_pickup_scale", collision_shape.scale)
+		var base_scale: Vector3 = collision_shape.get_meta("base_pickup_scale")
+		collision_shape.scale = base_scale * pickup_radius_multiplier
+
+
+func _get_runtime_pickup_radius_multiplier() -> float:
+	for body in get_tree().get_nodes_in_group("flame_vulnerable"):
+		if is_instance_valid(body) and body.has_method("get_pickup_radius_multiplier"):
+			return maxf(float(body.get_pickup_radius_multiplier()), 0.01)
+
+	return 1.0

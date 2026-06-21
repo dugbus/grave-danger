@@ -74,6 +74,23 @@ func heal_percent_over_time(percent_of_max: float, duration: float) -> bool:
 	return true
 
 
+func apply_temporary_damage(amount: float, restore_after_seconds: float) -> bool:
+	if is_dead:
+		return false
+
+	var damage_amount := minf(maxf(amount, 0.0), flame_energy)
+	if damage_amount <= 0.0:
+		return false
+
+	flame_energy = maxf(flame_energy - damage_amount, 0.0)
+	if flame_energy <= 0.0:
+		die_from_flames()
+		return true
+
+	_restore_temporary_damage_after(damage_amount, restore_after_seconds)
+	return true
+
+
 func die_from_flames() -> void:
 	# Multiple flame areas can report the body in the same frame, so death must
 	# be idempotent.
@@ -132,3 +149,9 @@ func _show_lose_screen_after_death() -> void:
 	await tween.finished
 
 	get_tree().change_scene_to_file(lose_scene)
+
+
+func _restore_temporary_damage_after(amount: float, seconds: float) -> void:
+	await get_tree().create_timer(maxf(seconds, 0.01)).timeout
+	if not is_dead:
+		flame_energy = minf(flame_energy + amount, max_flame_energy)
