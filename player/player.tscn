@@ -7,6 +7,8 @@
 [ext_resource type="Script" uid="uid://bxk737ajabv3s" path="res://player/player_animation.gd" id="5_8mhfk"]
 [ext_resource type="Script" uid="uid://bufcsm6qtgk23" path="res://player/player_death.gd" id="6_7xubc"]
 [ext_resource type="Script" uid="uid://c5fw58ydmf4o0" path="res://player/player_light.gd" id="7_boad6"]
+[ext_resource type="Script" path="res://player/flask_effect_text.gd" id="8_eh3tm"]
+[ext_resource type="Shader" path="res://player/flask_effect_text.gdshader" id="9_v2a87"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_fast"]
 noise_type = 1
@@ -50,6 +52,20 @@ shader_parameter/shadow_color = Color(0, 0, 0, 0.34)
 [sub_resource type="SphereShape3D" id="SphereShape3D_4flbx"]
 radius = 0.34
 
+[sub_resource type="TextMesh" id="TextMesh_potion_effect"]
+horizontal_alignment = 1
+vertical_alignment = 1
+font_size = 92
+pixel_size = 0.009
+depth = 0.08
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_potion_effect"]
+shader = ExtResource("9_v2a87")
+shader_parameter/text_color = Color(1, 0.94, 0.78, 1)
+shader_parameter/ambient_strength = 0.38
+shader_parameter/side_shadow = 0.68
+shader_parameter/roughness = 0.94
+
 [node name="Player" type="CharacterBody3D" unique_id=244343110]
 collision_layer = 2
 collision_mask = 9
@@ -91,6 +107,24 @@ layers = 3
 cast_shadow = 0
 mesh = SubResource("PlaneMesh_player_shadow")
 surface_material_override/0 = SubResource("ShaderMaterial_player_shadow")
+
+[node name="PotionEffectText" type="MeshInstance3D" parent="." unique_id=1931740386]
+visible = false
+top_level = true
+layers = 524288
+cast_shadow = 0
+mesh = SubResource("TextMesh_potion_effect")
+material_override = SubResource("ShaderMaterial_potion_effect")
+script = ExtResource("8_eh3tm")
+
+[node name="PotionEffectTextLight" type="OmniLight3D" parent="PotionEffectText" unique_id=1427709601]
+visible = false
+top_level = true
+light_color = Color(1, 0.88, 0.68, 1)
+light_energy = 6.5
+light_cull_mask = 524288
+omni_range = 5.5
+shadow_enabled = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=837824967]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.34, 0)

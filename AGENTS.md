@@ -7,6 +7,7 @@
 - Do not run commands that are expected to rewrite binary assets, including Godot import/reimport/save operations, unless the user explicitly approves that exact binary change first.
 - If a fix appears to require changing a binary file, stop and explain the issue instead of modifying it. Prefer text-only fixes such as `.tscn`, `.gd`, `.tres`, `.import`, project settings, or source metadata.
 - After any command that may have touched generated assets, check `git status --short` and revert any binary-file changes before continuing.
+- You can use godot to create import files for added assets without request.
 
 ## Scripts or Nodes
 
