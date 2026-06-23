@@ -18,10 +18,11 @@
 [ext_resource type="PackedScene" uid="uid://d6b03xve1ge1" path="res://Assets/kenney-graveyard/gravestone-bevel.glb" id="18_nm4ms"]
 [ext_resource type="PackedScene" uid="uid://cdji1pfixqhem" path="res://Assets/kenney-graveyard/gravestone-cross-large.glb" id="19_tys11"]
 [ext_resource type="PackedScene" uid="uid://smiw7occsaas" path="res://Assets/kenney-graveyard/pillar-obelisk.glb" id="20_xj8vh"]
-[ext_resource type="ArrayMesh" uid="uid://cqqygn2bs5no7" path="res://Assets/environment/church-small.res" id="21_tys11"]
+[ext_resource type="ArrayMesh" uid="uid://yc2k8f4mykxj" path="res://Assets/environment/church-small.res" id="21_tys11"]
 [ext_resource type="PackedScene" uid="uid://bjuxf3v3gaxby" path="res://Assets/kenney-graveyard/rocks.glb" id="22_7rxge"]
 [ext_resource type="Material" uid="uid://cu5fhcmgsc4va" path="res://Assets/environment/road.material" id="22_xj8vh"]
 [ext_resource type="PackedScene" uid="uid://dathjrgpejj8w" path="res://Assets/kenney-graveyard/rocks-tall.glb" id="23_vcbxs"]
+[ext_resource type="PackedScene" uid="uid://dr8vk5aeg8rt1" path="res://Assets/environment/level-crypt.blend" id="23_xj8vh"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hill_grass"]
 resource_local_to_scene = true
@@ -158,3 +159,33 @@ metadata/_edit_lock_ = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4601972, 0.63985896, 10.523843)
 mesh = ExtResource("21_tys11")
 surface_material_override/0 = ExtResource("22_xj8vh")
+
+[node name="level-crypt1" parent="." unique_id=765507669 instance=ExtResource("23_xj8vh")]
+transform = Transform3D(0.58184737, 0, -0.813298, 0, 1, 0, 0.813298, 0, 0.58184737, -11.974647, -0.6455971, 20.691889)
+
+[node name="level-crypt2" parent="." unique_id=2036969775 instance=ExtResource("23_xj8vh")]
+transform = Transform3D(0.9122238, 0, -0.4096923, 0, 1, 0, 0.4096923, 0, 0.9122238, -7.4800577, -0.10824525, 27.03977)
+
+[node name="level-crypt3" parent="." unique_id=1342088646 instance=ExtResource("23_xj8vh")]
+transform = Transform3D(0.91565067, 0, 0.40197483, 0, 1, 0, -0.40197483, 0, 0.91565067, 2.8283615, 0.66221154, 23.067215)
+
+[node name="level-crypt4" parent="." unique_id=59432881 instance=ExtResource("23_xj8vh")]
+transform = Transform3D(0.6918521, 0, 0.72203916, 0, 1, 0, -0.72203916, 0, 0.6918521, 12.188087, 1.1445037, 22.405521)
+
+[node name="level-crypt5" parent="." unique_id=1297244242 instance=ExtResource("23_xj8vh")]
+transform = Transform3D(0.15514085, 0, 0.98789227, 0, 1, 0, -0.98789227, 0, 0.15514085, 10.870488, -0.65556896, 13.2217)
+
+[node name="level-crypt6" parent="." unique_id=565085943 instance=ExtResource("23_xj8vh")]
+transform = Transform3D(-0.15231815, 0, 0.9883314, 0, 1, 0, -0.9883314, 0, -0.15231815, 17.893204, -0.05921352, 6.307749)
+
+[node name="level-crypt7" parent="." unique_id=1868675862 instance=ExtResource("23_xj8vh")]
+transform = Transform3D(-0.7036655, 0, 0.7105314, 0, 1, 0, -0.7105314, 0, -0.7036655, 12.906914, 0.10630238, -2.14285)
+
+[node name="level-crypt8" parent="." unique_id=31545856 instance=ExtResource("23_xj8vh")]
+transform = Transform3D(-0.95326936, 0, 0.30212185, 0, 1, 0, -0.30212185, 0, -0.95326936, 2.0229645, -1.0970434, -5.86166)
+
+[node name="level-crypt9" parent="." unique_id=243268209 instance=ExtResource("23_xj8vh")]
+transform = Transform3D(-0.79331565, 0, -0.6088105, 0, 1, 0, 0.6088105, 0, -0.79331565, -7.5568266, 1.0350567, -2.1033888)
+
+[node name="level-crypt10" parent="." unique_id=1135026135 instance=ExtResource("23_xj8vh")]
+transform = Transform3D(-0.26660958, 0, -0.9638046, 0, 1, 0, 0.9638046, 0, -0.26660958, -15.860413, 0.34149325, 2.02559)
