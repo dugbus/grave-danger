@@ -9,6 +9,15 @@ const VIEWPORT_SIZE := Vector2i(288, 288)
 const SLOT_GAP := 16
 const LIQUID_EMISSION_ENERGY := 1.35
 const PREVIEW_CAMERA_PADDING := 1.12
+const EFFECT_LABELS := {
+	&"health_flask": "Healing",
+	&"breathing_space": "Expand",
+	&"pause_boundary": "Freeze",
+	&"poison": "Poisoned",
+	&"pickup_radius": "Easy Pickup",
+	&"bigger_sack": "Big Sack",
+	&"no_boundary": "Safety",
+}
 
 @export var top_margin := 20.0
 @export var right_margin := 24.0
@@ -48,12 +57,12 @@ func _process(delta: float) -> void:
 			_remove_effect(effect)
 
 
-func show_flask_effect(_effect_id: StringName, color: Color, duration: float) -> void:
+func show_flask_effect(effect_id: StringName, color: Color, duration: float) -> void:
 	duration = maxf(duration, 0.0)
 	if duration <= 0.0:
 		return
 
-	var slot := _create_effect_slot(color)
+	var slot := _create_effect_slot(color, _get_effect_label(effect_id))
 	container.add_child(slot["root"])
 	active_effects.append({
 		"remaining": duration,
@@ -97,7 +106,7 @@ func _apply_layout() -> void:
 	container.offset_bottom = top_margin + SLOT_SIZE.y
 
 
-func _create_effect_slot(color: Color) -> Dictionary:
+func _create_effect_slot(color: Color, effect_label: String) -> Dictionary:
 	var root := VBoxContainer.new()
 	root.custom_minimum_size = SLOT_SIZE
 	root.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -148,11 +157,24 @@ func _create_effect_slot(color: Color) -> Dictionary:
 	camera.current = true
 	world.add_child(camera)
 
+	var name_label := Label.new()
+	name_label.name = "EffectName"
+	name_label.text = effect_label
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.custom_minimum_size = Vector2(SLOT_SIZE.x, 48.0)
+	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	name_label.add_theme_font_size_override("font_size", 36)
+	name_label.add_theme_color_override("font_color", Color(1.0, 0.94, 0.78))
+	name_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
+	name_label.add_theme_constant_override("shadow_offset_x", 2)
+	name_label.add_theme_constant_override("shadow_offset_y", 2)
+	root.add_child(name_label)
+
 	var label := Label.new()
 	label.name = "Countdown"
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.custom_minimum_size = Vector2(SLOT_SIZE.x, 72.0)
-	label.add_theme_font_size_override("font_size", 56)
+	label.custom_minimum_size = Vector2(SLOT_SIZE.x, 54.0)
+	label.add_theme_font_size_override("font_size", 48)
 	label.add_theme_color_override("font_color", Color(1.0, 0.94, 0.78))
 	label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
 	label.add_theme_constant_override("shadow_offset_x", 2)
@@ -176,6 +198,13 @@ func _remove_effect(effect: Dictionary) -> void:
 
 func _format_time(seconds: float) -> String:
 	return "%.1fs" % maxf(seconds, 0.0)
+
+
+func _get_effect_label(effect_id: StringName) -> String:
+	if EFFECT_LABELS.has(effect_id):
+		return EFFECT_LABELS[effect_id]
+
+	return String(effect_id).capitalize()
 
 
 func _frame_camera_to_model(camera: Camera3D, model: Node3D) -> void:

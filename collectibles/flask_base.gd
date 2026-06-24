@@ -5,7 +5,15 @@ class_name GDFlaskBase
 
 const DRINKING_SOUND := preload("res://Assets/audio/drinking-liquid.mp3")
 const LIQUID_MATERIAL_NAME := "FlaskLiquidMaterial"
+const FLASK_PROPERTIES := preload("res://collectibles/global_flask_properties.tres")
 
+@export_group("Global Properties")
+@export var global_flask_properties: GDGlobalFlaskProperties:
+	get:
+		return FLASK_PROPERTIES
+	set(_value):
+		pass
+@export_group("Visuals")
 @export var liquid_color := Color.WHITE:
 	set(value):
 		liquid_color = value
@@ -21,6 +29,7 @@ const LIQUID_MATERIAL_NAME := "FlaskLiquidMaterial"
 @export var bob_speed := 2.8
 @export var collect_shrink_duration := 0.24
 @export var pickup_volume_db := 8.0
+@export_group("HUD")
 @export var hud_effect_id: StringName = &""
 @export var show_hud_countdown := false
 

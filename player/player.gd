@@ -13,6 +13,8 @@ signal flask_effect_started(effect_id: StringName, liquid_color: Color, duration
 @onready var death_controller: Node = $PlayerDeath
 
 var pickup_radius_multiplier := 1.0
+var base_pickup_radius_multiplier := 1.0
+var active_pickup_radius_multipliers: Array[float] = []
 
 
 func _ready() -> void:
@@ -81,8 +83,22 @@ func increase_pickup_radius_percent(percent: float) -> bool:
 	if multiplier <= 1.0:
 		return false
 
-	pickup_radius_multiplier *= multiplier
-	get_tree().call_group("pickup_radius_scalable", "set_pickup_radius_multiplier", pickup_radius_multiplier)
+	base_pickup_radius_multiplier *= multiplier
+	_refresh_pickup_radius_multiplier()
+	return true
+
+
+func increase_pickup_radius_percent_for(percent: float, seconds: float) -> bool:
+	if death_controller.is_dead:
+		return false
+
+	var multiplier := 1.0 + maxf(percent, 0.0) * 0.01
+	if multiplier <= 1.0:
+		return false
+
+	active_pickup_radius_multipliers.append(multiplier)
+	_refresh_pickup_radius_multiplier()
+	_restore_pickup_radius_after(multiplier, seconds)
 	return true
 
 
@@ -131,3 +147,17 @@ func apply_flame_damage(amount: float) -> void:
 
 func drain_flame_energy() -> void:
 	death_controller.drain_flame_energy()
+
+
+func _restore_pickup_radius_after(multiplier: float, seconds: float) -> void:
+	await get_tree().create_timer(maxf(seconds, 0.01)).timeout
+	active_pickup_radius_multipliers.erase(multiplier)
+	_refresh_pickup_radius_multiplier()
+
+
+func _refresh_pickup_radius_multiplier() -> void:
+	pickup_radius_multiplier = base_pickup_radius_multiplier
+	for multiplier in active_pickup_radius_multipliers:
+		pickup_radius_multiplier *= multiplier
+
+	get_tree().call_group("pickup_radius_scalable", "set_pickup_radius_multiplier", pickup_radius_multiplier)

@@ -56,10 +56,6 @@ window/size/mode=3
 
 enabled=PackedStringArray("res://addons/copy_all_errors/plugin.cfg", "res://addons/png_to_gridmap/plugin.cfg", "res://addons/simplegrasstextured/plugin.cfg")
 
-[gameplay]
-
-health_flask_heal_percent=25.0
-
 [input]
 
 move_left={

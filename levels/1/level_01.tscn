@@ -304,38 +304,18 @@ random_seed = 18
 
 [node name="HealthPotion" parent="LevelLayout/Potions" unique_id=921123679 instance=ExtResource("7_rihgm")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 12.177471, 0, -8.0425625)
-heal_duration = 2.0
-heal_percent_of_max = -1.0
-hud_effect_id = &"health_flask"
-show_hud_countdown = true
 
 [node name="HealthPotion2" parent="LevelLayout/Potions" unique_id=913249563 instance=ExtResource("7_rihgm")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 19.13573, 0, -3.7101464)
-heal_duration = 2.0
-heal_percent_of_max = -1.0
-hud_effect_id = &"health_flask"
-show_hud_countdown = true
 
 [node name="HealthPotion3" parent="LevelLayout/Potions" unique_id=752436914 instance=ExtResource("7_rihgm")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 11.8513775, 0, 8.521909)
-heal_duration = 2.0
-heal_percent_of_max = -1.0
-hud_effect_id = &"health_flask"
-show_hud_countdown = true
 
 [node name="HealthPotion4" parent="LevelLayout/Potions" unique_id=1039384072 instance=ExtResource("7_rihgm")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 6.696965, 0, 0.047987416)
-heal_duration = 2.0
-heal_percent_of_max = -1.0
-hud_effect_id = &"health_flask"
-show_hud_countdown = true
 
 [node name="HealthPotion5" parent="LevelLayout/Potions" unique_id=329541679 instance=ExtResource("7_rihgm")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 23.518272, 0, 2.7458754)
-heal_duration = 2.0
-heal_percent_of_max = -1.0
-hud_effect_id = &"health_flask"
-show_hud_countdown = true
 
 [node name="Road" type="Node3D" parent="LevelLayout" unique_id=871004371]
 visible = false
@@ -458,40 +438,21 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.6740446, 0.024999011, 4.835
 
 [node name="GDFlaskBiggerSack" parent="." unique_id=1957394561 instance=ExtResource("20_uie34")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.404145, 9.536743e-07, 2.4153361)
-extra_inventory_space = 25
 
 [node name="GDFlaskBreathingSpace" parent="." unique_id=1159735215 instance=ExtResource("21_7mqv8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.472208, 0, 4.5362988)
-expansion_percent = 25.0
-expansion_seconds = 8.0
-transition_seconds = 1.0
-hud_effect_id = &"breathing_space"
-show_hud_countdown = true
 
 [node name="GDFlaskBreathingSpace2" parent="." unique_id=1494505948 instance=ExtResource("21_7mqv8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.391849, 0.335838, 5.027636)
-expansion_percent = 25.0
-expansion_seconds = 8.0
-transition_seconds = 1.0
-hud_effect_id = &"breathing_space"
-show_hud_countdown = true
 
 [node name="GDFlaskPauseBoundary" parent="." unique_id=1748075048 instance=ExtResource("22_htucy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.472548, 0, 13.842102)
-pause_seconds = 5.0
-hud_effect_id = &"pause_boundary"
-show_hud_countdown = true
 
 [node name="GDFlaskPickupRadius" parent="." unique_id=2058554336 instance=ExtResource("23_ijj0a")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.6785126, -9.536743e-07, 2.1951458)
-pickup_radius_percent = 50.0
 
 [node name="GDFlaskPoison" parent="." unique_id=1434934860 instance=ExtResource("24_hc001")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.737194, -9.536743e-07, 8.0374)
-poison_damage_points = 25.0
-poison_duration = 6.0
-hud_effect_id = &"poison"
-show_hud_countdown = true
 
 [node name="GDFlaskNoBoundary" parent="." unique_id=783658877 instance=ExtResource("25_ijj0a")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6494758, -2.3841858e-07, 11.711337)
