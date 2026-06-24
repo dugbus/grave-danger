@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://wakxwbb1skgm" path="res://levels/5/level_05.gd" id="1_level5_script"]
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
-[ext_resource type="AudioStream" uid="uid://bcd4h7b10r85q" path="res://Assets/audio/music-track.mp3" id="3_r63d1"]
 [ext_resource type="Texture2D" uid="uid://gadfwxebefkl" path="res://Assets/graveyard-grass.png" id="4_grass"]
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="6_2lsge"]
 [ext_resource type="PackedScene" uid="uid://fv08wdi8kict" path="res://Assets/kenney-graveyard/pine.glb" id="8_m3ptj"]
@@ -22,7 +21,7 @@
 [ext_resource type="PackedScene" uid="uid://bjuxf3v3gaxby" path="res://Assets/kenney-graveyard/rocks.glb" id="22_7rxge"]
 [ext_resource type="Material" uid="uid://cu5fhcmgsc4va" path="res://Assets/environment/road.material" id="22_xj8vh"]
 [ext_resource type="PackedScene" uid="uid://dathjrgpejj8w" path="res://Assets/kenney-graveyard/rocks-tall.glb" id="23_vcbxs"]
-[ext_resource type="PackedScene" uid="uid://dr8vk5aeg8rt1" path="res://Assets/environment/level-crypt.blend" id="23_xj8vh"]
+[ext_resource type="PackedScene" path="res://levels/common/level_select_crypt.tscn" id="23_xj8vh"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hill_grass"]
 resource_local_to_scene = true
@@ -42,11 +41,6 @@ script = ExtResource("1_level5_script")
 terrain_tint = Color(0.6666667, 0.6666667, 0.6666667, 1)
 terrain_material = SubResource("StandardMaterial3D_hill_grass")
 direct_run_camera_profile = ExtResource("10_camera_profile")
-
-[node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=1892453224]
-stream = ExtResource("3_r63d1")
-volume_db = -6.0
-autoplay = true
 
 [node name="LevelLayout" type="Node3D" parent="." unique_id=863965489]
 transform = Transform3D(0.80160874, 0, -0.597849, 0, 1, 0, 0.597849, 0, 0.80160874, 0.7847004, 0, 0.6189842)

@@ -33,6 +33,7 @@ func rebuild(level_size: Vector2, height_sampler: Callable, random_seed: int) ->
 	var transforms_by_chunk := _build_tree_transforms(level_size, height_sampler, random_seed, tree_meshes.size())
 	_create_tree_chunks(transforms_by_chunk, tree_meshes)
 	_create_tree_blockers(level_size)
+	_assign_editor_owners()
 
 
 func _clear_generated() -> void:
@@ -251,3 +252,22 @@ func _set_property_if_available(object: Object, property_name: StringName, value
 		if property.get("name", "") == property_name:
 			object.set(property_name, value)
 			return
+
+
+func _assign_editor_owners() -> void:
+	if not Engine.is_editor_hint() or not is_inside_tree():
+		return
+
+	var edited_scene_root := get_tree().edited_scene_root
+	if edited_scene_root == null:
+		return
+
+	_assign_owner_recursive(self, edited_scene_root)
+
+
+func _assign_owner_recursive(node: Node, edited_scene_root: Node) -> void:
+	if node != edited_scene_root:
+		node.owner = edited_scene_root
+
+	for child in node.get_children():
+		_assign_owner_recursive(child, edited_scene_root)

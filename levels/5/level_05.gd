@@ -144,6 +144,11 @@ func _enter_tree() -> void:
 		_queue_rebuild()
 
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_EDITOR_POST_SAVE and Engine.is_editor_hint():
+		_queue_rebuild()
+
+
 func _ready() -> void:
 	_rebuild_level()
 
@@ -163,8 +168,7 @@ func _rebuild_level() -> void:
 
 	_configure_legacy_grid_map()
 	_configure_terrain()
-	if not Engine.is_editor_hint():
-		_configure_tree_surround()
+	_configure_tree_surround()
 	_snap_player_spawn_to_terrain()
 	_configure_sun_light()
 	_configure_world_environment()
@@ -304,11 +308,20 @@ func _configure_tree_surround() -> void:
 		surround.name = TREE_SURROUND_NAME
 		add_child(surround)
 
+	if Engine.is_editor_hint():
+		_assign_editor_owner(surround)
+
 	if surround.get_script() != TREE_SURROUND_SCRIPT:
 		surround.set_script(TREE_SURROUND_SCRIPT)
 
 	if surround.has_method("rebuild"):
 		surround.rebuild(terrain_size, Callable(self, "_sample_terrain_height"), tree_surround_seed)
+
+
+func _assign_editor_owner(node: Node) -> void:
+	var edited_scene_root := get_tree().edited_scene_root
+	if edited_scene_root != null:
+		node.owner = edited_scene_root
 
 
 func _snap_player_spawn_to_terrain() -> void:
