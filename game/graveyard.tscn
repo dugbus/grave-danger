@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://game/graveyard.gd" id="1_graveyard"]
 [ext_resource type="PackedScene" path="res://game/game_runtime.tscn" id="2_runtime"]
-[ext_resource type="PackedScene" path="res://levels/1/level_01.tscn" id="3_level1"]
+[ext_resource type="PackedScene" path="res://levels/1/level.tscn" id="3_level1"]
 [ext_resource type="PackedScene" path="res://ui/screens/pause_screen.tscn" id="4_pause"]
 
 [node name="Graveyard" type="Node3D" unique_id=1224200127]

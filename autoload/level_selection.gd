@@ -1,18 +1,10 @@
 extends Node
 class_name GDLevelSelection
 
+const DEFAULT_LEVEL_MAPPING := preload("res://levels/level_mapping.tres")
 const RESULTS_PATH := "user://level_results.json"
-const LEVELS := [
-	{"name": "Level 1", "scene_path": "res://levels/1/level_01.tscn", "available": true},
-	{"name": "Level 2", "scene_path": "res://levels/2/level_02.tscn", "available": true},
-	{"name": "Level 3", "scene_path": "res://levels/3/level_03.tscn", "available": true},
-	{"name": "Level 4", "scene_path": "res://levels/4/level_04.tscn", "available": true},
-	{"name": "Level 5", "scene_path": "res://levels/5/level_05.tscn", "available": true},
-	{"name": "Level 6", "scene_path": "res://levels/6/level_06.tscn", "available": true},
-	{"name": "Level 7", "scene_path": "res://levels/7/level_07.tscn", "available": true},
-	{"name": "Level 8", "scene_path": "res://levels/8/level_08.tscn", "available": true},
-]
 
+var level_mapping = DEFAULT_LEVEL_MAPPING
 var selected_level_index := 0
 var level_results := {}
 
@@ -22,19 +14,24 @@ func _ready() -> void:
 
 
 func get_level_count() -> int:
-	return LEVELS.size()
+	if level_mapping == null:
+		return 0
+
+	return level_mapping.get_level_count()
 
 
 func get_level_data(index: int) -> Dictionary:
-	if index < 0 or index >= LEVELS.size():
+	if level_mapping == null:
 		return {}
 
-	return LEVELS[index]
+	return level_mapping.get_level_data(index)
 
 
 func is_level_available(index: int) -> bool:
-	var level_data := get_level_data(index)
-	return bool(level_data.get("available", false))
+	if level_mapping == null:
+		return false
+
+	return level_mapping.is_level_available(index)
 
 
 func select_level(index: int) -> bool:
@@ -46,8 +43,9 @@ func select_level(index: int) -> bool:
 
 
 func get_selected_level_scene() -> PackedScene:
-	var level_data := get_level_data(selected_level_index)
-	var scene_path := String(level_data.get("scene_path", ""))
+	var scene_path := ""
+	if level_mapping != null:
+		scene_path = level_mapping.get_level_scene_path(selected_level_index)
 	if scene_path.is_empty():
 		return null
 
@@ -75,7 +73,7 @@ func record_selected_level_result(score: int, percentage: int) -> void:
 
 
 func record_level_result(index: int, score: int, percentage: int) -> void:
-	if index < 0 or index >= LEVELS.size():
+	if index < 0 or index >= get_level_count():
 		return
 
 	var existing := get_level_result(index)

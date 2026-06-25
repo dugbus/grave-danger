@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://navu7mdvfhpu"
-path="res://.godot/imported/level_03.png-db219dcc98f25f446f78fb0af35d238d.ctex"
+uid="uid://dxpdae7wxcu4f"
+path="res://.godot/imported/height-map.png-6362e3bd064fd8832939f1b174aa7db2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://levels/3/level_03.png"
-dest_files=["res://.godot/imported/level_03.png-db219dcc98f25f446f78fb0af35d238d.ctex"]
+source_file="res://levels/graveyard/height-map.png"
+dest_files=["res://.godot/imported/height-map.png-6362e3bd064fd8832939f1b174aa7db2.ctex"]
 
 [params]
 

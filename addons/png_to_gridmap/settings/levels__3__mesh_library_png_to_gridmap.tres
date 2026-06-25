@@ -20,7 +20,7 @@ cross_item_ref = "wall"
 
 [resource]
 script = ExtResource("1_gorp3")
-png_path = "res://levels/3/level_03.png"
+png_path = "res://levels/3/level.png"
 target_gridmap_path = NodePath("GridMap")
 mesh_library_path = "res://levels/3/mesh_library.tres"
 export_origin = Vector2i(-150, -10)
