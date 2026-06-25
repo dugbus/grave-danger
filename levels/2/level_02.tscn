@@ -64,7 +64,6 @@ _data = {
 [node name="IndoorLighting" parent="." unique_id=743360249 instance=ExtResource("100_indoor")]
 
 [node name="LevelGround" parent="." unique_id=742734766 instance=ExtResource("101_ground")]
-visible = false
 ground_size = Vector2(30, 30)
 
 [node name="LevelLayout" type="Node3D" parent="." unique_id=863965489]
