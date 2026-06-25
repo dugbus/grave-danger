@@ -648,7 +648,7 @@ func _sync_movement_to_animation() -> void:
 	if not Engine.is_editor_hint() and animation_player.is_playing() and animation_position + 0.001 < last_animation_position:
 		movement_cycle_distance += _calculate_travel_distance(animation, animation.length)
 
-	center.progress = movement_cycle_distance + _calculate_travel_distance(animation, animation_position)
+	_set_center_progress(center, movement_cycle_distance + _calculate_travel_distance(animation, animation_position))
 	last_animation_position = animation_position
 
 
@@ -662,17 +662,16 @@ func _sync_editor_preview_animation() -> void:
 		return
 
 	var animation := animation_player.get_animation(DEFAULT_ANIMATION_NAME)
-	if animation_player.current_animation != DEFAULT_ANIMATION_NAME:
-		animation_player.current_animation = DEFAULT_ANIMATION_NAME
-	if animation_player.is_playing():
-		animation_player.stop(true)
-
 	var preview_time := _get_editor_preview_time(animation_player, animation)
-	center.progress = _calculate_travel_distance(animation, preview_time)
+	_set_center_progress(center, _calculate_travel_distance(animation, preview_time))
 	last_animation_position = preview_time
 
-	animation_player.seek(preview_time, true)
-	animation_player.stop(true)
+
+func _set_center_progress(center: PathFollow3D, target_progress: float) -> void:
+	var sanitized_progress := maxf(target_progress, 0.0)
+	if Engine.is_editor_hint() and is_zero_approx(sanitized_progress) and is_zero_approx(center.progress):
+		center.progress = 0.001
+	center.progress = sanitized_progress
 
 
 func _get_editor_preview_time(animation_player: AnimationPlayer, animation: Animation) -> float:
@@ -686,7 +685,10 @@ func _get_editor_preview_time(animation_player: AnimationPlayer, animation: Anim
 
 	if (
 		animation_player.current_animation == DEFAULT_ANIMATION_NAME
-		and absf(animation_player.current_animation_position - editor_preview_time) >= EDITOR_SCRUB_TIME_EPSILON
+		and (
+			animation_player.is_playing()
+			or absf(animation_player.current_animation_position - editor_preview_time) >= EDITOR_SCRUB_TIME_EPSILON
+		)
 	):
 		editor_preview_time = animation_player.current_animation_position
 

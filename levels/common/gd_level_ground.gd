@@ -25,6 +25,18 @@ var _floor_material: StandardMaterial3D
 		visible_floor = value
 		_sync_ground()
 
+## Texture applied to this level ground instance's floor material.
+@export var floor_texture: Texture2D:
+	set(value):
+		floor_texture = value
+		_sync_ground()
+
+## Optional normal map applied to this level ground instance's floor material.
+@export var floor_normal_texture: Texture2D:
+	set(value):
+		floor_normal_texture = value
+		_sync_ground()
+
 @export var floor_texture_tile_size := 2.0:
 	set(value):
 		floor_texture_tile_size = maxf(value, 0.05)
@@ -84,6 +96,10 @@ func _sync_floor_material(mesh_instance: MeshInstance3D) -> void:
 	var material := _get_floor_material(mesh_instance)
 	if material == null:
 		return
+
+	material.albedo_texture = floor_texture
+	material.normal_enabled = floor_normal_texture != null
+	material.normal_texture = floor_normal_texture
 
 	var tile_size := maxf(floor_texture_tile_size, 0.05)
 	material.uv1_scale = Vector3(
