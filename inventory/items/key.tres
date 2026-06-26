@@ -1,6 +1,7 @@
-[gd_resource type="Resource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="GDCarriedItem" format=3 uid="uid://7rlk6gnbd5xi"]
 
-[ext_resource type="Script" path="res://inventory/carried_item.gd" id="1_item"]
+[ext_resource type="Script" uid="uid://dnfptyeoq66i6" path="res://inventory/carried_item.gd" id="1_item"]
+[ext_resource type="AudioStream" uid="uid://diiii6rcy2uft" path="res://Assets/audio/key-pickup.mp3" id="key_pickup_sound"]
 
 [resource]
 script = ExtResource("1_item")
@@ -10,4 +11,4 @@ max_count = 99
 weight = 5.0
 drop_order = 10
 world_scene_path = "res://collectibles/key.tscn"
-require_facing_for_pickup = true
+pickup_sound = ExtResource("key_pickup_sound")
