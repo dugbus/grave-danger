@@ -13,7 +13,7 @@ enum LoseAction {
 }
 
 var action_buttons: Array[Button] = []
-var selected_button_index := LoseAction.RETRY
+var selected_button_index := int(LoseAction.RETRY)
 var analog_x_armed := true
 
 

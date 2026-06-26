@@ -9,6 +9,11 @@
 - After any command that may have touched generated assets, check `git status --short` and revert any binary-file changes before continuing.
 - You can use godot to create import files for added assets without request.
 
+## Types
+
+- Always use named enums over values.
+- Make sure that typing is either directly inferable or specified with 'as' keyword.
+
 ## Scripts or Nodes
 
 - Favour nodes over script generated content so that editor users can work with the scene without having to read scripts whereever possible.

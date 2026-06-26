@@ -12,21 +12,17 @@
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="8_h616y"]
 [ext_resource type="PackedScene" path="res://enemies/zombie.tscn" id="9_zombie"]
 [ext_resource type="PackedScene" uid="uid://fv3hosp0q8wg" path="res://Assets/kenney-graveyard/coffin-old.glb" id="10_a5y6d"]
-[ext_resource type="ArrayMesh" uid="uid://dr7b1es6egk2f" path="res://Assets/kenney-graveyard/road.res" id="11_a5y6d"]
+[ext_resource type="ArrayMesh" uid="uid://bsinmmogwhh0m" path="res://Assets/kenney-graveyard/road.res" id="11_a5y6d"]
 [ext_resource type="Shader" uid="uid://bi3o8elbtqoni" path="res://addons/simplegrasstextured/shaders/grass.gdshader" id="13_3m1bw"]
 [ext_resource type="ArrayMesh" uid="uid://bnp6ud7heja8" path="res://Assets/environment/grass-small.res" id="14_w2m8w"]
 [ext_resource type="Script" uid="uid://2juaclm8gc1n" path="res://addons/simplegrasstextured/grass.gd" id="16_86xts"]
 [ext_resource type="PackedScene" path="res://collectibles/key.tscn" id="17_w2m8w"]
-[ext_resource type="PackedScene" path="res://collectibles/flask_bigger_sack.tscn" id="20_uie34"]
-[ext_resource type="PackedScene" path="res://collectibles/flask_breathing_space.tscn" id="21_7mqv8"]
-[ext_resource type="PackedScene" path="res://collectibles/flask_pause_boundary.tscn" id="22_htucy"]
-[ext_resource type="PackedScene" path="res://collectibles/flask_pickup_radius.tscn" id="23_ijj0a"]
-[ext_resource type="PackedScene" path="res://collectibles/flask_poison.tscn" id="24_hc001"]
-[ext_resource type="PackedScene" path="res://collectibles/flask_no_boundary.tscn" id="25_ijj0a"]
+[ext_resource type="PackedScene" path="res://pushables/hay_bale_pushable.tscn" id="20_wynp1"]
+[ext_resource type="PackedScene" path="res://collectibles/flask_no_boundary.tscn" id="21_bj40y"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 [ext_resource type="PackedScene" uid="uid://4r3w85uciy08" path="res://levels/common/gd_level_ground.tscn" id="101_ground"]
 
-[sub_resource type="Curve3D" id="Curve3D_ijj0a"]
+[sub_resource type="Curve3D" id="Curve3D_ly0q6"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -5.5478525, -0.61502314, 3.3527384, 0, 0, 0, 0, 0, 0, -1.5608768, 0, 4.4078684),
@@ -34,7 +30,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_hc001"]
+[sub_resource type="Curve3D" id="Curve3D_6qs2t"]
 resource_local_to_scene = true
 closed = true
 _data = {
@@ -43,7 +39,7 @@ _data = {
 }
 point_count = 13
 
-[sub_resource type="Animation" id="Animation_mski2"]
+[sub_resource type="Animation" id="Animation_qp421"]
 resource_local_to_scene = true
 resource_name = "kill_boundary"
 length = 475.27316
@@ -80,9 +76,9 @@ tracks/2/keys = {
 "values": [0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_fu2b1"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_u7030"]
 _data = {
-&"kill_boundary": SubResource("Animation_mski2")
+&"kill_boundary": SubResource("Animation_qp421")
 }
 
 [sub_resource type="Gradient" id="Gradient_wjj06"]
@@ -93,7 +89,7 @@ gradient = SubResource("Gradient_wjj06")
 fill_from = Vector2(0, 1)
 fill_to = Vector2(0, 0.01994302)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_d6ypq"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_l7p7m"]
 render_priority = 0
 shader = ExtResource("13_3m1bw")
 shader_parameter/albedo = Color(1, 1, 1, 1)
@@ -371,7 +367,7 @@ transform = Transform3D(1.2024131, 0, 0.8967735, 0, 1.5, 0, -0.8967735, 0, 1.202
 
 [node name="StartZombie" parent="." unique_id=1332419429 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0354786, -0.015777588, 2.3562365)
-curve = SubResource("Curve3D_ijj0a")
+curve = SubResource("Curve3D_ly0q6")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -394,8 +390,8 @@ data = {
 
 [node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 21.266586, 0, 23.496054)
-curve = SubResource("Curve3D_hc001")
-boundary_animation = SubResource("Animation_mski2")
+curve = SubResource("Curve3D_6qs2t")
+boundary_animation = SubResource("Animation_qp421")
 playback_duration = 475.27316
 render_effect = 1
 
@@ -403,7 +399,7 @@ render_effect = 1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.722982, 0, -21.77174)
 
 [node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_fu2b1")
+libraries/ = SubResource("AnimationLibrary_u7030")
 
 [node name="coffin-old" parent="." unique_id=876962173 instance=ExtResource("10_a5y6d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.549681, 0, 14.97021)
@@ -415,7 +411,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 10)
 ground_size = Vector2(20, 20)
 
 [node name="SimpleGrassTextured" type="MultiMeshInstance3D" parent="." unique_id=1267581101]
-material_override = SubResource("ShaderMaterial_d6ypq")
+material_override = SubResource("ShaderMaterial_l7p7m")
 cast_shadow = 0
 multimesh = SubResource("MultiMesh_wjj06")
 script = ExtResource("16_86xts")
@@ -440,44 +436,11 @@ metadata/SimpleGrassTextured = "2.0.5"
 [node name="Key" parent="." unique_id=1585175688 instance=ExtResource("17_w2m8w")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.6740446, 0.024999011, 4.835276)
 
-[node name="GDFlaskBiggerSack" parent="." unique_id=1957394561 instance=ExtResource("20_uie34")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.404145, 9.536743e-07, 2.4153361)
-global_flask_properties = ExtResource("5_hc001")
-hud_effect_id = &"bigger_sack"
-show_hud_countdown = true
+[node name="HayBalePushable" parent="." unique_id=256300017 instance=ExtResource("20_wynp1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7331775, 0, 2.4129329)
 
-[node name="GDFlaskBreathingSpace" parent="." unique_id=1159735215 instance=ExtResource("21_7mqv8")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.472208, 0, 4.5362988)
-global_flask_properties = ExtResource("5_hc001")
-hud_effect_id = &"breathing_space"
-show_hud_countdown = true
-
-[node name="GDFlaskBreathingSpace2" parent="." unique_id=1494505948 instance=ExtResource("21_7mqv8")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.391849, 0.335838, 5.027636)
-global_flask_properties = ExtResource("5_hc001")
-hud_effect_id = &"breathing_space"
-show_hud_countdown = true
-
-[node name="GDFlaskPauseBoundary" parent="." unique_id=1748075048 instance=ExtResource("22_htucy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.472548, 0, 13.842102)
-global_flask_properties = ExtResource("5_hc001")
-hud_effect_id = &"pause_boundary"
-show_hud_countdown = true
-
-[node name="GDFlaskPickupRadius" parent="." unique_id=2058554336 instance=ExtResource("23_ijj0a")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.6785126, -9.536743e-07, 2.1951458)
-global_flask_properties = ExtResource("5_hc001")
-hud_effect_id = &"pickup_radius"
-show_hud_countdown = true
-
-[node name="GDFlaskPoison" parent="." unique_id=1434934860 instance=ExtResource("24_hc001")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.737194, -9.536743e-07, 8.0374)
-global_flask_properties = ExtResource("5_hc001")
-hud_effect_id = &"poison"
-show_hud_countdown = true
-
-[node name="GDFlaskNoBoundary" parent="." unique_id=783658877 instance=ExtResource("25_ijj0a")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6494758, -2.3841858e-07, 11.711337)
+[node name="GDFlaskNoBoundary" parent="." unique_id=1117850407 instance=ExtResource("21_bj40y")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8560688, 0, 2.0419965)
 global_flask_properties = ExtResource("5_hc001")
 hud_effect_id = &"no_boundary"
 show_hud_countdown = true

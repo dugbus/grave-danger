@@ -4,6 +4,9 @@ class_name GDPlayer
 
 signal flask_effect_started(effect_id: StringName, liquid_color: Color, duration: float)
 
+const PUSH_FLOOR_MIN_NORMAL_Y := 0.65
+const PUSH_FLOOR_IGNORE_SECONDS := 0.25
+
 # Player stays as the public API for other gameplay objects.
 # Coins and kill-boundary areas still talk to this CharacterBody3D, while the actual
 # behavior is split into focused child components below.
@@ -15,6 +18,7 @@ signal flask_effect_started(effect_id: StringName, liquid_color: Color, duration
 var pickup_radius_multiplier := 1.0
 var base_pickup_radius_multiplier := 1.0
 var active_pickup_radius_multipliers: Array[float] = []
+var floor_push_ignore_timers: Dictionary = {}
 
 
 func _ready() -> void:
@@ -40,7 +44,9 @@ func _physics_process(delta: float) -> void:
 	var input_strength: float = movement.update_walk(delta, inventory)
 	animation_controller.update_movement(input_strength, inventory)
 
+	var push_velocity := velocity
 	move_and_slide()
+	_push_slide_colliders(push_velocity, delta)
 
 
 func try_collect_gold_coin(gold_coin: Node3D) -> bool:
@@ -161,3 +167,31 @@ func _refresh_pickup_radius_multiplier() -> void:
 		pickup_radius_multiplier *= multiplier
 
 	get_tree().call_group("pickup_radius_scalable", "set_pickup_radius_multiplier", pickup_radius_multiplier)
+
+
+func _push_slide_colliders(push_velocity: Vector3, delta: float) -> void:
+	for ignored_collider_id in floor_push_ignore_timers.keys():
+		var remaining_seconds := float(floor_push_ignore_timers[ignored_collider_id]) - delta
+
+		if remaining_seconds <= 0.0:
+			floor_push_ignore_timers.erase(ignored_collider_id)
+		else:
+			floor_push_ignore_timers[ignored_collider_id] = remaining_seconds
+
+	for collision_index in get_slide_collision_count():
+		var collision := get_slide_collision(collision_index)
+		var collider := collision.get_collider()
+
+		if collider != null and collision.get_normal().y >= PUSH_FLOOR_MIN_NORMAL_Y:
+			floor_push_ignore_timers[collider.get_instance_id()] = PUSH_FLOOR_IGNORE_SECONDS
+
+	for collision_index in get_slide_collision_count():
+		var collision := get_slide_collision(collision_index)
+		var collider := collision.get_collider()
+		if collider == null or not collider.has_method("push_from_character"):
+			continue
+
+		if floor_push_ignore_timers.has(collider.get_instance_id()):
+			continue
+
+		collider.push_from_character(push_velocity, collision.get_normal(), delta)

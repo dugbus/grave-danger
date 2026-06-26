@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="GDLevelMapping" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="GDLevelMapping" format=3 uid="uid://cebfylk5f3jp2"]
 
-[ext_resource type="Script" path="res://levels/level_mapping.gd" id="1_mapping"]
+[ext_resource type="Script" uid="uid://b7flmxmwjrx6p" path="res://levels/level_mapping.gd" id="1_mapping"]
 
 [resource]
 script = ExtResource("1_mapping")

@@ -211,10 +211,10 @@ func _get_camera_overlay_position(camera: Camera3D) -> Vector3:
 		half_height = tan(deg_to_rad(camera.fov) * 0.5) * distance
 		half_width = half_height * aspect
 
-	var position := camera.global_position - camera_basis.z.normalized() * distance
-	position += camera_basis.x.normalized() * half_width * viewport_x_offset
-	position += camera_basis.y.normalized() * half_height * viewport_y_offset
-	return position
+	var overlay_position := camera.global_position - camera_basis.z.normalized() * distance
+	overlay_position += camera_basis.x.normalized() * half_width * viewport_x_offset
+	overlay_position += camera_basis.y.normalized() * half_height * viewport_y_offset
+	return overlay_position
 
 
 func _apply_effect_color(_color: Color) -> void:
@@ -265,11 +265,11 @@ func _update_text_light(camera: Camera3D, text_position: Vector3) -> void:
 	)
 
 
-func _set_text_light_visible(is_visible: bool) -> void:
+func _set_text_light_visible(should_be_visible: bool) -> void:
 	if text_light == null or not is_instance_valid(text_light):
 		_ensure_text_light()
 	if text_light != null:
-		text_light.visible = is_visible
+		text_light.visible = should_be_visible
 
 
 func _update_light_sweep_width() -> void:
