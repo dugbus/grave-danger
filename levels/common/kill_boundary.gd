@@ -8,6 +8,11 @@ const BOUNDARY_CENTER_NAME := "BoundaryCenter"
 const ANIMATION_PLAYER_NAME := "BoundaryAnimationPlayer"
 const DEFAULT_ANIMATION_NAME := &"kill_boundary"
 const MOVEMENT_SPEED_TRACK_PATH := ^".:movement_speed"
+const BOUNDARY_SCALE_X_TRACK_PATH := ^".:boundary_scale_x"
+const BOUNDARY_SCALE_Z_TRACK_PATH := ^".:boundary_scale_z"
+const BOUNDARY_ROTATION_Z_RADIANS_TRACK_PATH := ^".:boundary_rotation_z_radians"
+const LEGACY_SCALE_ROTATION_TARGET_TRACK_PATH := ^".:scale_rotation_target"
+const LEGACY_SCALE_TRACK_PATH := ^"BoundaryCenter"
 const NEAR_FLAMES_SOUND_PATH := "res://Assets/audio/near-the-flames.mp3"
 const PLAYER_BLOCKER_COLLISION_LAYER := 8
 const FLAME_SHADER := preload("res://levels/common/kill_boundary_effects/kill_boundary_flame_effect.gdshader")
@@ -40,6 +45,24 @@ const EDITOR_SCRUB_TIME_EPSILON := 0.05
 
 ## Distance travelled along the path per second. Key this to create pressure changes.
 @export_range(0.0, 20.0, 0.05, "or_greater", "suffix:m/s") var movement_speed := 1.0
+
+## BoundaryCenter local X scale.
+@export_range(0.001, 20.0, 0.001, "or_greater") var boundary_scale_x := 1.0:
+	set(value):
+		boundary_scale_x = maxf(value, 0.001)
+		_apply_boundary_scale_rotation()
+
+## BoundaryCenter local Z scale.
+@export_range(0.001, 20.0, 0.001, "or_greater") var boundary_scale_z := 1.0:
+	set(value):
+		boundary_scale_z = maxf(value, 0.001)
+		_apply_boundary_scale_rotation()
+
+## BoundaryCenter local Z rotation in radians. X/Y rotation is always overridden to zero.
+@export var boundary_rotation_z_radians := 0.0:
+	set(value):
+		boundary_rotation_z_radians = value
+		_apply_boundary_scale_rotation()
 
 @export_group("Boundary")
 ## Width and depth available to the boundary shape, in world units.
@@ -305,6 +328,9 @@ func _ready() -> void:
 	_ensure_boundary_nodes()
 	_configure_path_follow()
 	_sync_animation_player()
+	if boundary_animation != null:
+		_sync_boundary_scale_rotation_to_animation(boundary_animation, _get_first_animation_key_time(boundary_animation))
+	_apply_boundary_scale_rotation()
 	_create_flame_material()
 	_create_ghost_material()
 
@@ -525,7 +551,9 @@ func play_runtime_animation() -> void:
 		last_animation_position = 0.0
 		var center := _get_center_node() as PathFollow3D
 		if center != null:
-			center.progress = 0.0
+			var animation := animation_player.get_animation(DEFAULT_ANIMATION_NAME)
+			_sync_boundary_scale_rotation_to_animation(animation, 0.0)
+			_set_center_progress(center, 0.0)
 		animation_player.play(DEFAULT_ANIMATION_NAME)
 
 
@@ -596,6 +624,7 @@ func _sync_animation_player() -> void:
 	_ensure_boundary_nodes()
 	if boundary_animation == null:
 		boundary_animation = _create_default_animation()
+	_upgrade_boundary_animation_tracks(boundary_animation)
 
 	var animation_player := get_node_or_null(ANIMATION_PLAYER_NAME) as AnimationPlayer
 	if animation_player == null:
@@ -620,10 +649,20 @@ func _create_default_animation() -> Animation:
 	animation.track_set_interpolation_loop_wrap(movement_speed_track, false)
 	animation.track_insert_key(movement_speed_track, 0.0, movement_speed)
 
-	var scale_track := animation.add_track(Animation.TYPE_SCALE_3D)
-	animation.track_set_path(scale_track, NodePath("BoundaryCenter"))
-	animation.track_insert_key(scale_track, 0.0, Vector3.ONE)
-	animation.track_insert_key(scale_track, playback_duration, Vector3.ONE)
+	var scale_x_track := animation.add_track(Animation.TYPE_VALUE)
+	animation.track_set_path(scale_x_track, BOUNDARY_SCALE_X_TRACK_PATH)
+	animation.track_insert_key(scale_x_track, 0.0, boundary_scale_x)
+	animation.track_insert_key(scale_x_track, playback_duration, boundary_scale_x)
+
+	var scale_z_track := animation.add_track(Animation.TYPE_VALUE)
+	animation.track_set_path(scale_z_track, BOUNDARY_SCALE_Z_TRACK_PATH)
+	animation.track_insert_key(scale_z_track, 0.0, boundary_scale_z)
+	animation.track_insert_key(scale_z_track, playback_duration, boundary_scale_z)
+
+	var rotation_z_track := animation.add_track(Animation.TYPE_VALUE)
+	animation.track_set_path(rotation_z_track, BOUNDARY_ROTATION_Z_RADIANS_TRACK_PATH)
+	animation.track_insert_key(rotation_z_track, 0.0, boundary_rotation_z_radians)
+	animation.track_insert_key(rotation_z_track, playback_duration, boundary_rotation_z_radians)
 
 	var shape_track := animation.add_track(Animation.TYPE_VALUE)
 	animation.track_set_path(shape_track, NodePath(".:shape_morph"))
@@ -648,6 +687,7 @@ func _sync_movement_to_animation() -> void:
 	if not Engine.is_editor_hint() and animation_player.is_playing() and animation_position + 0.001 < last_animation_position:
 		movement_cycle_distance += _calculate_travel_distance(animation, animation.length)
 
+	_sync_boundary_scale_rotation_to_animation(animation, animation_position)
 	_set_center_progress(center, movement_cycle_distance + _calculate_travel_distance(animation, animation_position))
 	last_animation_position = animation_position
 
@@ -663,6 +703,7 @@ func _sync_editor_preview_animation() -> void:
 
 	var animation := animation_player.get_animation(DEFAULT_ANIMATION_NAME)
 	var preview_time := _get_editor_preview_time(animation_player, animation)
+	_sync_boundary_scale_rotation_to_animation(animation, preview_time)
 	_set_center_progress(center, _calculate_travel_distance(animation, preview_time))
 	last_animation_position = preview_time
 
@@ -672,6 +713,86 @@ func _set_center_progress(center: PathFollow3D, target_progress: float) -> void:
 	if Engine.is_editor_hint() and is_zero_approx(sanitized_progress) and is_zero_approx(center.progress):
 		center.progress = 0.001
 	center.progress = sanitized_progress
+	_apply_boundary_scale_rotation()
+
+
+func _apply_boundary_scale_rotation() -> void:
+	var center := get_node_or_null(BOUNDARY_CENTER_NAME) as Node3D
+	if center == null:
+		return
+
+	center.scale = Vector3(boundary_scale_x, 1.0, boundary_scale_z)
+	center.rotation = Vector3(0.0, 0.0, boundary_rotation_z_radians)
+
+
+func _sync_boundary_scale_rotation_to_animation(animation: Animation, time: float) -> void:
+	var sample_time := clampf(time, 0.0, animation.length)
+	var scale_x_track := animation.find_track(BOUNDARY_SCALE_X_TRACK_PATH, Animation.TYPE_VALUE)
+	if scale_x_track >= 0:
+		boundary_scale_x = float(animation.value_track_interpolate(scale_x_track, sample_time))
+
+	var scale_z_track := animation.find_track(BOUNDARY_SCALE_Z_TRACK_PATH, Animation.TYPE_VALUE)
+	if scale_z_track >= 0:
+		boundary_scale_z = float(animation.value_track_interpolate(scale_z_track, sample_time))
+
+	var rotation_z_track := animation.find_track(BOUNDARY_ROTATION_Z_RADIANS_TRACK_PATH, Animation.TYPE_VALUE)
+	if rotation_z_track >= 0:
+		boundary_rotation_z_radians = float(animation.value_track_interpolate(rotation_z_track, sample_time))
+
+
+func _upgrade_boundary_animation_tracks(animation: Animation) -> void:
+	var legacy_vector_track := animation.find_track(LEGACY_SCALE_ROTATION_TARGET_TRACK_PATH, Animation.TYPE_VALUE)
+	if legacy_vector_track >= 0:
+		_upgrade_boundary_scale_rotation_tracks_from_source(animation, legacy_vector_track, true)
+		animation.remove_track(legacy_vector_track)
+
+	var legacy_scale_track := animation.find_track(LEGACY_SCALE_TRACK_PATH, Animation.TYPE_SCALE_3D)
+	if legacy_scale_track >= 0:
+		_upgrade_boundary_scale_rotation_tracks_from_source(animation, legacy_scale_track, false)
+		animation.remove_track(legacy_scale_track)
+
+
+func _upgrade_boundary_scale_rotation_tracks_from_source(
+	animation: Animation,
+	source_track: int,
+	source_has_rotation: bool
+) -> void:
+	if _has_boundary_scale_rotation_tracks(animation):
+		return
+
+	var scale_x_track := _add_boundary_value_track(animation, BOUNDARY_SCALE_X_TRACK_PATH, source_track)
+	var scale_z_track := _add_boundary_value_track(animation, BOUNDARY_SCALE_Z_TRACK_PATH, source_track)
+	var rotation_z_track := _add_boundary_value_track(animation, BOUNDARY_ROTATION_Z_RADIANS_TRACK_PATH, source_track)
+
+	for key_index in animation.track_get_key_count(source_track):
+		var key_time := animation.track_get_key_time(source_track, key_index)
+		var key_transition := animation.track_get_key_transition(source_track, key_index)
+		var source_value := animation.track_get_key_value(source_track, key_index) as Vector3
+		var scale_x := source_value.x
+		var scale_z := source_value.y if source_has_rotation else source_value.z
+		var rotation_z := source_value.z if source_has_rotation else 0.0
+		animation.track_insert_key(scale_x_track, key_time, scale_x, key_transition)
+		animation.track_insert_key(scale_z_track, key_time, scale_z, key_transition)
+		animation.track_insert_key(rotation_z_track, key_time, rotation_z, key_transition)
+
+
+func _has_boundary_scale_rotation_tracks(animation: Animation) -> bool:
+	return (
+		animation.find_track(BOUNDARY_SCALE_X_TRACK_PATH, Animation.TYPE_VALUE) >= 0
+		and animation.find_track(BOUNDARY_SCALE_Z_TRACK_PATH, Animation.TYPE_VALUE) >= 0
+		and animation.find_track(BOUNDARY_ROTATION_Z_RADIANS_TRACK_PATH, Animation.TYPE_VALUE) >= 0
+	)
+
+
+func _add_boundary_value_track(animation: Animation, track_path: NodePath, source_track: int) -> int:
+	var track := animation.add_track(Animation.TYPE_VALUE)
+	animation.track_set_path(track, track_path)
+	animation.track_set_interpolation_type(track, animation.track_get_interpolation_type(source_track))
+	animation.track_set_interpolation_loop_wrap(
+		track,
+		animation.track_get_interpolation_loop_wrap(source_track)
+	)
+	return track
 
 
 func _get_editor_preview_time(animation_player: AnimationPlayer, animation: Animation) -> float:

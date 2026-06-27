@@ -17,12 +17,10 @@
 [ext_resource type="ArrayMesh" uid="uid://bnp6ud7heja8" path="res://Assets/environment/grass-small.res" id="14_w2m8w"]
 [ext_resource type="Script" uid="uid://2juaclm8gc1n" path="res://addons/simplegrasstextured/grass.gd" id="16_86xts"]
 [ext_resource type="PackedScene" path="res://collectibles/key.tscn" id="17_w2m8w"]
-[ext_resource type="PackedScene" path="res://pushables/hay_bale_pushable.tscn" id="20_wynp1"]
-[ext_resource type="PackedScene" path="res://collectibles/flask_no_boundary.tscn" id="21_bj40y"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 [ext_resource type="PackedScene" uid="uid://4r3w85uciy08" path="res://levels/common/gd_level_ground.tscn" id="101_ground"]
 
-[sub_resource type="Curve3D" id="Curve3D_ly0q6"]
+[sub_resource type="Curve3D" id="Curve3D_hbjlw"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -5.5478525, -0.61502314, 3.3527384, 0, 0, 0, 0, 0, 0, -1.5608768, 0, 4.4078684),
@@ -30,7 +28,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_6qs2t"]
+[sub_resource type="Curve3D" id="Curve3D_e7dkm"]
 resource_local_to_scene = true
 closed = true
 _data = {
@@ -39,7 +37,7 @@ _data = {
 }
 point_count = 13
 
-[sub_resource type="Animation" id="Animation_qp421"]
+[sub_resource type="Animation" id="Animation_wynp1"]
 resource_local_to_scene = true
 resource_name = "kill_boundary"
 length = 475.27316
@@ -56,29 +54,58 @@ tracks/0/keys = {
 "update": 0,
 "values": [1.0]
 }
-tracks/1/type = "scale_3d"
+tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("BoundaryCenter")
+tracks/1/path = NodePath(".:boundary_scale_x")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
-tracks/1/keys = PackedFloat32Array(0, 1, 1, 1, 1, 10, 1, 1.75, 1, 1.5, 20, 1, 0.625, 1, 0.875, 30, 1, 1, 1, 1)
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 10, 20, 30),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [1.0, 1.75, 0.625, 1.0]
+}
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath(".:shape_morph")
+tracks/2/path = NodePath(".:boundary_scale_z")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
+"times": PackedFloat32Array(0, 10, 20, 30),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [1.0, 1.5, 0.875, 1.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".:boundary_rotation_z_radians")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 10, 20, 30),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 0.0, 0.0, 0.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath(".:shape_morph")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
 "times": PackedFloat32Array(0, 5, 10, 15, 20, 30),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "update": 0,
 "values": [0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_u7030"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_bj40y"]
 _data = {
-&"kill_boundary": SubResource("Animation_qp421")
+&"kill_boundary": SubResource("Animation_wynp1")
 }
 
 [sub_resource type="Gradient" id="Gradient_wjj06"]
@@ -89,7 +116,7 @@ gradient = SubResource("Gradient_wjj06")
 fill_from = Vector2(0, 1)
 fill_to = Vector2(0, 0.01994302)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_l7p7m"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ly0q6"]
 render_priority = 0
 shader = ExtResource("13_3m1bw")
 shader_parameter/albedo = Color(1, 1, 1, 1)
@@ -367,7 +394,7 @@ transform = Transform3D(1.2024131, 0, 0.8967735, 0, 1.5, 0, -0.8967735, 0, 1.202
 
 [node name="StartZombie" parent="." unique_id=1332419429 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0354786, -0.015777588, 2.3562365)
-curve = SubResource("Curve3D_ly0q6")
+curve = SubResource("Curve3D_hbjlw")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -390,8 +417,8 @@ data = {
 
 [node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 21.266586, 0, 23.496054)
-curve = SubResource("Curve3D_6qs2t")
-boundary_animation = SubResource("Animation_qp421")
+curve = SubResource("Curve3D_e7dkm")
+boundary_animation = SubResource("Animation_wynp1")
 playback_duration = 475.27316
 render_effect = 1
 
@@ -399,7 +426,7 @@ render_effect = 1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.722982, 0, -21.77174)
 
 [node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_u7030")
+libraries/ = SubResource("AnimationLibrary_bj40y")
 
 [node name="coffin-old" parent="." unique_id=876962173 instance=ExtResource("10_a5y6d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.549681, 0, 14.97021)
@@ -411,7 +438,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 10)
 ground_size = Vector2(20, 20)
 
 [node name="SimpleGrassTextured" type="MultiMeshInstance3D" parent="." unique_id=1267581101]
-material_override = SubResource("ShaderMaterial_l7p7m")
+material_override = SubResource("ShaderMaterial_ly0q6")
 cast_shadow = 0
 multimesh = SubResource("MultiMesh_wjj06")
 script = ExtResource("16_86xts")
@@ -435,15 +462,6 @@ metadata/SimpleGrassTextured = "2.0.5"
 
 [node name="Key" parent="." unique_id=1585175688 instance=ExtResource("17_w2m8w")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.6740446, 0.024999011, 4.835276)
-
-[node name="HayBalePushable" parent="." unique_id=256300017 instance=ExtResource("20_wynp1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7331775, 0, 2.4129329)
-
-[node name="GDFlaskNoBoundary" parent="." unique_id=1117850407 instance=ExtResource("21_bj40y")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8560688, 0, 2.0419965)
-global_flask_properties = ExtResource("5_hc001")
-hud_effect_id = &"no_boundary"
-show_hud_countdown = true
 
 [editable path="StartZombie"]
 [editable path="KillBoundary3D"]
