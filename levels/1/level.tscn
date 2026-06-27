@@ -14,12 +14,15 @@
 [ext_resource type="ArrayMesh" uid="uid://bnp6ud7heja8" path="res://Assets/environment/grass-small.res" id="14_w2m8w"]
 [ext_resource type="Script" uid="uid://2juaclm8gc1n" path="res://addons/simplegrasstextured/grass.gd" id="16_86xts"]
 [ext_resource type="PackedScene" path="res://collectibles/key.tscn" id="17_w2m8w"]
+[ext_resource type="ArrayMesh" uid="uid://b7t641bijkwwa" path="res://Assets/environment/gate.res" id="19_wynp1"]
+[ext_resource type="ArrayMesh" uid="uid://bdftylyndodnn" path="res://Assets/environment/door.res" id="20_bj40y"]
 [ext_resource type="PackedScene" path="res://pushables/hay_bale_pushable.tscn" id="20_wynp1"]
 [ext_resource type="PackedScene" path="res://collectibles/flask_no_boundary.tscn" id="21_bj40y"]
+[ext_resource type="ArrayMesh" uid="uid://c1pcls2swo1q7" path="res://Assets/environment/frame.res" id="21_ly0q6"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 [ext_resource type="PackedScene" uid="uid://4r3w85uciy08" path="res://levels/common/gd_level_ground.tscn" id="101_ground"]
 
-[sub_resource type="Curve3D" id="Curve3D_hbjlw"]
+[sub_resource type="Curve3D" id="Curve3D_xvdtq"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.18044, -0.10870552, -1.137958, 0, 0, 0, 0, 0, 0, -2.6286125, 0, 5.3667564),
@@ -27,7 +30,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_xvdtq"]
+[sub_resource type="Curve3D" id="Curve3D_hbjlw"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.0362186, -0.10870552, 0.024645805, 0, 0, 0, 0, 0, 0, -2.6933193, 0, 7.214384),
@@ -35,7 +38,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_wynp1"]
+[sub_resource type="Curve3D" id="Curve3D_e7dkm"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.18044, -0.10870552, -1.137958, 0, 0, 0, 0, 0, 0, -3.5278893, 0, 5.3667564),
@@ -43,7 +46,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_u7030"]
+[sub_resource type="Curve3D" id="Curve3D_wynp1"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.18044, -0.10870552, -1.137958, 0, 0, 0, 0, 0, 0, -2.8422403, 0, 9.820116),
@@ -59,7 +62,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_qp421"]
+[sub_resource type="Curve3D" id="Curve3D_ly0q6"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.365759, -0.10870552, 2.486309, 0, 0, 0, 0, 0, 0, -3.276125, 0, -0.63265705),
@@ -67,7 +70,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_ly0q6"]
+[sub_resource type="Curve3D" id="Curve3D_6qs2t"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.1434994, -0.10870552, -1.1893473, 0, 0, 0, 0, 0, 0, 5.7833424, 0, -1.0126438),
@@ -75,7 +78,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_6qs2t"]
+[sub_resource type="Curve3D" id="Curve3D_qp421"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.1434994, -0.10870552, -1.1893473, 0, 0, 0, 0, 0, 0, 12.741501, 0, -1.0126438),
@@ -83,7 +86,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_e7dkm"]
+[sub_resource type="Curve3D" id="Curve3D_u7030"]
 resource_local_to_scene = true
 closed = true
 _data = {
@@ -92,7 +95,7 @@ _data = {
 }
 point_count = 13
 
-[sub_resource type="Animation" id="Animation_wynp1"]
+[sub_resource type="Animation" id="Animation_l7p7m"]
 resource_local_to_scene = true
 resource_name = "kill_boundary"
 length = 475.27316
@@ -109,29 +112,58 @@ tracks/0/keys = {
 "update": 0,
 "values": [1.0]
 }
-tracks/1/type = "scale_3d"
+tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("BoundaryCenter")
+tracks/1/path = NodePath(".:shape_morph")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
-tracks/1/keys = PackedFloat32Array(0, 1, 1, 1, 1, 10, 1, 1.75, 1, 1.5, 20, 1, 0.625, 1, 0.875, 30, 1, 1, 1, 1)
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath(".:shape_morph")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
+tracks/1/keys = {
 "times": PackedFloat32Array(0, 5, 10, 15, 20, 30),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "update": 0,
 "values": [0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
 }
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:boundary_scale_x")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 10, 20, 30),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [1.0, 1.75, 0.625, 1.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".:boundary_scale_z")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 10, 20, 30),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [1.0, 1.5, 0.875, 1.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath(".:boundary_rotation_z_radians")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 10, 20, 30),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 0.0, 0.0, 0.0]
+}
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_bj40y"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_6nq5c"]
 _data = {
-&"kill_boundary": SubResource("Animation_wynp1")
+&"kill_boundary": SubResource("Animation_l7p7m")
 }
 
 [sub_resource type="Gradient" id="Gradient_wjj06"]
@@ -142,7 +174,7 @@ gradient = SubResource("Gradient_wjj06")
 fill_from = Vector2(0, 1)
 fill_to = Vector2(0, 0.01994302)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_ly0q6"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sobgd"]
 render_priority = 0
 shader = ExtResource("13_3m1bw")
 shader_parameter/albedo = Color(1, 1, 1, 1)
@@ -394,7 +426,7 @@ show_hud_countdown = true
 
 [node name="StartZombie" parent="." unique_id=1332419429 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.033, 0, 2.356)
-curve = SubResource("Curve3D_hbjlw")
+curve = SubResource("Curve3D_xvdtq")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -403,7 +435,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.18044, -0.10870552, -1.137
 
 [node name="StartZombie6" parent="." unique_id=1999108660 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.3108587, 0, 10.155487)
-curve = SubResource("Curve3D_xvdtq")
+curve = SubResource("Curve3D_hbjlw")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -412,7 +444,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0362186, -0.10870552, 0.02
 
 [node name="StartZombie2" parent="." unique_id=384396972 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.656645, 9.536743e-07, 2.695012)
-curve = SubResource("Curve3D_wynp1")
+curve = SubResource("Curve3D_e7dkm")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -421,7 +453,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.18044, -0.10870552, -1.137
 
 [node name="StartZombie8" parent="." unique_id=2131303328 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.206179, 9.536743e-07, 8.002817)
-curve = SubResource("Curve3D_u7030")
+curve = SubResource("Curve3D_wynp1")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -439,7 +471,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2180443, -0.10870552, 4.21
 
 [node name="StartZombie7" parent="." unique_id=1959964737 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.821293, 9.536743e-07, 15.382387)
-curve = SubResource("Curve3D_qp421")
+curve = SubResource("Curve3D_ly0q6")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -448,7 +480,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.365759, -0.10870552, 2.486
 
 [node name="StartZombie4" parent="." unique_id=1297044051 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.688917, 9.536743e-07, 12.498597)
-curve = SubResource("Curve3D_ly0q6")
+curve = SubResource("Curve3D_6qs2t")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -457,7 +489,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1434994, -0.10870552, -1.1
 
 [node name="StartZombie5" parent="." unique_id=305127766 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8206196, 9.536743e-07, 19.704838)
-curve = SubResource("Curve3D_6qs2t")
+curve = SubResource("Curve3D_qp421")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -472,13 +504,13 @@ mesh_library = ExtResource("8_h616y")
 cell_size = Vector3(1, 1, 1)
 cell_center_y = false
 data = {
-"cells": PackedInt32Array(0, 0, 2, 1, 0, 655365, 2, 0, 655365, 3, 0, 655365, 4, 0, 5, 0, 2, 1441794, 0, 3, 1441797, 0, 4, 1441797, 0, 5, 1441797, 0, 6, 1441797, 0, 7, 1441797, 0, 8, 1441797, 0, 9, 1441797, 0, 10, 1441797, 0, 11, 1441797, 0, 12, 1441797, 0, 13, 1441797, 0, 14, 1441797, 0, 15, 1441797, 0, 16, 1441797, 0, 17, 1441797, 0, 18, 1441796, 0, 19, 0, 5, 0, 5, 6, 0, 5, 7, 0, 5, 8, 0, 655364, 9, 0, 5, 10, 0, 5, 11, 0, 655364, 12, 0, 5, 13, 0, 5, 14, 0, 5, 15, 0, 5, 16, 0, 5, 17, 0, 5, 18, 0, 5, 19, 0, 655360, 19, 1, 1048581, 19, 2, 1048581, 19, 3, 1048581, 19, 4, 1048581, 19, 5, 1048581, 19, 6, 1048581, 19, 7, 1048581, 19, 8, 1048581, 19, 9, 1048580, 19, 10, 1048581, 19, 11, 1048581, 19, 12, 1048581, 19, 13, 1048581, 19, 14, 1048581, 19, 15, 1048581, 19, 16, 1048581, 19, 17, 1048581, 19, 18, 1048581, 19, 19, 1048576, 18, 19, 5, 17, 19, 5, 16, 19, 5, 15, 19, 5, 14, 19, 5, 13, 19, 5, 12, 19, 5, 11, 19, 5, 10, 19, 5, 9, 19, 5, 8, 19, 5, 7, 19, 5, 6, 19, 5, 5, 19, 5, 4, 19, 5, 3, 19, 5, 2, 19, 5, 1, 19, 4, 1, 18, 655360, 3, 17, 2, 4, 17, 655362, 3, 15, 1048578, 3, 14, 1048581, 3, 13, 1441792, 4, 13, 655365, 5, 13, 655360, 5, 14, 0, 6, 14, 5, 7, 14, 655360, 7, 15, 1048581, 7, 16, 1048581, 7, 17, 1048578, 17, 17, 655362, 16, 17, 0, 16, 16, 1441797, 16, 15, 1441797, 16, 14, 1441794, 13, 17, 1048578, 11, 17, 1048578, 12, 16, 5, 11, 16, 1441792, 13, 16, 655360, 16, 11, 1048578, 16, 6, 1441794, 16, 7, 1441797, 16, 8, 1441797, 16, 9, 1441796, 16, 10, 1441797, 13, 9, 1441797, 13, 10, 1048578, 13, 8, 655360, 12, 8, 2, 10, 8, 655362, 10, 10, 655362, 9, 8, 655365, 9, 10, 655365, 8, 9, 1048581, 8, 10, 0, 8, 8, 1441792, 6, 9, 1048578, 4, 9, 1048578, 2, 9, 1048578, 2, 7, 1441794, 4, 7, 1441794, 6, 7, 1441794, 2, 8, 1441797, 4, 8, 1441797, 6, 8, 1441797, 4, 3, 1441793, 4, 4, 1441797, 3, 3, 655365, 5, 3, 655365, 4, 2, 1048581, 4, 1, 1441794, 6, 3, 655362, 4, 5, 1048578, 2, 3, 2, 8, 1, 1048581, 8, 2, 1048578, 8, 4, 1441794, 8, 5, 1048578, 11, 1, 1048581, 11, 2, 1048581, 11, 3, 1048581, 11, 4, 1048581, 11, 5, 1048578, 13, 3, 2, 15, 1, 1441794, 17, 3, 655362, 15, 5, 1048578, 15, 3, 1048577, 15, 4, 1048581, 15, 2, 1048581, 16, 3, 5, 14, 3, 5, 12, 13, 5, 13, 13, 5, 11, 13, 2, 14, 13, 655362, 9, 13, 655366, 7, 12, 655366, 5, 11, 655366, 3, 11, 655366, 13, 6, 655366, 9, 6, 1441794, 9, 7, 1048578, 6, 10, 7, 3, 10, 7, 3, 8, 7, 1, 1, 7, 1, 2, 7, 1, 3, 7, 3, 6, 7, 1, 4, 7, 3, 5, 7, 2, 5, 7, 1, 5, 7, 4, 6, 7, 5, 6, 7, 6, 5, 7, 6, 6, 7, 7, 5, 7, 7, 3, 7, 6, 2, 7, 5, 2, 7, 6, 1, 7, 9, 3, 7, 10, 2, 7, 10, 1, 7, 9, 1, 7, 9, 2, 7, 9, 5, 7, 10, 4, 7, 8, 6, 7, 7, 8, 7, 7, 10, 7, 5, 9, 7, 5, 7, 7, 10, 5, 7, 11, 6, 7, 12, 5, 7, 12, 3, 7, 13, 2, 7, 13, 1, 7, 14, 2, 7, 14, 4, 7, 14, 5, 7, 14, 6, 7, 15, 6, 7, 16, 5, 7, 17, 4, 7, 18, 3, 7, 17, 2, 7, 14, 8, 7, 15, 8, 7, 11, 7, 7, 11, 9, 7, 12, 9, 7, 12, 10, 7, 15, 10, 7, 15, 12, 7, 17, 13, 7, 18, 13, 7, 18, 14, 7, 18, 15, 7, 17, 18, 7, 15, 18, 7, 14, 17, 7, 13, 18, 7, 11, 18, 7, 10, 18, 7, 9, 18, 7, 9, 16, 7, 9, 15, 7, 10, 14, 7, 11, 14, 7, 7, 18, 7, 6, 18, 7, 5, 17, 7, 4, 16, 7, 2, 16, 7, 1, 15, 7, 2, 14, 7, 2, 15, 7, 3, 12, 7, 4, 11, 7, 6, 13, 7, 18, 8, 7, 17, 11, 7, 16, 13, 7, 17, 9, 5, 18, 9, 5)
+"cells": PackedInt32Array(0, 0, 1441792, 1, 0, 655365, 2, 0, 655365, 3, 0, 655365, 4, 0, 5, 0, 2, 1441795, 0, 5, 1441795, 0, 6, 1441797, 0, 7, 1441797, 0, 8, 1441797, 0, 9, 1441797, 0, 10, 1441797, 0, 11, 1441797, 0, 12, 1441797, 0, 13, 1441797, 0, 14, 1441797, 0, 15, 1441797, 0, 16, 1441797, 0, 17, 1441797, 0, 18, 1441796, 0, 19, 0, 5, 0, 5, 6, 0, 5, 7, 0, 5, 8, 0, 655364, 9, 0, 5, 10, 0, 5, 11, 0, 655364, 12, 0, 5, 13, 0, 5, 14, 0, 5, 15, 0, 5, 16, 0, 5, 17, 0, 5, 18, 0, 5, 19, 0, 655360, 19, 1, 1048581, 19, 2, 1048581, 19, 3, 1048581, 19, 4, 1048581, 19, 5, 1048581, 19, 6, 1048581, 19, 7, 1048581, 19, 8, 1048581, 19, 9, 1048580, 19, 10, 1048581, 19, 11, 1048581, 19, 12, 1048581, 19, 13, 1048581, 19, 14, 1048581, 19, 15, 1048581, 19, 16, 1048581, 19, 17, 1048581, 19, 18, 1048581, 19, 19, 1048576, 18, 19, 5, 17, 19, 5, 16, 19, 5, 15, 19, 5, 14, 19, 5, 13, 19, 5, 12, 19, 5, 11, 19, 5, 10, 19, 5, 9, 19, 5, 8, 19, 5, 7, 19, 5, 6, 19, 5, 5, 19, 5, 4, 19, 5, 3, 19, 5, 2, 19, 5, 1, 19, 4, 1, 18, 655360, 3, 17, 2, 4, 17, 655362, 3, 15, 1048578, 3, 14, 1048581, 3, 13, 1441792, 4, 13, 655365, 5, 13, 655360, 5, 14, 0, 6, 14, 5, 7, 14, 655360, 7, 15, 1048581, 7, 16, 1048581, 7, 17, 1048578, 17, 17, 655362, 16, 17, 0, 16, 16, 1441797, 16, 15, 1441797, 16, 14, 1441794, 13, 17, 1048578, 11, 17, 1048578, 12, 16, 5, 11, 16, 1441792, 13, 16, 655360, 16, 11, 1048578, 16, 6, 1441794, 16, 7, 1441797, 16, 8, 1441797, 16, 9, 1441796, 16, 10, 1441797, 13, 9, 1441797, 13, 10, 1048578, 13, 8, 655360, 12, 8, 2, 10, 8, 655362, 10, 10, 655362, 9, 8, 655365, 9, 10, 655365, 8, 9, 1048581, 8, 10, 0, 8, 8, 1441792, 6, 9, 1048578, 4, 9, 1048578, 2, 9, 1048578, 2, 7, 1441794, 4, 7, 1441794, 6, 7, 1441794, 2, 8, 1441797, 4, 8, 1441797, 6, 8, 1441797, 4, 3, 1441793, 4, 4, 1441797, 3, 3, 655365, 5, 3, 655365, 4, 2, 1048581, 4, 1, 1441794, 6, 3, 655362, 4, 5, 1048578, 2, 3, 2, 8, 1, 1048581, 8, 2, 1048578, 8, 4, 1441794, 8, 5, 1048578, 11, 1, 1048581, 11, 2, 1048581, 11, 4, 1048581, 11, 5, 1048578, 13, 3, 2, 15, 1, 1441794, 17, 3, 655362, 15, 5, 1048578, 15, 3, 1048577, 15, 4, 1048581, 15, 2, 1048581, 16, 3, 5, 14, 3, 5, 12, 13, 5, 13, 13, 5, 11, 13, 2, 14, 13, 655362, 9, 13, 655366, 7, 12, 655366, 5, 11, 655366, 3, 11, 655366, 13, 6, 655366, 9, 6, 1441794, 9, 7, 1048578, 6, 10, 7, 3, 10, 7, 3, 8, 7, 1, 1, 7, 1, 2, 7, 1, 3, 7, 3, 6, 7, 1, 4, 7, 3, 5, 7, 2, 5, 7, 1, 5, 7, 4, 6, 7, 5, 6, 7, 6, 5, 7, 6, 6, 7, 7, 5, 7, 7, 3, 7, 6, 2, 7, 5, 2, 7, 6, 1, 7, 9, 3, 7, 10, 2, 7, 10, 1, 7, 9, 1, 7, 9, 2, 7, 9, 5, 7, 10, 4, 7, 8, 6, 7, 7, 8, 7, 7, 10, 7, 5, 9, 7, 5, 7, 7, 10, 5, 7, 11, 6, 7, 12, 5, 7, 12, 3, 7, 13, 2, 7, 13, 1, 7, 14, 2, 7, 14, 4, 7, 14, 5, 7, 14, 6, 7, 15, 6, 7, 16, 5, 7, 17, 4, 7, 18, 3, 7, 17, 2, 7, 14, 8, 7, 15, 8, 7, 11, 7, 7, 11, 9, 7, 12, 9, 7, 12, 10, 7, 15, 10, 7, 15, 12, 7, 17, 13, 7, 18, 13, 7, 18, 14, 7, 18, 15, 7, 17, 18, 7, 15, 18, 7, 14, 17, 7, 13, 18, 7, 11, 18, 7, 10, 18, 7, 9, 18, 7, 9, 16, 7, 9, 15, 7, 10, 14, 7, 11, 14, 7, 7, 18, 7, 6, 18, 7, 5, 17, 7, 4, 16, 7, 2, 16, 7, 1, 15, 7, 2, 14, 7, 2, 15, 7, 3, 12, 7, 4, 11, 7, 6, 13, 7, 18, 8, 7, 17, 11, 7, 16, 13, 7, 17, 9, 5, 18, 9, 5, 0, 1, 1441797)
 }
 
 [node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 21.266586, 0, 23.496054)
-curve = SubResource("Curve3D_e7dkm")
-boundary_animation = SubResource("Animation_wynp1")
+curve = SubResource("Curve3D_u7030")
+boundary_animation = SubResource("Animation_l7p7m")
 playback_duration = 475.27316
 render_effect = 1
 
@@ -486,7 +518,7 @@ render_effect = 1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.722982, 0, -21.77174)
 
 [node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_bj40y")
+libraries/ = SubResource("AnimationLibrary_6nq5c")
 
 [node name="coffin-old" parent="." unique_id=876962173 instance=ExtResource("10_a5y6d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.549681, 0, 14.97021)
@@ -498,7 +530,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 10)
 ground_size = Vector2(20, 20)
 
 [node name="SimpleGrassTextured" type="MultiMeshInstance3D" parent="." unique_id=1267581101]
-material_override = SubResource("ShaderMaterial_ly0q6")
+material_override = SubResource("ShaderMaterial_sobgd")
 cast_shadow = 0
 multimesh = SubResource("MultiMesh_hbjlw")
 script = ExtResource("16_86xts")
@@ -531,6 +563,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8560688, 0, 2.0419965)
 global_flask_properties = ExtResource("5_hc001")
 hud_effect_id = &"no_boundary"
 show_hud_countdown = true
+
+[node name="Gate" type="MeshInstance3D" parent="." unique_id=66971313]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.5, 0, 5)
+mesh = ExtResource("19_wynp1")
+
+[node name="Gate2" type="MeshInstance3D" parent="." unique_id=1579664971]
+transform = Transform3D(1.3113416e-07, 0, -1, 0, 1, 0, 1, 0, 1.3113416e-07, 0.5, 0, 3)
+mesh = ExtResource("19_wynp1")
+
+[node name="Door" type="MeshInstance3D" parent="." unique_id=1244273689]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 11.5, 0, 3.8)
+mesh = ExtResource("20_bj40y")
+
+[node name="Frame" type="MeshInstance3D" parent="." unique_id=1725002655]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 11.5, 0, 3.5)
+mesh = ExtResource("21_ly0q6")
 
 [editable path="StartZombie"]
 [editable path="StartZombie6"]
