@@ -25,6 +25,9 @@ const EFFECT_FLAME := 0
 const EFFECT_GHOST := 1
 const EFFECT_NONE := 2
 const EDITOR_SCRUB_TIME_EPSILON := 0.05
+const TIMER_LABEL_LAYER := 40
+const TIMER_LABEL_POSITION := Vector2(16.0, 128.0)
+const TIMER_LABEL_FONT_SIZE := 48
 
 @export_group("Animation")
 ## Animation controlling path progress, scale, shape morph, and future properties.
@@ -425,6 +428,27 @@ func get_bounds_height() -> float:
 		return 0.0
 
 	return flame_height
+
+
+func get_elapsed_time() -> float:
+	return elapsed_time
+
+
+func get_boundary_animation_position() -> float:
+	var animation_player := get_node_or_null(ANIMATION_PLAYER_NAME) as AnimationPlayer
+	if animation_player == null or animation_player.current_animation.is_empty():
+		return last_animation_position
+
+	return animation_player.current_animation_position
+
+
+func get_boundary_animation_duration() -> float:
+	var animation_player := get_node_or_null(ANIMATION_PLAYER_NAME) as AnimationPlayer
+	if animation_player == null or not animation_player.has_animation(DEFAULT_ANIMATION_NAME):
+		return 0.0
+
+	var animation := animation_player.get_animation(DEFAULT_ANIMATION_NAME)
+	return animation.length if animation != null else 0.0
 
 
 func pause_runtime_for(seconds: float) -> bool:
@@ -1461,13 +1485,13 @@ func _create_near_flame_audio() -> void:
 func _create_time_label() -> void:
 	var canvas_layer := CanvasLayer.new()
 	canvas_layer.name = "FlameTimerLayer"
-	canvas_layer.layer = 20
+	canvas_layer.layer = TIMER_LABEL_LAYER
 	add_child(canvas_layer)
 
 	time_label = Label.new()
 	time_label.name = "FlameTimerLabel"
-	time_label.position = Vector2(16.0, 48.0)
-	time_label.add_theme_font_size_override("font_size", 22)
+	time_label.position = TIMER_LABEL_POSITION
+	time_label.add_theme_font_size_override("font_size", TIMER_LABEL_FONT_SIZE)
 	time_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.55))
 	time_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.85))
 	time_label.add_theme_constant_override("shadow_offset_x", 2)
@@ -1478,7 +1502,21 @@ func _create_time_label() -> void:
 
 func _update_time_label() -> void:
 	if time_label != null:
-		time_label.text = "Time %.1fs" % elapsed_time
+		time_label.text = "Elapsed %s\nBoundary %s / %s" % [
+			_format_elapsed_seconds(get_elapsed_time()),
+			_format_elapsed_seconds(get_boundary_animation_position()),
+			_format_elapsed_seconds(get_boundary_animation_duration()),
+		]
+
+
+func _format_elapsed_seconds(seconds: float) -> String:
+	var clamped_seconds := maxf(seconds, 0.0)
+	var minutes := int(floorf(clamped_seconds / 60.0))
+	var remaining_seconds := clamped_seconds - float(minutes * 60)
+	if minutes <= 0:
+		return "%.1fs" % remaining_seconds
+
+	return "%d:%04.1f" % [minutes, remaining_seconds]
 
 
 func _apply_flame_heat(delta: float) -> void:
