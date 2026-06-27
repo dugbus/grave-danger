@@ -43,6 +43,14 @@ _data = {
 }
 point_count = 2
 
+[sub_resource type="Curve3D" id="Curve3D_u7030"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.18044, -0.10870552, -1.137958, 0, 0, 0, 0, 0, 0, -2.8422403, 0, 9.820116),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
 [sub_resource type="Curve3D" id="Curve3D_bj40y"]
 resource_local_to_scene = true
 _data = {
@@ -193,6 +201,14 @@ metadata/_edit_lock_ = true
 transform = Transform3D(0.93765277, 0, 0.3475737, 0, 1, 0, -0.3475737, 0, 0.93765277, 20.108902, -5.9604645e-08, 6.213047)
 
 [node name="CoinDeposit" type="Node3D" parent="LevelLayout/Coffin3" unique_id=1106885509]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+script = ExtResource("6_deposit")
+metadata/_edit_lock_ = true
+
+[node name="Coffin7" parent="LevelLayout" unique_id=1778293660 instance=ExtResource("1_coffin")]
+transform = Transform3D(0.8694372, 0, -0.4940437, 0, 1, 0, 0.4940437, 0, 0.8694372, 25.759708, -5.9604645e-08, 3.7608423)
+
+[node name="CoinDeposit" type="Node3D" parent="LevelLayout/Coffin7" unique_id=1077798308]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
@@ -403,6 +419,15 @@ loop_patrol = false
 [node name="PathFollow3D" parent="StartZombie2" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.18044, -0.10870552, -1.137958)
 
+[node name="StartZombie8" parent="." unique_id=2131303328 instance=ExtResource("9_zombie")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.206179, 9.536743e-07, 8.002817)
+curve = SubResource("Curve3D_u7030")
+shuffle_speed = 0.55
+loop_patrol = false
+
+[node name="PathFollow3D" parent="StartZombie8" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.18044, -0.10870552, -1.137958)
+
 [node name="StartZombie3" parent="." unique_id=1876649631 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.250051, 9.536743e-07, 11.832761)
 curve = SubResource("Curve3D_bj40y")
@@ -510,6 +535,7 @@ show_hud_countdown = true
 [editable path="StartZombie"]
 [editable path="StartZombie6"]
 [editable path="StartZombie2"]
+[editable path="StartZombie8"]
 [editable path="StartZombie3"]
 [editable path="StartZombie7"]
 [editable path="StartZombie4"]
