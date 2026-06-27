@@ -30,6 +30,10 @@ func _ready() -> void:
 		if deposit.has_signal("coin_absorbed"):
 			deposit.coin_absorbed.connect(_on_coin_absorbed)
 
+	for completion_source in _get_level_completion_sources():
+		if completion_source.has_signal("level_completed"):
+			completion_source.level_completed.connect(_on_level_completed)
+
 
 func _on_coin_absorbed(count: int) -> void:
 	if showing_result:
@@ -40,6 +44,13 @@ func _on_coin_absorbed(count: int) -> void:
 
 	if max_coins_collected > 0 and coins_collected >= max_coins_collected:
 		_show_win_screen()
+
+
+func _on_level_completed() -> void:
+	if showing_result:
+		return
+
+	_show_win_screen()
 
 
 func _calculate_max_coins_collected() -> int:
@@ -184,6 +195,17 @@ func _get_coin_deposits() -> Array[Node]:
 		if node.has_signal("coin_absorbed"):
 			deposits.append(node)
 	return deposits
+
+
+func _get_level_completion_sources() -> Array[Node]:
+	if current_level == null:
+		return []
+
+	var sources: Array[Node] = []
+	for node in _get_descendants(current_level):
+		if node.has_signal("level_completed"):
+			sources.append(node)
+	return sources
 
 
 func _show_win_screen() -> void:
