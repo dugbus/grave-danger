@@ -16,16 +16,16 @@
 [ext_resource type="PackedScene" path="res://collectibles/key.tscn" id="17_w2m8w"]
 [ext_resource type="PackedScene" path="res://pushables/hay_bale_pushable.tscn" id="20_wynp1"]
 [ext_resource type="PackedScene" path="res://collectibles/flask_no_boundary.tscn" id="21_bj40y"]
-[ext_resource type="ArrayMesh" uid="uid://6rpsoncs63yw" path="res://Assets/environment/spike-trap.res" id="22_ly0q6"]
+[ext_resource type="ArrayMesh" uid="uid://c7ijma6epb5e7" path="res://Assets/environment/spike-trap.res" id="22_ly0q6"]
 [ext_resource type="PackedScene" path="res://collectibles/silver_key.tscn" id="22_silver_key"]
-[ext_resource type="ArrayMesh" uid="uid://clf32f5f1rejo" path="res://Assets/environment/spikes.res" id="23_6qs2t"]
+[ext_resource type="ArrayMesh" uid="uid://bhh1i7c78vtce" path="res://Assets/environment/spikes.res" id="23_6qs2t"]
 [ext_resource type="PackedScene" path="res://levels/common/locked_gate.tscn" id="23_locked_gate"]
 [ext_resource type="Material" uid="uid://yu0cqmik8u3x" path="res://Assets/environment/floors/dirt_floor.material" id="24_6qs2t"]
 [ext_resource type="PackedScene" path="res://levels/common/locked_door.tscn" id="24_locked_door"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 [ext_resource type="PackedScene" uid="uid://4r3w85uciy08" path="res://levels/common/gd_level_ground.tscn" id="101_ground"]
 
-[sub_resource type="Curve3D" id="Curve3D_qp421"]
+[sub_resource type="Curve3D" id="Curve3D_6qs2t"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.18044, -0.10870552, -1.137958, 0, 0, 0, 0, 0, 0, -2.6286125, 0, 5.3667564),
@@ -33,7 +33,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_u7030"]
+[sub_resource type="Curve3D" id="Curve3D_qp421"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.0362186, -0.10870552, 0.024645805, 0, 0, 0, 0, 0, 0, -2.6933193, 0, 7.214384),
@@ -41,7 +41,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_l7p7m"]
+[sub_resource type="Curve3D" id="Curve3D_u7030"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.18044, -0.10870552, -1.137958, 0, 0, 0, 0, 0, 0, -3.5278893, 0, 5.3667564),
@@ -49,7 +49,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_6nq5c"]
+[sub_resource type="Curve3D" id="Curve3D_l7p7m"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.18044, -0.10870552, -1.137958, 0, 0, 0, 0, 0, 0, -2.8422403, 0, 9.820116),
@@ -57,7 +57,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_sobgd"]
+[sub_resource type="Curve3D" id="Curve3D_6nq5c"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.2180443, -0.10870552, 4.214011, 0, 0, 0, 0, 0, 0, -3.276125, 0, -0.63265705),
@@ -65,7 +65,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_jandb"]
+[sub_resource type="Curve3D" id="Curve3D_sobgd"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.365759, -0.10870552, 2.486309, 0, 0, 0, 0, 0, 0, -3.276125, 0, -0.63265705),
@@ -73,7 +73,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_3p7t5"]
+[sub_resource type="Curve3D" id="Curve3D_jandb"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.1434994, -0.10870552, -1.1893473, 0, 0, 0, 0, 0, 0, 5.7833424, 0, -1.0126438),
@@ -81,7 +81,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_tpknb"]
+[sub_resource type="Curve3D" id="Curve3D_3p7t5"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.1434994, -0.10870552, -1.1893473, 0, 0, 0, 0, 0, 0, 12.741501, 0, -1.0126438),
@@ -89,7 +89,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_crkwu"]
+[sub_resource type="Curve3D" id="Curve3D_tpknb"]
 resource_local_to_scene = true
 closed = true
 _data = {
@@ -98,7 +98,7 @@ _data = {
 }
 point_count = 13
 
-[sub_resource type="Animation" id="Animation_tsecg"]
+[sub_resource type="Animation" id="Animation_crkwu"]
 resource_local_to_scene = true
 resource_name = "kill_boundary"
 length = 475.27316
@@ -164,9 +164,9 @@ tracks/4/keys = {
 "values": [0.0, 0.0, 0.0, 0.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_p0ipo"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_tsecg"]
 _data = {
-&"kill_boundary": SubResource("Animation_tsecg")
+&"kill_boundary": SubResource("Animation_crkwu")
 }
 
 [sub_resource type="Gradient" id="Gradient_wjj06"]
@@ -177,7 +177,7 @@ gradient = SubResource("Gradient_wjj06")
 fill_from = Vector2(0, 1)
 fill_to = Vector2(0, 0.01994302)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_rfb6x"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_p0ipo"]
 render_priority = 0
 shader = ExtResource("13_3m1bw")
 shader_parameter/albedo = Color(1, 1, 1, 1)
@@ -218,7 +218,7 @@ size = Vector2(1, 1)
 
 [node name="StartZombie" parent="." unique_id=1332419429 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.033, 0, 2.356)
-curve = SubResource("Curve3D_qp421")
+curve = SubResource("Curve3D_6qs2t")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -227,7 +227,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.18044, -0.10870552, -1.137
 
 [node name="StartZombie6" parent="." unique_id=1999108660 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.3108587, 0, 10.155487)
-curve = SubResource("Curve3D_u7030")
+curve = SubResource("Curve3D_qp421")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -236,7 +236,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0362186, -0.10870552, 0.02
 
 [node name="StartZombie2" parent="." unique_id=384396972 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.656645, 9.536743e-07, 2.695012)
-curve = SubResource("Curve3D_l7p7m")
+curve = SubResource("Curve3D_u7030")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -245,7 +245,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.18044, -0.10870552, -1.137
 
 [node name="StartZombie8" parent="." unique_id=2131303328 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.206179, 9.536743e-07, 8.002817)
-curve = SubResource("Curve3D_6nq5c")
+curve = SubResource("Curve3D_l7p7m")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -254,7 +254,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.18044, -0.10870552, -1.137
 
 [node name="StartZombie3" parent="." unique_id=1876649631 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.250051, 9.536743e-07, 11.832761)
-curve = SubResource("Curve3D_sobgd")
+curve = SubResource("Curve3D_6nq5c")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -263,7 +263,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2180443, -0.10870552, 4.21
 
 [node name="StartZombie7" parent="." unique_id=1959964737 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.821293, 9.536743e-07, 15.382387)
-curve = SubResource("Curve3D_jandb")
+curve = SubResource("Curve3D_sobgd")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -272,7 +272,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.365759, -0.10870552, 2.486
 
 [node name="StartZombie4" parent="." unique_id=1297044051 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.688917, 9.536743e-07, 12.498597)
-curve = SubResource("Curve3D_3p7t5")
+curve = SubResource("Curve3D_jandb")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -281,7 +281,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1434994, -0.10870552, -1.1
 
 [node name="StartZombie5" parent="." unique_id=305127766 instance=ExtResource("9_zombie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8206196, 9.536743e-07, 19.704838)
-curve = SubResource("Curve3D_tpknb")
+curve = SubResource("Curve3D_3p7t5")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -301,8 +301,8 @@ data = {
 
 [node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 21.266586, 0, 23.496054)
-curve = SubResource("Curve3D_crkwu")
-boundary_animation = SubResource("Animation_tsecg")
+curve = SubResource("Curve3D_tpknb")
+boundary_animation = SubResource("Animation_crkwu")
 playback_duration = 475.27316
 render_effect = 1
 
@@ -310,7 +310,7 @@ render_effect = 1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.722982, 0, -21.77174)
 
 [node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_p0ipo")
+libraries/ = SubResource("AnimationLibrary_tsecg")
 
 [node name="coffin-old" parent="." unique_id=876962173 instance=ExtResource("10_a5y6d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.549681, 0, 14.97021)
@@ -323,7 +323,7 @@ visible = false
 ground_size = Vector2(20, 20)
 
 [node name="SimpleGrassTextured" type="MultiMeshInstance3D" parent="." unique_id=1267581101]
-material_override = SubResource("ShaderMaterial_rfb6x")
+material_override = SubResource("ShaderMaterial_p0ipo")
 cast_shadow = 0
 multimesh = SubResource("MultiMesh_hbjlw")
 script = ExtResource("16_86xts")
@@ -426,58 +426,60 @@ surface_material_override/0 = ExtResource("24_6qs2t")
 
 [node name="Objects" type="Node3D" parent="." unique_id=538712402]
 
-[node name="Coffin" parent="Objects" unique_id=1894824003 instance=ExtResource("1_coffin")]
+[node name="Coffins" type="Node3D" parent="Objects" unique_id=1399010365]
+
+[node name="Coffin" parent="Objects/Coffins" unique_id=1894824003 instance=ExtResource("1_coffin")]
 transform = Transform3D(-0.01671946, 0, 0.9998602, 0, 1, 0, -0.9998602, 0, -0.01671946, 9.5704155, -5.9604645e-08, 9.54693)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffin" unique_id=894045105]
+[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/Coffin" unique_id=894045105]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
 
-[node name="Coffin2" parent="Objects" unique_id=973520463 instance=ExtResource("1_coffin")]
+[node name="Coffin2" parent="Objects/Coffins" unique_id=973520463 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.21026787, -0.11277296, 0.971118, -0.00047193095, 0.9933129, 0.115452595, -0.9776439, -0.024734259, 0.2088086, 16.205696, -5.9604645e-08, 2.6708536)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffin2" unique_id=35989831]
+[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/Coffin2" unique_id=35989831]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
 
-[node name="Coffin3" parent="Objects" unique_id=2088691337 instance=ExtResource("1_coffin")]
+[node name="Coffin3" parent="Objects/Coffins" unique_id=2088691337 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.95942724, 0, -0.28195664, 0, 1, 0, 0.28195664, 0, 0.95942724, 12.483252, -5.9604645e-08, 17.332811)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffin3" unique_id=1106885509]
+[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/Coffin3" unique_id=1106885509]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
 
-[node name="Coffin7" parent="Objects" unique_id=1778293660 instance=ExtResource("1_coffin")]
+[node name="Coffin7" parent="Objects/Coffins" unique_id=1778293660 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.40158492, 0, -0.9158219, 0, 1, 0, 0.9158219, 0, 0.40158492, 18.479034, -5.9604645e-08, 18.745432)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffin7" unique_id=1077798308]
+[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/Coffin7" unique_id=1077798308]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
 
-[node name="Coffin4" parent="Objects" unique_id=1254563237 instance=ExtResource("1_coffin")]
+[node name="Coffin4" parent="Objects/Coffins" unique_id=1254563237 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.77057254, 0, -0.6373526, 0, 1, 0, 0.6373526, 0, 0.77057254, 6.5659833, -5.9604645e-08, 15.5374775)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffin4" unique_id=339453596]
+[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/Coffin4" unique_id=339453596]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
 
-[node name="Coffin5" parent="Objects" unique_id=1205180236 instance=ExtResource("1_coffin")]
+[node name="Coffin5" parent="Objects/Coffins" unique_id=1205180236 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.99976933, 0, 0.021483392, 0, 1, 0, -0.021483392, 0, 0.99976933, 7.481971, -5.9604645e-08, 1.4312944)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffin5" unique_id=1411561944]
+[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/Coffin5" unique_id=1411561944]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
 
-[node name="Coffin6" parent="Objects" unique_id=901136980 instance=ExtResource("1_coffin")]
+[node name="Coffin6" parent="Objects/Coffins" unique_id=901136980 instance=ExtResource("1_coffin")]
 transform = Transform3D(1.7493963e-05, 0, 1.0000001, 0, 1, 0, -1.0000001, 0, 1.7493963e-05, 1.4835541, -5.9604645e-08, 8.073386)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffin6" unique_id=894547192]
+[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/Coffin6" unique_id=894547192]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
