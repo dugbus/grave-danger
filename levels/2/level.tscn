@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 [ext_resource type="PackedScene" uid="uid://4r3w85uciy08" path="res://levels/common/gd_level_ground.tscn" id="101_ground"]
 
-[sub_resource type="Curve3D" id="Curve3D_djuj5"]
+[sub_resource type="Curve3D" id="Curve3D_digkr"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -18.445782, 0, -19.87931, 0, 0, 0, 0, 0, 0, -14.925648, 0, -18.903809, 0, 0, 0, 0, 0, 0, -20.186985, 0, -14.781507, 0, 0, 0, 0, 0, 0, -18.890425, 0, -11.918795, 0, 0, 0, 0, 0, 0, -18.40918, 0, -9.011772, 0, 0, 0, 0, 0, 0, -16.58245, 0, -6.175517, 0, 0, 0, 0, 0, 0, -17.495754, 0, -4.000492, 0, 0, 0, 0, 0, 0, -20.004349, 0, -0.21078873, 0, 0, 0, 0, 0, 0, -18.164211, 0, 2.298658, 0, 0, 0, 0, 0, 0, -16.702156, 0, 3.0904937, 0, 0, 0, 0, 0, 0, -14.008546, 0, 1.5073256, 0, 0, 0, 0, 0, 0, -10.978762, 0, 2.2850318, 0, 0, 0, 0, 0, 0, -6.782787, 0, 2.9181552, 0, 0, 0, 0, 0, 0, -4.7504253, 0, 2.4757943, 0, 0, 0, 0, 0, 0, -0.96477985, 0, 2.453548, 0, 0, 0, 0, 0, 0, 1.2510338, 0, 3.7465892, 0, 0, 0, 0, 0, 0, 1.8949156, 0, 1.3520427, 0, 0, 0, 0, 0, 0, 1.5907669, 0, -2.051125, 0, 0, 0, 0, 0, 0, 4.7572165, 0, 0.88071966, 0, 0, 0, 0, 0, 0, 6.209138, 0, -3.4310975, 0, 0, 0, 0, 0, 0, 3.4725924, 0, -7.921921, 0, 0, 0, 0, 0, 0, 5.199334, 0, -11.556098, 0, 0, 0, 0, 0, 0, 1.4967041, 0, -14.579313, 0, 0, 0, 0, 0, 0, 3.5024672, 0, -18.61775, 0, 0, 0, 0, 0, 0, -1.5483322, 0, -20.488785, 0, 0, 0, 0, 0, 0, -9.895385, 0, -20.84062, 0, 0, 0, 0, 0, 0, -11.185323, 0, -15.009842, 0, 0, 0, 0, 0, 0, -12.198265, 0, -6.840667, 0, 0, 0, 0, 0, 0, -10.350559, 0, -2.6742625, 0, 0, 0, 0, 0, 0, -2.399201, 0, -2.6965852, 0, 0, 0, 0, 0, 0, -0.32050753, 0, -9.757769, 0, 0, 0, 0, 0, 0, -6.8335967, 0, -9.746569, 0, 0, 0, 0, 0, 0, -8.741132, 0, -8.130572, 0, 0, 0, 0, 0, 0, -6.829929, 0, -6.0243506, 0, 0, 0, 0, 0, 0, -5.23076, 0, -8.091568, 0, 0, 0, 0, 0, 0, -6.985175, 0, -10.917379, 0, 0, 0, 0, 0, 0, -9.517925, 0, -7.8885202, 0, 0, 0, 0, 0, 0, -6.358513, 0, -5.1468806, 0, 0, 0, 0, 0, 0, -4.400199, 0, -9.167952, 0, 0, 0, 0, 0, 0, -6.9590597, 0, -10.342939, 0, 0, 0, 0, 0, 0, -7.951277, 0, -8.358515, 0, 0, 0, 0, 0, 0, -5.3663, 0, -5.851872, 0, 0, 0, 0, 0, 0, -6.097401, 0, -8.9590645, 0, 0, 0, 0, 0, 0, -5.653516, 0, -10.107944),
@@ -17,7 +17,7 @@ _data = {
 }
 point_count = 44
 
-[sub_resource type="Animation" id="Animation_kfk4x"]
+[sub_resource type="Animation" id="Animation_1bhj3"]
 resource_local_to_scene = true
 resource_name = "kill_boundary"
 length = 475.27316
@@ -83,9 +83,9 @@ tracks/4/keys = {
 "values": [1.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_okamq"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_fn345"]
 _data = {
-&"kill_boundary": SubResource("Animation_kfk4x")
+&"kill_boundary": SubResource("Animation_1bhj3")
 }
 
 [node name="Level2" type="Node3D" unique_id=1192405132]
@@ -271,8 +271,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.084152, 12, -11.637171)
 
 [node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 7.4758077, 0, 7.7353163)
-curve = SubResource("Curve3D_djuj5")
-boundary_animation = SubResource("Animation_kfk4x")
+curve = SubResource("Curve3D_digkr")
+boundary_animation = SubResource("Animation_1bhj3")
 playback_duration = 475.27316
 movement_speed = 2.0
 shape_morph = 1.0
@@ -281,7 +281,7 @@ shape_morph = 1.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.445782, 0, -19.87931)
 
 [node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_okamq")
+libraries/ = SubResource("AnimationLibrary_fn345")
 
 [node name="GridMap" type="GridMap" parent="." unique_id=1808558701]
 mesh_library = ExtResource("6_e2jp1")
