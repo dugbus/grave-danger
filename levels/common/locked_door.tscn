@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://d1thxl65p3fxm" path="res://levels/common/lockable_hinged_leaf.gd" id="2_leaf"]
 [ext_resource type="ArrayMesh" uid="uid://cppgm51lmi48u" path="res://Assets/environment/door.res" id="3_door"]
 [ext_resource type="ArrayMesh" uid="uid://0y50s4nh1wa0" path="res://Assets/environment/frame.res" id="4_frame"]
+[ext_resource type="AudioStream" uid="uid://cj022a1x6puap" path="res://Assets/audio/unlock-door.mp3" id="5_unlock_sound"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_door_leaf"]
 size = Vector3(1.151022, 1.1913818, 0.243)
@@ -23,6 +24,9 @@ size = Vector3(1.459729, 1.4456214, 0.7532959)
 [node name="LockedDoor" type="Node3D" unique_id=945615625]
 script = ExtResource("1_passage")
 key_requirement = 1
+
+[node name="UnlockAudioPlayer" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource("5_unlock_sound")
 
 [node name="Leaves" type="Node3D" parent="." unique_id=1571038465]
 
