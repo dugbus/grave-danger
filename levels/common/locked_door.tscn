@@ -1,73 +1,74 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene format=3 uid="uid://4qkicc6gkfuv"]
 
-[ext_resource type="Script" path="res://levels/common/lockable_hinged_passage.gd" id="1_passage"]
-[ext_resource type="Script" path="res://levels/common/lockable_hinged_leaf.gd" id="2_leaf"]
-[ext_resource type="ArrayMesh" path="res://Assets/environment/door.res" id="3_door"]
-[ext_resource type="ArrayMesh" path="res://Assets/environment/frame.res" id="4_frame"]
+[ext_resource type="Script" uid="uid://c0u8ve3fhp6sl" path="res://levels/common/lockable_hinged_passage.gd" id="1_passage"]
+[ext_resource type="Script" uid="uid://d1thxl65p3fxm" path="res://levels/common/lockable_hinged_leaf.gd" id="2_leaf"]
+[ext_resource type="ArrayMesh" uid="uid://cppgm51lmi48u" path="res://Assets/environment/door.res" id="3_door"]
+[ext_resource type="ArrayMesh" uid="uid://0y50s4nh1wa0" path="res://Assets/environment/frame.res" id="4_frame"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_door_leaf"]
-size = Vector3(1.62, 2.7, 0.243)
+size = Vector3(0.9703076, 1.2079589, 0.243)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_door_push"]
-size = Vector3(2.0925, 2.97, 0.7425)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_door_unlock"]
-size = Vector3(2.7, 2.97, 1.6875)
+size = Vector3(0.9387134, 1.2034376, 0.7425)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_frame_post"]
-size = Vector3(0.297, 2.97, 0.459)
+size = Vector3(0.22049023, 1.416955, 0.459)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_frame_header"]
-size = Vector3(2.43, 0.432, 0.459)
+size = Vector3(1.4497852, 0.210417, 0.459)
 
-[node name="LockedDoor" type="Node3D"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_door_unlock"]
+size = Vector3(1.459729, 1.4456214, 0.95654297)
+
+[node name="LockedDoor" type="Node3D" unique_id=945615625]
 script = ExtResource("1_passage")
 key_requirement = 1
 
-[node name="Leaves" type="Node3D" parent="."]
+[node name="Leaves" type="Node3D" parent="." unique_id=1571038465]
 
-[node name="DoorLeaf" type="RigidBody3D" parent="Leaves"]
+[node name="DoorLeaf" type="RigidBody3D" parent="Leaves" unique_id=1802349850]
 mass = 8.0
 script = ExtResource("2_leaf")
-open_limit_degrees = 105.0
-push_torque = 16.0
 
-[node name="Door" type="MeshInstance3D" parent="Leaves/DoorLeaf"]
+[node name="Door" type="MeshInstance3D" parent="Leaves/DoorLeaf" unique_id=1169091027]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0, 0)
 mesh = ExtResource("3_door")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Leaves/DoorLeaf"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Leaves/DoorLeaf" unique_id=54202761]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28788823, 0.57810056, 0)
 shape = SubResource("BoxShape3D_door_leaf")
 
-[node name="PushArea" type="Area3D" parent="Leaves/DoorLeaf"]
+[node name="PushArea" type="Area3D" parent="Leaves/DoorLeaf" unique_id=1991937819]
 collision_layer = 0
 collision_mask = 2
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Leaves/DoorLeaf/PushArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Leaves/DoorLeaf/PushArea" unique_id=951212348]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29248413, 0.5838282, 0)
 shape = SubResource("BoxShape3D_door_push")
 
-[node name="FrameBody" type="StaticBody3D" parent="."]
-collision_layer = 1
+[node name="FrameBody" type="StaticBody3D" parent="." unique_id=413719902]
 collision_mask = 2
 
-[node name="Frame" type="MeshInstance3D" parent="FrameBody"]
+[node name="Frame" type="MeshInstance3D" parent="FrameBody" unique_id=661761975]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0.3, 0, 0)
 mesh = ExtResource("4_frame")
 
-[node name="LeftPostCollision" type="CollisionShape3D" parent="FrameBody"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0125, 1.2825, 0)
+[node name="LeftPostCollision" type="CollisionShape3D" parent="FrameBody" unique_id=1952216745]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.303918, 0.70080805, 0)
 shape = SubResource("BoxShape3D_frame_post")
 
-[node name="RightPostCollision" type="CollisionShape3D" parent="FrameBody"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0125, 1.2825, 0)
+[node name="RightPostCollision" type="CollisionShape3D" parent="FrameBody" unique_id=1629657507]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.89414096, 0.7023289, 0)
 shape = SubResource("BoxShape3D_frame_post")
 
-[node name="HeaderCollision" type="CollisionShape3D" parent="FrameBody"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0)
+[node name="HeaderCollision" type="CollisionShape3D" parent="FrameBody" unique_id=604204547]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29444313, 1.3055664, 0)
 shape = SubResource("BoxShape3D_frame_header")
 
-[node name="UnlockArea" type="Area3D" parent="."]
+[node name="UnlockArea" type="Area3D" parent="." unique_id=833136674]
 collision_layer = 0
 collision_mask = 2
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="UnlockArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="UnlockArea" unique_id=2137244428]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.30541372, 0.6937652, 0.01586914)
 shape = SubResource("BoxShape3D_door_unlock")
