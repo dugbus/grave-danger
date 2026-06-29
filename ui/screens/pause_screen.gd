@@ -6,6 +6,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	visible = false
 	set_process_unhandled_input(true)
+	var paused_label := get_node_or_null("PausedLabel") as Label
+	GDGameFont.apply_to_label(paused_label)
 
 
 func _unhandled_input(event: InputEvent) -> void:

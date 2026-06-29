@@ -98,12 +98,15 @@ func _bind_level_grid() -> void:
 		title.name = "Title"
 		title.text = "Select Level"
 		title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		GDGameFont.apply_to_label(title)
 		title.add_theme_font_size_override("font_size", 96)
 		title.add_theme_color_override("font_color", Color(1.0, 0.86, 0.35))
 		title.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.85))
 		title.add_theme_constant_override("shadow_offset_x", 3)
 		title.add_theme_constant_override("shadow_offset_y", 3)
 		panel.add_child(title)
+	else:
+		GDGameFont.apply_to_label(title)
 
 	grid = panel.get_node_or_null("LevelGrid") as GridContainer
 	if grid == null:
@@ -120,6 +123,8 @@ func _bind_level_grid() -> void:
 	if level_button_template == null:
 		level_button_template = _create_fallback_level_button_template()
 		grid.add_child(level_button_template)
+
+	_apply_level_button_fonts(level_button_template)
 
 
 func _populate_level_grid() -> void:
@@ -151,6 +156,7 @@ func _create_level_button(index: int) -> Button:
 
 	var button := level_button_template.duplicate() as Button
 	button.name = "LevelButton%d" % (index + 1)
+	_apply_level_button_fonts(button)
 	button.show()
 	button.set_meta("runtime_level_button", true)
 	button.disabled = not available
@@ -199,6 +205,7 @@ func _create_fallback_level_button_template() -> Button:
 	title.name = "Title"
 	title.text = "Level Name"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	GDGameFont.apply_to_label(title)
 	title.add_theme_font_size_override("font_size", 68)
 	title.add_theme_color_override("font_color", Color(1.0, 0.86, 0.35))
 	title.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.86))
@@ -212,6 +219,7 @@ func _create_fallback_level_button_template() -> Button:
 	result.text = "Best: --\nComplete: --"
 	result.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	result.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	GDGameFont.apply_to_label(result)
 	result.add_theme_font_size_override("font_size", 40)
 	result.add_theme_color_override("font_color", Color(0.9, 0.86, 0.72))
 	result.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.8))
@@ -221,6 +229,21 @@ func _create_fallback_level_button_template() -> Button:
 	content.add_child(result)
 
 	return button
+
+
+func _apply_level_button_fonts(button: Button) -> void:
+	if button == null:
+		return
+
+	GDGameFont.apply_to_button(button)
+
+	var title := button.get_node_or_null("Content/Title") as Label
+	if title != null:
+		GDGameFont.apply_to_label(title)
+
+	var result := button.get_node_or_null("Content/Result") as Label
+	if result != null:
+		GDGameFont.apply_to_label(result)
 
 
 func _get_result_text(index: int, available: bool) -> String:

@@ -163,6 +163,7 @@ func _create_effect_slot(color: Color, effect_label: String) -> Dictionary:
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.custom_minimum_size = Vector2(SLOT_SIZE.x, 48.0)
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	GDGameFont.apply_to_label(name_label)
 	name_label.add_theme_font_size_override("font_size", 36)
 	name_label.add_theme_color_override("font_color", Color(1.0, 0.94, 0.78))
 	name_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
@@ -174,6 +175,7 @@ func _create_effect_slot(color: Color, effect_label: String) -> Dictionary:
 	label.name = "Countdown"
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.custom_minimum_size = Vector2(SLOT_SIZE.x, 54.0)
+	GDGameFont.apply_to_label(label)
 	label.add_theme_font_size_override("font_size", 48)
 	label.add_theme_color_override("font_color", Color(1.0, 0.94, 0.78))
 	label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))

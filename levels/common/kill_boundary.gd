@@ -1491,6 +1491,7 @@ func _create_time_label() -> void:
 	time_label = Label.new()
 	time_label.name = "FlameTimerLabel"
 	time_label.position = TIMER_LABEL_POSITION
+	GDGameFont.apply_to_label(time_label)
 	time_label.add_theme_font_size_override("font_size", TIMER_LABEL_FONT_SIZE)
 	time_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.55))
 	time_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.85))

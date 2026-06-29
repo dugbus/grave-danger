@@ -167,6 +167,7 @@ func _configure_value_label(label: Label) -> void:
 	label.clip_text = true
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.z_index = 10
+	GDGameFont.apply_to_label(label)
 	if not label.has_theme_color_override("font_color"):
 		label.add_theme_color_override("font_color", text_color)
 	if not label.has_theme_color_override("font_shadow_color"):
@@ -424,7 +425,9 @@ class ResultValueOverlay:
 		if value.is_empty() or box.size.x <= 0.0 or box.size.y <= 0.0:
 			return
 
-		var font := ThemeDB.fallback_font
+		var font: Font = GDGameFont.get_almendra_font()
+		if font == null:
+			font = ThemeDB.fallback_font
 		if font == null:
 			return
 

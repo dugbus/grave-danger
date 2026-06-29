@@ -11,7 +11,6 @@ const EFFECT_LABELS := {
 	&"bigger_sack": "Big Sack",
 	&"no_boundary": "Safety",
 }
-const CREEPSTER_FONT_PATH := "res://Assets/fonts/creepster_regular.ttf"
 const TEXT_SHADER := preload("res://player/flask_effect_text.gdshader")
 const TEXT_VISUAL_LAYER := 1 << 19
 const FADE_IN_DURATION := 0.3
@@ -49,7 +48,6 @@ var active_effects: Array[Dictionary] = []
 var text_mesh: TextMesh
 var text_material: ShaderMaterial
 var text_light: OmniLight3D
-var creepster_font: FontFile
 var current_color := Color.WHITE
 var current_opacity := 0.0
 var current_light_sweep_width := 1.0
@@ -121,7 +119,7 @@ func _configure_text_mesh() -> void:
 
 	text_mesh.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	text_mesh.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	var font := _get_creepster_font()
+	var font := GDGameFont.get_almendra_font()
 	if font != null:
 		text_mesh.font = font
 	text_mesh.font_size = font_size
@@ -286,20 +284,6 @@ func _find_effect(effect_id: StringName) -> Dictionary:
 			return effect
 
 	return {}
-
-
-func _get_creepster_font() -> FontFile:
-	if creepster_font != null:
-		return creepster_font
-
-	var font := FontFile.new()
-	var load_error := font.load_dynamic_font(CREEPSTER_FONT_PATH)
-	if load_error != OK:
-		push_warning("Unable to load potion effect font: %s" % CREEPSTER_FONT_PATH)
-		return null
-
-	creepster_font = font
-	return creepster_font
 
 
 func _get_effect_label(effect_id: StringName) -> String:

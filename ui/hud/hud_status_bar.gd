@@ -215,7 +215,9 @@ func _draw_label(rect: Rect2) -> void:
 	if label_text.is_empty() or rect.size.x <= 1.0:
 		return
 
-	var font := ThemeDB.fallback_font
+	var font: Font = GDGameFont.get_almendra_font()
+	if font == null:
+		font = ThemeDB.fallback_font
 	var font_size := minf(float(label_font_size), maxf(rect.size.y * 0.46, 8.0))
 	var text_size := font.get_string_size(label_text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, int(font_size))
 	var text_position := rect.position + Vector2(

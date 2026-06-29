@@ -72,6 +72,7 @@ func _bind_action_buttons() -> void:
 
 
 func _configure_action_button(button: Button, action: LoseAction) -> void:
+	GDGameFont.apply_to_button(button)
 	button.focus_mode = Control.FOCUS_ALL
 	button.mouse_filter = Control.MOUSE_FILTER_STOP
 	button.focus_entered.connect(_select_button.bind(action))
