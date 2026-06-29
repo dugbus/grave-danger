@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bms78anfnxdc0"
-path="res://.godot/imported/door.blend-f5059a2f5da2a96202fc47acd93d29e0.scn"
+uid="uid://d22c5v5kepyl8"
+path="res://.godot/imported/doorway.blend-74f11acd7011a2429008eb41e20f22e2.scn"
 
 [deps]
 
-source_file="res://Assets/environment/blender/door.blend"
-dest_files=["res://.godot/imported/door.blend-f5059a2f5da2a96202fc47acd93d29e0.scn"]
+source_file="res://Assets/environment/blender/doorway.blend"
+dest_files=["res://.godot/imported/doorway.blend-74f11acd7011a2429008eb41e20f22e2.scn"]
 
 [params]
 
@@ -41,7 +41,7 @@ materials/extract_format=0
 materials/extract_path=""
 _subresources={
 "meshes": {
-"door_Door": {
+"doorway_Door": {
 "generate/lightmap_uv": 0,
 "generate/lods": 0,
 "generate/shadow_meshes": 0,
@@ -49,10 +49,22 @@ _subresources={
 "save_to_file/enabled": true,
 "save_to_file/fallback_path": "res://Assets/environment/door.res",
 "save_to_file/path": "uid://cppgm51lmi48u"
+},
+"doorway_Frame": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/frame.res",
+"save_to_file/path": "uid://0y50s4nh1wa0"
 }
 },
 "nodes": {
 "PATH:Door": {
+"generate/physics": true
+},
+"PATH:Frame": {
 "generate/physics": true
 }
 }
