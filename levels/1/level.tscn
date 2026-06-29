@@ -360,7 +360,7 @@ hud_effect_id = &"no_boundary"
 show_hud_countdown = true
 
 [node name="LockedDoor" parent="." unique_id=1294729630 instance=ExtResource("24_locked_door")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 11.5, 0, 3.8)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 11.5, 0, 3.4997358)
 
 [node name="LockedGate" parent="." unique_id=602399924 instance=ExtResource("23_locked_gate")]
 transform = Transform3D(0.99982834, 0, 0.018529339, 0, 1, 0, -0.018529339, 0, 0.99982834, 0.29494023, 0.08697152, 4.0410075)
@@ -369,7 +369,7 @@ transform = Transform3D(0.99982834, 0, 0.018529339, 0, 1, 0, -0.018529339, 0, 0.
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.239037, 0.024999965, 3.476375)
 
 [node name="LockedDoor2" parent="." unique_id=9500753 instance=ExtResource("24_locked_door")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.086622, -0.021442294, 8.522946)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, 0, 8.5)
 
 [node name="SpikeTrap" type="MeshInstance3D" parent="." unique_id=1380066204]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, 9.5)
