@@ -8,6 +8,8 @@ const TEXT_VISUAL_LAYER := 1 << 19
 const FADE_IN_DURATION := 0.2
 const MIN_TRIGGER_SIZE := 0.05
 const FLASK_EFFECT_TEXT_GROUP := &"flask_effect_text"
+const CONTINUE_ACTIONS: Array[StringName] = [&"ui_accept", &"drop_carried"]
+const DIM_OVERLAY_DISTANCE_PADDING := 0.35
 
 @export_group("Content")
 @export_multiline var heading := "A Warning":
@@ -79,14 +81,21 @@ const FLASK_EFFECT_TEXT_GROUP := &"flask_effect_text"
 @export var light_color := Color(1.0, 0.88, 0.68)
 @export_range(0.0, 4.0, 0.05, "suffix:m") var light_sweep_padding := 0.5
 @export_range(0.0, 6.0, 0.05, "suffix:Hz") var light_sweep_speed := 0.42
+@export_group("Pause Overlay")
+@export_range(0.0, 1.0, 0.01) var dim_opacity := 0.5:
+	set(value):
+		dim_opacity = clampf(value, 0.0, 1.0)
+		_apply_dim_overlay_opacity()
 
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
 
 var heading_text_mesh_instance: MeshInstance3D
 var body_text_mesh_instance: MeshInstance3D
+var dim_overlay_mesh_instance: MeshInstance3D
+var dim_overlay_mesh: QuadMesh
+var dim_overlay_material: StandardMaterial3D
 var text_light: OmniLight3D
 var pause_layer: CanvasLayer
-var dim_overlay: ColorRect
 var continue_button: Button
 var heading_text_mesh: TextMesh
 var body_text_mesh: TextMesh
@@ -102,6 +111,9 @@ var dismissed_until_exit := false
 var paused_by_trigger := false
 var tree_was_paused := false
 var suppressing_flask_effect_text := false
+var continue_button_has_focus := false
+var continue_requested := false
+var has_completed_paused_text := false
 
 
 func _ready() -> void:
@@ -111,6 +123,7 @@ func _ready() -> void:
 
 	collision_layer = 0
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	set_process_input(true)
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 	_create_runtime_nodes()
@@ -132,6 +145,17 @@ func _process(delta: float) -> void:
 		_update_continue_button()
 		_update_visibility_state()
 		_update_transform()
+		_consume_pending_continue()
+
+
+func _input(event: InputEvent) -> void:
+	if not pause_game_with_text or not is_showing:
+		return
+	if not _is_continue_input(event):
+		return
+
+	get_viewport().set_input_as_handled()
+	_request_continue()
 
 
 func _exit_tree() -> void:
@@ -147,6 +171,9 @@ func _configure_text_nodes() -> void:
 	body_text_mesh_instance.top_level = true
 	body_text_mesh_instance.layers = TEXT_VISUAL_LAYER
 	body_text_mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	dim_overlay_mesh_instance.top_level = true
+	dim_overlay_mesh_instance.layers = TEXT_VISUAL_LAYER
+	dim_overlay_mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	text_light.top_level = true
 	text_light.light_cull_mask = TEXT_VISUAL_LAYER
 	text_light.shadow_enabled = false
@@ -164,6 +191,10 @@ func _create_runtime_nodes() -> void:
 	body_text_mesh_instance.name = "BodyText"
 	add_child(body_text_mesh_instance)
 
+	dim_overlay_mesh_instance = MeshInstance3D.new()
+	dim_overlay_mesh_instance.name = "DimOverlay"
+	add_child(dim_overlay_mesh_instance)
+
 	text_light = OmniLight3D.new()
 	text_light.name = "TextLight"
 	add_child(text_light)
@@ -173,12 +204,6 @@ func _create_runtime_nodes() -> void:
 	pause_layer.layer = 190
 	add_child(pause_layer)
 
-	dim_overlay = ColorRect.new()
-	dim_overlay.name = "DimOverlay"
-	dim_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dim_overlay.color = Color(0.0, 0.0, 0.0, 0.5)
-	pause_layer.add_child(dim_overlay)
-
 	continue_button = Button.new()
 	continue_button.name = "ContinueButton"
 	continue_button.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
@@ -187,10 +212,12 @@ func _create_runtime_nodes() -> void:
 	continue_button.offset_right = 110.0
 	continue_button.offset_bottom = -56.0
 	continue_button.focus_mode = Control.FOCUS_ALL
+	continue_button.disabled = false
 	continue_button.add_theme_font_size_override("font_size", 32)
 	continue_button.add_theme_color_override("font_color", Color(1.0, 0.94, 0.78, 1.0))
-	continue_button.add_theme_color_override("font_disabled_color", Color(0.7, 0.65, 0.55, 0.75))
+	continue_button.add_theme_color_override("font_focus_color", Color.WHITE)
 	continue_button.add_theme_color_override("font_hover_color", Color.WHITE)
+	continue_button.add_theme_stylebox_override("focus", _create_continue_focus_style())
 	pause_layer.add_child(continue_button)
 
 
@@ -210,6 +237,7 @@ func _configure_text_meshes() -> void:
 
 	heading_text_mesh = _get_or_create_text_mesh(heading_text_mesh_instance, heading_font_size)
 	body_text_mesh = _get_or_create_text_mesh(body_text_mesh_instance, body_font_size)
+	_configure_dim_overlay_mesh()
 
 
 func _get_or_create_text_mesh(mesh_instance: MeshInstance3D, font_size: int) -> TextMesh:
@@ -245,6 +273,27 @@ func _get_or_create_text_material(mesh_instance: MeshInstance3D) -> ShaderMateri
 	return configured_material
 
 
+func _configure_dim_overlay_mesh() -> void:
+	if dim_overlay_mesh_instance == null:
+		return
+
+	dim_overlay_mesh = dim_overlay_mesh_instance.mesh as QuadMesh
+	if dim_overlay_mesh == null:
+		dim_overlay_mesh = QuadMesh.new()
+		dim_overlay_mesh_instance.mesh = dim_overlay_mesh
+
+	dim_overlay_material = dim_overlay_mesh_instance.material_override as StandardMaterial3D
+	if dim_overlay_material == null:
+		dim_overlay_material = StandardMaterial3D.new()
+		dim_overlay_mesh_instance.material_override = dim_overlay_material
+
+	dim_overlay_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	dim_overlay_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	dim_overlay_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	dim_overlay_material.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+	_apply_dim_overlay_opacity()
+
+
 func _get_collision_shape() -> CollisionShape3D:
 	if collision_shape != null:
 		return collision_shape
@@ -254,7 +303,6 @@ func _get_collision_shape() -> CollisionShape3D:
 func _configure_pause_layer() -> void:
 	pause_layer.process_mode = Node.PROCESS_MODE_ALWAYS
 	pause_layer.visible = false
-	dim_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	continue_button.process_mode = Node.PROCESS_MODE_ALWAYS
 	continue_button.text = "Continue"
 	continue_button.pressed.connect(_on_continue_button_pressed)
@@ -271,16 +319,19 @@ func _update_text_content() -> void:
 
 
 func _show_text() -> void:
-	if dismissed_until_exit:
+	if dismissed_until_exit or has_completed_paused_text:
 		return
 
 	elapsed_visible = 0.0
 	is_showing = true
+	continue_button_has_focus = false
+	continue_requested = false
 	_suppress_flask_effect_text()
 	heading_text_mesh_instance.visible = true
 	body_text_mesh_instance.visible = true
 	text_light.visible = true
 	if pause_game_with_text:
+		dim_overlay_mesh_instance.visible = true
 		tree_was_paused = get_tree().paused
 		paused_by_trigger = true
 		get_tree().paused = true
@@ -294,6 +345,7 @@ func _hide_text() -> void:
 	current_opacity = 0.0
 	heading_text_mesh_instance.visible = false
 	body_text_mesh_instance.visible = false
+	dim_overlay_mesh_instance.visible = false
 	text_light.visible = false
 	pause_layer.visible = false
 	_apply_text_opacity()
@@ -335,6 +387,7 @@ func _update_transform() -> void:
 		perspective_basis,
 		base_position + camera_basis.y.normalized() * body_y_offset
 	)
+	_update_dim_overlay(camera)
 	_update_text_light(camera, base_position)
 
 
@@ -357,6 +410,31 @@ func _get_camera_overlay_position(camera: Camera3D) -> Vector3:
 	overlay_position += camera_basis.x.normalized() * half_width * viewport_x_offset
 	overlay_position += camera_basis.y.normalized() * half_height * viewport_y_offset
 	return overlay_position
+
+
+func _update_dim_overlay(camera: Camera3D) -> void:
+	if not pause_game_with_text or not dim_overlay_mesh_instance.visible:
+		return
+
+	var distance := maxf(camera_distance + DIM_OVERLAY_DISTANCE_PADDING, camera.near + 0.01)
+	var camera_basis := camera.global_transform.basis
+	var viewport_size := get_viewport().get_visible_rect().size
+	var aspect := viewport_size.x / maxf(viewport_size.y, 1.0)
+	var half_height := 0.0
+	var half_width := 0.0
+
+	if camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
+		half_height = camera.size * 0.5
+		half_width = half_height * aspect
+	else:
+		half_height = tan(deg_to_rad(camera.fov) * 0.5) * distance
+		half_width = half_height * aspect
+
+	dim_overlay_mesh.size = Vector2(half_width * 2.0, half_height * 2.0)
+	dim_overlay_mesh_instance.global_transform = Transform3D(
+		camera_basis,
+		camera.global_position - camera_basis.z.normalized() * distance
+	)
 
 
 func _update_text_light(camera: Camera3D, text_position: Vector3) -> void:
@@ -383,6 +461,13 @@ func _apply_text_opacity() -> void:
 		body_text_material.set_shader_parameter("text_color", display_color)
 
 
+func _apply_dim_overlay_opacity() -> void:
+	if dim_overlay_material == null:
+		return
+
+	dim_overlay_material.albedo_color = Color(0.0, 0.0, 0.0, dim_opacity)
+
+
 func _update_light_sweep_width() -> void:
 	var heading_width := 0.0
 	if heading_text_mesh != null:
@@ -397,7 +482,32 @@ func _update_continue_button() -> void:
 	if continue_button == null:
 		return
 
-	continue_button.disabled = elapsed_visible < minimum_time_on_screen
+	if continue_button_has_focus:
+		return
+
+	continue_button.grab_focus()
+	continue_button_has_focus = true
+
+
+func _create_continue_focus_style() -> StyleBoxFlat:
+	var focus_style := StyleBoxFlat.new()
+	focus_style.bg_color = Color(1.0, 0.94, 0.78, 0.18)
+	focus_style.border_color = Color(1.0, 0.94, 0.78, 0.95)
+	focus_style.set_border_width_all(2)
+	focus_style.set_corner_radius_all(4)
+	focus_style.set_expand_margin_all(4.0)
+	return focus_style
+
+
+func _is_continue_input(event: InputEvent) -> bool:
+	if event.is_echo():
+		return false
+
+	for action: StringName in CONTINUE_ACTIONS:
+		if event.is_action_pressed(action):
+			return true
+
+	return false
 
 
 func _suppress_flask_effect_text() -> void:
@@ -440,11 +550,43 @@ func _on_body_exited(body: Node3D) -> void:
 
 
 func _on_continue_button_pressed() -> void:
-	if elapsed_visible < minimum_time_on_screen:
+	_request_continue()
+
+
+func _request_continue() -> void:
+	if pause_game_with_text:
+		_complete_paused_text()
 		return
 
+	continue_requested = true
+	_consume_pending_continue()
+
+
+func _consume_pending_continue() -> void:
+	if not continue_requested or elapsed_visible < minimum_time_on_screen:
+		return
+
+	continue_requested = false
 	dismissed_until_exit = not bodies_in_trigger.is_empty()
 	_hide_text()
+
+
+func _complete_paused_text() -> void:
+	if has_completed_paused_text:
+		return
+
+	has_completed_paused_text = true
+	dismissed_until_exit = true
+	_disable_trigger_area()
+	_hide_text()
+
+
+func _disable_trigger_area() -> void:
+	bodies_in_trigger.clear()
+	monitoring = false
+	monitorable = false
+	collision_layer = 0
+	collision_mask = 0
 
 
 func _is_player_body(body: Node3D) -> bool:
