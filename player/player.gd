@@ -24,6 +24,7 @@ var floor_push_ignore_timers: Dictionary = {}
 func _ready() -> void:
 	# Randomness is currently used by the pickup sound pitch/volume variation.
 	randomize()
+	add_to_group("player")
 	add_to_group("flame_vulnerable")
 
 
@@ -148,7 +149,12 @@ func die_from_flames() -> void:
 
 
 func apply_flame_damage(amount: float) -> void:
+	var was_dead := is_dead()
 	death_controller.apply_flame_damage(amount)
+	if was_dead or is_dead() or amount <= 0.0:
+		return
+	if animation_controller.has_method("play_hit_reaction"):
+		animation_controller.play_hit_reaction()
 
 
 func drain_flame_energy() -> void:

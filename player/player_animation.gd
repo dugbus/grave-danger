@@ -24,14 +24,25 @@ const DEATH_ANIMATION_CANDIDATES = ["death", "die", "fall"]
 
 ## Imported character subtree that contains meshes and animation players.
 @export var character_path: NodePath = ^"../Pivot/Character"
+## Visual pivot used for quick hit reactions.
+@export var pivot_path: NodePath = ^"../Pivot"
+## Local Y offset used for the non-physics hit hop.
+@export var hit_reaction_height := 0.16
+## Seconds used to lift the visual on hit.
+@export var hit_reaction_up_seconds := 0.055
+## Seconds used to settle the visual after a hit.
+@export var hit_reaction_down_seconds := 0.09
 
 @onready var character: Node = get_node_or_null(character_path)
+@onready var pivot := get_node_or_null(pivot_path) as Node3D
 
 var animation_player: AnimationPlayer
 var idle_animation := ""
 var walk_animation := ""
 var death_animation := ""
 var current_animation := ""
+var hit_reaction_tween: Tween
+var hit_reaction_base_y := 0.0
 
 
 func _ready() -> void:
@@ -40,6 +51,9 @@ func _ready() -> void:
 	if character != null:
 		_configure_character_visuals(character)
 		animation_player = _find_animation_player(character)
+
+	if pivot != null:
+		hit_reaction_base_y = pivot.position.y
 
 	if animation_player == null:
 		push_warning("Player character has no AnimationPlayer.")
@@ -73,9 +87,34 @@ func update_movement(input_strength: float, gold_inventory: Node) -> void:
 func play_death() -> void:
 	# Death animation is intentionally slower for readability during the camera
 	# close-up.
+	_stop_hit_reaction(true)
 	if animation_player != null:
 		animation_player.speed_scale = 0.5
 	_play_animation(death_animation)
+
+
+func play_hit_reaction() -> void:
+	if pivot == null:
+		return
+
+	_stop_hit_reaction(false)
+	pivot.position.y = hit_reaction_base_y
+	hit_reaction_tween = create_tween()
+	hit_reaction_tween.set_trans(Tween.TRANS_SINE)
+	hit_reaction_tween.set_ease(Tween.EASE_OUT)
+	hit_reaction_tween.tween_property(
+		pivot,
+		"position:y",
+		hit_reaction_base_y + maxf(hit_reaction_height, 0.0),
+		maxf(hit_reaction_up_seconds, 0.01)
+	)
+	hit_reaction_tween.set_ease(Tween.EASE_IN)
+	hit_reaction_tween.tween_property(
+		pivot,
+		"position:y",
+		hit_reaction_base_y,
+		maxf(hit_reaction_down_seconds, 0.01)
+	)
 
 
 func _play_animation(animation_name: String) -> void:
@@ -133,3 +172,12 @@ func _find_animation_player(node: Node) -> AnimationPlayer:
 			return result
 
 	return null
+
+
+func _stop_hit_reaction(reset_position: bool) -> void:
+	if hit_reaction_tween != null and hit_reaction_tween.is_valid():
+		hit_reaction_tween.kill()
+	hit_reaction_tween = null
+
+	if reset_position and pivot != null:
+		pivot.position.y = hit_reaction_base_y

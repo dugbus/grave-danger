@@ -9,6 +9,7 @@ const TOP_CONTACT_MIN_NORMAL_Y := 0.65
 
 @export_group("Collision")
 @export var add_to_pushable_group := true
+@export var add_to_navigation_blocker_group := true
 @export var use_world_collision_layer := true
 @export var collide_with_player := true
 @export var constrain_to_starting_height := true
@@ -35,6 +36,9 @@ func _ready() -> void:
 
 	if add_to_pushable_group:
 		add_to_group("pushable")
+
+	if add_to_navigation_blocker_group:
+		add_to_group("navigation_blocker")
 
 	if use_world_collision_layer:
 		collision_layer |= WORLD_COLLISION_LAYER

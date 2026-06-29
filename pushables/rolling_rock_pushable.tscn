@@ -30,6 +30,8 @@ script = ExtResource("2_pushable")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("SphereShape3D_rock")
 
+[node name="RuntimeNavigationObstacle" type="NavigationObstacle3D" parent="."]
+
 [node name="RollingRockAudio" type="AudioStreamPlayer3D" parent="."]
 stream = ExtResource("3_rolling_audio")
 volume_db = -80.0

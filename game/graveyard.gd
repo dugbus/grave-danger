@@ -4,6 +4,7 @@ class_name GDGraveyard
 const WIN_SCENE := "res://ui/screens/win_screen.tscn"
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 const KILL_BOUNDARY_SCRIPT := preload("res://levels/common/kill_boundary.gd")
+const NAVIGATION_BOOTSTRAP := preload("res://game/navigation_bootstrap.gd")
 
 const CURRENT_LEVEL_NAME := "CurrentLevel"
 
@@ -20,6 +21,7 @@ var current_level: Node
 
 func _ready() -> void:
 	_load_selected_level()
+	await NAVIGATION_BOOTSTRAP.prepare_level(current_level)
 	_configure_runtime_references()
 	_activate_current_level_camera()
 	_configure_kill_boundary_animation()

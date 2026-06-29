@@ -8,7 +8,7 @@
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
 [ext_resource type="PackedScene" path="res://collectibles/health_flask.tscn" id="7_rihgm"]
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="8_h616y"]
-[ext_resource type="PackedScene" path="res://enemies/zombie.tscn" id="9_zombie"]
+[ext_resource type="PackedScene" path="res://enemies/skeleton.tscn" id="9_skeleton"]
 [ext_resource type="PackedScene" uid="uid://fv3hosp0q8wg" path="res://Assets/kenney-graveyard/coffin-old.glb" id="10_a5y6d"]
 [ext_resource type="Shader" uid="uid://bi3o8elbtqoni" path="res://addons/simplegrasstextured/shaders/grass.gdshader" id="13_3m1bw"]
 [ext_resource type="ArrayMesh" uid="uid://bnp6ud7heja8" path="res://Assets/environment/grass-small.res" id="14_w2m8w"]
@@ -216,76 +216,76 @@ size = Vector2(1, 1)
 
 [node name="Level1" type="Node3D" unique_id=753330713]
 
-[node name="StartZombie" parent="." unique_id=1332419429 instance=ExtResource("9_zombie")]
+[node name="StartSkeleton" parent="." unique_id=1332419429 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.033, 0, 2.356)
 curve = SubResource("Curve3D_6qs2t")
 shuffle_speed = 0.55
 loop_patrol = false
 
-[node name="PathFollow3D" parent="StartZombie" index="0"]
+[node name="PathFollow3D" parent="StartSkeleton" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.18044, -0.10870552, -1.137958)
 
-[node name="StartZombie6" parent="." unique_id=1999108660 instance=ExtResource("9_zombie")]
+[node name="StartSkeleton6" parent="." unique_id=1999108660 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.3108587, 0, 10.155487)
 curve = SubResource("Curve3D_qp421")
 shuffle_speed = 0.55
 loop_patrol = false
 
-[node name="PathFollow3D" parent="StartZombie6" index="0"]
+[node name="PathFollow3D" parent="StartSkeleton6" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0362186, -0.10870552, 0.024645805)
 
-[node name="StartZombie2" parent="." unique_id=384396972 instance=ExtResource("9_zombie")]
+[node name="StartSkeleton2" parent="." unique_id=384396972 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.656645, 9.536743e-07, 2.695012)
 curve = SubResource("Curve3D_u7030")
 shuffle_speed = 0.55
 loop_patrol = false
 
-[node name="PathFollow3D" parent="StartZombie2" index="0"]
+[node name="PathFollow3D" parent="StartSkeleton2" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.18044, -0.10870552, -1.137958)
 
-[node name="StartZombie8" parent="." unique_id=2131303328 instance=ExtResource("9_zombie")]
+[node name="StartSkeleton8" parent="." unique_id=2131303328 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.206179, 9.536743e-07, 8.002817)
 curve = SubResource("Curve3D_l7p7m")
 shuffle_speed = 0.55
 loop_patrol = false
 
-[node name="PathFollow3D" parent="StartZombie8" index="0"]
+[node name="PathFollow3D" parent="StartSkeleton8" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.18044, -0.10870552, -1.137958)
 
-[node name="StartZombie3" parent="." unique_id=1876649631 instance=ExtResource("9_zombie")]
+[node name="StartSkeleton3" parent="." unique_id=1876649631 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.250051, 9.536743e-07, 11.832761)
 curve = SubResource("Curve3D_6nq5c")
 shuffle_speed = 0.55
 loop_patrol = false
 
-[node name="PathFollow3D" parent="StartZombie3" index="0"]
+[node name="PathFollow3D" parent="StartSkeleton3" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2180443, -0.10870552, 4.214011)
 
-[node name="StartZombie7" parent="." unique_id=1959964737 instance=ExtResource("9_zombie")]
+[node name="StartSkeleton7" parent="." unique_id=1959964737 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.821293, 9.536743e-07, 15.382387)
 curve = SubResource("Curve3D_sobgd")
 shuffle_speed = 0.55
 loop_patrol = false
 
-[node name="PathFollow3D" parent="StartZombie7" index="0"]
+[node name="PathFollow3D" parent="StartSkeleton7" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.365759, -0.10870552, 2.486309)
 
-[node name="StartZombie4" parent="." unique_id=1297044051 instance=ExtResource("9_zombie")]
+[node name="StartSkeleton4" parent="." unique_id=1297044051 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.688917, 9.536743e-07, 12.498597)
 curve = SubResource("Curve3D_jandb")
 shuffle_speed = 0.55
 loop_patrol = false
 
-[node name="PathFollow3D" parent="StartZombie4" index="0"]
+[node name="PathFollow3D" parent="StartSkeleton4" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1434994, -0.10870552, -1.1893473)
 
-[node name="StartZombie5" parent="." unique_id=305127766 instance=ExtResource("9_zombie")]
+[node name="StartSkeleton5" parent="." unique_id=305127766 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8206196, 9.536743e-07, 19.704838)
 curve = SubResource("Curve3D_3p7t5")
 shuffle_speed = 0.55
 loop_patrol = false
 
-[node name="PathFollow3D" parent="StartZombie5" index="0"]
+[node name="PathFollow3D" parent="StartSkeleton5" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1434994, -0.10870552, -1.1893473)
 
 [node name="Player" parent="." unique_id=244343110 instance=ExtResource("2_player")]
@@ -641,12 +641,15 @@ global_flask_properties = ExtResource("5_hc001")
 hud_effect_id = &"health_flask"
 show_hud_countdown = true
 
-[editable path="StartZombie"]
-[editable path="StartZombie6"]
-[editable path="StartZombie2"]
-[editable path="StartZombie8"]
-[editable path="StartZombie3"]
-[editable path="StartZombie7"]
-[editable path="StartZombie4"]
-[editable path="StartZombie5"]
+[node name="SilverKey" parent="." unique_id=1590207848 instance=ExtResource("22_silver_key")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0498176, 0.024999965, 1.6596706)
+
+[editable path="StartSkeleton"]
+[editable path="StartSkeleton6"]
+[editable path="StartSkeleton2"]
+[editable path="StartSkeleton8"]
+[editable path="StartSkeleton3"]
+[editable path="StartSkeleton7"]
+[editable path="StartSkeleton4"]
+[editable path="StartSkeleton5"]
 [editable path="KillBoundary3D"]
