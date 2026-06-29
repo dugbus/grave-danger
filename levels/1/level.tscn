@@ -21,7 +21,7 @@
 [ext_resource type="ArrayMesh" uid="uid://bhh1i7c78vtce" path="res://Assets/environment/spikes.res" id="23_6qs2t"]
 [ext_resource type="PackedScene" path="res://levels/common/locked_gate.tscn" id="23_locked_gate"]
 [ext_resource type="Material" uid="uid://yu0cqmik8u3x" path="res://Assets/environment/floors/dirt_floor.material" id="24_6qs2t"]
-[ext_resource type="PackedScene" path="res://levels/common/locked_door.tscn" id="24_locked_door"]
+[ext_resource type="PackedScene" uid="uid://4qkicc6gkfuv" path="res://levels/common/locked_door.tscn" id="24_locked_door"]
 [ext_resource type="PackedScene" path="res://levels/common/text_trigger.tscn" id="25_qp421"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 [ext_resource type="PackedScene" uid="uid://4r3w85uciy08" path="res://levels/common/gd_level_ground.tscn" id="101_ground"]

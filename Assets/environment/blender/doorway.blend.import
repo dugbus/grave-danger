@@ -59,14 +59,6 @@ _subresources={
 "save_to_file/fallback_path": "res://Assets/environment/frame.res",
 "save_to_file/path": "uid://0y50s4nh1wa0"
 }
-},
-"nodes": {
-"PATH:Door": {
-"generate/physics": true
-},
-"PATH:Frame": {
-"generate/physics": true
-}
 }
 }
 blender/nodes/visible=0
