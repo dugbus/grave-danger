@@ -14,6 +14,7 @@ const EFFECT_LABELS := {
 const TEXT_SHADER := preload("res://player/flask_effect_text.gdshader")
 const TEXT_VISUAL_LAYER := 1 << 19
 const FADE_IN_DURATION := 0.3
+const FLASK_EFFECT_TEXT_GROUP := &"flask_effect_text"
 
 @export_range(0.1, 1.0, 0.01) var text_opacity := 0.5:
 	set(value):
@@ -52,6 +53,7 @@ var current_color := Color.WHITE
 var current_opacity := 0.0
 var current_light_sweep_width := 1.0
 var light_elapsed := 0.0
+var suppression_count := 0
 
 
 func _init() -> void:
@@ -60,6 +62,7 @@ func _init() -> void:
 
 
 func _ready() -> void:
+	add_to_group(FLASK_EFFECT_TEXT_GROUP)
 	visible = false
 	top_level = true
 	layers = TEXT_VISUAL_LAYER
@@ -97,6 +100,16 @@ func show_flask_effect(effect_id: StringName, liquid_color: Color, duration: flo
 		active_effects.erase(effect)
 		active_effects.append(effect)
 
+	_update_text()
+
+
+func suppress_flask_effect_text() -> void:
+	suppression_count += 1
+	_update_text()
+
+
+func release_flask_effect_text() -> void:
+	suppression_count = maxi(suppression_count - 1, 0)
 	_update_text()
 
 
@@ -161,6 +174,14 @@ func _update_text() -> void:
 		visible = false
 		_set_text_light_visible(false)
 		current_opacity = 0.0
+		return
+
+	if suppression_count > 0:
+		text_mesh.text = ""
+		visible = false
+		_set_text_light_visible(false)
+		current_opacity = 0.0
+		_apply_effect_color(current_color)
 		return
 
 	var effect: Dictionary = active_effects.back()
