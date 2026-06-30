@@ -157,6 +157,19 @@ func apply_flame_damage(amount: float) -> void:
 		animation_controller.play_hit_reaction()
 
 
+func apply_spike_trap_damage(percent_of_max: float) -> void:
+	var was_dead := is_dead()
+	death_controller.apply_percent_damage(percent_of_max)
+	if was_dead or is_dead() or percent_of_max <= 0.0:
+		return
+	if animation_controller.has_method("play_hit_reaction"):
+		animation_controller.play_hit_reaction()
+
+
+func can_be_hit_by_spike_trap() -> bool:
+	return not is_dead()
+
+
 func drain_flame_energy() -> void:
 	death_controller.drain_flame_energy()
 

@@ -41,6 +41,13 @@ func apply_flame_damage(amount: float) -> void:
 		die_from_flames()
 
 
+func apply_percent_damage(percent_of_max: float) -> void:
+	if max_flame_energy <= 0.0:
+		return
+
+	apply_flame_damage(max_flame_energy * maxf(percent_of_max, 0.0) * 0.01)
+
+
 func drain_flame_energy() -> void:
 	if is_dead:
 		return

@@ -320,6 +320,18 @@ func get_zombie_state() -> ZombieState:
     return state
 
 
+func die_from_spike_trap() -> void:
+    _die_from_rolling_ball()
+
+
+func can_be_hit_by_spike_trap() -> bool:
+    return not is_dead
+
+
+func get_spike_trap_position() -> Vector3:
+    return _get_body_position()
+
+
 func force_state_for_test(next_state: ZombieState) -> void:
     _change_state(next_state)
 

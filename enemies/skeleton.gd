@@ -144,6 +144,7 @@ var is_disappearing := false
 
 
 func _ready() -> void:
+    add_to_group("skeleton")
     randomize()
     _load_footstep_sounds()
     _randomize_next_footstep_distance()
@@ -162,6 +163,18 @@ func _ready() -> void:
         _set_active_visible(false)
     else:
         _finish_drop_in()
+
+
+func die_from_spike_trap() -> void:
+    _die_from_rolling_ball()
+
+
+func can_be_hit_by_spike_trap() -> bool:
+    return not is_dead
+
+
+func get_spike_trap_position() -> Vector3:
+    return path_follow.global_position if path_follow != null else global_position
 
 
 func _physics_process(delta: float) -> void:
