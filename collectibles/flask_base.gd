@@ -146,17 +146,10 @@ func _disable_pickup_area() -> void:
 
 
 func _play_pickup_sound() -> void:
-	var sound_player := AudioStreamPlayer.new()
-	sound_player.name = "FlaskPickupAudio"
-	sound_player.stream = DRINKING_SOUND
-	sound_player.volume_db = pickup_volume_db
-	sound_player.finished.connect(sound_player.queue_free)
-
 	var audio_parent := get_tree().current_scene
 	if audio_parent == null:
 		audio_parent = get_parent()
-	audio_parent.add_child(sound_player)
-	sound_player.play()
+	GDAudio.play_one_shot(audio_parent, DRINKING_SOUND, "FlaskPickupAudio", pickup_volume_db)
 
 
 func _show_hud_countdown(body: Node3D) -> void:

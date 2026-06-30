@@ -405,23 +405,18 @@ func _play_item_sound(item: Resource, sound: AudioStream, player_name: String) -
 	if sound == null:
 		return
 
-	var sound_player := AudioStreamPlayer.new()
-	sound_player.name = player_name if not player_name.is_empty() else "InventoryItemAudio"
-	sound_player.stream = sound
+	var pitch_scale := ITEM_SOUND_PITCH_MIN
+	var volume_db := ITEM_SOUND_VOLUME_MIN_DB
 	if _item_type(item) == GOLD_COIN_ITEM_TYPE:
-		sound_player.pitch_scale = randf_range(COIN_SOUND_PITCH_MIN, COIN_SOUND_PITCH_MAX)
-		sound_player.volume_db = randf_range(
+		pitch_scale = randf_range(COIN_SOUND_PITCH_MIN, COIN_SOUND_PITCH_MAX)
+		volume_db = randf_range(
 			ITEM_SOUND_VOLUME_MIN_DB + COIN_SOUND_VOLUME_OFFSET_DB,
 			ITEM_SOUND_VOLUME_MAX_DB + COIN_SOUND_VOLUME_OFFSET_DB
 		)
 	else:
-		sound_player.pitch_scale = randf_range(ITEM_SOUND_PITCH_MIN, ITEM_SOUND_PITCH_MAX)
-		sound_player.volume_db = randf_range(ITEM_SOUND_VOLUME_MIN_DB, ITEM_SOUND_VOLUME_MAX_DB)
-	sound_player.finished.connect(sound_player.queue_free)
+		pitch_scale = randf_range(ITEM_SOUND_PITCH_MIN, ITEM_SOUND_PITCH_MAX)
+		volume_db = randf_range(ITEM_SOUND_VOLUME_MIN_DB, ITEM_SOUND_VOLUME_MAX_DB)
 
-	if player != null:
-		player.add_child(sound_player)
-	else:
-		add_child(sound_player)
-
-	sound_player.play()
+	var audio_parent: Node = player if player != null else self
+	var sound_name := player_name if not player_name.is_empty() else "InventoryItemAudio"
+	GDAudio.play_one_shot(audio_parent, sound, sound_name, volume_db, pitch_scale)

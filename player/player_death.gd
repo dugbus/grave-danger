@@ -129,20 +129,13 @@ func die_from_flames() -> void:
 
 
 func _play_death_scream() -> void:
-	var sound_player := AudioStreamPlayer.new()
-	sound_player.name = "DeathScreamAudio"
-	sound_player.stream = WILHELM_SCREAM
-	sound_player.volume_db = 2.0
-	sound_player.finished.connect(sound_player.queue_free)
-
 	var audio_parent: Node = get_tree().current_scene
 	if audio_parent == null:
 		if player != null:
 			audio_parent = player
 		else:
 			audio_parent = self
-	audio_parent.add_child(sound_player)
-	sound_player.play()
+	GDAudio.play_one_shot(audio_parent, WILHELM_SCREAM, "DeathScreamAudio", 2.0)
 
 
 func _show_lose_screen_after_death() -> void:

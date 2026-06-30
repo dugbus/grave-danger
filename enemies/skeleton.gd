@@ -497,12 +497,7 @@ func _resolve_animation_name(animation_name: String) -> String:
 
 
 func _load_footstep_sounds() -> void:
-    footstep_sounds.clear()
-
-    for sound_path in FOOTSTEP_SOUND_PATHS:
-        var stream := load(sound_path) as AudioStream
-        if stream != null:
-            footstep_sounds.append(stream)
+    footstep_sounds = GDAudio.load_streams(FOOTSTEP_SOUND_PATHS)
 
 
 func _update_footsteps(delta: float, horizontal_speed: float) -> void:
@@ -531,20 +526,19 @@ func _play_footstep(horizontal_speed: float) -> void:
     if is_dead:
         return
 
-    var sound_player := AudioStreamPlayer3D.new()
-    sound_player.name = "FootstepAudio"
-    sound_player.stream = footstep_sounds.pick_random()
-    sound_player.pitch_scale = randf_range(footstep_pitch_min, footstep_pitch_max)
-    var speed_volume_boost := clampf((horizontal_speed - footstep_speed_threshold) / maxf(shuffle_speed - footstep_speed_threshold, 0.001), 0.0, 1.0)
-    sound_player.volume_db = lerpf(footstep_volume_min_db, footstep_volume_max_db, speed_volume_boost) + randf_range(-1.0, 1.0)
-    sound_player.finished.connect(sound_player.queue_free)
-
-    if path_follow != null:
-        path_follow.add_child(sound_player)
-    else:
-        add_child(sound_player)
-
-    sound_player.play()
+    var audio_parent: Node = path_follow if path_follow != null else self
+    GDAudio.play_random_footstep_3d(
+        audio_parent,
+        footstep_sounds,
+        "FootstepAudio",
+        horizontal_speed,
+        footstep_speed_threshold,
+        shuffle_speed,
+        footstep_volume_min_db,
+        footstep_volume_max_db,
+        footstep_pitch_min,
+        footstep_pitch_max
+    )
 
 
 func _update_rolling_ball_death() -> void:
@@ -619,15 +613,8 @@ func _die_from_rolling_ball() -> void:
 
 
 func _play_death_scream() -> void:
-    var sound_player := AudioStreamPlayer3D.new()
-    sound_player.name = "SkeletonDeathScreamAudio"
-    sound_player.stream = WILHELM_SCREAM
-    sound_player.volume_db = death_scream_volume_db
-    sound_player.finished.connect(sound_player.queue_free)
-
     var audio_parent: Node = path_follow if path_follow != null else self
-    audio_parent.add_child(sound_player)
-    sound_player.play()
+    GDAudio.play_one_shot_3d(audio_parent, WILHELM_SCREAM, "SkeletonDeathScreamAudio", death_scream_volume_db)
 
 
 func _play_death_animation() -> void:

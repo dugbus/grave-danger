@@ -322,37 +322,13 @@ func _configure_area(area: Area3D) -> void:
 
 
 func _load_sounds() -> void:
-    trigger_sound = _load_audio_stream(trigger_sound_path)
-    hit_sound = _load_audio_stream(hit_sound_path)
-    reset_sound = _load_audio_stream(reset_sound_path)
-
-
-func _load_audio_stream(sound_path: String) -> AudioStream:
-    if sound_path.is_empty():
-        return null
-
-    if ResourceLoader.exists(sound_path):
-        return load(sound_path) as AudioStream
-
-    if sound_path.to_lower().ends_with(".mp3") and FileAccess.file_exists(sound_path):
-        var stream := AudioStreamMP3.new()
-        stream.data = FileAccess.get_file_as_bytes(sound_path)
-        return stream
-
-    return null
+    trigger_sound = GDAudio.load_stream(trigger_sound_path)
+    hit_sound = GDAudio.load_stream(hit_sound_path)
+    reset_sound = GDAudio.load_stream(reset_sound_path)
 
 
 func _play_sound(stream: AudioStream, sound_name: String, volume_db: float) -> void:
-    if stream == null:
-        return
-
-    var sound_player := AudioStreamPlayer3D.new()
-    sound_player.name = sound_name
-    sound_player.stream = stream
-    sound_player.volume_db = volume_db
-    sound_player.finished.connect(sound_player.queue_free)
-    add_child(sound_player)
-    sound_player.play()
+    GDAudio.play_one_shot_3d(self, stream, sound_name, volume_db)
 
 
 func _on_trigger_area_body_entered(body: Node3D) -> void:

@@ -167,16 +167,8 @@ func _play_unlock_sound() -> void:
 	if unlock_sound_path.is_empty():
 		return
 
-	var unlock_sound := load(unlock_sound_path) as AudioStream
-	if unlock_sound == null:
-		return
-
-	var sound_player := AudioStreamPlayer3D.new()
-	sound_player.name = "UnlockAudioPlayer"
-	sound_player.stream = unlock_sound
-	sound_player.finished.connect(sound_player.queue_free)
-	add_child(sound_player)
-	sound_player.play()
+	var unlock_sound := GDAudio.load_stream(unlock_sound_path)
+	GDAudio.play_one_shot_3d(self, unlock_sound, "UnlockAudioPlayer")
 
 
 func _get_hinged_leaves() -> Array[Node]:

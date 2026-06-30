@@ -1598,29 +1598,11 @@ func _resolve_animation_name(animation_name: String) -> String:
 
 
 func _load_footstep_sounds() -> void:
-    footstep_sounds.clear()
-
-    for sound_path in FOOTSTEP_SOUND_PATHS:
-        var stream := load(sound_path) as AudioStream
-        if stream != null:
-            footstep_sounds.append(stream)
+    footstep_sounds = GDAudio.load_streams(FOOTSTEP_SOUND_PATHS)
 
 
 func _load_punch_hit_sound() -> void:
-    punch_hit_sound = null
-    if punch_hit_sound_path.is_empty():
-        return
-
-    if ResourceLoader.exists(punch_hit_sound_path):
-        punch_hit_sound = load(punch_hit_sound_path) as AudioStream
-        return
-
-    if not punch_hit_sound_path.to_lower().ends_with(".mp3") or not FileAccess.file_exists(punch_hit_sound_path):
-        return
-
-    var stream := AudioStreamMP3.new()
-    stream.data = FileAccess.get_file_as_bytes(punch_hit_sound_path)
-    punch_hit_sound = stream
+    punch_hit_sound = GDAudio.load_stream(punch_hit_sound_path)
 
 
 func _update_footsteps(delta: float, horizontal_speed: float) -> void:
@@ -1649,36 +1631,26 @@ func _play_footstep(horizontal_speed: float) -> void:
     if is_dead:
         return
 
-    var sound_player := AudioStreamPlayer3D.new()
-    sound_player.name = "FootstepAudio"
-    sound_player.stream = footstep_sounds.pick_random()
-    sound_player.pitch_scale = footstep_rng.randf_range(footstep_pitch_min, footstep_pitch_max)
     var max_movement_speed := maxf(_get_chase_speed(), shuffle_speed)
-    var speed_volume_boost := clampf((horizontal_speed - footstep_speed_threshold) / maxf(max_movement_speed - footstep_speed_threshold, 0.001), 0.0, 1.0)
-    sound_player.volume_db = lerpf(footstep_volume_min_db, footstep_volume_max_db, speed_volume_boost) + footstep_rng.randf_range(-1.0, 1.0)
-    sound_player.finished.connect(sound_player.queue_free)
-
-    if zombie_body != null:
-        zombie_body.add_child(sound_player)
-    else:
-        add_child(sound_player)
-
-    sound_player.play()
+    var audio_parent: Node = zombie_body if zombie_body != null else self
+    GDAudio.play_random_footstep_3d(
+        audio_parent,
+        footstep_sounds,
+        "FootstepAudio",
+        horizontal_speed,
+        footstep_speed_threshold,
+        max_movement_speed,
+        footstep_volume_min_db,
+        footstep_volume_max_db,
+        footstep_pitch_min,
+        footstep_pitch_max,
+        footstep_rng
+    )
 
 
 func _play_punch_hit_sound() -> void:
-    if punch_hit_sound == null:
-        return
-
-    var sound_player := AudioStreamPlayer3D.new()
-    sound_player.name = "ZombiePunchHitAudio"
-    sound_player.stream = punch_hit_sound
-    sound_player.volume_db = punch_hit_volume_db
-    sound_player.finished.connect(sound_player.queue_free)
-
     var audio_parent: Node = zombie_body if zombie_body != null else self
-    audio_parent.add_child(sound_player)
-    sound_player.play()
+    GDAudio.play_one_shot_3d(audio_parent, punch_hit_sound, "ZombiePunchHitAudio", punch_hit_volume_db)
 
 
 func _is_crushed(delta: float) -> bool:
@@ -1770,15 +1742,8 @@ func _die_from_rolling_ball() -> void:
 
 
 func _play_death_scream() -> void:
-    var sound_player := AudioStreamPlayer3D.new()
-    sound_player.name = "ZombieDeathScreamAudio"
-    sound_player.stream = WILHELM_SCREAM
-    sound_player.volume_db = death_scream_volume_db
-    sound_player.finished.connect(sound_player.queue_free)
-
     var audio_parent: Node = zombie_body if zombie_body != null else self
-    audio_parent.add_child(sound_player)
-    sound_player.play()
+    GDAudio.play_one_shot_3d(audio_parent, WILHELM_SCREAM, "ZombieDeathScreamAudio", death_scream_volume_db)
 
 
 func _play_death_animation() -> void:

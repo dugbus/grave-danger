@@ -203,18 +203,12 @@ func _wobble() -> void:
 
 
 func _play_absorb_sound() -> void:
-	var sound_player := AudioStreamPlayer3D.new()
-	sound_player.name = "CoinAbsorbAudio"
-	sound_player.stream = COIN_PICKUP_SOUND
-	sound_player.pitch_scale = randf_range(COIN_SOUND_PITCH_MIN, COIN_SOUND_PITCH_MAX)
-	sound_player.volume_db = randf_range(
+	var pitch_scale := randf_range(COIN_SOUND_PITCH_MIN, COIN_SOUND_PITCH_MAX)
+	var volume_db := randf_range(
 		COIN_SOUND_VOLUME_MIN_DB + COIN_SOUND_VOLUME_OFFSET_DB,
 		COIN_SOUND_VOLUME_MAX_DB + COIN_SOUND_VOLUME_OFFSET_DB
 	)
-	sound_player.finished.connect(sound_player.queue_free)
-	add_child(sound_player)
-	sound_player.global_position = global_position
-	sound_player.play()
+	GDAudio.play_one_shot_3d(self, COIN_PICKUP_SOUND, "CoinAbsorbAudio", volume_db, pitch_scale)
 
 
 func _random_landing_offset() -> Vector3:
