@@ -113,7 +113,7 @@ var tree_was_paused := false
 var suppressing_flask_effect_text := false
 var continue_button_has_focus := false
 var continue_requested := false
-var has_completed_paused_text := false
+var has_completed_text := false
 
 
 func _ready() -> void:
@@ -319,7 +319,7 @@ func _update_text_content() -> void:
 
 
 func _show_text() -> void:
-	if dismissed_until_exit or has_completed_paused_text:
+	if dismissed_until_exit or has_completed_text:
 		return
 
 	elapsed_visible = 0.0
@@ -365,7 +365,7 @@ func _update_visibility_state() -> void:
 	if not bodies_in_trigger.is_empty():
 		return
 	if elapsed_visible >= minimum_time_on_screen:
-		_hide_text()
+		_complete_text()
 
 
 func _update_transform() -> void:
@@ -555,7 +555,7 @@ func _on_continue_button_pressed() -> void:
 
 func _request_continue() -> void:
 	if pause_game_with_text:
-		_complete_paused_text()
+		_complete_text()
 		return
 
 	continue_requested = true
@@ -568,14 +568,14 @@ func _consume_pending_continue() -> void:
 
 	continue_requested = false
 	dismissed_until_exit = not bodies_in_trigger.is_empty()
-	_hide_text()
+	_complete_text()
 
 
-func _complete_paused_text() -> void:
-	if has_completed_paused_text:
+func _complete_text() -> void:
+	if has_completed_text:
 		return
 
-	has_completed_paused_text = true
+	has_completed_text = true
 	dismissed_until_exit = true
 	_disable_trigger_area()
 	_hide_text()
