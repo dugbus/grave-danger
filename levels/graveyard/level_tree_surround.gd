@@ -36,6 +36,10 @@ func rebuild(level_size: Vector2, height_sampler: Callable, random_seed: int) ->
 	_assign_editor_owners()
 
 
+func clear_generated() -> void:
+	_clear_generated()
+
+
 func _clear_generated() -> void:
 	for child in get_children():
 		remove_child(child)

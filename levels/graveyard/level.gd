@@ -62,6 +62,12 @@ const DEFAULT_SKY_COLOR := Color(0.52, 0.46, 0.66, 1.0)
 		tree_surround_seed = value
 		_queue_rebuild()
 
+## Controls whether the graveyard level builds the surrounding tree wall and blockers.
+@export var generate_tree_surround := true:
+	set(value):
+		generate_tree_surround = value
+		_queue_rebuild()
+
 @export var terrain_tint := Color(1.0, 1.0, 1.0, 1.0):
 	set(value):
 		terrain_tint = value
@@ -168,7 +174,10 @@ func _rebuild_level() -> void:
 
 	_configure_legacy_grid_map()
 	_configure_terrain()
-	_configure_tree_surround()
+	if generate_tree_surround:
+		_configure_tree_surround()
+	else:
+		_clear_tree_surround()
 	_snap_player_spawn_to_terrain()
 	_configure_sun_light()
 	_configure_world_environment()
@@ -308,6 +317,8 @@ func _configure_tree_surround() -> void:
 		surround.name = TREE_SURROUND_NAME
 		add_child(surround)
 
+	surround.visible = true
+
 	if Engine.is_editor_hint():
 		_assign_editor_owner(surround)
 
@@ -316,6 +327,21 @@ func _configure_tree_surround() -> void:
 
 	if surround.has_method("rebuild"):
 		surround.rebuild(terrain_size, Callable(self, "_sample_terrain_height"), tree_surround_seed)
+
+
+func _clear_tree_surround() -> void:
+	var surround := get_node_or_null(TREE_SURROUND_NAME) as Node3D
+	if surround == null:
+		return
+
+	surround.visible = false
+	if surround.has_method("clear_generated"):
+		surround.call("clear_generated")
+		return
+
+	for child in surround.get_children():
+		surround.remove_child(child)
+		child.free()
 
 
 func _assign_editor_owner(node: Node) -> void:

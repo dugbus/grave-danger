@@ -827,6 +827,7 @@ size = Vector3(3, 14, 100)
 
 [node name="Level5" type="Node3D" unique_id=2124946868]
 script = ExtResource("1_level5_script")
+generate_tree_surround = false
 terrain_tint = Color(0.6666667, 0.6666667, 0.6666667, 1)
 terrain_material = SubResource("StandardMaterial3D_hill_grass")
 direct_run_camera_profile = ExtResource("10_camera_profile")
@@ -905,6 +906,7 @@ transform = Transform3D(-0.79331565, 0, -0.6088105, 0, 1, 0, 0.6088105, 0, -0.79
 transform = Transform3D(-0.26660958, 0, -0.9638046, 0, 1, 0, 0.9638046, 0, -0.26660958, -15.860413, 0.34149325, 2.02559)
 
 [node name="TreeSurround" type="Node3D" parent="." unique_id=120540292]
+visible = false
 script = ExtResource("10_tpldd")
 
 [node name="TreeChunks" type="Node3D" parent="TreeSurround" unique_id=259453132]
