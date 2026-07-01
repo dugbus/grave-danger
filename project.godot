@@ -52,6 +52,10 @@ window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/size/mode=3
 
+[editor]
+
+movie_writer/movie_file="C:/Godot/capture.avi"
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/copy_all_errors/plugin.cfg", "res://addons/png_to_gridmap/plugin.cfg", "res://addons/simplegrasstextured/plugin.cfg")
