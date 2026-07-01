@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://de147agwnjnqt" path="res://ui/hud/energy_hud.gd" id="6_energy"]
 [ext_resource type="Script" uid="uid://bror4xqpcudhg" path="res://ui/hud/hud_status_bar.gd" id="7_status"]
 [ext_resource type="Script" path="res://ui/hud/active_flask_hud.gd" id="8_active_flask"]
+[ext_resource type="Script" path="res://ui/hud/elapsed_time_hud.gd" id="9_elapsed"]
 
 [node name="GameRuntime" type="Node3D" unique_id=555773272]
 
@@ -41,6 +42,21 @@ theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 90
 text = "Coins 0"
+
+[node name="ElapsedTimeHud" type="CanvasLayer" parent="." unique_id=351507658]
+script = ExtResource("9_elapsed")
+
+[node name="ElapsedLabel" type="Label" parent="ElapsedTimeHud" unique_id=462353001]
+offset_left = 16.0
+offset_top = 128.0
+offset_right = 460.0
+offset_bottom = 250.0
+theme_override_colors/font_color = Color(1, 0.9, 0.55, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 48
+text = "Elapsed 0.0s"
 
 [node name="EnergyHud" type="CanvasLayer" parent="." unique_id=358766660]
 script = ExtResource("6_energy")

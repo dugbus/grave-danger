@@ -25,10 +25,6 @@ const EFFECT_FLAME := 0
 const EFFECT_GHOST := 1
 const EFFECT_NONE := 2
 const EDITOR_SCRUB_TIME_EPSILON := 0.05
-const TIMER_LABEL_LAYER := 40
-const TIMER_LABEL_POSITION := Vector2(16.0, 128.0)
-const TIMER_LABEL_FONT_SIZE := 48
-
 @export_group("Animation")
 ## Animation controlling path progress, scale, shape morph, and future properties.
 @export var boundary_animation: Animation:
@@ -286,11 +282,6 @@ const TIMER_LABEL_FONT_SIZE := 48
 ## Responsiveness of near-flame volume smoothing; higher values react faster.
 @export var near_flame_audio_lag := 8.0
 
-@export_group("HUD")
-## Shows an elapsed-time label while the flame boundary is active.
-@export var show_timer := true
-
-
 var strip_areas: Array[Area3D] = []
 var strip_collisions: Array[CollisionShape3D] = []
 var strip_meshes: Array[MeshInstance3D] = []
@@ -309,7 +300,6 @@ var ghost_mesh: ArrayMesh
 var preview_material: StandardMaterial3D
 var blocker_preview_material: StandardMaterial3D
 var elapsed_time := 0.0
-var time_label: Label
 var near_flame_audio_player: AudioStreamPlayer
 var movement_cycle_distance := 0.0
 var last_animation_position := 0.0
@@ -350,8 +340,6 @@ func _ready() -> void:
 		return
 
 	_create_strips()
-	if show_timer:
-		_create_time_label()
 	_create_near_flame_audio()
 	_sync_boundary()
 
@@ -389,7 +377,6 @@ func _physics_process(delta: float) -> void:
 	_apply_flame_heat(delta)
 	_update_player_blockers_enabled()
 	_update_near_flame_audio(delta)
-	_update_time_label()
 
 
 func get_bounds_center() -> Vector3:
@@ -511,8 +498,6 @@ func _runtime_effects_enabled() -> bool:
 func _ensure_runtime_effect_nodes() -> void:
 	if strip_areas.is_empty():
 		_create_strips()
-	if show_timer and time_label == null:
-		_create_time_label()
 	if near_flame_audio_player == null:
 		_create_near_flame_audio()
 
@@ -555,9 +540,6 @@ func _set_runtime_effects_enabled(enabled: bool, keep_visuals := false) -> void:
 		near_flame_audio_player.stream_paused = not enabled
 		if not enabled:
 			near_flame_audio_player.volume_db = near_flame_audio_min_db
-
-	if time_label != null:
-		time_label.visible = enabled
 
 
 func begin_runtime_animation() -> void:
@@ -1480,44 +1462,6 @@ func _create_near_flame_audio() -> void:
 	near_flame_audio_player.volume_db = near_flame_audio_min_db
 	add_child(near_flame_audio_player)
 	near_flame_audio_player.play()
-
-
-func _create_time_label() -> void:
-	var canvas_layer := CanvasLayer.new()
-	canvas_layer.name = "FlameTimerLayer"
-	canvas_layer.layer = TIMER_LABEL_LAYER
-	add_child(canvas_layer)
-
-	time_label = Label.new()
-	time_label.name = "FlameTimerLabel"
-	time_label.position = TIMER_LABEL_POSITION
-	GDGameFont.apply_to_label(time_label)
-	time_label.add_theme_font_size_override("font_size", TIMER_LABEL_FONT_SIZE)
-	time_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.55))
-	time_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.85))
-	time_label.add_theme_constant_override("shadow_offset_x", 2)
-	time_label.add_theme_constant_override("shadow_offset_y", 2)
-
-	canvas_layer.add_child(time_label)
-
-
-func _update_time_label() -> void:
-	if time_label != null:
-		time_label.text = "Elapsed %s\nBoundary %s / %s" % [
-			_format_elapsed_seconds(get_elapsed_time()),
-			_format_elapsed_seconds(get_boundary_animation_position()),
-			_format_elapsed_seconds(get_boundary_animation_duration()),
-		]
-
-
-func _format_elapsed_seconds(seconds: float) -> String:
-	var clamped_seconds := maxf(seconds, 0.0)
-	var minutes := int(floorf(clamped_seconds / 60.0))
-	var remaining_seconds := clamped_seconds - float(minutes * 60)
-	if minutes <= 0:
-		return "%.1fs" % remaining_seconds
-
-	return "%d:%04.1f" % [minutes, remaining_seconds]
 
 
 func _apply_flame_heat(delta: float) -> void:

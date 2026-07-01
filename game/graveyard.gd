@@ -125,6 +125,10 @@ func _configure_runtime_references() -> void:
 			player.get_node_or_null("PlayerInventory")
 		)
 
+	var elapsed_time_hud := get_node_or_null("GameRuntime/ElapsedTimeHud")
+	if elapsed_time_hud != null and elapsed_time_hud.has_method("set_runtime_references"):
+		elapsed_time_hud.set_runtime_references(kill_boundary)
+
 
 func _activate_current_level_camera() -> void:
 	if current_level == null:
