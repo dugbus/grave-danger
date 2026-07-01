@@ -24,8 +24,10 @@ const FOOTSTEP_SOUND_PATHS: Array[String] = [
 ]
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 const DEFAULT_PUNCH_HIT_SOUND_PATH := "res://Assets/audio/punch.mp3"
+const CHARACTER_GROUP: StringName = &"character"
 const NAVIGATION_BLOCKER_GROUP := &"navigation_blocker"
 const PLAYER_GROUP := &"player"
+const SMART_ZOMBIE_GROUP: StringName = &"smart_zombie"
 const WORLD_COLLISION_LAYER := 1
 const PLAYER_COLLISION_LAYER := 2
 const PICKUP_COLLISION_LAYER := 4
@@ -232,7 +234,8 @@ var is_disappearing := false
 
 
 func _ready() -> void:
-    add_to_group("smart_zombie")
+    add_to_group(CHARACTER_GROUP)
+    add_to_group(SMART_ZOMBIE_GROUP)
     _seed_deterministic_rng()
     _load_footstep_sounds()
     _load_punch_hit_sound()

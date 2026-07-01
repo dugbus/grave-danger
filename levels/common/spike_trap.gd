@@ -12,6 +12,7 @@ enum SpikeTrapState {
 
 const PLAYER_COLLISION_LAYER := 2
 const ZOMBIE_COLLISION_LAYER := 8
+const CHARACTER_GROUP: StringName = &"character"
 const DEFAULT_TRIGGER_SOUND_PATH := "res://Assets/audio/spike-trigger.mp3"
 const DEFAULT_HIT_SOUND_PATH := "res://Assets/audio/spike-trigger-hits.mp3"
 const DEFAULT_RESET_SOUND_PATH := "res://Assets/audio/spike-going-back-down.mp3"
@@ -22,7 +23,8 @@ const DEFAULT_RESET_SOUND_PATH := "res://Assets/audio/spike-going-back-down.mp3"
 
 @export_group("Targeting")
 @export_flags_3d_physics var target_collision_mask := PLAYER_COLLISION_LAYER | ZOMBIE_COLLISION_LAYER
-@export var target_groups: Array[StringName] = [&"player", &"smart_zombie", &"skeleton"]
+## Groups whose members can trigger and be damaged by this trap.
+@export var target_groups: Array[StringName] = [CHARACTER_GROUP]
 @export var trigger_area_size := Vector3(1.4, 1.2, 1.4)
 @export var strike_area_size := Vector3(1.05, 1.4, 1.05)
 @export var target_vertical_min := -0.25

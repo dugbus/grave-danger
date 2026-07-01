@@ -4,6 +4,9 @@ class_name GDPlayer
 
 signal flask_effect_started(effect_id: StringName, liquid_color: Color, duration: float)
 
+const CHARACTER_GROUP: StringName = &"character"
+const FLAME_VULNERABLE_GROUP: StringName = &"flame_vulnerable"
+const PLAYER_GROUP: StringName = &"player"
 const PUSH_FLOOR_MIN_NORMAL_Y := 0.65
 const PUSH_FLOOR_IGNORE_SECONDS := 0.25
 
@@ -24,8 +27,9 @@ var floor_push_ignore_timers: Dictionary = {}
 func _ready() -> void:
 	# Randomness is currently used by the pickup sound pitch/volume variation.
 	randomize()
-	add_to_group("player")
-	add_to_group("flame_vulnerable")
+	add_to_group(CHARACTER_GROUP)
+	add_to_group(PLAYER_GROUP)
+	add_to_group(FLAME_VULNERABLE_GROUP)
 
 
 func _physics_process(delta: float) -> void:

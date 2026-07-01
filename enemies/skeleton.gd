@@ -8,6 +8,8 @@ const FOOTSTEP_SOUND_PATHS: Array[String] = [
     "res://Assets/audio/footstep3.wav",
     "res://Assets/audio/footstep4.wav",
 ]
+const CHARACTER_GROUP: StringName = &"character"
+const SKELETON_GROUP: StringName = &"skeleton"
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 const WORLD_COLLISION_LAYER := 1
 
@@ -144,7 +146,8 @@ var is_disappearing := false
 
 
 func _ready() -> void:
-    add_to_group("skeleton")
+    add_to_group(CHARACTER_GROUP)
+    add_to_group(SKELETON_GROUP)
     randomize()
     _load_footstep_sounds()
     _randomize_next_footstep_distance()

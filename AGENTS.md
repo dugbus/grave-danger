@@ -1,5 +1,13 @@
 # Codex Instructions
 
+## Coding starndard.
+
+- Always use named enums over values.
+- Make sure that typing is either directly inferable or specified with 'as' keyword.
+- Any exported variable has a human friendly comment to explain the intent of the setting.
+- If settings are aiming to be contant for the whole game and not per instance then they should live in their own .tres file.
+- 
+
 ## Binary Files
 
 - Never create, edit, regenerate, reimport, re-save, format, or otherwise modify binary files.
@@ -8,11 +16,6 @@
 - If a fix appears to require changing a binary file, stop and explain the issue instead of modifying it. Prefer text-only fixes such as `.tscn`, `.gd`, `.tres`, `.import`, project settings, or source metadata.
 - After any command that may have touched generated assets, check `git status --short` and revert any binary-file changes before continuing.
 - You can use godot to create import files for added assets without request.
-
-## Types
-
-- Always use named enums over values.
-- Make sure that typing is either directly inferable or specified with 'as' keyword.
 
 ## Scripts or Nodes
 

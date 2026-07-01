@@ -8,7 +8,6 @@ class_name GDPlayerMovement
 
 # Base movement tuning for an unloaded character.
 const SPEED = 5.0
-const JUMP_VELOCITY = 4.5
 const ROTATION_SPEED = 12.0
 const ACCELERATION = 18.0
 const DECELERATION = 22.0
@@ -21,8 +20,8 @@ const MIN_WEIGHT_SPEED_MULTIPLIER = 0.35
 const MIN_WEIGHT_ACCELERATION_MULTIPLIER = 0.28
 const MIN_WEIGHT_DECELERATION_MULTIPLIER = 0.2
 const MIN_WEIGHT_ROTATION_MULTIPLIER = 0.35
-const MIN_WEIGHT_JUMP_MULTIPLIER = 0.4
 
+const JUMP_SETTINGS := preload("res://game/player_jump_settings.tres")
 const FOOTSTEP_SOUND_PATHS: Array[String] = [
 	"res://Assets/audio/footstep1.wav",
 	"res://Assets/audio/footstep2.wav",
@@ -61,12 +60,14 @@ const FOOTSTEP_SOUND_PATHS: Array[String] = [
 @onready var pivot: Node3D = get_node_or_null(pivot_path)
 
 var footstep_sounds: Array[AudioStream] = []
+var jump_sound: AudioStream
 var footstep_distance_accumulator := 0.0
 var next_footstep_distance := 1.0
 
 
 func _ready() -> void:
 	_load_footstep_sounds()
+	_load_jump_sound()
 	_randomize_next_footstep_distance()
 
 
@@ -81,7 +82,11 @@ func apply_gravity_and_jump(delta: float, gold_inventory: Node) -> void:
 
 	if Input.is_action_just_pressed("jump") and player.is_on_floor():
 		# Carrying coins makes jumps shorter through the inventory weight curve.
-		player.velocity.y = JUMP_VELOCITY * gold_inventory.weight_multiplier(1.0, MIN_WEIGHT_JUMP_MULTIPLIER)
+		var settings := JUMP_SETTINGS as GDPlayerJumpSettings
+		var gravity_magnitude := player.get_gravity().length()
+		var jump_velocity := settings.get_jump_velocity(gravity_magnitude)
+		player.velocity.y = jump_velocity * gold_inventory.weight_multiplier(1.0, settings.min_weight_jump_multiplier)
+		_play_jump_sound(settings)
 
 
 func update_walk(delta: float, gold_inventory: Node) -> float:
@@ -149,6 +154,11 @@ func _load_footstep_sounds() -> void:
 	footstep_sounds = GDAudio.load_streams(FOOTSTEP_SOUND_PATHS)
 
 
+func _load_jump_sound() -> void:
+	var settings := JUMP_SETTINGS as GDPlayerJumpSettings
+	jump_sound = GDAudio.load_stream(settings.jump_sound_path)
+
+
 func _update_footsteps(delta: float, horizontal_speed: float) -> void:
 	if footstep_sounds.is_empty():
 		return
@@ -169,6 +179,20 @@ func _update_footsteps(delta: float, horizontal_speed: float) -> void:
 func _randomize_next_footstep_distance() -> void:
 	var variance := maxf(footstep_distance_variance, 0.0)
 	next_footstep_distance = maxf(0.1, footstep_distance + randf_range(-variance, variance))
+
+
+func _play_jump_sound(settings: GDPlayerJumpSettings) -> void:
+	if jump_sound == null:
+		return
+
+	var audio_parent: Node = player if player != null else self
+	GDAudio.play_one_shot_3d(
+		audio_parent,
+		jump_sound,
+		"JumpAudio",
+		settings.jump_volume_db,
+		randf_range(settings.jump_pitch_min, settings.jump_pitch_max)
+	)
 
 
 func _play_footstep(horizontal_speed: float) -> void:
