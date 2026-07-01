@@ -9,6 +9,7 @@
 [ext_resource type="ArrayMesh" uid="uid://c424cj73i6but" path="res://Assets/environment/wall-solo.res" id="9_fn345"]
 [ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://levels/1/level.gdshader" id="10_3xhgt"]
 [ext_resource type="Shader" uid="uid://uwm825jn6lwl" path="res://Assets/environment/shaders/rock_texture.gdshader" id="10_6n7ac"]
+[ext_resource type="PackedScene" path="res://enemies/zombie.tscn" id="10_veeoo"]
 [ext_resource type="Texture2D" uid="uid://cj5phhpf53e7v" path="res://Assets/environment/floor-albedo.png" id="11_veeoo"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 
@@ -104,6 +105,54 @@ shader_parameter/normal_strength = 1.6
 shader_parameter/noise_scale = 6.0
 shader_parameter/detail_scale = 18.0
 shader_parameter/octaves = 6
+
+[sub_resource type="Curve3D" id="Curve3D_1rlxb"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[sub_resource type="Curve3D" id="Curve3D_mx8o4"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[sub_resource type="Curve3D" id="Curve3D_yyw7i"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[sub_resource type="Curve3D" id="Curve3D_haq2d"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[sub_resource type="Curve3D" id="Curve3D_fhv3i"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[sub_resource type="Curve3D" id="Curve3D_rtouc"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_8e3ph"]
 size = Vector2(32, 32)
@@ -323,6 +372,30 @@ coin_count = 10
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
 mesh = ExtResource("9_fn345")
 surface_material_override/0 = SubResource("ShaderMaterial_kvfjf")
+
+[node name="Zombie1" parent="." unique_id=1519867817 instance=ExtResource("10_veeoo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.2, -8)
+curve = SubResource("Curve3D_1rlxb")
+
+[node name="Zombie2" parent="." unique_id=1915992793 instance=ExtResource("10_veeoo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.2, -1)
+curve = SubResource("Curve3D_mx8o4")
+
+[node name="Zombie3" parent="." unique_id=355287101 instance=ExtResource("10_veeoo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.2, 9)
+curve = SubResource("Curve3D_yyw7i")
+
+[node name="Zombie4" parent="." unique_id=1275127404 instance=ExtResource("10_veeoo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.2, -8)
+curve = SubResource("Curve3D_haq2d")
+
+[node name="Zombie6" parent="." unique_id=714024419 instance=ExtResource("10_veeoo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 9)
+curve = SubResource("Curve3D_fhv3i")
+
+[node name="Zombie5" parent="." unique_id=411967273 instance=ExtResource("10_veeoo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, -1)
+curve = SubResource("Curve3D_rtouc")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1561209129]
 
