@@ -5,7 +5,6 @@
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="4_cogbq"]
 [ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="4_flame"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
-[ext_resource type="PackedScene" uid="uid://4r3w85uciy08" path="res://levels/common/gd_level_ground.tscn" id="101_ground"]
 
 [sub_resource type="Curve3D" id="Curve3D_ej6ns"]
 resource_local_to_scene = true
@@ -89,9 +88,6 @@ _data = {
 [node name="Level3" type="Node3D" unique_id=340819746]
 
 [node name="IndoorLighting" parent="." unique_id=674717850 instance=ExtResource("100_indoor")]
-
-[node name="LevelGround" parent="." unique_id=1593335951 instance=ExtResource("101_ground")]
-ground_size = Vector2(300, 20)
 
 [node name="Player" parent="." unique_id=244343110 instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -138.16736, 11.999611, -0.16962579)

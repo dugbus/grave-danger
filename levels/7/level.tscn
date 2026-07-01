@@ -6,7 +6,6 @@
 [ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="4_flame"]
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
-[ext_resource type="PackedScene" uid="uid://4r3w85uciy08" path="res://levels/common/gd_level_ground.tscn" id="101_ground"]
 
 [sub_resource type="Curve3D" id="Curve3D_mf4tc"]
 resource_local_to_scene = true
@@ -90,9 +89,6 @@ _data = {
 [node name="Level7" type="Node3D" unique_id=1808988836]
 
 [node name="IndoorLighting" parent="." unique_id=370338518 instance=ExtResource("100_indoor")]
-
-[node name="LevelGround" parent="." unique_id=1600768402 instance=ExtResource("101_ground")]
-ground_size = Vector2(96, 96)
 
 [node name="Player" parent="." unique_id=244343110 instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.364414, 12, -23.739996)

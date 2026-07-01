@@ -9,7 +9,6 @@
 [ext_resource type="ArrayMesh" uid="uid://c424cj73i6but" path="res://Assets/environment/wall-solo.res" id="9_fn345"]
 [ext_resource type="Shader" uid="uid://uwm825jn6lwl" path="res://Assets/environment/shaders/rock_texture.gdshader" id="10_6n7ac"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
-[ext_resource type="PackedScene" uid="uid://4r3w85uciy08" path="res://levels/common/gd_level_ground.tscn" id="101_ground"]
 
 [sub_resource type="Curve3D" id="Curve3D_3xhgt"]
 resource_local_to_scene = true
@@ -107,9 +106,6 @@ shader_parameter/octaves = 6
 [node name="Level2" type="Node3D" unique_id=1192405132]
 
 [node name="IndoorLighting" parent="." unique_id=743360249 instance=ExtResource("100_indoor")]
-
-[node name="LevelGround" parent="." unique_id=742734766 instance=ExtResource("101_ground")]
-ground_size = Vector2(30, 30)
 
 [node name="Player" parent="." unique_id=244343110 instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.084152, 12, -11.637171)
