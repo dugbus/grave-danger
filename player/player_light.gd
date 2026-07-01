@@ -1,9 +1,12 @@
 extends OmniLight3D
 class_name GDPlayerLight
 
-@export var base_energy := 4.2
-@export var dip_amount := 1.0     # how far below base it can drop
-@export var peak_amount := 0.9    # how far above base it can rise
+## Baseline flame brightness before the flicker offset is applied.
+@export var base_energy := 2.0
+## Maximum amount the flame can dip below its baseline brightness.
+@export var dip_amount := 1.45
+## Maximum amount the flame can rise above its baseline brightness.
+@export var peak_amount := 0.65
 @export var flicker_speed := 7.5
 @export var noise_fast: NoiseTexture3D
 @export var noise_slow: NoiseTexture3D

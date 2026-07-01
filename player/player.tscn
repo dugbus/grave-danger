@@ -69,15 +69,13 @@ script = ExtResource("6_7xubc")
 [node name="Character" parent="Pivot" unique_id=2053546351 instance=ExtResource("1_4flbx")]
 
 [node name="PlayerLight" type="OmniLight3D" parent="Pivot" unique_id=994237452]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 1.42, 0.34)
 light_color = Color(0.8842759, 0.4890548, 0.27783498, 1)
-light_energy = 4.2
-omni_range = 10.0
-omni_attenuation = 0.85
+light_energy = 2.0
+shadow_enabled = true
+omni_range = 6.0
+omni_attenuation = 1.35
 script = ExtResource("7_boad6")
-base_energy = 4.2
-dip_amount = 1.0
-peak_amount = 0.9
 noise_fast = SubResource("NoiseTexture3D_fast")
 noise_slow = SubResource("NoiseTexture3D_slow")
 
