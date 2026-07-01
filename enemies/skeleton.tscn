@@ -1,7 +1,10 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="PackedScene" path="res://Assets/kenney-graveyard/character-skeleton.glb" id="1_skeleton"]
 [ext_resource type="Script" path="res://enemies/skeleton.gd" id="2_skeleton"]
+[ext_resource type="Script" path="res://player/player_shadow.gd" id="3_shadow"]
+[ext_resource type="PlaneMesh" path="res://game/contact_shadow_mesh.tres" id="4_shadow_mesh"]
+[ext_resource type="Material" path="res://game/contact_shadow_material.tres" id="5_shadow_material"]
 
 [sub_resource type="Curve3D" id="Curve3D_skeleton_patrol"]
 resource_local_to_scene = true
@@ -14,28 +17,6 @@ point_count = 2
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_kill_area"]
 radius = 0.22
 height = 0.74
-
-[sub_resource type="Shader" id="Shader_skeleton_shadow"]
-code = "shader_type spatial;
-render_mode unshaded, blend_mix, depth_draw_never, cull_disabled;
-
-uniform vec4 shadow_color : source_color = vec4(0.0, 0.0, 0.0, 0.3);
-
-void fragment() {
-    vec2 centered_uv = UV * 2.0 - 1.0;
-    float distance_from_center = length(centered_uv);
-    float shadow_alpha = (1.0 - smoothstep(0.2, 1.0, distance_from_center)) * shadow_color.a;
-
-    ALBEDO = shadow_color.rgb;
-    ALPHA = shadow_alpha;
-}"
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_skeleton_shadow"]
-render_priority = -1
-shader = SubResource("Shader_skeleton_shadow")
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_skeleton_shadow"]
-size = Vector2(0.9, 0.55)
 
 [node name="Skeleton" type="Path3D"]
 curve = SubResource("Curve3D_skeleton_patrol")
@@ -54,7 +35,6 @@ loop = false
 [node name="SkeletonLight" type="OmniLight3D" parent="PathFollow3D/DropPivot/Pivot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16, 1.08, 0.22)
 layers = 1
-shadow_enabled = true
 light_color = Color(0.85, 1, 0.62, 1)
 light_energy = 0.95
 omni_range = 4.2
@@ -64,8 +44,11 @@ omni_attenuation = 1.45
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0.03)
 layers = 3
 cast_shadow = 0
-mesh = SubResource("PlaneMesh_skeleton_shadow")
-surface_material_override/0 = SubResource("ShaderMaterial_skeleton_shadow")
+mesh = ExtResource("4_shadow_mesh")
+surface_material_override/0 = ExtResource("5_shadow_material")
+script = ExtResource("3_shadow")
+shadow_size = Vector2(0.9, 0.55)
+projected_local_offset = Vector3(0, 0, 0.03)
 
 [node name="KillArea" type="Area3D" parent="PathFollow3D/DropPivot"]
 collision_layer = 0

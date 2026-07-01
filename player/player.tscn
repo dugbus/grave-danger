@@ -10,6 +10,8 @@
 [ext_resource type="Script" path="res://player/flask_effect_text.gd" id="8_eh3tm"]
 [ext_resource type="Shader" path="res://player/flask_effect_text.gdshader" id="9_v2a87"]
 [ext_resource type="Script" path="res://player/player_shadow.gd" id="10_shadow"]
+[ext_resource type="PlaneMesh" path="res://game/contact_shadow_mesh.tres" id="11_shadow_mesh"]
+[ext_resource type="Material" path="res://game/contact_shadow_material.tres" id="12_shadow_material"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_fast"]
 noise_type = 1
@@ -26,29 +28,6 @@ noise = SubResource("FastNoiseLite_fast")
 
 [sub_resource type="NoiseTexture3D" id="NoiseTexture3D_slow"]
 noise = SubResource("FastNoiseLite_slow")
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_player_shadow"]
-size = Vector2(1.2, 0.75)
-
-[sub_resource type="Shader" id="Shader_player_shadow"]
-code = "shader_type spatial;
-render_mode unshaded, blend_mix, depth_draw_never, cull_disabled;
-
-uniform vec4 shadow_color : source_color = vec4(0.0, 0.0, 0.0, 0.34);
-
-void fragment() {
-	vec2 centered_uv = UV * 2.0 - 1.0;
-	float distance_from_center = length(centered_uv);
-	float shadow_alpha = (1.0 - smoothstep(0.2, 1.0, distance_from_center)) * shadow_color.a;
-
-	ALBEDO = shadow_color.rgb;
-	ALPHA = shadow_alpha;
-}"
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_player_shadow"]
-render_priority = 10
-shader = SubResource("Shader_player_shadow")
-shader_parameter/shadow_color = Color(0, 0, 0, 0.42)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4flbx"]
 radius = 0.28
@@ -106,9 +85,10 @@ noise_slow = SubResource("NoiseTexture3D_slow")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0.06)
 layers = 3
 cast_shadow = 0
-mesh = SubResource("PlaneMesh_player_shadow")
-surface_material_override/0 = SubResource("ShaderMaterial_player_shadow")
+mesh = ExtResource("11_shadow_mesh")
+surface_material_override/0 = ExtResource("12_shadow_material")
 script = ExtResource("10_shadow")
+shadow_size = Vector2(1.2, 0.75)
 
 [node name="PotionEffectText" type="MeshInstance3D" parent="." unique_id=1931740386]
 visible = false

@@ -2,8 +2,12 @@ extends MeshInstance3D
 class_name GDPlayerShadow
 
 
-## Character body used as the world-space source for the projected contact shadow.
-@export var player_path: NodePath = ^".."
+## Node used as the world-space source for the projected contact shadow.
+@export var source_path: NodePath = ^".."
+## Physics layers treated as ground by the contact shadow probe.
+@export_flags_3d_physics var ground_collision_mask := 1
+## World-space footprint size of the projected contact shadow.
+@export var shadow_size := Vector2(1.0, 1.0)
 ## Height above the player origin where the ground probe starts.
 @export var probe_up_distance := 1.25
 ## Distance below the player origin searched for ground.
@@ -15,7 +19,7 @@ class_name GDPlayerShadow
 ## Lowest world-space height used when no floor is found by the probe.
 @export var fallback_height_offset := 0.025
 
-@onready var player := get_node_or_null(player_path) as CharacterBody3D
+@onready var source := get_node_or_null(source_path) as Node3D
 
 
 func _ready() -> void:
@@ -29,35 +33,44 @@ func _physics_process(_delta: float) -> void:
 
 
 func _update_projected_shadow() -> void:
-	if player == null:
+	if source == null:
 		return
 
 	var projected_position := _get_projected_position()
-	global_transform = Transform3D(Basis.IDENTITY, projected_position)
+	var shadow_basis := Basis.IDENTITY.scaled(Vector3(
+		maxf(shadow_size.x, 0.01),
+		1.0,
+		maxf(shadow_size.y, 0.01)
+	))
+	global_transform = Transform3D(shadow_basis, projected_position)
 
 
 func _get_projected_position() -> Vector3:
-	var origin := player.global_position + Vector3.UP * probe_up_distance
-	var target := player.global_position + Vector3.DOWN * probe_down_distance
+	var origin := source.global_position + Vector3.UP * probe_up_distance
+	var target := source.global_position + Vector3.DOWN * probe_down_distance
 	var ground_position: Variant = _probe_ground(origin, target)
-	var projected_offset := player.global_transform.basis * projected_local_offset
+	var projected_offset := source.global_transform.basis * projected_local_offset
 
 	if ground_position != null:
 		return (ground_position as Vector3) + Vector3.UP * surface_offset + projected_offset
 
-	return player.global_position + Vector3.UP * fallback_height_offset + projected_offset
+	return source.global_position + Vector3.UP * fallback_height_offset + projected_offset
 
 
 func _probe_ground(origin: Vector3, target: Vector3) -> Variant:
-	var world := player.get_world_3d()
+	var world := source.get_world_3d()
 	if world == null:
 		return null
+
+	var excluded_rids: Array[RID] = []
+	if source is CollisionObject3D:
+		excluded_rids.append((source as CollisionObject3D).get_rid())
 
 	var query := PhysicsRayQueryParameters3D.create(
 		origin,
 		target,
-		player.collision_mask,
-		[player.get_rid()]
+		ground_collision_mask,
+		excluded_rids
 	)
 	query.collide_with_areas = false
 	query.collide_with_bodies = true
