@@ -404,12 +404,15 @@ func _update_state(delta: float) -> void:
         _die_from_rolling_ball()
         return
 
-    var visible_player := _can_see_player(_should_force_vision_update())
+    if _is_player_dead():
+        _return_to_patrol_after_player_death()
+
+    var visible_player := false if _is_player_dead() else _can_see_player(_should_force_vision_update())
     if visible_player:
         last_seen_position = _get_player_navigation_position()
         last_seen_timer = 0.0
         if state != ZombieState.ATTACK and _is_route_reachable(last_seen_position):
-            if _is_touching_player_collision():
+            if _can_start_attack():
                 _change_state(ZombieState.ATTACK)
             else:
                 _change_state(ZombieState.CHASE)
@@ -457,7 +460,7 @@ func _update_patrol(delta: float) -> void:
 
 
 func _update_chase(delta: float, visible_player: bool) -> void:
-    if player == null:
+    if player == null or _is_player_dead():
         _change_state(ZombieState.RETURN_TO_PATROL)
         return
 
@@ -465,7 +468,7 @@ func _update_chase(delta: float, visible_player: bool) -> void:
         last_seen_position = _get_player_navigation_position()
         last_seen_timer = 0.0
 
-    if _is_touching_player_collision():
+    if _can_start_attack():
         _change_state(ZombieState.ATTACK)
         return
 
@@ -531,6 +534,17 @@ func _update_return_to_patrol(delta: float, visible_player: bool) -> void:
 
 func _update_attack(delta: float, visible_player: bool) -> void:
     _stop_body()
+
+    if not _can_continue_attack():
+        _set_attack_hitboxes_enabled(false)
+        if player != null and _is_player_dead():
+            _change_state(ZombieState.RETURN_TO_PATROL)
+        elif player == null or last_seen_timer >= lost_sight_seconds:
+            _change_state(ZombieState.SEARCH_LAST_SEEN)
+        else:
+            _change_state(ZombieState.CHASE)
+        return
+
     _face_position(_get_player_target_position(), delta)
     attack_timer += delta
 
@@ -551,7 +565,7 @@ func _update_attack(delta: float, visible_player: bool) -> void:
             _change_state(ZombieState.SEARCH_LAST_SEEN)
         else:
             _change_state(ZombieState.CHASE)
-    elif _is_touching_player_collision():
+    elif _can_start_attack():
         _start_attack()
     else:
         _change_state(ZombieState.CHASE)
@@ -562,8 +576,12 @@ func _update_sitdown(delta: float, visible_player: bool) -> void:
     sit_vision_timer -= delta
     sit_repath_timer -= delta
 
+    if _is_player_dead() and not patrol_points.is_empty():
+        _change_state(ZombieState.RETURN_TO_PATROL)
+        return
+
     if visible_player:
-        if _is_touching_player_collision():
+        if _can_start_attack():
             _change_state(ZombieState.ATTACK)
         else:
             _change_state(ZombieState.CHASE)
@@ -611,6 +629,20 @@ func _change_state(next_state: ZombieState) -> void:
             _set_attack_hitboxes_enabled(false)
 
 
+func _return_to_patrol_after_player_death() -> void:
+    cached_player_visible = false
+    last_seen_timer = lost_sight_seconds
+    _set_attack_hitboxes_enabled(false)
+
+    if patrol_points.is_empty():
+        if state != ZombieState.SITDOWN:
+            _change_state(ZombieState.SITDOWN)
+        return
+
+    if state != ZombieState.PATROL and state != ZombieState.RETURN_TO_PATROL:
+        _change_state(ZombieState.RETURN_TO_PATROL)
+
+
 func _start_attack() -> void:
     attack_timer = 0.0
     attack_hit_applied = false
@@ -653,7 +685,7 @@ func _get_animation_duration_seconds(animation_name: String) -> float:
 
 
 func _apply_attack_damage() -> bool:
-    var targets := _get_attack_hitbox_targets(active_attack_hitbox)
+    var targets := _get_attack_damage_targets()
     var hit_landed := false
 
     for target in targets:
@@ -671,6 +703,13 @@ func _apply_attack_damage() -> bool:
         _play_punch_hit_sound()
 
     return hit_landed
+
+
+func _get_attack_damage_targets() -> Array[Node]:
+    var targets := _get_attack_hitbox_targets(active_attack_hitbox)
+    if _is_player_within_attack_range(attack_range):
+        _append_unique_node_target(targets, player)
+    return targets
 
 
 func _get_attack_hitbox_targets(hitbox: Area3D) -> Array[Node]:
@@ -814,14 +853,32 @@ func _get_chase_speed() -> float:
     return shuffle_speed * maxf(chase_speed_multiplier, 0.0)
 
 
-func _is_touching_player_collision() -> bool:
+func _can_start_attack() -> bool:
+    return _is_player_within_attack_range(attack_range) or _is_touching_player_collision(false)
+
+
+func _can_continue_attack() -> bool:
+    return _is_player_within_attack_range(maxf(attack_continue_range, attack_range))
+
+
+func _is_player_within_attack_range(range: float) -> bool:
+    if player == null or not _is_live_player_body(player):
+        return false
+
+    var to_player := player.global_position - _get_body_position()
+    to_player.y = 0.0
+    return to_player.length() <= maxf(range, 0.0)
+
+
+func _is_touching_player_collision(include_slide_collisions := true) -> bool:
     if player == null or zombie_body == null:
         return false
 
-    for collision_index in zombie_body.get_slide_collision_count():
-        var collision := zombie_body.get_slide_collision(collision_index)
-        if collision != null and _is_live_player_body(collision.get_collider() as Node):
-            return true
+    if include_slide_collisions:
+        for collision_index in zombie_body.get_slide_collision_count():
+            var collision := zombie_body.get_slide_collision(collision_index)
+            if collision != null and _is_live_player_body(collision.get_collider() as Node):
+                return true
 
     var body_shape := _find_collision_shape(zombie_body)
     if body_shape == null or body_shape.shape == null:

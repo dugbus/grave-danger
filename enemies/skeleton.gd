@@ -56,7 +56,7 @@ const WORLD_COLLISION_LAYER := 1
 ## Radius used to detect pushable map blockers such as rolling rocks.
 @export_range(0.05, 2.0, 0.01) var map_collision_pushable_probe_radius := 0.48
 ## Height above the path used for pushable blocker overlap checks.
-@export_range(0.0, 2.0, 0.01) var map_collision_pushable_probe_height := 1.0
+@export_range(0.0, 2.0, 0.01) var map_collision_pushable_probe_height := 0.5
 ## Number of overlap samples checked ahead of the skeleton.
 @export_range(1, 8, 1) var map_collision_pushable_probe_steps := 3
 ## Animation played while the skeleton is moving.

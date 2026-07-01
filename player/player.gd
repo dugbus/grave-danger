@@ -7,6 +7,7 @@ signal flask_effect_started(effect_id: StringName, liquid_color: Color, duration
 const CHARACTER_GROUP: StringName = &"character"
 const FLAME_VULNERABLE_GROUP: StringName = &"flame_vulnerable"
 const PLAYER_GROUP: StringName = &"player"
+const BOUNDARY_BLOCKER_COLLISION_LAYER := 16
 const PUSH_FLOOR_MIN_NORMAL_Y := 0.65
 const PUSH_FLOOR_IGNORE_SECONDS := 0.25
 
@@ -30,6 +31,7 @@ func _ready() -> void:
 	add_to_group(CHARACTER_GROUP)
 	add_to_group(PLAYER_GROUP)
 	add_to_group(FLAME_VULNERABLE_GROUP)
+	collision_mask |= BOUNDARY_BLOCKER_COLLISION_LAYER
 
 
 func _physics_process(delta: float) -> void:

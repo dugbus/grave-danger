@@ -16,7 +16,7 @@ const LEGACY_SCALE_TRACK_PATH := ^"BoundaryCenter"
 const NEAR_FLAMES_SOUND_PATH := "res://Assets/audio/near-the-flames.mp3"
 const GHOST_BOUNDARY_SOUND_PATH := "res://Assets/audio/ghost-boundary.mp3"
 const GHOST_BOUNDARY_VOLUME_BOOST_DB := 8.0
-const PLAYER_BLOCKER_COLLISION_LAYER := 8
+const PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER := 16
 const FLAME_SHADER := preload("res://levels/common/kill_boundary_effects/kill_boundary_flame_effect.gdshader")
 const GHOST_SHADER := preload("res://levels/common/kill_boundary_effects/kill_boundary_ghost_effect.gdshader")
 const GHOST_TEXTURE := preload("res://Assets/ghost1.png")
@@ -1182,7 +1182,7 @@ func _ensure_player_blocker_count(center: Node3D) -> void:
 		var i := blocker_bodies.size()
 		var body := StaticBody3D.new()
 		body.name = "PlayerBlocker%d" % i
-		body.collision_layer = PLAYER_BLOCKER_COLLISION_LAYER
+		body.collision_layer = PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
 		body.collision_mask = 0
 		center.add_child(body)
 		blocker_bodies.append(body)
