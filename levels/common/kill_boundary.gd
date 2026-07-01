@@ -14,6 +14,8 @@ const BOUNDARY_ROTATION_Z_RADIANS_TRACK_PATH := ^".:boundary_rotation_z_radians"
 const LEGACY_SCALE_ROTATION_TARGET_TRACK_PATH := ^".:scale_rotation_target"
 const LEGACY_SCALE_TRACK_PATH := ^"BoundaryCenter"
 const NEAR_FLAMES_SOUND_PATH := "res://Assets/audio/near-the-flames.mp3"
+const GHOST_BOUNDARY_SOUND_PATH := "res://Assets/audio/ghost-boundary.mp3"
+const GHOST_BOUNDARY_VOLUME_BOOST_DB := 8.0
 const PLAYER_BLOCKER_COLLISION_LAYER := 8
 const FLAME_SHADER := preload("res://levels/common/kill_boundary_effects/kill_boundary_flame_effect.gdshader")
 const GHOST_SHADER := preload("res://levels/common/kill_boundary_effects/kill_boundary_ghost_effect.gdshader")
@@ -1449,7 +1451,7 @@ func _has_dead_flame_vulnerable_body() -> bool:
 
 
 func _create_near_flame_audio() -> void:
-	var stream := load(NEAR_FLAMES_SOUND_PATH) as AudioStream
+	var stream := GDAudio.load_stream(_get_boundary_audio_path())
 	if stream == null:
 		return
 
@@ -1459,9 +1461,23 @@ func _create_near_flame_audio() -> void:
 	if loop_stream is AudioStreamMP3:
 		(loop_stream as AudioStreamMP3).loop = true
 	near_flame_audio_player.stream = loop_stream
-	near_flame_audio_player.volume_db = near_flame_audio_min_db
+	near_flame_audio_player.volume_db = _get_boundary_audio_volume_db(near_flame_audio_min_db)
 	add_child(near_flame_audio_player)
 	near_flame_audio_player.play()
+
+
+func _get_boundary_audio_path() -> String:
+	if _is_ghost_effect_active():
+		return GHOST_BOUNDARY_SOUND_PATH
+
+	return NEAR_FLAMES_SOUND_PATH
+
+
+func _get_boundary_audio_volume_db(base_volume_db: float) -> float:
+	if _is_ghost_effect_active():
+		return base_volume_db + GHOST_BOUNDARY_VOLUME_BOOST_DB
+
+	return base_volume_db
 
 
 func _apply_flame_heat(delta: float) -> void:
@@ -1504,7 +1520,7 @@ func _update_near_flame_audio(delta: float) -> void:
 		return
 
 	if not _runtime_effects_enabled():
-		near_flame_audio_player.volume_db = near_flame_audio_min_db
+		near_flame_audio_player.volume_db = _get_boundary_audio_volume_db(near_flame_audio_min_db)
 		return
 
 	var closest_distance := INF
@@ -1524,6 +1540,7 @@ func _update_near_flame_audio(delta: float) -> void:
 		closeness = pow(closeness, near_flame_audio_curve)
 		target_volume = lerpf(near_flame_audio_min_db, near_flame_audio_max_db, closeness)
 
+	target_volume = _get_boundary_audio_volume_db(target_volume)
 	var t := 1.0 - exp(-near_flame_audio_lag * delta)
 	near_flame_audio_player.volume_db = lerpf(near_flame_audio_player.volume_db, target_volume, t)
 
