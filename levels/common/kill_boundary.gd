@@ -44,6 +44,12 @@ const EDITOR_SCRUB_TIME_EPSILON := 0.05
 ## Starts the boundary animation automatically during gameplay.
 @export var autoplay_boundary_animation := true
 
+## Loops BoundaryCenter back to the start when movement passes the end of the path.
+@export var loop_boundary_path := true:
+	set(value):
+		loop_boundary_path = value
+		_configure_path_follow()
+
 ## Distance travelled along the path per second. Key this to create pressure changes.
 @export_range(0.0, 20.0, 0.05, "or_greater", "suffix:m/s") var movement_speed := 1.0
 
@@ -576,8 +582,7 @@ func _ensure_boundary_nodes() -> void:
 		add_child(center)
 		_set_authored_owner(center)
 
-	center.rotation_mode = PathFollow3D.ROTATION_NONE
-	center.loop = true
+	_configure_path_follow()
 
 	var animation_player := get_node_or_null(ANIMATION_PLAYER_NAME) as AnimationPlayer
 	if animation_player == null:
@@ -614,7 +619,7 @@ func _configure_path_follow() -> void:
 		return
 
 	path_follow.rotation_mode = PathFollow3D.ROTATION_NONE
-	path_follow.loop = true
+	path_follow.loop = loop_boundary_path
 
 
 func _get_center_node() -> Node3D:
