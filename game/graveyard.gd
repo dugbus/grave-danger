@@ -44,9 +44,6 @@ func _on_coin_absorbed(count: int) -> void:
 	coins_collected += maxi(count, 0)
 	_store_result_stats()
 
-	if max_coins_collected > 0 and coins_collected >= max_coins_collected:
-		_show_win_screen()
-
 
 func _on_level_completed() -> void:
 	if showing_result:
