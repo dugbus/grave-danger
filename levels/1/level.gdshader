@@ -1,7 +1,7 @@
 shader_type spatial;
 
 uniform sampler2D tiled_texture : source_color, filter_linear_mipmap, repeat_enable;
-uniform vec2 uv_scale = vec2(10.0, 10.0); // Adjust tile amount here
+uniform vec2 uv_scale = vec2(8.0, 87.0); // Adjust tile amount here
 uniform float fade_margin : hint_range(0.0, 0.5) = 0.2; // How wide the black fade is
 
 void fragment() {
