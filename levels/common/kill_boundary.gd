@@ -372,6 +372,10 @@ func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
 
+	if boundary_removed_for_level:
+		_update_removed_boundary_visuals(delta)
+		return
+
 	if not _runtime_effects_enabled():
 		_set_runtime_effects_enabled(false)
 		return
@@ -488,13 +492,14 @@ func remove_for_level(sink_seconds := 1.0, sink_distance := 3.0) -> bool:
 	if boundary_removed_for_level:
 		return false
 
-	boundary_removed_for_level = true
 	runtime_pause_token += 1
 	if runtime_bounds_tween != null and runtime_bounds_tween.is_valid():
 		runtime_bounds_tween.kill()
+	_sync_movement_to_animation()
+	_sync_boundary()
+	boundary_removed_for_level = true
 	_set_runtime_effects_enabled(false, true)
 	set_process(false)
-	set_physics_process(false)
 	_sink_removed_boundary(sink_seconds, sink_distance)
 	return true
 
@@ -541,8 +546,12 @@ func _set_runtime_effects_enabled(enabled: bool, keep_visuals := false) -> void:
 	if animation_player != null:
 		if enabled and autoplay_boundary_animation and animation_player.has_animation(DEFAULT_ANIMATION_NAME) and not animation_player.is_playing():
 			animation_player.play(DEFAULT_ANIMATION_NAME)
+		elif not enabled and keep_visuals:
+			animation_player.speed_scale = 1.0
+			if autoplay_boundary_animation and animation_player.has_animation(DEFAULT_ANIMATION_NAME) and not animation_player.is_playing():
+				animation_player.play(DEFAULT_ANIMATION_NAME)
 		elif not enabled and animation_player.is_playing():
-			animation_player.stop()
+			animation_player.stop(true)
 
 	if near_flame_audio_player != null:
 		near_flame_audio_player.stream_paused = not enabled
@@ -703,6 +712,14 @@ func _sync_movement_to_animation() -> void:
 	_sync_boundary_scale_rotation_to_animation(animation, animation_position)
 	_set_center_progress(center, movement_cycle_distance + _calculate_travel_distance(animation, animation_position))
 	last_animation_position = animation_position
+
+
+func _update_removed_boundary_visuals(delta: float) -> void:
+	elapsed_time += delta
+	runtime_effect_time += delta
+	_sync_movement_to_animation()
+	_sync_boundary(true)
+	_update_ghost_billboards()
 
 
 func _sync_editor_preview_animation() -> void:
@@ -1204,8 +1221,10 @@ func _ensure_player_blocker_count(center: Node3D) -> void:
 		removed_body.queue_free()
 
 
-func _sync_boundary() -> void:
-	if not is_inside_tree() or boundary_removed_for_level or is_syncing_boundary:
+func _sync_boundary(update_removed_visuals := false) -> void:
+	if not is_inside_tree() or is_syncing_boundary:
+		return
+	if boundary_removed_for_level and not update_removed_visuals:
 		return
 
 	is_syncing_boundary = true
@@ -1219,7 +1238,7 @@ func _sync_boundary() -> void:
 		is_syncing_boundary = false
 		return
 
-	if not _runtime_effects_enabled():
+	if not _runtime_effects_enabled() and not update_removed_visuals:
 		_set_runtime_effects_enabled(false)
 		is_syncing_boundary = false
 		return
