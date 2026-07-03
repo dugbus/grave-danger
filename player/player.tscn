@@ -68,14 +68,34 @@ script = ExtResource("6_7xubc")
 
 [node name="Character" parent="Pivot" unique_id=2053546351 instance=ExtResource("1_4flbx")]
 
-[node name="PlayerLight" type="OmniLight3D" parent="Pivot" unique_id=994237452]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 1.42, 0.34)
+[node name="PlayerHeadlampLight" type="SpotLight3D" parent="Pivot"]
+transform = Transform3D(-1, 0, -8.7422777e-08, -5.015858e-08, 0.81915206, 0.57357645, 7.163184e-08, 0.57357645, -0.81915206, 0, 1.05, 0.3)
 light_color = Color(0.8842759, 0.4890548, 0.27783498, 1)
-light_energy = 2.0
+light_energy = 50.0
+light_indirect_energy = 0.0
+shadow_enabled = true
+spot_range = 20.0
+spot_attenuation = 2.5
+spot_angle = 90.0
+spot_angle_attenuation = 0.5
+script = ExtResource("7_boad6")
+base_energy = 3.0
+dip_amount = 0.45
+peak_amount = 1.0
+noise_fast = SubResource("NoiseTexture3D_fast")
+noise_slow = SubResource("NoiseTexture3D_slow")
+
+[node name="PlayerLight" type="OmniLight3D" parent="Pivot" unique_id=994237452]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0.3)
+light_color = Color(0.8842759, 0.4890548, 0.27783498, 1)
+light_energy = 1.25
 shadow_enabled = true
 omni_range = 6.0
-omni_attenuation = 1.35
+omni_attenuation = 0.2
 script = ExtResource("7_boad6")
+base_energy = 0.5
+dip_amount = 0.02
+peak_amount = 0.015
 noise_fast = SubResource("NoiseTexture3D_fast")
 noise_slow = SubResource("NoiseTexture3D_slow")
 

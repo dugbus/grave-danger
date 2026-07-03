@@ -37,6 +37,7 @@ func _ready() -> void:
 			completion_source.level_completed.connect(_on_level_completed)
 
 
+## Deposited coins update result stats only; gate completion owns the win condition.
 func _on_coin_absorbed(count: int) -> void:
 	if showing_result:
 		return

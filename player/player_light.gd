@@ -1,4 +1,4 @@
-extends OmniLight3D
+extends Light3D
 class_name GDPlayerLight
 
 ## Baseline flame brightness before the flicker offset is applied.
@@ -7,8 +7,11 @@ class_name GDPlayerLight
 @export var dip_amount := 1.45
 ## Maximum amount the flame can rise above its baseline brightness.
 @export var peak_amount := 0.65
+## Rate at which the flame samples the fast flicker noise.
 @export var flicker_speed := 7.5
+## High-frequency noise used for small flame flutter.
 @export var noise_fast: NoiseTexture3D
+## Low-frequency noise used for larger flame swells and dips.
 @export var noise_slow: NoiseTexture3D
 
 var time_passed := 0.0
