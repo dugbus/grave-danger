@@ -28,3 +28,11 @@ export const DOOR_COLOR: PixelColor = {
   blue: 255,
   alpha: 255,
 };
+
+/** Pixel color used outside organic cavern bounds. */
+export const TRANSPARENT_COLOR: PixelColor = {
+  red: 0,
+  green: 0,
+  blue: 0,
+  alpha: 0,
+};

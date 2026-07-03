@@ -24,9 +24,9 @@ export class RoomsOperation implements MapOperation {
       return;
     }
 
-    const target_room_count = this.target_room_count(map);
+    const target_room_count = this.target_room_count(map, context);
     const rooms: RoomBounds[] = [];
-    const maximum_attempts = target_room_count * 12;
+    const maximum_attempts = target_room_count * 30;
 
     for (
       let attempt = 0;
@@ -42,12 +42,17 @@ export class RoomsOperation implements MapOperation {
       }
 
       this.carve_room(map, room);
+      this.clear_outer_surround(map, room);
       this.place_door(map, room, context);
       rooms.push(room);
     }
   }
 
-  private target_room_count(map: MapCanvas): number {
+  private target_room_count(map: MapCanvas, context: OperationContext): number {
+    if (context.rooms_count !== null) {
+      return context.rooms_count;
+    }
+
     const area = map.width * map.height;
     return Math.max(1, Math.min(12, Math.floor(area / 180)));
   }
@@ -84,6 +89,34 @@ export class RoomsOperation implements MapOperation {
         map.set_pixel(x, y, is_wall ? WALL_COLOR : FLOOR_COLOR);
       }
     }
+  }
+
+  private clear_outer_surround(map: MapCanvas, room: RoomBounds): void {
+    const left = room.x - 1;
+    const right = room.x + room.width;
+    const top = room.y - 1;
+    const bottom = room.y + room.height;
+
+    for (let x = left; x <= right; x += 1) {
+      this.clear_if_not_edge(map, x, top);
+      this.clear_if_not_edge(map, x, bottom);
+    }
+
+    for (let y = top; y <= bottom; y += 1) {
+      this.clear_if_not_edge(map, left, y);
+      this.clear_if_not_edge(map, right, y);
+    }
+  }
+
+  private clear_if_not_edge(map: MapCanvas, x: number, y: number): void {
+    if (
+      x <= 0 || x >= map.width - 1 || y <= 0 || y >= map.height - 1 ||
+      !map.is_inside(x, y)
+    ) {
+      return;
+    }
+
+    map.set_pixel(x, y, FLOOR_COLOR);
   }
 
   private place_door(

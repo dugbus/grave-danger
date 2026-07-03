@@ -1,6 +1,7 @@
 {
   "tasks": {
-    "dev": "deno run --watch --allow-write main.ts 31 31 --seed dev --maze --surround-with-walls --output map.png",
+    "dev": "deno run --watch --allow-write main.ts 31 31 --seed dev --maze-corridor-width 2 --maze --rooms-count 3 --rooms --paint-out 12 --surround-with-caves --output map.png",
+    "random-maze": "deno run --allow-write --allow-run=ffmpeg random-maze.ts",
     "test": "deno test"
   },
   "imports": {

@@ -6,6 +6,10 @@ export class SurroundWithWallsOperation implements MapOperation {
   readonly name = "surround-with-walls";
 
   apply(map: MapCanvas, _context: OperationContext): void {
+    if (map.width < 1 || map.height < 1) {
+      return;
+    }
+
     for (let x = 0; x < map.width; x += 1) {
       map.set_pixel(x, 0, WALL_COLOR);
       map.set_pixel(x, map.height - 1, WALL_COLOR);
