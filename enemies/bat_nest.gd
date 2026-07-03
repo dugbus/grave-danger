@@ -15,6 +15,10 @@ const DEFAULT_BAT_SCENE := preload("res://Assets/environment/blender/batty.blend
 const PLAYER_GROUP: StringName = &"player"
 const COMBINED_FLAP_ANIMATION: StringName = &"combined_flap"
 const DEFAULT_FLAP_SOUND_PATH := "res://Assets/audio/bat-flap.mp3"
+const DEFAULT_SQUEAK_SOUND_PATHS: Array[String] = [
+    "res://Assets/audio/bat-squeek-1.mp3",
+    "res://Assets/audio/bat-squeek-2.mp3",
+]
 const MIN_BAT_COUNT := 1
 const MAX_BAT_COUNT := 80
 const MIN_SPEED := 0.05
@@ -105,6 +109,28 @@ const MIN_SPEED := 0.05
 @export_range(0.1, 30.0, 0.1, "suffix:m") var flap_sound_unit_size := 8.0
 ## Maximum bat flap one-shots allowed to overlap for this nest.
 @export_range(1, 8, 1) var flap_sound_max_concurrent := 3
+## Bat squeak one-shot samples randomly played by the nest.
+@export var squeak_sound_paths: Array[String] = DEFAULT_SQUEAK_SOUND_PATHS
+## Volume for each bat squeak one-shot.
+@export var squeak_sound_volume_db := 2.0
+## Lowest random pitch used for bat squeaks.
+@export_range(0.1, 3.0, 0.01) var squeak_sound_pitch_min := 0.92
+## Highest random pitch used for bat squeaks.
+@export_range(0.1, 3.0, 0.01) var squeak_sound_pitch_max := 1.12
+## Shortest delay between bat squeak trigger attempts.
+@export_range(0.03, 5.0, 0.01, "suffix:s") var squeak_sound_interval_min := 0.08
+## Longest delay between bat squeak trigger attempts.
+@export_range(0.03, 8.0, 0.01, "suffix:s") var squeak_sound_interval_max := 0.22
+## Chance that each squeak trigger attempt actually plays a sample.
+@export_range(0.0, 100.0, 1.0, "suffix:%") var squeak_sound_chance_percent := 95.0
+## Distance where bat squeak audio fades out.
+@export_range(1.0, 120.0, 0.5, "suffix:m") var squeak_sound_max_distance := 42.0
+## Distance scale for 3D attenuation; higher values keep squeaks audible from the follow camera.
+@export_range(0.1, 30.0, 0.1, "suffix:m") var squeak_sound_unit_size := 8.0
+## Maximum bat squeak one-shots allowed to overlap for this nest.
+@export_range(1, 8, 1) var squeak_sound_max_concurrent := 4
+## Seconds after fly-off starts for bat sounds to fade out.
+@export_range(0.0, 10.0, 0.05, "suffix:s") var fly_off_audio_fade_seconds := 1.35
 @export_group("")
 @export_group("Camera Scare")
 ## Percent chance that one bat flies toward the active camera when the nest triggers.
@@ -129,8 +155,11 @@ var scare_camera: Camera3D
 var scare_elapsed_seconds := 0.0
 var camera_scare_active := false
 var flap_sound: AudioStream
+var squeak_sounds: Array[AudioStream] = []
 var active_flap_audio_players: Array[AudioStreamPlayer3D] = []
+var active_squeak_audio_players: Array[AudioStreamPlayer3D] = []
 var flap_sound_timer := 0.0
+var squeak_sound_timer := 0.0
 var rng := RandomNumberGenerator.new()
 
 
@@ -152,7 +181,9 @@ class BatState:
 func _ready() -> void:
     rng.seed = hash("%s:%s" % [scene_file_path, str(get_path()) if is_inside_tree() else name])
     _load_flap_sound()
+    _load_squeak_sounds()
     _randomize_next_flap_sound()
+    _randomize_next_squeak_sound()
     _rebuild_roost()
 
 
@@ -172,6 +203,7 @@ func _physics_process(delta: float) -> void:
 
     _update_bat_animations()
     _update_flap_audio(delta)
+    _update_squeak_audio(delta)
 
 
 func force_take_flight(target_player: Node3D = null) -> void:
@@ -226,6 +258,7 @@ func _rebuild_roost() -> void:
 
 func _clear_bats() -> void:
     _stop_flap_audio()
+    _stop_squeak_audio()
     for bat_state in bats:
         if bat_state.node != null:
             if Engine.is_editor_hint():
@@ -277,6 +310,7 @@ func _start_swarm() -> void:
 
     _try_start_camera_scare()
     flap_sound_timer = 0.0
+    squeak_sound_timer = 0.0
 
 
 func _update_swarming(delta: float) -> void:
@@ -384,8 +418,16 @@ func _load_flap_sound() -> void:
     flap_sound = GDAudio.load_stream(flap_sound_path)
 
 
+func _load_squeak_sounds() -> void:
+    if Engine.is_editor_hint():
+        return
+
+    squeak_sounds = GDAudio.load_streams(squeak_sound_paths)
+
+
 func _update_flap_audio(delta: float) -> void:
     _prune_finished_flap_audio_players()
+    _apply_audio_fade(active_flap_audio_players, flap_sound_volume_db)
     if flap_sound == null:
         return
 
@@ -398,6 +440,9 @@ func _update_flap_audio(delta: float) -> void:
     if flap_sound_timer > 0.0:
         return
 
+    if _is_fly_off_audio_faded_out():
+        return
+
     if active_flap_audio_players.size() >= flap_sound_max_concurrent:
         _randomize_next_flap_sound()
         return
@@ -405,7 +450,7 @@ func _update_flap_audio(delta: float) -> void:
     var flap_audio_player := AudioStreamPlayer3D.new()
     flap_audio_player.name = "BatFlapOneShotAudio"
     flap_audio_player.stream = flap_sound
-    flap_audio_player.volume_db = flap_sound_volume_db
+    flap_audio_player.volume_db = _get_faded_audio_volume_db(flap_sound_volume_db)
     flap_audio_player.pitch_scale = rng.randf_range(
         minf(flap_sound_pitch_min, flap_sound_pitch_max),
         maxf(flap_sound_pitch_min, flap_sound_pitch_max)
@@ -421,11 +466,95 @@ func _update_flap_audio(delta: float) -> void:
     _randomize_next_flap_sound()
 
 
+func _update_squeak_audio(delta: float) -> void:
+    _prune_finished_squeak_audio_players()
+    _apply_audio_fade(active_squeak_audio_players, squeak_sound_volume_db)
+    if squeak_sounds.is_empty():
+        return
+
+    if state == BatNestState.ROOSTING or state == BatNestState.FINISHED or bats.is_empty():
+        _stop_squeak_audio()
+        return
+
+    squeak_sound_timer -= delta
+    if squeak_sound_timer > 0.0:
+        return
+
+    if _is_fly_off_audio_faded_out():
+        return
+
+    if active_squeak_audio_players.size() >= squeak_sound_max_concurrent:
+        _randomize_next_squeak_sound()
+        return
+
+    if rng.randf() * 100.0 > squeak_sound_chance_percent:
+        _randomize_next_squeak_sound()
+        return
+
+    var stream := squeak_sounds[rng.randi_range(0, squeak_sounds.size() - 1)]
+    var squeak_audio_player := AudioStreamPlayer3D.new()
+    squeak_audio_player.name = "BatSqueakOneShotAudio"
+    squeak_audio_player.stream = stream
+    squeak_audio_player.volume_db = _get_faded_audio_volume_db(squeak_sound_volume_db)
+    squeak_audio_player.pitch_scale = rng.randf_range(
+        minf(squeak_sound_pitch_min, squeak_sound_pitch_max),
+        maxf(squeak_sound_pitch_min, squeak_sound_pitch_max)
+    )
+    squeak_audio_player.max_distance = squeak_sound_max_distance
+    squeak_audio_player.unit_size = squeak_sound_unit_size
+    squeak_audio_player.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
+    squeak_audio_player.finished.connect(_on_squeak_audio_finished.bind(squeak_audio_player))
+    add_child(squeak_audio_player)
+    squeak_audio_player.global_position = _get_flock_center()
+    active_squeak_audio_players.append(squeak_audio_player)
+    squeak_audio_player.play()
+    _randomize_next_squeak_sound()
+
+
 func _randomize_next_flap_sound() -> void:
     flap_sound_timer = rng.randf_range(
         minf(flap_sound_interval_min, flap_sound_interval_max),
         maxf(flap_sound_interval_min, flap_sound_interval_max)
     )
+
+
+func _randomize_next_squeak_sound() -> void:
+    squeak_sound_timer = rng.randf_range(
+        minf(squeak_sound_interval_min, squeak_sound_interval_max),
+        maxf(squeak_sound_interval_min, squeak_sound_interval_max)
+    )
+
+
+func _apply_audio_fade(audio_players: Array[AudioStreamPlayer3D], base_volume_db: float) -> void:
+    var faded_volume_db := _get_faded_audio_volume_db(base_volume_db)
+    for audio_player in audio_players:
+        if audio_player == null:
+            continue
+
+        audio_player.volume_db = faded_volume_db
+
+
+func _get_faded_audio_volume_db(base_volume_db: float) -> float:
+    var fade := _get_fly_off_audio_fade()
+    if fade >= 1.0:
+        return base_volume_db
+
+    return base_volume_db + linear_to_db(maxf(fade, 0.001))
+
+
+func _get_fly_off_audio_fade() -> float:
+    if state != BatNestState.FLYING_OFF:
+        return 1.0
+
+    var fade_seconds := minf(maxf(fly_off_audio_fade_seconds, 0.0), maxf(fly_off_seconds, 0.001))
+    if fade_seconds <= 0.0:
+        return 0.0
+
+    return 1.0 - clampf(elapsed_state_seconds / fade_seconds, 0.0, 1.0)
+
+
+func _is_fly_off_audio_faded_out() -> bool:
+    return state == BatNestState.FLYING_OFF and _get_fly_off_audio_fade() <= 0.02
 
 
 func _stop_flap_audio() -> void:
@@ -439,6 +568,17 @@ func _stop_flap_audio() -> void:
     active_flap_audio_players.clear()
 
 
+func _stop_squeak_audio() -> void:
+    for squeak_audio_player in active_squeak_audio_players.duplicate():
+        if squeak_audio_player == null:
+            continue
+
+        squeak_audio_player.stop()
+        squeak_audio_player.queue_free()
+
+    active_squeak_audio_players.clear()
+
+
 func _prune_finished_flap_audio_players() -> void:
     for index in range(active_flap_audio_players.size() - 1, -1, -1):
         var flap_audio_player := active_flap_audio_players[index]
@@ -446,10 +586,23 @@ func _prune_finished_flap_audio_players() -> void:
             active_flap_audio_players.remove_at(index)
 
 
+func _prune_finished_squeak_audio_players() -> void:
+    for index in range(active_squeak_audio_players.size() - 1, -1, -1):
+        var squeak_audio_player := active_squeak_audio_players[index]
+        if squeak_audio_player == null or not is_instance_valid(squeak_audio_player):
+            active_squeak_audio_players.remove_at(index)
+
+
 func _on_flap_audio_finished(flap_audio_player: AudioStreamPlayer3D) -> void:
     active_flap_audio_players.erase(flap_audio_player)
     if flap_audio_player != null:
         flap_audio_player.queue_free()
+
+
+func _on_squeak_audio_finished(squeak_audio_player: AudioStreamPlayer3D) -> void:
+    active_squeak_audio_players.erase(squeak_audio_player)
+    if squeak_audio_player != null:
+        squeak_audio_player.queue_free()
 
 
 func _get_flock_center() -> Vector3:

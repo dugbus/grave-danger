@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "dev": "deno run --watch --allow-write main.ts 31 31 --seed dev --maze --surround-with-walls --output map.png",
+    "test": "deno test"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1"
+  }
+}
