@@ -6,9 +6,11 @@
 [ext_resource type="PackedScene" path="res://collectibles/gold_coin_pile.tscn" id="6_1rl82"]
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="6_ivkoh"]
 [ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="8_sqtlf"]
+[ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://levels/1/level.gdshader" id="8_t5rcl"]
+[ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="9_ywqr7"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 
-[sub_resource type="Curve3D" id="Curve3D_s2s57"]
+[sub_resource type="Curve3D" id="Curve3D_xsp4e"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0),
@@ -16,7 +18,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Animation" id="Animation_t5rcl"]
+[sub_resource type="Animation" id="Animation_qfxyg"]
 resource_local_to_scene = true
 resource_name = "kill_boundary"
 length = 4.0
@@ -82,6 +84,19 @@ tracks/4/keys = {
 "values": [0.0, 0.0]
 }
 
+[sub_resource type="PlaneMesh" id="PlaneMesh_e87q2"]
+size = Vector2(124, 186)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_l4oko"]
+render_priority = 0
+shader = ExtResource("8_t5rcl")
+shader_parameter/tiled_texture = ExtResource("9_ywqr7")
+shader_parameter/uv_scale = Vector2(3, 3)
+shader_parameter/fade_margin = 0.2
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_41ed0"]
+size = Vector3(124, 0.1, 186)
+
 [node name="Level4" type="Node3D" unique_id=1711249033]
 
 [node name="IndoorLighting" parent="." unique_id=1711692255 instance=ExtResource("100_indoor")]
@@ -90,8 +105,8 @@ tracks/4/keys = {
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, -2)
 
 [node name="KillBoundary3D" parent="." unique_id=463239041 instance=ExtResource("8_sqtlf")]
-curve = SubResource("Curve3D_s2s57")
-boundary_animation = SubResource("Animation_t5rcl")
+curve = SubResource("Curve3D_xsp4e")
+boundary_animation = SubResource("Animation_qfxyg")
 bounds_size = Vector2(119, 179)
 boundary_segments = 96
 
@@ -162,3 +177,15 @@ random_seed = 4007
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 48)
 coin_count = 10
 random_seed = 4008
+
+[node name="Tiled Floor" type="Node3D" parent="." unique_id=805366673]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Tiled Floor" unique_id=28699236]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiled Floor/StaticBody3D" unique_id=1772009123]
+mesh = SubResource("PlaneMesh_e87q2")
+surface_material_override/0 = SubResource("ShaderMaterial_l4oko")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiled Floor/StaticBody3D" unique_id=1945503350]
+shape = SubResource("BoxShape3D_41ed0")

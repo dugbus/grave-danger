@@ -4,9 +4,11 @@
 [ext_resource type="PackedScene" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="4_cogbq"]
 [ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="4_flame"]
+[ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://levels/1/level.gdshader" id="6_rakk4"]
+[ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="7_46uyn"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 
-[sub_resource type="Curve3D" id="Curve3D_ej6ns"]
+[sub_resource type="Curve3D" id="Curve3D_xr1q8"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -15.122086, 0.01753807, -21.473944, 0, 0, 0, 0, 0, 0, 262.24744, 0.0094509125, -21.709044),
@@ -14,7 +16,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Animation" id="Animation_rakk4"]
+[sub_resource type="Animation" id="Animation_c2irs"]
 resource_local_to_scene = true
 resource_name = "kill_boundary"
 length = 475.27316
@@ -80,10 +82,23 @@ tracks/4/keys = {
 "values": [1.0, 1.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_46uyn"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_nst7r"]
 _data = {
-&"kill_boundary": SubResource("Animation_rakk4")
+&"kill_boundary": SubResource("Animation_c2irs")
 }
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_u6dqf"]
+size = Vector2(24, 24)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rwgeq"]
+render_priority = 0
+shader = ExtResource("6_rakk4")
+shader_parameter/tiled_texture = ExtResource("7_46uyn")
+shader_parameter/uv_scale = Vector2(3, 3)
+shader_parameter/fade_margin = 0.2
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_f2tia"]
+size = Vector3(24, 0.1, 24)
 
 [node name="Level3" type="Node3D" unique_id=340819746]
 
@@ -94,8 +109,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -138.16736, 11.999611, -0.169
 
 [node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, -125.43729, 0, 21.607485)
-curve = SubResource("Curve3D_ej6ns")
-boundary_animation = SubResource("Animation_rakk4")
+curve = SubResource("Curve3D_xr1q8")
+boundary_animation = SubResource("Animation_c2irs")
 playback_duration = 475.27316
 movement_speed = 1.95
 boundary_scale_x = 2.2
@@ -106,7 +121,7 @@ shape_morph = 1.0
 transform = Transform3D(2.2, 0, 0, 0, 1, 0, 0, 0, 2.2, -15.122086, 0.01753807, -21.473944)
 
 [node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_46uyn")
+libraries/ = SubResource("AnimationLibrary_nst7r")
 
 [node name="PNGGridMap" type="GridMap" parent="." unique_id=1498944449]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -149.5, 0, -9.5)
@@ -122,5 +137,19 @@ data = {
 [node name="GoldCoinPile" parent="Objects" unique_id=1305244581 instance=ExtResource("3_coinpile")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.7637644, 0, -1.4678383)
 coin_count = 10
+
+[node name="Tiled Floor" type="Node3D" parent="." unique_id=1911167747]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Tiled Floor" unique_id=1341768302]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiled Floor/StaticBody3D" unique_id=1137796034]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 0, 10.5)
+mesh = SubResource("PlaneMesh_u6dqf")
+surface_material_override/0 = SubResource("ShaderMaterial_rwgeq")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiled Floor/StaticBody3D" unique_id=1154710177]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 0, 10.5)
+shape = SubResource("BoxShape3D_f2tia")
 
 [editable path="KillBoundary3D"]

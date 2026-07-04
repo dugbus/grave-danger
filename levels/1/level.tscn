@@ -392,7 +392,6 @@ orbit_weight = 2.4
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, 9.5)
 
 [node name="Tiled Floor" type="Node3D" parent="." unique_id=340660680]
-visible = false
 
 [node name="StaticBody3D" type="StaticBody3D" parent="Tiled Floor" unique_id=1983636118]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1)
