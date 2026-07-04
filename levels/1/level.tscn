@@ -15,7 +15,7 @@
 [ext_resource type="ArrayMesh" uid="uid://bnp6ud7heja8" path="res://Assets/environment/grass-small.res" id="14_w2m8w"]
 [ext_resource type="Script" uid="uid://2juaclm8gc1n" path="res://addons/simplegrasstextured/grass.gd" id="16_86xts"]
 [ext_resource type="PackedScene" path="res://collectibles/key.tscn" id="17_w2m8w"]
-[ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://levels/1/level.gdshader" id="18_ly0q6"]
+[ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://Assets/environment/shaders/level.gdshader" id="18_ly0q6"]
 [ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="19_6qs2t"]
 [ext_resource type="PackedScene" path="res://pushables/hay_bale_pushable.tscn" id="20_wynp1"]
 [ext_resource type="PackedScene" path="res://collectibles/flask_no_boundary.tscn" id="21_bj40y"]
