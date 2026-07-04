@@ -11,6 +11,7 @@ const FOOTSTEP_SOUND_PATHS: Array[String] = [
 const CHARACTER_GROUP: StringName = &"character"
 const SKELETON_GROUP: StringName = &"skeleton"
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
+const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const WORLD_COLLISION_LAYER := 1
 
 ## PathFollow3D that carries the skeleton visual and contact area.
@@ -130,6 +131,7 @@ const WORLD_COLLISION_LAYER := 1
 
 var patrol_direction := 1.0
 var footstep_sounds: Array[AudioStream] = []
+var footstep_rng := RandomNumberGenerator.new()
 var footstep_distance_accumulator := 0.0
 var next_footstep_distance := 1.0
 var animation_player: AnimationPlayer
@@ -148,7 +150,7 @@ var is_disappearing := false
 func _ready() -> void:
     add_to_group(CHARACTER_GROUP)
     add_to_group(SKELETON_GROUP)
-    randomize()
+    footstep_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"skeleton_audio")
     _load_footstep_sounds()
     _randomize_next_footstep_distance()
     _apply_start_progress()
@@ -522,7 +524,7 @@ func _update_footsteps(delta: float, horizontal_speed: float) -> void:
 
 func _randomize_next_footstep_distance() -> void:
     var variance := maxf(footstep_distance_variance, 0.0)
-    next_footstep_distance = maxf(0.1, footstep_distance + randf_range(-variance, variance))
+    next_footstep_distance = maxf(0.1, footstep_distance + footstep_rng.randf_range(-variance, variance))
 
 
 func _play_footstep(horizontal_speed: float) -> void:
@@ -540,7 +542,8 @@ func _play_footstep(horizontal_speed: float) -> void:
         footstep_volume_min_db,
         footstep_volume_max_db,
         footstep_pitch_min,
-        footstep_pitch_max
+        footstep_pitch_max,
+        footstep_rng
     )
 
 

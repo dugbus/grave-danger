@@ -4,6 +4,7 @@ class_name GDPlayerInventory
 
 const GOLD_COIN_ITEM_TYPE := &"gold_coin"
 const DEFAULT_GOLD_COIN_ITEM := preload("res://inventory/items/gold_coin.tres")
+const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 
 # A carried item can only be collected if it is roughly in front of the character.
 const PICKUP_FACING_DOT = 0.35
@@ -41,6 +42,11 @@ signal carried_gold_coins_changed(carried_count: int)
 var carried_items := {}
 var drop_cooldown := 0.0
 var bonus_inventory_space := 0
+var audio_rng := RandomNumberGenerator.new()
+
+
+func _ready() -> void:
+	audio_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"player_inventory_audio")
 
 
 func update_drop_input(delta: float) -> void:
@@ -173,7 +179,7 @@ func get_item_count(item_type: StringName) -> int:
 
 func get_carried_weight() -> float:
 	var total := 0.0
-	for item_type in carried_items.keys():
+	for item_type in _get_sorted_carried_item_types():
 		var item: Resource = peek_item_of_type(item_type)
 		if item == null:
 			continue
@@ -229,7 +235,7 @@ func _add_item(item: Resource) -> void:
 
 func _get_next_drop_item() -> Resource:
 	var best_item: Resource = null
-	for item_type in carried_items.keys():
+	for item_type in _get_sorted_carried_item_types():
 		var item: Resource = peek_item_of_type(item_type)
 		if item == null or get_item_count(_item_type(item)) <= 0:
 			continue
@@ -267,7 +273,7 @@ func _drop_unstored_pickup(item: Resource) -> bool:
 func _get_next_auto_shed_item(incoming_item: Resource) -> Resource:
 	var best_item: Resource = null
 	var incoming_drop_order := _item_drop_order(incoming_item)
-	for item_type in carried_items.keys():
+	for item_type in _get_sorted_carried_item_types():
 		var item: Resource = peek_item_of_type(item_type)
 		if item == null or get_item_count(_item_type(item)) <= 0:
 			continue
@@ -308,7 +314,7 @@ func _is_drop_position_blocked(item: Resource, position: Vector3) -> bool:
 	if _item_type(item) != GOLD_COIN_ITEM_TYPE:
 		return false
 
-	for coin in get_tree().get_nodes_in_group("gold_coin"):
+	for coin in _get_sorted_gold_coins():
 		if not coin is Node3D:
 			continue
 
@@ -321,7 +327,7 @@ func _is_drop_position_blocked(item: Resource, position: Vector3) -> bool:
 
 
 func _nudge_blocking_coins(position: Vector3, fallback_direction: Vector3) -> void:
-	for coin in get_tree().get_nodes_in_group("gold_coin"):
+	for coin in _get_sorted_gold_coins():
 		if not coin is RigidBody3D:
 			continue
 
@@ -408,15 +414,42 @@ func _play_item_sound(item: Resource, sound: AudioStream, player_name: String) -
 	var pitch_scale := ITEM_SOUND_PITCH_MIN
 	var volume_db := ITEM_SOUND_VOLUME_MIN_DB
 	if _item_type(item) == GOLD_COIN_ITEM_TYPE:
-		pitch_scale = randf_range(COIN_SOUND_PITCH_MIN, COIN_SOUND_PITCH_MAX)
-		volume_db = randf_range(
+		pitch_scale = audio_rng.randf_range(COIN_SOUND_PITCH_MIN, COIN_SOUND_PITCH_MAX)
+		volume_db = audio_rng.randf_range(
 			ITEM_SOUND_VOLUME_MIN_DB + COIN_SOUND_VOLUME_OFFSET_DB,
 			ITEM_SOUND_VOLUME_MAX_DB + COIN_SOUND_VOLUME_OFFSET_DB
 		)
 	else:
-		pitch_scale = randf_range(ITEM_SOUND_PITCH_MIN, ITEM_SOUND_PITCH_MAX)
-		volume_db = randf_range(ITEM_SOUND_VOLUME_MIN_DB, ITEM_SOUND_VOLUME_MAX_DB)
+		pitch_scale = audio_rng.randf_range(ITEM_SOUND_PITCH_MIN, ITEM_SOUND_PITCH_MAX)
+		volume_db = audio_rng.randf_range(ITEM_SOUND_VOLUME_MIN_DB, ITEM_SOUND_VOLUME_MAX_DB)
 
 	var audio_parent: Node = player if player != null else self
 	var sound_name := player_name if not player_name.is_empty() else "InventoryItemAudio"
 	GDAudio.play_one_shot(audio_parent, sound, sound_name, volume_db, pitch_scale)
+
+
+func _get_sorted_carried_item_types() -> Array[StringName]:
+	var item_types: Array[StringName] = []
+	for item_type in carried_items.keys():
+		item_types.append(item_type as StringName)
+
+	item_types.sort_custom(_sort_string_names)
+	return item_types
+
+
+func _get_sorted_gold_coins() -> Array[Node]:
+	var coins: Array[Node] = []
+	for coin in get_tree().get_nodes_in_group("gold_coin"):
+		if coin is Node:
+			coins.append(coin as Node)
+
+	coins.sort_custom(_sort_nodes_by_path)
+	return coins
+
+
+func _sort_string_names(a: StringName, b: StringName) -> bool:
+	return String(a) < String(b)
+
+
+func _sort_nodes_by_path(a: Node, b: Node) -> bool:
+	return str(a.get_path()) < str(b.get_path())

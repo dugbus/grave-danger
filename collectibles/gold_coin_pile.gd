@@ -4,7 +4,10 @@ class_name GDGoldCoinPile
 
 
 const GOLD_COIN_SCENE := preload("res://collectibles/gold_coin.tscn")
+const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const PREVIEW_CONTAINER_NAME := "EditorPreviewCoins"
+const GAMEPLAY_PROCESS_GROUP := &"deterministic_gameplay_process"
+const USEC_PER_SECOND := 1000000
 
 ## Total number of coins this pile will spawn.
 @export_range(0, 500, 1) var coin_count := 200:
@@ -27,15 +30,15 @@ const PREVIEW_CONTAINER_NAME := "EditorPreviewCoins"
 ## Seconds between individual coin spawns; zero queues the whole pile at once.
 @export_range(0.0, 1.0, 0.005) var spawn_interval := 0.01
 
-## Random seed for repeatable scatter; use 0 for a different scatter each run.
+## Random seed for repeatable scatter; 0 derives a stable seed from this pile's scene path.
 @export var random_seed := 0:
 	set(value):
 		random_seed = value
 		_refresh_preview_when_editing()
 
 @export_group("Runtime Culling")
-## Wait until the pile is close to the camera view before creating physics coins.
-@export var spawn_when_near_camera := true
+## Wait until the pile is close to the camera view before creating scheduled physics coins.
+@export var spawn_when_near_camera := false
 ## Extra screen area around the camera frustum where piles may begin spawning.
 @export_range(0.0, 2000.0, 1.0, "suffix:px") var spawn_screen_margin := 420.0
 ## Extra world-space radius tested around the pile center for visibility checks.
@@ -43,62 +46,85 @@ const PREVIEW_CONTAINER_NAME := "EditorPreviewCoins"
 ## Seconds between visibility checks before this pile starts spawning.
 @export_range(0.02, 2.0, 0.01) var visibility_check_interval := 0.15
 
-var spawn_elapsed := 0.0
-var trigger_elapsed := 0.0
+var spawn_elapsed_usec := 0
+var trigger_elapsed_usec := 0
+var scheduled_coins := 0
 var spawned_coins := 0
 var spawn_started := false
 var spawn_all_queued := false
 var spawn_area_active := false
 var visibility_check_elapsed := 0.0
+var runtime_seed := 0
 var rng := RandomNumberGenerator.new()
 var preview_mesh: CylinderMesh
 
 
 func _ready() -> void:
+	add_to_group(GAMEPLAY_PROCESS_GROUP)
 	if Engine.is_editor_hint():
 		_refresh_editor_preview()
 		return
 
-	if random_seed == 0:
-		rng.randomize()
-	else:
-		rng.seed = random_seed
+	runtime_seed = DETERMINISTIC_SEED.from_node(self, random_seed, &"gold_coin_pile")
+	rng.seed = runtime_seed
 
 	spawn_started = trigger_time <= 0.0
-	if not spawn_when_near_camera and spawn_started and spawn_interval <= 0.0:
-		_queue_spawn_all()
 
 
 func get_max_coin_count() -> int:
 	return coin_count
 
 
+func get_runtime_random_seed() -> int:
+	return runtime_seed
+
+
 func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
 
+	_advance_spawn_schedule()
+
 	if not _is_spawn_area_active(delta):
+		if scheduled_coins >= coin_count and coin_count <= 0:
+			queue_free()
+		return
+
+	_spawn_scheduled_coins()
+
+
+func _advance_spawn_schedule() -> void:
+	if scheduled_coins >= coin_count:
 		return
 
 	if not spawn_started:
-		trigger_elapsed += delta
-		if trigger_elapsed < trigger_time:
+		trigger_elapsed_usec += _get_physics_tick_usec()
+		if trigger_elapsed_usec < _seconds_to_usec(trigger_time):
 			return
 
 		spawn_started = true
 
 	if spawn_interval <= 0.0:
-		_queue_spawn_all()
+		scheduled_coins = coin_count
 		return
 
+	spawn_elapsed_usec += _get_physics_tick_usec()
+	var spawn_interval_usec := _seconds_to_usec(spawn_interval)
+	while spawn_elapsed_usec >= spawn_interval_usec and scheduled_coins < coin_count:
+		spawn_elapsed_usec -= spawn_interval_usec
+		scheduled_coins += 1
+
+
+func _spawn_scheduled_coins() -> void:
 	if spawned_coins >= coin_count:
 		queue_free()
 		return
 
-	spawn_elapsed += delta
-	while spawn_elapsed >= spawn_interval and spawned_coins < coin_count:
-		spawn_elapsed -= spawn_interval
+	while spawned_coins < scheduled_coins:
 		_spawn_gold_coin()
+
+	if spawned_coins >= coin_count:
+		queue_free()
 
 
 func _queue_spawn_all() -> void:
@@ -205,7 +231,7 @@ func _refresh_editor_preview() -> void:
 
 	var preview_rng := RandomNumberGenerator.new()
 	if random_seed == 0:
-		preview_rng.seed = 1337
+		preview_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"gold_coin_pile")
 	else:
 		preview_rng.seed = random_seed
 
@@ -259,3 +285,12 @@ func _get_preview_mesh() -> CylinderMesh:
 	preview_mesh.height = 0.035
 	preview_mesh.radial_segments = 32
 	return preview_mesh
+
+
+func _seconds_to_usec(seconds: float) -> int:
+	return maxi(roundi(maxf(seconds, 0.0) * float(USEC_PER_SECOND)), 1)
+
+
+func _get_physics_tick_usec() -> int:
+	var ticks_per_second := maxi(Engine.physics_ticks_per_second, 1)
+	return maxi(roundi(float(USEC_PER_SECOND) / float(ticks_per_second)), 1)

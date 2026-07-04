@@ -12,6 +12,7 @@ enum BatNestState {
 }
 
 const DEFAULT_BAT_SCENE := preload("res://Assets/environment/blender/batty.blend")
+const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const PLAYER_GROUP: StringName = &"player"
 const COMBINED_FLAP_ANIMATION: StringName = &"combined_flap"
 const DEFAULT_FLAP_SOUND_PATH := "res://Assets/audio/bat-flap.mp3"
@@ -179,7 +180,7 @@ class BatState:
 
 
 func _ready() -> void:
-    rng.seed = hash("%s:%s" % [scene_file_path, str(get_path()) if is_inside_tree() else name])
+    rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"bat_nest")
     _load_flap_sound()
     _load_squeak_sounds()
     _randomize_next_flap_sound()

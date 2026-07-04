@@ -18,6 +18,7 @@ var can_be_collected := false
 var is_being_collected := false
 var candidate_bodies: Array[Node3D] = []
 var pickup_radius_multiplier := 1.0
+var pickup_block_ticks_remaining := 0
 
 
 func _ready() -> void:
@@ -27,10 +28,11 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	_update_pickup_block()
 	if not can_be_collected or is_being_collected:
 		return
 
-	for body in candidate_bodies.duplicate():
+	for body in _get_sorted_candidate_bodies():
 		if not is_instance_valid(body):
 			candidate_bodies.erase(body)
 			continue
@@ -148,9 +150,7 @@ func _disable_collision_shapes(node: Node) -> void:
 func _block_pickup_for(seconds: float) -> void:
 	can_be_collected = false
 	is_being_collected = false
-	await get_tree().create_timer(seconds).timeout
-	if not is_being_collected:
-		can_be_collected = true
+	pickup_block_ticks_remaining = _seconds_to_physics_ticks(seconds)
 
 
 func _apply_pickup_radius_multiplier() -> void:
@@ -169,8 +169,42 @@ func _apply_pickup_radius_multiplier() -> void:
 
 
 func _get_runtime_pickup_radius_multiplier() -> float:
-	for body in get_tree().get_nodes_in_group("flame_vulnerable"):
+	for body in _get_sorted_flame_vulnerable_bodies():
 		if is_instance_valid(body) and body.has_method("get_pickup_radius_multiplier"):
 			return maxf(float(body.get_pickup_radius_multiplier()), 0.01)
 
 	return 1.0
+
+
+func _update_pickup_block() -> void:
+	if is_being_collected or can_be_collected:
+		return
+
+	pickup_block_ticks_remaining -= 1
+	if pickup_block_ticks_remaining <= 0:
+		can_be_collected = true
+
+
+func _seconds_to_physics_ticks(seconds: float) -> int:
+	var ticks_per_second := maxi(Engine.physics_ticks_per_second, 1)
+	return maxi(ceili(maxf(seconds, 0.0) * float(ticks_per_second)), 1)
+
+
+func _get_sorted_candidate_bodies() -> Array[Node3D]:
+	var sorted_bodies := candidate_bodies.duplicate()
+	sorted_bodies.sort_custom(_sort_nodes_by_path)
+	return sorted_bodies
+
+
+func _get_sorted_flame_vulnerable_bodies() -> Array[Node]:
+	var bodies: Array[Node] = []
+	for body in get_tree().get_nodes_in_group("flame_vulnerable"):
+		if body is Node:
+			bodies.append(body as Node)
+
+	bodies.sort_custom(_sort_nodes_by_path)
+	return bodies
+
+
+func _sort_nodes_by_path(a: Node, b: Node) -> bool:
+	return str(a.get_path()) < str(b.get_path())

@@ -4,6 +4,7 @@ class_name GDGraveyard
 const WIN_SCENE := "res://ui/screens/win_screen.tscn"
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 const KILL_BOUNDARY_SCRIPT := preload("res://levels/common/kill_boundary.gd")
+const LEVEL_SETTINGS_SCRIPT := preload("res://levels/common/level_settings.gd")
 const NAVIGATION_BOOTSTRAP := preload("res://game/navigation_bootstrap.gd")
 
 const CURRENT_LEVEL_NAME := "CurrentLevel"
@@ -116,6 +117,17 @@ func _configure_runtime_references() -> void:
 	if camera != null and camera.has_method("set_runtime_targets"):
 		camera.set_runtime_targets(player, kill_boundary)
 
+	var minimap := get_node_or_null("GameRuntime/MinimapHud/MinimapView")
+	var show_minimap := _should_show_minimap()
+	if minimap != null and minimap.has_method("set_minimap_enabled"):
+		minimap.set_minimap_enabled(false)
+	if show_minimap and minimap != null and minimap.has_method("set_runtime_references"):
+		minimap.set_runtime_references(player, kill_boundary, current_level)
+	if minimap != null and minimap.has_method("set_minimap_enabled"):
+		minimap.set_minimap_enabled(show_minimap)
+	if not show_minimap and minimap != null and minimap.has_method("clear_runtime_references"):
+		minimap.clear_runtime_references()
+
 	var energy_hud := get_node_or_null("GameRuntime/EnergyHud")
 	if energy_hud != null and energy_hud.has_method("set_runtime_references") and player != null:
 		energy_hud.set_runtime_references(
@@ -176,6 +188,28 @@ func _configure_kill_boundary_animation() -> void:
 	var kill_boundary := _get_kill_boundary()
 	if kill_boundary != null:
 		kill_boundary.play_runtime_animation()
+
+
+func _should_show_minimap() -> bool:
+	var level_settings := _get_level_settings()
+	if level_settings == null:
+		return false
+
+	return bool(level_settings.get("show_minimap"))
+
+
+func _get_level_settings() -> Node:
+	if current_level == null:
+		return null
+
+	if current_level.get_script() == LEVEL_SETTINGS_SCRIPT:
+		return current_level
+
+	for node in _get_descendants(current_level):
+		if node.get_script() == LEVEL_SETTINGS_SCRIPT:
+			return node
+
+	return null
 
 
 func _get_kill_boundary() -> Node:

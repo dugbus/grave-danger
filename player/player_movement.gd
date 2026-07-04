@@ -22,6 +22,7 @@ const MIN_WEIGHT_DECELERATION_MULTIPLIER = 0.2
 const MIN_WEIGHT_ROTATION_MULTIPLIER = 0.35
 
 const JUMP_SETTINGS := preload("res://game/player_jump_settings.tres")
+const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const FOOTSTEP_SOUND_PATHS: Array[String] = [
 	"res://Assets/audio/footstep1.wav",
 	"res://Assets/audio/footstep2.wav",
@@ -63,9 +64,11 @@ var footstep_sounds: Array[AudioStream] = []
 var jump_sound: AudioStream
 var footstep_distance_accumulator := 0.0
 var next_footstep_distance := 1.0
+var audio_rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
+	audio_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"player_movement_audio")
 	_load_footstep_sounds()
 	_load_jump_sound()
 	_randomize_next_footstep_distance()
@@ -178,7 +181,7 @@ func _update_footsteps(delta: float, horizontal_speed: float) -> void:
 
 func _randomize_next_footstep_distance() -> void:
 	var variance := maxf(footstep_distance_variance, 0.0)
-	next_footstep_distance = maxf(0.1, footstep_distance + randf_range(-variance, variance))
+	next_footstep_distance = maxf(0.1, footstep_distance + audio_rng.randf_range(-variance, variance))
 
 
 func _play_jump_sound(settings: GDPlayerJumpSettings) -> void:
@@ -191,7 +194,7 @@ func _play_jump_sound(settings: GDPlayerJumpSettings) -> void:
 		jump_sound,
 		"JumpAudio",
 		settings.jump_volume_db,
-		randf_range(settings.jump_pitch_min, settings.jump_pitch_max)
+		audio_rng.randf_range(settings.jump_pitch_min, settings.jump_pitch_max)
 	)
 
 
@@ -207,7 +210,8 @@ func _play_footstep(horizontal_speed: float) -> void:
 		footstep_volume_min_db,
 		footstep_volume_max_db,
 		footstep_pitch_min,
-		footstep_pitch_max
+		footstep_pitch_max,
+		audio_rng
 	)
 
 

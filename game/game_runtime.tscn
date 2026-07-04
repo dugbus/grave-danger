@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://3w0dhwvg7s4a"]
+[gd_scene load_steps=12 format=3 uid="uid://3w0dhwvg7s4a"]
 
 [ext_resource type="Script" uid="uid://bov7w0cyy2jl7" path="res://game/follow_camera.gd" id="1_camera"]
 [ext_resource type="AudioStream" uid="uid://bcd4h7b10r85q" path="res://Assets/audio/music-track.mp3" id="3_music"]
@@ -8,6 +8,8 @@
 [ext_resource type="Script" uid="uid://bror4xqpcudhg" path="res://ui/hud/hud_status_bar.gd" id="7_status"]
 [ext_resource type="Script" path="res://ui/hud/active_flask_hud.gd" id="8_active_flask"]
 [ext_resource type="Script" path="res://ui/hud/elapsed_time_hud.gd" id="9_elapsed"]
+[ext_resource type="Script" path="res://game/minimap_view.gd" id="10_minimap"]
+[ext_resource type="Resource" path="res://game/minimap_view_settings.tres" id="11_minimap_settings"]
 
 [node name="GameRuntime" type="Node3D" unique_id=555773272]
 
@@ -91,3 +93,54 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("8_active_flask")
+
+[node name="MinimapHud" type="CanvasLayer" parent="."]
+layer = 3
+
+[node name="MinimapView" type="Control" parent="MinimapHud"]
+layout_mode = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -292.0
+offset_top = -212.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+script = ExtResource("10_minimap")
+settings = ExtResource("11_minimap_settings")
+
+[node name="Backdrop" type="ColorRect" parent="MinimapHud/MinimapView"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.02, 0.024, 0.03, 0.72)
+
+[node name="ViewportContainer" type="SubViewportContainer" parent="MinimapHud/MinimapView"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+stretch = true
+
+[node name="MinimapViewport" type="SubViewport" parent="MinimapHud/MinimapView/ViewportContainer"]
+size = Vector2i(240, 240)
+handle_input_locally = false
+
+[node name="MinimapCamera" type="Camera3D" parent="MinimapHud/MinimapView/ViewportContainer/MinimapViewport"]
+current = true
+fov = 42.0

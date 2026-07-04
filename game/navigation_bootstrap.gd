@@ -8,6 +8,7 @@ const RUNTIME_NAVIGATION_OBSTACLE_NAME := "RuntimeNavigationObstacle"
 const NAVIGATION_BLOCKER_GROUP := &"navigation_blocker"
 const SMART_ZOMBIE_GROUP := &"smart_zombie"
 const PLAYER_GROUP := &"player"
+const GAMEPLAY_PROCESS_GROUP := &"deterministic_gameplay_process"
 const NAVIGATION_MARGIN := 3.0
 const DEFAULT_HALF_EXTENTS := 30.0
 
@@ -21,6 +22,7 @@ static func prepare_level(level: Node) -> void:
         return
 
     _set_player_processing(level, false)
+    _set_runtime_gameplay_processing(level, false)
     _set_zombie_navigation_ready(level, false)
     _ensure_navigation_region(level)
     _ensure_navigation_obstacles(level)
@@ -28,6 +30,7 @@ static func prepare_level(level: Node) -> void:
     await tree.physics_frame
     await tree.physics_frame
     _set_zombie_navigation_ready(level, true)
+    _set_runtime_gameplay_processing(level, true)
     _set_player_processing(level, true)
 
 
@@ -136,6 +139,12 @@ static func _set_zombie_navigation_grid_maps(level: Node) -> void:
 static func _set_player_processing(level: Node, enabled: bool) -> void:
     for node in _get_descendants(level):
         if node.is_in_group(PLAYER_GROUP):
+            node.set_physics_process(enabled)
+
+
+static func _set_runtime_gameplay_processing(level: Node, enabled: bool) -> void:
+    for node in _get_descendants(level):
+        if node.is_in_group(GAMEPLAY_PROCESS_GROUP):
             node.set_physics_process(enabled)
 
 

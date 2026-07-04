@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_ef483"]
 [ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/kenney-graveyard/coffin.glb" id="4_jo3om"]
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="5_xsjys"]
+[ext_resource type="Script" path="res://levels/common/level_settings.gd" id="5_level_settings"]
 [ext_resource type="PackedScene" path="res://collectibles/gold_coin_pile.tscn" id="6_1rl82"]
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="6_ivkoh"]
 [ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="8_sqtlf"]
@@ -98,6 +99,10 @@ shader_parameter/fade_margin = 0.2
 size = Vector3(124, 0.1, 186)
 
 [node name="Level4" type="Node3D" unique_id=1711249033]
+
+[node name="LevelSettings" type="Node" parent="."]
+script = ExtResource("5_level_settings")
+show_minimap = true
 
 [node name="IndoorLighting" parent="." unique_id=1711692255 instance=ExtResource("100_indoor")]
 

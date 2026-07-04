@@ -1,6 +1,8 @@
 extends "res://enemies/zombie/zombie_combat.gd"
 class_name GDZombiePath
 
+const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
+
 
 func _ready() -> void:
     add_to_group(CHARACTER_GROUP)
@@ -112,8 +114,7 @@ func _configure_nodes() -> void:
         crush_check_area.monitorable = false
 
 func _seed_deterministic_rng() -> void:
-    var seed_source := "%s:%s" % [scene_file_path, str(get_path()) if is_inside_tree() else name]
-    footstep_rng.seed = hash(seed_source)
+    footstep_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"zombie")
 
 func _update_state(delta: float) -> void:
     if is_dead:

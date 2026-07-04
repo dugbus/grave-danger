@@ -26,8 +26,6 @@ var floor_push_ignore_timers: Dictionary = {}
 
 
 func _ready() -> void:
-	# Randomness is currently used by the pickup sound pitch/volume variation.
-	randomize()
 	add_to_group(CHARACTER_GROUP)
 	add_to_group(PLAYER_GROUP)
 	add_to_group(FLAME_VULNERABLE_GROUP)

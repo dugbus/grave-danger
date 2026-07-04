@@ -110,7 +110,7 @@ static func _pick_stream(streams: Array[AudioStream], rng: RandomNumberGenerator
     if rng != null:
         return streams[rng.randi_range(0, streams.size() - 1)]
 
-    return streams.pick_random()
+    return streams[0]
 
 
 static func _randf_range(
@@ -121,4 +121,4 @@ static func _randf_range(
     if rng != null:
         return rng.randf_range(min_value, max_value)
 
-    return randf_range(min_value, max_value)
+    return (min_value + max_value) * 0.5

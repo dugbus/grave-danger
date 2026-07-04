@@ -2,6 +2,7 @@ extends Node3D
 class_name GDCoinDeposit
 
 const COIN_PICKUP_SOUND := preload("res://Assets/audio/coin-pickup.mp3")
+const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const COIN_SOUND_VOLUME_OFFSET_DB := -2.5
 const COIN_SOUND_PITCH_MIN := 0.82
 const COIN_SOUND_PITCH_MAX := 0.98
@@ -43,7 +44,7 @@ var pickup_radius_multiplier := 1.0
 func _ready() -> void:
 	add_to_group("coin_deposit")
 	add_to_group("pickup_radius_scalable")
-	rng.randomize()
+	rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"coin_deposit")
 	wobble_node = get_node_or_null(wobble_node_path) as Node3D
 	if wobble_node == null:
 		wobble_node = self
@@ -57,7 +58,7 @@ func _physics_process(delta: float) -> void:
 	if deposit_cooldown > 0.0:
 		return
 
-	for body in candidate_bodies.duplicate():
+	for body in _get_sorted_candidate_bodies():
 		if not is_instance_valid(body):
 			candidate_bodies.erase(body)
 			continue
@@ -203,8 +204,8 @@ func _wobble() -> void:
 
 
 func _play_absorb_sound() -> void:
-	var pitch_scale := randf_range(COIN_SOUND_PITCH_MIN, COIN_SOUND_PITCH_MAX)
-	var volume_db := randf_range(
+	var pitch_scale := rng.randf_range(COIN_SOUND_PITCH_MIN, COIN_SOUND_PITCH_MAX)
+	var volume_db := rng.randf_range(
 		COIN_SOUND_VOLUME_MIN_DB + COIN_SOUND_VOLUME_OFFSET_DB,
 		COIN_SOUND_VOLUME_MAX_DB + COIN_SOUND_VOLUME_OFFSET_DB
 	)
@@ -236,8 +237,28 @@ func _apply_pickup_radius_multiplier() -> void:
 
 
 func _get_runtime_pickup_radius_multiplier() -> float:
-	for body in get_tree().get_nodes_in_group("flame_vulnerable"):
+	for body in _get_sorted_flame_vulnerable_bodies():
 		if is_instance_valid(body) and body.has_method("get_pickup_radius_multiplier"):
 			return maxf(float(body.get_pickup_radius_multiplier()), 0.01)
 
 	return 1.0
+
+
+func _get_sorted_candidate_bodies() -> Array[Node3D]:
+	var sorted_bodies := candidate_bodies.duplicate()
+	sorted_bodies.sort_custom(_sort_nodes_by_path)
+	return sorted_bodies
+
+
+func _get_sorted_flame_vulnerable_bodies() -> Array[Node]:
+	var bodies: Array[Node] = []
+	for body in get_tree().get_nodes_in_group("flame_vulnerable"):
+		if body is Node:
+			bodies.append(body as Node)
+
+	bodies.sort_custom(_sort_nodes_by_path)
+	return bodies
+
+
+func _sort_nodes_by_path(a: Node, b: Node) -> bool:
+	return str(a.get_path()) < str(b.get_path())
