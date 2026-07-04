@@ -423,7 +423,7 @@ func _play_item_sound(item: Resource, sound: AudioStream, player_name: String) -
 		pitch_scale = audio_rng.randf_range(ITEM_SOUND_PITCH_MIN, ITEM_SOUND_PITCH_MAX)
 		volume_db = audio_rng.randf_range(ITEM_SOUND_VOLUME_MIN_DB, ITEM_SOUND_VOLUME_MAX_DB)
 
-	var audio_parent: Node = player if player != null else self
+	var audio_parent: Node = player as Node if player != null else self as Node
 	var sound_name := player_name if not player_name.is_empty() else "InventoryItemAudio"
 	GDAudio.play_one_shot(audio_parent, sound, sound_name, volume_db, pitch_scale)
 

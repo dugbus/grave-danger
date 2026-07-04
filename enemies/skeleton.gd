@@ -531,7 +531,7 @@ func _play_footstep(horizontal_speed: float) -> void:
     if is_dead:
         return
 
-    var audio_parent: Node = path_follow if path_follow != null else self
+    var audio_parent: Node = path_follow as Node if path_follow != null else self as Node
     GDAudio.play_random_footstep_3d(
         audio_parent,
         footstep_sounds,
@@ -619,7 +619,7 @@ func _die_from_rolling_ball() -> void:
 
 
 func _play_death_scream() -> void:
-    var audio_parent: Node = path_follow if path_follow != null else self
+    var audio_parent: Node = path_follow as Node if path_follow != null else self as Node
     GDAudio.play_one_shot_3d(audio_parent, WILHELM_SCREAM, "SkeletonDeathScreamAudio", death_scream_volume_db)
 
 

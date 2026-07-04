@@ -1,6 +1,7 @@
 extends Path3D
 
 
+@warning_ignore("unused_signal")
 signal navigation_ready_changed(is_ready: bool)
 
 enum ZombieState {
@@ -270,9 +271,9 @@ func _get_player_navigation_position() -> Vector3:
     if player == null:
         return last_seen_position
 
-    var position := player.global_position
-    position.y = _get_body_position().y
-    return position
+    var navigation_position := player.global_position
+    navigation_position.y = _get_body_position().y
+    return navigation_position
 
 
 func _find_collision_shape(node: Node) -> CollisionShape3D:

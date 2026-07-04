@@ -2,3 +2,5 @@ root = true
 
 [*]
 charset = utf-8
+tab_width = 4
+use_tab = true

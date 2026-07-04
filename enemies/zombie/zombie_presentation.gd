@@ -157,7 +157,7 @@ func _play_footstep(horizontal_speed: float) -> void:
         return
 
     var max_movement_speed := shuffle_speed
-    var audio_parent: Node = zombie_body if zombie_body != null else self
+    var audio_parent: Node = zombie_body as Node if zombie_body != null else self as Node
     GDAudio.play_random_footstep_3d(
         audio_parent,
         footstep_sounds,
@@ -173,11 +173,11 @@ func _play_footstep(horizontal_speed: float) -> void:
     )
 
 func _play_punch_hit_sound() -> void:
-    var audio_parent: Node = zombie_body if zombie_body != null else self
+    var audio_parent: Node = zombie_body as Node if zombie_body != null else self as Node
     GDAudio.play_one_shot_3d(audio_parent, punch_hit_sound, "ZombiePunchHitAudio", punch_hit_volume_db)
 
 func _play_death_scream() -> void:
-    var audio_parent: Node = zombie_body if zombie_body != null else self
+    var audio_parent: Node = zombie_body as Node if zombie_body != null else self as Node
     GDAudio.play_one_shot_3d(audio_parent, WILHELM_SCREAM, "ZombieDeathScreamAudio", death_scream_volume_db)
 
 func _play_death_animation() -> void:

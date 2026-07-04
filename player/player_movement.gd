@@ -188,7 +188,7 @@ func _play_jump_sound(settings: GDPlayerJumpSettings) -> void:
 	if jump_sound == null:
 		return
 
-	var audio_parent: Node = player if player != null else self
+	var audio_parent: Node = player as Node if player != null else self as Node
 	GDAudio.play_one_shot_3d(
 		audio_parent,
 		jump_sound,
@@ -199,7 +199,8 @@ func _play_jump_sound(settings: GDPlayerJumpSettings) -> void:
 
 
 func _play_footstep(horizontal_speed: float) -> void:
-	var audio_parent: Node = player if player != null else self
+	var audio_parent: Node = player as Node if player != null else self as Node
+
 	GDAudio.play_random_footstep_3d(
 		audio_parent,
 		footstep_sounds,

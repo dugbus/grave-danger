@@ -241,6 +241,10 @@ func _draw_capsule(rect: Rect2, color: Color) -> void:
 		return
 
 	var radius := minf(rect.size.x, rect.size.y) * 0.5
+	if radius < 1.0:
+		draw_rect(rect, color)
+		return
+
 	if rect.size.x <= rect.size.y:
 		draw_colored_polygon(_create_circle_points(rect.position + rect.size * 0.5, radius), color)
 		return
@@ -249,6 +253,10 @@ func _draw_capsule(rect: Rect2, color: Color) -> void:
 
 
 func _draw_capsule_cap(center: Vector2, radius: float, color: Color) -> void:
+	if radius < 1.0:
+		draw_rect(Rect2(center - Vector2.ONE * radius, Vector2.ONE * radius * 2.0), color)
+		return
+
 	draw_colored_polygon(_create_circle_points(center, radius), color)
 
 

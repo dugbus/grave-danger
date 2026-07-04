@@ -351,9 +351,9 @@ func _get_grid_navigation_bounds(grid_map: GridMap) -> Rect2i:
         max_z = maxi(max_z, cell.z)
 
     var padding := maxi(grid_navigation_padding_cells, 0)
-    var position := Vector2i(min_x - padding, min_z - padding)
+    var grid_position := Vector2i(min_x - padding, min_z - padding)
     var end := Vector2i(max_x + padding + 1, max_z + padding + 1)
-    return Rect2i(position, end - position)
+    return Rect2i(grid_position, end - grid_position)
 
 func _set_navigation_target(target_position: Vector3) -> void:
     current_target = target_position

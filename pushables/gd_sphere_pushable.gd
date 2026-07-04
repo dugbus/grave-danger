@@ -101,7 +101,7 @@ func push(impulse: Vector3) -> void:
 	apply_central_impulse(horizontal_impulse)
 
 
-func push_from_character(character_velocity: Vector3, collision_normal: Vector3, delta: float) -> void:
+func push_from_character(character_velocity: Vector3, collision_normal: Vector3, _delta: float) -> void:
 	var horizontal_velocity := Vector3(character_velocity.x, 0.0, character_velocity.z)
 	if horizontal_velocity.length_squared() < MIN_PUSH_SPEED * MIN_PUSH_SPEED:
 		return

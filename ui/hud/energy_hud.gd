@@ -208,8 +208,6 @@ func _apply_bar_layout() -> void:
 	if coins_bar.has_method("configure_size"):
 		coins_bar.configure_size(bar_width, bar_height, top_offset + bar_height + bar_gap)
 
-	var label_size := 0
-	var label_width := clampf(bar_width * 0.24, 96.0, 150.0)
 	if energy_bar.has_method("configure_label_text"):
 		energy_bar.configure_label_text("Hitpoints")
 	if coins_bar.has_method("configure_label_text"):
