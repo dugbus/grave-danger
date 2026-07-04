@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" path="res://collectibles/gold_coin_pile.tscn" id="6_1rl82"]
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="6_ivkoh"]
 [ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="8_sqtlf"]
-[ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://levels/1/level.gdshader" id="8_t5rcl"]
+[ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://Assets/environment/shaders/level.gdshader" id="8_t5rcl"]
 [ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="9_ywqr7"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 
