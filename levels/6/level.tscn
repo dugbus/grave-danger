@@ -5,6 +5,8 @@
 [ext_resource type="PackedScene" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
 [ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="4_flame"]
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
+[ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://levels/1/level.gdshader" id="8_floor_shader"]
+[ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="9_floor_texture"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 
 [sub_resource type="Curve3D" id="Curve3D_3p4sf"]
@@ -85,6 +87,22 @@ tracks/4/keys = {
 _data = {
 &"kill_boundary": SubResource("Animation_gmagw")
 }
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_floor"]
+size = Vector2(52, 52)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_floor"]
+render_priority = 0
+shader = ExtResource("8_floor_shader")
+shader_parameter/tiled_texture = ExtResource("9_floor_texture")
+shader_parameter/level_width = 48.0
+shader_parameter/level_height = 48.0
+shader_parameter/floor_overscan = Vector2(2, 2)
+shader_parameter/floor_tile_size = Vector2(8, 8)
+shader_parameter/fade_margin = 0.2
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(52, 0.1, 52)
 
 [node name="Level6" type="Node3D" unique_id=1446171614]
 
@@ -272,6 +290,17 @@ script = ExtResource("6_deposit")
 [node name="GoldCoinPile" parent="Objects" unique_id=1305244581 instance=ExtResource("3_coinpile")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.7637644, 0, -1.4678383)
 coin_count = 10
+
+[node name="Tiled Floor" type="Node3D" parent="."]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Tiled Floor"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiled Floor/StaticBody3D"]
+mesh = SubResource("PlaneMesh_floor")
+surface_material_override/0 = SubResource("ShaderMaterial_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiled Floor/StaticBody3D"]
+shape = SubResource("BoxShape3D_floor")
 
 [node name="GoldCoinPile25" parent="Objects" unique_id=1129076963 instance=ExtResource("3_coinpile")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.0434, 0, -20.635777)

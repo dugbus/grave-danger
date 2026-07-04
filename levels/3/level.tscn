@@ -88,17 +88,20 @@ _data = {
 }
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_u6dqf"]
-size = Vector2(24, 24)
+size = Vector2(304, 24)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rwgeq"]
 render_priority = 0
 shader = ExtResource("6_rakk4")
 shader_parameter/tiled_texture = ExtResource("7_46uyn")
-shader_parameter/uv_scale = Vector2(3, 3)
+shader_parameter/level_width = 300.0
+shader_parameter/level_height = 20.0
+shader_parameter/floor_overscan = Vector2(2, 2)
+shader_parameter/floor_tile_size = Vector2(8, 8)
 shader_parameter/fade_margin = 0.2
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_f2tia"]
-size = Vector3(24, 0.1, 24)
+size = Vector3(304, 0.1, 24)
 
 [node name="Level3" type="Node3D" unique_id=340819746]
 
@@ -144,12 +147,10 @@ coin_count = 10
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Tiled Floor/StaticBody3D" unique_id=1137796034]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 0, 10.5)
 mesh = SubResource("PlaneMesh_u6dqf")
 surface_material_override/0 = SubResource("ShaderMaterial_rwgeq")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Tiled Floor/StaticBody3D" unique_id=1154710177]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 0, 10.5)
 shape = SubResource("BoxShape3D_f2tia")
 
 [editable path="KillBoundary3D"]

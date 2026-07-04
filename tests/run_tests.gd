@@ -74,6 +74,7 @@ func _run_tests() -> void:
     failed = not _test_audio_fallback_is_deterministic() or failed
     failed = not _test_coin_absorption_does_not_complete_level() or failed
     failed = not _test_gate_completion_completes_level() or failed
+    failed = not _test_graveyard_scene_does_not_embed_default_level() or failed
     failed = not _test_kill_boundary_loop_setting() or failed
     failed = not _test_no_boundary_removal_keeps_current_pose() or failed
     failed = not _test_level_settings_control_minimap_visibility() or failed
@@ -142,6 +143,17 @@ func _test_gate_completion_completes_level() -> bool:
 
     var passed := _expect(graveyard.win_requested, "gate completion completes the level")
     graveyard.free()
+    return passed
+
+
+func _test_graveyard_scene_does_not_embed_default_level() -> bool:
+    var scene := load("res://game/graveyard.tscn") as PackedScene
+    if not _expect(scene != null, "graveyard scene loads"):
+        return false
+
+    var graveyard := scene.instantiate()
+    var passed := _expect(graveyard.get_node_or_null("CurrentLevel") == null, "graveyard editor scene does not embed level 1")
+    graveyard.queue_free()
     return passed
 
 

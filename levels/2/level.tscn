@@ -161,7 +161,10 @@ size = Vector2(32, 32)
 render_priority = 0
 shader = ExtResource("10_3xhgt")
 shader_parameter/tiled_texture = ExtResource("11_veeoo")
-shader_parameter/uv_scale = Vector2(10, 10)
+shader_parameter/level_width = 28.0
+shader_parameter/level_height = 28.0
+shader_parameter/floor_overscan = Vector2(2, 2)
+shader_parameter/floor_tile_size = Vector2(3.2, 3.2)
 shader_parameter/fade_margin = 0.2
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_v11xe"]

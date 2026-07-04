@@ -1,20 +1,22 @@
 shader_type spatial;
 
 uniform sampler2D tiled_texture : source_color, filter_linear_mipmap, repeat_enable;
-uniform vec2 uv_scale = vec2(8.0, 87.0); // Adjust tile amount here
-uniform float fade_margin : hint_range(0.0, 0.5) = 0.2; // How wide the black fade is
+uniform float level_width = 20.0;
+uniform float level_height = 20.0;
+uniform vec2 floor_overscan = vec2(2.0, 2.0);
+uniform vec2 floor_tile_size = vec2(8.0, 8.0);
+uniform float fade_margin : hint_range(0.0, 8.0) = 0.2;
 
 void fragment() {
-    // 1. Calculate the tiled texture color
-    vec3 tex_color = texture(tiled_texture, UV * uv_scale).rgb;
-    
-    // 2. Calculate distance to the closest edge (0.0 at edge, 0.5 at center)
-    vec2 edge_dist = min(UV, vec2(1.0) - UV);
+    vec2 level_size = max(vec2(level_width, level_height), vec2(0.001));
+    vec2 floor_size = level_size + floor_overscan * 2.0;
+    vec2 level_uv = (UV * floor_size - floor_overscan) / level_size;
+    vec2 tile_count = level_size / max(floor_tile_size, vec2(0.001));
+    vec3 tex_color = texture(tiled_texture, level_uv * tile_count).rgb;
+
+    vec2 edge_dist = min(UV, vec2(1.0) - UV) * floor_size;
     float closest_edge = min(edge_dist.x, edge_dist.y);
-    
-    // 3. Create a smooth gradient fade factor
     float fade = smoothstep(0.0, fade_margin, closest_edge);
-    
-    // 4. Mix texture with black based on the fade factor
+
     ALBEDO = mix(vec3(0.0), tex_color, fade);
 }
