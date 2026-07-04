@@ -476,6 +476,7 @@ transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.801608
 coin_count = 10
 pile_radius = 1.0
 random_seed = 1
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile2" parent="Objects/Coins" unique_id=644783439 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 8.425863, 0, 1.7727897)
@@ -483,6 +484,7 @@ coin_count = 10
 pile_radius = 1.0
 trigger_time = 5.0
 random_seed = 2
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile3" parent="Objects/Coins" unique_id=1432348188 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 5.776385, 0, -2.3839197)
@@ -490,6 +492,7 @@ coin_count = 10
 pile_radius = 1.0
 trigger_time = 8.0
 random_seed = 3
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile4" parent="Objects/Coins" unique_id=865127613 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 9.199665, 0, -4.4667997)
@@ -497,12 +500,14 @@ coin_count = 10
 pile_radius = 1.0
 trigger_time = 12.0
 random_seed = 4
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile5" parent="Objects/Coins" unique_id=881636225 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 13.221897, 0, -1.490655)
 coin_count = 10
 pile_radius = 1.0
 random_seed = 5
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile6" parent="Objects/Coins" unique_id=2134328773 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 11.819277, 0, -6.7340326)
@@ -510,24 +515,28 @@ coin_count = 10
 pile_radius = 1.0
 trigger_time = 15.0
 random_seed = 6
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile7" parent="Objects/Coins" unique_id=258647245 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 17.127789, 0, -6.6569495)
 coin_count = 10
 pile_radius = 1.0
 random_seed = 7
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile8" parent="Objects/Coins" unique_id=1389538194 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 18.503696, 0, -0.5036288)
 coin_count = 10
 pile_radius = 1.0
 random_seed = 8
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile9" parent="Objects/Coins" unique_id=153726824 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 15.29535, 0, 0.7640514)
 coin_count = 10
 pile_radius = 1.0
 random_seed = 9
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile10" parent="Objects/Coins" unique_id=1518380605 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 23.059452, 0, 1.1649971)
@@ -535,6 +544,7 @@ coin_count = 10
 pile_radius = 1.0
 trigger_time = 20.0
 random_seed = 10
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile11" parent="Objects/Coins" unique_id=907101760 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 18.29043, 0, 8.405342)
@@ -542,6 +552,7 @@ coin_count = 10
 pile_radius = 1.0
 trigger_time = 25.0
 random_seed = 11
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile12" parent="Objects/Coins" unique_id=1689375130 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 16.072603, 0, 2.5943537)
@@ -549,6 +560,7 @@ coin_count = 10
 pile_radius = 1.0
 trigger_time = 30.0
 random_seed = 12
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile13" parent="Objects/Coins" unique_id=1424934867 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 12.034517, 0, 4.3520284)
@@ -556,6 +568,7 @@ coin_count = 10
 pile_radius = 1.0
 trigger_time = 35.0
 random_seed = 13
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile14" parent="Objects/Coins" unique_id=2037532441 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 13.383137, 0, 9.531481)
@@ -563,6 +576,7 @@ coin_count = 10
 pile_radius = 1.0
 trigger_time = 37.0
 random_seed = 14
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile15" parent="Objects/Coins" unique_id=786100175 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 10.715289, 0, 11.331491)
@@ -570,6 +584,7 @@ coin_count = 10
 pile_radius = 1.0
 trigger_time = 45.0
 random_seed = 15
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile16" parent="Objects/Coins" unique_id=461327822 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 7.9979753, 0, 7.871956)
@@ -577,6 +592,7 @@ coin_count = 10
 pile_radius = 1.0
 trigger_time = 50.0
 random_seed = 16
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile17" parent="Objects/Coins" unique_id=857606811 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 16.788483, 0, 5.8103046)
@@ -584,6 +600,7 @@ coin_count = 10
 pile_radius = 1.0
 trigger_time = 60.0
 random_seed = 18
+spawn_when_near_camera = true
 
 [node name="GoldCoinPile18" parent="Objects/Coins" unique_id=575243205 instance=ExtResource("3_coinpile")]
 transform = Transform3D(0.33025673, 0, 0.9438913, 0, 1, 0, -0.9438913, 0, 0.33025673, 21.658558, 0, -1.1671085)
@@ -591,6 +608,7 @@ coin_count = 10
 pile_radius = 1.0
 trigger_time = 18.0
 random_seed = 18
+spawn_when_near_camera = true
 
 [node name="Potions" type="Node3D" parent="Objects" unique_id=1204042465]
 transform = Transform3D(0.80160874, 0, -0.597849, 0, 1, 0, 0.597849, 0, 0.80160874, 0.078243256, 0, 0.33029175)

@@ -7,6 +7,7 @@ uniform vec2 floor_overscan = vec2(2.0, 2.0);
 uniform vec2 floor_tile_size = vec2(8.0, 8.0);
 uniform float fade_margin : hint_range(0.0, 8.0) = 0.2;
 
+
 void fragment() {
     vec2 level_size = max(vec2(level_width, level_height), vec2(0.001));
     vec2 floor_size = level_size + floor_overscan * 2.0;

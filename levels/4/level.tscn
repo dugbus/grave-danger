@@ -2,8 +2,8 @@
 
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_ef483"]
 [ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/kenney-graveyard/coffin.glb" id="4_jo3om"]
+[ext_resource type="Script" uid="uid://bvowj5mveddhm" path="res://levels/common/level_settings.gd" id="5_level_settings"]
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="5_xsjys"]
-[ext_resource type="Script" path="res://levels/common/level_settings.gd" id="5_level_settings"]
 [ext_resource type="PackedScene" path="res://collectibles/gold_coin_pile.tscn" id="6_1rl82"]
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="6_ivkoh"]
 [ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="8_sqtlf"]
@@ -11,7 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="9_ywqr7"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 
-[sub_resource type="Curve3D" id="Curve3D_xsp4e"]
+[sub_resource type="Curve3D" id="Curve3D_ywqr7"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0),
@@ -19,7 +19,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Animation" id="Animation_qfxyg"]
+[sub_resource type="Animation" id="Animation_xsp4e"]
 resource_local_to_scene = true
 resource_name = "kill_boundary"
 length = 4.0
@@ -96,6 +96,7 @@ shader_parameter/level_width = 120.0
 shader_parameter/level_height = 180.0
 shader_parameter/floor_overscan = Vector2(2, 3)
 shader_parameter/floor_tile_size = Vector2(8, 8)
+
 shader_parameter/fade_margin = 0.2
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_41ed0"]
@@ -103,7 +104,7 @@ size = Vector3(124, 0.1, 186)
 
 [node name="Level4" type="Node3D" unique_id=1711249033]
 
-[node name="LevelSettings" type="Node" parent="."]
+[node name="LevelSettings" type="Node" parent="." unique_id=370128978]
 script = ExtResource("5_level_settings")
 show_minimap = true
 
@@ -113,8 +114,8 @@ show_minimap = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, -2)
 
 [node name="KillBoundary3D" parent="." unique_id=463239041 instance=ExtResource("8_sqtlf")]
-curve = SubResource("Curve3D_xsp4e")
-boundary_animation = SubResource("Animation_qfxyg")
+curve = SubResource("Curve3D_ywqr7")
+boundary_animation = SubResource("Animation_xsp4e")
 bounds_size = Vector2(119, 179)
 boundary_segments = 96
 
