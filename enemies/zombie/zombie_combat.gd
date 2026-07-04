@@ -287,13 +287,13 @@ func _is_attack_position_free(candidate: Vector3) -> bool:
 
     return true
 
-func _is_player_within_attack_range(attack_range: float) -> bool:
+func _is_player_within_attack_range(range_to_check: float) -> bool:
     if player == null or not _is_live_player_body(player):
         return false
 
     var to_player := player.global_position - _get_body_position()
     to_player.y = 0.0
-    return to_player.length() <= maxf(attack_range, 0.0)
+    return to_player.length() <= maxf(range_to_check, 0.0)
 
 func _is_touching_player_collision(include_slide_collisions := true) -> bool:
     if player == null or zombie_body == null:
