@@ -11,6 +11,4 @@ default_level_scene = ExtResource("3_level1")
 
 [node name="GameRuntime" parent="." instance=ExtResource("2_runtime")]
 
-[node name="CurrentLevel" parent="." instance=ExtResource("3_level1")]
-
 [node name="PauseScreen" parent="." instance=ExtResource("4_pause")]
