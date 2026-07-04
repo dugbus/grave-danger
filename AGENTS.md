@@ -6,6 +6,7 @@
 - Make sure that typing is either directly inferable or specified with 'as' keyword.
 - Any exported variable has a human friendly comment to explain the intent of the setting.
 - If settings are aiming to be contant for the whole game and not per instance then they should live in their own .tres file.
+- Preserve and update comments, don't remove as a tidy up operation unless they are truly redundant.
 - 
 
 ## Binary Files

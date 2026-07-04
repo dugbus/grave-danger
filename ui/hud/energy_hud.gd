@@ -119,6 +119,7 @@ func _bind_bars() -> void:
 	if coins_bar == null:
 		coins_bar = HudStatusBarScene.new()
 		coins_bar.name = "CoinsHeldBar"
+		coins_bar.set("warning_at_top", true)
 		add_child(coins_bar)
 
 	_configure_default_bars()
@@ -136,20 +137,26 @@ func _bind_active_flask_hud() -> void:
 
 func _configure_default_bars() -> void:
 	if energy_bar != null and energy_bar.has_method("configure_label"):
-		energy_bar.configure_label("Hitpoints")
-
+		energy_bar.configure_label_text("Hitpoints")
+	if coins_bar.has_method("configure_fill"):
+		energy_bar.configure_fill(
+			Color(1.0, 0.0, 0.0),
+			Color(1.0, 1.0, 0.0),
+			Color(0.0, 1.0, 0.0)
+		)
 	if coins_bar == null:
 		return
 
-	coins_bar.set("warning_enabled", false)
+	# coins_bar.set("warning_enabled", false)
 	coins_bar.set("spark_enabled", false)
+	coins_bar.set("warning_at_top", true)
 	if coins_bar.has_method("configure_label"):
-		coins_bar.configure_label("Coins Held")
+		coins_bar.configure_label_text("Coins")
 	if coins_bar.has_method("configure_fill"):
 		coins_bar.configure_fill(
-			Color(1.0, 0.76, 0.2),
-			Color(1.0, 0.92, 0.34),
-			Color(0.72, 1.0, 0.62)
+			Color(1.0, 0.0, 0.0),
+			Color(1.0, 1.0, 0.0),
+			Color(0.0, 1.0, 0.0)
 		)
 
 
@@ -201,9 +208,9 @@ func _apply_bar_layout() -> void:
 	if coins_bar.has_method("configure_size"):
 		coins_bar.configure_size(bar_width, bar_height, top_offset + bar_height + bar_gap)
 
-	var label_size := int(clampf(bar_height * 0.28 + 2.0, 14.0, 22.0))
+	var label_size := 0
 	var label_width := clampf(bar_width * 0.24, 96.0, 150.0)
-	if energy_bar.has_method("configure_label"):
-		energy_bar.configure_label("Hitpoints", label_size, label_width)
-	if coins_bar.has_method("configure_label"):
-		coins_bar.configure_label("Coins Held", label_size, label_width)
+	if energy_bar.has_method("configure_label_text"):
+		energy_bar.configure_label_text("Hitpoints")
+	if coins_bar.has_method("configure_label_text"):
+		coins_bar.configure_label_text("Coins Held")
