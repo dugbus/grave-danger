@@ -1,8 +1,9 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://5ele5gk0flc"]
 
-[ext_resource type="PackedScene" path="res://collectibles/flask_base.tscn" id="1_base"]
-[ext_resource type="Script" path="res://collectibles/flask_pause_boundary.gd" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://cx1gj06246clp" path="res://collectibles/flask_base.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://ca384yr6v27qu" path="res://collectibles/flask_pause_boundary.gd" id="2_script"]
 
-[node name="GDFlaskPauseBoundary" instance=ExtResource("1_base")]
+[node name="GDFlaskPauseBoundary" unique_id=1516151897 instance=ExtResource("1_base")]
 script = ExtResource("2_script")
-liquid_color = Color(1, 1, 1, 1)
+hud_effect_id = &"pause_boundary"
+show_hud_countdown = true

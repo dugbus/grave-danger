@@ -1,6 +1,6 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene format=3 uid="uid://duuakotsr2vxs"]
 
-[ext_resource type="Script" path="res://collectibles/gold-coin.gd" id="2_y4swq"]
+[ext_resource type="Script" uid="uid://ck1xksx2jac4l" path="res://collectibles/gold-coin.gd" id="2_y4swq"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jb4t0"]
 albedo_color = Color(1, 0.72, 0.08, 1)
@@ -18,10 +18,10 @@ height = 0.035
 radial_segments = 32
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_y4swq"]
-radius = 0.08
 height = 0.06
+radius = 0.08
 
-[node name="GoldCoin" type="RigidBody3D"]
+[node name="GoldCoin" type="RigidBody3D" unique_id=792259617]
 collision_layer = 4
 collision_mask = 5
 mass = 0.05
@@ -30,16 +30,16 @@ contact_monitor = true
 max_contacts_reported = 8
 script = ExtResource("2_y4swq")
 
-[node name="CoinMesh" type="MeshInstance3D" parent="."]
+[node name="CoinMesh" type="MeshInstance3D" parent="." unique_id=400760398]
 mesh = SubResource("CylinderMesh_jb4t0")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=316609474]
 shape = SubResource("CylinderShape3D_y4swq")
 
-[node name="PickupArea" type="Area3D" parent="."]
+[node name="PickupArea" type="Area3D" parent="." unique_id=1730707714]
 collision_layer = 0
 collision_mask = 2
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="PickupArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PickupArea" unique_id=2033189606]
 transform = Transform3D(4.5, 0, 0, 0, 8, 0, 0, 0, 4.5, 0, 0, 0)
 shape = SubResource("CylinderShape3D_y4swq")

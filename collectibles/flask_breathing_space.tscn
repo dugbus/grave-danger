@@ -1,8 +1,10 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://cujenbxxb5lj5"]
 
-[ext_resource type="PackedScene" path="res://collectibles/flask_base.tscn" id="1_base"]
-[ext_resource type="Script" path="res://collectibles/flask_breathing_space.gd" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://cx1gj06246clp" path="res://collectibles/flask_base.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://daaiwiffqf43i" path="res://collectibles/flask_breathing_space.gd" id="2_script"]
 
-[node name="GDFlaskBreathingSpace" instance=ExtResource("1_base")]
+[node name="GDFlaskBreathingSpace" unique_id=264903540 instance=ExtResource("1_base")]
 script = ExtResource("2_script")
 liquid_color = Color(0, 0.9, 1, 1)
+hud_effect_id = &"breathing_space"
+show_hud_countdown = true
