@@ -13,6 +13,7 @@ const SKELETON_GROUP: StringName = &"skeleton"
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const WORLD_COLLISION_LAYER := 1
+const MODEL_FORWARD_YAW_OFFSET := 0.0
 
 ## PathFollow3D that carries the skeleton visual and contact area.
 @export var path_follow_path: NodePath = ^"PathFollow3D"
@@ -46,8 +47,6 @@ const WORLD_COLLISION_LAYER := 1
 @export var reverse_at_path_ends := true
 ## How quickly the visual turns toward the current movement direction.
 @export var turn_speed := 1.5
-## Yaw correction for the imported skeleton model's local forward direction.
-@export_range(-180.0, 180.0, 1.0, "radians_as_degrees") var facing_yaw_offset := -PI / 2.0
 ## Physics layers that make the skeleton reverse when detected ahead on its path.
 @export_flags_3d_physics var map_collision_mask := WORLD_COLLISION_LAYER
 ## Height above the path used for the map collision probe.
@@ -450,7 +449,7 @@ func _update_facing(horizontal_displacement: Vector3, delta: float) -> void:
         return
 
     var direction := horizontal_displacement.normalized()
-    var target_yaw := atan2(direction.x, direction.z) + facing_yaw_offset
+    var target_yaw := atan2(direction.x, direction.z) + MODEL_FORWARD_YAW_OFFSET
     pivot.rotation.y = lerp_angle(pivot.rotation.y, target_yaw, turn_speed * delta)
 
 
