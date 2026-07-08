@@ -1,16 +1,16 @@
 extends CanvasLayer
 class_name GDLowHealthVignette
 
-## Full-screen warning vignette shown behind gameplay HUD when player health is low.
+## Full-screen warning vignette shown above gameplay but behind gameplay HUD when player health is low.
 
-const VIGNETTE_LAYER := 0
+const VIGNETTE_LAYER := 30
 
 ## Control containing the vignette shader material.
 @export var vignette_rect_path: NodePath = ^"VignetteRect"
-## Health ratio where the vignette first starts to appear.
-@export_range(0.0, 1.0, 0.01) var start_health_ratio := 0.35
-## Health ratio where the vignette reaches full strength.
-@export_range(0.0, 1.0, 0.01) var full_health_ratio := 0.12
+## Health ratio where the vignette first starts to appear, just below three default health bars.
+@export_range(0.0, 1.0, 0.01) var start_health_ratio := 0.50
+## Health ratio where the vignette reaches full strength, before the default HUD reaches one health bar.
+@export_range(0.0, 1.0, 0.01) var full_health_ratio := 0.20
 ## How quickly the visible vignette catches up to health changes.
 @export_range(0.1, 40.0, 0.1) var response_speed := 7.0
 
