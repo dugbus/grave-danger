@@ -28,6 +28,7 @@ func _ready() -> void:
 	_configure_kill_boundary_animation()
 	max_coins_collected = _calculate_max_coins_collected()
 	_store_result_stats()
+	get_tree().call_group("coin_score_display", "set_treasure_total", max_coins_collected)
 
 	for deposit in _get_coin_deposits():
 		if deposit.has_signal("coin_absorbed"):

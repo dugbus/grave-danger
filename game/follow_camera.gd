@@ -64,8 +64,8 @@ class_name GDFollowCamera
 @export var death_zoom_lag := 4.5
 
 # Cached scene references.
-@onready var target: Node3D = get_node_or_null(target_path)
-@onready var kill_boundary: Node = get_node_or_null(kill_boundary_path)
+@onready var target: Node3D = _get_node_3d_or_null(target_path)
+@onready var kill_boundary: Node = _get_node_or_null_from_path(kill_boundary_path)
 
 # The point the camera is currently following.
 var focus_position := Vector3.ZERO
@@ -137,6 +137,17 @@ func set_runtime_targets(target_node: Node, kill_boundary_node: Node) -> void:
 	if target != null:
 		focus_position = target.global_position
 		_update_camera_transform()
+
+
+func _get_node_or_null_from_path(path: NodePath) -> Node:
+	if String(path).is_empty():
+		return null
+
+	return get_node_or_null(path)
+
+
+func _get_node_3d_or_null(path: NodePath) -> Node3D:
+	return _get_node_or_null_from_path(path) as Node3D
 
 
 func _physics_process(delta: float) -> void:

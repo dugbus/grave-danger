@@ -4,8 +4,11 @@ const BAT_NEST_SCRIPT := preload("res://enemies/bat_nest.gd")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const GOLD_COIN_PILE_SCRIPT := preload("res://collectibles/gold_coin_pile.gd")
 const LEVEL_SETTINGS_SCRIPT := preload("res://levels/common/level_settings.gd")
+const LOW_HEALTH_VIGNETTE_SCRIPT := preload("res://ui/hud/low_health_vignette.gd")
 const MINIMAP_VIEW_SCRIPT := preload("res://game/minimap_view.gd")
 const MINIMAP_VIEW_SETTINGS := preload("res://game/minimap_view_settings.tres")
+const PANEL_SCENE := preload("res://ui/hud/panel.tscn")
+const SKELETON_SCENE := preload("res://enemies/skeleton.tscn")
 const TEST_TEXT_OVERLAY_VISUAL_LAYER := 1 << 19
 
 class TestGraveyard:
@@ -78,6 +81,9 @@ func _run_tests() -> void:
     failed = not _test_kill_boundary_loop_setting() or failed
     failed = not _test_no_boundary_removal_keeps_current_pose() or failed
     failed = not _test_level_settings_control_minimap_visibility() or failed
+    failed = not _test_low_health_vignette_maps_health_to_warning_intensity() or failed
+    failed = not _test_hud_panel_sets_split_value_labels() or failed
+    failed = not _test_skeleton_facing_is_driven_by_movement() or failed
     failed = not _test_minimap_disables_processing_and_rendering() or failed
     failed = not _test_minimap_camera_scrolls_wide_level_without_empty_space() or failed
     failed = not _test_minimap_camera_scrolls_tall_level_without_empty_space() or failed
@@ -218,6 +224,86 @@ func _test_level_settings_control_minimap_visibility() -> bool:
 
     level.queue_free()
     graveyard.queue_free()
+    return passed
+
+
+func _test_low_health_vignette_maps_health_to_warning_intensity() -> bool:
+    var vignette: CanvasLayer = LOW_HEALTH_VIGNETTE_SCRIPT.new()
+    var vignette_rect := ColorRect.new()
+    vignette_rect.name = "VignetteRect"
+    var shader_material := ShaderMaterial.new()
+    shader_material.shader = load("res://ui/hud/low_health_vignette.gdshader")
+    vignette_rect.material = shader_material
+    vignette.add_child(vignette_rect)
+    root.add_child(vignette)
+
+    vignette.call("set_health_ratio", 1.0, false)
+    var passed := _expect(is_equal_approx(float(vignette.call("get_target_intensity")), 0.0), "healthy player hides low-health vignette")
+    passed = _expect(vignette.layer == 0, "low-health vignette renders under gameplay HUD layers") and passed
+
+    vignette.call("set_health_ratio", 0.35, false)
+    passed = _expect(is_equal_approx(float(vignette.call("get_target_intensity")), 0.0), "vignette starts below configured health threshold") and passed
+
+    vignette.call("set_health_ratio", 0.12, false)
+    passed = _expect(is_equal_approx(float(vignette.call("get_target_intensity")), 1.0), "vignette reaches full strength at critical health") and passed
+
+    vignette.call("set_health_ratio", 1.0, true)
+    passed = _expect(is_equal_approx(float(vignette.call("get_target_intensity")), 1.0), "dead player keeps warning vignette visible") and passed
+
+    vignette.queue_free()
+    return passed
+
+
+func _test_hud_panel_sets_split_value_labels() -> bool:
+    var panel := PANEL_SCENE.instantiate()
+    root.add_child(panel)
+    panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+    panel.size = Vector2(2560.0, 1080.0)
+    panel.set("reference_screen_size", Vector2(1920.0, 1080.0))
+    panel.call("_sync_screen_container")
+
+    panel.call("set_sack_counts", 7, 12)
+    panel.call("set_treasure_total", 30)
+    panel.call("add_score", 4)
+
+    var sack_contents := panel.get_node("ScreenContainer/PanelPlacement/PanelArt/SackContents") as Label
+    var sack_max := panel.get_node("ScreenContainer/PanelPlacement/PanelArt/SackMax") as Label
+    var treasure_lifted := panel.get_node("ScreenContainer/PanelPlacement/PanelArt/TreasureLifted") as Label
+    var treasure_on_level := panel.get_node("ScreenContainer/PanelPlacement/PanelArt/TreasureOnLevel") as Label
+    var screen_container := panel.get_node("ScreenContainer") as Control
+    var passed := _expect(sack_contents.text == "7", "HUD panel displays carried sack count") \
+        and _expect(sack_max.text == "of 12", "HUD panel displays sack capacity") \
+        and _expect(treasure_lifted.text == "4", "HUD panel displays lifted treasure count") \
+        and _expect(treasure_on_level.text == "of 30", "HUD panel displays level treasure total") \
+        and _expect(panel.get_node_or_null("ScreenContainer") != null, "HUD panel has a full-screen editor container") \
+        and _expect(panel.get_node_or_null("ScreenContainer/PanelPlacement") != null, "HUD panel has an editor-owned placement node") \
+        and _expect(not panel.get_node("ScreenContainer/PanelPlacement/PlacementGuide").visible, "HUD panel hides placement guide at runtime") \
+        and _expect(is_equal_approx(screen_container.scale.x, screen_container.scale.y), "HUD panel scales reference screen uniformly") \
+        and _expect(is_equal_approx(screen_container.position.x, 320.0), "HUD panel centers reference screen on wide viewports")
+
+    panel.queue_free()
+    return passed
+
+
+func _test_skeleton_facing_is_driven_by_movement() -> bool:
+    var skeleton := SKELETON_SCENE.instantiate()
+    root.add_child(skeleton)
+
+    var exposes_facing_offset := false
+    for property: Dictionary in skeleton.get_property_list():
+        if property.get("name") == "facing_yaw_offset":
+            exposes_facing_offset = true
+            break
+
+    skeleton.set("turn_speed", 1.0)
+    var pivot := skeleton.get_node("PathFollow3D/DropPivot/Pivot") as Node3D
+    pivot.rotation.y = 0.0
+    skeleton.call("_update_facing", Vector3.RIGHT, 1.0)
+
+    var passed := _expect(not exposes_facing_offset, "skeleton facing offset is not editable per instance") \
+        and _expect(is_equal_approx(pivot.rotation.y, PI / 2.0), "skeleton visual faces rightward patrol movement")
+
+    skeleton.queue_free()
     return passed
 
 

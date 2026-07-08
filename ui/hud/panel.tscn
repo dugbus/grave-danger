@@ -1,0 +1,275 @@
+[gd_scene format=3 uid="uid://btv615aeevoep"]
+
+[ext_resource type="Texture2D" uid="uid://insimck2kc3f" path="res://Assets/frontend/panel.png" id="1_fic63"]
+[ext_resource type="Script" uid="uid://cxo4s0r4so1n7" path="res://ui/hud/panel.gd" id="1_yb7y0"]
+[ext_resource type="Texture2D" uid="uid://cx74gotk2klae" path="res://Assets/frontend/creme-capsule.png" id="2_qeh8b"]
+[ext_resource type="Texture2D" uid="uid://c3n3bc7qfl3gu" path="res://Assets/frontend/green-capsule.png" id="3_h5g02"]
+[ext_resource type="Texture2D" uid="uid://ou6j2wibr5w1" path="res://Assets/frontend/red-capsule.png" id="4_dxmjo"]
+[ext_resource type="FontFile" uid="uid://ipq4de64yjtd" path="res://Assets/fonts/Almendra-Bold.ttf" id="6_y4x0o"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_screen_guide"]
+bg_color = Color(0.0021631045, 0.0012604409, 0.009983954, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.05, 0.35, 0.9, 0.55)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_placement_guide"]
+bg_color = Color(0.2, 0.8, 1, 0.08)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.2, 0.8, 1, 0.8)
+
+[sub_resource type="LabelSettings" id="LabelSettings_y4x0o"]
+font = ExtResource("6_y4x0o")
+font_size = 33
+font_color = Color(0.0126172, 0.0126172, 0.0126172, 1)
+shadow_size = 6
+shadow_color = Color(1, 1, 1, 0.6666667)
+
+[sub_resource type="LabelSettings" id="LabelSettings_sithk"]
+font = ExtResource("6_y4x0o")
+font_size = 89
+font_color = Color(0.0126172, 0.0126172, 0.0126172, 1)
+shadow_size = 6
+shadow_color = Color(1, 1, 1, 0.6666667)
+
+[node name="HudPanel" type="Control" unique_id=174788711]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_yb7y0")
+remaining_health_texture = ExtResource("3_h5g02")
+lost_health_texture = ExtResource("4_dxmjo")
+locked_health_texture = ExtResource("2_qeh8b")
+editor_description = "HUD panel root. The script uniformly scales ScreenContainer to the runtime viewport. Edit ScreenContainer/PanelPlacement for the panel's position and size inside the reference canvas."
+
+[node name="ScreenContainer" type="Control" parent="." unique_id=1684799469]
+layout_mode = 1
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+tooltip_text = "Reference 1920x1080 canvas. The script uniformly scales this node to fit the actual viewport."
+editor_description = "Reference canvas. Keep HUD layout work inside this node. HudPanel scales this canvas uniformly to the actual viewport, preserving child aspect ratios."
+
+[node name="ScreenGuide" type="Panel" parent="ScreenContainer" unique_id=229240427]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_screen_guide")
+tooltip_text = "Editor guide for the reference canvas. Hidden at runtime."
+editor_description = "Visible editor guide for the 1920x1080 reference canvas. Hidden automatically at runtime."
+
+[node name="PanelPlacement" type="Control" parent="ScreenContainer" unique_id=680983975]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -772.0
+offset_top = -192.0
+offset_right = 760.0
+offset_bottom = -13.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(0.75, 0.75)
+pivot_offset_ratio = Vector2(0.5, 1)
+mouse_filter = 2
+tooltip_text = "Move, anchor, and uniformly scale this node to place the panel in the reference canvas."
+editor_description = "Primary placement control. Move this node, adjust its anchors/offsets, or set a uniform scale to position the panel inside the reference canvas. Child aspect ratios are preserved because the runtime screen scaling is uniform."
+
+[node name="PlacementGuide" type="Panel" parent="ScreenContainer/PanelPlacement" unique_id=670048927]
+z_index = 100
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_placement_guide")
+tooltip_text = "Editor guide for PanelPlacement. Hidden at runtime."
+editor_description = "Visible editor guide for the PanelPlacement rectangle. Hidden automatically at runtime."
+
+[node name="PanelArt" type="Control" parent="ScreenContainer/PanelPlacement" unique_id=2071611117]
+layout_mode = 1
+anchors_preset = 0
+offset_right = 1532.0
+offset_bottom = 179.0
+mouse_filter = 2
+tooltip_text = "Fixed panel art and label layout. Prefer moving PanelPlacement instead."
+editor_description = "Fixed panel art and label layout. Prefer moving or scaling parent PanelPlacement for screen placement."
+
+[node name="PanelTexture" type="TextureRect" parent="ScreenContainer/PanelPlacement/PanelArt" unique_id=68431294]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("1_fic63")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HealthSegments" type="HBoxContainer" parent="ScreenContainer/PanelPlacement/PanelArt" unique_id=1777385584]
+layout_mode = 0
+offset_left = 192.0
+offset_top = 59.0
+offset_right = 612.0
+offset_bottom = 112.0
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="Segment01" type="TextureRect" parent="ScreenContainer/PanelPlacement/PanelArt/HealthSegments" unique_id=1435078555]
+custom_minimum_size = Vector2(35, 53)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_h5g02")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Segment02" type="TextureRect" parent="ScreenContainer/PanelPlacement/PanelArt/HealthSegments" unique_id=1767338419]
+custom_minimum_size = Vector2(35, 53)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_h5g02")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Segment03" type="TextureRect" parent="ScreenContainer/PanelPlacement/PanelArt/HealthSegments" unique_id=122125413]
+custom_minimum_size = Vector2(35, 53)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_h5g02")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Segment04" type="TextureRect" parent="ScreenContainer/PanelPlacement/PanelArt/HealthSegments" unique_id=574410082]
+custom_minimum_size = Vector2(35, 53)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_h5g02")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Segment05" type="TextureRect" parent="ScreenContainer/PanelPlacement/PanelArt/HealthSegments" unique_id=1721977912]
+custom_minimum_size = Vector2(35, 53)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_h5g02")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Segment06" type="TextureRect" parent="ScreenContainer/PanelPlacement/PanelArt/HealthSegments" unique_id=882074302]
+custom_minimum_size = Vector2(35, 53)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_h5g02")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Segment07" type="TextureRect" parent="ScreenContainer/PanelPlacement/PanelArt/HealthSegments" unique_id=1322181935]
+custom_minimum_size = Vector2(35, 53)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_qeh8b")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Segment08" type="TextureRect" parent="ScreenContainer/PanelPlacement/PanelArt/HealthSegments" unique_id=1320727919]
+custom_minimum_size = Vector2(35, 53)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_qeh8b")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Segment09" type="TextureRect" parent="ScreenContainer/PanelPlacement/PanelArt/HealthSegments" unique_id=1417118120]
+custom_minimum_size = Vector2(35, 53)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_qeh8b")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Segment10" type="TextureRect" parent="ScreenContainer/PanelPlacement/PanelArt/HealthSegments" unique_id=342014952]
+custom_minimum_size = Vector2(35, 53)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_qeh8b")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Segment11" type="TextureRect" parent="ScreenContainer/PanelPlacement/PanelArt/HealthSegments" unique_id=608584806]
+custom_minimum_size = Vector2(35, 53)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_qeh8b")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Segment12" type="TextureRect" parent="ScreenContainer/PanelPlacement/PanelArt/HealthSegments" unique_id=1496098135]
+custom_minimum_size = Vector2(35, 53)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_qeh8b")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SackMax" type="Label" parent="ScreenContainer/PanelPlacement/PanelArt" unique_id=1949007012]
+layout_mode = 0
+offset_left = 635.0
+offset_top = 74.0
+offset_right = 825.0
+offset_bottom = 176.0
+text = "of 1"
+label_settings = SubResource("LabelSettings_y4x0o")
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="SackContents" type="Label" parent="ScreenContainer/PanelPlacement/PanelArt" unique_id=1481212961]
+layout_mode = 0
+offset_left = 646.0
+offset_top = 18.0
+offset_right = 824.0
+offset_bottom = 134.0
+text = "0"
+label_settings = SubResource("LabelSettings_sithk")
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="TreasureOnLevel" type="Label" parent="ScreenContainer/PanelPlacement/PanelArt" unique_id=954322049]
+layout_mode = 0
+offset_left = 837.0
+offset_top = 76.0
+offset_right = 1027.0
+offset_bottom = 178.0
+text = "of 0"
+label_settings = SubResource("LabelSettings_y4x0o")
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="TreasureLifted" type="Label" parent="ScreenContainer/PanelPlacement/PanelArt" unique_id=608315815]
+layout_mode = 0
+offset_left = 848.0
+offset_top = 21.0
+offset_right = 1026.0
+offset_bottom = 137.0
+text = "0"
+label_settings = SubResource("LabelSettings_sithk")
+horizontal_alignment = 2
+vertical_alignment = 1

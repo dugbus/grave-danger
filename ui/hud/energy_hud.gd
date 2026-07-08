@@ -1,58 +1,33 @@
 extends CanvasLayer
 class_name GDEnergyHud
 
-const HudStatusBarScene := preload("res://ui/hud/hud_status_bar.gd")
 const ActiveFlaskHudScene := preload("res://ui/hud/active_flask_hud.gd")
+const HudPanelScene := preload("res://ui/hud/panel.tscn")
 
-## Node that owns flame energy and death state values for the hitpoints bar.
+## Node that owns flame energy and death state values for the HUD panel.
 @export var death_controller_path: NodePath = ^"../Player/PlayerDeath"
-## Node that owns carried coin counts for the coins-held bar.
+## Node that owns carried coin counts for the HUD panel.
 @export var inventory_path: NodePath = ^"../Player/PlayerInventory"
-## Existing editor-placed hitpoints bar. If missing, a fallback bar is created.
-@export var energy_bar_path: NodePath = ^"EnergyBar"
-## Existing editor-placed carried-coins bar. If missing, a fallback bar is created.
-@export var coins_bar_path: NodePath = ^"CoinsHeldBar"
-
-@export_group("Bars")
-## Width of each HUD status bar, in screen pixels.
-@export_range(120.0, 900.0, 1.0, "suffix:px") var bar_width := 420.0:
-	set(value):
-		bar_width = maxf(value, 120.0)
-		_apply_bar_layout()
-
-## Height of each HUD status bar, in screen pixels.
-@export_range(12.0, 80.0, 1.0, "suffix:px") var bar_height := 26.0:
-	set(value):
-		bar_height = maxf(value, 12.0)
-		_apply_bar_layout()
-
-## Vertical spacing between the hitpoints and coins-held bars.
-@export_range(0.0, 80.0, 1.0, "suffix:px") var bar_gap := 10.0:
-	set(value):
-		bar_gap = maxf(value, 0.0)
-		_apply_bar_layout()
-
-## Distance from the top of the viewport to the first status bar.
-@export_range(0.0, 160.0, 1.0, "suffix:px") var top_offset := 20.0:
-	set(value):
-		top_offset = maxf(value, 0.0)
-		_apply_bar_layout()
+## Existing editor-placed full HUD panel. If missing, a fallback panel is created.
+@export var hud_panel_path: NodePath = ^"HudPanel"
+## Existing editor-placed low-health vignette. If missing, this HUD skips the screen-edge warning.
+@export var low_health_vignette_path: NodePath = ^"../LowHealthVignette"
 
 var death_controller: Node
 var gold_inventory: Node
 var player: Node
-var energy_bar: Control
-var coins_bar: Control
 var active_flask_hud: Control
+var hud_panel: Control
+var low_health_vignette: Node
 
 
 func _ready() -> void:
 	layer = 35
 
-	_bind_bars()
+	_bind_hud_panel()
 	_bind_active_flask_hud()
+	_bind_low_health_vignette()
 
-	_apply_bar_layout()
 	_resolve_references()
 	_connect_inventory_signal()
 	_connect_player_signal()
@@ -64,29 +39,31 @@ func set_runtime_references(death_controller_node: Node, gold_inventory_node: No
 	player = death_controller.get_parent() if death_controller != null else null
 	_connect_inventory_signal()
 	_connect_player_signal()
-	_update_energy_bar()
-	_update_coins_bar()
+	_update_health_display()
+	_update_sack_display()
 
 
 func _process(_delta: float) -> void:
-	if energy_bar == null or coins_bar == null:
-		_bind_bars()
-		_apply_bar_layout()
+	if hud_panel == null:
+		_bind_hud_panel()
+
 	if active_flask_hud == null:
 		_bind_active_flask_hud()
+	if low_health_vignette == null:
+		_bind_low_health_vignette()
 
 	if not is_instance_valid(death_controller) or not is_instance_valid(gold_inventory):
 		_resolve_references()
 		_connect_inventory_signal()
 		_connect_player_signal()
 
-	_update_energy_bar()
-	_update_coins_bar()
+	_update_health_display()
+	_update_sack_display()
 
 
 func _resolve_references() -> void:
-	death_controller = get_node_or_null(death_controller_path)
-	gold_inventory = get_node_or_null(inventory_path)
+	death_controller = _get_node_or_null_from_path(death_controller_path)
+	gold_inventory = _get_node_or_null_from_path(inventory_path)
 	player = death_controller.get_parent() if death_controller != null else null
 
 
@@ -108,21 +85,14 @@ func _connect_player_signal() -> void:
 	player.flask_effect_started.connect(_on_flask_effect_started)
 
 
-func _bind_bars() -> void:
-	energy_bar = get_node_or_null(energy_bar_path) as Control
-	if energy_bar == null:
-		energy_bar = HudStatusBarScene.new()
-		energy_bar.name = "EnergyBar"
-		add_child(energy_bar)
+func _bind_hud_panel() -> void:
+	hud_panel = get_node_or_null(hud_panel_path) as Control
+	if hud_panel != null:
+		return
 
-	coins_bar = get_node_or_null(coins_bar_path) as Control
-	if coins_bar == null:
-		coins_bar = HudStatusBarScene.new()
-		coins_bar.name = "CoinsHeldBar"
-		coins_bar.set("warning_at_top", true)
-		add_child(coins_bar)
-
-	_configure_default_bars()
+	hud_panel = HudPanelScene.instantiate() as Control
+	hud_panel.name = "HudPanel"
+	add_child(hud_panel)
 
 
 func _bind_active_flask_hud() -> void:
@@ -135,33 +105,12 @@ func _bind_active_flask_hud() -> void:
 	add_child(active_flask_hud)
 
 
-func _configure_default_bars() -> void:
-	if energy_bar != null and energy_bar.has_method("configure_label"):
-		energy_bar.configure_label_text("Hitpoints")
-	if coins_bar.has_method("configure_fill"):
-		energy_bar.configure_fill(
-			Color(1.0, 0.0, 0.0),
-			Color(1.0, 1.0, 0.0),
-			Color(0.0, 1.0, 0.0)
-		)
-	if coins_bar == null:
-		return
-
-	# coins_bar.set("warning_enabled", false)
-	coins_bar.set("spark_enabled", false)
-	coins_bar.set("warning_at_top", true)
-	if coins_bar.has_method("configure_label"):
-		coins_bar.configure_label_text("Coins")
-	if coins_bar.has_method("configure_fill"):
-		coins_bar.configure_fill(
-			Color(1.0, 0.0, 0.0),
-			Color(1.0, 1.0, 0.0),
-			Color(0.0, 1.0, 0.0)
-		)
+func _bind_low_health_vignette() -> void:
+	low_health_vignette = _get_node_or_null_from_path(low_health_vignette_path)
 
 
 func _on_carried_gold_coins_changed(_carried_count: int) -> void:
-	_update_coins_bar()
+	_update_sack_display()
 
 
 func _on_flask_effect_started(effect_id: StringName, liquid_color: Color, duration: float) -> void:
@@ -170,7 +119,7 @@ func _on_flask_effect_started(effect_id: StringName, liquid_color: Color, durati
 		active_flask_hud.show_flask_effect(effect_id, liquid_color, duration)
 
 
-func _update_energy_bar() -> void:
+func _update_health_display() -> void:
 	var energy_ratio := 1.0
 	var is_dead := false
 	if death_controller != null:
@@ -182,11 +131,13 @@ func _update_energy_bar() -> void:
 		var dead_value = death_controller.get("is_dead")
 		is_dead = dead_value is bool and dead_value
 
-	if energy_bar != null and energy_bar.has_method("set_ratio"):
-		energy_bar.set_ratio(energy_ratio, is_dead)
+	if hud_panel != null and hud_panel.has_method("set_health_ratio"):
+		hud_panel.set_health_ratio(0.0 if is_dead else energy_ratio)
+	if low_health_vignette != null and low_health_vignette.has_method("set_health_ratio"):
+		low_health_vignette.set_health_ratio(energy_ratio, is_dead)
 
 
-func _update_coins_bar() -> void:
+func _update_sack_display() -> void:
 	var carried_count := 0
 	var max_count := 100
 	if gold_inventory != null:
@@ -195,20 +146,12 @@ func _update_coins_bar() -> void:
 		if gold_inventory.has_method("get_max_carried_gold_coins"):
 			max_count = maxi(gold_inventory.get_max_carried_gold_coins(), 1)
 
-	if coins_bar != null and coins_bar.has_method("set_ratio"):
-		coins_bar.set_ratio(float(carried_count) / float(max_count))
+	if hud_panel != null and hud_panel.has_method("set_sack_counts"):
+		hud_panel.set_sack_counts(carried_count, max_count)
 
 
-func _apply_bar_layout() -> void:
-	if energy_bar == null or coins_bar == null:
-		return
+func _get_node_or_null_from_path(path: NodePath) -> Node:
+	if String(path).is_empty():
+		return null
 
-	if energy_bar.has_method("configure_size"):
-		energy_bar.configure_size(bar_width, bar_height, top_offset)
-	if coins_bar.has_method("configure_size"):
-		coins_bar.configure_size(bar_width, bar_height, top_offset + bar_height + bar_gap)
-
-	if energy_bar.has_method("configure_label_text"):
-		energy_bar.configure_label_text("Hitpoints")
-	if coins_bar.has_method("configure_label_text"):
-		coins_bar.configure_label_text("Coins Held")
+	return get_node_or_null(path)
