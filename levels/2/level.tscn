@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" path="res://enemies/bat_nest.tscn" id="1_1rlxb"]
 [ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/kenney-graveyard/coffin.glb" id="1_coffin"]
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
-[ext_resource type="PackedScene" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
+[ext_resource type="PackedScene" uid="uid://cw45377f21i2v" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
 [ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="4_flame"]
 [ext_resource type="PackedScene" path="res://collectibles/silver_key.tscn" id="5_lm540"]
 [ext_resource type="PackedScene" path="res://collectibles/key.tscn" id="6_1rlxb"]
@@ -11,9 +11,8 @@
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="6_e2jp1"]
 [ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://Assets/environment/shaders/level.gdshader" id="10_3xhgt"]
 [ext_resource type="PackedScene" uid="uid://cp58o88h2j8e7" path="res://enemies/zombie.tscn" id="10_veeoo"]
-[ext_resource type="PackedScene" path="res://collectibles/health_flask.tscn" id="11_haq2d"]
+[ext_resource type="PackedScene" uid="uid://mbxax50al4bn" path="res://collectibles/health_flask.tscn" id="11_haq2d"]
 [ext_resource type="PackedScene" uid="uid://4qkicc6gkfuv" path="res://levels/common/locked_door.tscn" id="12_fhv3i"]
-[ext_resource type="Resource" path="res://collectibles/global_flask_properties.tres" id="12_rtouc"]
 [ext_resource type="PackedScene" path="res://levels/common/locked_gate.tscn" id="16_mx8o4"]
 [ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="16_yyw7i"]
 [ext_resource type="PackedScene" path="res://pushables/hay_bale_pushable.tscn" id="18_fhv3i"]
@@ -21,7 +20,7 @@
 [ext_resource type="PackedScene" path="res://levels/common/spike_trap.tscn" id="20_yyw7i"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 
-[sub_resource type="Curve3D" id="Curve3D_j77ya"]
+[sub_resource type="Curve3D" id="Curve3D_mx8o4"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -18.445782, 0, -19.87931, 0, 0, 0, 0, 0, 0, -14.925648, 0, -18.903809, 0, 0, 0, 0, 0, 0, -17.64296, 0, -14.781507, 0, 0, 0, 0, 0, 0, -18.890425, 0, -11.918795, 0, 0, 0, 0, 0, 0, -18.40918, 0, -9.011772, 0, 0, 0, 0, 0, 0, -16.58245, 0, -6.175517, 0, 0, 0, 0, 0, 0, -17.495754, 0, -4.000492, 0, 0, 0, 0, 0, 0, -20.004349, 0, -0.21078873, 0, 0, 0, 0, 0, 0, -18.164211, 0, 2.298658, 0, 0, 0, 0, 0, 0, -16.702156, 0, 3.0904937, 0, 0, 0, 0, 0, 0, -14.008546, 0, 1.5073256, 0, 0, 0, 0, 0, 0, -10.978762, 0, 2.2850318, 0, 0, 0, 0, 0, 0, -6.782787, 0, 2.9181552, 0, 0, 0, 0, 0, 0, -4.7504253, 0, 2.4757943, 0, 0, 0, 0, 0, 0, -0.96477985, 0, 2.453548, 0, 0, 0, 0, 0, 0, 1.2510338, 0, 3.7465892, 0, 0, 0, 0, 0, 0, 1.8949156, 0, 1.3520427, 0, 0, 0, 0, 0, 0, 1.5907669, 0, -2.051125, 0, 0, 0, 0, 0, 0, 4.7572165, 0, 0.88071966, 0, 0, 0, 0, 0, 0, 6.209138, 0, -3.4310975, 0, 0, 0, 0, 0, 0, 2.3918438, 0, -7.921921, 0, 0, 0, 0, 0, 0, 4.0298862, 0, -11.556098, 0, 0, 0, 0, 0, 0, 1.4967041, 0, -14.579313, 0, 0, 0, 0, 0, 0, 3.5024672, 0, -18.61775, 0, 0, 0, 0, 0, 0, -1.5483322, 0, -20.488785, 0, 0, 0, 0, 0, 0, -9.895385, 0, -20.84062, 0, 0, 0, 0, 0, 0, -11.185323, 0, -15.009842, 0, 0, 0, 0, 0, 0, -12.198265, 0, -6.840667, 0, 0, 0, 0, 0, 0, -10.350559, 0, -2.6742625, 0, 0, 0, 0, 0, 0, -2.399201, 0, -2.6965852, 0, 0, 0, 0, 0, 0, -0.54618454, 0, -11.073807, 0, 0, 0, 0, 0, 0, -2.2987337, 0.050048828, -11.736767, 0, 0, 0, 0, 0, 0, -6.8335967, 0, -9.746569, 0, 0, 0, 0, 0, 0, -8.741132, 0, -8.130572, 0, 0, 0, 0, 0, 0, -6.829929, 0, -6.0243506, 0, 0, 0, 0, 0, 0, -5.23076, 0, -8.091568, 0, 0, 0, 0, 0, 0, -6.985175, 0, -10.917379, 0, 0, 0, 0, 0, 0, -9.517925, 0, -7.8885202, 0, 0, 0, 0, 0, 0, -6.358513, 0, -5.1468806, 0, 0, 0, 0, 0, 0, -4.400199, 0, -9.167952, 0, 0, 0, 0, 0, 0, -6.9590597, 0, -10.342939, 0, 0, 0, 0, 0, 0, -7.951277, 0, -8.358515, 0, 0, 0, 0, 0, 0, -5.3663, 0, -5.851872, 0, 0, 0, 0, 0, 0, -6.097401, 0, -8.9590645, 0, 0, 0, 0, 0, 0, -5.53732, 0, -9.721592, 0, 0, 0, 0, 0, 0, 2.147893, 0.050048828, -9.1427765, 0, 0, 0, 0, 0, 0, 5.359558, 0.050048828, -9.1513195, 0, 0, 0, 0, 0, 0, 15.863497, 0.9647217, -8.329178),
@@ -29,7 +28,7 @@ _data = {
 }
 point_count = 48
 
-[sub_resource type="Animation" id="Animation_ysqwc"]
+[sub_resource type="Animation" id="Animation_yyw7i"]
 resource_local_to_scene = true
 resource_name = "kill_boundary"
 length = 480.0
@@ -95,12 +94,12 @@ tracks/4/keys = {
 "values": [1.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_82gew"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_haq2d"]
 _data = {
-&"kill_boundary": SubResource("Animation_ysqwc")
+&"kill_boundary": SubResource("Animation_yyw7i")
 }
 
-[sub_resource type="Curve3D" id="Curve3D_efr0m"]
+[sub_resource type="Curve3D" id="Curve3D_rtouc"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
@@ -108,7 +107,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_ujxs0"]
+[sub_resource type="Curve3D" id="Curve3D_j77ya"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
@@ -132,7 +131,7 @@ shader_parameter/fade_margin = 0.2
 [sub_resource type="BoxShape3D" id="BoxShape3D_v11xe"]
 size = Vector3(32, 0.1, 32)
 
-[sub_resource type="Curve3D" id="Curve3D_2g2p0"]
+[sub_resource type="Curve3D" id="Curve3D_ysqwc"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.1434994, -0.10870552, -1.1893473, 0, 0, 0, 0, 0, 0, -3.1615887, 0, 3.4354763),
@@ -140,7 +139,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_haq2d"]
+[sub_resource type="Curve3D" id="Curve3D_82gew"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.1434994, -0.10870552, -1.1893473, 0, 0, 0, 0, 0, 0, -3.2513103, 0, 9.408987),
@@ -148,10 +147,10 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_5d2yv"]
+[sub_resource type="Curve3D" id="Curve3D_efr0m"]
 resource_local_to_scene = true
 _data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.1434994, -0.10870552, -1.1893473, 0, 0, 0, 0, 0, 0, 5.7833424, 0, -1.0126438),
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.8836575, -0.10870552, 4.092025, 0, 0, 0, 0, 0, 0, 1.0432568, 0, -1.6242161),
 "tilts": PackedFloat32Array(0, 0)
 }
 point_count = 2
@@ -168,8 +167,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.084152, 12, -11.637171)
 
 [node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 7.4758077, 0, 7.7353163)
-curve = SubResource("Curve3D_j77ya")
-boundary_animation = SubResource("Animation_ysqwc")
+curve = SubResource("Curve3D_mx8o4")
+boundary_animation = SubResource("Animation_yyw7i")
 playback_duration = 480.0
 movement_speed = 2.0
 shape_morph = 1.0
@@ -178,7 +177,7 @@ shape_morph = 1.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.445782, 0, -19.87931)
 
 [node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_82gew")
+libraries/ = SubResource("AnimationLibrary_haq2d")
 
 [node name="GridMap" type="GridMap" parent="." unique_id=1808558701]
 mesh_library = ExtResource("6_e2jp1")
@@ -371,34 +370,26 @@ coin_count = 10
 
 [node name="HealthPotion3" parent="Objects/Potions" unique_id=844040700 instance=ExtResource("11_haq2d")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 11.974081, 0, 11.246274)
-global_flask_properties = ExtResource("12_rtouc")
-hud_effect_id = &"health_flask"
-show_hud_countdown = true
 
 [node name="HealthPotion4" parent="Objects/Potions" unique_id=795995713 instance=ExtResource("11_haq2d")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 5.1349087, 0, -4.9243803)
-global_flask_properties = ExtResource("12_rtouc")
-hud_effect_id = &"health_flask"
-show_hud_countdown = true
 
 [node name="HealthPotion5" parent="Objects/Potions" unique_id=2016739216 instance=ExtResource("11_haq2d")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 2.6802197, 0, 2.1989107)
-global_flask_properties = ExtResource("12_rtouc")
-hud_effect_id = &"health_flask"
-show_hud_countdown = true
 
 [node name="LockedDoor" parent="." unique_id=945615625 instance=ExtResource("12_fhv3i")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 6.5, 0, -1.5002642)
 
 [node name="Zombie1" parent="." unique_id=1519867817 instance=ExtResource("10_veeoo")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.2, -11)
-curve = SubResource("Curve3D_efr0m")
+curve = SubResource("Curve3D_rtouc")
 
 [node name="Zombie2" parent="." unique_id=734149938 instance=ExtResource("10_veeoo")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5519028, 0.2, -5.592163)
-curve = SubResource("Curve3D_ujxs0")
+curve = SubResource("Curve3D_j77ya")
 
 [node name="Tiled Floor" type="StaticBody3D" parent="." unique_id=1561209129]
+visible = false
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Tiled Floor" unique_id=1482312015]
 mesh = SubResource("PlaneMesh_8e3ph")
@@ -415,7 +406,7 @@ transform = Transform3D(0.7498454, 0, 0.6616132, 0, 1, 0, -0.6616132, 0, 0.74984
 
 [node name="StartSkeleton4" parent="." unique_id=1599184812 instance=ExtResource("19_haq2d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.575163, 9.536743e-07, -11.32611)
-curve = SubResource("Curve3D_2g2p0")
+curve = SubResource("Curve3D_ysqwc")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -424,7 +415,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1434994, -0.10870552, -1.1
 
 [node name="StartSkeleton6" parent="." unique_id=1270048018 instance=ExtResource("19_haq2d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.228209, 9.536743e-07, -4.6654654)
-curve = SubResource("Curve3D_haq2d")
+curve = SubResource("Curve3D_82gew")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -432,13 +423,13 @@ loop_patrol = false
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1434994, -0.10870552, -1.1893473)
 
 [node name="StartSkeleton5" parent="." unique_id=1216761837 instance=ExtResource("19_haq2d")]
-transform = Transform3D(0.68745196, 0, 0.72622985, 0, 1, 0, -0.72622985, 0, 0.68745196, -8.52907, 9.536743e-07, 5.608094)
-curve = SubResource("Curve3D_5d2yv")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.52907, 9.536743e-07, 5.608094)
+curve = SubResource("Curve3D_efr0m")
 shuffle_speed = 0.55
 loop_patrol = false
 
 [node name="PathFollow3D" parent="StartSkeleton5" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1434994, -0.10870552, -1.1893473)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8836575, -0.10870552, 4.092025)
 
 [node name="SpikeTrap" parent="." unique_id=1124881707 instance=ExtResource("20_yyw7i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8055115, 0, -1.3905029)
