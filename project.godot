@@ -58,7 +58,7 @@ movie_writer/movie_file="C:/Godot/capture.avi"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/copy_all_errors/plugin.cfg", "res://addons/png_to_gridmap/plugin.cfg", "res://addons/simplegrasstextured/plugin.cfg")
+enabled=PackedStringArray("res://addons/copy_all_errors/plugin.cfg", "res://addons/path3d_selected_gizmo/plugin.cfg", "res://addons/png_to_gridmap/plugin.cfg", "res://addons/simplegrasstextured/plugin.cfg")
 
 [input]
 
