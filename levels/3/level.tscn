@@ -1,25 +1,23 @@
 [gd_scene format=3 uid="uid://c7k5wvrum4far"]
 
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
-[ext_resource type="PackedScene" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
+[ext_resource type="PackedScene" uid="uid://cw45377f21i2v" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="4_cogbq"]
 [ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="4_flame"]
-[ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://Assets/environment/shaders/level.gdshader" id="6_rakk4"]
-[ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="7_46uyn"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 
-[sub_resource type="Curve3D" id="Curve3D_xr1q8"]
+[sub_resource type="Curve3D" id="Curve3D_rakk4"]
 resource_local_to_scene = true
 _data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -15.122086, 0.01753807, -21.473944, 0, 0, 0, 0, 0, 0, 262.24744, 0.0094509125, -21.709044),
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 51.87783, 0.01753807, -21.473944, 0, 0, 0, 0, 0, 0, 203.2475, 0.0094509125, -21.709044),
 "tilts": PackedFloat32Array(0, 0)
 }
 point_count = 2
 
-[sub_resource type="Animation" id="Animation_c2irs"]
+[sub_resource type="Animation" id="Animation_46uyn"]
 resource_local_to_scene = true
 resource_name = "kill_boundary"
-length = 475.27316
+length = 10.0
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -28,7 +26,7 @@ tracks/0/path = NodePath(".:movement_speed")
 tracks/0/interp = 1
 tracks/0/loop_wrap = false
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 475.23334),
+"times": PackedFloat32Array(0, 9.999162),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [1.0, 1.0]
@@ -40,7 +38,7 @@ tracks/1/path = NodePath(".:boundary_scale_x")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 475.26666),
+"times": PackedFloat32Array(0, 9.999864),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [2.2, 2.2]
@@ -52,7 +50,7 @@ tracks/2/path = NodePath(".:boundary_scale_z")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 475.26666),
+"times": PackedFloat32Array(0, 9.999864),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [2.2, 2.2]
@@ -64,7 +62,7 @@ tracks/3/path = NodePath(".:boundary_rotation_z_radians")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 475.26666),
+"times": PackedFloat32Array(0, 9.999864),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 0.0]
@@ -76,55 +74,49 @@ tracks/4/path = NodePath(".:shape_morph")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 475.27316),
+"times": PackedFloat32Array(0, 10),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [1.0, 1.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_nst7r"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_h2uts"]
 _data = {
-&"kill_boundary": SubResource("Animation_c2irs")
+&"kill_boundary": SubResource("Animation_46uyn")
 }
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_u6dqf"]
-size = Vector2(304, 24)
+size = Vector2(150, 24)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_rwgeq"]
-render_priority = 0
-shader = ExtResource("6_rakk4")
-shader_parameter/tiled_texture = ExtResource("7_46uyn")
-shader_parameter/level_width = 300.0
-shader_parameter/level_height = 20.0
-shader_parameter/floor_overscan = Vector2(2, 2)
-shader_parameter/floor_tile_size = Vector2(8, 8)
-shader_parameter/fade_margin = 0.2
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_og3ov"]
+metallic = 1.0
+roughness = 0.0
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_f2tia"]
-size = Vector3(304, 0.1, 24)
+size = Vector3(150, 0.1, 24)
 
 [node name="Level3" type="Node3D" unique_id=340819746]
 
 [node name="IndoorLighting" parent="." unique_id=674717850 instance=ExtResource("100_indoor")]
 
 [node name="Player" parent="." unique_id=244343110 instance=ExtResource("2_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -138.16736, 11.999611, -0.16962579)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -61.16736, 11.999611, -0.16962579)
 
 [node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, -125.43729, 0, 21.607485)
-curve = SubResource("Curve3D_xr1q8")
-boundary_animation = SubResource("Animation_c2irs")
-playback_duration = 475.27316
+curve = SubResource("Curve3D_rakk4")
+boundary_animation = SubResource("Animation_46uyn")
+playback_duration = 10.0
 movement_speed = 1.95
 boundary_scale_x = 2.2
 boundary_scale_z = 2.2
 shape_morph = 1.0
 
 [node name="BoundaryCenter" parent="KillBoundary3D" index="0"]
-transform = Transform3D(2.2, 0, 0, 0, 1, 0, 0, 0, 2.2, -15.122086, 0.01753807, -21.473944)
+transform = Transform3D(2.2, 0, 0, 0, 1, 0, 0, 0, 2.2, 51.87783, 0.01753807, -21.473944)
 
 [node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_nst7r")
+libraries/ = SubResource("AnimationLibrary_h2uts")
 
 [node name="PNGGridMap" type="GridMap" parent="." unique_id=1498944449]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -149.5, 0, -9.5)
@@ -148,7 +140,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Tiled Floor/StaticBody3D" unique_id=1137796034]
 mesh = SubResource("PlaneMesh_u6dqf")
-surface_material_override/0 = SubResource("ShaderMaterial_rwgeq")
+surface_material_override/0 = SubResource("StandardMaterial3D_og3ov")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Tiled Floor/StaticBody3D" unique_id=1154710177]
 shape = SubResource("BoxShape3D_f2tia")
