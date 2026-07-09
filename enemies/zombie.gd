@@ -25,7 +25,7 @@ func _ready() -> void:
 
 	previous_body_position = _get_body_position()
 	navigation_ready = ai_enabled_on_ready
-	state = ZombieState.PATROL if navigation_ready else ZombieState.LEVEL_START
+	state = ZombieState.Patrol if navigation_ready else ZombieState.LevelStart
 
 	if drop_in_time > 0.0:
 		_set_active_visible(false)
@@ -45,7 +45,7 @@ func _physics_process(delta: float) -> void:
 		return
 
 	if not navigation_ready:
-		_change_state(ZombieState.LEVEL_START)
+		_change_state(ZombieState.LevelStart)
 		_stop_body()
 		_update_animation(0.0)
 		return
@@ -57,11 +57,11 @@ func _physics_process(delta: float) -> void:
 func set_navigation_ready(is_ready: bool) -> void:
 	navigation_ready = is_ready
 	navigation_ready_changed.emit(navigation_ready)
-	if navigation_ready and state == ZombieState.LEVEL_START:
-		_change_state(ZombieState.PATROL)
+	if navigation_ready and state == ZombieState.LevelStart:
+		_change_state(ZombieState.Patrol)
 		_set_next_patrol_target()
 	elif not navigation_ready:
-		_change_state(ZombieState.LEVEL_START)
+		_change_state(ZombieState.LevelStart)
 		_stop_body()
 
 func set_ai_enabled(enabled: bool) -> void:
@@ -118,11 +118,11 @@ func _seed_deterministic_rng() -> void:
 
 func _update_state(delta: float) -> void:
 	if is_dead:
-		_change_state(ZombieState.DIE)
+		_change_state(ZombieState.Die)
 		return
 
 	if _is_crushed(delta):
-		_change_state(ZombieState.CRUSHED)
+		_change_state(ZombieState.Crushed)
 		_die_from_rolling_ball()
 		return
 
@@ -133,39 +133,39 @@ func _update_state(delta: float) -> void:
 	if visible_player:
 		last_seen_position = _get_player_navigation_position()
 		last_seen_timer = 0.0
-		if state != ZombieState.ATTACK and _is_route_reachable(last_seen_position):
+		if state != ZombieState.Attack and _is_route_reachable(last_seen_position):
 			if _can_start_attack():
-				_change_state(ZombieState.ATTACK)
+				_change_state(ZombieState.Attack)
 			else:
-				_change_state(ZombieState.CHASE)
+				_change_state(ZombieState.Chase)
 	else:
 		last_seen_timer += delta
 
 	match state:
-		ZombieState.LEVEL_START:
+		ZombieState.LevelStart:
 			_stop_body()
-		ZombieState.PATROL:
+		ZombieState.Patrol:
 			_update_patrol(delta)
-		ZombieState.CHASE:
+		ZombieState.Chase:
 			_update_chase(delta, visible_player)
-		ZombieState.SEARCH_LAST_SEEN:
+		ZombieState.SearchLastSeen:
 			_update_search_last_seen(delta, visible_player)
-		ZombieState.RETURN_TO_PATROL:
+		ZombieState.ReturnToPatrol:
 			_update_return_to_patrol(delta, visible_player)
-		ZombieState.POSITION_FOR_ATTACK:
+		ZombieState.PositionForAttack:
 			_update_position_for_attack(delta, visible_player)
-		ZombieState.ATTACK:
+		ZombieState.Attack:
 			_update_attack(delta, visible_player)
-		ZombieState.SITDOWN:
+		ZombieState.Sitdown:
 			_update_sitdown(delta, visible_player)
-		ZombieState.CRUSHED:
+		ZombieState.Crushed:
 			_stop_body()
-		ZombieState.DIE:
+		ZombieState.Die:
 			_stop_body()
 
 func _update_patrol(delta: float) -> void:
 	if patrol_points.is_empty():
-		_change_state(ZombieState.SITDOWN)
+		_change_state(ZombieState.Sitdown)
 		return
 
 	var body_position := _get_body_position()
@@ -175,7 +175,7 @@ func _update_patrol(delta: float) -> void:
 	if not _is_route_reachable(current_target):
 		_update_stuck(delta, 0.0)
 		if stuck_timer >= stuck_seconds_before_sit:
-			_change_state(ZombieState.SITDOWN)
+			_change_state(ZombieState.Sitdown)
 		return
 
 	var horizontal_speed := _follow_navigation_target(current_target, delta)
@@ -183,7 +183,7 @@ func _update_patrol(delta: float) -> void:
 
 func _update_chase(delta: float, visible_player: bool) -> void:
 	if player == null or _is_player_dead():
-		_change_state(ZombieState.RETURN_TO_PATROL)
+		_change_state(ZombieState.ReturnToPatrol)
 		return
 
 	if visible_player:
@@ -191,11 +191,11 @@ func _update_chase(delta: float, visible_player: bool) -> void:
 		last_seen_timer = 0.0
 
 	if _can_start_attack():
-		_change_state(ZombieState.ATTACK)
+		_change_state(ZombieState.Attack)
 		return
 
 	if last_seen_timer >= lost_sight_seconds:
-		_change_state(ZombieState.SEARCH_LAST_SEEN)
+		_change_state(ZombieState.SearchLastSeen)
 		_set_navigation_target(last_seen_position)
 		return
 
@@ -204,13 +204,13 @@ func _update_chase(delta: float, visible_player: bool) -> void:
 	if repath_timer <= 0.0:
 		repath_timer = repath_interval
 		if visible_player and not _is_route_reachable(chase_target):
-			_change_state(ZombieState.SITDOWN)
+			_change_state(ZombieState.Sitdown)
 			return
 		_set_navigation_target(chase_target)
 
 	var horizontal_speed := _follow_navigation_target(chase_target, delta, false, shuffle_speed)
 	if visible_player and _is_blocked_by_zombie() and _select_attack_position_target():
-		_change_state(ZombieState.POSITION_FOR_ATTACK)
+		_change_state(ZombieState.PositionForAttack)
 		_update_animation(horizontal_speed)
 		return
 
@@ -222,7 +222,7 @@ func _update_chase(delta: float, visible_player: bool) -> void:
 
 func _update_search_last_seen(delta: float, visible_player: bool) -> void:
 	if visible_player:
-		_change_state(ZombieState.CHASE)
+		_change_state(ZombieState.Chase)
 		return
 
 	search_timer += delta
@@ -237,69 +237,78 @@ func _update_search_last_seen(delta: float, visible_player: bool) -> void:
 	_scan_deterministically(delta)
 	_update_animation(0.0)
 	if search_timer >= search_duration:
-		_change_state(ZombieState.RETURN_TO_PATROL)
+		_change_state(ZombieState.ReturnToPatrol)
 
 func _update_return_to_patrol(delta: float, visible_player: bool) -> void:
 	if visible_player:
-		_change_state(ZombieState.CHASE)
+		_change_state(ZombieState.Chase)
 		return
 
 	if patrol_points.is_empty():
-		_change_state(ZombieState.SITDOWN)
+		_change_state(ZombieState.Sitdown)
 		return
 
 	var body_position := _get_body_position()
 	if body_position.distance_to(current_target) <= patrol_point_reached_distance:
-		_change_state(ZombieState.PATROL)
+		_change_state(ZombieState.Patrol)
 		return
 
 	var horizontal_speed := _follow_navigation_target(current_target, delta)
 	_after_motion(delta, horizontal_speed)
 
 func _update_position_for_attack(delta: float, visible_player: bool) -> void:
+	var should_follow_target := true
 	if player == null or _is_player_dead():
-		_change_state(ZombieState.RETURN_TO_PATROL)
+		_change_state(ZombieState.ReturnToPatrol)
 		return
 
 	if visible_player:
 		last_seen_position = _get_player_navigation_position()
 		last_seen_timer = 0.0
 	elif last_seen_timer >= lost_sight_seconds:
-		_change_state(ZombieState.SEARCH_LAST_SEEN)
+		_change_state(ZombieState.SearchLastSeen)
 		return
 
 	if _can_start_attack():
-		_change_state(ZombieState.ATTACK)
+		_change_state(ZombieState.Attack)
 		return
 
 	var current_player_position := _get_player_navigation_position()
-	if has_attack_position_target and current_player_position.distance_to(attack_position_player_anchor) > attack_position_reached_distance:
-		_change_state(ZombieState.CHASE)
-		return
+	if (
+		has_attack_position_target
+		and current_player_position.distance_to(attack_position_player_anchor) > attack_position_reached_distance
+	):
+		_change_state(ZombieState.Chase)
+		should_follow_target = false
 
-	repath_timer -= delta
-	if repath_timer <= 0.0:
+	if should_follow_target:
+		repath_timer -= delta
+	if should_follow_target and repath_timer <= 0.0:
 		repath_timer = repath_interval
 		if not _select_attack_position_target():
-			_change_state(ZombieState.CHASE)
-			return
+			_change_state(ZombieState.Chase)
+			should_follow_target = false
 
-	if not has_attack_position_target or _has_static_blocker_between(_get_player_navigation_position(), attack_position_target):
+	if should_follow_target and (
+		not has_attack_position_target
+		or _has_static_blocker_between(_get_player_navigation_position(), attack_position_target)
+	):
 		if not _select_attack_position_target():
-			_change_state(ZombieState.CHASE)
-			return
+			_change_state(ZombieState.Chase)
+			should_follow_target = false
 
 	var body_position := _get_body_position()
-	if body_position.distance_to(attack_position_target) <= attack_position_reached_distance:
+	if should_follow_target and body_position.distance_to(attack_position_target) <= attack_position_reached_distance:
 		if not _select_attack_position_target():
-			_change_state(ZombieState.CHASE)
-			return
+			_change_state(ZombieState.Chase)
+			should_follow_target = false
 
-	var horizontal_speed := _follow_navigation_target(attack_position_target, delta, false, shuffle_speed)
-	if _is_blocked_by_zombie():
-		_select_attack_position_target()
+	if should_follow_target:
+		var horizontal_speed := _follow_navigation_target(attack_position_target, delta, false, shuffle_speed)
+		if _is_blocked_by_zombie():
+			_select_attack_position_target()
 
-	_after_motion(delta, horizontal_speed)
+		_after_motion(delta, horizontal_speed)
 
 func _update_attack(delta: float, visible_player: bool) -> void:
 	_stop_body()
@@ -307,11 +316,11 @@ func _update_attack(delta: float, visible_player: bool) -> void:
 	if not _can_continue_attack():
 		_set_attack_hitboxes_enabled(false)
 		if player != null and _is_player_dead():
-			_change_state(ZombieState.RETURN_TO_PATROL)
+			_change_state(ZombieState.ReturnToPatrol)
 		elif player == null or last_seen_timer >= lost_sight_seconds:
-			_change_state(ZombieState.SEARCH_LAST_SEEN)
+			_change_state(ZombieState.SearchLastSeen)
 		else:
-			_change_state(ZombieState.CHASE)
+			_change_state(ZombieState.Chase)
 		return
 
 	_face_position(_get_player_target_position(), delta)
@@ -331,13 +340,13 @@ func _update_attack(delta: float, visible_player: bool) -> void:
 
 	if not visible_player:
 		if last_seen_timer >= lost_sight_seconds:
-			_change_state(ZombieState.SEARCH_LAST_SEEN)
+			_change_state(ZombieState.SearchLastSeen)
 		else:
-			_change_state(ZombieState.CHASE)
+			_change_state(ZombieState.Chase)
 	elif _can_start_attack():
 		_start_attack()
 	else:
-		_change_state(ZombieState.CHASE)
+		_change_state(ZombieState.Chase)
 
 func _update_sitdown(delta: float, visible_player: bool) -> void:
 	_stop_body()
@@ -345,14 +354,14 @@ func _update_sitdown(delta: float, visible_player: bool) -> void:
 	sit_repath_timer -= delta
 
 	if _is_player_dead() and not patrol_points.is_empty():
-		_change_state(ZombieState.RETURN_TO_PATROL)
+		_change_state(ZombieState.ReturnToPatrol)
 		return
 
 	if visible_player:
 		if _can_start_attack():
-			_change_state(ZombieState.ATTACK)
+			_change_state(ZombieState.Attack)
 		else:
-			_change_state(ZombieState.CHASE)
+			_change_state(ZombieState.Chase)
 		return
 
 	_scan_randomly_while_idle(delta)
@@ -361,7 +370,7 @@ func _update_sitdown(delta: float, visible_player: bool) -> void:
 	if sit_repath_timer <= 0.0:
 		sit_repath_timer = sit_repath_interval
 		if _select_closest_reachable_patrol_target():
-			_change_state(ZombieState.RETURN_TO_PATROL)
+			_change_state(ZombieState.ReturnToPatrol)
 
 func _change_state(next_state: ZombieState) -> void:
 	if state == next_state:
@@ -369,35 +378,35 @@ func _change_state(next_state: ZombieState) -> void:
 
 	state = next_state
 	stuck_timer = 0.0
-	if state != ZombieState.POSITION_FOR_ATTACK:
+	if state != ZombieState.PositionForAttack:
 		has_attack_position_target = false
 
 	match state:
-		ZombieState.LEVEL_START:
+		ZombieState.LevelStart:
 			_play_animation(static_animation_name)
-		ZombieState.PATROL:
+		ZombieState.Patrol:
 			_set_next_patrol_target()
-		ZombieState.CHASE:
+		ZombieState.Chase:
 			repath_timer = 0.0
-		ZombieState.SEARCH_LAST_SEEN:
+		ZombieState.SearchLastSeen:
 			search_timer = 0.0
 			_set_navigation_target(last_seen_position)
-		ZombieState.RETURN_TO_PATROL:
+		ZombieState.ReturnToPatrol:
 			_select_closest_reachable_patrol_target()
-		ZombieState.POSITION_FOR_ATTACK:
+		ZombieState.PositionForAttack:
 			repath_timer = 0.0
 			_select_attack_position_target()
-		ZombieState.ATTACK:
+		ZombieState.Attack:
 			_start_attack()
-		ZombieState.SITDOWN:
+		ZombieState.Sitdown:
 			sit_repath_timer = 0.0
 			sit_vision_timer = 0.0
 			idle_scan_timer = 0.0
 			_set_attack_hitboxes_enabled(false)
 			_play_animation(idle_animation_name)
-		ZombieState.CRUSHED:
+		ZombieState.Crushed:
 			_set_attack_hitboxes_enabled(false)
-		ZombieState.DIE:
+		ZombieState.Die:
 			_set_attack_hitboxes_enabled(false)
 
 func _return_to_patrol_after_player_death() -> void:
@@ -406,18 +415,18 @@ func _return_to_patrol_after_player_death() -> void:
 	_set_attack_hitboxes_enabled(false)
 
 	if patrol_points.is_empty():
-		if state != ZombieState.SITDOWN:
-			_change_state(ZombieState.SITDOWN)
+		if state != ZombieState.Sitdown:
+			_change_state(ZombieState.Sitdown)
 		return
 
-	if state != ZombieState.PATROL and state != ZombieState.RETURN_TO_PATROL:
-		_change_state(ZombieState.RETURN_TO_PATROL)
+	if state != ZombieState.Patrol and state != ZombieState.ReturnToPatrol:
+		_change_state(ZombieState.ReturnToPatrol)
 
 func _after_motion(delta: float, horizontal_speed: float) -> void:
 	_update_animation(horizontal_speed)
 	_update_footsteps(delta, horizontal_speed)
 	if stuck_timer >= stuck_seconds_before_sit:
-		_change_state(ZombieState.SITDOWN)
+		_change_state(ZombieState.Sitdown)
 
 func _is_crushed(delta: float) -> bool:
 	if crush_check_area == null:
@@ -489,7 +498,7 @@ func _die_from_rolling_ball() -> void:
 		return
 
 	is_dead = true
-	_change_state(ZombieState.DIE)
+	_change_state(ZombieState.Die)
 	footstep_distance_accumulator = 0.0
 	_stop_body()
 	_set_kill_area_enabled(false)

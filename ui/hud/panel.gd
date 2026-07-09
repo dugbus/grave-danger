@@ -5,9 +5,9 @@ class_name GDHudPanel
 ## Full-width HUD panel that displays treasure, sack capacity, and segmented health.
 
 enum HealthSegmentState {
-	REMAINING,
-	LOST,
-	LOCKED,
+	Remaining,
+	Lost,
+	Locked,
 }
 
 const ACTIVE_HEALTH_SEGMENTS := 6
@@ -15,8 +15,14 @@ const TOTAL_HEALTH_SEGMENTS := 12
 const DEFAULT_LEVEL_COIN_TOTAL := 0
 
 @export_group("Placement Help")
-## Inspector note: edit ScreenContainer/PanelPlacement to move or resize the panel inside the reference canvas. HudPanel scales ScreenContainer uniformly to the actual viewport, so child aspect ratios are preserved on widescreen displays.
-@export_multiline var placement_help := "Edit ScreenContainer/PanelPlacement to position and scale the HUD panel inside the 1920x1080 reference canvas. HudPanel scales ScreenContainer uniformly to fit the real viewport, so child aspect ratios stay unchanged. ScreenGuide shows the reference canvas in the editor. PlacementGuide shows the panel placement rectangle and is hidden at runtime."
+## Inspector note: edit ScreenContainer/PanelPlacement to move or resize the panel inside the reference canvas.
+## HudPanel scales ScreenContainer uniformly to the actual viewport, so child aspect ratios are preserved.
+@export_multiline var placement_help := (
+	"Edit ScreenContainer/PanelPlacement to position and scale the HUD panel inside the 1920x1080 "
+	+ "reference canvas. HudPanel scales ScreenContainer uniformly to fit the real viewport, so child "
+	+ "aspect ratios stay unchanged. ScreenGuide shows the reference canvas in the editor. PlacementGuide "
+	+ "shows the panel placement rectangle and is hidden at runtime."
+)
 @export_group("")
 
 ## Reference canvas size used to position HUD elements before uniform screen scaling.
@@ -151,19 +157,19 @@ func _update_health_segments() -> void:
 
 func _get_health_segment_state(segment_index: int) -> HealthSegmentState:
 	if segment_index >= health_available:
-		return HealthSegmentState.LOCKED
+		return HealthSegmentState.Locked
 	if segment_index < health_remaining:
-		return HealthSegmentState.REMAINING
-	return HealthSegmentState.LOST
+		return HealthSegmentState.Remaining
+	return HealthSegmentState.Lost
 
 
 func _get_health_segment_texture(segment_state: HealthSegmentState) -> Texture2D:
 	match segment_state:
-		HealthSegmentState.REMAINING:
+		HealthSegmentState.Remaining:
 			return remaining_health_texture
-		HealthSegmentState.LOST:
+		HealthSegmentState.Lost:
 			return lost_health_texture
-		HealthSegmentState.LOCKED:
+		HealthSegmentState.Locked:
 			return locked_health_texture
 
 	return locked_health_texture

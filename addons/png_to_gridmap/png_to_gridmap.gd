@@ -7,6 +7,7 @@ const DockResource := preload("res://addons/png_to_gridmap/png_to_gridmap_dock.g
 const ProfileStoreResource := preload("res://addons/png_to_gridmap/png_to_gridmap_profile_store.gd")
 const ImporterResource := preload("res://addons/png_to_gridmap/png_to_gridmap_importer.gd")
 const ExporterResource := preload("res://addons/png_to_gridmap/png_to_gridmap_exporter.gd")
+const PathsResource := preload("res://addons/png_to_gridmap/png_to_gridmap_paths.gd")
 
 const PLUGIN_CONFIG_PATH := "res://addons/png_to_gridmap/plugin.cfg"
 const EMPTY_KEY := "FFFFFFFF"
@@ -146,7 +147,7 @@ func _on_load_png_selected(path: String) -> void:
 
 ## Records the user-selected export PNG path without writing a file.
 func _on_export_png_path_selected(path: String) -> void:
-	_settings.export_png_path = _normalize_png_output_path(path)
+	_settings.export_png_path = PathsResource.normalize_png_output_path(path)
 	_save_profile()
 	_update_dock_state()
 
@@ -222,20 +223,21 @@ func _on_mapping_changed() -> void:
 
 ## Loads a PNG image and rebuilds colour mappings from its palette.
 func _load_png(path: String, save_profile: bool) -> void:
-	var texture := ResourceLoader.load(path) as Texture2D
+	var localized_path := PathsResource.localize_project_path(path)
+	var texture := ResourceLoader.load(localized_path) as Texture2D
 	if texture == null:
-		_update_dock_state("Could not load PNG: %s." % path)
+		_update_dock_state("Could not load PNG: %s." % localized_path)
 		return
 
 	var image := texture.get_image()
 	if image == null:
-		_update_dock_state("Could not read image data from PNG: %s." % path)
+		_update_dock_state("Could not read image data from PNG: %s." % localized_path)
 		return
 	_image = image
-	_settings.png_path = path
+	_settings.png_path = localized_path
 	_scan_colours()
 	_dock.set_settings(_settings)
-	_dock.set_png_state(path, _detected_colours, _colour_order)
+	_dock.set_png_state(localized_path, _detected_colours, _colour_order)
 	if save_profile:
 		_save_profile()
 	_update_dock_state()
@@ -278,7 +280,7 @@ func _continue_import(active: Dictionary) -> void:
 
 ## Confirms overwrite when needed before exporting the selected GridMap.
 func _request_export(path: String) -> void:
-	var normalized_path := _normalize_png_output_path(path)
+	var normalized_path := PathsResource.normalize_png_output_path(path)
 	if FileAccess.file_exists(normalized_path):
 		_dock.show_overwrite_warning(normalized_path, func() -> void: _run_export(normalized_path))
 		return
@@ -292,7 +294,7 @@ func _run_export(path: String) -> void:
 	if not errors.is_empty():
 		_update_dock_state("\n".join(errors))
 		return
-	var normalized_path := _normalize_png_output_path(path)
+	var normalized_path := PathsResource.normalize_png_output_path(path)
 	var result := _exporter.run(_settings, _selected_gridmap(), normalized_path, _available_item_ref_aliases, _available_item_display_names)
 	errors = _to_string_array(result.get("errors", []))
 	if not errors.is_empty():
@@ -363,13 +365,6 @@ func _export_output_path() -> String:
 	if root != null and root.scene_file_path != "":
 		return root.scene_file_path.get_basename() + "_gridmap.png"
 	return "res://gridmap_export.png"
-
-
-## Ensures export paths end in the PNG extension before display or writing.
-func _normalize_png_output_path(path: String) -> String:
-	if path.get_extension().to_lower() == "png":
-		return path
-	return path + ".png"
 
 
 ## Saves the selected MeshLibrary's automatic mapping profile when configured.

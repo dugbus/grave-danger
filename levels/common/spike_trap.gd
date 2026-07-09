@@ -3,11 +3,11 @@ class_name GDSpikeTrap
 
 
 enum SpikeTrapState {
-    READY,
-    ARMING,
-    RISING,
-    ACTIVE,
-    RESETTING,
+    Ready,
+    Arming,
+    Rising,
+    Active,
+    Resetting,
 }
 
 const PLAYER_COLLISION_LAYER := 2
@@ -60,7 +60,7 @@ const DEFAULT_RESET_SOUND_PATH := "res://Assets/audio/spike-going-back-down.mp3"
 @onready var trigger_area := get_node_or_null(trigger_area_path) as Area3D
 @onready var strike_area := get_node_or_null(strike_area_path) as Area3D
 
-var state := SpikeTrapState.READY
+var state := SpikeTrapState.Ready
 var motion_tween: Tween
 var trigger_sound: AudioStream
 var hit_sound: AudioStream
@@ -81,7 +81,7 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
-    if state != SpikeTrapState.READY:
+    if state != SpikeTrapState.Ready:
         return
 
     if not _get_targets_in_box(trigger_area_size).is_empty():
@@ -89,10 +89,10 @@ func _physics_process(_delta: float) -> void:
 
 
 func trigger() -> void:
-    if state != SpikeTrapState.READY:
+    if state != SpikeTrapState.Ready:
         return
 
-    state = SpikeTrapState.ARMING
+    state = SpikeTrapState.Arming
     _run_cycle.call_deferred()
 
 
@@ -101,18 +101,18 @@ func get_spike_trap_state() -> SpikeTrapState:
 
 
 func is_ready() -> bool:
-    return state == SpikeTrapState.READY
+    return state == SpikeTrapState.Ready
 
 
 func _run_cycle() -> void:
-    if state != SpikeTrapState.ARMING:
+    if state != SpikeTrapState.Arming:
         return
 
     await get_tree().create_timer(maxf(arming_delay, 0.0)).timeout
     if not is_inside_tree():
         return
 
-    state = SpikeTrapState.RISING
+    state = SpikeTrapState.Rising
     var hit_count := _damage_targets_in_strike_area()
     if hit_count > 0:
         _play_sound(hit_sound, "SpikeTrapHitAudio", hit_volume_db)
@@ -125,18 +125,18 @@ func _run_cycle() -> void:
     if not is_inside_tree():
         return
 
-    state = SpikeTrapState.ACTIVE
+    state = SpikeTrapState.Active
     await get_tree().create_timer(maxf(raised_hold_seconds, 0.0)).timeout
     if not is_inside_tree():
         return
 
-    state = SpikeTrapState.RESETTING
+    state = SpikeTrapState.Resetting
     _play_sound(reset_sound, "SpikeTrapResetAudio", reset_volume_db)
     await _animate_reset()
     if not is_inside_tree():
         return
 
-    state = SpikeTrapState.READY
+    state = SpikeTrapState.Ready
 
 
 func _damage_targets_in_strike_area() -> int:
@@ -334,7 +334,7 @@ func _play_sound(stream: AudioStream, sound_name: String, volume_db: float) -> v
 
 
 func _on_trigger_area_body_entered(body: Node3D) -> void:
-    if state != SpikeTrapState.READY:
+    if state != SpikeTrapState.Ready:
         return
 
     var target := _resolve_target_node(body)

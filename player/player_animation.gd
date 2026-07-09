@@ -80,7 +80,10 @@ func update_movement(input_strength: float, gold_inventory: Node) -> void:
 	if animation_player != null:
 		# Carrying gold slows the walk cycle as well as the player's movement.
 		var weight_animation_multiplier: float = gold_inventory.weight_multiplier(1.0, MIN_WEIGHT_ANIMATION_MULTIPLIER)
-		animation_player.speed_scale = lerpf(MIN_WALK_ANIMATION_SPEED, MAX_WALK_ANIMATION_SPEED, input_strength) * weight_animation_multiplier
+		animation_player.speed_scale = (
+			lerpf(MIN_WALK_ANIMATION_SPEED, MAX_WALK_ANIMATION_SPEED, input_strength)
+			* weight_animation_multiplier
+		)
 	_play_animation(walk_animation)
 
 

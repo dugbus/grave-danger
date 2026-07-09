@@ -5,16 +5,16 @@ extends Path3D
 signal navigation_ready_changed(is_ready: bool)
 
 enum ZombieState {
-    LEVEL_START,
-    PATROL,
-    CHASE,
-    SEARCH_LAST_SEEN,
-    RETURN_TO_PATROL,
-    POSITION_FOR_ATTACK,
-    ATTACK,
-    SITDOWN,
-    CRUSHED,
-    DIE,
+    LevelStart,
+    Patrol,
+    Chase,
+    SearchLastSeen,
+    ReturnToPatrol,
+    PositionForAttack,
+    Attack,
+    Sitdown,
+    Crushed,
+    Die,
 }
 
 const FOOTSTEP_SOUND_PATHS: Array[String] = [
@@ -201,7 +201,7 @@ const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 @onready var attack_hitbox_left := get_node_or_null(attack_hitbox_left_path) as Area3D
 @onready var crush_check_area := get_node_or_null(crush_check_area_path) as Area3D
 
-var state := ZombieState.LEVEL_START
+var state := ZombieState.LevelStart
 var player: Node3D
 var patrol_points: Array[Vector3] = []
 var navigation_grid_maps: Array[GridMap] = []

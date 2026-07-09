@@ -138,10 +138,10 @@ func _append_unique_node_target(targets: Array[Node], candidate: Object) -> void
 
 func _should_force_vision_update() -> bool:
     return (
-        state == ZombieState.CHASE
-        or state == ZombieState.SEARCH_LAST_SEEN
-        or state == ZombieState.RETURN_TO_PATROL
-        or state == ZombieState.POSITION_FOR_ATTACK
+        state == ZombieState.Chase
+        or state == ZombieState.SearchLastSeen
+        or state == ZombieState.ReturnToPatrol
+        or state == ZombieState.PositionForAttack
     )
 
 func _can_see_player(force_update := false) -> bool:

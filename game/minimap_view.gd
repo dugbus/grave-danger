@@ -25,8 +25,12 @@ var minimap_environment: Environment
 var minimap_enabled := false
 
 @onready var viewport_container := get_node_or_null(VIEWPORT_CONTAINER_NAME) as SubViewportContainer
-@onready var minimap_viewport := get_node_or_null("%s/%s" % [VIEWPORT_CONTAINER_NAME, MINIMAP_VIEWPORT_NAME]) as SubViewport
-@onready var minimap_camera := get_node_or_null("%s/%s/%s" % [VIEWPORT_CONTAINER_NAME, MINIMAP_VIEWPORT_NAME, MINIMAP_CAMERA_NAME]) as Camera3D
+@onready var minimap_viewport := (
+	get_node_or_null("%s/%s" % [VIEWPORT_CONTAINER_NAME, MINIMAP_VIEWPORT_NAME]) as SubViewport
+)
+@onready var minimap_camera := (
+	get_node_or_null("%s/%s/%s" % [VIEWPORT_CONTAINER_NAME, MINIMAP_VIEWPORT_NAME, MINIMAP_CAMERA_NAME]) as Camera3D
+)
 
 
 func _ready() -> void:

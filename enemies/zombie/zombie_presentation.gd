@@ -67,7 +67,11 @@ func _face_direction(direction: Vector3, delta: float) -> void:
 
     facing_direction = Vector3(direction.x, 0.0, direction.z).normalized()
     if pivot != null:
-        pivot.rotation.y = lerp_angle(pivot.rotation.y, atan2(facing_direction.x, facing_direction.z), turn_speed * delta)
+        pivot.rotation.y = lerp_angle(
+            pivot.rotation.y,
+            atan2(facing_direction.x, facing_direction.z),
+            turn_speed * delta
+        )
 
 func _face_position(world_position: Vector3, delta: float) -> void:
     var direction := world_position - _get_body_position()
@@ -78,10 +82,14 @@ func _update_animation(horizontal_speed: float) -> void:
     if animation_player == null or is_dead:
         return
 
-    if state == ZombieState.SITDOWN:
+    if state == ZombieState.Sitdown:
         animation_player.speed_scale = 1.0
         _play_animation(idle_animation_name)
-    elif state == ZombieState.CHASE and horizontal_speed >= footstep_speed_threshold and not resolved_run_animation.is_empty():
+    elif (
+        state == ZombieState.Chase
+        and horizontal_speed >= footstep_speed_threshold
+        and not resolved_run_animation.is_empty()
+    ):
         animation_player.speed_scale = run_animation_speed_scale
         _play_animation(run_animation_name)
     elif horizontal_speed >= footstep_speed_threshold:

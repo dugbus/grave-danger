@@ -5,10 +5,10 @@ extends Node3D
 
 
 enum BatNestState {
-	ROOSTING,
-	SWARMING,
-	FLYING_OFF,
-	FINISHED,
+	Roosting,
+	Swarming,
+	FlyingOff,
+	Finished,
 }
 
 const DEFAULT_BAT_SCENE := preload("res://Assets/environment/blender/batty.blend")
@@ -146,7 +146,7 @@ const MIN_SPEED := 0.05
 @export_range(1.0, 12.0, 0.1) var camera_scare_scale_multiplier := 4.0
 @export_group("")
 
-var state := BatNestState.ROOSTING
+var state := BatNestState.Roosting
 var bats: Array[BatState] = []
 var player: Node3D
 var elapsed_state_seconds := 0.0
@@ -193,13 +193,13 @@ func _physics_process(delta: float) -> void:
 		return
 
 	match state:
-		BatNestState.ROOSTING:
+		BatNestState.Roosting:
 			_update_roosting()
-		BatNestState.SWARMING:
+		BatNestState.Swarming:
 			_update_swarming(delta)
-		BatNestState.FLYING_OFF:
+		BatNestState.FlyingOff:
 			_update_flying_off(delta)
-		BatNestState.FINISHED:
+		BatNestState.Finished:
 			pass
 
 	_update_bat_animations()
@@ -208,7 +208,7 @@ func _physics_process(delta: float) -> void:
 
 
 func force_take_flight(target_player: Node3D = null) -> void:
-	if state != BatNestState.ROOSTING:
+	if state != BatNestState.Roosting:
 		return
 
 	if target_player != null:
@@ -292,7 +292,7 @@ func _update_roosting() -> void:
 
 
 func _start_swarm() -> void:
-	state = BatNestState.SWARMING
+	state = BatNestState.Swarming
 	elapsed_state_seconds = 0.0
 	var center := _get_player_swarm_center()
 	for bat_index in bats.size():
@@ -361,7 +361,7 @@ func _update_swarming(delta: float) -> void:
 
 
 func _start_flying_off() -> void:
-	state = BatNestState.FLYING_OFF
+	state = BatNestState.FlyingOff
 	elapsed_state_seconds = 0.0
 	var origin := _get_player_swarm_center()
 	fly_off_group_direction = _get_fly_off_group_direction(origin)
@@ -409,7 +409,7 @@ func _update_flying_off(delta: float) -> void:
 
 	if elapsed_state_seconds >= fly_off_seconds:
 		_clear_bats()
-		state = BatNestState.FINISHED
+		state = BatNestState.Finished
 
 
 func _load_flap_sound() -> void:
@@ -432,7 +432,7 @@ func _update_flap_audio(delta: float) -> void:
 	if flap_sound == null:
 		return
 
-	if state == BatNestState.ROOSTING or state == BatNestState.FINISHED or bats.is_empty():
+	if state == BatNestState.Roosting or state == BatNestState.Finished or bats.is_empty():
 		_stop_flap_audio()
 		return
 
@@ -473,7 +473,7 @@ func _update_squeak_audio(delta: float) -> void:
 	if squeak_sounds.is_empty():
 		return
 
-	if state == BatNestState.ROOSTING or state == BatNestState.FINISHED or bats.is_empty():
+	if state == BatNestState.Roosting or state == BatNestState.Finished or bats.is_empty():
 		_stop_squeak_audio()
 		return
 
@@ -544,7 +544,7 @@ func _get_faded_audio_volume_db(base_volume_db: float) -> float:
 
 
 func _get_fly_off_audio_fade() -> float:
-	if state != BatNestState.FLYING_OFF:
+	if state != BatNestState.FlyingOff:
 		return 1.0
 
 	var fade_seconds := minf(maxf(fly_off_audio_fade_seconds, 0.0), maxf(fly_off_seconds, 0.001))
@@ -555,7 +555,7 @@ func _get_fly_off_audio_fade() -> float:
 
 
 func _is_fly_off_audio_faded_out() -> bool:
-	return state == BatNestState.FLYING_OFF and _get_fly_off_audio_fade() <= 0.02
+	return state == BatNestState.FlyingOff and _get_fly_off_audio_fade() <= 0.02
 
 
 func _stop_flap_audio() -> void:

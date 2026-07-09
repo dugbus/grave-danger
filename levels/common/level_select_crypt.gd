@@ -311,7 +311,10 @@ func _get_collision_shapes(root: Node) -> Array[CollisionShape3D]:
 func _is_collision_shape_inside_level_trigger(collision: CollisionShape3D) -> bool:
 	var shape := collision.shape
 	if shape is SphereShape3D:
-		return _is_trigger_sphere_inside(collision.global_position, _get_scaled_sphere_radius(collision, shape as SphereShape3D))
+		return _is_trigger_sphere_inside(
+			collision.global_position,
+			_get_scaled_sphere_radius(collision, shape as SphereShape3D)
+		)
 	if shape is CapsuleShape3D:
 		return _is_trigger_capsule_inside(collision, shape as CapsuleShape3D)
 	if shape is BoxShape3D:
@@ -333,9 +336,9 @@ func _is_trigger_sphere_inside(global_center: Vector3, radius: float) -> bool:
 
 
 func _is_trigger_capsule_inside(collision: CollisionShape3D, shape: CapsuleShape3D) -> bool:
-	var scale := _absolute_scale(collision.global_basis.get_scale())
-	var radius := shape.radius * maxf(scale.x, scale.z)
-	var half_height := maxf(shape.height * scale.y * 0.5 - radius, 0.0)
+	var absolute_basis_scale := _absolute_scale(collision.global_basis.get_scale())
+	var radius := shape.radius * maxf(absolute_basis_scale.x, absolute_basis_scale.z)
+	var half_height := maxf(shape.height * absolute_basis_scale.y * 0.5 - radius, 0.0)
 	var offset := collision.global_basis.y.normalized() * half_height
 	return (
 		_is_trigger_sphere_inside(collision.global_position + offset, radius)
@@ -368,12 +371,12 @@ func _is_trigger_point_inside(global_point: Vector3) -> bool:
 
 
 func _get_scaled_sphere_radius(collision: CollisionShape3D, shape: SphereShape3D) -> float:
-	var scale := _absolute_scale(collision.global_basis.get_scale())
-	return shape.radius * maxf(scale.x, maxf(scale.y, scale.z))
+	var absolute_basis_scale := _absolute_scale(collision.global_basis.get_scale())
+	return shape.radius * maxf(absolute_basis_scale.x, maxf(absolute_basis_scale.y, absolute_basis_scale.z))
 
 
-func _absolute_scale(scale: Vector3) -> Vector3:
-	return Vector3(absf(scale.x), absf(scale.y), absf(scale.z))
+func _absolute_scale(source_scale: Vector3) -> Vector3:
+	return Vector3(absf(source_scale.x), absf(source_scale.y), absf(source_scale.z))
 
 
 func _start_level_transition() -> void:

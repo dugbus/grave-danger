@@ -2,6 +2,8 @@
 class_name PNGToGridMapExporter
 extends RefCounted
 
+const PathsResource := preload("res://addons/png_to_gridmap/png_to_gridmap_paths.gd")
+
 
 ## Exports a selected GridMap to a PNG file.
 func run(settings: Resource, grid_map: GridMap, path: String, item_aliases: Dictionary, item_display_names: Dictionary) -> Dictionary:
@@ -14,7 +16,7 @@ func run(settings: Resource, grid_map: GridMap, path: String, item_aliases: Dict
 	if not errors.is_empty():
 		return {"errors": errors}
 	var image: Image = export_model["image"]
-	var normalized_path := _normalize_png_output_path(path)
+	var normalized_path := PathsResource.normalize_png_output_path(path)
 	var result := image.save_png(normalized_path)
 	if result != OK:
 		return {"errors": ["Could not save PNG to %s. Error: %s" % [normalized_path, result]]}
@@ -212,13 +214,6 @@ func _mapping_variant_ref(mapping: Resource, variant: String, item_aliases: Dict
 ## Looks up a display label for an item ref.
 func _item_display_name(item_ref: String, item_display_names: Dictionary) -> String:
 	return String(item_display_names.get(item_ref, item_ref))
-
-
-## Ensures export paths end in the PNG extension.
-func _normalize_png_output_path(path: String) -> String:
-	if path.get_extension().to_lower() == "png":
-		return path
-	return path + ".png"
 
 
 ## Converts an arbitrary variant into a typed string array.

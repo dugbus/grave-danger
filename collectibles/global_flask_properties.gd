@@ -2,13 +2,16 @@ extends Resource
 class_name GDGlobalFlaskProperties
 
 @export_group("Health Flask")
-## Seconds over which the health flask restores health after pickup. Higher values make the recovery feel slower and safer to tune than an instant heal.
+## Seconds over which the health flask restores health after pickup.
+## Higher values make the recovery feel slower and safer to tune than an instant heal.
 @export_range(0.1, 120.0, 0.1, "or_greater", "suffix:s") var health_heal_duration := 2.0
-## Percent of the player's maximum health restored by one health flask. For example, 25 restores one quarter of max health over health_heal_duration.
+## Percent of the player's maximum health restored by one health flask.
+## For example, 25 restores one quarter of max health over health_heal_duration.
 @export_range(0.0, 100.0, 0.5, "or_greater", "suffix:%") var health_heal_percent_of_max := 25.0
 
 @export_group("Bigger Sack")
-## Extra inventory capacity granted while the bigger sack flask effect is active. This is added on top of the player's normal carry limit.
+## Extra inventory capacity granted while the bigger sack flask effect is active.
+## This is added on top of the player's normal carry limit.
 @export_range(1, 999, 1, "or_greater") var bigger_sack_extra_inventory_space := 25
 ## Seconds the bigger sack flask message stays visible on the HUD after the flask is collected.
 @export_range(0.1, 120.0, 0.1, "or_greater", "suffix:s") var bigger_sack_display_seconds := 5.0
@@ -40,7 +43,8 @@ class_name GDGlobalFlaskProperties
 @export_range(0.1, 120.0, 0.1, "or_greater", "suffix:s") var pickup_radius_seconds := 5.0
 
 @export_group("Poison")
-## Total damage dealt by a poison flask effect across poison_duration. This drains health gradually rather than all at once.
+## Total damage dealt by a poison flask effect across poison_duration.
+## This drains health gradually rather than all at once.
 @export_range(0.1, 999.0, 0.1, "or_greater") var poison_damage_points := 25.0
 ## Seconds over which poison_damage_points is applied to the affected player.
 @export_range(0.1, 120.0, 0.1, "or_greater", "suffix:s") var poison_duration := 6.0

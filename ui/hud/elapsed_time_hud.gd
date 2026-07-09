@@ -85,7 +85,10 @@ func _update_label() -> void:
 func _is_boundary_animation_active() -> bool:
 	if time_source == null:
 		return false
-	if not time_source.has_method("get_boundary_animation_position") or not time_source.has_method("get_boundary_animation_duration"):
+	if (
+		not time_source.has_method("get_boundary_animation_position")
+		or not time_source.has_method("get_boundary_animation_duration")
+	):
 		return false
 	var visible_value: Variant = time_source.get("visible")
 	if visible_value is bool and not visible_value:

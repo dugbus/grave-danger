@@ -1,12 +1,12 @@
 [gd_scene format=3 uid="uid://cya86vrgabnep"]
 
-[ext_resource type="ArrayMesh" uid="uid://ypbpta6bxhwo" path="res://Assets/environment/wall-corner.res" id="1_o2g60"]
-[ext_resource type="ArrayMesh" uid="uid://cumdxvoyd0q6x" path="res://Assets/environment/wall-cross.res" id="2_8rl0p"]
-[ext_resource type="ArrayMesh" uid="uid://cqedx5vesbccr" path="res://Assets/environment/wall-end.res" id="3_62828"]
-[ext_resource type="ArrayMesh" uid="uid://c1v8dcfkrwnrk" path="res://Assets/environment/wall-sides.res" id="4_ptpte"]
-[ext_resource type="ArrayMesh" uid="uid://dy2v7pr63m252" path="res://Assets/environment/wall-tee.res" id="5_ovlxj"]
-[ext_resource type="ArrayMesh" uid="uid://bvvb6wthfks48" path="res://Assets/environment/wall.res" id="6_f1ohu"]
-[ext_resource type="ArrayMesh" uid="uid://dvbc6bnkp5wyk" path="res://Assets/environment/wall-solo.res" id="7_8rl0p"]
+[ext_resource type="ArrayMesh" path="res://Assets/environment/wall-corner.res" id="1_o2g60"]
+[ext_resource type="ArrayMesh" path="res://Assets/environment/wall-cross.res" id="2_8rl0p"]
+[ext_resource type="ArrayMesh" path="res://Assets/environment/wall-end.res" id="3_62828"]
+[ext_resource type="ArrayMesh" path="res://Assets/environment/wall-sides.res" id="4_ptpte"]
+[ext_resource type="ArrayMesh" path="res://Assets/environment/wall-tee.res" id="5_ovlxj"]
+[ext_resource type="ArrayMesh" path="res://Assets/environment/wall.res" id="6_f1ohu"]
+[ext_resource type="ArrayMesh" path="res://Assets/environment/wall-solo.res" id="7_8rl0p"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_5e4in"]
 points = PackedVector3Array(-0.2890931, 0.012345294, -0.23433524, -0.18565935, 0.37111413, -0.510146, 0.5158698, -0.006674677, -0.09191318, -0.2294414, 0.006200746, 0.28738296, 0.50255173, 0.7121695, 0.10340526, -0.2927524, 0.724362, 0.22006845, 0.11112905, 0.72177315, -0.510146, 0.08422153, -0.0065901875, -0.510146, 0.22894107, 0.0055130026, 0.2880279, 0.22798103, 0.72419035, 0.28499615, -0.28841895, 0.7210957, -0.2341143, 0.5158698, 0.72177315, -0.10538411, 0.5023355, 0.37102962, 0.1913726, -0.02917132, 0.83207417, 0.034402523, 0.48361212, 0.5119624, -0.1799469, -0.2275494, 0.72431344, 0.28515676, -0.29504293, 0.0061045876, 0.22194566, -0.098861724, 0.7133, -0.49870032, 0.49518996, 0.015020386, 0.08675118, -0.083005145, 0.011584072, -0.4931029, -0.22403853, 0.785534, -0.23413695, 0.22796631, 0.7892763, 0.21984309, 0.22616933, 0.78398097, -0.23355359, -0.22757097, 0.7894117, 0.22003677, 0.1836684, 0.51037675, -0.47161275, 0.5158698, 0.37102962, 0.13740964, -0.02784678, 0.82803667, -0.042508613, 0.058938198, 0.7884562, -0.23515157, 0.058330763, 0.7933161, 0.22345017, 0.4483593, -0.006674677, -0.09191318, -0.16703783, 0.5133, -0.48415732)

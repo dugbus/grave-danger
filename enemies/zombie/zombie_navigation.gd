@@ -37,7 +37,12 @@ func _has_static_blocker_between(from_position: Vector3, to_position: Vector3) -
     query.exclude = _get_vision_excludes()
     return not world.direct_space_state.intersect_ray(query).is_empty()
 
-func _follow_navigation_target(target_position: Vector3, delta: float, stop_on_static_blocker := true, movement_speed := -1.0) -> float:
+func _follow_navigation_target(
+    target_position: Vector3,
+    delta: float,
+    stop_on_static_blocker := true,
+    movement_speed := -1.0
+) -> float:
     _set_navigation_target(target_position)
     var has_static_blocker := _has_static_blocker_between(_get_body_position(), target_position)
     var has_grid_blocker := _has_grid_blocker_between(_get_body_position(), target_position)
@@ -258,7 +263,10 @@ func _has_grid_blocker_between(from_position: Vector3, to_position: Vector3) -> 
 
 func _find_grid_path(grid_map: GridMap, start_cell: Vector3i, target_cell: Vector3i) -> Array[Vector3i]:
     var bounds := navigation_grid_bounds_by_id.get(grid_map.get_instance_id(), Rect2i()) as Rect2i
-    if not bounds.has_point(Vector2i(start_cell.x, start_cell.z)) or not bounds.has_point(Vector2i(target_cell.x, target_cell.z)):
+    if (
+        not bounds.has_point(Vector2i(start_cell.x, start_cell.z))
+        or not bounds.has_point(Vector2i(target_cell.x, target_cell.z))
+    ):
         return []
 
     var open_cells: Array[Vector3i] = [start_cell]

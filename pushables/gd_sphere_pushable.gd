@@ -181,16 +181,14 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 
 
 func _apply_character_push_force(planar_velocity: Vector3, delta: float) -> Vector3:
-	if recent_push_direction.is_zero_approx():
-		return planar_velocity
-
-	if recent_push_speed <= 0.0:
-		return planar_velocity
+	var adjusted_velocity := planar_velocity
+	if recent_push_direction.is_zero_approx() or recent_push_speed <= 0.0:
+		return adjusted_velocity
 
 	var push_direction := Vector3(recent_push_direction.x, 0.0, recent_push_direction.z)
 
 	if push_direction.length_squared() < 0.0001:
-		return planar_velocity
+		return adjusted_velocity
 
 	push_direction = push_direction.normalized()
 
@@ -198,28 +196,25 @@ func _apply_character_push_force(planar_velocity: Vector3, delta: float) -> Vect
 		push_direction = _remove_into_wall_component(push_direction)
 
 	if push_direction.length_squared() < 0.0001:
-		return planar_velocity
+		return adjusted_velocity
 
 	push_direction = push_direction.normalized()
 
-	var current_speed_along_push := planar_velocity.dot(push_direction)
+	var current_speed_along_push := adjusted_velocity.dot(push_direction)
 	var target_speed_along_push := recent_push_speed
 
 	# Important:
 	# Touching a moving ball from behind must not slow it down.
 	# If the ball is already moving at or above the player's useful push speed,
 	# do not pull it back toward the player speed.
-	if current_speed_along_push >= target_speed_along_push:
-		return planar_velocity
+	if current_speed_along_push < target_speed_along_push:
+		var safe_mass := maxf(mass, 0.001)
+		var push_acceleration := character_push_force / safe_mass
+		var speed_to_add := minf(push_acceleration * delta, target_speed_along_push - current_speed_along_push)
+		if speed_to_add > 0.0:
+			adjusted_velocity += push_direction * speed_to_add
 
-	var safe_mass := maxf(mass, 0.001)
-	var push_acceleration := character_push_force / safe_mass
-	var speed_to_add := minf(push_acceleration * delta, target_speed_along_push - current_speed_along_push)
-
-	if speed_to_add <= 0.0:
-		return planar_velocity
-
-	return planar_velocity + push_direction * speed_to_add
+	return adjusted_velocity
 
 
 func _get_contact_push_direction(collision_normal: Vector3) -> Vector3:

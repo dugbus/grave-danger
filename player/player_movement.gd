@@ -166,7 +166,12 @@ func _update_footsteps(delta: float, horizontal_speed: float) -> void:
 	if footstep_sounds.is_empty():
 		return
 
-	if player == null or not player.is_on_floor() or player.velocity.y > 0.05 or horizontal_speed < footstep_speed_threshold:
+	if (
+		player == null
+		or not player.is_on_floor()
+		or player.velocity.y > 0.05
+		or horizontal_speed < footstep_speed_threshold
+	):
 		footstep_distance_accumulator = 0.0
 		return
 

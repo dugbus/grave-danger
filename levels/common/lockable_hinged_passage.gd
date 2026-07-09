@@ -5,14 +5,14 @@ class_name GDLockableHingedPassage
 signal unlocked
 signal level_completed
 
-enum KeyRequirement { GOLD_KEY, SILVER_KEY }
+enum KeyRequirement { GoldKey, SilverKey }
 
 const GOLD_KEY_ITEM_TYPE := &"key"
 const SILVER_KEY_ITEM_TYPE := &"silver_key"
 const WORLD_COLLISION_LAYER := 1
 const PLAYER_COLLISION_LAYER := 2
 
-@export var key_requirement := KeyRequirement.GOLD_KEY
+@export var key_requirement := KeyRequirement.GoldKey
 @export var starts_locked := true
 @export var completes_level := false
 @export var leaf_root_path: NodePath = ^"Leaves"
@@ -191,9 +191,9 @@ func _collect_hinged_leaves(root: Node, found: Array[Node]) -> void:
 
 func _required_item_type() -> StringName:
 	match key_requirement:
-		KeyRequirement.GOLD_KEY:
+		KeyRequirement.GoldKey:
 			return GOLD_KEY_ITEM_TYPE
-		KeyRequirement.SILVER_KEY:
+		KeyRequirement.SilverKey:
 			return SILVER_KEY_ITEM_TYPE
 		_:
 			return &""

@@ -110,7 +110,7 @@ func _build_tree_transforms(
 				continue
 
 			var mesh_index := rng.randi_range(0, tree_mesh_count - 1)
-			var transform := _build_tree_transform(position_2d, height_sampler, rng)
+			var tree_transform := _build_tree_transform(position_2d, height_sampler, rng)
 			var chunk_key := Vector3i(
 				floori(position_2d.x / chunk_size),
 				mesh_index,
@@ -119,7 +119,7 @@ func _build_tree_transforms(
 
 			if not transforms_by_chunk.has(chunk_key):
 				transforms_by_chunk[chunk_key] = []
-			transforms_by_chunk[chunk_key].append(transform)
+			transforms_by_chunk[chunk_key].append(tree_transform)
 
 	return transforms_by_chunk
 
@@ -144,9 +144,9 @@ func _build_tree_transform(position_2d: Vector2, height_sampler: Callable, rng: 
 		terrain_height = float(height_sampler.call(position_2d.x, position_2d.y))
 
 	var tree_scale := rng.randf_range(minimum_tree_scale, maximum_tree_scale)
-	var rotation := rng.randf_range(-PI, PI)
-	var basis := Basis(Vector3.UP, rotation).scaled(Vector3.ONE * tree_scale)
-	return Transform3D(basis, Vector3(position_2d.x, terrain_height, position_2d.y))
+	var y_rotation := rng.randf_range(-PI, PI)
+	var tree_basis := Basis(Vector3.UP, y_rotation).scaled(Vector3.ONE * tree_scale)
+	return Transform3D(tree_basis, Vector3(position_2d.x, terrain_height, position_2d.y))
 
 
 func _create_tree_chunks(transforms_by_chunk: Dictionary, tree_meshes: Array[Mesh]) -> void:
@@ -187,20 +187,20 @@ func _calculate_chunk_aabb(transforms: Array) -> AABB:
 	)
 
 	for index in range(1, transforms.size()):
-		var transform := transforms[index] as Transform3D
-		var scale := _get_uniform_scale(transform)
+		var tree_transform := transforms[index] as Transform3D
+		var uniform_scale := _get_uniform_scale(tree_transform)
 		var tree_bounds := AABB(
-			transform.origin + Vector3(-1.0, -0.2, -1.0) * scale,
-			Vector3(2.0, 3.2, 2.0) * scale
+			tree_transform.origin + Vector3(-1.0, -0.2, -1.0) * uniform_scale,
+			Vector3(2.0, 3.2, 2.0) * uniform_scale
 		)
 		bounds = bounds.merge(tree_bounds)
 
 	return bounds.grow(1.0)
 
 
-func _get_uniform_scale(transform: Transform3D) -> float:
-	var scale := transform.basis.get_scale()
-	return maxf(maxf(absf(scale.x), absf(scale.y)), absf(scale.z))
+func _get_uniform_scale(source_transform: Transform3D) -> float:
+	var basis_scale := source_transform.basis.get_scale()
+	return maxf(maxf(absf(basis_scale.x), absf(basis_scale.y)), absf(basis_scale.z))
 
 
 func _create_tree_blockers(level_size: Vector2) -> void:

@@ -183,11 +183,26 @@ func _create_fallback_level_button_template() -> Button:
 	var button := Button.new()
 	button.name = "LevelButtonTemplate"
 	button.custom_minimum_size = Vector2(420.0, 264.0)
-	button.add_theme_stylebox_override("normal", _create_button_style(Color(0.08, 0.07, 0.08, 0.82), Color(0.86, 0.68, 0.32, 0.48), 2))
-	button.add_theme_stylebox_override("hover", _create_button_style(Color(0.15, 0.12, 0.11, 0.92), Color(1.0, 0.78, 0.28, 0.72), 3))
-	button.add_theme_stylebox_override("pressed", _create_button_style(Color(0.20, 0.13, 0.08, 0.98), Color(1.0, 0.88, 0.42, 0.9), 3))
-	button.add_theme_stylebox_override("focus", _create_button_style(Color(0.18, 0.12, 0.08, 0.25), Color(0.72, 1.0, 0.62, 0.95), 4))
-	button.add_theme_stylebox_override("disabled", _create_button_style(Color(0.04, 0.04, 0.045, 0.70), Color(0.45, 0.43, 0.38, 0.32), 2))
+	button.add_theme_stylebox_override(
+		"normal",
+		_create_button_style(Color(0.08, 0.07, 0.08, 0.82), Color(0.86, 0.68, 0.32, 0.48), 2)
+	)
+	button.add_theme_stylebox_override(
+		"hover",
+		_create_button_style(Color(0.15, 0.12, 0.11, 0.92), Color(1.0, 0.78, 0.28, 0.72), 3)
+	)
+	button.add_theme_stylebox_override(
+		"pressed",
+		_create_button_style(Color(0.20, 0.13, 0.08, 0.98), Color(1.0, 0.88, 0.42, 0.9), 3)
+	)
+	button.add_theme_stylebox_override(
+		"focus",
+		_create_button_style(Color(0.18, 0.12, 0.08, 0.25), Color(0.72, 1.0, 0.62, 0.95), 4)
+	)
+	button.add_theme_stylebox_override(
+		"disabled",
+		_create_button_style(Color(0.04, 0.04, 0.045, 0.70), Color(0.45, 0.43, 0.38, 0.32), 2)
+	)
 
 	var content := VBoxContainer.new()
 	content.name = "Content"
@@ -298,7 +313,12 @@ func _is_left_stick_axis(axis: int) -> bool:
 	return axis == JOY_AXIS_LEFT_X or axis == JOY_AXIS_LEFT_Y
 
 
-func _handle_analog_axis(value: float, is_armed: bool, positive_direction: Vector2i, negative_direction: Vector2i) -> bool:
+func _handle_analog_axis(
+	value: float,
+	is_armed: bool,
+	positive_direction: Vector2i,
+	negative_direction: Vector2i
+) -> bool:
 	if absf(value) <= ANALOG_RELEASE_THRESHOLD:
 		return true
 

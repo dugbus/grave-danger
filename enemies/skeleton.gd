@@ -578,7 +578,10 @@ func _update_rolling_ball_death() -> void:
         if collider_3d == null:
             continue
 
-        var encroachment_percent := _get_rolling_ball_encroachment_percent(detection_center, collider_3d.global_position)
+        var encroachment_percent := _get_rolling_ball_encroachment_percent(
+            detection_center,
+            collider_3d.global_position
+        )
         if encroachment_percent >= rolling_ball_death_encroachment_percent:
             _die_from_rolling_ball()
             return

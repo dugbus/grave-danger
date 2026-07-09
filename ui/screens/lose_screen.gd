@@ -8,12 +8,12 @@ const ANALOG_TRIGGER_THRESHOLD := 0.62
 const ANALOG_RELEASE_THRESHOLD := 0.25
 
 enum LoseAction {
-	BACK,
-	RETRY,
+	Back,
+	Retry,
 }
 
 var action_buttons: Array[Button] = []
-var selected_button_index := int(LoseAction.RETRY)
+var selected_button_index := int(LoseAction.Retry)
 var analog_x_armed := true
 
 
@@ -38,10 +38,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	if _is_left_event(event):
-		_select_button(LoseAction.BACK)
+		_select_button(LoseAction.Back)
 		get_viewport().set_input_as_handled()
 	elif _is_right_event(event):
-		_select_button(LoseAction.RETRY)
+		_select_button(LoseAction.Retry)
 		get_viewport().set_input_as_handled()
 	elif _is_primary_event(event):
 		get_viewport().set_input_as_handled()
@@ -63,10 +63,10 @@ func _bind_action_buttons() -> void:
 		return
 
 	action_buttons = [back_button, retry_button]
-	_configure_action_button(back_button, LoseAction.BACK)
-	_configure_action_button(retry_button, LoseAction.RETRY)
-	back_button.pressed.connect(_choose_action.bind(LoseAction.BACK))
-	retry_button.pressed.connect(_choose_action.bind(LoseAction.RETRY))
+	_configure_action_button(back_button, LoseAction.Back)
+	_configure_action_button(retry_button, LoseAction.Retry)
+	back_button.pressed.connect(_choose_action.bind(LoseAction.Back))
+	retry_button.pressed.connect(_choose_action.bind(LoseAction.Retry))
 	back_button.focus_neighbor_right = back_button.get_path_to(retry_button)
 	retry_button.focus_neighbor_left = retry_button.get_path_to(back_button)
 
@@ -79,7 +79,7 @@ func _configure_action_button(button: Button, action: LoseAction) -> void:
 
 
 func _focus_retry_button() -> void:
-	_select_button(LoseAction.RETRY)
+	_select_button(LoseAction.Retry)
 
 
 func _select_button(action: LoseAction) -> void:
@@ -93,10 +93,10 @@ func _select_button(action: LoseAction) -> void:
 
 
 func _choose_selected_action() -> void:
-	if selected_button_index == int(LoseAction.BACK):
-		_choose_action(LoseAction.BACK)
+	if selected_button_index == int(LoseAction.Back):
+		_choose_action(LoseAction.Back)
 	else:
-		_choose_action(LoseAction.RETRY)
+		_choose_action(LoseAction.Retry)
 
 
 func _choose_action(action: LoseAction) -> void:
@@ -104,7 +104,7 @@ func _choose_action(action: LoseAction) -> void:
 		return
 
 	returning_to_title = true
-	var target_scene := LEVEL_SELECT_SCENE if action == LoseAction.BACK else GAME_SCENE
+	var target_scene := LEVEL_SELECT_SCENE if action == LoseAction.Back else GAME_SCENE
 	var tween := SCREEN_FADE.fade_out(self, "ResultFade", fade_duration, FADE_LAYER_NAME, FADE_LAYER_INDEX)
 	await tween.finished
 
@@ -119,11 +119,11 @@ func _handle_analog_axis(value: float, is_armed: bool) -> bool:
 		return false
 
 	if value >= ANALOG_TRIGGER_THRESHOLD:
-		_select_button(LoseAction.RETRY)
+		_select_button(LoseAction.Retry)
 		return false
 
 	if value <= -ANALOG_TRIGGER_THRESHOLD:
-		_select_button(LoseAction.BACK)
+		_select_button(LoseAction.Back)
 		return false
 
 	return is_armed

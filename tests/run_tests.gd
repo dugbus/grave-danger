@@ -114,7 +114,10 @@ func _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() -
     var expected_seed := DETERMINISTIC_SEED.from_node(pile, 0, &"gold_coin_pile")
     var runtime_seed := int(pile.get_runtime_random_seed())
     var passed := _expect(runtime_seed == expected_seed, "coin pile derives a stable fallback seed") \
-        and _expect(not bool(pile.get("spawn_when_near_camera")), "coin pile does not camera-gate spawn timing by default")
+        and _expect(
+            not bool(pile.get("spawn_when_near_camera")),
+            "coin pile does not camera-gate spawn timing by default"
+        )
 
     parent.queue_free()
     return passed
@@ -158,7 +161,10 @@ func _test_graveyard_scene_does_not_embed_default_level() -> bool:
         return false
 
     var graveyard := scene.instantiate()
-    var passed := _expect(graveyard.get_node_or_null("CurrentLevel") == null, "graveyard editor scene does not embed level 1")
+    var passed := _expect(
+        graveyard.get_node_or_null("CurrentLevel") == null,
+        "graveyard editor scene does not embed level 1"
+    )
     graveyard.queue_free()
     return passed
 
@@ -198,7 +204,10 @@ func _test_no_boundary_removal_keeps_current_pose() -> bool:
 
     boundary.remove_for_level(1.0, 3.0)
     var passed := _expect(animation_player.is_playing(), "no-boundary removal keeps visual animation playing") \
-        and _expect(center.global_position.is_equal_approx(center_position), "no-boundary removal keeps current center pose") \
+        and _expect(
+            center.global_position.is_equal_approx(center_position),
+            "no-boundary removal keeps current center pose"
+        ) \
         and _expect(is_equal_approx(boundary.boundary_scale_x, scale_x), "no-boundary removal keeps current x scale") \
         and _expect(is_equal_approx(boundary.boundary_scale_z, scale_z), "no-boundary removal keeps current z scale") \
         and _expect(boundary.sink_requested, "no-boundary removal still starts sink transition")
@@ -220,7 +229,10 @@ func _test_level_settings_control_minimap_visibility() -> bool:
     var passed := _expect(graveyard.call("_should_show_minimap"), "level settings can enable the minimap")
 
     level_settings.set("show_minimap", false)
-    passed = _expect(not bool(graveyard.call("_should_show_minimap")), "level settings can disable the minimap") and passed
+    passed = _expect(
+        not bool(graveyard.call("_should_show_minimap")),
+        "level settings can disable the minimap"
+    ) and passed
 
     level.queue_free()
     graveyard.queue_free()
@@ -238,17 +250,44 @@ func _test_low_health_vignette_maps_health_to_warning_intensity() -> bool:
     root.add_child(vignette)
 
     vignette.call("set_health_ratio", 1.0, false)
-    var passed := _expect(is_equal_approx(float(vignette.call("get_target_intensity")), 0.0), "healthy player hides low-health vignette")
-    passed = _expect(vignette.layer == 0, "low-health vignette renders under gameplay HUD layers") and passed
+    var passed := _expect(
+        is_equal_approx(float(vignette.call("get_target_intensity")), 0.0),
+        "healthy player hides low-health vignette"
+    )
+    passed = _expect(
+        vignette.layer == 30,
+        "low-health vignette renders above gameplay and under gameplay HUD layers"
+    ) and passed
 
-    vignette.call("set_health_ratio", 0.35, false)
-    passed = _expect(is_equal_approx(float(vignette.call("get_target_intensity")), 0.0), "vignette starts below configured health threshold") and passed
+    vignette.call("set_health_ratio", 0.50, false)
+    passed = _expect(
+        is_equal_approx(float(vignette.call("get_target_intensity")), 0.0),
+        "vignette starts below configured health threshold"
+    ) and passed
 
-    vignette.call("set_health_ratio", 0.12, false)
-    passed = _expect(is_equal_approx(float(vignette.call("get_target_intensity")), 1.0), "vignette reaches full strength at critical health") and passed
+    vignette.call("set_health_ratio", 2.0 / 6.0, false)
+    passed = _expect(
+        float(vignette.call("get_target_intensity")) > 0.4,
+        "vignette is visible when two health bars remain"
+    ) and passed
+
+    vignette.call("set_health_ratio", 1.0 / 6.0, false)
+    passed = _expect(
+        float(vignette.call("get_target_intensity")) > 0.99,
+        "vignette is full strength when one health bar remains"
+    ) and passed
+
+    vignette.call("set_health_ratio", 0.20, false)
+    passed = _expect(
+        is_equal_approx(float(vignette.call("get_target_intensity")), 1.0),
+        "vignette reaches full strength at critical health"
+    ) and passed
 
     vignette.call("set_health_ratio", 1.0, true)
-    passed = _expect(is_equal_approx(float(vignette.call("get_target_intensity")), 1.0), "dead player keeps warning vignette visible") and passed
+    passed = _expect(
+        is_equal_approx(float(vignette.call("get_target_intensity")), 1.0),
+        "dead player keeps warning vignette visible"
+    ) and passed
 
     vignette.queue_free()
     return passed
@@ -275,11 +314,26 @@ func _test_hud_panel_sets_split_value_labels() -> bool:
         and _expect(sack_max.text == "of 12", "HUD panel displays sack capacity") \
         and _expect(treasure_lifted.text == "4", "HUD panel displays lifted treasure count") \
         and _expect(treasure_on_level.text == "of 30", "HUD panel displays level treasure total") \
-        and _expect(panel.get_node_or_null("ScreenContainer") != null, "HUD panel has a full-screen editor container") \
-        and _expect(panel.get_node_or_null("ScreenContainer/PanelPlacement") != null, "HUD panel has an editor-owned placement node") \
-        and _expect(not panel.get_node("ScreenContainer/PanelPlacement/PlacementGuide").visible, "HUD panel hides placement guide at runtime") \
-        and _expect(is_equal_approx(screen_container.scale.x, screen_container.scale.y), "HUD panel scales reference screen uniformly") \
-        and _expect(is_equal_approx(screen_container.position.x, 320.0), "HUD panel centers reference screen on wide viewports")
+        and _expect(
+            panel.get_node_or_null("ScreenContainer") != null,
+            "HUD panel has a full-screen editor container"
+        ) \
+        and _expect(
+            panel.get_node_or_null("ScreenContainer/PanelPlacement") != null,
+            "HUD panel has an editor-owned placement node"
+        ) \
+        and _expect(
+            not panel.get_node("ScreenContainer/PanelPlacement/PlacementGuide").visible,
+            "HUD panel hides placement guide at runtime"
+        ) \
+        and _expect(
+            is_equal_approx(screen_container.scale.x, screen_container.scale.y),
+            "HUD panel scales reference screen uniformly"
+        ) \
+        and _expect(
+            is_equal_approx(screen_container.position.x, 320.0),
+            "HUD panel centers reference screen on wide viewports"
+        )
 
     panel.queue_free()
     return passed
@@ -327,8 +381,14 @@ func _test_minimap_disables_processing_and_rendering() -> bool:
 
     var passed := _expect(not minimap.visible, "disabled minimap hides the HUD") \
         and _expect(not minimap.is_processing(), "disabled minimap stops script processing") \
-        and _expect(minimap_viewport.process_mode == Node.PROCESS_MODE_DISABLED, "disabled minimap stops SubViewport processing") \
-        and _expect(minimap_viewport.render_target_update_mode == SubViewport.UPDATE_DISABLED, "disabled minimap stops SubViewport rendering") \
+        and _expect(
+            minimap_viewport.process_mode == Node.PROCESS_MODE_DISABLED,
+            "disabled minimap stops SubViewport processing"
+        ) \
+        and _expect(
+            minimap_viewport.render_target_update_mode == SubViewport.UPDATE_DISABLED,
+            "disabled minimap stops SubViewport rendering"
+        ) \
         and _expect(not minimap_camera.current, "disabled minimap camera is not current")
 
     minimap.queue_free()
@@ -395,17 +455,41 @@ func _test_minimap_camera_scrolls_wide_level_without_empty_space() -> bool:
     var panel_width := minimap.offset_right - minimap.offset_left
     var passed := _expect(minimap_camera.current, "minimap camera is current in its viewport") \
         and _expect(minimap_viewport.world_3d == root.world_3d, "minimap viewport shares the main world") \
-        and _expect(is_equal_approx(panel_width, expected_panel_width), "minimap width follows the configured viewport fraction") \
+        and _expect(
+            is_equal_approx(panel_width, expected_panel_width),
+            "minimap width follows the configured viewport fraction"
+        ) \
         and _expect(viewport_container.stretch, "minimap render target stretches to fill the visible panel content") \
-        and _expect(minimap_camera.projection == Camera3D.PROJECTION_ORTHOGONAL, "minimap camera uses an orthographic top-down view") \
-        and _expect(is_equal_approx(minimap_camera.size, level_box.size.z), "wide minimap fits the level depth to avoid vertical empty space") \
+        and _expect(
+            minimap_camera.projection == Camera3D.PROJECTION_ORTHOGONAL,
+            "minimap camera uses an orthographic top-down view"
+        ) \
+        and _expect(
+            is_equal_approx(minimap_camera.size, level_box.size.z),
+            "wide minimap fits the level depth to avoid vertical empty space"
+        ) \
         and _expect(minimap_camera.size < 150.0, "minimap bounds ignore outlier light volumes") \
-        and _expect((source_camera.cull_mask & TEST_TEXT_OVERLAY_VISUAL_LAYER) != 0, "main camera keeps the text overlay visual layer") \
-        and _expect((minimap_camera.cull_mask & TEST_TEXT_OVERLAY_VISUAL_LAYER) == 0, "minimap camera hides the text overlay visual layer") \
+        and _expect(
+            (source_camera.cull_mask & TEST_TEXT_OVERLAY_VISUAL_LAYER) != 0,
+            "main camera keeps the text overlay visual layer"
+        ) \
+        and _expect(
+            (minimap_camera.cull_mask & TEST_TEXT_OVERLAY_VISUAL_LAYER) == 0,
+            "minimap camera hides the text overlay visual layer"
+        ) \
         and _expect(minimap_environment != null, "minimap camera has its own environment override") \
-        and _expect(is_equal_approx(minimap_environment.ambient_light_energy, MINIMAP_VIEW_SETTINGS.ambient_light_energy), "minimap environment has ambient light") \
-        and _expect(is_equal_approx(minimap_camera.global_position.x, expected_clamped_x), "wide minimap clamps horizontally at the level edge") \
-        and _expect(is_equal_approx(minimap_camera.global_position.z, level_center.z), "wide minimap keeps the full level depth visible") \
+        and _expect(
+            is_equal_approx(minimap_environment.ambient_light_energy, MINIMAP_VIEW_SETTINGS.ambient_light_energy),
+            "minimap environment has ambient light"
+        ) \
+        and _expect(
+            is_equal_approx(minimap_camera.global_position.x, expected_clamped_x),
+            "wide minimap clamps horizontally at the level edge"
+        ) \
+        and _expect(
+            is_equal_approx(minimap_camera.global_position.z, level_center.z),
+            "wide minimap keeps the full level depth visible"
+        ) \
         and _expect(minimap_camera.global_position.y > level_center.y, "minimap camera uses an elevated view")
 
     minimap.queue_free()
@@ -455,9 +539,18 @@ func _test_minimap_camera_scrolls_tall_level_without_empty_space() -> bool:
     var level_center := level_mesh.global_position
     var expected_size := level_box.size.x / _get_minimap_render_aspect(minimap)
     var expected_clamped_z := level_center.z - level_box.size.z * 0.5 + minimap_camera.size * 0.5
-    var passed := _expect(is_equal_approx(minimap_camera.size, expected_size), "tall minimap fits the level width to avoid horizontal empty space") \
-        and _expect(is_equal_approx(minimap_camera.global_position.x, level_center.x), "tall minimap keeps the full level width visible") \
-        and _expect(is_equal_approx(minimap_camera.global_position.z, expected_clamped_z), "tall minimap clamps vertically at the level edge")
+    var passed := _expect(
+        is_equal_approx(minimap_camera.size, expected_size),
+        "tall minimap fits the level width to avoid horizontal empty space"
+    ) \
+        and _expect(
+            is_equal_approx(minimap_camera.global_position.x, level_center.x),
+            "tall minimap keeps the full level width visible"
+        ) \
+        and _expect(
+            is_equal_approx(minimap_camera.global_position.z, expected_clamped_z),
+            "tall minimap clamps vertically at the level edge"
+        )
 
     minimap.queue_free()
     level_root.queue_free()
@@ -530,16 +623,31 @@ func _test_bat_nest_swarms_then_rises_away() -> bool:
 
     nest._physics_process(0.016)
     var passed := _expect(nest.get_runtime_bat_count() == 4, "bat nest creates the requested cluster count") \
-        and _expect(nest.get_bat_nest_state() == BAT_NEST_SCRIPT.BatNestState.ROOSTING, "bat nest waits while the player is far away") \
+        and _expect(
+            nest.get_bat_nest_state() == BAT_NEST_SCRIPT.BatNestState.Roosting,
+            "bat nest waits while the player is far away"
+        ) \
         and _expect(_are_bats_visible(nest) == false, "bat nest hides bats before triggering")
 
     player.global_position = Vector3.ZERO
     nest._physics_process(0.016)
-    passed = _expect(nest.get_bat_nest_state() == BAT_NEST_SCRIPT.BatNestState.SWARMING, "bat nest starts swarming when the player is close") and passed
+    passed = _expect(
+        nest.get_bat_nest_state() == BAT_NEST_SCRIPT.BatNestState.Swarming,
+        "bat nest starts swarming when the player is close"
+    ) and passed
     passed = _expect(_are_bats_visible(nest), "bat nest shows bats after triggering") and passed
-    passed = _expect(_are_bats_spawned_near_player(nest, player.global_position), "bat nest spawns bats close to the player") and passed
-    passed = _expect(_get_flap_audio_player_count(nest) > 0, "bat nest plays flap audio immediately on trigger") and passed
-    passed = _expect(_get_squeak_audio_player_count(nest) > 0, "bat nest plays squeak audio immediately on trigger") and passed
+    passed = _expect(
+        _are_bats_spawned_near_player(nest, player.global_position),
+        "bat nest spawns bats close to the player"
+    ) and passed
+    passed = _expect(
+        _get_flap_audio_player_count(nest) > 0,
+        "bat nest plays flap audio immediately on trigger"
+    ) and passed
+    passed = _expect(
+        _get_squeak_audio_player_count(nest) > 0,
+        "bat nest plays squeak audio immediately on trigger"
+    ) and passed
     nest._physics_process(0.02)
     nest._physics_process(0.02)
     nest._physics_process(0.02)
@@ -564,15 +672,33 @@ func _test_bat_nest_swarms_then_rises_away() -> bool:
     var first_bat_final_fly_direction := _get_horizontal_direction(first_bat.velocity as Vector3)
     var audio_volume_after_fade := _get_first_flap_audio_volume(nest)
     var height_after_fly_off := first_bat_node.global_position.y
-    passed = _expect(nest.get_bat_nest_state() == BAT_NEST_SCRIPT.BatNestState.FLYING_OFF, "bat nest switches from swarming to flying off") and passed
+    passed = _expect(
+        nest.get_bat_nest_state() == BAT_NEST_SCRIPT.BatNestState.FlyingOff,
+        "bat nest switches from swarming to flying off"
+    ) and passed
     passed = _expect(height_after_fly_off > height_before_fly_off, "bat nest rises while flying away") and passed
     var halfway_turn := nest._slerp_horizontal_direction(Vector3.RIGHT, Vector3.FORWARD, 0.5)
-    passed = _expect(halfway_turn.dot(Vector3.RIGHT) > 0.5 and halfway_turn.dot(Vector3.FORWARD) > 0.5, "bat nest blends fly-off turn directions") and passed
-    passed = _expect(first_bat_final_fly_direction.dot(first_bat_turn_target) > 0.9, "bat nest finishes fly-off turn toward escape direction") and passed
-    passed = _expect(audio_volume_after_fade < audio_volume_before_fade, "bat nest fades audio during fly-off") and passed
+    passed = _expect(
+        halfway_turn.dot(Vector3.RIGHT) > 0.5 and halfway_turn.dot(Vector3.FORWARD) > 0.5,
+        "bat nest blends fly-off turn directions"
+    ) and passed
+    passed = _expect(
+        first_bat_final_fly_direction.dot(first_bat_turn_target) > 0.9,
+        "bat nest finishes fly-off turn toward escape direction"
+    ) and passed
+    passed = _expect(
+        audio_volume_after_fade < audio_volume_before_fade,
+        "bat nest fades audio during fly-off"
+    ) and passed
     passed = _expect(_are_bats_flying_as_group(nest), "bat nest flies away as a group") and passed
-    passed = _expect(animation_player.has_animation(&"combined_flap"), "bat nest combines separate wing animations") and passed
-    passed = _expect(animation_player.current_animation == &"combined_flap", "bat nest plays the combined wing animation") and passed
+    passed = _expect(
+        animation_player.has_animation(&"combined_flap"),
+        "bat nest combines separate wing animations"
+    ) and passed
+    passed = _expect(
+        animation_player.current_animation == &"combined_flap",
+        "bat nest plays the combined wing animation"
+    ) and passed
 
     nest.queue_free()
     player.queue_free()

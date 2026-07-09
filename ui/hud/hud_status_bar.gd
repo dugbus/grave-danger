@@ -120,7 +120,6 @@ func _draw() -> void:
 	_draw_capsule(outer_rect, outer_color)
 	_draw_capsule(track_rect, track_color)
 
-	
 	var fill_color := _fill_color(visible_ratio)
 
 	_draw_capsule(fill_rect, fill_color)
@@ -227,7 +226,15 @@ func _draw_label(rect: Rect2) -> void:
 		(rect.size.y - text_size.y) * 0.5 + font.get_ascent(int(font_size))
 	)
 
-	draw_string(font, text_position + Vector2(1.0, 1.0), label_text, HORIZONTAL_ALIGNMENT_CENTER, -1.0, int(font_size), label_shadow_color)
+	draw_string(
+		font,
+		text_position + Vector2(1.0, 1.0),
+		label_text,
+		HORIZONTAL_ALIGNMENT_CENTER,
+		-1.0,
+		int(font_size),
+		label_shadow_color
+	)
 	draw_string(font, text_position, label_text, HORIZONTAL_ALIGNMENT_CENTER, -1.0, int(font_size), label_color)
 
 

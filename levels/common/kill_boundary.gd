@@ -1,4 +1,5 @@
 @tool
+# gdlint: disable=max-file-lines
 extends Path3D
 class_name GDKillBoundary3D
 
@@ -544,11 +545,20 @@ func _set_runtime_effects_enabled(enabled: bool, keep_visuals := false) -> void:
 
 	var animation_player := get_node_or_null(ANIMATION_PLAYER_NAME) as AnimationPlayer
 	if animation_player != null:
-		if enabled and autoplay_boundary_animation and animation_player.has_animation(DEFAULT_ANIMATION_NAME) and not animation_player.is_playing():
+		if (
+			enabled
+			and autoplay_boundary_animation
+			and animation_player.has_animation(DEFAULT_ANIMATION_NAME)
+			and not animation_player.is_playing()
+		):
 			animation_player.play(DEFAULT_ANIMATION_NAME)
 		elif not enabled and keep_visuals:
 			animation_player.speed_scale = 1.0
-			if autoplay_boundary_animation and animation_player.has_animation(DEFAULT_ANIMATION_NAME) and not animation_player.is_playing():
+			if (
+				autoplay_boundary_animation
+				and animation_player.has_animation(DEFAULT_ANIMATION_NAME)
+				and not animation_player.is_playing()
+			):
 				animation_player.play(DEFAULT_ANIMATION_NAME)
 		elif not enabled and animation_player.is_playing():
 			animation_player.stop(true)
@@ -706,7 +716,11 @@ func _sync_movement_to_animation() -> void:
 	if animation_player.current_animation.is_empty():
 		return
 	var animation_position := animation_player.current_animation_position
-	if not Engine.is_editor_hint() and animation_player.is_playing() and animation_position + 0.001 < last_animation_position:
+	if (
+		not Engine.is_editor_hint()
+		and animation_player.is_playing()
+		and animation_position + 0.001 < last_animation_position
+	):
 		movement_cycle_distance += _calculate_travel_distance(animation, animation.length)
 
 	_sync_boundary_scale_rotation_to_animation(animation, animation_position)
@@ -1232,7 +1246,11 @@ func _sync_boundary(update_removed_visuals := false) -> void:
 
 	if Engine.is_editor_hint():
 		var target_ghost_count := boundary_segments * ghost_ribbons_per_segment
-		if preview_meshes.size() != boundary_segments or preview_ghost_meshes.size() != target_ghost_count or blocker_preview_meshes.size() != boundary_segments:
+		if (
+			preview_meshes.size() != boundary_segments
+			or preview_ghost_meshes.size() != target_ghost_count
+			or blocker_preview_meshes.size() != boundary_segments
+		):
 			_ensure_editor_preview()
 		_update_preview_boundary()
 		is_syncing_boundary = false
@@ -1349,17 +1367,36 @@ func _apply_ghosts_to_boundary(meshes: Array[MeshInstance3D]) -> void:
 func _configure_ghost_ribbon(mesh_instance: MeshInstance3D, rng: RandomNumberGenerator) -> void:
 	var height := rng.randf_range(ghost_height_range.x, ghost_height_range.y)
 	var width := rng.randf_range(ghost_width_range.x, ghost_width_range.y)
-	var size_ratio := 0.0 if is_equal_approx(ghost_height_range.x, ghost_height_range.y) else inverse_lerp(ghost_height_range.x, ghost_height_range.y, height)
+	var size_ratio := (
+		0.0
+		if is_equal_approx(ghost_height_range.x, ghost_height_range.y)
+		else inverse_lerp(ghost_height_range.x, ghost_height_range.y, height)
+	)
 	mesh_instance.set_instance_shader_parameter("ghost_width", width)
 	mesh_instance.set_instance_shader_parameter("ghost_height", height)
 	mesh_instance.set_instance_shader_parameter("rise_distance", ghost_rise_distance * rng.randf_range(0.72, 1.18))
-	mesh_instance.set_instance_shader_parameter("emerge_depth", height * rng.randf_range(ghost_emerge_depth_ratio_range.x, ghost_emerge_depth_ratio_range.y))
-	mesh_instance.set_instance_shader_parameter("rise_speed", rng.randf_range(ghost_rise_speed_range.x, ghost_rise_speed_range.y))
+	mesh_instance.set_instance_shader_parameter(
+		"emerge_depth",
+		height * rng.randf_range(ghost_emerge_depth_ratio_range.x, ghost_emerge_depth_ratio_range.y)
+	)
+	mesh_instance.set_instance_shader_parameter(
+		"rise_speed",
+		rng.randf_range(ghost_rise_speed_range.x, ghost_rise_speed_range.y)
+	)
 	mesh_instance.set_instance_shader_parameter("cycle_offset", rng.randf())
 	mesh_instance.set_instance_shader_parameter("wave_phase", rng.randf_range(0.0, TAU))
-	mesh_instance.set_instance_shader_parameter("wave_amplitude", ghost_wave_amplitude * rng.randf_range(0.45, 1.3) * lerpf(0.85, 1.15, size_ratio))
-	mesh_instance.set_instance_shader_parameter("wave_frequency", rng.randf_range(ghost_wave_frequency_range.x, ghost_wave_frequency_range.y))
-	mesh_instance.set_instance_shader_parameter("wave_speed", rng.randf_range(ghost_wave_speed_range.x, ghost_wave_speed_range.y))
+	mesh_instance.set_instance_shader_parameter(
+		"wave_amplitude",
+		ghost_wave_amplitude * rng.randf_range(0.45, 1.3) * lerpf(0.85, 1.15, size_ratio)
+	)
+	mesh_instance.set_instance_shader_parameter(
+		"wave_frequency",
+		rng.randf_range(ghost_wave_frequency_range.x, ghost_wave_frequency_range.y)
+	)
+	mesh_instance.set_instance_shader_parameter(
+		"wave_speed",
+		rng.randf_range(ghost_wave_speed_range.x, ghost_wave_speed_range.y)
+	)
 	mesh_instance.set_instance_shader_parameter("lean", rng.randf_range(ghost_lean_range.x, ghost_lean_range.y))
 	mesh_instance.set_instance_shader_parameter("opacity", rng.randf_range(ghost_opacity_range.x, ghost_opacity_range.y))
 
