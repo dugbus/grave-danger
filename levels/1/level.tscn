@@ -2,12 +2,11 @@
 
 [ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/kenney-graveyard/coffin.glb" id="1_coffin"]
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
-[ext_resource type="PackedScene" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
+[ext_resource type="PackedScene" uid="uid://cw45377f21i2v" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
 [ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="4_flame"]
-[ext_resource type="Resource" path="res://collectibles/global_flask_properties.tres" id="5_hc001"]
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
 [ext_resource type="PackedScene" path="res://enemies/bat_nest.tscn" id="7_qp421"]
-[ext_resource type="PackedScene" path="res://collectibles/health_flask.tscn" id="7_rihgm"]
+[ext_resource type="PackedScene" uid="uid://mbxax50al4bn" path="res://collectibles/health_flask.tscn" id="7_rihgm"]
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="8_h616y"]
 [ext_resource type="PackedScene" path="res://enemies/skeleton.tscn" id="9_skeleton"]
 [ext_resource type="PackedScene" uid="uid://fv3hosp0q8wg" path="res://Assets/kenney-graveyard/coffin-old.glb" id="10_a5y6d"]
@@ -15,10 +14,9 @@
 [ext_resource type="ArrayMesh" uid="uid://bnp6ud7heja8" path="res://Assets/environment/grass-small.res" id="14_w2m8w"]
 [ext_resource type="Script" uid="uid://2juaclm8gc1n" path="res://addons/simplegrasstextured/grass.gd" id="16_86xts"]
 [ext_resource type="PackedScene" path="res://collectibles/key.tscn" id="17_w2m8w"]
-[ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://Assets/environment/shaders/level.gdshader" id="18_ly0q6"]
-[ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="19_6qs2t"]
+[ext_resource type="Material" uid="uid://6xa14siv3rq4" path="res://Assets/environment/shaders/level_shader.tres" id="18_ly0q6"]
 [ext_resource type="PackedScene" path="res://pushables/hay_bale_pushable.tscn" id="20_wynp1"]
-[ext_resource type="PackedScene" path="res://collectibles/flask_no_boundary.tscn" id="21_bj40y"]
+[ext_resource type="PackedScene" uid="uid://bilrp2by5t4q1" path="res://collectibles/flask_no_boundary.tscn" id="21_bj40y"]
 [ext_resource type="PackedScene" path="res://collectibles/silver_key.tscn" id="22_silver_key"]
 [ext_resource type="PackedScene" path="res://levels/common/locked_gate.tscn" id="23_locked_gate"]
 [ext_resource type="PackedScene" uid="uid://4qkicc6gkfuv" path="res://levels/common/locked_door.tscn" id="24_locked_door"]
@@ -26,7 +24,7 @@
 [ext_resource type="PackedScene" path="res://levels/common/spike_trap.tscn" id="26_spike_trap"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 
-[sub_resource type="Curve3D" id="Curve3D_qp421"]
+[sub_resource type="Curve3D" id="Curve3D_6qs2t"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.18044, -0.10870552, -1.137958, 0, 0, 0, 0, 0, 0, -2.6286125, 0, 5.3667564),
@@ -34,7 +32,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_u7030"]
+[sub_resource type="Curve3D" id="Curve3D_qp421"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.0362186, -0.10870552, 0.024645805, 0, 0, 0, 0, 0, 0, -2.6933193, 0, 7.214384),
@@ -42,7 +40,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_l7p7m"]
+[sub_resource type="Curve3D" id="Curve3D_u7030"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.18044, -0.10870552, -1.137958, 0, 0, 0, 0, 0, 0, -3.5278893, 0, 5.3667564),
@@ -50,7 +48,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_6nq5c"]
+[sub_resource type="Curve3D" id="Curve3D_l7p7m"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.18044, -0.10870552, -1.137958, 0, 0, 0, 0, 0, 0, -2.8422403, 0, 9.820116),
@@ -58,7 +56,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_sobgd"]
+[sub_resource type="Curve3D" id="Curve3D_6nq5c"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.2180443, -0.10870552, 4.214011, 0, 0, 0, 0, 0, 0, -3.276125, 0, -0.63265705),
@@ -66,7 +64,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_jandb"]
+[sub_resource type="Curve3D" id="Curve3D_sobgd"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.365759, -0.10870552, 2.486309, 0, 0, 0, 0, 0, 0, -3.276125, 0, -0.63265705),
@@ -74,7 +72,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_3p7t5"]
+[sub_resource type="Curve3D" id="Curve3D_jandb"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -3.1434994, -0.10870552, -1.1893473, 0, 0, 0, 0, 0, 0, 5.7833424, 0, -1.0126438),
@@ -82,7 +80,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_tpknb"]
+[sub_resource type="Curve3D" id="Curve3D_3p7t5"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -1.1434994, -0.10870552, -1.1893463, 0, 0, 0, 0, 0, 0, 12.741501, 0, -1.0126438),
@@ -90,7 +88,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_crkwu"]
+[sub_resource type="Curve3D" id="Curve3D_tpknb"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -19.619999, 0, -21.83598, -1.8176594, 0, -1.4644976, 1.8176594, 0, 1.4644976, -17.927063, 0, -17.282557, -1.4606743, 0, 0.06282425, 1.4606743, 0, -0.06282425, -7.56524, 0, -21.770702, -0.8010168, 0, -0.7067795, 0.8010168, 0, 0.7067795, -6.764223, 0, -19.242008, -0.3769493, 0, -1.2407894, 0.3769493, 0, 1.2407894, -2.4764347, 0, -19.948786, 0.4942131, 0, -2.6454668, -0.4942131, 0, 2.6454668, -8.386793, 0, -14.22895, -0.40699577, 0, -2.441967, 0.40699577, 0, 2.441967, -2.3350773, 0, -7.211069, 1.5989094, 0, 1.3372669, -1.5989094, 0, -1.3372669, -8.824327, 0, -5.095955, -4.511731, 0, 0.026682854, 4.511731, 0, -0.026682854, -11.743083, 0, -12.127105, 1.3954105, 0, -0.95934486, -1.3954105, 0, 0.95934486, -14.0280485, 0, -5.037813, 0.75584793, 0, 1.6861191, -0.75584793, 0, -1.6861191, -19.406193, 0, -7.2762833, 1.2500553, 0, 1.2209835, -1.2500553, 0, -1.2209835, -17.661928, 0, -13.991698, 0.46513748, 0, 0.9884167, -0.46513748, 0, -0.9884167, -18.039854, 0, -20.91061, 0, 0, 0, 0, 0, 0, -19.166698, 0.0501709, -21.74099, 0, 0, 0, 0, 0, 0, -20.337357, 0.0501709, -21.721153, 0, 0, 0, 0, 0, 0, -21.810291, 0.050048828, -21.664543, 0, 0, 0, 0, 0, 0, -22.803204, 0.050048828, -21.631279, 0, 0, 0, 0, 0, 0, -24.424156, 0.035888672, -21.53936),
@@ -98,7 +96,7 @@ _data = {
 }
 point_count = 18
 
-[sub_resource type="Animation" id="Animation_tsecg"]
+[sub_resource type="Animation" id="Animation_crkwu"]
 resource_local_to_scene = true
 resource_name = "kill_boundary"
 length = 475.27316
@@ -164,9 +162,9 @@ tracks/4/keys = {
 "values": [0.0, 0.0, 0.0, 0.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_p0ipo"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_tsecg"]
 _data = {
-&"kill_boundary": SubResource("Animation_tsecg")
+&"kill_boundary": SubResource("Animation_crkwu")
 }
 
 [sub_resource type="Gradient" id="Gradient_wjj06"]
@@ -177,7 +175,7 @@ gradient = SubResource("Gradient_wjj06")
 fill_from = Vector2(0, 1)
 fill_to = Vector2(0, 0.01994302)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_rfb6x"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_p0ipo"]
 render_priority = 0
 shader = ExtResource("13_3m1bw")
 shader_parameter/albedo = Color(1, 1, 1, 1)
@@ -214,16 +212,6 @@ buffer = PackedFloat32Array(0.33937177, 0, -0.9406523, 7.2343326, 0, 1, 0, 0, 0.
 [sub_resource type="PlaneMesh" id="PlaneMesh_v11xe"]
 size = Vector2(24, 24)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_hl8aa"]
-render_priority = 0
-shader = ExtResource("18_ly0q6")
-shader_parameter/tiled_texture = ExtResource("19_6qs2t")
-shader_parameter/level_width = 20.0
-shader_parameter/level_height = 20.0
-shader_parameter/floor_overscan = Vector2(2, 2)
-shader_parameter/floor_tile_size = Vector2(8, 8)
-shader_parameter/fade_margin = 0.2
-
 [sub_resource type="BoxShape3D" id="BoxShape3D_8e3ph"]
 size = Vector3(24, 0.1, 24)
 
@@ -231,7 +219,7 @@ size = Vector3(24, 0.1, 24)
 
 [node name="StartSkeleton" parent="." unique_id=1332419429 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.033, 0, 2.356)
-curve = SubResource("Curve3D_qp421")
+curve = SubResource("Curve3D_6qs2t")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -240,7 +228,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.18044, -0.10870552, -1.137
 
 [node name="StartSkeleton6" parent="." unique_id=1999108660 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.3108587, 0, 10.155487)
-curve = SubResource("Curve3D_u7030")
+curve = SubResource("Curve3D_qp421")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -249,7 +237,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0362186, -0.10870552, 0.02
 
 [node name="StartSkeleton2" parent="." unique_id=384396972 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.656645, 9.536743e-07, 2.695012)
-curve = SubResource("Curve3D_l7p7m")
+curve = SubResource("Curve3D_u7030")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -258,7 +246,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.18044, -0.10870552, -1.137
 
 [node name="StartSkeleton8" parent="." unique_id=2131303328 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.206179, 9.536743e-07, 8.002817)
-curve = SubResource("Curve3D_6nq5c")
+curve = SubResource("Curve3D_l7p7m")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -267,7 +255,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.18044, -0.10870552, -1.137
 
 [node name="StartSkeleton3" parent="." unique_id=1876649631 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.250051, 9.536743e-07, 11.832761)
-curve = SubResource("Curve3D_sobgd")
+curve = SubResource("Curve3D_6nq5c")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -276,7 +264,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2180443, -0.10870552, 4.21
 
 [node name="StartSkeleton7" parent="." unique_id=1959964737 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.821293, 9.536743e-07, 15.382387)
-curve = SubResource("Curve3D_jandb")
+curve = SubResource("Curve3D_sobgd")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -285,7 +273,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.365759, -0.10870552, 2.486
 
 [node name="StartSkeleton4" parent="." unique_id=1297044051 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.688917, 9.536743e-07, 12.498597)
-curve = SubResource("Curve3D_3p7t5")
+curve = SubResource("Curve3D_jandb")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -294,7 +282,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1434994, -0.10870552, -1.1
 
 [node name="StartSkeleton5" parent="." unique_id=305127766 instance=ExtResource("9_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8206196, 9.536743e-07, 19.704838)
-curve = SubResource("Curve3D_tpknb")
+curve = SubResource("Curve3D_3p7t5")
 shuffle_speed = 0.55
 loop_patrol = false
 
@@ -314,8 +302,8 @@ data = {
 
 [node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 21.266586, 0, 23.496054)
-curve = SubResource("Curve3D_crkwu")
-boundary_animation = SubResource("Animation_tsecg")
+curve = SubResource("Curve3D_tpknb")
+boundary_animation = SubResource("Animation_crkwu")
 playback_duration = 475.27316
 loop_boundary_path = false
 render_effect = 1
@@ -325,7 +313,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.619999, 0, -21.83598)
 loop = false
 
 [node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_p0ipo")
+libraries/ = SubResource("AnimationLibrary_tsecg")
 
 [node name="coffin-old" parent="." unique_id=876962173 instance=ExtResource("10_a5y6d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.549681, 0, 14.97021)
@@ -333,7 +321,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.549681, 0, 14.97021)
 [node name="IndoorLighting" parent="." unique_id=343606488 instance=ExtResource("100_indoor")]
 
 [node name="SimpleGrassTextured" type="MultiMeshInstance3D" parent="." unique_id=1267581101]
-material_override = SubResource("ShaderMaterial_rfb6x")
+material_override = SubResource("ShaderMaterial_p0ipo")
 cast_shadow = 0
 multimesh = SubResource("MultiMesh_hbjlw")
 script = ExtResource("16_86xts")
@@ -363,9 +351,6 @@ transform = Transform3D(-0.004005942, 0, 0.99999195, 0, 1, 0, -0.99999195, 0, -0
 
 [node name="GDFlaskNoBoundary" parent="." unique_id=1117850407 instance=ExtResource("21_bj40y")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.228441, 0, 1.4080114)
-global_flask_properties = ExtResource("5_hc001")
-hud_effect_id = &"no_boundary"
-show_hud_countdown = true
 
 [node name="LockedDoor" parent="." unique_id=1294729630 instance=ExtResource("24_locked_door")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 11.5, 0, 3.4997358)
@@ -402,7 +387,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1)
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Tiled Floor/StaticBody3D" unique_id=2113375371]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 0, 10.5)
 mesh = SubResource("PlaneMesh_v11xe")
-surface_material_override/0 = SubResource("ShaderMaterial_hl8aa")
+surface_material_override/0 = ExtResource("18_ly0q6")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Tiled Floor/StaticBody3D" unique_id=1196415478]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 0, 10.5)
@@ -597,33 +582,18 @@ transform = Transform3D(0.80160874, 0, -0.597849, 0, 1, 0, 0.597849, 0, 0.801608
 
 [node name="HealthPotion" parent="Objects/Potions" unique_id=921123679 instance=ExtResource("7_rihgm")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 12.177471, 0, -8.0425625)
-global_flask_properties = ExtResource("5_hc001")
-hud_effect_id = &"health_flask"
-show_hud_countdown = true
 
 [node name="HealthPotion2" parent="Objects/Potions" unique_id=913249563 instance=ExtResource("7_rihgm")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 19.13573, 0, -3.7101464)
-global_flask_properties = ExtResource("5_hc001")
-hud_effect_id = &"health_flask"
-show_hud_countdown = true
 
 [node name="HealthPotion3" parent="Objects/Potions" unique_id=752436914 instance=ExtResource("7_rihgm")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 11.8513775, 0, 8.521909)
-global_flask_properties = ExtResource("5_hc001")
-hud_effect_id = &"health_flask"
-show_hud_countdown = true
 
 [node name="HealthPotion4" parent="Objects/Potions" unique_id=1039384072 instance=ExtResource("7_rihgm")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 6.696965, 0, 0.047987416)
-global_flask_properties = ExtResource("5_hc001")
-hud_effect_id = &"health_flask"
-show_hud_countdown = true
 
 [node name="HealthPotion5" parent="Objects/Potions" unique_id=329541679 instance=ExtResource("7_rihgm")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 23.518272, 0, 2.7458754)
-global_flask_properties = ExtResource("5_hc001")
-hud_effect_id = &"health_flask"
-show_hud_countdown = true
 
 [node name="SilverKey" parent="." unique_id=1590207848 instance=ExtResource("22_silver_key")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4823318, 0.024999965, 8.640018)
