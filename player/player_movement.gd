@@ -24,10 +24,10 @@ const MIN_WEIGHT_ROTATION_MULTIPLIER = 0.35
 const JUMP_SETTINGS := preload("res://game/player_jump_settings.tres")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const FOOTSTEP_SOUND_PATHS: Array[String] = [
-	"res://Assets/audio/footstep1.wav",
-	"res://Assets/audio/footstep2.wav",
-	"res://Assets/audio/footstep3.wav",
-	"res://Assets/audio/footstep4.wav",
+	"res://Assets/audio/footstep1.mp3",
+	"res://Assets/audio/footstep2.mp3",
+	"res://Assets/audio/footstep3.mp3",
+	"res://Assets/audio/footstep4.mp3",
 ]
 
 ## Visual pivot rotated toward the current movement direction.
@@ -37,15 +37,17 @@ const FOOTSTEP_SOUND_PATHS: Array[String] = [
 ## Base travel distance between footstep sounds.
 @export var footstep_distance := 0.7
 ## Random distance added or subtracted from each footstep interval.
-@export var footstep_distance_variance := 0.18
+@export var footstep_distance_variance := 0.08
 ## Lowest random pitch scale used for each footstep.
 @export var footstep_pitch_min := 0.92
 ## Highest random pitch scale used for each footstep.
 @export var footstep_pitch_max := 1.08
 ## Footstep volume at the speed threshold, in decibels.
-@export var footstep_volume_min_db := 0.0
+@export var footstep_volume_min_db := -6.0
 ## Footstep volume near full walking speed, in decibels.
-@export var footstep_volume_max_db := 4.0
+@export var footstep_volume_max_db := 0.0
+## Random volume variation applied to each footstep, in decibels.
+@export var footstep_volume_variance_db := 0.35
 ## Height above the player origin used by sideways squeeze probes.
 @export var squeeze_probe_height := 0.35
 ## Maximum side clearance distance checked while moving through gaps.
@@ -64,6 +66,7 @@ var footstep_sounds: Array[AudioStream] = []
 var jump_sound: AudioStream
 var footstep_distance_accumulator := 0.0
 var next_footstep_distance := 1.0
+var current_horizontal_speed := 0.0
 var audio_rng := RandomNumberGenerator.new()
 
 
@@ -134,7 +137,7 @@ func update_walk(delta: float, gold_inventory: Node) -> float:
 	player.velocity.x = horizontal_velocity.x
 	player.velocity.z = horizontal_velocity.y
 
-	_update_footsteps(delta, horizontal_velocity.length())
+	current_horizontal_speed = horizontal_velocity.length()
 
 	return effective_input_strength
 
@@ -148,6 +151,7 @@ func update_dead_motion(delta: float) -> void:
 	player.velocity.x = move_toward(player.velocity.x, 0.0, DECELERATION * delta)
 	player.velocity.z = move_toward(player.velocity.z, 0.0, DECELERATION * delta)
 	footstep_distance_accumulator = 0.0
+	current_horizontal_speed = 0.0
 
 	if not player.is_on_floor():
 		player.velocity += player.get_gravity() * delta
@@ -169,7 +173,7 @@ func _update_footsteps(delta: float, horizontal_speed: float) -> void:
 	if (
 		player == null
 		or not player.is_on_floor()
-		or player.velocity.y > 0.05
+		or absf(player.velocity.y) > 0.05
 		or horizontal_speed < footstep_speed_threshold
 	):
 		footstep_distance_accumulator = 0.0
@@ -187,6 +191,14 @@ func _update_footsteps(delta: float, horizontal_speed: float) -> void:
 func _randomize_next_footstep_distance() -> void:
 	var variance := maxf(footstep_distance_variance, 0.0)
 	next_footstep_distance = maxf(0.1, footstep_distance + audio_rng.randf_range(-variance, variance))
+
+
+func play_animation_footstep() -> void:
+	if not _can_play_footstep(current_horizontal_speed):
+		footstep_distance_accumulator = 0.0
+		return
+
+	_play_footstep(current_horizontal_speed)
 
 
 func _play_jump_sound(settings: GDPlayerJumpSettings) -> void:
@@ -217,7 +229,18 @@ func _play_footstep(horizontal_speed: float) -> void:
 		footstep_volume_max_db,
 		footstep_pitch_min,
 		footstep_pitch_max,
-		audio_rng
+		audio_rng,
+		footstep_volume_variance_db
+	)
+
+
+func _can_play_footstep(horizontal_speed: float) -> bool:
+	return (
+		not footstep_sounds.is_empty()
+		and player != null
+		and player.is_on_floor()
+		and absf(player.velocity.y) <= 0.05
+		and horizontal_speed >= footstep_speed_threshold
 	)
 
 

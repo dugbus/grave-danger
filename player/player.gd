@@ -30,6 +30,8 @@ func _ready() -> void:
 	add_to_group(PLAYER_GROUP)
 	add_to_group(FLAME_VULNERABLE_GROUP)
 	collision_mask |= BOUNDARY_BLOCKER_COLLISION_LAYER
+	if animation_controller.has_signal("footstep_phase_reached"):
+		animation_controller.connect(&"footstep_phase_reached", Callable(movement, "play_animation_footstep"))
 
 
 func _physics_process(delta: float) -> void:

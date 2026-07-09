@@ -2,6 +2,8 @@ extends Node
 class_name GDPlayerAnimation
 
 
+signal footstep_phase_reached
+
 # Animation owns imported-character setup and playback decisions. It searches
 # the GLB subtree at runtime because imported scenes often nest AnimationPlayer
 # nodes differently after asset updates.
@@ -41,6 +43,7 @@ var idle_animation := ""
 var walk_animation := ""
 var death_animation := ""
 var current_animation := ""
+var previous_walk_animation_phase := -1.0
 var hit_reaction_tween: Tween
 var hit_reaction_base_y := 0.0
 
@@ -75,6 +78,7 @@ func update_movement(input_strength: float, gold_inventory: Node) -> void:
 		if animation_player != null:
 			animation_player.speed_scale = 1.0
 		_play_animation(idle_animation)
+		_reset_footstep_phase()
 		return
 
 	if animation_player != null:
@@ -85,6 +89,7 @@ func update_movement(input_strength: float, gold_inventory: Node) -> void:
 			* weight_animation_multiplier
 		)
 	_play_animation(walk_animation)
+	_update_footstep_phase()
 
 
 func play_death() -> void:
@@ -94,6 +99,7 @@ func play_death() -> void:
 	if animation_player != null:
 		animation_player.speed_scale = 0.5
 	_play_animation(death_animation)
+	_reset_footstep_phase()
 
 
 func play_hit_reaction() -> void:
@@ -128,6 +134,26 @@ func _play_animation(animation_name: String) -> void:
 
 	current_animation = animation_name
 	animation_player.play(animation_name, 0.15)
+
+
+func _update_footstep_phase() -> void:
+	if animation_player == null or current_animation != walk_animation or walk_animation.is_empty():
+		_reset_footstep_phase()
+		return
+
+	var animation := animation_player.get_animation(walk_animation)
+	if animation == null or animation.length <= 0.0:
+		_reset_footstep_phase()
+		return
+
+	var current_phase := animation_player.current_animation_position / animation.length
+	if GDAudio.did_cross_footstep_animation_phase(previous_walk_animation_phase, current_phase):
+		footstep_phase_reached.emit()
+	previous_walk_animation_phase = current_phase
+
+
+func _reset_footstep_phase() -> void:
+	previous_walk_animation_phase = -1.0
 
 
 func _find_animation(candidates: Array) -> String:

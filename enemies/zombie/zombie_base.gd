@@ -18,10 +18,10 @@ enum ZombieState {
 }
 
 const FOOTSTEP_SOUND_PATHS: Array[String] = [
-    "res://Assets/audio/footstep1.wav",
-    "res://Assets/audio/footstep2.wav",
-    "res://Assets/audio/footstep3.wav",
-    "res://Assets/audio/footstep4.wav",
+    "res://Assets/audio/footstep1.mp3",
+    "res://Assets/audio/footstep2.mp3",
+    "res://Assets/audio/footstep3.mp3",
+    "res://Assets/audio/footstep4.mp3",
 ]
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 const DEFAULT_PUNCH_HIT_SOUND_PATH := "res://Assets/audio/punch.mp3"
@@ -171,11 +171,13 @@ const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 @export_group("Footsteps")
 @export var footstep_speed_threshold := 0.1
 @export var footstep_distance := 0.7
-@export var footstep_distance_variance := 0.18
+@export var footstep_distance_variance := 0.08
 @export var footstep_pitch_min := 0.92
 @export var footstep_pitch_max := 1.08
 @export var footstep_volume_min_db := 0.0
 @export var footstep_volume_max_db := 4.0
+## Random volume variation applied to each zombie footstep, in decibels.
+@export var footstep_volume_variance_db := 0.35
 @export_group("")
 
 @export_group("Light")
@@ -238,6 +240,7 @@ var punch_hit_sound: AudioStream
 var footstep_distance_accumulator := 0.0
 var next_footstep_distance := 1.0
 var footstep_rng := RandomNumberGenerator.new()
+var previous_walk_animation_phase := -1.0
 var animation_player: AnimationPlayer
 var current_animation := ""
 var resolved_run_animation := ""

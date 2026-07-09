@@ -19,13 +19,10 @@ func _run() -> void:
 	_collect_scenes("res://", scenes)
 	scenes.sort()
 
-	print("Checking %d scene(s)..." % scenes.size())
-
 	for scene_path in scenes:
 		await _check_scene(scene_path)
 
-	print("")
-	print("Checked %d scene(s), failures: %d" % [checked, failures])
+	print("Checked %d/%d scenes." % [checked, scenes.size()])
 
 	quit(1 if failures > 0 else 0)
 
@@ -63,16 +60,17 @@ func _collect_scenes(dir_path: String, scenes: Array[String]) -> void:
 
 func _check_scene(scene_path: String) -> void:
 	checked += 1
-	print("--- %s" % scene_path)
 
 	var res := ResourceLoader.load(scene_path, "PackedScene")
 
 	if res == null:
+		print("--- %s" % scene_path)
 		push_error("Failed to load scene: %s" % scene_path)
 		failures += 1
 		return
 
 	if not res is PackedScene:
+		print("--- %s" % scene_path)
 		push_error("Resource is not a PackedScene: %s" % scene_path)
 		failures += 1
 		return
@@ -80,6 +78,7 @@ func _check_scene(scene_path: String) -> void:
 	var packed := res as PackedScene
 
 	if not packed.can_instantiate():
+		print("--- %s" % scene_path)
 		push_error("Scene cannot be instantiated: %s" % scene_path)
 		failures += 1
 		return
@@ -87,6 +86,7 @@ func _check_scene(scene_path: String) -> void:
 	var instance := packed.instantiate()
 
 	if instance == null:
+		print("--- %s" % scene_path)
 		push_error("Instantiation returned null: %s" % scene_path)
 		failures += 1
 		return

@@ -140,21 +140,38 @@ func _load_footstep_sounds() -> void:
 func _load_punch_hit_sound() -> void:
     punch_hit_sound = GDAudio.load_stream(punch_hit_sound_path)
 
-func _update_footsteps(delta: float, horizontal_speed: float) -> void:
+func _update_footsteps(_delta: float, horizontal_speed: float) -> void:
     if footstep_sounds.is_empty():
         return
 
     if horizontal_speed < footstep_speed_threshold:
         footstep_distance_accumulator = 0.0
+        _reset_footstep_phase()
         return
 
-    footstep_distance_accumulator += horizontal_speed * delta
-    if footstep_distance_accumulator < next_footstep_distance:
+    if not _did_cross_footstep_phase():
         return
 
-    footstep_distance_accumulator = 0.0
-    _randomize_next_footstep_distance()
     _play_footstep(horizontal_speed)
+
+func _did_cross_footstep_phase() -> bool:
+    var resolved_walk_animation := _resolve_animation_name(walk_animation_name)
+    if animation_player == null or current_animation != resolved_walk_animation or resolved_walk_animation.is_empty():
+        _reset_footstep_phase()
+        return false
+
+    var animation := animation_player.get_animation(resolved_walk_animation)
+    if animation == null or animation.length <= 0.0:
+        _reset_footstep_phase()
+        return false
+
+    var current_phase := animation_player.current_animation_position / animation.length
+    var crossed_phase := GDAudio.did_cross_footstep_animation_phase(previous_walk_animation_phase, current_phase)
+    previous_walk_animation_phase = current_phase
+    return crossed_phase
+
+func _reset_footstep_phase() -> void:
+    previous_walk_animation_phase = -1.0
 
 func _randomize_next_footstep_distance() -> void:
     var variance := maxf(footstep_distance_variance, 0.0)
@@ -177,12 +194,15 @@ func _play_footstep(horizontal_speed: float) -> void:
         footstep_volume_max_db,
         footstep_pitch_min,
         footstep_pitch_max,
-        footstep_rng
+        footstep_rng,
+        footstep_volume_variance_db,
+        GDAudio.FootstepSoundProfile.Enemy
     )
 
 func _play_punch_hit_sound() -> void:
-    var audio_parent: Node = zombie_body as Node if zombie_body != null else self as Node
-    GDAudio.play_one_shot_3d(audio_parent, punch_hit_sound, "ZombiePunchHitAudio", punch_hit_volume_db)
+    # This confirms the player was damaged, so it must not be lost to 3D attenuation.
+    var audio_parent: Node = player as Node if player != null else self as Node
+    GDAudio.play_one_shot(audio_parent, punch_hit_sound, "ZombiePunchHitAudio", punch_hit_volume_db)
 
 func _play_death_scream() -> void:
     var audio_parent: Node = zombie_body as Node if zombie_body != null else self as Node

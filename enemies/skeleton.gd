@@ -3,10 +3,10 @@ class_name GDSkeletonPath
 
 
 const FOOTSTEP_SOUND_PATHS: Array[String] = [
-    "res://Assets/audio/footstep1.wav",
-    "res://Assets/audio/footstep2.wav",
-    "res://Assets/audio/footstep3.wav",
-    "res://Assets/audio/footstep4.wav",
+    "res://Assets/audio/footstep1.mp3",
+    "res://Assets/audio/footstep2.mp3",
+    "res://Assets/audio/footstep3.mp3",
+    "res://Assets/audio/footstep4.mp3",
 ]
 const CHARACTER_GROUP: StringName = &"character"
 const SKELETON_GROUP: StringName = &"skeleton"
@@ -76,15 +76,17 @@ const MODEL_FORWARD_YAW_OFFSET := 0.0
 ## Base travel distance between skeleton footsteps.
 @export var footstep_distance := 0.7
 ## Random distance added or subtracted from each footstep interval.
-@export var footstep_distance_variance := 0.18
+@export var footstep_distance_variance := 0.08
 ## Lowest random pitch scale used for each skeleton footstep.
 @export var footstep_pitch_min := 0.92
 ## Highest random pitch scale used for each skeleton footstep.
 @export var footstep_pitch_max := 1.08
 ## Footstep volume at the speed threshold, in decibels.
-@export var footstep_volume_min_db := 0.0
+@export var footstep_volume_min_db := -10.0
 ## Footstep volume near full shuffle speed, in decibels.
-@export var footstep_volume_max_db := 4.0
+@export var footstep_volume_max_db := -1.0
+## Random volume variation applied to each skeleton footstep, in decibels.
+@export var footstep_volume_variance_db := 0.35
 
 @export_group("Rolling Ball Death")
 ## Enables rolling balls to kill the skeleton when they push far enough into its detection area.
@@ -135,6 +137,7 @@ var footstep_sounds: Array[AudioStream] = []
 var footstep_rng := RandomNumberGenerator.new()
 var footstep_distance_accumulator := 0.0
 var next_footstep_distance := 1.0
+var previous_walk_animation_phase := -1.0
 var animation_player: AnimationPlayer
 var current_animation := ""
 var resolved_walk_animation := ""
@@ -507,21 +510,39 @@ func _load_footstep_sounds() -> void:
     footstep_sounds = GDAudio.load_streams(FOOTSTEP_SOUND_PATHS)
 
 
-func _update_footsteps(delta: float, horizontal_speed: float) -> void:
+func _update_footsteps(_delta: float, horizontal_speed: float) -> void:
     if footstep_sounds.is_empty():
         return
 
     if horizontal_speed < footstep_speed_threshold:
         footstep_distance_accumulator = 0.0
+        _reset_footstep_phase()
         return
 
-    footstep_distance_accumulator += horizontal_speed * delta
-    if footstep_distance_accumulator < next_footstep_distance:
+    if not _did_cross_footstep_phase():
         return
 
-    footstep_distance_accumulator = 0.0
-    _randomize_next_footstep_distance()
     _play_footstep(horizontal_speed)
+
+
+func _did_cross_footstep_phase() -> bool:
+    if animation_player == null or current_animation != resolved_walk_animation or resolved_walk_animation.is_empty():
+        _reset_footstep_phase()
+        return false
+
+    var animation := animation_player.get_animation(resolved_walk_animation)
+    if animation == null or animation.length <= 0.0:
+        _reset_footstep_phase()
+        return false
+
+    var current_phase := animation_player.current_animation_position / animation.length
+    var crossed_phase := GDAudio.did_cross_footstep_animation_phase(previous_walk_animation_phase, current_phase)
+    previous_walk_animation_phase = current_phase
+    return crossed_phase
+
+
+func _reset_footstep_phase() -> void:
+    previous_walk_animation_phase = -1.0
 
 
 func _randomize_next_footstep_distance() -> void:
@@ -545,7 +566,9 @@ func _play_footstep(horizontal_speed: float) -> void:
         footstep_volume_max_db,
         footstep_pitch_min,
         footstep_pitch_max,
-        footstep_rng
+        footstep_rng,
+        footstep_volume_variance_db,
+        GDAudio.FootstepSoundProfile.Enemy
     )
 
 

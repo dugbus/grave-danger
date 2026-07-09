@@ -66,7 +66,7 @@ const EDITOR_SCRUB_TIME_EPSILON := 0.05
 		boundary_scale_z = maxf(value, 0.001)
 		_apply_boundary_scale_rotation()
 
-## BoundaryCenter local Z rotation in radians. X/Y rotation is always overridden to zero.
+## Rotation-key value applied around BoundaryCenter's local Y (height) axis in radians.
 @export var boundary_rotation_z_radians := 0.0:
 	set(value):
 		boundary_rotation_z_radians = value
@@ -766,7 +766,7 @@ func _apply_boundary_scale_rotation() -> void:
 		return
 
 	center.scale = Vector3(boundary_scale_x, 1.0, boundary_scale_z)
-	center.rotation = Vector3(0.0, 0.0, boundary_rotation_z_radians)
+	center.rotation = Vector3(0.0, boundary_rotation_z_radians, 0.0)
 
 
 func _sync_boundary_scale_rotation_to_animation(animation: Animation, time: float) -> void:

@@ -2,6 +2,18 @@ class_name GDAudio
 extends RefCounted
 
 
+enum FootstepSoundProfile {
+    Player,
+    Enemy,
+}
+
+const ENEMY_FOOTSTEP_MAX_DISTANCE := 28.0
+const ENEMY_FOOTSTEP_UNIT_SIZE := 8.0
+const PLAYER_FOOTSTEP_MAX_DISTANCE := 0.0
+const PLAYER_FOOTSTEP_UNIT_SIZE := 10.0
+const FOOTSTEP_ANIMATION_PHASES: Array[float] = [0.25, 0.75]
+
+
 static func load_stream(sound_path: String) -> AudioStream:
     if sound_path.is_empty():
         return null
@@ -53,7 +65,10 @@ static func play_one_shot_3d(
     stream: AudioStream,
     sound_name: String,
     volume_db: float = 0.0,
-    pitch_scale: float = 1.0
+    pitch_scale: float = 1.0,
+    max_distance: float = 0.0,
+    unit_size: float = 10.0,
+    attenuation_model := AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
 ) -> AudioStreamPlayer3D:
     if parent == null or stream == null:
         return null
@@ -63,6 +78,10 @@ static func play_one_shot_3d(
     sound_player.stream = stream
     sound_player.volume_db = volume_db
     sound_player.pitch_scale = pitch_scale
+    if max_distance > 0.0:
+        sound_player.max_distance = max_distance
+    sound_player.unit_size = unit_size
+    sound_player.attenuation_model = attenuation_model
     sound_player.finished.connect(sound_player.queue_free)
     parent.add_child(sound_player)
     sound_player.play()
@@ -80,7 +99,9 @@ static func play_random_footstep_3d(
     volume_max_db: float,
     pitch_min: float,
     pitch_max: float,
-    rng: RandomNumberGenerator = null
+    rng: RandomNumberGenerator = null,
+    volume_variance_db: float = 1.0,
+    footstep_profile := FootstepSoundProfile.Player
 ) -> AudioStreamPlayer3D:
     var stream := _pick_stream(streams, rng)
     if stream == null:
@@ -92,15 +113,52 @@ static func play_random_footstep_3d(
         1.0
     )
     var volume_db := lerpf(volume_min_db, volume_max_db, speed_volume_boost)
-    volume_db += _randf_range(-1.0, 1.0, rng)
+    var variance := maxf(volume_variance_db, 0.0)
+    volume_db += _randf_range(-variance, variance, rng)
+    var profile_settings := _get_footstep_profile_settings(footstep_profile)
+    var max_distance := profile_settings.max_distance as float
+    var unit_size := profile_settings.unit_size as float
 
     return play_one_shot_3d(
         parent,
         stream,
         sound_name,
         volume_db,
-        _randf_range(pitch_min, pitch_max, rng)
+        _randf_range(pitch_min, pitch_max, rng),
+        max_distance,
+        unit_size,
+        AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
     )
+
+
+static func _get_footstep_profile_settings(footstep_profile: FootstepSoundProfile) -> Dictionary:
+    match footstep_profile:
+        FootstepSoundProfile.Enemy:
+            return {
+                max_distance = ENEMY_FOOTSTEP_MAX_DISTANCE,
+                unit_size = ENEMY_FOOTSTEP_UNIT_SIZE,
+            }
+        _:
+            return {
+                max_distance = PLAYER_FOOTSTEP_MAX_DISTANCE,
+                unit_size = PLAYER_FOOTSTEP_UNIT_SIZE,
+            }
+
+
+static func did_cross_footstep_animation_phase(previous_phase: float, current_phase: float) -> bool:
+    if previous_phase < 0.0:
+        return false
+
+    var normalized_previous := wrapf(previous_phase, 0.0, 1.0)
+    var normalized_current := wrapf(current_phase, 0.0, 1.0)
+    for footstep_phase in FOOTSTEP_ANIMATION_PHASES:
+        if normalized_current >= normalized_previous:
+            if normalized_previous < footstep_phase and normalized_current >= footstep_phase:
+                return true
+        elif normalized_previous < footstep_phase or normalized_current >= footstep_phase:
+            return true
+
+    return false
 
 
 static func _pick_stream(streams: Array[AudioStream], rng: RandomNumberGenerator) -> AudioStream:
