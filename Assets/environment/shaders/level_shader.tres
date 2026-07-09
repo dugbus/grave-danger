@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://6xa14siv3rq4"]
+
+[ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://Assets/environment/shaders/level.gdshader" id="1_c08ej"]
+[ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="2_7svxn"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_c08ej")
+shader_parameter/tiled_texture = ExtResource("2_7svxn")
+shader_parameter/level_width = 150.0
+shader_parameter/level_height = 24.0
+shader_parameter/floor_overscan = Vector2(2, 2)
+shader_parameter/floor_tile_size = Vector2(8, 8)
+shader_parameter/fade_margin = 0.2
