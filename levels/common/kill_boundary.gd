@@ -28,6 +28,7 @@ const EFFECT_FLAME := 0
 const EFFECT_GHOST := 1
 const EFFECT_NONE := 2
 const EDITOR_SCRUB_TIME_EPSILON := 0.05
+const EDITOR_GHOST_PREVIEW_CYCLE_OFFSET := 0.38
 @export_group("Animation")
 ## Animation controlling path progress, scale, shape morph, and future properties.
 @export var boundary_animation: Animation:
@@ -1281,7 +1282,7 @@ func _update_preview_boundary() -> void:
 	var no_collisions: Array[CollisionShape3D] = []
 	_apply_boundary_to_segments(preview_meshes, no_collisions)
 	if preview_ghost_meshes.size() == boundary_segments * ghost_ribbons_per_segment:
-		_apply_ghosts_to_boundary(preview_ghost_meshes)
+		_apply_ghosts_to_boundary(preview_ghost_meshes, true)
 	if preview_center_mesh != null:
 		preview_center_mesh.position = Vector3(0.0, flame_y + 0.18, 0.0)
 
@@ -1337,7 +1338,7 @@ func _apply_boundary_to_segments(meshes: Array[MeshInstance3D], collisions: Arra
 		perimeter_offset += segment_length
 
 
-func _apply_ghosts_to_boundary(meshes: Array[MeshInstance3D]) -> void:
+func _apply_ghosts_to_boundary(meshes: Array[MeshInstance3D], is_editor_preview := false) -> void:
 	if meshes.is_empty():
 		return
 
@@ -1360,11 +1361,15 @@ func _apply_ghosts_to_boundary(meshes: Array[MeshInstance3D]) -> void:
 			mesh_instance.position = Vector3(ground_position.x, flame_y, ground_position.y)
 			mesh_instance.rotation = Vector3.ZERO
 			mesh_instance.extra_cull_margin = maxf(ghost_height_range.y + ghost_rise_distance + ghost_wave_amplitude, 1.0)
-			_configure_ghost_ribbon(mesh_instance, rng)
+			_configure_ghost_ribbon(mesh_instance, rng, is_editor_preview)
 			ghost_index += 1
 
 
-func _configure_ghost_ribbon(mesh_instance: MeshInstance3D, rng: RandomNumberGenerator) -> void:
+func _configure_ghost_ribbon(
+	mesh_instance: MeshInstance3D,
+	rng: RandomNumberGenerator,
+	is_editor_preview := false
+) -> void:
 	var height := rng.randf_range(ghost_height_range.x, ghost_height_range.y)
 	var width := rng.randf_range(ghost_width_range.x, ghost_width_range.y)
 	var size_ratio := (
@@ -1383,7 +1388,10 @@ func _configure_ghost_ribbon(mesh_instance: MeshInstance3D, rng: RandomNumberGen
 		"rise_speed",
 		rng.randf_range(ghost_rise_speed_range.x, ghost_rise_speed_range.y)
 	)
-	mesh_instance.set_instance_shader_parameter("cycle_offset", rng.randf())
+	var cycle_offset := rng.randf()
+	if is_editor_preview:
+		cycle_offset = EDITOR_GHOST_PREVIEW_CYCLE_OFFSET
+	mesh_instance.set_instance_shader_parameter("cycle_offset", cycle_offset)
 	mesh_instance.set_instance_shader_parameter("wave_phase", rng.randf_range(0.0, TAU))
 	mesh_instance.set_instance_shader_parameter(
 		"wave_amplitude",

@@ -10,6 +10,8 @@ const PLAYER_GROUP: StringName = &"player"
 const BOUNDARY_BLOCKER_COLLISION_LAYER := 16
 const PUSH_FLOOR_MIN_NORMAL_Y := 0.65
 const PUSH_FLOOR_IGNORE_SECONDS := 0.25
+const FLOOR_LEVEL_Y := 0.0
+const FALL_DEATH_DEPTH := 4.0
 
 # Player stays as the public API for other gameplay objects.
 # Coins and kill-boundary areas still talk to this CharacterBody3D, while the actual
@@ -53,6 +55,7 @@ func _physics_process(delta: float) -> void:
 
 	var push_velocity := velocity
 	move_and_slide()
+	_die_if_fallen_below_floor()
 	_push_slide_colliders(push_velocity, delta)
 
 
@@ -154,6 +157,15 @@ func die_from_flames() -> void:
 	death_controller.die_from_flames()
 
 
+func die_from_fall() -> void:
+	# Falling out of the level uses the same death sequence as other lethal hazards.
+	death_controller.die_from_fall()
+
+
+func is_below_fall_death_height() -> bool:
+	return global_position.y < FLOOR_LEVEL_Y - FALL_DEATH_DEPTH
+
+
 func apply_flame_damage(amount: float) -> void:
 	var was_dead := is_dead()
 	death_controller.apply_flame_damage(amount)
@@ -192,6 +204,11 @@ func _refresh_pickup_radius_multiplier() -> void:
 		pickup_radius_multiplier *= multiplier
 
 	get_tree().call_group("pickup_radius_scalable", "set_pickup_radius_multiplier", pickup_radius_multiplier)
+
+
+func _die_if_fallen_below_floor() -> void:
+	if is_below_fall_death_height():
+		die_from_fall()
 
 
 func _push_slide_colliders(push_velocity: Vector3, delta: float) -> void:

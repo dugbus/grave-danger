@@ -99,8 +99,17 @@ func apply_temporary_damage(amount: float, restore_after_seconds: float) -> bool
 
 
 func die_from_flames() -> void:
+	_die()
+
+
+func die_from_fall() -> void:
+	# A fall is lethal immediately, but otherwise follows the normal death flow.
+	_die()
+
+
+func _die() -> void:
 	# Multiple flame areas can report the body in the same frame, so death must
-	# be idempotent.
+	# be idempotent. Falls share this same one-way transition.
 	if is_dead:
 		return
 

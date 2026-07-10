@@ -75,6 +75,7 @@ func _run_tests() -> void:
     failed = not _test_deterministic_seed_helper_is_stable() or failed
     failed = not _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() or failed
     failed = not _test_audio_fallback_is_deterministic() or failed
+    failed = not _test_player_fall_death_threshold() or failed
     failed = not _test_coin_absorption_does_not_complete_level() or failed
     failed = not _test_gate_completion_completes_level() or failed
     failed = not _test_graveyard_scene_does_not_embed_default_level() or failed
@@ -132,6 +133,27 @@ func _test_audio_fallback_is_deterministic() -> bool:
 
     return _expect(picked_stream == first_stream, "audio fallback picks the first stream deterministically") \
         and _expect(is_equal_approx(midpoint, 0.5), "audio fallback uses deterministic midpoint variation")
+
+
+func _test_player_fall_death_threshold() -> bool:
+    var player_scene := load("res://player/player.tscn") as PackedScene
+    if not _expect(player_scene != null, "player scene loads for fall-death threshold test"):
+        return false
+
+    var player := player_scene.instantiate() as GDPlayer
+    if not _expect(player != null, "player scene instantiates for fall-death threshold test"):
+        return false
+
+    root.add_child(player)
+    player.global_position.y = GDPlayer.FLOOR_LEVEL_Y - GDPlayer.FALL_DEATH_DEPTH
+    var survives_at_threshold := not player.is_below_fall_death_height()
+
+    player.global_position.y -= 0.01
+    var dies_below_threshold := player.is_below_fall_death_height()
+    player.free()
+
+    return _expect(survives_at_threshold, "player survives exactly four metres below the floor") \
+        and _expect(dies_below_threshold, "player dies below four metres under the floor")
 
 
 func _test_coin_absorption_does_not_complete_level() -> bool:
