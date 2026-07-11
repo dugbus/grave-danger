@@ -6,8 +6,9 @@
 - Make sure that typing is either directly inferable or specified with 'as' keyword.
 - Any exported variable has a human friendly comment to explain the intent of the setting.
 - If settings are aiming to be contant for the whole game and not per instance then they should live in their own .tres file.
-- Preserve and update comments, don't remove as a tidy up operation unless they are truly redundant.
-- 
+- Preserve and update comments, don't remove as a tidy up operation unless they are incorrect in which case update them. Comments can show important intent.
+- Use PascalCase for Project Enumerations.
+
 
 ## Binary Files
 
@@ -21,6 +22,7 @@
 ## Scripts or Nodes
 
 - Favour nodes over script generated content so that editor users can work with the scene without having to read scripts whereever possible.
+- When a model has attached behaviour always create a scene for that object so it can placed fully populated and working.
 
 ## Paths
 
@@ -45,6 +47,9 @@
 - Use signals or typed dependencies for decoupling; avoid global singletons unless already established.
 - Do not invent nodes, autoloads, input actions, groups, or resources without checking existing files first.
 
+## CHANGELOG.md 
+- On every task update the changelog with the updates as bullet points describing the changes in terms of a player or as a level editor.
+
 ## Unit testing
 
 - Whereever possible add long lived tests to protect existing functionality and prevent regressions.
@@ -53,6 +58,5 @@
 Run the relevant checks after code changes:
 
 ```bash
-godot --headless --editor --import --quit --path .
-godot --headless --check-only --quit --path .
+./check.sh
 ```

@@ -2,6 +2,9 @@
 class_name PNGToGridMapMeshCatalog
 extends RefCounted
 
+## Discovers MeshLibrary resources and exposes stable names for their items.
+## The catalog keeps editor selections and saved mapping references meaningful across sessions.
+
 
 ## Scans the project for MeshLibrary resources.
 static func find_project_mesh_libraries() -> Array[String]:

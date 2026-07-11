@@ -2,6 +2,9 @@
 class_name PNGToGridMapExporter
 extends RefCounted
 
+## Converts an existing GridMap into a PNG representation using the active colour-mapping profile.
+## Exported images preserve the grid footprint so they can be edited and imported again.
+
 const PathsResource := preload("res://addons/png_to_gridmap/png_to_gridmap_paths.gd")
 
 
@@ -51,7 +54,7 @@ func _build_export_model(
 	var origin: Vector2i = bounds["origin"]
 	var size: Vector2i = bounds["size"]
 	var cell_to_key: Dictionary = bounds["cell_to_key"]
-	var colour_grid := PNGToGridMapImageGrid.grid_from_cells(cell_to_key, origin, size, settings.flip_y_to_world_negative_z)
+	var colour_grid := PNGToGridMapImageGrid.grid_from_cells(cell_to_key, origin, size, true)
 	errors.append_array(_validate_mapping_conflicts(grid_map, item_to_mapping))
 	if not errors.is_empty():
 		return {"errors": errors}
@@ -150,7 +153,7 @@ func _validate_cells(
 		if mapping == null:
 			errors.append("No mapping found for exported colour #%s." % key)
 			continue
-		_append_cell_validation(errors, grid_map, cell, mapping, colour_grid, origin, size, settings.flip_y_to_world_negative_z, ref_to_id, item_aliases, item_display_names)
+		_append_cell_validation(errors, grid_map, cell, mapping, colour_grid, origin, size, true, ref_to_id, item_aliases, item_display_names)
 	return errors
 
 
@@ -192,7 +195,7 @@ func _build_image_from_cells(settings: Resource, cell_to_key: Dictionary, origin
 	image.fill(Color.TRANSPARENT)
 	for cell in cell_to_key.keys():
 		var mapping := _mapping_for_key(settings, String(cell_to_key[cell]))
-		var pixel := PNGToGridMapImageGrid.cell_to_pixel(cell, origin, size, settings.flip_y_to_world_negative_z)
+		var pixel := PNGToGridMapImageGrid.cell_to_pixel(cell, origin, size, true)
 		image.set_pixel(pixel.x, pixel.y, mapping.colour)
 	return image
 

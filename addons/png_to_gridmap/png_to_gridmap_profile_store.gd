@@ -2,10 +2,27 @@
 class_name PNGToGridMapProfileStore
 extends RefCounted
 
+## Loads and saves reusable PNG-to-GridMap mapping profiles and lightweight editor preferences.
+## Profiles are associated with their source assets so repeat imports use consistent intent.
+
 const SETTINGS_DIR := "res://addons/png_to_gridmap/settings"
 const UI_STATE_SECTION := "png_to_gridmap"
 const UI_STATE_ADVANCED_VISIBLE := "advanced_visible"
 const UI_STATE_OPERATION_ID := "operation_id"
+const LEVEL_SETTINGS_FILE := "png_to_gridmap_settings.tres"
+const GLOBAL_PROPERTIES := [&"mesh_library_path", &"color_mappings", &"floor_materials_folder"]
+const LEVEL_PROPERTIES := [
+	&"png_path",
+	&"export_png_path",
+	&"target_gridmap_path",
+	&"gridmap_name",
+	&"cell_size",
+	&"auto_repair",
+	&"export_origin",
+	&"export_size",
+	&"floor_gridmap_path",
+	&"floor_material_path",
+]
 
 var _editor_interface: EditorInterface
 var _settings_script: Script
@@ -61,30 +78,51 @@ func load_for_mesh_library(current_settings: Resource) -> Resource:
 	var loaded := ResourceLoader.load(path)
 	if loaded == null or loaded.get_script() != _settings_script:
 		return current_settings
-	var mesh_library_path: String = current_settings.mesh_library_path
-	var png_path: String = current_settings.png_path
-	var export_png_path: String = current_settings.export_png_path
-	var target_gridmap_path: NodePath = current_settings.target_gridmap_path
-	loaded.mesh_library_path = mesh_library_path
-	if png_path != "":
-		loaded.png_path = png_path
-	if export_png_path != "":
-		loaded.export_png_path = export_png_path
-	if String(target_gridmap_path) != "":
-		loaded.target_gridmap_path = target_gridmap_path
+	_copy_properties(current_settings, loaded, LEVEL_PROPERTIES)
+	return loaded
+
+
+## Loads level-specific conversion state stored beside the edited scene.
+func load_for_scene(current_settings: Resource, scene_path: String) -> Resource:
+	var path := path_for_scene(scene_path)
+	if path == "" or not ResourceLoader.exists(path):
+		return current_settings
+	var loaded := ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE)
+	if loaded == null or loaded.get_script() != _settings_script:
+		return current_settings
+	_copy_properties(current_settings, loaded, GLOBAL_PROPERTIES)
 	return loaded
 
 
 ## Saves the automatic mapping profile for the selected MeshLibrary.
-func save(settings: Resource) -> Error:
+func save(settings: Resource, scene_path: String) -> Error:
 	if settings.mesh_library_path == "":
 		return ERR_UNCONFIGURED
 	_ensure_settings_dir()
 	var path := path_for_mesh_library(settings.mesh_library_path)
 	if path == "":
 		return ERR_UNCONFIGURED
-	var result := ResourceSaver.save(settings, path)
-	return result
+	var global_settings := _settings_script.new() as Resource
+	_copy_properties(settings, global_settings, GLOBAL_PROPERTIES)
+	var result := ResourceSaver.save(global_settings, path)
+	if result != OK or scene_path == "":
+		return result
+	var level_settings := _settings_script.new() as Resource
+	_copy_properties(settings, level_settings, LEVEL_PROPERTIES)
+	return ResourceSaver.save(level_settings, path_for_scene(scene_path))
+
+
+## Returns the per-level settings path beside a scene file.
+func path_for_scene(scene_path: String) -> String:
+	if scene_path == "":
+		return ""
+	return scene_path.get_base_dir().path_join(LEVEL_SETTINGS_FILE)
+
+
+## Copies a selected persistence partition between settings resources.
+func _copy_properties(source: Resource, destination: Resource, properties: Array) -> void:
+	for property_name: StringName in properties:
+		destination.set(property_name, source.get(property_name))
 
 
 ## Ensures the automatic profile directory exists before saving.

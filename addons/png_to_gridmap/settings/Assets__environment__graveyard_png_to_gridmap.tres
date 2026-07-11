@@ -2,11 +2,16 @@
 
 [ext_resource type="Script" uid="uid://sqp5sti0kxob" path="res://addons/png_to_gridmap/png_to_gridmap_color_mapping.gd" id="1_kvfjf"]
 [ext_resource type="Script" uid="uid://bhrpqhaebhdyj" path="res://addons/png_to_gridmap/png_to_gridmap_settings.gd" id="2_8r5vs"]
+[ext_resource type="Script" uid="uid://c38f8f2eaw7al" path="res://addons/png_to_gridmap/png_to_gridmap_autotile_alternative.gd" id="3_alternative"]
 
 [sub_resource type="Resource" id="Resource_2sf17"]
 script = ExtResource("1_kvfjf")
 colour = Color(0.9529412, 0.9529412, 0.9529412, 1)
 display_name = "#F3F3F3FF"
+
+[sub_resource type="Resource" id="Resource_wall_sides_dark"]
+script = ExtResource("3_alternative")
+item_ref = "WallSides"
 
 [sub_resource type="Resource" id="Resource_eq3mc"]
 script = ExtResource("1_kvfjf")
@@ -22,6 +27,7 @@ corner_rotation_offset = 3
 tee_item_ref = "WallTee"
 tee_rotation_offset = 2
 cross_item_ref = "WallCross"
+autotile_alternatives = Array[Resource]([SubResource("Resource_wall_sides_dark")])
 
 [sub_resource type="Resource" id="Resource_2s3yr"]
 script = ExtResource("1_kvfjf")
@@ -32,6 +38,10 @@ display_name = "#BBC8A7FF"
 script = ExtResource("1_kvfjf")
 colour = Color(0.41960785, 0.72156864, 0.6039216, 0.99607843)
 display_name = "#6BB89AFE"
+
+[sub_resource type="Resource" id="Resource_wall_sides_black"]
+script = ExtResource("3_alternative")
+item_ref = "WallSides"
 
 [sub_resource type="Resource" id="Resource_kvfjf"]
 script = ExtResource("1_kvfjf")
@@ -47,17 +57,97 @@ corner_rotation_offset = 3
 tee_item_ref = "WallTee"
 tee_rotation_offset = 2
 cross_item_ref = "WallCross"
+autotile_alternatives = Array[Resource]([SubResource("Resource_wall_sides_black")])
 
 [sub_resource type="Resource" id="Resource_8r5vs"]
 script = ExtResource("1_kvfjf")
 colour = Color(0.41960785, 0.72156864, 0.6039216, 1)
 display_name = "#6BB89AFF"
 
+[sub_resource type="Resource" id="Resource_og7v6"]
+script = ExtResource("1_kvfjf")
+colour = Color(0, 0, 0.003921569, 1)
+display_name = "#000001FF"
+
+[sub_resource type="Resource" id="Resource_bx4n4"]
+script = ExtResource("1_kvfjf")
+colour = Color(0.003921569, 0, 0, 1)
+display_name = "#010000FF"
+
+[sub_resource type="Resource" id="Resource_s5ukk"]
+script = ExtResource("1_kvfjf")
+colour = Color(1, 0.99607843, 1, 1)
+display_name = "#FFFEFFFF"
+
+[sub_resource type="Resource" id="Resource_rmf38"]
+script = ExtResource("1_kvfjf")
+colour = Color(0, 0.003921569, 0, 1)
+display_name = "#000100FF"
+
+[sub_resource type="Resource" id="Resource_ug0ke"]
+script = ExtResource("1_kvfjf")
+colour = Color(1, 1, 0.99607843, 1)
+display_name = "#FFFFFEFF"
+
+[sub_resource type="Resource" id="Resource_8lvk6"]
+script = ExtResource("1_kvfjf")
+colour = Color(0.99607843, 1, 1, 1)
+display_name = "#FEFFFFFF"
+
+[sub_resource type="Resource" id="Resource_hoefr"]
+script = ExtResource("1_kvfjf")
+colour = Color(0, 0.003921569, 0.003921569, 1)
+display_name = "#000101FF"
+
+[sub_resource type="Resource" id="Resource_84add"]
+script = ExtResource("1_kvfjf")
+colour = Color(0.003921569, 0, 0.003921569, 1)
+display_name = "#010001FF"
+
+[sub_resource type="Resource" id="Resource_f305w"]
+script = ExtResource("1_kvfjf")
+colour = Color(0.003921569, 0.003921569, 0, 1)
+display_name = "#010100FF"
+
+[sub_resource type="Resource" id="Resource_4ec7g"]
+script = ExtResource("1_kvfjf")
+colour = Color(0.99607843, 1, 0.99607843, 1)
+display_name = "#FEFFFEFF"
+
+[sub_resource type="Resource" id="Resource_bqhbv"]
+script = ExtResource("1_kvfjf")
+colour = Color(1, 0.99607843, 0.99607843, 1)
+display_name = "#FFFEFEFF"
+
+[sub_resource type="Resource" id="Resource_fxhhw"]
+script = ExtResource("1_kvfjf")
+colour = Color(0.003921569, 0.003921569, 0.003921569, 1)
+display_name = "#010101FF"
+
+[sub_resource type="Resource" id="Resource_dak61"]
+script = ExtResource("1_kvfjf")
+colour = Color(0.99607843, 0.99607843, 1, 1)
+display_name = "#FEFEFFFF"
+
+[sub_resource type="Resource" id="Resource_r4clu"]
+script = ExtResource("1_kvfjf")
+colour = Color(0.14117648, 0.101960786, 0.043137256, 1)
+display_name = "#241A0BFF"
+
+[sub_resource type="Resource" id="Resource_73bbm"]
+script = ExtResource("1_kvfjf")
+colour = Color(1, 1, 1, 0.9529412)
+display_name = "#FFFFFFF3"
+
+[sub_resource type="Resource" id="Resource_f2dpr"]
+script = ExtResource("1_kvfjf")
+colour = Color(0.023529412, 0.015686275, 0.003921569, 1)
+display_name = "#060401FF"
+
 [resource]
 script = ExtResource("2_8r5vs")
-png_path = "res://levels/4/level.png"
+png_path = "res://levels/7/level.png"
 target_gridmap_path = NodePath("PNGGridMap")
 mesh_library_path = "res://Assets/environment/graveyard.res"
-flip_y_to_world_negative_z = false
-export_size = Vector2i(120, 180)
-color_mappings = Array[Resource]([SubResource("Resource_2sf17"), SubResource("Resource_eq3mc"), SubResource("Resource_2s3yr"), SubResource("Resource_7hgml"), SubResource("Resource_kvfjf"), SubResource("Resource_8r5vs")])
+color_mappings = Array[Resource]([SubResource("Resource_2sf17"), SubResource("Resource_eq3mc"), SubResource("Resource_2s3yr"), SubResource("Resource_7hgml"), SubResource("Resource_kvfjf"), SubResource("Resource_8r5vs"), SubResource("Resource_og7v6"), SubResource("Resource_bx4n4"), SubResource("Resource_s5ukk"), SubResource("Resource_rmf38"), SubResource("Resource_ug0ke"), SubResource("Resource_8lvk6"), SubResource("Resource_hoefr"), SubResource("Resource_84add"), SubResource("Resource_f305w"), SubResource("Resource_4ec7g"), SubResource("Resource_bqhbv"), SubResource("Resource_fxhhw"), SubResource("Resource_dak61"), SubResource("Resource_r4clu"), SubResource("Resource_73bbm"), SubResource("Resource_f2dpr")])
+floor_material_path = "res://Assets/environment/floors/flagstones_floor.material"

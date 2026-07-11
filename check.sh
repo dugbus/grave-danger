@@ -11,5 +11,5 @@ fi
 
 printf '%s\n' "$lint_output" >> scene_scan.log
 
-script_count="$(rg --files -g '*.gd' | wc -l | tr -d ' ')"
+script_count="$(rg --files -g '*.gd' -g '!addons/**' -g '!tests/**' | wc -l | tr -d ' ')"
 printf 'Linted %s/%s .gd scripts.\n' "$script_count" "$script_count"

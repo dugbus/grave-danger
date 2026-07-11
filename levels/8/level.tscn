@@ -115,7 +115,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.364414, 12, -23.739996)
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 0.18119812, 0, -0.41855812)
 curve = SubResource("Curve3D_gm14s")
 boundary_animation = SubResource("Animation_r85gb")
-playback_duration = 475.27316
 
 [node name="BoundaryCenter" parent="KillBoundary3D" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.321892, 0, -22.004309)

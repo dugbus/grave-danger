@@ -2,6 +2,9 @@
 class_name PNGToGridMapImageGrid
 extends RefCounted
 
+## Provides the shared image-grid vocabulary used by PNG import, export, repair, and floor creation.
+## It centralises colour scanning, coordinate conversion, and rectangular GridMap updates.
+
 
 ## Converts a Godot colour to the uppercase key used by mapping profiles.
 static func colour_key(colour: Color) -> String:

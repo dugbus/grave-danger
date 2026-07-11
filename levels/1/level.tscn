@@ -1,10 +1,9 @@
 [gd_scene format=3 uid="uid://bpewmtap4wln7"]
 
-[ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/kenney-graveyard/coffin.glb" id="1_coffin"]
+[ext_resource type="PackedScene" path="res://levels/common/coin_deposit_coffin.tscn" id="1_coffin"]
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://cw45377f21i2v" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
 [ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="4_flame"]
-[ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
 [ext_resource type="PackedScene" path="res://enemies/bat_nest.tscn" id="7_qp421"]
 [ext_resource type="PackedScene" uid="uid://mbxax50al4bn" path="res://collectibles/health_flask.tscn" id="7_rihgm"]
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="8_h616y"]
@@ -128,26 +127,26 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath(".:boundary_scale_x")
+tracks/2/path = NodePath(".:boundary_size_x")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 10, 20, 30),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
-"values": [1.0, 1.75, 0.625, 1.0]
+"values": [8.0, 14.0, 5.0, 8.0]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath(".:boundary_scale_z")
+tracks/3/path = NodePath(".:boundary_size_y")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 10, 20, 30),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
-"values": [1.0, 1.5, 0.875, 1.0]
+"values": [8.0, 12.0, 7.0, 8.0]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -304,7 +303,6 @@ data = {
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 21.266586, 0, 23.496054)
 curve = SubResource("Curve3D_tpknb")
 boundary_animation = SubResource("Animation_crkwu")
-playback_duration = 475.27316
 loop_boundary_path = false
 render_effect = 1
 
@@ -400,58 +398,23 @@ shape = SubResource("BoxShape3D_8e3ph")
 [node name="Coffin" parent="Objects/Coffins" unique_id=1894824003 instance=ExtResource("1_coffin")]
 transform = Transform3D(-0.01671946, 0, 0.9998602, 0, 1, 0, -0.9998602, 0, -0.01671946, 9.5704155, -5.9604645e-08, 9.54693)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/Coffin" unique_id=894045105]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-metadata/_edit_lock_ = true
-
 [node name="Coffin2" parent="Objects/Coffins" unique_id=973520463 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.21026787, -0.11277296, 0.971118, -0.00047193095, 0.9933129, 0.115452595, -0.9776439, -0.024734259, 0.2088086, 16.205696, -5.9604645e-08, 2.6708536)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/Coffin2" unique_id=35989831]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-metadata/_edit_lock_ = true
 
 [node name="Coffin3" parent="Objects/Coffins" unique_id=2088691337 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.95942724, 0, -0.28195664, 0, 1, 0, 0.28195664, 0, 0.95942724, 12.483252, -5.9604645e-08, 17.332811)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/Coffin3" unique_id=1106885509]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-metadata/_edit_lock_ = true
-
 [node name="Coffin7" parent="Objects/Coffins" unique_id=1778293660 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.40158492, 0, -0.9158219, 0, 1, 0, 0.9158219, 0, 0.40158492, 18.479034, -5.9604645e-08, 18.745432)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/Coffin7" unique_id=1077798308]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-metadata/_edit_lock_ = true
 
 [node name="Coffin4" parent="Objects/Coffins" unique_id=1254563237 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.77057254, 0, -0.6373526, 0, 1, 0, 0.6373526, 0, 0.77057254, 6.5659833, -5.9604645e-08, 15.5374775)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/Coffin4" unique_id=339453596]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-metadata/_edit_lock_ = true
-
 [node name="Coffin5" parent="Objects/Coffins" unique_id=1205180236 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.99976933, 0, 0.021483392, 0, 1, 0, -0.021483392, 0, 0.99976933, 7.481971, -5.9604645e-08, 1.4312944)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/Coffin5" unique_id=1411561944]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-metadata/_edit_lock_ = true
-
 [node name="Coffin6" parent="Objects/Coffins" unique_id=901136980 instance=ExtResource("1_coffin")]
 transform = Transform3D(1.7493963e-05, 0, 1.0000001, 0, 1, 0, -1.0000001, 0, 1.7493963e-05, 1.4835541, -5.9604645e-08, 8.073386)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/Coffin6" unique_id=894547192]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-metadata/_edit_lock_ = true
 
 [node name="Coins" type="Node3D" parent="Objects" unique_id=1047111414]
 transform = Transform3D(0.80160874, 0, -0.597849, 0, 1, 0, 0.597849, 0, 0.80160874, 0.078243256, 0, 0.33029175)

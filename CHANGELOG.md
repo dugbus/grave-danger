@@ -1,0 +1,28 @@
+- PNG-to-GridMap wall-piece and floor-material locations are now editable shared settings, with their existing locations retained as defaults.
+- The redundant new-configuration action has been removed now that PNG-to-GridMap tile choices are shared automatically.
+- Tooltips now explain the PNG-to-GridMap controls.
+- PNG-to-GridMap can now automatically repair connected wall pieces shortly after painting stops, without repairing every tile during a brush stroke.
+- The redundant GridMap output text has been disabled.
+- PNG-to-GridMap now separates shared MeshLibrary colour and tile mappings from level-specific PNG, GridMap, export, floor, and auto-repair settings stored beside each level scene.
+- Level editors can now create or rebuild a collision-backed floor from every non-transparent PNG pixel, using one batched GridMap tile and a selectable authored floor material in the floors folder.
+- PNG-to-GridMap floor materials are now selected from a configurable project folder, replacing converter-owned texture and tiling controls so authored materials remain the source of their appearance.
+- Imported wall and generated floor cells now use a fixed, grounded coordinate convention. No more cell->centre y changes. Disabled unused parameters.
+- Connected tile mappings can now share an explicit connectivity group, allowing different colours or mesh sets to repair as one continuous wall type.
+- Autotile mappings can now list decorative alternative pieces with their connection shape and rotation; repair preserves matching alternatives, corrects their orientation, and replaces them only when their neighbours require another shape. Only currently placeable in the gridmap editor in godot.
+- GridMap repair is now an undoable editor action with coverage summaries and warnings for configured, skipped, and changed cells.
+- PNG-to-GridMap profiles now retain selected GridMaps, floor materials, paths, export bounds, and auto-repair choices independently for each level while continuing to share the MeshLibrary catalogue.
+- The PNG-to-GridMap dock has been reorganised around clearer wall configuration, level settings, floor-material selection, validation, and import/export actions.
+- Selecting a supported Path3D and clicking one of its path points now seeks the matching animation marker and centres that arrival time in the Animation timeline.
+- Kill-boundary path points now maintain named arrival markers derived from movement speed, making path timing visible and directly previewable in the editor.
+- Editing a kill-boundary movement-speed key can now ripple-retime keys and markers on both sides of the edit so authored events remain attached to the same travelled positions.
+
+- Kill-boundary animation duration now follows the distance and keyed movement speed needed to reach the end of the path instead of a separate per-level playback-duration setting.
+- Kill-boundary size animation now uses explicit world-space width and depth tracks, preserving existing level dimensions without relying on scaled centre nodes.
+- Kill boundaries now expose editor-friendly controls for world size, path looping, shape morphing, segment count, flame or ghost presentation, player blockers, damage, and proximity audio.
+- Kill-boundary collision, visuals, blockers, damage, audio, animation, removal, and editor-preview responsibilities have been split into focused scripts.
+- Levels 1, 2, and 3 have been migrated to the new world-size kill-boundary animation tracks, and levels 6 and 8 now derive boundary duration automatically.
+- Level 7 draft.
+- Gold and silver keys now include dedicated player pickup areas, making collection more reliable without changing their physical rigid-body collisions.
+- Holding the drop action now accelerates from deliberate individual drops to rapid unloading, while dropped items spread across a small deterministic angle instead of piling into one line.
+- Coin-deposit behavior is now packaged with its coffin as a reusable scene, reducing per-level setup and keeping every placed deposit consistently configured.
+- Scene validation now covers relevant addon scenes while excluding only intentionally unsupported addon/test paths, and lint reporting now counts the same production scripts that are actually linted.

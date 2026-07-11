@@ -3,7 +3,9 @@ extends SceneTree
 const ADD_TO_TREE := false
 const EXCLUDE_DIRS := [
 	"res://.godot",
-	"res://addons"
+	"res://addons/copy_all_errors",
+    "res://addons/simplegrasstextured",
+    "res://tests/run_tests.gd"
 ]
 
 var checked := 0

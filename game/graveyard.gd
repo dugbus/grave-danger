@@ -3,7 +3,7 @@ class_name GDGraveyard
 
 const WIN_SCENE := "res://ui/screens/win_screen.tscn"
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
-const KILL_BOUNDARY_SCRIPT := preload("res://levels/common/kill_boundary.gd")
+const KILL_BOUNDARY_SCRIPT := preload("res://levels/common/kill_boundary/kill_boundary.gd")
 const LEVEL_SETTINGS_SCRIPT := preload("res://levels/common/level_settings.gd")
 const NAVIGATION_BOOTSTRAP := preload("res://game/navigation_bootstrap.gd")
 

@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Shader" path="res://addons/png_to_gridmap/floor/png_floor_grid.gdshader" id="1_floor_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_floor"]
+shader = ExtResource("1_floor_shader")
+shader_parameter/floor_tile_size = Vector2(8, 8)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_floor"]
+material = SubResource("ShaderMaterial_floor")
+size = Vector2(1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(1, 0.5, 1)
+
+[node name="PNGFloorTile" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_floor")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+position = Vector3(0, -0.25, 0)
+shape = SubResource("BoxShape3D_floor")

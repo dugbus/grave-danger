@@ -2,6 +2,9 @@
 class_name PNGToGridMapAutotile
 extends RefCounted
 
+## Defines the connectivity rules that turn neighbouring PNG cells into oriented GridMap pieces.
+## This is the shared source of truth for choosing autotile variants and their rotations.
+
 const NORTH := 1
 const EAST := 2
 const SOUTH := 4

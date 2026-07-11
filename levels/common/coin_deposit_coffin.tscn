@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/kenney-graveyard/coffin.glb" id="1_coffin"]
+[ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="2_deposit"]
+
+[node name="CoinDepositCoffin" instance=ExtResource("1_coffin")]
+
+[node name="CoinDeposit" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+script = ExtResource("2_deposit")
+metadata/_edit_lock_ = true

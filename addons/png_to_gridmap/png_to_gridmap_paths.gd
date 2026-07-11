@@ -2,6 +2,9 @@
 class_name PNGToGridMapPaths
 extends RefCounted
 
+## Normalises project and filesystem paths used by PNG-to-GridMap editor workflows.
+## Keeping path policy here prevents import, export, and profile storage from disagreeing.
+
 
 ## Returns a project-relative resource path when a filesystem path is inside the project.
 static func localize_project_path(path: String) -> String:

@@ -1,27 +1,75 @@
 [gd_scene format=3 uid="uid://dopo37mt1ed2l"]
 
-[ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/kenney-graveyard/coffin.glb" id="1_coffin"]
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
-[ext_resource type="PackedScene" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
+[ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="4_88far"]
 [ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="4_flame"]
-[ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
-[ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://Assets/environment/shaders/level.gdshader" id="8_floor_shader"]
-[ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="9_floor_texture"]
+[ext_resource type="PackedScene" path="res://collectibles/silver_key.tscn" id="5_68qku"]
+[ext_resource type="PackedScene" path="res://levels/common/locked_gate.tscn" id="6_ptbvn"]
+[ext_resource type="Shader" uid="uid://c8vy24lq7es0j" path="res://addons/png_to_gridmap/floor/png_floor_grid.gdshader" id="7_88far"]
+[ext_resource type="Texture2D" uid="uid://cj5phhpf53e7v" path="res://Assets/environment/floor-albedo.png" id="8_68qku"]
+[ext_resource type="PackedScene" uid="uid://cw45377f21i2v" path="res://collectibles/gold_coin_pile.tscn" id="9_68qku"]
+[ext_resource type="PackedScene" path="res://collectibles/key.tscn" id="10_eghc2"]
+[ext_resource type="PackedScene" path="res://levels/common/coin_deposit_coffin.tscn" id="10_ptbvn"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 
-[sub_resource type="Curve3D" id="Curve3D_mf4tc"]
+[sub_resource type="Curve3D" id="Curve3D_eghc2"]
 resource_local_to_scene = true
 _data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -21.321892, 0, -22.004309, 0, 0, 0, 0, 0, 0, -20.485313, 0, -21.962996, 0, 0, 0, 0, 0, 0, -22.778164, 0, -17.45992, 0, 0, 0, 0, 0, 0, -15.900345, 0, -22.754658, 0, 0, 0, 0, 0, 0, -8.613056, 0, -22.754658, 0, 0, 0, 0, 0, 0, -11.756594, 0, -18.496595, 0, 0, 0, 0, 0, 0, -12.213835, 0, -14.181377, 0, 0, 0, 0, 0, 0, -18.243708, 0, -14.124222, 0, 0, 0, 0, 0, 0, -20.186985, 0, -14.781507, 0, 0, 0, 0, 0, 0, -20.301296, 0, -12.038057, 0, 0, 0, 0, 0, 0, -16.271852, 0, -12.638186, 0, 0, 0, 0, 0, 0, -12.442455, 0, -12.209523, 0, 0, 0, 0, 0, 0, -9.89905, 0, -9.5518055, 0, 0, 0, 0, 0, 0, -12.185257, 0, -6.6654687, 0, 0, 0, 0, 0, 0, -15.443104, 0, -9.437495, 0, 0, 0, 0, 0, 0, -20.501339, 0, -9.294608, 0, 0, 0, 0, 0, 0, -20.501339, 0, -0.86421686, 0, 0, 0, 0, 0, 0, -21.244356, 0, -9.123142, 0, 0, 0, 0, 0, 0, -17.843622, 0, -7.179867, 0, 0, 0, 0, 0, 0, -14.271421, 0, -5.7795644, 0, 0, 0, 0, 0, 0, -16.900562, 0, -2.1216316, 0, 0, 0, 0, 0, 0, -14.299999, 0, 0.9647493, 0, 0, 0, 0, 0, 0, -14.52862, 0, 2.850872, 0, 0, 0, 0, 0, 0, -21.044312, 0, 2.9937599, 0, 0, 0, 0, 0, 0, -21.1872, 0, 8.223459, 0, 0, 0, 0, 0, 0, -20.615648, 0, 3.851087, 0, 0, 0, 0, 0, 0, -15.471682, 0, 3.6510441, 0, 0, 0, 0, 0, 0, -14.042801, 0, 8.394928, 0, 0, 0, 0, 0, 0, -20.529917, 0, 12.224326, 0, 0, 0, 0, 0, 0, -22.987589, 0, 16.56812, 0, 0, 0, 0, 0, 0, -18.358019, 0, 21.19769, 0, 0, 0, 0, 0, 0, -21.93022, 0, 21.026222, 0, 0, 0, 0, 0, 0, -14.271421, 0, 19.082949, 0, 0, 0, 0, 0, 0, -10.670645, 0, 21.283424, 0, 0, 0, 0, 0, 0, -9.584694, 0, 12.195748, 0, 0, 0, 0, 0, 0, -5.926764, 0, 17.911264, 0, 0, 0, 0, 0, 0, -2.8118043, 0, 22.312218, 0, 0, 0, 0, 0, 0, 3.0466018, 0, 21.226267, 0, 0, 0, 0, 0, 0, 6.675958, 0, 20.94049, 0, 0, 0, 0, 0, 0, 8.219149, 0, 21.997864, 0, 0, 0, 0, 0, 0, 6.3044524, 0, 22.597992, 0, 0, 0, 0, 0, 0, 11.04833, 0, 22.51226, 0, 0, 0, 0, 0, 0, 14.591955, 0, 19.711655, 0, 0, 0, 0, 0, 0, 17.306826, 0, 22.369371, 0, 0, 0, 0, 0, 0, 21.964975, 0, 22.798037, 0, 0, 0, 0, 0, 0, 20.33605, 0, 18.654285, 0, 0, 0, 0, 0, 0, 16.763853, 0, 13.538894, 0, 0, 0, 0, 0, 0, 21.507734, 0, 12.853032, 0, 0, 0, 0, 0, 0, 21.357784, 0, 6.480995, 0, 0, 0, 0, 0, 0, 21.38636, 0, -14.352075, 0, 0, 0, 0, 0, 0, 20.197063, 0, -20.079802, 0, 0, 0, 0, 0, 0, 16.91064, 0, -17.164886, 0, 0, 0, 0, 0, 0, 13.967152, 0, -21.794456, 0, 0, 0, 0, 0, 0, 9.480465, 0, -20.279846, 0, 0, 0, 0, 0, 0, 5.508179, 0, -23.709156, 0, 0, 0, 0, 0, 0, 1.5930486, 0, -23.023293, 0, 0, 0, 0, 0, 0, 3.2505498, 0, -14.8501, 0, 0, 0, 0, 0, 0, 7.822968, 0, -9.563246, 0, 0, 0, 0, 0, 0, 11.309429, 0, -7.991477, 0, 0, 0, 0, 0, 0, 13.05267, 0, -3.0475504, 0, 0, 0, 0, 0, 0, 13.173797, 0, 1.1922086, 0, 0, 0, 0, 0, 0, 11.316253, 0, 6.5362177, 0, 0, 0, 0, 0, 0, 10.344611, 0, 10.222731, 0, 0, 0, 0, 0, 0, 9.715903, 0, 14.109284, 0, 0, 0, 0, 0, 0, 2.0856848, 0, 13.79493, 0, 0, 0, 0, 0, 0, -4.3728533, 0, 13.137644, 0, 0, 0, 0, 0, 0, -5.515956, 0, 12.594669, 0, 0, 0, 0, 0, 0, -9.831172, 0, 6.3933296, 0, 0, 0, 0, 0, 0, -11.374362, 0, 1.1636297, 0, 0, 0, 0, 0, 0, -5.487378, 0, 2.4210443, 0, 0, 0, 0, 0, 0, -1.9437532, 0, 5.8217783, 0, 0, 0, 0, 0, 0, 3.600299, 0, 5.507425, 0, 0, 0, 0, 0, 0, 7.6583204, 0, 1.3922517, 0, 0, 0, 0, 0, 0, 10.058841, 0, -2.40857, 0, 0, 0, 0, 0, 0, 3.6574545, 0, -7.295339, 0, 0, 0, 0, 0, 0, 2.028533, 0, -1.6655515, 0, 0, 0, 0, 0, 0, -4.7729387, 0, -2.3799922, 0, 0, 0, 0, 0, 0, -6.887681, 0, -1.6083964, 0, 0, 0, 0, 0, 0, -4.6586275, 0, -4.580467, 0, 0, 0, 0, 0, 0, -11.917338, 0, -3.6659844, 0, 0, 0, 0, 0, 0, -2.5724611, 0, -9.581547, 0, 0, 0, 0, 0, 0, -2.6581964, 0, -23.38453, 0, 0, 0, 0, 0, 0, -5.973197, 0, -22.812977, 0, 0, 0, 0, 0, 0, -7.3735, 0, -15.554265, 0, 0, 0, 0, 0, 0, -12.488891, 0, -19.469395, 0, 0, 0, 0, 0, 0, -10.145528, 0, -22.212845, 0, 0, 0, 0, 0, 0, -15.803891, 0, -21.81276, 0, 0, 0, 0, 0, 0, -20.082123, 0, -24.155224),
-"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -22.037884, -9.536743e-07, -20.23211, 0, 0, 0, 0, 0, 0, -21.861654, -3.8146973e-06, -21.58252, 0, 0, 0, 0, 0, 0, -22.116663, 0, -49.48889, 0, 0, 0, 0, 0, 0, -21.211967, 0, -32.919228, 0, 0, 0, 0, 0, 0, -21.08255, 0, -98.01859, 0, 0, 0, 0, 0, 0, -21.356441, 0, -116.8847, 0, 0, 0, 0, 0, 0, -21.31929, 1.7690797e-06, -122.367966, 0, 0, 0, 0, 0, 0, -21.196217, 7.6293945e-06, -140.53203, 0, 0, 0, 0, 0, 0, -21.5183, 4.0159357e-06, -151.7674, 0, 0, 0, 0, 0, 0, -21.876255, 0, -164.2542, 0, 0, 0, 0, 0, 0, -22.090694, -25.882805, -178.96814),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 }
-point_count = 88
+point_count = 11
 
-[sub_resource type="Animation" id="Animation_88far"]
+[sub_resource type="Animation" id="Animation_0b107"]
 resource_local_to_scene = true
 resource_name = "kill_boundary"
-length = 475.27316
+length = 143.04734391784677
 loop_mode = 1
+markers = [{
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 1",
+"time": 0.0
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 2",
+"time": 45.395368159798984
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 3",
+"time": 54.79024103781015
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 4",
+"time": 60.321685321396174
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 5",
+"time": 92.26466047735474
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 6",
+"time": 101.69870787359855
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 7",
+"time": 104.44041145484152
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 8",
+"time": 113.52252165515114
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 9",
+"time": 119.14250073779809
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 10",
+"time": 125.38851034933575
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 11",
+"time": 140.27534377060317
+}]
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -29,10 +77,10 @@ tracks/0/path = NodePath(".:movement_speed")
 tracks/0/interp = 1
 tracks/0/loop_wrap = false
 tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 45.446316, 45.531, 60.333332, 62.737133),
+"transitions": PackedFloat32Array(1, 1, 0.26794326, 1, 1),
 "update": 0,
-"values": [1.0]
+"values": [0.03, 0.03, 3.0, 3.0, 2.0]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -41,10 +89,10 @@ tracks/1/path = NodePath(".:boundary_scale_x")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 10, 20, 30),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
+"times": PackedFloat32Array(),
+"transitions": PackedFloat32Array(),
 "update": 0,
-"values": [1.0, 1.75, 0.625, 1.0]
+"values": []
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -53,10 +101,10 @@ tracks/2/path = NodePath(".:boundary_scale_z")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 10, 20, 30),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
+"times": PackedFloat32Array(-0.3),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [1.0, 1.5, 0.875, 1.0]
+"values": [1.0]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -65,10 +113,10 @@ tracks/3/path = NodePath(".:boundary_rotation_z_radians")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 10, 20, 30),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
+"times": PackedFloat32Array(0, 63.778133),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.0, 0.0, 0.0, 0.0]
+"values": [0.0, 0.0]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -77,335 +125,166 @@ tracks/4/path = NodePath(".:shape_morph")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 5, 10, 15, 20, 30),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 45.55275),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
+"values": [0.0, 1.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".:boundary_size_x")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 45.74312, 52.97397),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [30.0, 15.0, 8.0]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath(".:boundary_size_y")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 45.74201, 52.97397),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [26.0, 15.0, 8.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_68qku"]
+[sub_resource type="Animation" id="Animation_2ij0k"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:movement_speed")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [3.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ki37y"]
 _data = {
-&"kill_boundary": SubResource("Animation_88far")
+&"RESET": SubResource("Animation_2ij0k"),
+&"kill_boundary": SubResource("Animation_0b107")
 }
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_floor"]
-size = Vector2(52, 52)
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_floor"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_eghc2"]
 render_priority = 0
-shader = ExtResource("8_floor_shader")
-shader_parameter/tiled_texture = ExtResource("9_floor_texture")
-shader_parameter/level_width = 48.0
-shader_parameter/level_height = 48.0
-shader_parameter/floor_overscan = Vector2(2, 2)
-shader_parameter/floor_tile_size = Vector2(8, 8)
-shader_parameter/fade_margin = 0.2
+shader = ExtResource("7_88far")
+shader_parameter/tiled_texture = ExtResource("8_68qku")
+shader_parameter/floor_tile_size = Vector2(8.01, 8.01)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
-size = Vector3(52, 0.1, 52)
+[sub_resource type="PlaneMesh" id="PlaneMesh_0b107"]
+material = SubResource("ShaderMaterial_eghc2")
+size = Vector2(1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2ij0k"]
+size = Vector3(1, 0.5, 1)
+
+[sub_resource type="MeshLibrary" id="MeshLibrary_ki37y"]
+item/0/name = "PNG Floor Tile"
+item/0/mesh = SubResource("PlaneMesh_0b107")
+item/0/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/0/mesh_cast_shadow = 1
+item/0/shapes = [SubResource("BoxShape3D_2ij0k"), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)]
+item/0/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/0/navigation_layers = 1
 
 [node name="Level7" type="Node3D" unique_id=1808988836]
 
 [node name="IndoorLighting" parent="." unique_id=370338518 instance=ExtResource("100_indoor")]
 
 [node name="Player" parent="." unique_id=244343110 instance=ExtResource("2_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.364414, 12, -23.739996)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.40533066, 3.0480652, 11.045128)
 
 [node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
-transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 0.18119812, 0, -0.41855812)
-curve = SubResource("Curve3D_mf4tc")
-boundary_animation = SubResource("Animation_88far")
-playback_duration = 475.27316
+transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 21.98343, 0, 36.509598)
+curve = SubResource("Curve3D_eghc2")
+boundary_animation = SubResource("Animation_0b107")
+movement_speed = 3.0
+boundary_size_x = 30.0
+boundary_size_y = 26.0
+bounds_size = Vector2(30, 26)
+render_effect = 1
 
 [node name="BoundaryCenter" parent="KillBoundary3D" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.321892, 0, -22.004309)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.211967, 0, -32.919228)
+progress = 45.863743
 
 [node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_68qku")
+libraries/ = SubResource("AnimationLibrary_ki37y")
 
 [node name="Objects" type="Node3D" parent="." unique_id=680268237]
 
-[node name="coffin3" parent="Objects" unique_id=1894824003 instance=ExtResource("1_coffin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.085945, -5.9604645e-08, -0.098694086)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin3" unique_id=894045105]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-metadata/_edit_lock_ = true
-
-[node name="coffin4" parent="Objects" unique_id=600896566 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.4832977, 0, 0.8754561, 0, 1, 0, -0.8754561, 0, 0.4832977, -9.267612, -5.9604645e-08, -15.682045)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin4" unique_id=91261711]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin5" parent="Objects" unique_id=868622373 instance=ExtResource("1_coffin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7774043, -5.9604645e-08, -9.22204)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin5" unique_id=1240180796]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin6" parent="Objects" unique_id=2051800972 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.40229934, 0, -0.91550815, 0, 1, 0, 0.91550815, 0, 0.40229934, -17.646578, -5.9604645e-08, -1.0837998)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin6" unique_id=54787116]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin25" parent="Objects" unique_id=1601046856 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.99999964, 0, 0.000959903, 0, 1, 0, -0.000959903, 0, 0.99999964, -22.934593, -5.9604645e-08, -3.8827286)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin25" unique_id=995087480]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin7" parent="Objects" unique_id=2027677637 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.44472903, 0, 0.89566517, 0, 1, 0, -0.89566517, 0, 0.44472903, -19.432016, -5.9604645e-08, 10.420669)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin7" unique_id=891446467]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin24" parent="Objects" unique_id=502835946 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.99265003, 0, -0.121020466, 0, 1, 0, 0.121020466, 0, 0.99265003, -12.935608, -5.9604645e-08, 6.733516)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin24" unique_id=341637864]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin23" parent="Objects" unique_id=1329291622 instance=ExtResource("1_coffin")]
-transform = Transform3D(-0.48375595, 0, 0.8752029, 0, 1, 0, -0.8752029, 0, -0.48375595, -17.019213, -5.9604645e-08, 18.244072)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin23" unique_id=1729369881]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin8" parent="Objects" unique_id=1850102587 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.3292292, 0, -0.94425, 0, 1, 0, 0.94425, 0, 0.3292292, -6.9960976, -5.9604645e-08, 21.738663)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin8" unique_id=1095241424]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin9" parent="Objects" unique_id=1291365494 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.3292292, 0, -0.94425, 0, 1, 0, 0.94425, 0, 0.3292292, 5.3881836, -5.9604645e-08, 21.738663)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin9" unique_id=1994220810]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin10" parent="Objects" unique_id=2126768573 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.36365777, 0, 0.93153256, 0, 1, 0, -0.93153256, 0, 0.36365777, 16.074047, -5.9604645e-08, 18.978733)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin10" unique_id=71785300]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin11" parent="Objects" unique_id=37510148 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.36365777, 0, 0.93153256, 0, 1, 0, -0.93153256, 0, 0.36365777, 22.08926, -5.9604645e-08, 23.083237)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin11" unique_id=1264859161]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin12" parent="Objects" unique_id=557072321 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.99981236, 0, 0.019371808, 0, 1, 0, -0.019371808, 0, 0.99981236, 19.930859, -5.9604645e-08, 9.283611)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin12" unique_id=667941352]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin13" parent="Objects" unique_id=782746036 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.99981236, 0, 0.019371808, 0, 1, 0, -0.019371808, 0, 0.99981236, 11.863386, -5.9604645e-08, 8.009802)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin13" unique_id=383798219]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin14" parent="Objects" unique_id=37830806 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.99981236, 0, 0.019371808, 0, 1, 0, -0.019371808, 0, 0.99981236, 18.373985, -5.9604645e-08, -5.294453)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin14" unique_id=1896814200]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin15" parent="Objects" unique_id=1703037237 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.62340194, 0, -0.7819015, 0, 1, 0, 0.7819015, 0, 0.62340194, 22.620018, -5.9604645e-08, -20.757113)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin15" unique_id=1551282622]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin17" parent="Objects" unique_id=1138384471 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.9993207, 0, -0.036853135, 0, 1, 0, 0.036853135, 0, 0.9993207, 9.669605, -5.9604645e-08, -23.092434)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin17" unique_id=1058906827]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin18" parent="Objects" unique_id=975916250 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.006736815, 0, -0.99997735, 0, 1, 0, 0.99997735, 0, 0.006736815, -1.1224065, -5.9604645e-08, -13.39731)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin18" unique_id=1864563174]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin19" parent="Objects" unique_id=396706901 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.6309738, 0, -0.77580434, 0, 1, 0, 0.77580434, 0, 0.6309738, -5.7222786, -5.9604645e-08, -22.773983)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin19" unique_id=463839353]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin20" parent="Objects" unique_id=1842326328 instance=ExtResource("1_coffin")]
-transform = Transform3D(-0.054044068, 0, -0.9985386, 0, 1, 0, 0.9985386, 0, -0.054044068, -18.77885, -5.9604645e-08, -21.394018)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin20" unique_id=806444074]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin21" parent="Objects" unique_id=960388081 instance=ExtResource("1_coffin")]
-transform = Transform3D(-0.054044068, 0, -0.9985386, 0, 1, 0, 0.9985386, 0, -0.054044068, -2.7854404, -5.9604645e-08, -5.0467663)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin21" unique_id=976198342]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin22" parent="Objects" unique_id=5946835 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.7184906, 0, -0.69553685, 0, 1, 0, 0.69553685, 0, 0.7184906, -8.942198, -5.9604645e-08, -4.9406157)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin22" unique_id=1052803318]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="coffin16" parent="Objects" unique_id=1825766928 instance=ExtResource("1_coffin")]
-transform = Transform3D(0.4574084, 0, 0.8892567, 0, 1, 0, -0.8892567, 0, 0.4574084, 14.411009, -5.9604645e-08, -13.786531)
-
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin16" unique_id=649242765]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
-script = ExtResource("6_deposit")
-
-[node name="GoldCoinPile" parent="Objects" unique_id=1305244581 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.7637644, 0, -1.4678383)
-coin_count = 10
-
-[node name="GoldCoinPile25" parent="Objects" unique_id=1129076963 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.0434, 0, -20.635777)
-coin_count = 10
-
-[node name="GoldCoinPile26" parent="Objects" unique_id=95235736 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.393196, 0, -9.400294)
-coin_count = 10
-
-[node name="GoldCoinPile2" parent="Objects" unique_id=2006825687 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.1959515, 0, -3.6870575)
-coin_count = 10
-
-[node name="GoldCoinPile22" parent="Objects" unique_id=2015703996 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.434891, 0, 6.1439886)
-coin_count = 10
-
-[node name="GoldCoinPile23" parent="Objects" unique_id=1198355647 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.745777, 0, 7.0542717)
-coin_count = 10
-
-[node name="GoldCoinPile3" parent="Objects" unique_id=1309464412 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62754524, 0, -3.2619524)
-coin_count = 15
-
-[node name="GoldCoinPile4" parent="Objects" unique_id=1462296258 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.186044, 0, -9.227491)
-coin_count = 10
-pile_radius = 2.0
-
-[node name="GoldCoinPile5" parent="Objects" unique_id=122153076 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4956579, 0, -14.465305)
-coin_count = 10
-
-[node name="GoldCoinPile6" parent="Objects" unique_id=1364329950 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.9203224, 0, -16.246128)
-coin_count = 10
-
-[node name="GoldCoinPile7" parent="Objects" unique_id=1440141592 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.611984, 0, -15.628456)
-coin_count = 10
-
-[node name="GoldCoinPile9" parent="Objects" unique_id=691761814 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.981255, 0, -9.143211)
-coin_count = 10
-
-[node name="GoldCoinPile27" parent="Objects" unique_id=599318615 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.600943, 0, -15.680935)
-coin_count = 10
-
-[node name="GoldCoinPile24" parent="Objects" unique_id=1145272006 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.258121, 0, -4.9987545)
-coin_count = 10
-
-[node name="GoldCoinPile10" parent="Objects" unique_id=880519627 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.482168, 0, -3.5724669)
-coin_count = 10
-
-[node name="GoldCoinPile11" parent="Objects" unique_id=2016635951 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.996262, 0, 2.134138)
-coin_count = 10
-
-[node name="GoldCoinPile12" parent="Objects" unique_id=601058255 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.163282, 0, 7.484151)
-coin_count = 10
-
-[node name="GoldCoinPile13" parent="Objects" unique_id=621262923 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.351753, 0, 13.775362)
-coin_count = 10
-
-[node name="GoldCoinPile14" parent="Objects" unique_id=1528887053 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.439384, 0, 21.878218)
-coin_count = 10
-
-[node name="GoldCoinPile15" parent="Objects" unique_id=2045258749 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.827582, 0, 14.058435)
-coin_count = 10
-
-[node name="GoldCoinPile16" parent="Objects" unique_id=89848146 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.762777, 0, 22.868965)
-coin_count = 10
-
-[node name="GoldCoinPile17" parent="Objects" unique_id=1483082274 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.090746, 0, 23.045887)
-coin_count = 10
-
-[node name="GoldCoinPile18" parent="Objects" unique_id=1964026963 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.645982, 0, 21.205936)
-coin_count = 10
-
-[node name="GoldCoinPile19" parent="Objects" unique_id=1948470944 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.806036, 0, 9.140109)
-coin_count = 10
-
-[node name="GoldCoinPile20" parent="Objects" unique_id=716572566 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.71181, 0, 11.864651)
-coin_count = 10
-
-[node name="GoldCoinPile21" parent="Objects" unique_id=1977483895 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.179409, 0, 18.658312)
-coin_count = 10
-
-[node name="GoldCoinPile8" parent="Objects" unique_id=1123125425 instance=ExtResource("3_coinpile")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.07674, 0, -2.508677)
-coin_count = 20
-pile_radius = 2.0
-
-[node name="Tiled Floor" type="Node3D" parent="."]
-
-[node name="StaticBody3D" type="StaticBody3D" parent="Tiled Floor"]
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiled Floor/StaticBody3D"]
-mesh = SubResource("PlaneMesh_floor")
-surface_material_override/0 = SubResource("ShaderMaterial_floor")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiled Floor/StaticBody3D"]
-shape = SubResource("BoxShape3D_floor")
+[node name="SilverKey" parent="." unique_id=553937471 instance=ExtResource("5_68qku")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.707394, 0, 12.363075)
+
+[node name="SilverKey2" parent="." unique_id=2078430839 instance=ExtResource("5_68qku")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.250795, 0, 12.31469)
+
+[node name="GoldCoinPile" parent="." unique_id=492205804 instance=ExtResource("9_68qku")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.2541485, 0, 17.972908)
+coin_count = 50
+pile_radius = 2.6999999999999997
+
+[node name="GoldCoinPile2" parent="." unique_id=642445069 instance=ExtResource("9_68qku")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.8218246, 1.9073486e-06, 18.009254)
+coin_count = 50
+pile_radius = 2.6999999999999997
+
+[node name="PNGGridMap" type="GridMap" parent="." unique_id=1416498824]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0, -90)
+mesh_library = ExtResource("4_88far")
+cell_size = Vector3(1, 1, 1)
+cell_center_y = false
+data = {
+"cells": PackedInt32Array(5, 9, 1441792, 6, 9, 5, 7, 9, 5, 8, 9, 5, 9, 9, 655362, 12, 9, 2, 13, 9, 5, 14, 9, 5, 15, 9, 5, 16, 9, 655360, 4, 10, 1441792, 5, 10, 1048576, 16, 10, 0, 17, 10, 655360, 3, 11, 1441792, 4, 11, 1048576, 17, 11, 0, 18, 11, 655360, 3, 12, 1441797, 18, 12, 1441797, 3, 13, 0, 4, 13, 655360, 17, 13, 1441792, 18, 13, 1048576, 4, 14, 1441797, 17, 14, 1441797, 3, 15, 1441792, 4, 15, 1048576, 17, 15, 0, 18, 15, 655360, 3, 16, 1441797, 18, 16, 1441797, 3, 17, 0, 4, 17, 655360, 17, 17, 1441792, 18, 17, 1048576, 4, 18, 0, 5, 18, 655360, 16, 18, 1441792, 17, 18, 1048576, 5, 19, 0, 6, 19, 5, 7, 19, 5, 8, 19, 5, 9, 19, 655360, 12, 19, 1441792, 13, 19, 5, 14, 19, 5, 15, 19, 5, 16, 19, 1048576, 9, 20, 1441797, 12, 20, 1441797, 9, 21, 1441797, 12, 21, 1441797, 8, 22, 1441792, 9, 22, 1048576, 12, 22, 0, 13, 22, 655360, 8, 23, 1441797, 13, 23, 1441797, 8, 24, 1441797, 13, 24, 1441797, 8, 25, 1441797, 13, 25, 1441797, 8, 26, 1441797, 13, 26, 1441797, 8, 27, 1441797, 13, 27, 1441797, 8, 28, 1441797, 13, 28, 1441797, 8, 29, 1441797, 13, 29, 1441797, 8, 30, 1441797, 13, 30, 1441797, 8, 31, 1441797, 13, 31, 1441797, 8, 32, 1441797, 13, 32, 1441797, 8, 33, 1441797, 13, 33, 1441797, 8, 34, 1441797, 13, 34, 1441797, 8, 35, 1441797, 13, 35, 1441797, 8, 36, 1441797, 13, 36, 1441797, 8, 37, 0, 9, 37, 655360, 12, 37, 1441792, 13, 37, 1048576, 9, 38, 1441797, 12, 38, 1441797, 9, 39, 1441797, 12, 39, 1441797, 9, 40, 1441797, 12, 40, 1441797, 9, 41, 1441797, 12, 41, 1441797, 9, 42, 1441797, 12, 42, 1441797, 9, 43, 1441797, 12, 43, 1441797, 9, 44, 1441797, 12, 44, 1441797, 9, 45, 1441797, 12, 45, 1441797, 9, 46, 1441797, 12, 46, 1441797, 9, 47, 1441797, 12, 47, 1441797, 9, 48, 1441797, 12, 48, 1441797, 9, 49, 1441797, 12, 49, 1441797, 9, 50, 1441797, 12, 50, 1441797, 9, 51, 1441797, 12, 51, 1441797, 9, 52, 1441797, 12, 52, 1441797, 9, 53, 1441797, 12, 53, 1441797, 9, 54, 1441797, 12, 54, 1441797, 9, 55, 1441797, 12, 55, 1441797, 9, 56, 1441797, 12, 56, 1441797, 9, 57, 1441797, 12, 57, 1441797, 9, 58, 1441797, 12, 58, 1441797, 9, 59, 1441797, 12, 59, 1441797, 9, 60, 1441797, 12, 60, 1441797, 9, 61, 1441797, 12, 61, 1441797, 9, 62, 1441797, 12, 62, 1441797, 9, 63, 1441797, 12, 63, 1441797, 9, 64, 1441797, 12, 64, 1441797, 9, 65, 1441797, 12, 65, 1441797, 9, 66, 1441797, 12, 66, 1441797, 9, 67, 1441797, 12, 67, 1441797, 9, 68, 1441797, 12, 68, 1441797, 9, 69, 1441797, 12, 69, 1441797, 9, 70, 1441797, 12, 70, 1441797, 9, 71, 1441797, 12, 71, 1441797, 9, 72, 1441797, 12, 72, 1441797, 9, 73, 1441797, 12, 73, 1441797, 9, 74, 1441797, 12, 74, 1441797, 9, 75, 1441797, 12, 75, 1441797, 9, 76, 1441797, 12, 76, 1441797, 9, 77, 1441797, 12, 77, 1441797, 9, 78, 1441797, 12, 78, 1441797, 9, 79, 1441797, 12, 79, 1441797, 9, 80, 1441797, 12, 80, 1441797, 9, 81, 1441797, 12, 81, 1441797, 9, 82, 1441797, 12, 82, 1441797, 9, 83, 1441797, 12, 83, 1441797, 9, 84, 1441797, 12, 84, 1441797, 9, 85, 1441797, 12, 85, 1441797, 9, 86, 1441797, 12, 86, 1441797, 9, 87, 1441797, 12, 87, 1441797, 9, 88, 1441797, 12, 88, 1441797, 9, 89, 1441797, 12, 89, 1441797, 9, 90, 1441797, 12, 90, 1441797, 9, 91, 1441797, 12, 91, 1441797, 9, 92, 1441797, 12, 92, 1441797, 9, 93, 1441797, 12, 93, 1441797, 9, 94, 1441797, 12, 94, 1441797, 9, 95, 1441797, 12, 95, 1441797, 6, 96, 1441792, 7, 96, 5, 8, 96, 5, 9, 96, 1048576, 12, 96, 0, 13, 96, 5, 14, 96, 5, 15, 96, 655360, 6, 97, 1441797, 15, 97, 1441797, 3, 98, 1441792, 4, 98, 5, 5, 98, 5, 6, 98, 1048576, 15, 98, 0, 16, 98, 5, 17, 98, 5, 18, 98, 655360, 3, 99, 1441797, 18, 99, 1441797, 0, 100, 1441792, 1, 100, 5, 2, 100, 5, 3, 100, 1048576, 18, 100, 0, 19, 100, 5, 20, 100, 5, 21, 100, 655360, 0, 101, 1441797, 21, 101, 1441797, 0, 102, 1441797, 21, 102, 1441797, 0, 103, 1441796, 1, 103, 5, 2, 103, 5, 3, 103, 5, 4, 103, 5, 5, 103, 5, 6, 103, 5, 7, 103, 5, 8, 103, 655360, 13, 103, 1441792, 14, 103, 5, 15, 103, 5, 16, 103, 5, 17, 103, 5, 18, 103, 5, 19, 103, 5, 20, 103, 5, 21, 103, 1048580, 0, 104, 1441797, 8, 104, 1441797, 13, 104, 1441797, 21, 104, 1441797, 0, 105, 1441797, 8, 105, 1441797, 13, 105, 1441797, 21, 105, 1441797, 0, 106, 1441797, 8, 106, 1048578, 13, 106, 1048578, 21, 106, 1441797, 0, 107, 1441797, 21, 107, 1441797, 0, 108, 1441797, 8, 108, 1441794, 13, 108, 1441794, 21, 108, 1441797, 0, 109, 1441797, 8, 109, 1441797, 13, 109, 1441797, 21, 109, 1441797, 0, 110, 1441797, 8, 110, 1441797, 13, 110, 1441797, 21, 110, 1441797, 0, 111, 0, 1, 111, 5, 2, 111, 5, 3, 111, 5, 4, 111, 5, 5, 111, 5, 6, 111, 5, 7, 111, 5, 8, 111, 4, 9, 111, 5, 10, 111, 5, 11, 111, 5, 12, 111, 5, 13, 111, 4, 14, 111, 5, 15, 111, 5, 16, 111, 5, 17, 111, 5, 18, 111, 5, 19, 111, 5, 20, 111, 5, 21, 111, 1048576)
+}
+
+[node name="PNGFloorGridMap" type="GridMap" parent="." unique_id=2013044275]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0, -90)
+mesh_library = SubResource("MeshLibrary_ki37y")
+cell_size = Vector3(1, 1, 1)
+cell_octant_size = 16
+cell_center_y = false
+collision_mask = 0
+data = {
+"cells": PackedInt32Array(6, 0, 0, 7, 0, 0, 8, 0, 0, 9, 0, 0, 10, 0, 0, 11, 0, 0, 12, 0, 0, 13, 0, 0, 14, 0, 0, 15, 0, 0, 5, 1, 0, 6, 1, 0, 7, 1, 0, 8, 1, 0, 9, 1, 0, 10, 1, 0, 11, 1, 0, 12, 1, 0, 13, 1, 0, 14, 1, 0, 15, 1, 0, 16, 1, 0, 5, 2, 0, 6, 2, 0, 7, 2, 0, 8, 2, 0, 9, 2, 0, 10, 2, 0, 11, 2, 0, 12, 2, 0, 13, 2, 0, 14, 2, 0, 15, 2, 0, 16, 2, 0, 5, 3, 0, 6, 3, 0, 7, 3, 0, 8, 3, 0, 9, 3, 0, 10, 3, 0, 11, 3, 0, 12, 3, 0, 13, 3, 0, 14, 3, 0, 15, 3, 0, 16, 3, 0, 5, 4, 0, 6, 4, 0, 7, 4, 0, 8, 4, 0, 9, 4, 0, 10, 4, 0, 11, 4, 0, 12, 4, 0, 13, 4, 0, 14, 4, 0, 15, 4, 0, 16, 4, 0, 5, 5, 0, 6, 5, 0, 7, 5, 0, 8, 5, 0, 9, 5, 0, 10, 5, 0, 11, 5, 0, 12, 5, 0, 13, 5, 0, 14, 5, 0, 15, 5, 0, 16, 5, 0, 5, 6, 0, 6, 6, 0, 7, 6, 0, 8, 6, 0, 9, 6, 0, 10, 6, 0, 11, 6, 0, 12, 6, 0, 13, 6, 0, 14, 6, 0, 15, 6, 0, 16, 6, 0, 5, 7, 0, 6, 7, 0, 7, 7, 0, 8, 7, 0, 9, 7, 0, 10, 7, 0, 11, 7, 0, 12, 7, 0, 13, 7, 0, 14, 7, 0, 15, 7, 0, 16, 7, 0, 5, 8, 0, 6, 8, 0, 7, 8, 0, 8, 8, 0, 9, 8, 0, 10, 8, 0, 11, 8, 0, 12, 8, 0, 13, 8, 0, 14, 8, 0, 15, 8, 0, 16, 8, 0, 5, 9, 0, 6, 9, 0, 7, 9, 0, 8, 9, 0, 9, 9, 0, 10, 9, 0, 11, 9, 0, 12, 9, 0, 13, 9, 0, 14, 9, 0, 15, 9, 0, 16, 9, 0, 4, 10, 0, 5, 10, 0, 6, 10, 0, 7, 10, 0, 8, 10, 0, 9, 10, 0, 10, 10, 0, 11, 10, 0, 12, 10, 0, 13, 10, 0, 14, 10, 0, 15, 10, 0, 16, 10, 0, 17, 10, 0, 3, 11, 0, 4, 11, 0, 5, 11, 0, 6, 11, 0, 7, 11, 0, 8, 11, 0, 9, 11, 0, 10, 11, 0, 11, 11, 0, 12, 11, 0, 13, 11, 0, 14, 11, 0, 15, 11, 0, 16, 11, 0, 17, 11, 0, 18, 11, 0, 3, 12, 0, 4, 12, 0, 5, 12, 0, 6, 12, 0, 7, 12, 0, 8, 12, 0, 9, 12, 0, 10, 12, 0, 11, 12, 0, 12, 12, 0, 13, 12, 0, 14, 12, 0, 15, 12, 0, 16, 12, 0, 17, 12, 0, 18, 12, 0, 3, 13, 0, 4, 13, 0, 5, 13, 0, 6, 13, 0, 7, 13, 0, 8, 13, 0, 9, 13, 0, 10, 13, 0, 11, 13, 0, 12, 13, 0, 13, 13, 0, 14, 13, 0, 15, 13, 0, 16, 13, 0, 17, 13, 0, 18, 13, 0, 4, 14, 0, 5, 14, 0, 6, 14, 0, 7, 14, 0, 8, 14, 0, 9, 14, 0, 10, 14, 0, 11, 14, 0, 12, 14, 0, 13, 14, 0, 14, 14, 0, 15, 14, 0, 16, 14, 0, 17, 14, 0, 3, 15, 0, 4, 15, 0, 5, 15, 0, 6, 15, 0, 7, 15, 0, 8, 15, 0, 9, 15, 0, 10, 15, 0, 11, 15, 0, 12, 15, 0, 13, 15, 0, 14, 15, 0, 15, 15, 0, 16, 15, 0, 17, 15, 0, 18, 15, 0, 3, 16, 0, 4, 16, 0, 5, 16, 0, 6, 16, 0, 7, 16, 0, 8, 16, 0, 9, 16, 0, 10, 16, 0, 11, 16, 0, 12, 16, 0, 13, 16, 0, 14, 16, 0, 15, 16, 0, 16, 16, 0, 17, 16, 0, 18, 16, 0, 3, 17, 0, 4, 17, 0, 5, 17, 0, 6, 17, 0, 7, 17, 0, 8, 17, 0, 9, 17, 0, 10, 17, 0, 11, 17, 0, 12, 17, 0, 13, 17, 0, 14, 17, 0, 15, 17, 0, 16, 17, 0, 17, 17, 0, 18, 17, 0, 4, 18, 0, 5, 18, 0, 6, 18, 0, 7, 18, 0, 8, 18, 0, 9, 18, 0, 10, 18, 0, 11, 18, 0, 12, 18, 0, 13, 18, 0, 14, 18, 0, 15, 18, 0, 16, 18, 0, 17, 18, 0, 5, 19, 0, 6, 19, 0, 7, 19, 0, 8, 19, 0, 9, 19, 0, 10, 19, 0, 11, 19, 0, 12, 19, 0, 13, 19, 0, 14, 19, 0, 15, 19, 0, 16, 19, 0, 9, 20, 0, 10, 20, 0, 11, 20, 0, 12, 20, 0, 9, 21, 0, 10, 21, 0, 11, 21, 0, 12, 21, 0, 8, 22, 0, 9, 22, 0, 10, 22, 0, 11, 22, 0, 12, 22, 0, 13, 22, 0, 8, 23, 0, 9, 23, 0, 10, 23, 0, 11, 23, 0, 12, 23, 0, 13, 23, 0, 8, 24, 0, 9, 24, 0, 10, 24, 0, 11, 24, 0, 12, 24, 0, 13, 24, 0, 8, 25, 0, 9, 25, 0, 10, 25, 0, 11, 25, 0, 12, 25, 0, 13, 25, 0, 8, 26, 0, 9, 26, 0, 10, 26, 0, 11, 26, 0, 12, 26, 0, 13, 26, 0, 8, 27, 0, 9, 27, 0, 10, 27, 0, 11, 27, 0, 12, 27, 0, 13, 27, 0, 8, 28, 0, 9, 28, 0, 10, 28, 0, 11, 28, 0, 12, 28, 0, 13, 28, 0, 8, 29, 0, 9, 29, 0, 10, 29, 0, 11, 29, 0, 12, 29, 0, 13, 29, 0, 8, 30, 0, 9, 30, 0, 10, 30, 0, 11, 30, 0, 12, 30, 0, 13, 30, 0, 8, 31, 0, 9, 31, 0, 10, 31, 0, 11, 31, 0, 12, 31, 0, 13, 31, 0, 8, 32, 0, 9, 32, 0, 10, 32, 0, 11, 32, 0, 12, 32, 0, 13, 32, 0, 8, 33, 0, 9, 33, 0, 10, 33, 0, 11, 33, 0, 12, 33, 0, 13, 33, 0, 8, 34, 0, 9, 34, 0, 10, 34, 0, 11, 34, 0, 12, 34, 0, 13, 34, 0, 8, 35, 0, 9, 35, 0, 10, 35, 0, 11, 35, 0, 12, 35, 0, 13, 35, 0, 8, 36, 0, 9, 36, 0, 10, 36, 0, 11, 36, 0, 12, 36, 0, 13, 36, 0, 8, 37, 0, 9, 37, 0, 10, 37, 0, 11, 37, 0, 12, 37, 0, 13, 37, 0, 9, 38, 0, 10, 38, 0, 11, 38, 0, 12, 38, 0, 9, 39, 0, 10, 39, 0, 11, 39, 0, 12, 39, 0, 9, 40, 0, 10, 40, 0, 11, 40, 0, 12, 40, 0, 9, 41, 0, 10, 41, 0, 11, 41, 0, 12, 41, 0, 9, 42, 0, 10, 42, 0, 11, 42, 0, 12, 42, 0, 9, 43, 0, 10, 43, 0, 11, 43, 0, 12, 43, 0, 9, 44, 0, 10, 44, 0, 11, 44, 0, 12, 44, 0, 9, 45, 0, 10, 45, 0, 11, 45, 0, 12, 45, 0, 9, 46, 0, 10, 46, 0, 11, 46, 0, 12, 46, 0, 9, 47, 0, 10, 47, 0, 11, 47, 0, 12, 47, 0, 9, 48, 0, 10, 48, 0, 11, 48, 0, 12, 48, 0, 9, 49, 0, 10, 49, 0, 11, 49, 0, 12, 49, 0, 9, 50, 0, 10, 50, 0, 11, 50, 0, 12, 50, 0, 9, 51, 0, 10, 51, 0, 11, 51, 0, 12, 51, 0, 9, 52, 0, 10, 52, 0, 11, 52, 0, 12, 52, 0, 9, 53, 0, 10, 53, 0, 11, 53, 0, 12, 53, 0, 9, 54, 0, 10, 54, 0, 11, 54, 0, 12, 54, 0, 9, 55, 0, 10, 55, 0, 11, 55, 0, 12, 55, 0, 9, 56, 0, 10, 56, 0, 11, 56, 0, 12, 56, 0, 9, 57, 0, 10, 57, 0, 11, 57, 0, 12, 57, 0, 9, 58, 0, 10, 58, 0, 11, 58, 0, 12, 58, 0, 9, 59, 0, 10, 59, 0, 11, 59, 0, 12, 59, 0, 9, 60, 0, 10, 60, 0, 11, 60, 0, 12, 60, 0, 9, 61, 0, 10, 61, 0, 11, 61, 0, 12, 61, 0, 9, 62, 0, 10, 62, 0, 11, 62, 0, 12, 62, 0, 9, 63, 0, 10, 63, 0, 11, 63, 0, 12, 63, 0, 9, 64, 0, 10, 64, 0, 11, 64, 0, 12, 64, 0, 9, 65, 0, 10, 65, 0, 11, 65, 0, 12, 65, 0, 9, 66, 0, 10, 66, 0, 11, 66, 0, 12, 66, 0, 9, 67, 0, 10, 67, 0, 11, 67, 0, 12, 67, 0, 9, 68, 0, 10, 68, 0, 11, 68, 0, 12, 68, 0, 9, 69, 0, 10, 69, 0, 11, 69, 0, 12, 69, 0, 9, 70, 0, 10, 70, 0, 11, 70, 0, 12, 70, 0, 9, 71, 0, 10, 71, 0, 11, 71, 0, 12, 71, 0, 9, 72, 0, 10, 72, 0, 11, 72, 0, 12, 72, 0, 9, 73, 0, 10, 73, 0, 11, 73, 0, 12, 73, 0, 9, 74, 0, 10, 74, 0, 11, 74, 0, 12, 74, 0, 9, 75, 0, 10, 75, 0, 11, 75, 0, 12, 75, 0, 9, 76, 0, 10, 76, 0, 11, 76, 0, 12, 76, 0, 9, 77, 0, 10, 77, 0, 11, 77, 0, 12, 77, 0, 9, 78, 0, 10, 78, 0, 11, 78, 0, 12, 78, 0, 9, 79, 0, 10, 79, 0, 11, 79, 0, 12, 79, 0, 9, 80, 0, 10, 80, 0, 11, 80, 0, 12, 80, 0, 9, 81, 0, 10, 81, 0, 11, 81, 0, 12, 81, 0, 9, 82, 0, 10, 82, 0, 11, 82, 0, 12, 82, 0, 9, 83, 0, 10, 83, 0, 11, 83, 0, 12, 83, 0, 9, 84, 0, 10, 84, 0, 11, 84, 0, 12, 84, 0, 9, 85, 0, 10, 85, 0, 11, 85, 0, 12, 85, 0, 9, 86, 0, 10, 86, 0, 11, 86, 0, 12, 86, 0, 9, 87, 0, 10, 87, 0, 11, 87, 0, 12, 87, 0, 9, 88, 0, 10, 88, 0, 11, 88, 0, 12, 88, 0, 9, 89, 0, 10, 89, 0, 11, 89, 0, 12, 89, 0, 9, 90, 0, 10, 90, 0, 11, 90, 0, 12, 90, 0, 9, 91, 0, 10, 91, 0, 11, 91, 0, 12, 91, 0, 9, 92, 0, 10, 92, 0, 11, 92, 0, 12, 92, 0, 9, 93, 0, 10, 93, 0, 11, 93, 0, 12, 93, 0, 9, 94, 0, 10, 94, 0, 11, 94, 0, 12, 94, 0, 9, 95, 0, 10, 95, 0, 11, 95, 0, 12, 95, 0, 6, 96, 0, 7, 96, 0, 8, 96, 0, 9, 96, 0, 10, 96, 0, 11, 96, 0, 12, 96, 0, 13, 96, 0, 14, 96, 0, 15, 96, 0, 6, 97, 0, 7, 97, 0, 8, 97, 0, 9, 97, 0, 10, 97, 0, 11, 97, 0, 12, 97, 0, 13, 97, 0, 14, 97, 0, 15, 97, 0, 3, 98, 0, 4, 98, 0, 5, 98, 0, 6, 98, 0, 7, 98, 0, 8, 98, 0, 9, 98, 0, 10, 98, 0, 11, 98, 0, 12, 98, 0, 13, 98, 0, 14, 98, 0, 15, 98, 0, 16, 98, 0, 17, 98, 0, 18, 98, 0, 3, 99, 0, 4, 99, 0, 5, 99, 0, 6, 99, 0, 7, 99, 0, 8, 99, 0, 9, 99, 0, 10, 99, 0, 11, 99, 0, 12, 99, 0, 13, 99, 0, 14, 99, 0, 15, 99, 0, 16, 99, 0, 17, 99, 0, 18, 99, 0, 0, 100, 0, 1, 100, 0, 2, 100, 0, 3, 100, 0, 4, 100, 0, 5, 100, 0, 6, 100, 0, 7, 100, 0, 8, 100, 0, 9, 100, 0, 10, 100, 0, 11, 100, 0, 12, 100, 0, 13, 100, 0, 14, 100, 0, 15, 100, 0, 16, 100, 0, 17, 100, 0, 18, 100, 0, 19, 100, 0, 20, 100, 0, 21, 100, 0, 0, 101, 0, 1, 101, 0, 2, 101, 0, 3, 101, 0, 4, 101, 0, 5, 101, 0, 6, 101, 0, 7, 101, 0, 8, 101, 0, 9, 101, 0, 10, 101, 0, 11, 101, 0, 12, 101, 0, 13, 101, 0, 14, 101, 0, 15, 101, 0, 16, 101, 0, 17, 101, 0, 18, 101, 0, 19, 101, 0, 20, 101, 0, 21, 101, 0, 0, 102, 0, 1, 102, 0, 2, 102, 0, 3, 102, 0, 4, 102, 0, 5, 102, 0, 6, 102, 0, 7, 102, 0, 8, 102, 0, 9, 102, 0, 10, 102, 0, 11, 102, 0, 12, 102, 0, 13, 102, 0, 14, 102, 0, 15, 102, 0, 16, 102, 0, 17, 102, 0, 18, 102, 0, 19, 102, 0, 20, 102, 0, 21, 102, 0, 0, 103, 0, 1, 103, 0, 2, 103, 0, 3, 103, 0, 4, 103, 0, 5, 103, 0, 6, 103, 0, 7, 103, 0, 8, 103, 0, 9, 103, 0, 10, 103, 0, 11, 103, 0, 12, 103, 0, 13, 103, 0, 14, 103, 0, 15, 103, 0, 16, 103, 0, 17, 103, 0, 18, 103, 0, 19, 103, 0, 20, 103, 0, 21, 103, 0, 0, 104, 0, 1, 104, 0, 2, 104, 0, 3, 104, 0, 4, 104, 0, 5, 104, 0, 6, 104, 0, 7, 104, 0, 8, 104, 0, 9, 104, 0, 10, 104, 0, 11, 104, 0, 12, 104, 0, 13, 104, 0, 14, 104, 0, 15, 104, 0, 16, 104, 0, 17, 104, 0, 18, 104, 0, 19, 104, 0, 20, 104, 0, 21, 104, 0, 0, 105, 0, 1, 105, 0, 2, 105, 0, 3, 105, 0, 4, 105, 0, 5, 105, 0, 6, 105, 0, 7, 105, 0, 8, 105, 0, 9, 105, 0, 10, 105, 0, 11, 105, 0, 12, 105, 0, 13, 105, 0, 14, 105, 0, 15, 105, 0, 16, 105, 0, 17, 105, 0, 18, 105, 0, 19, 105, 0, 20, 105, 0, 21, 105, 0, 0, 106, 0, 1, 106, 0, 2, 106, 0, 3, 106, 0, 4, 106, 0, 5, 106, 0, 6, 106, 0, 7, 106, 0, 8, 106, 0, 9, 106, 0, 10, 106, 0, 11, 106, 0, 12, 106, 0, 13, 106, 0, 14, 106, 0, 15, 106, 0, 16, 106, 0, 17, 106, 0, 18, 106, 0, 19, 106, 0, 20, 106, 0, 21, 106, 0, 0, 107, 0, 1, 107, 0, 2, 107, 0, 3, 107, 0, 4, 107, 0, 5, 107, 0, 6, 107, 0, 7, 107, 0, 8, 107, 0, 9, 107, 0, 10, 107, 0, 11, 107, 0, 12, 107, 0, 13, 107, 0, 14, 107, 0, 15, 107, 0, 16, 107, 0, 17, 107, 0, 18, 107, 0, 19, 107, 0, 20, 107, 0, 21, 107, 0, 0, 108, 0, 1, 108, 0, 2, 108, 0, 3, 108, 0, 4, 108, 0, 5, 108, 0, 6, 108, 0, 7, 108, 0, 8, 108, 0, 9, 108, 0, 10, 108, 0, 11, 108, 0, 12, 108, 0, 13, 108, 0, 14, 108, 0, 15, 108, 0, 16, 108, 0, 17, 108, 0, 18, 108, 0, 19, 108, 0, 20, 108, 0, 21, 108, 0, 0, 109, 0, 1, 109, 0, 2, 109, 0, 3, 109, 0, 4, 109, 0, 5, 109, 0, 6, 109, 0, 7, 109, 0, 8, 109, 0, 9, 109, 0, 10, 109, 0, 11, 109, 0, 12, 109, 0, 13, 109, 0, 14, 109, 0, 15, 109, 0, 16, 109, 0, 17, 109, 0, 18, 109, 0, 19, 109, 0, 20, 109, 0, 21, 109, 0, 0, 110, 0, 1, 110, 0, 2, 110, 0, 3, 110, 0, 4, 110, 0, 5, 110, 0, 6, 110, 0, 7, 110, 0, 8, 110, 0, 9, 110, 0, 10, 110, 0, 11, 110, 0, 12, 110, 0, 13, 110, 0, 14, 110, 0, 15, 110, 0, 16, 110, 0, 17, 110, 0, 18, 110, 0, 19, 110, 0, 20, 110, 0, 21, 110, 0, 0, 111, 0, 1, 111, 0, 2, 111, 0, 3, 111, 0, 4, 111, 0, 5, 111, 0, 6, 111, 0, 7, 111, 0, 8, 111, 0, 9, 111, 0, 10, 111, 0, 11, 111, 0, 12, 111, 0, 13, 111, 0, 14, 111, 0, 15, 111, 0, 16, 111, 0, 17, 111, 0, 18, 111, 0, 19, 111, 0, 20, 111, 0, 21, 111, 0)
+}
+
+[node name="CoinDepositCoffin" parent="." unique_id=71181615 instance=ExtResource("10_ptbvn")]
+transform = Transform3D(0.026943058, 0.5227826, -0.8520403, -0.016523074, 0.85246605, 0.5225214, 0.9995005, 0, 0.03160602, -1.5614567, 0.10706043, -66.32987)
+
+[node name="CoinDepositCoffin2" parent="." unique_id=1334864560 instance=ExtResource("10_ptbvn")]
+transform = Transform3D(0.98339283, 0, 0.18148975, 0, 1, 0, -0.18148975, 0, 0.98339283, 1.9590105, 1.9073486e-06, -64.315506)
+
+[node name="CoinDepositCoffin3" parent="." unique_id=2081041282 instance=ExtResource("10_ptbvn")]
+transform = Transform3D(-0.98650694, 0, -0.1637195, 0, 1, 0, 0.1637195, 0, -0.98650694, -1.156765, 0, -62.672356)
+
+[node name="CoinDepositCoffin4" parent="." unique_id=1259918607 instance=ExtResource("10_ptbvn")]
+transform = Transform3D(0.498266, 0, 0.8670242, 0, 1, 0, -0.8670242, 0, 0.498266, 1.9188759, 0, -60.812214)
+
+[node name="CoinDepositCoffin5" parent="." unique_id=200464224 instance=ExtResource("10_ptbvn")]
+transform = Transform3D(0.8850463, 0, 0.46550295, 0, 1, 0, -0.46550295, 0, 0.8850463, -1.1849055, 0, -58.774673)
+
+[node name="CoinDepositCoffin6" parent="." unique_id=1948422608 instance=ExtResource("10_ptbvn")]
+transform = Transform3D(0.055861544, 0, -0.99843854, 0, 1, 0, 0.99843854, 0, 0.055861544, 1.9199893, 0, -56.859665)
+
+[node name="CoinDepositCoffin7" parent="." unique_id=492960057 instance=ExtResource("10_ptbvn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1602798, 0, -54.03338)
+
+[node name="Key" parent="." unique_id=752838139 instance=ExtResource("10_eghc2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.19939661, 0.024999965, -68.917114)
+
+[node name="LockedGate" parent="." unique_id=1470202402 instance=ExtResource("6_ptbvn")]
+transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 0.47655368, -9.536743e-07, -80.28888)
 
 [editable path="KillBoundary3D"]

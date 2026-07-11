@@ -48,26 +48,26 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:boundary_scale_x")
+tracks/1/path = NodePath(".:boundary_size_x")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 10.099455, 20.19891, 30.298367),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
-"values": [1.0, 1.75, 0.625, 1.0]
+"values": [8.0, 14.0, 5.0, 8.0]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath(".:boundary_scale_z")
+tracks/2/path = NodePath(".:boundary_size_y")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 10.099455, 20.19891, 30.298367),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
-"values": [1.0, 1.5, 0.875, 1.0]
+"values": [8.0, 12.0, 7.0, 8.0]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -169,7 +169,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.084152, 12, -11.637171)
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 7.4758077, 0, 7.7353163)
 curve = SubResource("Curve3D_mx8o4")
 boundary_animation = SubResource("Animation_yyw7i")
-playback_duration = 480.0
 movement_speed = 2.0
 shape_morph = 1.0
 

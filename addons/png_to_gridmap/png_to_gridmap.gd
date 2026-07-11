@@ -1,22 +1,31 @@
 @tool
 extends EditorPlugin
 
+## Coordinates the PNG-to-GridMap editor workflow and its focused import, export, repair, and floor services.
+## The plugin connects the dock to scene-safe operations, profile persistence, and undo history.
+
 const SettingsResource := preload("res://addons/png_to_gridmap/png_to_gridmap_settings.gd")
 const ColorMappingResource := preload("res://addons/png_to_gridmap/png_to_gridmap_color_mapping.gd")
 const DockResource := preload("res://addons/png_to_gridmap/png_to_gridmap_dock.gd")
 const ProfileStoreResource := preload("res://addons/png_to_gridmap/png_to_gridmap_profile_store.gd")
 const ImporterResource := preload("res://addons/png_to_gridmap/png_to_gridmap_importer.gd")
 const ExporterResource := preload("res://addons/png_to_gridmap/png_to_gridmap_exporter.gd")
+const RepairerResource := preload("res://addons/png_to_gridmap/png_to_gridmap_repairer.gd")
+const FloorBuilderResource := preload("res://addons/png_to_gridmap/png_to_gridmap_floor_builder.gd")
 const PathsResource := preload("res://addons/png_to_gridmap/png_to_gridmap_paths.gd")
 
 const PLUGIN_CONFIG_PATH := "res://addons/png_to_gridmap/plugin.cfg"
 const EMPTY_KEY := "FFFFFFFF"
+const LEVEL_PNG_FILE := "level.png"
+const AUTO_REPAIR_CHECK_INTERVAL_MSEC := 200
+const AUTO_REPAIR_DEBOUNCE_MSEC := 600
 
 var _settings: Resource = SettingsResource.new()
 var _image: Image
 var _detected_colours := {}
 var _colour_order: Array[String] = []
 var _mesh_library_paths: Array[String] = []
+var _floor_material_paths: Array[String] = []
 var _available_item_refs: Array[String] = []
 var _available_item_display_names := {}
 var _available_item_ref_aliases := {}
@@ -26,6 +35,12 @@ var _dock: PNGToGridMapDock
 var _profile_store: PNGToGridMapProfileStore
 var _importer: PNGToGridMapImporter
 var _exporter: PNGToGridMapExporter
+var _repairer: RefCounted
+var _floor_builder: RefCounted
+var _observed_grid_map_id := 0
+var _observed_grid_map_fingerprint := 0
+var _next_auto_repair_check_msec := 0
+var _auto_repair_due_msec := 0
 
 
 ## Creates the dock and service objects when the editor enables the addon.
@@ -33,6 +48,8 @@ func _enter_tree() -> void:
 	_profile_store = ProfileStoreResource.new(get_editor_interface(), SettingsResource)
 	_importer = ImporterResource.new()
 	_exporter = ExporterResource.new()
+	_repairer = RepairerResource.new()
+	_floor_builder = FloorBuilderResource.new()
 	var ui_state := _profile_store.load_ui_state(PNGToGridMapDock.OPERATION_IMPORT)
 	_operation_id = int(ui_state["operation_id"])
 	_advanced_visible = bool(ui_state["advanced_visible"])
@@ -40,15 +57,48 @@ func _enter_tree() -> void:
 	_dock.setup(_dock_title(), _settings, ui_state)
 	_connect_dock_signals()
 	add_control_to_dock(DOCK_SLOT_RIGHT_UL, _dock)
+	_load_level_settings()
+	_load_conventional_level_png()
 	_refresh_all()
+	set_process(true)
 
 
 ## Removes the dock when the editor disables the addon.
 func _exit_tree() -> void:
+	set_process(false)
 	if _dock != null:
 		remove_control_from_docks(_dock)
 		_dock.queue_free()
 		_dock = null
+
+
+## Watches the selected GridMap at a low frequency and repairs once painting has paused.
+func _process(_delta: float) -> void:
+	if not _settings.auto_repair:
+		_reset_auto_repair_watch()
+		return
+	var now := Time.get_ticks_msec()
+	if now < _next_auto_repair_check_msec:
+		return
+	_next_auto_repair_check_msec = now + AUTO_REPAIR_CHECK_INTERVAL_MSEC
+	var grid_map := _selected_gridmap()
+	if grid_map == null:
+		_reset_auto_repair_watch()
+		return
+	var instance_id := int(grid_map.get_instance_id())
+	var fingerprint := _grid_map_fingerprint(grid_map)
+	if instance_id != _observed_grid_map_id:
+		_observed_grid_map_id = instance_id
+		_observed_grid_map_fingerprint = fingerprint
+		_auto_repair_due_msec = 0
+		return
+	if fingerprint != _observed_grid_map_fingerprint:
+		_observed_grid_map_fingerprint = fingerprint
+		_auto_repair_due_msec = now + AUTO_REPAIR_DEBOUNCE_MSEC
+	if _auto_repair_due_msec != 0 and now >= _auto_repair_due_msec:
+		_auto_repair_due_msec = 0
+		_repair_grid_map(grid_map, true)
+		_observed_grid_map_fingerprint = _grid_map_fingerprint(grid_map)
 
 
 ## Builds a compact title using plugin.cfg metadata.
@@ -65,8 +115,10 @@ func _connect_dock_signals() -> void:
 	_dock.load_png_selected.connect(_on_load_png_selected)
 	_dock.export_png_path_selected.connect(_on_export_png_path_selected)
 	_dock.run_requested.connect(_on_run_requested)
+	_dock.repair_gridmap_requested.connect(_on_repair_gridmap_requested)
+	_dock.create_floor_requested.connect(_on_create_floor_requested)
+	_dock.floor_material_selected.connect(_on_floor_material_selected)
 	_dock.refresh_requested.connect(_refresh_all)
-	_dock.new_settings_requested.connect(_on_new_settings_requested)
 	_dock.operation_changed.connect(_on_operation_changed)
 	_dock.mesh_library_selected.connect(_on_mesh_library_selected)
 	_dock.gridmap_selected.connect(_on_gridmap_selected)
@@ -77,9 +129,14 @@ func _connect_dock_signals() -> void:
 ## Refreshes project-driven dropdowns and reloads any saved PNG state.
 func _refresh_all() -> void:
 	_refresh_mesh_libraries()
+	_refresh_floor_materials()
 	_refresh_gridmap_paths()
 	_refresh_available_items()
-	if _settings.png_path != "" and _image == null:
+	var conventional_png := _conventional_level_png_path()
+	if conventional_png != "" and ResourceLoader.exists(conventional_png) \
+			and _settings.png_path != conventional_png:
+		_load_png(conventional_png, false)
+	elif _settings.png_path != "" and _image == null:
 		_load_png(_settings.png_path, false)
 	else:
 		_dock.set_png_state(_settings.png_path, _detected_colours, _colour_order)
@@ -94,6 +151,33 @@ func _refresh_mesh_libraries() -> void:
 		_load_profile_for_current_mesh_library()
 	_dock.set_settings(_settings)
 	_dock.set_mesh_library_paths(_mesh_library_paths)
+
+
+## Rebuilds the floor material choices from the globally configured folder.
+func _refresh_floor_materials() -> void:
+	_floor_material_paths.clear()
+	_collect_material_paths(_settings.floor_materials_folder, _floor_material_paths)
+	_floor_material_paths.sort()
+	_dock.set_floor_material_paths(_floor_material_paths)
+
+
+## Recursively collects loadable Material resources without relying on file extensions alone.
+func _collect_material_paths(folder: String, paths: Array[String]) -> void:
+	var directory := DirAccess.open(folder)
+	if directory == null:
+		return
+	directory.list_dir_begin()
+	var entry := directory.get_next()
+	while entry != "":
+		var path := folder.path_join(entry)
+		if directory.current_is_dir():
+			if not entry.begins_with("."):
+				_collect_material_paths(path, paths)
+		elif entry.get_extension().to_lower() in ["material", "tres"]:
+			if ResourceLoader.load(path) is Material:
+				paths.append(path)
+		entry = directory.get_next()
+	directory.list_dir_end()
 
 
 ## Rebuilds the GridMap dropdown from the currently edited scene.
@@ -160,21 +244,81 @@ func _on_run_requested(operation_id: int) -> void:
 		_run_import()
 
 
-## Replaces mappings with a fresh profile while keeping current editor inputs.
-func _on_new_settings_requested() -> void:
-	var previous := _settings
-	_settings = SettingsResource.new()
-	_settings.png_path = previous.png_path
-	_settings.export_png_path = previous.export_png_path
-	_settings.target_gridmap_path = previous.target_gridmap_path
-	_settings.mesh_library_path = previous.mesh_library_path
-	_settings.gridmap_name = previous.gridmap_name
-	if _image != null:
-		_scan_colours()
-	_dock.set_settings(_settings)
-	_dock.set_png_state(_settings.png_path, _detected_colours, _colour_order)
+## Stores the floor material selected for the current level.
+func _on_floor_material_selected(path: String) -> void:
+	_settings.floor_material_path = PathsResource.localize_project_path(path)
 	_save_profile()
-	_update_dock_state("Started a fresh automatic mapping profile.")
+	_update_dock_state("Floor material selected: %s" % _settings.floor_material_path)
+
+
+## Creates or rebuilds the generated floor from every non-transparent PNG pixel.
+func _on_create_floor_requested() -> void:
+	var root := get_editor_interface().get_edited_scene_root()
+	var result: Dictionary = _floor_builder.run(_settings, _image, root, _selected_gridmap())
+	var errors := _to_string_array(result.get("errors", []))
+	if not errors.is_empty():
+		_update_dock_state("Create Floor could not run:\n- %s" % "\n- ".join(errors))
+		return
+	var floor_grid_map: GridMap = result["grid_map"]
+	get_editor_interface().edit_node(floor_grid_map)
+	get_editor_interface().mark_scene_as_unsaved()
+	_refresh_gridmap_paths()
+	_save_profile()
+	var action := "Created" if bool(result["created"]) else "Rebuilt"
+	_update_dock_state("%s %s collision-backed floor cells in %s." % [
+		action,
+		int(result["placed"]),
+		floor_grid_map.name,
+	])
+
+
+## Repairs enabled autotile variants using the occupied cells in the selected GridMap.
+func _on_repair_gridmap_requested() -> void:
+	var grid_map := _selected_gridmap()
+	_repair_grid_map(grid_map, false)
+
+
+## Repairs one GridMap, optionally keeping quiet when an automatic pass has nothing to change.
+func _repair_grid_map(grid_map: GridMap, automatic: bool) -> void:
+	var result: Dictionary = _repairer.build_plan(_settings, grid_map, _available_item_ref_aliases)
+	var errors := _to_string_array(result.get("errors", []))
+	if not errors.is_empty():
+		_update_dock_state("Repair GridMap could not run:\n- %s" % "\n- ".join(errors))
+		return
+
+	var changes: Array = result.get("changes", [])
+	var warnings := _to_string_array(result.get("warnings", []))
+	if changes.is_empty():
+		if automatic:
+			return
+		var message := "No autotile changes were needed in %s.\n%s" % [grid_map.name, _repair_result_summary(result)]
+		if not warnings.is_empty():
+			message += "\n" + "\n".join(warnings)
+		_update_dock_state(message)
+		return
+
+	var undo_redo := get_undo_redo()
+	undo_redo.create_action("Auto Repair GridMap" if automatic else "Repair GridMap")
+	for change: Dictionary in changes:
+		undo_redo.add_do_method(grid_map, &"set_cell_item", change["cell"], int(change["item_id"]), int(change["orientation"]))
+		undo_redo.add_undo_method(grid_map, &"set_cell_item", change["cell"], int(change["previous_item_id"]), int(change["previous_orientation"]))
+	undo_redo.commit_action()
+	get_editor_interface().edit_node(grid_map)
+	get_editor_interface().mark_scene_as_unsaved()
+	_save_profile()
+	var message := "Repaired %s autotile cells in %s.\n%s" % [changes.size(), grid_map.name, _repair_result_summary(result)]
+	if not warnings.is_empty():
+		message += "\n" + "\n".join(warnings)
+	_update_dock_state(message)
+
+
+## Formats repair coverage without exposing internal cell coordinates or IDs.
+func _repair_result_summary(result: Dictionary) -> String:
+	return "Checked %s cells: %s matched enabled mappings, %s skipped." % [
+		int(result.get("total_cells", 0)),
+		int(result.get("configured_cells", 0)),
+		int(result.get("skipped_cells", 0)),
+	]
 
 
 ## Persists the operation selector and Advanced visibility as editor UI state.
@@ -201,6 +345,7 @@ func _on_mesh_library_selected(path: String) -> void:
 ## Records the scene GridMap target chosen in the dock.
 func _on_gridmap_selected(path: String) -> void:
 	_settings.target_gridmap_path = NodePath(path)
+	_reset_auto_repair_watch()
 	_save_profile()
 	_update_dock_state()
 
@@ -212,7 +357,33 @@ func _on_settings_changed() -> void:
 		_scan_colours()
 		_dock.set_png_state(_settings.png_path, _detected_colours, _colour_order)
 	_save_profile()
+	_refresh_floor_materials()
+	if not _settings.auto_repair:
+		_reset_auto_repair_watch()
 	_update_dock_state()
+
+
+## Clears pending change detection when the target or setting changes.
+func _reset_auto_repair_watch() -> void:
+	_observed_grid_map_id = 0
+	_observed_grid_map_fingerprint = 0
+	_next_auto_repair_check_msec = 0
+	_auto_repair_due_msec = 0
+
+
+## Summarises GridMap contents so painting changes can be detected without editor input hooks.
+func _grid_map_fingerprint(grid_map: GridMap) -> int:
+	var cells := grid_map.get_used_cells()
+	cells.sort()
+	var fingerprint := cells.size()
+	for cell: Vector3i in cells:
+		fingerprint = hash([
+			fingerprint,
+			cell,
+			grid_map.get_cell_item(cell),
+			grid_map.get_cell_item_orientation(cell),
+		])
+	return fingerprint
 
 
 ## Saves mapping changes and updates validation with current assignments.
@@ -312,7 +483,7 @@ func _run_export(path: String) -> void:
 
 ## Scans the current image and creates missing colour mappings.
 func _scan_colours() -> void:
-	var scan := PNGToGridMapImageGrid.scan_image_colours(_image, _settings.ignore_fully_transparent)
+	var scan := PNGToGridMapImageGrid.scan_image_colours(_image, true)
 	_detected_colours = scan["data"]
 	_colour_order.clear()
 	_colour_order.assign(scan["order"])
@@ -371,7 +542,32 @@ func _export_output_path() -> String:
 func _save_profile() -> void:
 	if _settings.mesh_library_path == "":
 		return
-	_profile_store.save(_settings)
+	var root := get_editor_interface().get_edited_scene_root()
+	var scene_path := root.scene_file_path if root != null else ""
+	_profile_store.save(_settings, scene_path)
+
+
+## Loads conversion state from the settings resource beside the edited level scene.
+func _load_level_settings() -> void:
+	var root := get_editor_interface().get_edited_scene_root()
+	if root == null:
+		return
+	_settings = _profile_store.load_for_scene(_settings, root.scene_file_path)
+
+
+## Loads level.png beside the edited level scene using the add-on's file convention.
+func _load_conventional_level_png() -> void:
+	var path := _conventional_level_png_path()
+	if path != "" and ResourceLoader.exists(path):
+		_load_png(path, false)
+
+
+## Returns the conventional PNG path beside the currently edited level scene.
+func _conventional_level_png_path() -> String:
+	var root := get_editor_interface().get_edited_scene_root()
+	if root == null or root.scene_file_path == "":
+		return ""
+	return root.scene_file_path.get_base_dir().path_join(LEVEL_PNG_FILE)
 
 
 ## Updates shared dock labels and validation status.
@@ -390,7 +586,14 @@ func _validation_text() -> String:
 	var active := _active_mesh_library()
 	errors.append_array(_to_string_array(active.get("errors", [])))
 	if _operation_id == PNGToGridMapDock.OPERATION_IMPORT and _image == null:
-		errors.append("Load a PNG before importing.")
+		var expected_path := _conventional_level_png_path()
+		if expected_path == "":
+			errors.append("Open a saved level scene so its level.png can be loaded automatically.")
+		else:
+			errors.append(
+				"Create the level layout PNG at %s, then press Refresh. Each pixel represents one GridMap cell."
+				% expected_path
+			)
 	if _operation_id == PNGToGridMapDock.OPERATION_EXPORT and _selected_gridmap() == null:
 		errors.append("Select an existing GridMap before exporting.")
 	return "\n".join(errors) if not errors.is_empty() else "Ready."

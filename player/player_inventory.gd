@@ -13,8 +13,12 @@ const PICKUP_FACING_DOT = 0.35
 const DROP_BACK_DISTANCE = 0.75
 const DROP_UPWARD_OFFSET = 0.28
 
-# How quickly held drop input sheds carried items.
-const DROP_REPEAT_INTERVAL = 0.02
+# How quickly held drop input starts and finishes shedding carried items.
+const DROP_REPEAT_START_INTERVAL := 0.06
+const DROP_REPEAT_MIN_INTERVAL := 1.0 / 120.0
+const DROP_REPEAT_ACCELERATION_TIME := 0.75
+# Maximum sideways angle applied to the direction of each dropped item.
+const DROP_DIRECTION_VARIANCE_RADIANS := PI / 15.0
 
 # How much space a dropped coin needs, and how hard nearby coins are nudged.
 const DROP_CLEAR_RADIUS = 0.18
@@ -41,25 +45,35 @@ signal carried_gold_coins_changed(carried_count: int)
 
 var carried_items := {}
 var drop_cooldown := 0.0
+var drop_hold_time := 0.0
 var bonus_inventory_space := 0
 var audio_rng := RandomNumberGenerator.new()
+var drop_position_rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
 	audio_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"player_inventory_audio")
+	drop_position_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"player_inventory_drop_position")
 
 
 func update_drop_input(delta: float) -> void:
 	if not Input.is_action_pressed("drop_carried"):
 		drop_cooldown = 0.0
+		drop_hold_time = 0.0
 		return
 
+	drop_hold_time += delta
 	drop_cooldown -= delta
-	if drop_cooldown > 0.0:
-		return
+	while drop_cooldown <= 0.0:
+		if not drop_next_item():
+			return
+		drop_cooldown += _get_drop_repeat_interval(drop_hold_time)
 
-	drop_next_item()
-	drop_cooldown = DROP_REPEAT_INTERVAL
+
+func _get_drop_repeat_interval(hold_time: float) -> float:
+	var acceleration_ratio := clampf(hold_time / DROP_REPEAT_ACCELERATION_TIME, 0.0, 1.0)
+	var curved_ratio := acceleration_ratio * acceleration_ratio
+	return lerpf(DROP_REPEAT_START_INTERVAL, DROP_REPEAT_MIN_INTERVAL, curved_ratio)
 
 
 func try_collect_item_pickup(pickup: Node3D) -> bool:
@@ -122,7 +136,7 @@ func _spawn_dropped_item(item: Resource) -> bool:
 	spawn_parent.add_child(dropped_item)
 
 	var forward := pivot.global_transform.basis.z.normalized()
-	var back := -forward
+	var back := _get_varied_drop_direction(-forward)
 	var spawn_position := _find_drop_position(item, player.global_position + back * DROP_BACK_DISTANCE, back)
 	var spawn_transform := Transform3D(Basis(), spawn_position + Vector3.UP * DROP_UPWARD_OFFSET)
 	if dropped_item.has_method("throw_from"):
@@ -131,6 +145,14 @@ func _spawn_dropped_item(item: Resource) -> bool:
 		dropped_item.global_transform = spawn_transform
 
 	return true
+
+
+func _get_varied_drop_direction(back: Vector3) -> Vector3:
+	var angle := drop_position_rng.randf_range(
+		-DROP_DIRECTION_VARIANCE_RADIANS,
+		DROP_DIRECTION_VARIANCE_RADIANS
+	)
+	return back.rotated(Vector3.UP, angle).normalized()
 
 
 func take_item(item_type: StringName, count := 1) -> bool:
