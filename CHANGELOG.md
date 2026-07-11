@@ -18,6 +18,7 @@
 
 - Kill-boundary animation duration now follows the distance and keyed movement speed needed to reach the end of the path instead of a separate per-level playback-duration setting.
 - Kill-boundary size animation now uses explicit world-space width and depth tracks, preserving existing level dimensions without relying on scaled centre nodes.
+- Level 6 now converts its original fixed 8-metre Flame Boundary scale into equivalent world-space sizes while retaining the incoming extended layout.
 - Kill boundaries now expose editor-friendly controls for world size, path looping, shape morphing, segment count, flame or ghost presentation, player blockers, damage, and proximity audio.
 - Kill-boundary collision, visuals, blockers, damage, audio, animation, removal, and editor-preview responsibilities have been split into focused scripts.
 - Levels 1, 2, and 3 have been migrated to the new world-size kill-boundary animation tracks, and levels 6 and 8 now derive boundary duration automatically.

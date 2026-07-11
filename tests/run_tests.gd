@@ -729,6 +729,14 @@ func _test_production_kill_boundaries_use_equivalent_size_tracks() -> bool:
             "widths": [17.6],
             "depths": [17.6],
         },
+        {
+            "path": "res://levels/6/level.tscn",
+            "length": 475.27316,
+            "speed": 1.0,
+            "times": [0.0, 10.0, 20.0, 30.0],
+            "widths": [8.0, 14.0, 5.0, 8.0],
+            "depths": [8.0, 12.0, 7.0, 8.0],
+        },
     ]
     var passed := true
     for expectation in level_expectations:
