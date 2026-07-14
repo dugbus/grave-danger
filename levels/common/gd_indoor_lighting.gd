@@ -7,10 +7,10 @@ const AUTHORED_SHADOW_SETTINGS_GROUP: StringName = &"authored_shadow_settings"
 
 ## Fully opaque indoor shadows prevent lit geometry from showing through occluders.
 @export_range(0.0, 1.0, 0.01) var shadow_opacity := 1.0
-## Depth bias used by indoor lights; zero keeps shadows attached to wall edges.
-@export_range(0.0, 1.0, 0.001) var shadow_bias := 0.0
-## Normal bias used by indoor lights; zero prevents a gap at wall and floor joins.
-@export_range(0.0, 10.0, 0.01) var shadow_normal_bias := 0.0
+## Depth bias used by indoor lights to prevent wall faces from shadowing themselves.
+@export_range(0.0, 1.0, 0.001) var shadow_bias := 0.03
+## Normal bias used by indoor lights to prevent acne on faces near wall shadow volumes.
+@export_range(0.0, 10.0, 0.01) var shadow_normal_bias := 0.6
 
 var level_root: Node3D
 
