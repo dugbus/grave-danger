@@ -4,8 +4,6 @@ extends "res://enemies/zombie/zombie_base.gd"
 func _set_active_visible(active: bool) -> void:
     if drop_pivot != null:
         drop_pivot.visible = active
-    if shadow != null:
-        shadow.visible = active
     if zombie_light != null:
         zombie_light.visible = active and zombie_light_enabled
     _set_kill_area_enabled(false)
@@ -27,8 +25,6 @@ func _set_attack_hitbox_enabled(hitbox: Area3D, enabled: bool) -> void:
 func _set_zombie_transparency(transparency: float) -> void:
     if drop_pivot != null:
         _set_geometry_transparency(drop_pivot, transparency)
-    if shadow != null:
-        _set_geometry_transparency(shadow, transparency)
 
 func _set_geometry_transparency(node: Node, transparency: float) -> void:
     if node is GeometryInstance3D:
@@ -254,8 +250,6 @@ func _get_fade_geometry() -> Array[GeometryInstance3D]:
     var geometry_instances: Array[GeometryInstance3D] = []
     if drop_pivot != null:
         _collect_geometry(drop_pivot, geometry_instances)
-    if shadow != null:
-        _collect_geometry(shadow, geometry_instances)
 
     return geometry_instances
 

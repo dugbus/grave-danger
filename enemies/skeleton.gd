@@ -25,8 +25,6 @@ const MODEL_FORWARD_YAW_OFFSET := 0.0
 @export var character_path: NodePath = ^"PathFollow3D/DropPivot/Pivot/Character"
 ## Area that kills the player on contact.
 @export var kill_area_path: NodePath = ^"PathFollow3D/DropPivot/KillArea"
-## Ground shadow shown while the skeleton is active.
-@export var shadow_path: NodePath = ^"PathFollow3D/SkeletonShadow"
 ## Light used to make the skeleton readable before the player gets close.
 @export var skeleton_light_path: NodePath = ^"PathFollow3D/DropPivot/Pivot/SkeletonLight"
 ## Seconds a player must remain inside the contact area before death triggers.
@@ -129,7 +127,6 @@ const MODEL_FORWARD_YAW_OFFSET := 0.0
 @onready var pivot := get_node_or_null(pivot_path) as Node3D
 @onready var character := get_node_or_null(character_path) as Node3D
 @onready var kill_area := get_node_or_null(kill_area_path) as Area3D
-@onready var shadow := get_node_or_null(shadow_path) as Node3D
 @onready var skeleton_light := get_node_or_null(skeleton_light_path) as OmniLight3D
 
 var patrol_direction := 1.0
@@ -271,8 +268,6 @@ func _finish_drop_in() -> void:
 func _set_active_visible(active: bool) -> void:
     if drop_pivot != null:
         drop_pivot.visible = active
-    if shadow != null:
-        shadow.visible = active
     if skeleton_light != null:
         skeleton_light.visible = active and skeleton_light_enabled
     _set_kill_area_enabled(active and has_dropped_in)
@@ -287,8 +282,6 @@ func _set_kill_area_enabled(enabled: bool) -> void:
 func _set_skeleton_transparency(transparency: float) -> void:
     if drop_pivot != null:
         _set_geometry_transparency(drop_pivot, transparency)
-    if shadow != null:
-        _set_geometry_transparency(shadow, transparency)
 
 
 func _set_geometry_transparency(node: Node, transparency: float) -> void:
@@ -699,8 +692,6 @@ func _get_fade_geometry() -> Array[GeometryInstance3D]:
     var geometry_instances: Array[GeometryInstance3D] = []
     if drop_pivot != null:
         _collect_geometry(drop_pivot, geometry_instances)
-    if shadow != null:
-        _collect_geometry(shadow, geometry_instances)
 
     return geometry_instances
 

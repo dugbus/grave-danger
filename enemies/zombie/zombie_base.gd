@@ -51,8 +51,6 @@ const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 @export var vision_origin_path: NodePath = ^"ZombieBody/VisionOrigin"
 ## Legacy contact area retained for crush detection placement only. Zombies damage through attack hitboxes.
 @export var kill_area_path: NodePath = ^"ZombieBody/DropPivot/KillArea"
-## Ground shadow shown while the zombie is active.
-@export var shadow_path: NodePath = ^"ZombieBody/ZombieShadow"
 ## Light used to make the zombie readable before the player gets close.
 @export var zombie_light_path: NodePath = ^"ZombieBody/DropPivot/Pivot/ZombieLight"
 @export var attack_hitbox_right_path: NodePath = ^"ZombieBody/AttackHitboxRight"
@@ -197,7 +195,6 @@ const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 @onready var character := get_node_or_null(character_path) as Node3D
 @onready var vision_origin := get_node_or_null(vision_origin_path) as Marker3D
 @onready var kill_area := get_node_or_null(kill_area_path) as Area3D
-@onready var shadow := get_node_or_null(shadow_path) as Node3D
 @onready var zombie_light := get_node_or_null(zombie_light_path) as OmniLight3D
 @onready var attack_hitbox_right := get_node_or_null(attack_hitbox_right_path) as Area3D
 @onready var attack_hitbox_left := get_node_or_null(attack_hitbox_left_path) as Area3D

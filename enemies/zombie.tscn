@@ -2,9 +2,6 @@
 
 [ext_resource type="PackedScene" uid="uid://cy08iiip3270u" path="res://Assets/kenney-graveyard/character-zombie.glb" id="1_zombie"]
 [ext_resource type="Script" uid="uid://ck4dn6vnn8rkn" path="res://enemies/zombie.gd" id="2_zombie"]
-[ext_resource type="Script" uid="uid://cs73qa7c0pcul" path="res://player/player_shadow.gd" id="3_shadow"]
-[ext_resource type="PlaneMesh" path="res://game/contact_shadow_mesh.tres" id="4_shadow_mesh"]
-[ext_resource type="Material" path="res://game/contact_shadow_material.tres" id="5_shadow_material"]
 
 [sub_resource type="Curve3D" id="Curve3D_zombie_patrol"]
 resource_local_to_scene = true
@@ -75,16 +72,6 @@ monitorable = false
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ZombieBody/DropPivot/KillArea" unique_id=925098466]
 transform = Transform3D(1, 0, 0, 0, 0.819152, 0.573576, 0, -0.573576, 0.819152, 0, 0.47, 0)
 shape = SubResource("CapsuleShape3D_kill_area")
-
-[node name="ZombieShadow" type="MeshInstance3D" parent="ZombieBody" unique_id=589540868]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0.03)
-layers = 3
-cast_shadow = 0
-mesh = ExtResource("4_shadow_mesh")
-surface_material_override/0 = ExtResource("5_shadow_material")
-script = ExtResource("3_shadow")
-shadow_size = Vector2(0.9, 0.55)
-projected_local_offset = Vector3(0, 0, 0.03)
 
 [node name="AttackHitboxRight" type="Area3D" parent="ZombieBody" unique_id=190581432]
 collision_layer = 0
