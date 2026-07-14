@@ -4,6 +4,8 @@ extends "res://enemies/zombie/zombie_base.gd"
 func _set_active_visible(active: bool) -> void:
     if drop_pivot != null:
         drop_pivot.visible = active
+    if shadow != null:
+        shadow.visible = active
     if zombie_light != null:
         zombie_light.visible = active and zombie_light_enabled
     _set_kill_area_enabled(false)
@@ -25,6 +27,8 @@ func _set_attack_hitbox_enabled(hitbox: Area3D, enabled: bool) -> void:
 func _set_zombie_transparency(transparency: float) -> void:
     if drop_pivot != null:
         _set_geometry_transparency(drop_pivot, transparency)
+    if shadow != null:
+        _set_geometry_transparency(shadow, transparency)
 
 func _set_geometry_transparency(node: Node, transparency: float) -> void:
     if node is GeometryInstance3D:
@@ -47,10 +51,15 @@ func _configure_zombie_light() -> void:
     zombie_light.light_energy = zombie_light_energy
     zombie_light.omni_range = zombie_light_range
     zombie_light.omni_attenuation = zombie_light_attenuation
-    zombie_light.shadow_enabled = zombie_light_cast_shadows
+    zombie_light.light_cull_mask = ALL_VISUAL_LAYERS
+    zombie_light.shadow_caster_mask = ENEMY_LIGHT_SHADOW_CASTER_MASK
+    zombie_light.shadow_enabled = true
     zombie_light.visible = zombie_light_enabled
 
 func _set_shadow_casting(node: Node) -> void:
+    if node is VisualInstance3D:
+        (node as VisualInstance3D).layers = ENEMY_GEOMETRY_VISUAL_LAYER
+
     if node is GeometryInstance3D:
         (node as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 
@@ -250,6 +259,8 @@ func _get_fade_geometry() -> Array[GeometryInstance3D]:
     var geometry_instances: Array[GeometryInstance3D] = []
     if drop_pivot != null:
         _collect_geometry(drop_pivot, geometry_instances)
+    if shadow != null:
+        _collect_geometry(shadow, geometry_instances)
 
     return geometry_instances
 

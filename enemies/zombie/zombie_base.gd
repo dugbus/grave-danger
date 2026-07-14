@@ -33,6 +33,12 @@ const WORLD_COLLISION_LAYER := 1
 const PLAYER_COLLISION_LAYER := 2
 const PICKUP_COLLISION_LAYER := 4
 const ZOMBIE_COLLISION_LAYER := 8
+const ENEMY_GEOMETRY_VISUAL_LAYER := 1 << 18
+const ALL_VISUAL_LAYERS := (1 << 20) - 1
+const ALL_SHADOW_CASTER_LAYERS := (1 << 32) - 1
+const ENEMY_LIGHT_SHADOW_CASTER_MASK := (
+    ALL_SHADOW_CASTER_LAYERS & ~ENEMY_GEOMETRY_VISUAL_LAYER
+)
 const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 
 ## Compatibility sampler for existing level `PathFollow3D` overrides.
@@ -51,6 +57,8 @@ const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 @export var vision_origin_path: NodePath = ^"ZombieBody/VisionOrigin"
 ## Legacy contact area retained for crush detection placement only. Zombies damage through attack hitboxes.
 @export var kill_area_path: NodePath = ^"ZombieBody/DropPivot/KillArea"
+## Ground shadow shown while the zombie is active.
+@export var shadow_path: NodePath = ^"ZombieBody/ZombieShadow"
 ## Light used to make the zombie readable before the player gets close.
 @export var zombie_light_path: NodePath = ^"ZombieBody/DropPivot/Pivot/ZombieLight"
 @export var attack_hitbox_right_path: NodePath = ^"ZombieBody/AttackHitboxRight"
@@ -184,7 +192,6 @@ const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 @export var zombie_light_energy := 0.95
 @export var zombie_light_range := 4.2
 @export var zombie_light_attenuation := 1.45
-@export var zombie_light_cast_shadows := true
 @export_group("")
 
 @onready var path_follow := get_node_or_null(path_follow_path) as PathFollow3D
@@ -195,6 +202,7 @@ const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 @onready var character := get_node_or_null(character_path) as Node3D
 @onready var vision_origin := get_node_or_null(vision_origin_path) as Marker3D
 @onready var kill_area := get_node_or_null(kill_area_path) as Area3D
+@onready var shadow := get_node_or_null(shadow_path) as Node3D
 @onready var zombie_light := get_node_or_null(zombie_light_path) as OmniLight3D
 @onready var attack_hitbox_right := get_node_or_null(attack_hitbox_right_path) as Area3D
 @onready var attack_hitbox_left := get_node_or_null(attack_hitbox_left_path) as Area3D

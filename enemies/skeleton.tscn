@@ -1,7 +1,10 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="PackedScene" path="res://Assets/kenney-graveyard/character-skeleton.glb" id="1_skeleton"]
 [ext_resource type="Script" path="res://enemies/skeleton.gd" id="2_skeleton"]
+[ext_resource type="Script" path="res://player/player_shadow.gd" id="3_shadow"]
+[ext_resource type="PlaneMesh" path="res://game/contact_shadow_mesh.tres" id="4_shadow_mesh"]
+[ext_resource type="Material" path="res://game/contact_shadow_material.tres" id="5_shadow_material"]
 
 [sub_resource type="Curve3D" id="Curve3D_skeleton_patrol"]
 resource_local_to_scene = true
@@ -36,6 +39,16 @@ light_color = Color(0.85, 1, 0.62, 1)
 light_energy = 0.95
 omni_range = 4.2
 omni_attenuation = 1.45
+
+[node name="SkeletonShadow" type="MeshInstance3D" parent="PathFollow3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0.03)
+layers = 3
+cast_shadow = 0
+mesh = ExtResource("4_shadow_mesh")
+surface_material_override/0 = ExtResource("5_shadow_material")
+script = ExtResource("3_shadow")
+shadow_size = Vector2(0.9, 0.55)
+projected_local_offset = Vector3(0, 0, 0.03)
 
 [node name="KillArea" type="Area3D" parent="PathFollow3D/DropPivot"]
 collision_layer = 0
