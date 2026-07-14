@@ -13,6 +13,10 @@ class_name GDPlayerLight
 @export var noise_fast: NoiseTexture3D
 ## Low-frequency noise used for larger flame swells and dips.
 @export var noise_slow: NoiseTexture3D
+## Warmest flame colour used at the dim end of the flicker.
+@export var dim_color := Color(1.0, 0.45, 0.1)
+## Brightest flame colour used at the peak of the flicker.
+@export var bright_color := Color(1.0, 0.75, 0.3)
 
 var time_passed := 0.0
 
@@ -43,4 +47,4 @@ func _process(delta: float) -> void:
 
 	# Subtle color shift: dimmer = deeper orange, brighter = yellow
 	var t := inverse_lerp(-dip_amount, peak_amount, flicker)
-	light_color = Color(1.0, 0.45, 0.1).lerp(Color(1.0, 0.75, 0.3), t)
+	light_color = dim_color.lerp(bright_color, t)

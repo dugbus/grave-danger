@@ -24,6 +24,20 @@ func _ready() -> void:
 	call_deferred("_focus_retry_button")
 
 
+func _record_level_result() -> void:
+	var stats := get_node_or_null("/root/ResultStats")
+	if stats == null or stats.max_coins_collected <= 0:
+		return
+
+	var level_selection := get_node_or_null("/root/LevelSelection")
+	if level_selection != null and level_selection.has_method("record_selected_level_result"):
+		level_selection.record_selected_level_result(
+			stats.coins_collected,
+			stats.get_completion_percentage(),
+			false
+		)
+
+
 func _input(event: InputEvent) -> void:
 	if returning_to_title:
 		return

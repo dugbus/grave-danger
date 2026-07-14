@@ -1,3 +1,24 @@
+- Indoor lighting now preserves the torch's authored shadow bias, preventing zero-bias concentric shadow acne around lit torches.
+- Torch OmniLights use a dedicated shadow-caster mask to ignore their own model while still illuminating it and casting shadows.
+- Nearby unlit torches now gain a subtle warm shader outline that fades with distance and disappears once lit.
+- Torch flame particle effect.
+- Wall-mounted torches now begin dark, light after the stationary player faces them, and remain lit across level restarts to improve navigation over successive runs.
+- Invalid or unavailable remembered level slots now fall back safely to the first available level.
+- Level selection now saves keyboard, joypad, and focus changes, restoring that same card on the next visit.
+- The level-select heading and card text now author Almendra Bold directly.
+- Each level card now uses the new level background artwork, while the screen retains its original page background and supports the renamed direct card nodes.
+- Level selection now uses three large columns with TV-readable card titles, outcomes, treasure percentages, and play counts.
+- The level-select frame and cards are larger, with each card led by its authored display name instead of a repeated level number.
+- Level outcome, treasure caption, emphasised percentage, and play count now use separate card rows for clearer results.
+- Returning to level selection now positions the remembered level fully inside the viewport before showing it.
+- Moving focus beyond the visible level rows now scrolls quickly with eased motion instead of snapping the viewport.
+- Level selection now includes sixteen playable slots, with the additional placeholders reusing Level 1 until their own levels are authored.
+- Level cards now distinguish failed attempts, partial-treasure escapes, and 100% treasure successes without truncating their status text.
+- Each level card now tracks and displays how many times that level slot has been played.
+- Failed level cards now retain and display their best collected-treasure percentage alongside their play count.
+- Tutorial levels can now be marked in the level lookup, and the most recently played level is highlighted when level selection opens.
+- The level-select screen now scrolls through additional level rows with the mouse wheel and keeps keyboard or joypad selections visible automatically.
+- Level selection now uses a clearer graveyard-styled frame, compact numbered cards, stronger focus states, and visible control hints.
 - PNG-to-GridMap wall-piece and floor-material locations are now editable shared settings, with their existing locations retained as defaults.
 - The redundant new-configuration action has been removed now that PNG-to-GridMap tile choices are shared automatically.
 - Tooltips now explain the PNG-to-GridMap controls.
@@ -22,6 +43,13 @@
 - Kill boundaries now expose editor-friendly controls for world size, path looping, shape morphing, segment count, flame or ghost presentation, player blockers, damage, and proximity audio.
 - Kill-boundary collision, visuals, blockers, damage, audio, animation, removal, and editor-preview responsibilities have been split into focused scripts.
 - Levels 1, 2, and 3 have been migrated to the new world-size kill-boundary animation tracks, and levels 6 and 8 now derive boundary duration automatically.
+- Indoor lights now cast fully opaque shadows so areas behind walls stay dark.
+- Indoor GridMaps now add batched, closed shadow volumes only for wall items, preventing light leaks without placing black shadow boxes beneath flagstone floors.
+- Indoor GridMap walls now retain their authored face-culling settings so every intended wall face remains visible.
+- Indoor headlamps now use a wide, shadow-safe 82-degree cone with a 60-metre range and gentler falloff while retaining their authored height.
+- Indoor levels now place the player's shadow-casting omnidirectional fill at the headlamp, approximating local reflections around the visible area.
+- Player light cone, range, falloff, placement, visibility, and shadow settings now live in the player scene, while flicker colours are exposed in the editor.
+- Coins stop casting shadows only while flying into a coin collector, while collectible and dropped coins retain their shadows.
 - Level 7 draft.
 - Gold and silver keys now include dedicated player pickup areas, making collection more reliable without changing their physical rigid-body collisions.
 - Holding the drop action now accelerates from deliberate individual drops to rapid unloading, while dropped items spread across a small deterministic angle instead of piling into one line.

@@ -42,3 +42,8 @@ func get_level_folder_name(index: int) -> String:
 func is_level_available(index: int) -> bool:
     var level_data := get_level_entry(index)
     return bool(level_data.get("available", false))
+
+
+func is_level_tutorial(index: int) -> bool:
+    var level_data := get_level_entry(index)
+    return bool(level_data.get("tutorial", false))

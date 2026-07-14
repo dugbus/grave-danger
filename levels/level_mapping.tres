@@ -7,7 +7,8 @@ script = ExtResource("1_mapping")
 level_entries = Array[Dictionary]([{
 "available": true,
 "folder_name": "1",
-"name": "Level 1"
+"name": "Level 1",
+"tutorial": true
 }, {
 "available": true,
 "folder_name": "2",
@@ -36,4 +37,36 @@ level_entries = Array[Dictionary]([{
 "available": true,
 "folder_name": "8",
 "name": "Level 8"
+}, {
+"available": true,
+"folder_name": "1",
+"name": "Level 9"
+}, {
+"available": true,
+"folder_name": "1",
+"name": "Level 10"
+}, {
+"available": true,
+"folder_name": "1",
+"name": "Level 11"
+}, {
+"available": true,
+"folder_name": "1",
+"name": "Level 12"
+}, {
+"available": true,
+"folder_name": "1",
+"name": "Level 13"
+}, {
+"available": true,
+"folder_name": "1",
+"name": "Level 14"
+}, {
+"available": true,
+"folder_name": "1",
+"name": "Level 15"
+}, {
+"available": true,
+"folder_name": "1",
+"name": "Level 16"
 }])

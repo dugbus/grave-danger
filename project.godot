@@ -128,6 +128,7 @@ camera_zoom_out={
 [layer_names]
 
 3d_render/layer_17="SimpleGrassTextured interactive layer"
+3d_render/layer_18="Torch geometry"
 
 [physics]
 

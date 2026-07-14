@@ -136,6 +136,7 @@ func _create_visual_coin() -> MeshInstance3D:
 	var coin := MeshInstance3D.new()
 	coin.name = "DepositCoinVisual"
 	coin.mesh = _get_visual_coin_mesh()
+	coin.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return coin
 
 

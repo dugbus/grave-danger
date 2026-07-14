@@ -3,49 +3,46 @@
 [ext_resource type="PackedScene" uid="uid://bg1o6o88d6aih" path="res://Assets/kenney-graveyard/character-keeper.glb" id="1_4flbx"]
 [ext_resource type="Script" uid="uid://dtq13owafx466" path="res://player/player.gd" id="1_onrkg"]
 [ext_resource type="Script" uid="uid://clsohtxpkv21k" path="res://player/player_movement.gd" id="3_i5lcx"]
-[ext_resource type="Script" path="res://player/player_inventory.gd" id="4_nltvg"]
+[ext_resource type="Script" uid="uid://dv3aldc2lljxt" path="res://player/player_inventory.gd" id="4_nltvg"]
 [ext_resource type="Script" uid="uid://bxk737ajabv3s" path="res://player/player_animation.gd" id="5_8mhfk"]
 [ext_resource type="Script" uid="uid://bufcsm6qtgk23" path="res://player/player_death.gd" id="6_7xubc"]
 [ext_resource type="Script" uid="uid://c5fw58ydmf4o0" path="res://player/player_light.gd" id="7_boad6"]
-[ext_resource type="Script" path="res://player/flask_effect_text.gd" id="8_eh3tm"]
-[ext_resource type="Shader" path="res://player/flask_effect_text.gdshader" id="9_v2a87"]
-[ext_resource type="Script" path="res://player/player_shadow.gd" id="10_shadow"]
+[ext_resource type="Script" uid="uid://bml0j2kqkf6rn" path="res://player/flask_effect_text.gd" id="8_eh3tm"]
+[ext_resource type="Shader" uid="uid://bli3s8fh1lhvp" path="res://player/flask_effect_text.gdshader" id="9_v2a87"]
+[ext_resource type="Script" uid="uid://cs73qa7c0pcul" path="res://player/player_shadow.gd" id="10_shadow"]
 [ext_resource type="PlaneMesh" path="res://game/contact_shadow_mesh.tres" id="11_shadow_mesh"]
 [ext_resource type="Material" path="res://game/contact_shadow_material.tres" id="12_shadow_material"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_fast"]
-noise_type = 1
 frequency = 0.8
-fractal_octaves = 4
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_slow"]
-noise_type = 1
-frequency = 0.3
 fractal_octaves = 4
 
 [sub_resource type="NoiseTexture3D" id="NoiseTexture3D_fast"]
 noise = SubResource("FastNoiseLite_fast")
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_slow"]
+frequency = 0.3
+fractal_octaves = 4
+
 [sub_resource type="NoiseTexture3D" id="NoiseTexture3D_slow"]
 noise = SubResource("FastNoiseLite_slow")
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4flbx"]
-radius = 0.28
-height = 0.8
-
-[sub_resource type="TextMesh" id="TextMesh_potion_effect"]
-horizontal_alignment = 1
-vertical_alignment = 1
-font_size = 92
-pixel_size = 0.009
-depth = 0.08
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_potion_effect"]
+render_priority = 0
 shader = ExtResource("9_v2a87")
 shader_parameter/text_color = Color(1, 0.94, 0.78, 1)
 shader_parameter/ambient_strength = 0.38
 shader_parameter/side_shadow = 0.68
 shader_parameter/roughness = 0.94
+
+[sub_resource type="TextMesh" id="TextMesh_potion_effect"]
+font_size = 92
+pixel_size = 0.009
+depth = 0.08
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4flbx"]
+radius = 0.28
+height = 0.8
 
 [node name="Player" type="CharacterBody3D" unique_id=244343110]
 collision_layer = 2
@@ -68,18 +65,19 @@ script = ExtResource("6_7xubc")
 
 [node name="Character" parent="Pivot" unique_id=2053546351 instance=ExtResource("1_4flbx")]
 
-[node name="PlayerHeadlampLight" type="SpotLight3D" parent="Pivot"]
-transform = Transform3D(-1, 0, -8.7422777e-08, -5.015858e-08, 0.81915206, 0.57357645, 7.163184e-08, 0.57357645, -0.81915206, 0, 1.05, 0.3)
+[node name="PlayerHeadlampLight" type="SpotLight3D" parent="Pivot" unique_id=1854365692]
+transform = Transform3D(-1, 0, -8.742278e-08, -5.015858e-08, 0.81915206, 0.57357645, 7.163184e-08, 0.57357645, -0.81915206, 0, 1.05, 0.3)
 light_color = Color(0.8842759, 0.4890548, 0.27783498, 1)
-light_energy = 50.0
+light_energy = 8.0
 light_indirect_energy = 0.0
 shadow_enabled = true
-spot_range = 20.0
-spot_attenuation = 2.5
-spot_angle = 90.0
+shadow_bias = 0.0
+shadow_normal_bias = 0.0
+spot_range = 60.0
+spot_attenuation = 1.25
 spot_angle_attenuation = 0.5
 script = ExtResource("7_boad6")
-base_energy = 3.0
+base_energy = 8.0
 dip_amount = 0.45
 peak_amount = 1.0
 noise_fast = SubResource("NoiseTexture3D_fast")
@@ -88,12 +86,15 @@ noise_slow = SubResource("NoiseTexture3D_slow")
 [node name="PlayerLight" type="OmniLight3D" parent="Pivot" unique_id=994237452]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0.3)
 light_color = Color(0.8842759, 0.4890548, 0.27783498, 1)
-light_energy = 1.25
+light_energy = 1.2
+light_indirect_energy = 0.0
 shadow_enabled = true
-omni_range = 6.0
+shadow_bias = 0.0
+shadow_normal_bias = 0.0
+omni_range = 4.0
 omni_attenuation = 0.2
 script = ExtResource("7_boad6")
-base_energy = 0.5
+base_energy = 1.2
 dip_amount = 0.02
 peak_amount = 0.015
 noise_fast = SubResource("NoiseTexture3D_fast")
@@ -109,22 +110,21 @@ script = ExtResource("10_shadow")
 shadow_size = Vector2(1.2, 0.75)
 
 [node name="PotionEffectText" type="MeshInstance3D" parent="." unique_id=1931740386]
-visible = false
 top_level = true
+visible = false
 layers = 524288
+material_override = SubResource("ShaderMaterial_potion_effect")
 cast_shadow = 0
 mesh = SubResource("TextMesh_potion_effect")
-material_override = SubResource("ShaderMaterial_potion_effect")
 script = ExtResource("8_eh3tm")
 
 [node name="PotionEffectTextLight" type="OmniLight3D" parent="PotionEffectText" unique_id=1427709601]
-visible = false
 top_level = true
+visible = false
 light_color = Color(1, 0.88, 0.68, 1)
 light_energy = 6.5
 light_cull_mask = 524288
 omni_range = 5.5
-shadow_enabled = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=837824967]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)

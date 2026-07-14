@@ -3,11 +3,14 @@ extends SceneTree
 const BAT_NEST_SCRIPT := preload("res://enemies/bat_nest.gd")
 const COIN_DEPOSIT_COFFIN_SCENE := preload("res://levels/common/coin_deposit_coffin.tscn")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
+const GOLD_COIN_SCENE := preload("res://collectibles/gold_coin.tscn")
 const GOLD_COIN_PILE_SCRIPT := preload("res://collectibles/gold_coin_pile.gd")
 const KEY_SCENE := preload("res://collectibles/key.tscn")
 const LEVEL_SETTINGS_SCRIPT := preload("res://levels/common/level_settings.gd")
+const LEVEL_SELECT_SCENE := preload("res://ui/screens/level_select_screen.tscn")
 const LOW_HEALTH_VIGNETTE_SCRIPT := preload("res://ui/hud/low_health_vignette.gd")
 const LOCKED_GATE_SCENE := preload("res://levels/common/locked_gate.tscn")
+const INDOOR_LIGHTING_SCENE := preload("res://levels/common/gd_indoor_lighting.tscn")
 const MINIMAP_VIEW_SCRIPT := preload("res://game/minimap_view.gd")
 const MINIMAP_VIEW_SETTINGS := preload("res://game/minimap_view_settings.tres")
 const PANEL_SCENE := preload("res://ui/hud/panel.tscn")
@@ -21,6 +24,7 @@ const PNG_TO_GRIDMAP_SETTINGS := preload("res://addons/png_to_gridmap/png_to_gri
 const SKELETON_SCENE := preload("res://enemies/skeleton.tscn")
 const SILVER_KEY_SCENE := preload("res://collectibles/silver_key.tscn")
 const TEST_TEXT_OVERLAY_VISUAL_LAYER := 1 << 19
+const TORCH_SCENE := preload("res://levels/common/torch.tscn")
 
 enum TestAutotileItem {
     Base = 1,
@@ -63,6 +67,14 @@ class TestKillBoundary:
         sink_requested = true
 
 
+class TestLevelSelection:
+    extends GDLevelSelection
+
+
+    func _save_results() -> void:
+        pass
+
+
 class TestMinimapBoundary:
     extends Node3D
 
@@ -90,6 +102,16 @@ class TestMinimapBoundary:
         return bounds_height
 
 
+class TestTorch:
+    extends "res://levels/common/torch.gd"
+
+    var level_selection: Node
+
+
+    func _get_level_selection() -> Node:
+        return level_selection
+
+
 func _init() -> void:
     _run_tests.call_deferred()
 
@@ -100,6 +122,8 @@ func _run_tests() -> void:
     failed = not _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() or failed
     failed = not _test_audio_fallback_is_deterministic() or failed
     failed = not _test_player_fall_death_threshold() or failed
+    failed = not _test_torch_scene_and_persistent_activation() or failed
+    failed = not _test_indoor_lighting_strengthens_occlusion() or failed
     failed = not _test_held_drop_input_accelerates() or failed
     failed = not _test_drop_direction_variation_is_deterministic_and_compact() or failed
     failed = not _test_coin_absorption_does_not_complete_level() or failed
@@ -107,6 +131,9 @@ func _run_tests() -> void:
     failed = not _test_reusable_gate_and_coin_deposit_coffin_scenes() or failed
     failed = not _test_key_scenes_have_authored_pickup_areas() or failed
     failed = not _test_graveyard_scene_does_not_embed_default_level() or failed
+    failed = not _test_level_lookup_supports_tutorials_and_sixteen_slots() or failed
+    failed = not _test_level_selection_tracks_outcomes_and_highlight() or failed
+    failed = not await _test_level_select_scrolls_focused_cards_into_view() or failed
     failed = not _test_kill_boundary_loop_setting() or failed
     failed = not _test_kill_boundary_size_does_not_scale_center() or failed
     failed = not _test_kill_boundary_missing_scale_tracks_use_identity_scale() or failed
@@ -178,6 +205,284 @@ func _test_audio_fallback_is_deterministic() -> bool:
 
     return _expect(picked_stream == first_stream, "audio fallback picks the first stream deterministically") \
         and _expect(is_equal_approx(midpoint, 0.5), "audio fallback uses deterministic midpoint variation")
+
+
+func _test_torch_scene_and_persistent_activation() -> bool:
+    var torch_scene := TORCH_SCENE.instantiate()
+    var mount := torch_scene.get_node("RaisedWallMount") as Node3D
+    var particles := torch_scene.get_node(
+        "RaisedWallMount/FabricFlameAttachment/FlameParticles"
+    ) as GPUParticles3D
+    var embers := torch_scene.get_node(
+        "RaisedWallMount/FabricFlameAttachment/EmberParticles"
+    ) as GPUParticles3D
+    var light := torch_scene.get_node(
+        "RaisedWallMount/FabricFlameAttachment/FlameLight"
+    ) as OmniLight3D
+    var outline_mesh := torch_scene.get_node(
+        "RaisedWallMount/Model/RootNode/Torch1"
+    ) as MeshInstance3D
+    var editor_light_range := light.omni_range
+    root.add_child(torch_scene)
+    var passed := _expect(
+        mount.rotation.is_zero_approx(),
+        "torch model stands upright at its wall-placement origin"
+    ) and _expect(
+        is_equal_approx(mount.position.z, 0.22) and mount.scale.is_equal_approx(Vector3.ONE * 1.5),
+        "torch model remains visible outside the wall when placed at a wall section origin"
+    ) and _expect(
+        particles.get_parent().name == "FabricFlameAttachment",
+        "torch flame particles are attached at the model's fabric"
+    ) and _expect(
+        particles.draw_pass_1.material is ShaderMaterial \
+        and (particles.draw_pass_1.material as ShaderMaterial).shader.resource_path \
+        == "res://levels/common/torch_flame.gdshader",
+        "torch flame uses the animated procedural flame material"
+    ) and _expect(
+        embers != null and embers.get_parent() == particles.get_parent(),
+        "torch flame includes rising embers at the fabric attachment"
+    ) and _expect(
+        particles.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF \
+        and embers.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF,
+        "transparent torch particles do not project card-shaped shadows"
+    ) and _expect(
+        (mount.basis * (particles.process_material as ParticleProcessMaterial).direction) \
+        .normalized().is_equal_approx(Vector3.UP),
+        "upright torch flame rises vertically"
+    ) and _expect(
+        light != null and not light.visible and not particles.emitting and not embers.emitting,
+        "torch light and flame begin unlit"
+    ) and _expect(
+        light.shadow_enabled,
+        "torch omni illumination retains dungeon shadow casting"
+    ) and _expect(
+        light.is_in_group(GDIndoorLighting.AUTHORED_SHADOW_SETTINGS_GROUP) \
+        and is_equal_approx(light.shadow_bias, 0.03) \
+        and is_equal_approx(light.shadow_normal_bias, 0.6),
+        "torch retains authored anti-acne shadow bias in indoor levels"
+    ) and _expect(
+        outline_mesh.layers == GDTorch.TORCH_GEOMETRY_VISUAL_LAYER \
+        and light.light_cull_mask & outline_mesh.layers == outline_mesh.layers \
+        and light.shadow_caster_mask & outline_mesh.layers == 0 \
+        and light.shadow_caster_mask & 1 == 1 \
+        and light.light_cull_mask & 1 == 1,
+        "torch light illuminates its model but excludes it only from shadow casting"
+    ) and _expect(
+        is_equal_approx(editor_light_range, 0.1) and is_equal_approx(light.omni_range, 7.0),
+        "torch keeps light bounds small for editor placement and restores gameplay range at runtime"
+    )
+
+    var outline_player := Node3D.new()
+    outline_player.position = Vector3(0.0, 0.0, -2.0)
+    root.add_child(outline_player)
+    torch_scene.update_outline_for_player(outline_player)
+    var outline_material := outline_mesh.material_overlay as ShaderMaterial
+    passed = _expect(
+        outline_material.shader.resource_path \
+        == "res://levels/common/torch_outline.gdshader" \
+        and float(outline_material.get_shader_parameter(&"outline_intensity")) > 0.0,
+        "an unlit torch gains a subtle shader outline when the player approaches"
+    ) and _expect(
+        torch_scene.find_children("*", "MeshInstance3D", true, false).size() == 1,
+        "torch guidance reuses the original model without duplicate shadow geometry"
+    ) and passed
+    torch_scene._set_lit(false)
+    passed = _expect(
+        is_zero_approx(float(outline_material.get_shader_parameter(&"outline_intensity"))),
+        "lighting a torch immediately removes its proximity outline"
+    ) and passed
+    outline_player.queue_free()
+    torch_scene.queue_free()
+
+    var level_selection := TestLevelSelection.new()
+    var torch := TestTorch.new()
+    torch.level_selection = level_selection
+    torch.torch_id = &"test_wall_torch"
+    torch.torch_activation_time = 100.0
+    torch.activation_distance = 2.0
+    root.add_child(torch)
+    var player := CharacterBody3D.new()
+    player.position = Vector3(0.0, 0.0, -1.0)
+    root.add_child(player)
+    var pivot := Node3D.new()
+    pivot.name = "Pivot"
+    player.add_child(pivot)
+
+    player.velocity = Vector3(0.5, 0.0, 0.0)
+    torch.update_activation_for_player(player, 0.06)
+    passed = _expect(
+        is_zero_approx(torch.activation_elapsed_ms),
+        "torch activation does not begin while the player is moving"
+    ) and passed
+    player.velocity = Vector3.ZERO
+    torch.update_activation_for_player(player, 0.06)
+    pivot.rotation.y = PI
+    torch.update_activation_for_player(player, 0.06)
+    passed = _expect(
+        is_zero_approx(torch.activation_elapsed_ms),
+        "looking away resets partial torch activation"
+    ) and passed
+    pivot.rotation.y = 0.0
+    torch.update_activation_for_player(player, 0.1)
+    passed = _expect(torch.is_lit, "facing a torch for its activation time lights it") and passed
+    passed = _expect(
+        level_selection.is_torch_lit(&"test_wall_torch"),
+        "lighting a torch stores it in the selected level's user progress"
+    ) and passed
+
+    var restored_torch := TestTorch.new()
+    restored_torch.level_selection = level_selection
+    restored_torch.torch_id = &"test_wall_torch"
+    root.add_child(restored_torch)
+    passed = _expect(
+        restored_torch.is_lit,
+        "a previously lit torch restores its lit state when the level restarts"
+    ) and passed
+
+    player.queue_free()
+    torch.queue_free()
+    restored_torch.queue_free()
+    level_selection.free()
+    return passed
+
+
+func _test_indoor_lighting_strengthens_occlusion() -> bool:
+    var level := Node3D.new()
+    root.add_child(level)
+    var grid_map := GridMap.new()
+    var mesh_library := MeshLibrary.new()
+    var wall_mesh_source := load("res://Assets/environment/wall.res") as ArrayMesh
+    var wall_mesh := wall_mesh_source.duplicate(true) as ArrayMesh
+    mesh_library.create_item(0)
+    mesh_library.set_item_name(0, "Wall")
+    mesh_library.set_item_mesh(0, wall_mesh)
+    mesh_library.set_item_mesh_cast_shadow(
+        0,
+        RenderingServer.SHADOW_CASTING_SETTING_ON
+    )
+    mesh_library.create_item(1)
+    mesh_library.set_item_name(1, "Road")
+    mesh_library.set_item_mesh(1, BoxMesh.new())
+    grid_map.mesh_library = mesh_library
+    grid_map.set_cell_item(Vector3i.ZERO, 0)
+    grid_map.set_cell_item(Vector3i.RIGHT, 1)
+    level.add_child(grid_map)
+    var headlamp := SpotLight3D.new()
+    headlamp.shadow_enabled = true
+    headlamp.position.y = 1.05
+    headlamp.shadow_bias = 0.0
+    headlamp.shadow_normal_bias = 0.0
+    headlamp.spot_angle = 82.0
+    headlamp.spot_range = 60.0
+    headlamp.spot_attenuation = 1.25
+    headlamp.name = "PlayerHeadlampLight"
+    level.add_child(headlamp)
+    var light := OmniLight3D.new()
+    light.shadow_enabled = true
+    light.shadow_bias = 0.0
+    light.shadow_normal_bias = 0.0
+    light.name = "PlayerLight"
+    light.position = headlamp.position
+    level.add_child(light)
+    var room_light := OmniLight3D.new()
+    room_light.shadow_enabled = true
+    room_light.shadow_opacity = 0.25
+    room_light.shadow_bias = 0.1
+    room_light.shadow_normal_bias = 2.0
+    level.add_child(room_light)
+    var effect_light := OmniLight3D.new()
+    effect_light.shadow_enabled = false
+    effect_light.shadow_opacity = 0.25
+    level.add_child(effect_light)
+    var indoor_lighting := INDOOR_LIGHTING_SCENE.instantiate() as GDIndoorLighting
+    level.add_child(indoor_lighting)
+    indoor_lighting.strengthen_level_shadows()
+
+    var passed := _expect(light.shadow_enabled, "indoor lights cast shadows") \
+        and _expect(light.visible, "indoor levels enable the player's omni fill light") \
+        and _expect(
+            light.global_position.is_equal_approx(headlamp.global_position),
+            "indoor omni fill originates at the headlamp"
+        ) \
+        and _expect(
+            is_equal_approx(headlamp.position.y, 1.05),
+            "indoor headlamps retain their authored height"
+        ) \
+        and _expect(
+            is_equal_approx(headlamp.spot_angle, 82.0),
+            "indoor headlamps retain their editor-authored cone"
+        ) \
+        and _expect(
+            is_equal_approx(headlamp.spot_range, 60.0),
+            "indoor headlamps retain their editor-authored range"
+        ) \
+        and _expect(
+            is_equal_approx(headlamp.spot_attenuation, 1.25),
+            "indoor headlamps retain their editor-authored falloff"
+        ) \
+        and _expect(is_equal_approx(room_light.shadow_opacity, 1.0), \
+            "indoor room-light shadows are fully opaque") \
+        and _expect(is_zero_approx(room_light.shadow_bias), \
+            "indoor room-light shadows stay attached to occluders") \
+        and _expect(
+            is_zero_approx(room_light.shadow_normal_bias),
+            "indoor room-light wall shadows seal against the floor"
+        ) \
+        and _expect(_player_scene_owns_light_tuning(), \
+            "player light tuning is authored in the player scene") \
+        and _expect(
+            is_equal_approx(effect_light.shadow_opacity, 0.25),
+            "indoor effect lights remain free of shadow overrides"
+        ) \
+        and _expect(not headlamp.shadow_reverse_cull_face, \
+            "indoor lights keep normal shadow-face culling") \
+        and _expect(_grid_map_has_dedicated_shadow_caster(grid_map), \
+            "indoor GridMaps use dedicated wall-only geometry for reliable shadows")
+
+    level.queue_free()
+    return passed
+
+
+func _player_scene_owns_light_tuning() -> bool:
+    var player := PLAYER_SCENE.instantiate()
+    var headlamp := player.get_node_or_null("Pivot/PlayerHeadlampLight") as SpotLight3D
+    var fill_light := player.get_node_or_null("Pivot/PlayerLight") as OmniLight3D
+    var passed := headlamp != null \
+        and fill_light != null \
+        and headlamp.visible \
+        and fill_light.visible \
+        and headlamp.position.is_equal_approx(fill_light.position) \
+        and is_equal_approx(headlamp.spot_angle, 82.0) \
+        and is_equal_approx(headlamp.spot_range, 60.0) \
+        and is_equal_approx(headlamp.spot_attenuation, 1.25) \
+        and is_zero_approx(headlamp.shadow_bias) \
+        and is_zero_approx(headlamp.shadow_normal_bias) \
+        and is_zero_approx(fill_light.shadow_bias) \
+        and is_zero_approx(fill_light.shadow_normal_bias)
+    player.free()
+    return passed
+
+
+func _grid_map_has_dedicated_shadow_caster(grid_map: GridMap) -> bool:
+    var shadow_casters := grid_map.get_node_or_null("GridMapShadowCasters")
+    if shadow_casters == null or shadow_casters.get_child_count() != 1:
+        return false
+
+    var caster := shadow_casters.get_child(0) as MultiMeshInstance3D
+    if caster == null or caster.multimesh == null:
+        return false
+
+    var wall_mesh := grid_map.mesh_library.get_item_mesh(0)
+    var caster_mesh := caster.multimesh.mesh as BoxMesh
+    var caster_material := caster.material_override as BaseMaterial3D
+    return caster.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY \
+        and caster.multimesh.instance_count == 1 \
+        and caster_mesh != null \
+        and caster_mesh.size.x < wall_mesh.get_aabb().size.x \
+        and is_equal_approx(caster_mesh.size.y, wall_mesh.get_aabb().size.y) \
+        and caster_mesh.size.z < wall_mesh.get_aabb().size.z \
+        and caster_material != null \
+        and caster_material.cull_mode == BaseMaterial3D.CULL_DISABLED
 
 
 func _test_player_fall_death_threshold() -> bool:
@@ -296,6 +601,9 @@ func _test_reusable_gate_and_coin_deposit_coffin_scenes() -> bool:
     root.add_child(gate)
     root.add_child(coffin)
     var deposit := coffin.get_node_or_null("CoinDeposit") as GDCoinDeposit
+    var deposit_coin: MeshInstance3D = deposit._create_visual_coin() if deposit != null else null
+    var world_coin := GOLD_COIN_SCENE.instantiate() as GDGoldCoin
+    var world_coin_mesh := world_coin.get_node_or_null("CoinMesh") as MeshInstance3D
     var passed := _expect(gate.completes_level, "locked gate scene completes the level") \
         and _expect(gate.get_node_or_null("Leaves/LeftGateLeaf") != null, "locked gate includes its left leaf") \
         and _expect(gate.get_node_or_null("Leaves/RightGateLeaf") != null, "locked gate includes its right leaf") \
@@ -307,7 +615,20 @@ func _test_reusable_gate_and_coin_deposit_coffin_scenes() -> bool:
         and _expect(
             deposit != null and deposit.get_node_or_null("DepositArea/CollisionShape3D") != null,
             "coin deposit coffin creates its player detection area"
+        ) \
+        and _expect(
+            deposit_coin != null \
+                and deposit_coin.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF,
+            "coins flying into a deposit do not cast distracting shadows"
+        ) \
+        and _expect(
+            world_coin_mesh != null \
+                and world_coin_mesh.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_ON,
+            "ordinary world coins continue to cast shadows"
         )
+    if deposit_coin != null:
+        deposit_coin.free()
+    world_coin.free()
     gate.queue_free()
     coffin.queue_free()
     return passed
@@ -347,6 +668,194 @@ func _test_graveyard_scene_does_not_embed_default_level() -> bool:
         "graveyard editor scene does not embed level 1"
     )
     graveyard.queue_free()
+    return passed
+
+
+func _test_level_select_scrolls_focused_cards_into_view() -> bool:
+    var level_selection := root.get_node_or_null("LevelSelection") as GDLevelSelection
+    if not _expect(level_selection != null, "level selection autoload exists for menu test"):
+        return false
+
+    var original_mapping = level_selection.level_mapping
+    var original_highlighted_index := level_selection.last_highlighted_level_index
+    var original_results := level_selection.level_results.duplicate(true)
+    var original_persistence_enabled := level_selection.persistence_enabled
+    level_selection.persistence_enabled = false
+    var test_mapping := GDLevelMapping.new()
+    for index in range(16):
+        test_mapping.level_entries.append({
+            "available": true,
+            "folder_name": str(index + 1),
+            "name": "Test Level %d" % (index + 1),
+            "tutorial": index == 0,
+        })
+    level_selection.level_mapping = test_mapping
+    level_selection.last_highlighted_level_index = 12
+    level_selection.level_results = {
+        "01": {"best_percentage": 40, "escaped": false, "play_count": 2, "played": true},
+        "02": {"best_percentage": 70, "escaped": true, "play_count": 3, "played": true},
+        "03": {"best_percentage": 100, "escaped": true, "play_count": 1, "played": true},
+    }
+
+    var screen := LEVEL_SELECT_SCENE.instantiate() as GDLevelSelectScreen
+    root.add_child(screen)
+    await process_frame
+    await process_frame
+
+    var scroll := screen.scroll_container
+    var initial_button_rect := screen.level_buttons[12].get_global_rect()
+    var initial_viewport_rect := scroll.get_global_rect()
+    var passed := _expect(scroll != null, "level selection places cards in a scrolling viewport") \
+        and _expect(
+            screen.background.texture.resource_path \
+            == "res://Assets/frontend/level-select.png",
+            "level selection retains its page background"
+        ) \
+        and _expect(
+            screen.level_buttons[0].get_node("CardBackground").texture.resource_path \
+            == "res://Assets/frontend/level-background.png",
+            "each level card uses the authored card background"
+        ) \
+        and _expect(
+            screen.level_buttons[0].get_node("Title").get_theme_font("font") \
+            == GDGameFont.get_almendra_font(),
+            "level cards use the bold Almendra game font"
+        ) \
+        and _expect(
+            screen.selected_button_index == 12,
+            "level selection initially highlights the remembered level"
+        ) \
+        and _expect(
+            scroll.vertical_scroll_mode != ScrollContainer.SCROLL_MODE_DISABLED,
+            "level selection supports mouse-wheel scrolling"
+        ) \
+        and _expect(
+            scroll.get_v_scroll_bar().visible,
+            "additional level rows extend beyond the viewport"
+        ) \
+        and _expect(
+            initial_button_rect.position.y \
+            >= initial_viewport_rect.position.y + GDLevelSelectScreen.FOCUS_SCROLL_MARGIN \
+            and initial_button_rect.end.y \
+            <= initial_viewport_rect.end.y - GDLevelSelectScreen.FOCUS_SCROLL_MARGIN,
+            "the remembered level card and its focus surround start fully visible"
+        ) \
+        and _expect(
+            screen.level_buttons[0].get_node("LevelStatus").text.begins_with("TUTORIAL"),
+            "tutorial levels are identified on their cards"
+        ) \
+        and _expect(
+            screen.level_buttons[0].get_node("LevelStatus").text == "TUTORIAL  •  FAILED" \
+            and screen.level_buttons[0].get_node("Percentage").text == "40%" \
+            and screen.level_buttons[0].get_node("Plays").text == "2 PLAYS",
+            "failed level cards separate status, treasure percentage, and play count"
+        ) \
+        and _expect(
+            screen.level_buttons[1].get_node("LevelStatus").text == "COMPLETE" \
+            and screen.level_buttons[1].get_node("Percentage").text == "70%",
+            "escaped levels show completion and treasure percentage"
+        ) \
+        and _expect(
+            screen.level_buttons[2].get_node("LevelStatus").text == "SUCCESS" \
+            and screen.level_buttons[2].get_node("Percentage").text == "100%",
+            "full treasure completion has a distinct success status"
+        )
+
+    screen.level_buttons[6].grab_focus()
+    await create_timer(GDLevelSelectScreen.FOCUS_SCROLL_DURATION + 0.05).timeout
+    screen._move_focus(Vector2i.DOWN)
+    screen._move_focus(Vector2i.DOWN)
+    passed = _expect(
+        screen.selected_button_index == 12,
+        "a double down tap moves focus twice without waiting for scrolling"
+    ) and passed
+    passed = _expect(
+        screen.scroll_tween != null and screen.scroll_tween.is_running(),
+        "a double down tap retargets one active smooth scroll"
+    ) and passed
+    await create_timer(GDLevelSelectScreen.FOCUS_SCROLL_DURATION + 0.05).timeout
+    passed = _expect(
+        screen.selected_button_index == 12,
+        "joypad-style grid navigation reaches later level rows"
+    ) and passed
+    passed = _expect(
+        scroll.scroll_vertical > 0,
+        "focused joypad selections automatically scroll into view"
+    ) and passed
+
+    screen._on_button_gui_input(InputEventMouseMotion.new(), 3)
+    passed = _expect(
+        screen.selected_button_index == 3 \
+        and level_selection.get_last_highlighted_level_index() == 3,
+        "moving the mouse over a level remembers that highlighted card"
+    ) and passed
+
+    level_selection.last_highlighted_level_index = 99
+    screen._focus_initial_level()
+    passed = _expect(
+        screen.selected_button_index == 0,
+        "an invalid remembered level falls back to the first available level"
+    ) and passed
+
+    level_selection.level_mapping = original_mapping
+    level_selection.last_highlighted_level_index = original_highlighted_index
+    level_selection.level_results = original_results
+    level_selection.persistence_enabled = original_persistence_enabled
+    screen.queue_free()
+    return passed
+
+
+func _test_level_lookup_supports_tutorials_and_sixteen_slots() -> bool:
+    var mapping := load("res://levels/level_mapping.tres") as GDLevelMapping
+    return _expect(mapping.get_level_count() == 16, "level lookup exposes sixteen slots") \
+        and _expect(mapping.is_level_tutorial(0), "level lookup can mark a tutorial") \
+        and _expect(not mapping.is_level_tutorial(1), "tutorial marking is opt-in") \
+        and _expect(
+            mapping.get_level_scene_path(8) == "res://levels/1/level.tscn",
+            "dummy level slots can reuse an existing level scene"
+        )
+
+
+func _test_level_selection_tracks_outcomes_and_highlight() -> bool:
+    var level_selection := TestLevelSelection.new()
+    level_selection.select_level(0)
+    level_selection.select_level(0)
+    level_selection.record_level_result(0, 3, 50, false)
+    var failed_result := level_selection.get_level_result(0)
+    var passed := _expect(
+        bool(failed_result.get("played", false)) and not bool(failed_result.get("escaped", false)),
+        "a failed attempt is stored separately from an escape"
+    ) and _expect(
+        int(failed_result.get("play_count", 0)) == 2,
+        "launching a level increments its persistent play count"
+    )
+
+    level_selection.record_level_result(0, 4, 65, true)
+    var complete_result := level_selection.get_level_result(0)
+    passed = _expect(
+        bool(complete_result.get("escaped", false))
+        and int(complete_result.get("best_percentage", 0)) == 65,
+        "an escape stores its best treasure percentage"
+    ) and passed
+
+    level_selection.record_level_result(0, 6, 100, false)
+    var failed_after_escape_result := level_selection.get_level_result(0)
+    passed = _expect(
+        int(failed_after_escape_result.get("best_percentage", 0)) == 65,
+        "a later failed attempt cannot turn an earlier partial escape into full success"
+    ) and passed
+
+    passed = _expect(level_selection.select_level(15), "the final dummy level can be selected") and passed
+    passed = _expect(
+        level_selection.get_last_highlighted_level_index() == 15,
+        "selecting a level remembers it for the next menu visit"
+    ) and passed
+    passed = _expect(
+        level_selection.remember_highlighted_level(3) \
+        and level_selection.get_last_highlighted_level_index() == 3,
+        "moving focus remembers the highlighted level without launching it"
+    ) and passed
+    level_selection.free()
     return passed
 
 

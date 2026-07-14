@@ -23,7 +23,7 @@ point_count = 11
 [sub_resource type="Animation" id="Animation_0b107"]
 resource_local_to_scene = true
 resource_name = "kill_boundary"
-length = 143.04734391784677
+length = 143.04734391784675
 loop_mode = 1
 markers = [{
 "color": Color(0.25, 0.8, 1, 1),
@@ -48,7 +48,7 @@ markers = [{
 }, {
 "color": Color(0.25, 0.8, 1, 1),
 "name": &"Path Point 6",
-"time": 101.69870787359855
+"time": 101.69870787359856
 }, {
 "color": Color(0.25, 0.8, 1, 1),
 "name": &"Path Point 7",
@@ -60,11 +60,11 @@ markers = [{
 }, {
 "color": Color(0.25, 0.8, 1, 1),
 "name": &"Path Point 9",
-"time": 119.14250073779809
+"time": 119.14250073779807
 }, {
 "color": Color(0.25, 0.8, 1, 1),
 "name": &"Path Point 10",
-"time": 125.38851034933575
+"time": 125.38851034933576
 }, {
 "color": Color(0.25, 0.8, 1, 1),
 "name": &"Path Point 11",
@@ -155,24 +155,8 @@ tracks/6/keys = {
 "values": [26.0, 15.0, 8.0]
 }
 
-[sub_resource type="Animation" id="Animation_2ij0k"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:movement_speed")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [3.0]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_ki37y"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_2ij0k"]
 _data = {
-&"RESET": SubResource("Animation_2ij0k"),
 &"kill_boundary": SubResource("Animation_0b107")
 }
 
@@ -216,11 +200,10 @@ bounds_size = Vector2(30, 26)
 render_effect = 1
 
 [node name="BoundaryCenter" parent="KillBoundary3D" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.211967, 0, -32.919228)
-progress = 45.863743
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.037884, -9.536743e-07, -20.23211)
 
 [node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_ki37y")
+libraries/ = SubResource("AnimationLibrary_2ij0k")
 
 [node name="Objects" type="Node3D" parent="." unique_id=680268237]
 
@@ -287,4 +270,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.19939661, 0.024999965, -68.
 [node name="LockedGate" parent="." unique_id=1470202402 instance=ExtResource("6_ptbvn")]
 transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 0.47655368, -9.536743e-07, -80.28888)
 
+[editable path="IndoorLighting"]
 [editable path="KillBoundary3D"]

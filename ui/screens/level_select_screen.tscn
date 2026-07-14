@@ -1,82 +1,108 @@
 [gd_scene format=3 uid="uid://pmuofl7veu10"]
 
-[ext_resource type="Script" path="res://ui/screens/level_select_screen.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://Assets/frontend/level-select.png" id="2_texture"]
+[ext_resource type="Script" uid="uid://todmlhvnf50e" path="res://ui/screens/level_select_screen.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://ba0bqdkt340fe" path="res://Assets/frontend/level-select.png" id="2_texture"]
+[ext_resource type="Texture2D" uid="uid://7wrf3dj6qtlq" path="res://Assets/frontend/level-background.png" id="3_card_texture"]
+[ext_resource type="FontFile" uid="uid://ipq4de64yjtd" path="res://Assets/fonts/Almendra-Bold.ttf" id="4_almendra_bold"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frame"]
+bg_color = Color(0.035, 0.027, 0.027, 0.93)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.66, 0.48, 0.22, 0.78)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0, 0, 0, 0.72)
+shadow_size = 28
+shadow_offset = Vector2(0, 12)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scroll"]
+bg_color = Color(0.015, 0.012, 0.014, 0.7)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.52, 0.39, 0.21, 0.38)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_normal"]
-bg_color = Color(0.08, 0.07, 0.08, 0.82)
+bg_color = Color(0.075, 0.065, 0.065, 0.94)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.86, 0.68, 0.32, 0.48)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.32)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
+border_color = Color(0.62, 0.46, 0.22, 0.7)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.44)
+shadow_size = 10
+shadow_offset = Vector2(0, 5)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_pressed"]
-bg_color = Color(0.2, 0.13, 0.08, 0.98)
+bg_color = Color(0.24, 0.15, 0.065, 0.99)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(1, 0.88, 0.42, 0.9)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.32)
+border_color = Color(1, 0.88, 0.42, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.4)
 shadow_size = 8
-shadow_offset = Vector2(0, 4)
+shadow_offset = Vector2(0, 3)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_hover"]
-bg_color = Color(0.15, 0.12, 0.11, 0.92)
+bg_color = Color(0.17, 0.125, 0.08, 0.98)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(1, 0.78, 0.28, 0.72)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.32)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
+border_color = Color(1, 0.76, 0.25, 0.9)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.42)
+shadow_size = 12
+shadow_offset = Vector2(0, 5)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_disabled"]
-bg_color = Color(0.04, 0.04, 0.045, 0.7)
+bg_color = Color(0.035, 0.033, 0.035, 0.78)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.45, 0.43, 0.38, 0.32)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.32)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
+border_color = Color(0.35, 0.32, 0.28, 0.38)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_focus"]
-bg_color = Color(0.18, 0.12, 0.08, 0.25)
+bg_color = Color(0.21, 0.145, 0.07, 0.4)
 border_width_left = 4
 border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
-border_color = Color(0.72, 1, 0.62, 0.95)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.32)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
+border_color = Color(1, 0.87, 0.42, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(1, 0.58, 0.12, 0.2)
+shadow_size = 14
+shadow_offset = Vector2(0, 3)
 
 [node name="LevelSelectScreen" type="Control" unique_id=1744003434]
 layout_mode = 3
@@ -108,40 +134,79 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0, 0, 0, 0.44)
+color = Color(0.015, 0.01, 0.015, 0.58)
 
-[node name="LevelSelectPanel" type="VBoxContainer" parent="." unique_id=421454747]
+[node name="LevelSelectFrame" type="PanelContainer" parent="." unique_id=929869806]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -920.0
-offset_top = -450.0
-offset_right = 920.0
-offset_bottom = 450.0
-theme_override_constants/separation = 48
-alignment = 1
+offset_left = -940.0
+offset_top = -520.0
+offset_right = 940.0
+offset_bottom = 520.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_frame")
 
-[node name="Title" type="Label" parent="LevelSelectPanel" unique_id=1487271135]
+[node name="Margin" type="MarginContainer" parent="LevelSelectFrame" unique_id=1033775950]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.86, 0.35, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/margin_left = 38
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 38
+theme_override_constants/margin_bottom = 22
+
+[node name="LevelSelectPanel" type="VBoxContainer" parent="LevelSelectFrame/Margin" unique_id=421454747]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Header" type="VBoxContainer" parent="LevelSelectFrame/Margin/LevelSelectPanel" unique_id=2146098723]
+layout_mode = 2
+theme_override_constants/separation = -4
+
+[node name="Title" type="Label" parent="LevelSelectFrame/Margin/LevelSelectPanel/Header" unique_id=1487271135]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0.34, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
 theme_override_constants/shadow_offset_x = 3
 theme_override_constants/shadow_offset_y = 3
-theme_override_font_sizes/font_size = 96
-text = "Select Level"
+theme_override_fonts/font = ExtResource("4_almendra_bold")
+theme_override_font_sizes/font_size = 76
+text = "CHOOSE YOUR TOMB"
 horizontal_alignment = 1
 
-[node name="LevelGrid" type="GridContainer" parent="LevelSelectPanel" unique_id=1831174116]
+[node name="Accent" type="ColorRect" parent="LevelSelectFrame/Margin/LevelSelectPanel" unique_id=1111507151]
+custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
-theme_override_constants/h_separation = 32
-theme_override_constants/v_separation = 32
-columns = 4
+mouse_filter = 2
+color = Color(0.7, 0.5, 0.2, 0.58)
 
-[node name="LevelButtonTemplate" type="Button" parent="LevelSelectPanel/LevelGrid" unique_id=1842819667]
-custom_minimum_size = Vector2(420, 264)
+[node name="LevelScroll" type="ScrollContainer" parent="LevelSelectFrame/Margin/LevelSelectPanel" unique_id=1196102514]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_scroll")
+scroll_vertical_custom_step = 384.0
+horizontal_scroll_mode = 0
+
+[node name="GridMargin" type="MarginContainer" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll" unique_id=722211005]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="LevelGrid" type="GridContainer" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll/GridMargin" unique_id=1831174116]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 24
+theme_override_constants/v_separation = 24
+columns = 3
+
+[node name="LevelButtonTemplate" type="Button" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll/GridMargin/LevelGrid" unique_id=1842819667]
+custom_minimum_size = Vector2(550, 360)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_level_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_level_pressed")
@@ -149,39 +214,74 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_level_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_level_disabled")
 theme_override_styles/focus = SubResource("StyleBoxFlat_level_focus")
 
-[node name="Content" type="VBoxContainer" parent="LevelSelectPanel/LevelGrid/LevelButtonTemplate" unique_id=2025176603]
+[node name="CardBackground" type="TextureRect" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll/GridMargin/LevelGrid/LevelButtonTemplate" unique_id=1612761150]
+modulate = Color(0.72, 0.72, 0.72, 1)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 28.0
-offset_top = 24.0
-offset_right = -28.0
-offset_bottom = -24.0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = -6.0
+offset_bottom = -6.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_constants/separation = 16
-alignment = 1
+texture = ExtResource("3_card_texture")
+expand_mode = 1
+stretch_mode = 6
 
-[node name="Title" type="Label" parent="LevelSelectPanel/LevelGrid/LevelButtonTemplate/Content" unique_id=2115129994]
-layout_mode = 2
+[node name="Title" type="Label" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll/GridMargin/LevelGrid/LevelButtonTemplate" unique_id=2115129994]
+layout_mode = 0
+offset_left = 19.0
+offset_top = 46.0
+offset_right = 521.0
+offset_bottom = 123.0
 theme_override_colors/font_color = Color(1, 0.86, 0.35, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 68
+theme_override_fonts/font = ExtResource("4_almendra_bold")
+theme_override_font_sizes/font_size = 56
 text = "Level Name"
 horizontal_alignment = 1
+max_lines_visible = 2
 
-[node name="Result" type="Label" parent="LevelSelectPanel/LevelGrid/LevelButtonTemplate/Content" unique_id=1992305327]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.86, 0.72, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
-theme_override_constants/shadow_offset_x = 1
-theme_override_constants/shadow_offset_y = 1
-theme_override_font_sizes/font_size = 40
-text = "Best: --
-Complete: --"
+[node name="LevelStatus" type="Label" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll/GridMargin/LevelGrid/LevelButtonTemplate" unique_id=126792022]
+layout_mode = 0
+offset_left = 23.0
+offset_top = 110.0
+offset_right = 525.0
+offset_bottom = 149.0
+theme_override_colors/font_color = Color(0.58, 0.86, 0.82, 1)
+theme_override_fonts/font = ExtResource("4_almendra_bold")
+theme_override_font_sizes/font_size = 28
+text = "TUTORIAL"
 horizontal_alignment = 1
-autowrap_mode = 3
+
+[node name="Percentage" type="Label" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll/GridMargin/LevelGrid/LevelButtonTemplate" unique_id=846358815]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 158.0
+offset_right = 524.0
+offset_bottom = 257.0
+theme_override_colors/font_color = Color(1, 0.82, 0.3, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_fonts/font = ExtResource("4_almendra_bold")
+theme_override_font_sizes/font_size = 72
+text = "100%"
+horizontal_alignment = 1
+
+[node name="Plays" type="Label" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll/GridMargin/LevelGrid/LevelButtonTemplate" unique_id=1990337750]
+layout_mode = 0
+offset_left = 217.0
+offset_top = 273.0
+offset_right = 467.0
+offset_bottom = 309.0
+theme_override_colors/font_color = Color(0.7, 0.66, 0.58, 1)
+theme_override_fonts/font = ExtResource("4_almendra_bold")
+theme_override_font_sizes/font_size = 26
+text = "0 PLAYS"
+horizontal_alignment = 2
