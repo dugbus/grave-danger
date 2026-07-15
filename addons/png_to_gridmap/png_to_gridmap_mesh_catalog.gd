@@ -7,15 +7,19 @@ extends RefCounted
 
 
 ## Scans the project for MeshLibrary resources.
-static func find_project_mesh_libraries() -> Array[String]:
+static func find_project_mesh_libraries(editor_filesystem: Object) -> Array[String]:
 	var results: Array[String] = []
-	_collect_project_mesh_libraries("res://", results)
+	_collect_project_mesh_libraries("res://", results, editor_filesystem)
 	results.sort()
 	return results
 
 
 ## Recursively collects MeshLibrary resource paths under one directory.
-static func _collect_project_mesh_libraries(directory_path: String, results: Array[String]) -> void:
+static func _collect_project_mesh_libraries(
+	directory_path: String,
+	results: Array[String],
+	editor_filesystem: Object
+) -> void:
 	var directory := DirAccess.open(directory_path)
 	if directory == null:
 		return
@@ -28,13 +32,14 @@ static func _collect_project_mesh_libraries(directory_path: String, results: Arr
 			continue
 		var path := directory_path.path_join(entry)
 		if directory.current_is_dir():
-			_collect_project_mesh_libraries(path, results)
+			_collect_project_mesh_libraries(path, results, editor_filesystem)
 			continue
 		var extension := entry.get_extension().to_lower()
 		if extension != "tres" and extension != "res":
 			continue
-		var resource := ResourceLoader.load(path)
-		if resource is MeshLibrary:
+		# Checking the declared type avoids loading every project resource and all of
+		# its dependencies merely to discover the small set of MeshLibraries.
+		if String(editor_filesystem.call(&"get_file_type", path)) == "MeshLibrary":
 			results.append(path)
 	directory.list_dir_end()
 

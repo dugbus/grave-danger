@@ -9,6 +9,7 @@ const SETTINGS_DIR := "res://addons/png_to_gridmap/settings"
 const UI_STATE_SECTION := "png_to_gridmap"
 const UI_STATE_ADVANCED_VISIBLE := "advanced_visible"
 const UI_STATE_OPERATION_ID := "operation_id"
+const LEVELS_ROOT := "res://levels"
 const LEVEL_SETTINGS_FILE := "png_to_gridmap_settings.tres"
 const GLOBAL_PROPERTIES := [&"mesh_library_path", &"color_mappings", &"floor_materials_folder"]
 const LEVEL_PROPERTIES := [
@@ -94,8 +95,11 @@ func load_for_scene(current_settings: Resource, scene_path: String) -> Resource:
 	return loaded
 
 
-## Saves the automatic mapping profile for the selected MeshLibrary.
+## Saves mapping and scene settings only while editing a scene below res://levels/.
 func save(settings: Resource, scene_path: String) -> Error:
+	var level_settings_path := path_for_scene(scene_path)
+	if level_settings_path == "":
+		return ERR_INVALID_PARAMETER
 	if settings.mesh_library_path == "":
 		return ERR_UNCONFIGURED
 	_ensure_settings_dir()
@@ -105,18 +109,27 @@ func save(settings: Resource, scene_path: String) -> Error:
 	var global_settings := _settings_script.new() as Resource
 	_copy_properties(settings, global_settings, GLOBAL_PROPERTIES)
 	var result := ResourceSaver.save(global_settings, path)
-	if result != OK or scene_path == "":
+	if result != OK:
 		return result
 	var level_settings := _settings_script.new() as Resource
 	_copy_properties(settings, level_settings, LEVEL_PROPERTIES)
-	return ResourceSaver.save(level_settings, path_for_scene(scene_path))
+	return ResourceSaver.save(level_settings, level_settings_path)
 
 
-## Returns the per-level settings path beside a scene file.
+## Returns a settings path only for scenes inside a subfolder of res://levels/.
 func path_for_scene(scene_path: String) -> String:
-	if scene_path == "":
+	if not is_scene_in_levels_subfolder(scene_path):
 		return ""
-	return scene_path.get_base_dir().path_join(LEVEL_SETTINGS_FILE)
+	var normalized_path := scene_path.replace("\\", "/").simplify_path()
+	return normalized_path.get_base_dir().path_join(LEVEL_SETTINGS_FILE)
+
+
+## Reports whether a scene is below, rather than directly inside, the levels root.
+static func is_scene_in_levels_subfolder(scene_path: String) -> bool:
+	if scene_path == "":
+		return false
+	var normalized_path := scene_path.replace("\\", "/").simplify_path()
+	return normalized_path.get_base_dir().begins_with(LEVELS_ROOT + "/")
 
 
 ## Copies a selected persistence partition between settings resources.

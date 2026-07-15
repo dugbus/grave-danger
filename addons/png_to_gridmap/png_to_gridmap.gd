@@ -19,6 +19,7 @@ const EMPTY_KEY := "FFFFFFFF"
 const LEVEL_PNG_FILE := "level.png"
 const AUTO_REPAIR_CHECK_INTERVAL_MSEC := 200
 const AUTO_REPAIR_DEBOUNCE_MSEC := 600
+const DIAGNOSTIC_PREFIX := "[PNGToGridMap]"
 
 var _settings: Resource = SettingsResource.new()
 var _image: Image
@@ -41,10 +42,18 @@ var _observed_grid_map_id := 0
 var _observed_grid_map_fingerprint := 0
 var _next_auto_repair_check_msec := 0
 var _auto_repair_due_msec := 0
+var _resource_refresh_pending := true
+var _level_settings_loaded := false
 
 
 ## Creates the dock and service objects when the editor enables the addon.
 func _enter_tree() -> void:
+	var engine_version := String(Engine.get_version_info().get("string", "unknown"))
+	_trace("Enabling on Godot %s (%s, %s)." % [
+		engine_version,
+		OS.get_name(),
+		Engine.get_architecture_name(),
+	])
 	_profile_store = ProfileStoreResource.new(get_editor_interface(), SettingsResource)
 	_importer = ImporterResource.new()
 	_exporter = ExporterResource.new()
@@ -57,14 +66,17 @@ func _enter_tree() -> void:
 	_dock.setup(_dock_title(), _settings, ui_state)
 	_connect_dock_signals()
 	add_control_to_dock(DOCK_SLOT_RIGHT_UL, _dock)
-	_load_level_settings()
-	_load_conventional_level_png()
-	_refresh_all()
+	_trace("Dock created; waiting for the edited scene and project filesystem.")
+	# A deferred check supports enabling the plugin after a scene is already open. During
+	# editor startup, scene_changed supplies the readiness event after scenes are restored.
+	_dock.set_validation_text("Waiting for Godot to finish opening the edited scene...")
+	call_deferred(&"_try_complete_resource_refresh")
 	set_process(true)
 
 
 ## Removes the dock when the editor disables the addon.
 func _exit_tree() -> void:
+	_trace("Disabling plugin.")
 	set_process(false)
 	if _dock != null:
 		remove_control_from_docks(_dock)
@@ -112,13 +124,18 @@ func _dock_title() -> String:
 
 ## Connects dock UI actions to plugin-level orchestration handlers.
 func _connect_dock_signals() -> void:
+	scene_changed.connect(_on_first_edited_scene_changed)
+	var editor_filesystem := get_editor_interface().get_resource_filesystem()
+	editor_filesystem.filesystem_changed.connect(_on_editor_filesystem_activity_finished)
+	editor_filesystem.resources_reimporting.connect(_on_editor_resources_reimporting)
+	editor_filesystem.resources_reimported.connect(_on_editor_resources_reimported)
 	_dock.load_png_selected.connect(_on_load_png_selected)
 	_dock.export_png_path_selected.connect(_on_export_png_path_selected)
 	_dock.run_requested.connect(_on_run_requested)
 	_dock.repair_gridmap_requested.connect(_on_repair_gridmap_requested)
 	_dock.create_floor_requested.connect(_on_create_floor_requested)
 	_dock.floor_material_selected.connect(_on_floor_material_selected)
-	_dock.refresh_requested.connect(_refresh_all)
+	_dock.refresh_requested.connect(_on_refresh_requested)
 	_dock.operation_changed.connect(_on_operation_changed)
 	_dock.mesh_library_selected.connect(_on_mesh_library_selected)
 	_dock.gridmap_selected.connect(_on_gridmap_selected)
@@ -126,12 +143,96 @@ func _connect_dock_signals() -> void:
 	_dock.mapping_changed.connect(_on_mapping_changed)
 
 
+## Schedules initial discovery when the editor restores or opens its first edited scene.
+func _on_first_edited_scene_changed(scene_root: Node) -> void:
+	_trace("Edited scene changed to %s." % _scene_diagnostic_name(scene_root))
+	if _level_settings_loaded:
+		return
+	if scene_root == null:
+		_resource_refresh_pending = false
+		_dock.set_validation_text("Open a scene before running the converter.")
+		return
+	_resource_refresh_pending = true
+	call_deferred(&"_try_complete_resource_refresh")
+
+
+## Retries queued discovery after the editor finishes a filesystem update.
+func _on_editor_filesystem_activity_finished() -> void:
+	_trace("Editor filesystem activity finished; refresh pending: %s." % _resource_refresh_pending)
+	if _resource_refresh_pending:
+		call_deferred(&"_try_complete_resource_refresh")
+
+
+## Suspends discovery when Godot begins replacing imported resource data.
+func _on_editor_resources_reimporting(resources: PackedStringArray) -> void:
+	_trace("Resource reimport started for %s file(s)." % resources.size())
+	_resource_refresh_pending = true
+	_dock.set_validation_text("Waiting for Godot to finish importing project files...")
+
+
+## Retries queued discovery after imported resource data becomes available.
+func _on_editor_resources_reimported(resources: PackedStringArray) -> void:
+	_trace("Resource reimport finished for %s file(s)." % resources.size())
+	if _resource_refresh_pending:
+		call_deferred(&"_try_complete_resource_refresh")
+
+
+## Runs discovery only when an edited scene exists and the project filesystem is idle.
+func _try_complete_resource_refresh() -> void:
+	var root := get_editor_interface().get_edited_scene_root()
+	if root == null:
+		_trace("Resource refresh paused: there is no edited scene.")
+		_resource_refresh_pending = false
+		_dock.set_validation_text("Open a scene before running the converter.")
+		return
+	if not _editor_filesystem_is_ready():
+		var editor_filesystem := get_editor_interface().get_resource_filesystem()
+		_trace("Resource refresh paused: filesystem scanning=%s, importing=%s." % [
+			editor_filesystem.is_scanning(),
+			editor_filesystem.is_importing(),
+		])
+		_dock.set_validation_text("Waiting for Godot to finish scanning project files...")
+		return
+	_trace("Edited scene and project filesystem are ready; starting discovery.")
+	_resource_refresh_pending = false
+	if not _level_settings_loaded:
+		_load_level_settings()
+		_level_settings_loaded = true
+	_load_conventional_level_png()
+	_refresh_all()
+
+
+## Refreshes immediately when safe, or queues the request behind an active editor scan.
+func _on_refresh_requested() -> void:
+	if not _editor_filesystem_is_ready():
+		_resource_refresh_pending = true
+		_dock.set_validation_text("Waiting for Godot to finish scanning project files...")
+		return
+	_resource_refresh_pending = false
+	_refresh_all()
+
+
+## Reports readiness only while the editor has an indexed and idle project filesystem.
+func _editor_filesystem_is_ready() -> bool:
+	var editor_filesystem := get_editor_interface().get_resource_filesystem()
+	return editor_filesystem.get_filesystem() != null \
+		and not editor_filesystem.is_scanning() \
+		and not editor_filesystem.is_importing()
+
+
 ## Refreshes project-driven dropdowns and reloads any saved PNG state.
 func _refresh_all() -> void:
+	_trace("Refreshing MeshLibrary catalogue.")
 	_refresh_mesh_libraries()
+	_trace("Found %s MeshLibrary resource(s)." % _mesh_library_paths.size())
+	_trace("Refreshing floor material catalogue.")
 	_refresh_floor_materials()
+	_trace("Found %s floor material resource(s)." % _floor_material_paths.size())
+	_trace("Refreshing edited-scene GridMap paths.")
 	_refresh_gridmap_paths()
+	_trace("Refreshing MeshLibrary item references.")
 	_refresh_available_items()
+	_trace("Found %s selectable MeshLibrary item(s)." % _available_item_refs.size())
 	var conventional_png := _conventional_level_png_path()
 	if conventional_png != "" and ResourceLoader.exists(conventional_png) \
 			and _settings.png_path != conventional_png:
@@ -141,11 +242,13 @@ func _refresh_all() -> void:
 	else:
 		_dock.set_png_state(_settings.png_path, _detected_colours, _colour_order)
 	_update_dock_state()
+	_trace("Resource refresh completed.")
 
 
 ## Rebuilds the MeshLibrary dropdown from project resources.
 func _refresh_mesh_libraries() -> void:
-	_mesh_library_paths = PNGToGridMapMeshCatalog.find_project_mesh_libraries()
+	var editor_filesystem := get_editor_interface().get_resource_filesystem()
+	_mesh_library_paths = PNGToGridMapMeshCatalog.find_project_mesh_libraries(editor_filesystem)
 	if _settings.mesh_library_path == "" and _mesh_library_paths.size() == 1:
 		_settings.mesh_library_path = _mesh_library_paths[0]
 		_load_profile_for_current_mesh_library()
@@ -174,7 +277,9 @@ func _collect_material_paths(folder: String, paths: Array[String]) -> void:
 			if not entry.begins_with("."):
 				_collect_material_paths(path, paths)
 		elif entry.get_extension().to_lower() in ["material", "tres"]:
-			if ResourceLoader.load(path) is Material:
+			var editor_filesystem := get_editor_interface().get_resource_filesystem()
+			var resource_type := editor_filesystem.get_file_type(path)
+			if resource_type != "" and ClassDB.is_parent_class(resource_type, &"Material"):
 				paths.append(path)
 		entry = directory.get_next()
 	directory.list_dir_end()
@@ -300,13 +405,29 @@ func _repair_grid_map(grid_map: GridMap, automatic: bool) -> void:
 	var undo_redo := get_undo_redo()
 	undo_redo.create_action("Auto Repair GridMap" if automatic else "Repair GridMap")
 	for change: Dictionary in changes:
-		undo_redo.add_do_method(grid_map, &"set_cell_item", change["cell"], int(change["item_id"]), int(change["orientation"]))
-		undo_redo.add_undo_method(grid_map, &"set_cell_item", change["cell"], int(change["previous_item_id"]), int(change["previous_orientation"]))
+		undo_redo.add_do_method(
+			grid_map,
+			&"set_cell_item",
+			change["cell"],
+			int(change["item_id"]),
+			int(change["orientation"])
+		)
+		undo_redo.add_undo_method(
+			grid_map,
+			&"set_cell_item",
+			change["cell"],
+			int(change["previous_item_id"]),
+			int(change["previous_orientation"])
+		)
 	undo_redo.commit_action()
 	get_editor_interface().edit_node(grid_map)
 	get_editor_interface().mark_scene_as_unsaved()
 	_save_profile()
-	var message := "Repaired %s autotile cells in %s.\n%s" % [changes.size(), grid_map.name, _repair_result_summary(result)]
+	var message := "Repaired %s autotile cells in %s.\n%s" % [
+		changes.size(),
+		grid_map.name,
+		_repair_result_summary(result),
+	]
 	if not warnings.is_empty():
 		message += "\n" + "\n".join(warnings)
 	_update_dock_state(message)
@@ -395,18 +516,26 @@ func _on_mapping_changed() -> void:
 ## Loads a PNG image and rebuilds colour mappings from its palette.
 func _load_png(path: String, save_profile: bool) -> void:
 	var localized_path := PathsResource.localize_project_path(path)
+	_trace("Loading PNG resource: %s." % localized_path)
 	var texture := ResourceLoader.load(localized_path) as Texture2D
 	if texture == null:
+		_trace("PNG load failed: the resource did not produce a Texture2D.")
 		_update_dock_state("Could not load PNG: %s." % localized_path)
 		return
 
 	var image := texture.get_image()
 	if image == null:
+		_trace("PNG load failed: the Texture2D did not provide image data.")
 		_update_dock_state("Could not read image data from PNG: %s." % localized_path)
 		return
 	_image = image
 	_settings.png_path = localized_path
 	_scan_colours()
+	_trace("PNG loaded at %sx%s with %s mapped colour(s)." % [
+		_image.get_width(),
+		_image.get_height(),
+		_colour_order.size(),
+	])
 	_dock.set_settings(_settings)
 	_dock.set_png_state(localized_path, _detected_colours, _colour_order)
 	if save_profile:
@@ -436,7 +565,16 @@ func _run_import() -> void:
 ## Performs the import once the user has accepted any non-blocking warnings.
 func _continue_import(active: Dictionary) -> void:
 	var root := get_editor_interface().get_edited_scene_root()
-	var result := _importer.run(_settings, _image, root, _selected_gridmap(), active["library"], active["ref_to_id"], _available_item_ref_aliases, EMPTY_KEY)
+	var result := _importer.run(
+		_settings,
+		_image,
+		root,
+		_selected_gridmap(),
+		active["library"],
+		active["ref_to_id"],
+		_available_item_ref_aliases,
+		EMPTY_KEY
+	)
 	var errors := _to_string_array(result.get("errors", []))
 	if not errors.is_empty():
 		_update_dock_state("\n".join(errors))
@@ -466,7 +604,13 @@ func _run_export(path: String) -> void:
 		_update_dock_state("\n".join(errors))
 		return
 	var normalized_path := PathsResource.normalize_png_output_path(path)
-	var result := _exporter.run(_settings, _selected_gridmap(), normalized_path, _available_item_ref_aliases, _available_item_display_names)
+	var result := _exporter.run(
+		_settings,
+		_selected_gridmap(),
+		normalized_path,
+		_available_item_ref_aliases,
+		_available_item_display_names
+	)
 	errors = _to_string_array(result.get("errors", []))
 	if not errors.is_empty():
 		_update_dock_state("\n".join(errors))
@@ -575,6 +719,20 @@ func _update_dock_state(message: String = "") -> void:
 	_dock.set_settings(_settings)
 	_dock.set_output_path(_export_output_path())
 	_dock.set_validation_text(message if message != "" else _validation_text())
+
+
+## Prints low-noise lifecycle detail only when Godot is launched with --verbose.
+func _trace(message: String) -> void:
+	print_verbose("%s %s" % [DIAGNOSTIC_PREFIX, message])
+
+
+## Names an edited scene safely for startup diagnostics.
+func _scene_diagnostic_name(scene_root: Node) -> String:
+	if scene_root == null:
+		return "<none>"
+	if scene_root.scene_file_path != "":
+		return scene_root.scene_file_path
+	return "%s (unsaved)" % scene_root.name
 
 
 ## Builds the current validation summary shown above Run.
