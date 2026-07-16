@@ -50,7 +50,7 @@ var _floor_materials_folder_edit: LineEdit
 var _rows_container: VBoxContainer
 var _outputs_section_label: Label
 var _output_label: Label
-var _output_png_button_row: HBoxContainer
+var _output_png_button_row: HFlowContainer
 var _validation_label: RichTextLabel
 var _png_open_dialog: EditorFileDialog
 var _png_save_dialog: EditorFileDialog
@@ -64,7 +64,6 @@ var _floor_materials_folder_dialog: EditorFileDialog
 func setup(title_text: String, settings: Resource, ui_state: Dictionary) -> void:
 	_settings = settings
 	name = "PNG to GridMap"
-	custom_minimum_size = Vector2(430, 0)
 	_build_main_scroll(title_text)
 	_build_operation()
 	_build_inputs()
@@ -153,7 +152,10 @@ func set_validation_text(text: String) -> void:
 func show_import_warning(warnings: Array[String], confirmed: Callable) -> void:
 	_disconnect_signal_callables(_import_warning_dialog.confirmed)
 	_import_warning_dialog.confirmed.connect(confirmed, CONNECT_ONE_SHOT)
-	_import_warning_dialog.dialog_text = "Some colours are unassigned and will be skipped:\n\n- %s\n\nContinue import?" % "\n- ".join(warnings)
+	_import_warning_dialog.dialog_text = (
+		"Some colours are unassigned and will be skipped:\n\n- %s\n\nContinue import?"
+		% "\n- ".join(warnings)
+	)
 	_import_warning_dialog.popup_centered()
 
 
@@ -362,8 +364,9 @@ func _build_outputs() -> void:
 func _build_footer() -> void:
 	add_child(HSeparator.new())
 	_validation_label = RichTextLabel.new()
-	_validation_label.custom_minimum_size = Vector2(0, 120)
-	_validation_label.fit_content = true
+	_validation_label.custom_minimum_size = Vector2(0, 84)
+	_validation_label.fit_content = false
+	_validation_label.scroll_active = true
 	_validation_label.bbcode_enabled = false
 	add_child(_validation_label)
 	add_child(_button_row([
@@ -468,7 +471,10 @@ func _colour_row(key: String) -> Control:
 	swatch.custom_minimum_size = Vector2(34, 22)
 	header.add_child(swatch)
 	var title := Label.new()
-	title.text = "%s  %s px" % [mapping.display_name if mapping.display_name != "" else "#" + key, _detected_colours[key]["count"]]
+	title.text = "%s  %s px" % [
+		mapping.display_name if mapping.display_name != "" else "#" + key,
+		_detected_colours[key]["count"],
+	]
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
 	var autotile := CheckBox.new()
@@ -502,7 +508,10 @@ func _autotile_connectivity_group_row(mapping: Resource) -> Control:
 	group.placeholder_text = "Configured variants"
 	group.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	group.text = mapping.autotile_connectivity_group
-	group.tooltip_text = "Blank connects equivalent variant configurations. Matching groups connect different mappings as one tile type."
+	group.tooltip_text = (
+		"Blank connects equivalent variant configurations. "
+		+ "Matching groups connect different mappings as one tile type."
+	)
 	group.text_changed.connect(func(value: String) -> void:
 		mapping.autotile_connectivity_group = value.strip_edges()
 		mapping_changed.emit()
@@ -681,9 +690,9 @@ func _path_label(text: String) -> Label:
 	return label
 
 
-## Creates a horizontal row of buttons from label/callable pairs.
-func _button_row(specs: Array) -> HBoxContainer:
-	var row := HBoxContainer.new()
+## Creates a wrapping row of buttons that does not impose a wide editor dock.
+func _button_row(specs: Array) -> HFlowContainer:
+	var row := HFlowContainer.new()
 	for spec in specs:
 		var button := Button.new()
 		button.text = spec[0]
@@ -747,10 +756,18 @@ func _tooltip_for_control(control: Control) -> String:
 		"GridMap": return "Choose which collection of placed pieces this tool should use."
 		"GridMap name": return "Name the new collection of placed pieces that will be created."
 		"MeshLibrary": return "Choose the set of wall pieces available for this level."
-		"Configure Wall Tiles and Colours": return "Choose which wall piece each picture colour represents. These choices are shared across levels."
+		"Configure Wall Tiles and Colours":
+			return (
+				"Choose which wall piece each picture colour represents. "
+				+ "These choices are shared across levels."
+			)
 		"More Level Settings": return "Show or hide less commonly changed choices for this level."
 		"Cell size": return "Set the width and depth of each square in the level."
-		"Auto repair": return "After you finish painting, automatically fit wall ends, corners, and junctions to their neighbours."
+		"Auto repair":
+			return (
+				"After you finish painting, automatically fit wall ends, corners, "
+				+ "and junctions to their neighbours."
+			)
 		"Floor GridMap": return "Choose the look of the floor created beneath the picture."
 		"Wall pieces file": return "Choose the shared file containing the wall pieces used by picture colours."
 		"Floor materials folder": return "Choose the shared folder whose floor finishes appear in the floor list."
