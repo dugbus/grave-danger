@@ -13,7 +13,7 @@
 [ext_resource type="PackedScene" path="res://pushables/rolling_rock_pushable.tscn" id="12_2ij0k"]
 [ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
 
-[sub_resource type="Curve3D" id="Curve3D_ki37y"]
+[sub_resource type="Curve3D" id="Curve3D_0b107"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -22.037884, -9.536743e-07, -20.23211, 0, 0, 0, 0, 0, 0, -21.861654, -3.8146973e-06, -21.58252, 0, 0, 0, 0, 0, 0, -22.116663, 0, -49.48889, 0, 0, 0, 0, 0, 0, -21.211967, 0, -32.919228, 0, 0, 0, 0, 0, 0, -21.08255, 0, -98.01859, 0, 0, 0, 0, 0, 0, -21.356441, 0, -116.8847, 0, 0, 0, 0, 0, 0, -21.31929, 1.7690797e-06, -122.367966, 0, 0, 0, 0, 0, 0, -21.196217, 7.6293945e-06, -140.53203, 0, 0, 0, 0, 0, 0, -21.5183, 4.0159357e-06, -151.7674, 0, 0, 0, 0, 0, 0, -21.876255, 0, -164.2542, 0, 0, 0, 0, 0, 0, -22.090694, -25.882805, -178.96814),
@@ -21,7 +21,7 @@ _data = {
 }
 point_count = 11
 
-[sub_resource type="Animation" id="Animation_ecquf"]
+[sub_resource type="Animation" id="Animation_2ij0k"]
 resource_local_to_scene = true
 resource_name = "kill_boundary"
 length = 143.04734391784675
@@ -156,9 +156,9 @@ tracks/6/keys = {
 "values": [26.0, 15.0, 8.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_swd6y"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ki37y"]
 _data = {
-&"kill_boundary": SubResource("Animation_ecquf")
+&"kill_boundary": SubResource("Animation_2ij0k")
 }
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_eghc2"]
@@ -192,8 +192,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.40533066, 3.0480652, 11.04
 
 [node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 21.98343, 0, 36.509598)
-curve = SubResource("Curve3D_ki37y")
-boundary_animation = SubResource("Animation_ecquf")
+curve = SubResource("Curve3D_0b107")
+boundary_animation = SubResource("Animation_2ij0k")
 movement_speed = 3.0
 boundary_size_x = 30.0
 boundary_size_y = 26.0
@@ -204,18 +204,18 @@ render_effect = 1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.037884, -9.536743e-07, -20.23211)
 
 [node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_swd6y")
+libraries/ = SubResource("AnimationLibrary_ki37y")
 
 [node name="Objects" type="Node3D" parent="." unique_id=680268237]
 
 [node name="GoldCoinPile" parent="." unique_id=492205804 instance=ExtResource("9_68qku")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.2541485, 0, 17.972908)
-coin_count = 50
+coin_count = 45
 pile_radius = 2.6999999999999997
 
 [node name="GoldCoinPile2" parent="." unique_id=642445069 instance=ExtResource("9_68qku")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.8218246, 1.9073486e-06, 18.009254)
-coin_count = 50
+coin_count = 45
 pile_radius = 2.6999999999999997
 
 [node name="PNGGridMap" type="GridMap" parent="." unique_id=1416498824]
