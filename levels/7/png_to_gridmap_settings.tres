@@ -6,4 +6,4 @@
 script = ExtResource("1_jbrcq")
 png_path = "res://levels/7/level.png"
 target_gridmap_path = NodePath("PNGGridMap")
-floor_material_path = "res://Assets/environment/floors/flagstones_floor.material"
+auto_repair = true
