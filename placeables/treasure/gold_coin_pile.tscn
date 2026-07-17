@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cw45377f21i2v"]
+
+[ext_resource type="Script" uid="uid://yolfjxhtbw5f" path="res://placeables/treasure/gold_coin_pile.gd" id="1_8nvh0"]
+
+[node name="GoldCoinPile" type="Node3D" unique_id=492205804]
+script = ExtResource("1_8nvh0")

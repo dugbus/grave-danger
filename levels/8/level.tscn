@@ -2,12 +2,12 @@
 
 [ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/kenney-graveyard/coffin.glb" id="1_coffin"]
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
-[ext_resource type="PackedScene" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
-[ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="4_flame"]
-[ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
+[ext_resource type="PackedScene" path="res://placeables/treasure/gold_coin_pile.tscn" id="3_coinpile"]
+[ext_resource type="PackedScene" path="res://placeables/kill_boundary/kill_boundary.tscn" id="4_flame"]
+[ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://placeables/treasure_deposit/treasure_deposit.gd" id="6_deposit"]
 [ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://Assets/environment/shaders/level.gdshader" id="8_floor_shader"]
 [ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="9_floor_texture"]
-[ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
+[ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]
 
 [sub_resource type="Curve3D" id="Curve3D_gm14s"]
 resource_local_to_scene = true
@@ -237,7 +237,7 @@ pile_radius = 2.0
 [node name="coffin3" parent="Objects" unique_id=1894824003 instance=ExtResource("1_coffin")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.085945, -5.9604645e-08, -0.098694086)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin3" unique_id=894045105]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin3" unique_id=894045105]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
@@ -245,154 +245,154 @@ metadata/_edit_lock_ = true
 [node name="coffin4" parent="Objects" unique_id=600896566 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.4832977, 0, 0.8754561, 0, 1, 0, -0.8754561, 0, 0.4832977, -9.267612, -5.9604645e-08, -15.682045)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin4" unique_id=91261711]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin4" unique_id=91261711]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin5" parent="Objects" unique_id=868622373 instance=ExtResource("1_coffin")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7774043, -5.9604645e-08, -9.22204)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin5" unique_id=1240180796]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin5" unique_id=1240180796]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin6" parent="Objects" unique_id=2051800972 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.40229934, 0, -0.91550815, 0, 1, 0, 0.91550815, 0, 0.40229934, -17.646578, -5.9604645e-08, -1.0837998)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin6" unique_id=54787116]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin6" unique_id=54787116]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin25" parent="Objects" unique_id=1601046856 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.99999964, 0, 0.000959903, 0, 1, 0, -0.000959903, 0, 0.99999964, -22.934593, -5.9604645e-08, -3.8827286)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin25" unique_id=995087480]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin25" unique_id=995087480]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin7" parent="Objects" unique_id=2027677637 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.44472903, 0, 0.89566517, 0, 1, 0, -0.89566517, 0, 0.44472903, -19.432016, -5.9604645e-08, 10.420669)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin7" unique_id=891446467]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin7" unique_id=891446467]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin24" parent="Objects" unique_id=502835946 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.99265003, 0, -0.121020466, 0, 1, 0, 0.121020466, 0, 0.99265003, -12.935608, -5.9604645e-08, 6.733516)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin24" unique_id=341637864]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin24" unique_id=341637864]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin23" parent="Objects" unique_id=1329291622 instance=ExtResource("1_coffin")]
 transform = Transform3D(-0.48375595, 0, 0.8752029, 0, 1, 0, -0.8752029, 0, -0.48375595, -17.019213, -5.9604645e-08, 18.244072)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin23" unique_id=1729369881]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin23" unique_id=1729369881]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin8" parent="Objects" unique_id=1850102587 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.3292292, 0, -0.94425, 0, 1, 0, 0.94425, 0, 0.3292292, -6.9960976, -5.9604645e-08, 21.738663)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin8" unique_id=1095241424]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin8" unique_id=1095241424]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin9" parent="Objects" unique_id=1291365494 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.3292292, 0, -0.94425, 0, 1, 0, 0.94425, 0, 0.3292292, 5.3881836, -5.9604645e-08, 21.738663)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin9" unique_id=1994220810]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin9" unique_id=1994220810]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin10" parent="Objects" unique_id=2126768573 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.36365777, 0, 0.93153256, 0, 1, 0, -0.93153256, 0, 0.36365777, 16.074047, -5.9604645e-08, 18.978733)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin10" unique_id=71785300]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin10" unique_id=71785300]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin11" parent="Objects" unique_id=37510148 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.36365777, 0, 0.93153256, 0, 1, 0, -0.93153256, 0, 0.36365777, 22.08926, -5.9604645e-08, 23.083237)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin11" unique_id=1264859161]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin11" unique_id=1264859161]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin12" parent="Objects" unique_id=557072321 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.99981236, 0, 0.019371808, 0, 1, 0, -0.019371808, 0, 0.99981236, 19.930859, -5.9604645e-08, 9.283611)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin12" unique_id=667941352]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin12" unique_id=667941352]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin13" parent="Objects" unique_id=782746036 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.99981236, 0, 0.019371808, 0, 1, 0, -0.019371808, 0, 0.99981236, 11.863386, -5.9604645e-08, 8.009802)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin13" unique_id=383798219]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin13" unique_id=383798219]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin14" parent="Objects" unique_id=37830806 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.99981236, 0, 0.019371808, 0, 1, 0, -0.019371808, 0, 0.99981236, 18.373985, -5.9604645e-08, -5.294453)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin14" unique_id=1896814200]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin14" unique_id=1896814200]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin15" parent="Objects" unique_id=1703037237 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.62340194, 0, -0.7819015, 0, 1, 0, 0.7819015, 0, 0.62340194, 22.620018, -5.9604645e-08, -20.757113)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin15" unique_id=1551282622]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin15" unique_id=1551282622]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin17" parent="Objects" unique_id=1138384471 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.9993207, 0, -0.036853135, 0, 1, 0, 0.036853135, 0, 0.9993207, 9.669605, -5.9604645e-08, -23.092434)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin17" unique_id=1058906827]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin17" unique_id=1058906827]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin18" parent="Objects" unique_id=975916250 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.006736815, 0, -0.99997735, 0, 1, 0, 0.99997735, 0, 0.006736815, -1.1224065, -5.9604645e-08, -13.39731)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin18" unique_id=1864563174]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin18" unique_id=1864563174]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin19" parent="Objects" unique_id=396706901 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.6309738, 0, -0.77580434, 0, 1, 0, 0.77580434, 0, 0.6309738, -5.7222786, -5.9604645e-08, -22.773983)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin19" unique_id=463839353]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin19" unique_id=463839353]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin20" parent="Objects" unique_id=1842326328 instance=ExtResource("1_coffin")]
 transform = Transform3D(-0.054044068, 0, -0.9985386, 0, 1, 0, 0.9985386, 0, -0.054044068, -18.77885, -5.9604645e-08, -21.394018)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin20" unique_id=806444074]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin20" unique_id=806444074]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin21" parent="Objects" unique_id=960388081 instance=ExtResource("1_coffin")]
 transform = Transform3D(-0.054044068, 0, -0.9985386, 0, 1, 0, 0.9985386, 0, -0.054044068, -2.7854404, -5.9604645e-08, -5.0467663)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin21" unique_id=976198342]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin21" unique_id=976198342]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin22" parent="Objects" unique_id=5946835 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.7184906, 0, -0.69553685, 0, 1, 0, 0.69553685, 0, 0.7184906, -8.942198, -5.9604645e-08, -4.9406157)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin22" unique_id=1052803318]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin22" unique_id=1052803318]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
 [node name="coffin16" parent="Objects" unique_id=1825766928 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.4574084, 0, 0.8892567, 0, 1, 0, -0.8892567, 0, 0.4574084, 14.411009, -5.9604645e-08, -13.786531)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/coffin16" unique_id=649242765]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/coffin16" unique_id=649242765]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 

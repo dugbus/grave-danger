@@ -3,8 +3,8 @@ class_name GDGraveyard
 
 const WIN_SCENE := "res://ui/screens/win_screen.tscn"
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
-const KILL_BOUNDARY_SCRIPT := preload("res://levels/common/kill_boundary/kill_boundary.gd")
-const LEVEL_SETTINGS_SCRIPT := preload("res://levels/common/level_settings.gd")
+const KILL_BOUNDARY_SCRIPT := preload("res://placeables/kill_boundary/kill_boundary.gd")
+const LEVEL_SETTINGS_SCRIPT := preload("res://levels/level_settings.gd")
 const NAVIGATION_BOOTSTRAP := preload("res://game/navigation_bootstrap.gd")
 
 const CURRENT_LEVEL_NAME := "CurrentLevel"
@@ -14,8 +14,8 @@ const CURRENT_LEVEL_NAME := "CurrentLevel"
 ## Level scene used when nothing has been selected yet.
 @export var default_level_scene: PackedScene
 
-var coins_collected := 0
-var max_coins_collected := 0
+var treasure_collected := 0
+var max_treasure_value := 0
 var showing_result := false
 var current_level: Node
 
@@ -26,25 +26,24 @@ func _ready() -> void:
 	_configure_runtime_references()
 	_activate_current_level_camera()
 	_configure_kill_boundary_animation()
-	max_coins_collected = _calculate_max_coins_collected()
+	max_treasure_value = _calculate_max_treasure_value()
 	_store_result_stats()
-	get_tree().call_group("coin_score_display", "set_treasure_total", max_coins_collected)
+	get_tree().call_group("treasure_score_display", "set_treasure_total", max_treasure_value)
 
-	for deposit in _get_coin_deposits():
-		if deposit.has_signal("coin_absorbed"):
-			deposit.coin_absorbed.connect(_on_coin_absorbed)
+	for deposit in _get_treasure_deposits():
+		deposit.treasure_absorbed.connect(_on_treasure_absorbed)
 
 	for completion_source in _get_level_completion_sources():
 		if completion_source.has_signal("level_completed"):
 			completion_source.level_completed.connect(_on_level_completed)
 
 
-## Deposited coins update result stats only; gate completion owns the win condition.
-func _on_coin_absorbed(count: int) -> void:
+## Deposited treasure updates result stats only; gate completion owns the win condition.
+func _on_treasure_absorbed(value: int) -> void:
 	if showing_result:
 		return
 
-	coins_collected += maxi(count, 0)
+	treasure_collected += maxi(value, 0)
 	_store_result_stats()
 
 
@@ -55,14 +54,14 @@ func _on_level_completed() -> void:
 	_show_win_screen()
 
 
-func _calculate_max_coins_collected() -> int:
+func _calculate_max_treasure_value() -> int:
 	var total := 0
 	if current_level == null:
 		return total
 
 	for node in _get_descendants(current_level):
-		if node.has_method("get_max_coin_count"):
-			total += maxi(node.get_max_coin_count(), 0)
+		if node.has_method("get_max_treasure_value"):
+			total += maxi(node.get_max_treasure_value(), 0)
 	return total
 
 
@@ -77,7 +76,7 @@ func _get_descendants(root: Node) -> Array[Node]:
 func _store_result_stats() -> void:
 	var stats := get_node_or_null("/root/ResultStats")
 	if stats != null and stats.has_method("set_result"):
-		stats.set_result(coins_collected, max_coins_collected)
+		stats.set_result(treasure_collected, max_treasure_value)
 
 
 func _load_selected_level() -> void:
@@ -225,13 +224,13 @@ func _get_kill_boundary() -> Node:
 	return null
 
 
-func _get_coin_deposits() -> Array[Node]:
+func _get_treasure_deposits() -> Array[Node]:
 	if current_level == null:
 		return []
 
 	var deposits: Array[Node] = []
 	for node in _get_descendants(current_level):
-		if node.has_signal("coin_absorbed"):
+		if node.has_signal("treasure_absorbed"):
 			deposits.append(node)
 	return deposits
 

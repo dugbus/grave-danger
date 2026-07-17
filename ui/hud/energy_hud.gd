@@ -6,7 +6,7 @@ const HudPanelScene := preload("res://ui/hud/panel.tscn")
 
 ## Node that owns flame energy and death state values for the HUD panel.
 @export var death_controller_path: NodePath = ^"../Player/PlayerDeath"
-## Node that owns carried coin counts for the HUD panel.
+## Node that owns carried-item capacity for the HUD panel.
 @export var inventory_path: NodePath = ^"../Player/PlayerInventory"
 ## Existing editor-placed full HUD panel. If missing, a fallback panel is created.
 @export var hud_panel_path: NodePath = ^"HudPanel"
@@ -14,7 +14,7 @@ const HudPanelScene := preload("res://ui/hud/panel.tscn")
 @export var low_health_vignette_path: NodePath = ^"../LowHealthVignette"
 
 var death_controller: Node
-var gold_inventory: Node
+var player_inventory: Node
 var player: Node
 var active_flask_hud: Control
 var hud_panel: Control
@@ -33,9 +33,9 @@ func _ready() -> void:
 	_connect_player_signal()
 
 
-func set_runtime_references(death_controller_node: Node, gold_inventory_node: Node) -> void:
+func set_runtime_references(death_controller_node: Node, player_inventory_node: Node) -> void:
 	death_controller = death_controller_node
-	gold_inventory = gold_inventory_node
+	player_inventory = player_inventory_node
 	player = death_controller.get_parent() if death_controller != null else null
 	_connect_inventory_signal()
 	_connect_player_signal()
@@ -52,7 +52,7 @@ func _process(_delta: float) -> void:
 	if low_health_vignette == null:
 		_bind_low_health_vignette()
 
-	if not is_instance_valid(death_controller) or not is_instance_valid(gold_inventory):
+	if not is_instance_valid(death_controller) or not is_instance_valid(player_inventory):
 		_resolve_references()
 		_connect_inventory_signal()
 		_connect_player_signal()
@@ -63,17 +63,21 @@ func _process(_delta: float) -> void:
 
 func _resolve_references() -> void:
 	death_controller = _get_node_or_null_from_path(death_controller_path)
-	gold_inventory = _get_node_or_null_from_path(inventory_path)
+	player_inventory = _get_node_or_null_from_path(inventory_path)
 	player = death_controller.get_parent() if death_controller != null else null
 
 
 func _connect_inventory_signal() -> void:
-	if gold_inventory == null or not gold_inventory.has_signal("carried_gold_coins_changed"):
+	if player_inventory == null:
 		return
-	if gold_inventory.carried_gold_coins_changed.is_connected(_on_carried_gold_coins_changed):
-		return
-
-	gold_inventory.carried_gold_coins_changed.connect(_on_carried_gold_coins_changed)
+	if player_inventory.has_signal("item_count_changed") \
+		and not player_inventory.item_count_changed.is_connected(_on_item_count_changed):
+		player_inventory.item_count_changed.connect(_on_item_count_changed)
+	if player_inventory.has_signal("inventory_capacity_changed") \
+		and not player_inventory.inventory_capacity_changed.is_connected(
+			_on_inventory_capacity_changed
+		):
+		player_inventory.inventory_capacity_changed.connect(_on_inventory_capacity_changed)
 
 
 func _connect_player_signal() -> void:
@@ -109,7 +113,11 @@ func _bind_low_health_vignette() -> void:
 	low_health_vignette = _get_node_or_null_from_path(low_health_vignette_path)
 
 
-func _on_carried_gold_coins_changed(_carried_count: int) -> void:
+func _on_item_count_changed(_item_type: StringName, _carried_count: int) -> void:
+	_update_sack_display()
+
+
+func _on_inventory_capacity_changed(_max_units: int) -> void:
 	_update_sack_display()
 
 
@@ -140,11 +148,11 @@ func _update_health_display() -> void:
 func _update_sack_display() -> void:
 	var carried_count := 0
 	var max_count := 100
-	if gold_inventory != null:
-		if gold_inventory.has_method("get_carried_gold_coins"):
-			carried_count = maxi(gold_inventory.get_carried_gold_coins(), 0)
-		if gold_inventory.has_method("get_max_carried_gold_coins"):
-			max_count = maxi(gold_inventory.get_max_carried_gold_coins(), 1)
+	if player_inventory != null:
+		if player_inventory.has_method("get_used_inventory_units"):
+			carried_count = maxi(player_inventory.get_used_inventory_units(), 0)
+		if player_inventory.has_method("get_max_inventory_units"):
+			max_count = maxi(player_inventory.get_max_inventory_units(), 1)
 
 	if hud_panel != null and hud_panel.has_method("set_sack_counts"):
 		hud_panel.set_sack_counts(carried_count, max_count)

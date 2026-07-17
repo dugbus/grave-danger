@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="GDCarriedItem" format=3 uid="uid://dpqs8ur4s8s7f"]
+
+[ext_resource type="Script" uid="uid://dnfptyeoq66i6" path="res://inventory/carried_item.gd" id="1_item"]
+[ext_resource type="AudioStream" uid="uid://c7sicq1l56gub" path="res://Assets/audio/gold-bar-pickup.mp3" id="2_pickup_sound"]
+[ext_resource type="AudioStream" uid="uid://ekcrsun24ynb" path="res://Assets/audio/gold-hits-floor.mp3" id="3_landing_sound"]
+
+[resource]
+script = ExtResource("1_item")
+item_type = &"gold_bar"
+display_name = "Gold Bar"
+max_count = 99
+weight = 45.0
+treasure_value = 45
+drop_order = -10
+world_scene_path = "res://placeables/treasure/gold_bar.tscn"
+pickup_sound = ExtResource("2_pickup_sound")
+landing_sound = ExtResource("3_landing_sound")

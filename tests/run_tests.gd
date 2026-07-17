@@ -1,30 +1,49 @@
 extends SceneTree
 
 const BAT_NEST_SCRIPT := preload("res://enemies/bat_nest.gd")
-const COIN_DEPOSIT_COFFIN_SCENE := preload("res://levels/common/coin_deposit_coffin.tscn")
+const TREASURE_DEPOSIT_COFFIN_SCENE := preload("res://placeables/treasure_deposit/treasure_deposit_coffin.tscn")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
-const GOLD_COIN_SCENE := preload("res://collectibles/gold_coin.tscn")
-const GOLD_COIN_PILE_SCRIPT := preload("res://collectibles/gold_coin_pile.gd")
-const KEY_SCENE := preload("res://collectibles/key.tscn")
-const LEVEL_SETTINGS_SCRIPT := preload("res://levels/common/level_settings.gd")
+const AMETHYST_ITEM := preload("res://placeables/treasure/gems/amethyst_inventory.tres")
+const AMETHYST_SCENE := preload("res://placeables/treasure/gems/amethyst.tscn")
+const DIAMOND_ITEM := preload("res://placeables/treasure/gems/diamond_inventory.tres")
+const DIAMOND_MATERIAL := preload("res://placeables/treasure/gems/diamond_material.tres")
+const DIAMOND_SCENE := preload("res://placeables/treasure/gems/diamond.tscn")
+const EMERALD_ITEM := preload("res://placeables/treasure/gems/emerald_inventory.tres")
+const EMERALD_SCENE := preload("res://placeables/treasure/gems/emerald.tscn")
+const GOLD_BAR_ITEM := preload("res://placeables/treasure/gold_bar_inventory.tres")
+const GOLD_BAR_SCENE := preload("res://placeables/treasure/gold_bar.tscn")
+const GOLD_BAR_SCRIPT := preload("res://placeables/treasure/gold_bar.gd")
+const GOLD_COIN_ITEM := preload("res://placeables/treasure/gold_coin_inventory.tres")
+const GOLD_COIN_SCENE := preload("res://placeables/treasure/gold_coin.tscn")
+const GOLD_COIN_PILE_SCRIPT := preload("res://placeables/treasure/gold_coin_pile.gd")
+const GOLD_TREASURE_MATERIAL := preload("res://placeables/treasure/gold_treasure_material.tres")
+const KEY_SCENE := preload("res://inventory/key.tscn")
+const LEVEL_SETTINGS_SCRIPT := preload("res://levels/level_settings.gd")
 const LEVEL_SELECT_SCENE := preload("res://ui/screens/level_select_screen.tscn")
 const LOW_HEALTH_VIGNETTE_SCRIPT := preload("res://ui/hud/low_health_vignette.gd")
-const LOCKED_GATE_SCENE := preload("res://levels/common/locked_gate.tscn")
-const INDOOR_LIGHTING_SCENE := preload("res://levels/common/gd_indoor_lighting.tscn")
-const MINIMAP_VIEW_SCRIPT := preload("res://game/minimap_view.gd")
-const MINIMAP_VIEW_SETTINGS := preload("res://game/minimap_view_settings.tres")
+const LOCKED_GATE_SCENE := preload("res://placeables/lockables/locked_gate.tscn")
+const INDOOR_LIGHTING_SCENE := preload("res://lighting/gd_indoor_lighting.tscn")
+const MINIMAP_VIEW_SCRIPT := preload("res://ui/hud/minimap/minimap_view.gd")
+const MINIMAP_VIEW_SETTINGS := preload("res://ui/hud/minimap/minimap_view_settings.tres")
 const PANEL_SCENE := preload("res://ui/hud/panel.tscn")
 const PLAYER_SCENE := preload("res://player/player.tscn")
+const RUBY_ITEM := preload("res://placeables/treasure/gems/ruby_inventory.tres")
+const RUBY_SCENE := preload("res://placeables/treasure/gems/ruby.tscn")
+const SAPPHIRE_ITEM := preload("res://placeables/treasure/gems/sapphire_inventory.tres")
+const SAPPHIRE_SCENE := preload("res://placeables/treasure/gems/sapphire.tscn")
 const PNG_TO_GRIDMAP_ALTERNATIVE := preload("res://addons/png_to_gridmap/png_to_gridmap_autotile_alternative.gd")
 const PNG_TO_GRIDMAP_COLOR_MAPPING := preload("res://addons/png_to_gridmap/png_to_gridmap_color_mapping.gd")
 const PNG_TO_GRIDMAP_FLOOR_BUILDER := preload("res://addons/png_to_gridmap/png_to_gridmap_floor_builder.gd")
 const PNG_TO_GRIDMAP_IMPORTER := preload("res://addons/png_to_gridmap/png_to_gridmap_importer.gd")
+const PNG_TO_GRIDMAP_PROFILE_STORE := preload("res://addons/png_to_gridmap/png_to_gridmap_profile_store.gd")
 const PNG_TO_GRIDMAP_REPAIRER := preload("res://addons/png_to_gridmap/png_to_gridmap_repairer.gd")
 const PNG_TO_GRIDMAP_SETTINGS := preload("res://addons/png_to_gridmap/png_to_gridmap_settings.gd")
 const SKELETON_SCENE := preload("res://enemies/skeleton.tscn")
-const SILVER_KEY_SCENE := preload("res://collectibles/silver_key.tscn")
+const SILVER_KEY_SCENE := preload("res://inventory/silver_key.tscn")
 const TEST_TEXT_OVERLAY_VISUAL_LAYER := 1 << 19
-const TORCH_SCENE := preload("res://levels/common/torch.tscn")
+const TORCH_SCENE := preload("res://placeables/torch/torch.tscn")
+const TREASURE_PILE_SCENE := preload("res://placeables/treasure/treasure_pile.tscn")
+const ZOMBIE_SCENE := preload("res://enemies/zombie.tscn")
 
 enum TestAutotileItem {
     Base = 1,
@@ -53,6 +72,14 @@ class TestGraveyard:
         win_requested = true
 
 
+    func start_kill_boundary_for_test() -> void:
+        _configure_kill_boundary_animation()
+
+
+    func get_kill_boundary_for_test() -> Node:
+        return _get_kill_boundary()
+
+
 class TestKillBoundary:
     extends GDKillBoundary3D
 
@@ -73,6 +100,14 @@ class TestLevelSelection:
 
     func _save_results() -> void:
         pass
+
+
+    func migrate_results_for_test(stored_results: Dictionary) -> Dictionary:
+        return _migrate_legacy_results(stored_results)
+
+
+    func resolve_highlighted_index_for_test(stored_results: Dictionary) -> int:
+        return _resolve_saved_highlighted_level_index(stored_results)
 
 
 class TestMinimapBoundary:
@@ -103,7 +138,7 @@ class TestMinimapBoundary:
 
 
 class TestTorch:
-    extends "res://levels/common/torch.gd"
+    extends "res://placeables/torch/torch.gd"
 
     var level_selection: Node
 
@@ -120,19 +155,27 @@ func _run_tests() -> void:
     var failed := false
     failed = not _test_deterministic_seed_helper_is_stable() or failed
     failed = not _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() or failed
+    failed = not _test_treasure_pile_discovers_compatible_scenes_and_spawns_mixed_counts() \
+        or failed
+    failed = not _test_diamond_collectible_value_and_material() or failed
+    failed = not _test_gem_variants_share_model_and_scale_values() or failed
     failed = not _test_audio_fallback_is_deterministic() or failed
     failed = not _test_player_fall_death_threshold() or failed
     failed = not _test_torch_scene_and_persistent_activation() or failed
     failed = not _test_indoor_lighting_strengthens_occlusion() or failed
     failed = not _test_held_drop_input_accelerates() or failed
     failed = not _test_drop_direction_variation_is_deterministic_and_compact() or failed
-    failed = not _test_coin_absorption_does_not_complete_level() or failed
+    failed = not _test_gold_treasure_stays_lit_and_uses_indoor_bloom() or failed
+    failed = not await _test_gold_bar_uses_inventory_capacity_and_physics_drop() or failed
+    failed = not _test_result_percentage_uses_mixed_treasure_value() or failed
+    failed = not _test_treasure_absorption_does_not_complete_level() or failed
     failed = not _test_gate_completion_completes_level() or failed
-    failed = not _test_reusable_gate_and_coin_deposit_coffin_scenes() or failed
+    failed = not _test_reusable_gate_and_treasure_deposit_coffin_scenes() or failed
     failed = not _test_key_scenes_have_authored_pickup_areas() or failed
     failed = not _test_graveyard_scene_does_not_embed_default_level() or failed
-    failed = not _test_level_lookup_supports_tutorials_and_sixteen_slots() or failed
+    failed = not _test_level_lookup_supports_debug_and_stable_ids() or failed
     failed = not _test_level_selection_tracks_outcomes_and_highlight() or failed
+    failed = not _test_level_progress_uses_stable_mapping_ids() or failed
     failed = not await _test_level_select_scrolls_focused_cards_into_view() or failed
     failed = not _test_kill_boundary_loop_setting() or failed
     failed = not _test_kill_boundary_size_does_not_scale_center() or failed
@@ -146,11 +189,13 @@ func _run_tests() -> void:
     failed = not _test_kill_boundary_path_markers_wait_for_stable_curve() or failed
     failed = not _test_kill_boundary_speed_edit_ripple_retimes_other_keys() or failed
     failed = not _test_kill_boundary_speed_edit_retimes_incoming_linear_interval() or failed
+    failed = not _test_graveyard_starts_refactored_kill_boundary_animation() or failed
     failed = not _test_production_kill_boundaries_use_equivalent_size_tracks() or failed
     failed = not _test_no_boundary_removal_keeps_current_pose() or failed
     failed = not _test_level_settings_control_minimap_visibility() or failed
     failed = not _test_low_health_vignette_maps_health_to_warning_intensity() or failed
     failed = not _test_hud_panel_sets_split_value_labels() or failed
+    failed = not _test_enemies_use_fake_shadows_without_warning_light_blobs() or failed
     failed = not _test_skeleton_facing_is_driven_by_movement() or failed
     failed = not _test_minimap_disables_processing_and_rendering() or failed
     failed = not _test_minimap_camera_scrolls_wide_level_without_empty_space() or failed
@@ -160,6 +205,7 @@ func _run_tests() -> void:
     failed = not _test_gridmap_repair_uses_configured_connection_groups() or failed
     failed = not _test_gridmap_repair_merges_equivalent_configurations() or failed
     failed = not _test_gridmap_repair_preserves_only_matching_alternatives() or failed
+    failed = not _test_png_profile_store_only_accepts_level_subfolders() or failed
     failed = not _test_png_floor_gridmap_uses_non_transparent_pixels_and_safe_collision() or failed
     failed = not _test_png_gridmap_import_disables_y_cell_centering() or failed
     await process_frame
@@ -188,11 +234,257 @@ func _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() -
     var runtime_seed := int(pile.get_runtime_random_seed())
     var passed := _expect(runtime_seed == expected_seed, "coin pile derives a stable fallback seed") \
         and _expect(
+            pile.get_max_coin_count() == 200 and pile.get_max_item_count() == 200,
+            "coin pile keeps its existing quantity API and default"
+        ) \
+        and _expect(
             not bool(pile.get("spawn_when_near_camera")),
             "coin pile does not camera-gate spawn timing by default"
         )
 
-    parent.queue_free()
+    parent.free()
+    return passed
+
+
+func _test_treasure_pile_discovers_compatible_scenes_and_spawns_mixed_counts() -> bool:
+    var parent := Node3D.new()
+    parent.name = "TreasurePileTestParent"
+    root.add_child(parent)
+    var pile := TREASURE_PILE_SCENE.instantiate() as GDTreasurePile
+
+    var inspector_properties: Array[StringName] = []
+    for property in pile.get_property_list():
+        inspector_properties.append(property["name"] as StringName)
+    var compatible_types := pile.get_compatible_treasure_types()
+    var diamond_preview := pile._create_preview_item(0)
+    var gold_bar_preview := pile._create_preview_item(3)
+    var gold_coin_preview := pile._create_preview_item(6)
+    parent.add_child(pile)
+    var passed := _expect(
+        compatible_types == [
+            &"amethyst",
+            &"diamond",
+            &"emerald",
+            &"gold_bar",
+            &"gold_coin",
+            &"ruby",
+            &"sapphire",
+        ] \
+            and not compatible_types.has(&"key"),
+        "treasure pile discovers marked treasure scenes and excludes unmarked collectibles"
+    ) and _expect(
+        pile.get_treasure_count(&"gold_coin") == 5 \
+            and pile.get_treasure_count(&"diamond") == 3 \
+            and pile.get_treasure_count(&"gold_bar") == 3 \
+            and pile.get_max_item_count() == 11,
+        "treasure pile defaults to five coins, three diamonds, and three bars"
+    ) and _expect(
+        inspector_properties.has(&"gold_coin_count") \
+            and inspector_properties.has(&"diamond_count") \
+            and inspector_properties.has(&"ruby_count") \
+            and inspector_properties.has(&"sapphire_count") \
+            and inspector_properties.has(&"emerald_count") \
+            and inspector_properties.has(&"amethyst_count") \
+            and inspector_properties.has(&"gold_bar_count"),
+        "treasure pile exposes every built-in gem count as an ordinary editor property"
+    ) and _expect(
+        not diamond_preview.find_children("*", "MeshInstance3D", true, false).is_empty() \
+            and not gold_bar_preview.find_children(
+                "*", "MeshInstance3D", true, false
+            ).is_empty() \
+            and not gold_coin_preview.find_children(
+                "*", "MeshInstance3D", true, false
+            ).is_empty() \
+            and diamond_preview.find_children(
+                "*", "CollisionObject3D", true, false
+            ).is_empty() \
+            and gold_bar_preview.find_children(
+                "*", "CollisionObject3D", true, false
+            ).is_empty(),
+        "mixed pile editor previews contain visible meshes without physics bodies"
+    )
+
+    diamond_preview.free()
+    gold_bar_preview.free()
+    gold_coin_preview.free()
+
+    pile.set_treasure_count(&"gold_coin", 2)
+    pile.set_treasure_count(&"diamond", 1)
+    pile.set_treasure_count(&"ruby", 1)
+    pile.set_treasure_count(&"sapphire", 1)
+    pile.set_treasure_count(&"emerald", 1)
+    pile.set_treasure_count(&"amethyst", 1)
+    pile.set_treasure_count(&"gold_bar", 2)
+    pile.set("spawn_interval", 0.0)
+    pile._advance_spawn_schedule()
+    pile._spawn_scheduled_items()
+
+    var spawned_coins := 0
+    var spawned_gems: Dictionary = {}
+    var spawned_bars: Array[GDGoldBar] = []
+    for child in parent.get_children():
+        if child is GDGoldCoin:
+            spawned_coins += 1
+        elif child is GDGoldBar:
+            spawned_bars.append(child as GDGoldBar)
+        elif child is GDInventoryPickup:
+            var gem := child as GDInventoryPickup
+            var gem_type: StringName = gem.carried_item.get("item_type")
+            if gem_type in [&"diamond", &"ruby", &"sapphire", &"emerald", &"amethyst"]:
+                spawned_gems[gem_type] = int(spawned_gems.get(gem_type, 0)) + 1
+
+    passed = _expect(
+        pile.get_max_item_count() == 9 \
+            and pile.get_max_treasure_value() == 124 \
+            and spawned_coins == 2 \
+            and spawned_gems == {
+                &"amethyst": 1,
+                &"diamond": 1,
+                &"emerald": 1,
+                &"ruby": 1,
+                &"sapphire": 1,
+            } \
+            and spawned_bars.size() == 2,
+        "treasure pile spawns each configured gem count and reports their combined value"
+    ) and _expect(
+        not spawned_bars.is_empty() and not spawned_bars[0].freeze,
+        "mixed treasure pile uses the working rigid collectible scenes"
+    ) and passed
+
+    parent.free()
+    return passed
+
+
+func _test_diamond_collectible_value_and_material() -> bool:
+    var diamond := DIAMOND_SCENE.instantiate() as GDDiamond
+    root.add_child(diamond)
+    var diamond_collision := diamond.get_node_or_null("CollisionShape3D") as CollisionShape3D
+    var diamond_shape := (
+        diamond_collision.shape as ConvexPolygonShape3D if diamond_collision != null else null
+    )
+    var diamond_meshes := diamond.find_children("*", "MeshInstance3D", true, false)
+    var diamond_mesh := (
+        diamond_meshes[0] as MeshInstance3D if not diamond_meshes.is_empty() else null
+    )
+    var surface_material: Material = (
+        diamond_mesh.material_override if diamond_mesh != null else null
+    )
+    var diamond_material := DIAMOND_MATERIAL as ShaderMaterial
+    var inventory := GDPlayerInventory.new()
+    inventory._add_item(GOLD_COIN_ITEM)
+    inventory._add_item(DIAMOND_ITEM)
+    var deposited_item := inventory.take_highest_value_carried_treasure()
+
+    var passed := _expect(
+        diamond is RigidBody3D \
+            and diamond_shape != null \
+            and diamond_shape.points.size() == 17,
+        "diamond uses an authored faceted convex collider instead of a rolling sphere"
+    ) and _expect(
+        diamond.physics_material_override != null \
+            and is_equal_approx(diamond.physics_material_override.friction, 0.9) \
+            and is_equal_approx(diamond.physics_material_override.bounce, 0.02) \
+            and diamond.angular_damp >= 2.5,
+        "diamond friction, bounce, and angular damping help it settle on a face"
+    ) and _expect(
+        surface_material == DIAMOND_MATERIAL,
+        "diamond mesh receives the authored stylized material"
+    ) and _expect(
+        diamond_mesh != null \
+            and diamond_mesh.mesh != null \
+            and diamond_mesh.mesh.resource_path.begins_with("res://Assets/placeables/treasure/gems/diamond.glb") \
+            and diamond_mesh.mesh.get_faces().size() >= 200,
+        "diamond uses a purpose-built, densely faceted GLB model"
+    ) and _expect(
+        diamond_material.shader.resource_path \
+            == "res://placeables/treasure/gems/gem_stylized.gdshader" \
+            and (diamond_material.get_shader_parameter(&"body_color") as Color).a == 1.0 \
+            and float(diamond_material.get_shader_parameter(&"rim_energy")) > 0.0 \
+            and diamond_mesh.material_overlay == null,
+        "diamond uses one opaque game-styled facet shader without a corrective overlay"
+    ) and _expect(
+        is_equal_approx(DIAMOND_ITEM.weight, GOLD_COIN_ITEM.weight) \
+            and DIAMOND_ITEM.treasure_value == 10 \
+            and GOLD_COIN_ITEM.treasure_value == 1,
+        "a diamond uses one sack unit and carries ten treasure value"
+    ) and _expect(
+        DIAMOND_ITEM.pickup_sound == GOLD_COIN_ITEM.pickup_sound \
+            and DIAMOND_ITEM.drop_sound == GOLD_COIN_ITEM.drop_sound,
+        "diamond pickup and drop temporarily reuse coin sounds"
+    ) and _expect(
+        deposited_item == DIAMOND_ITEM \
+            and inventory.get_used_inventory_units() == 1 \
+            and inventory.get_carried_treasure_value() == 1,
+        "deposit selection removes the highest-value treasure while preserving sack accounting"
+    )
+
+    inventory.free()
+    diamond.free()
+    return passed
+
+
+func _test_gem_variants_share_model_and_scale_values() -> bool:
+    var gem_items: Array[Resource] = [
+        DIAMOND_ITEM,
+        RUBY_ITEM,
+        SAPPHIRE_ITEM,
+        EMERALD_ITEM,
+        AMETHYST_ITEM,
+    ]
+    var gem_scenes: Array[PackedScene] = [
+        DIAMOND_SCENE,
+        RUBY_SCENE,
+        SAPPHIRE_SCENE,
+        EMERALD_SCENE,
+        AMETHYST_SCENE,
+    ]
+    var expected_values := [10, 9, 5, 6, 2]
+    var shared_mesh: Mesh
+    var body_colors: Array[Color] = []
+    var passed := true
+
+    for index in gem_items.size():
+        var gem := gem_scenes[index].instantiate() as GDInventoryPickup
+        root.add_child(gem)
+        var gem_meshes := gem.find_children("*", "MeshInstance3D", true, false)
+        var gem_mesh := (
+            gem_meshes[0] as MeshInstance3D if not gem_meshes.is_empty() else null
+        )
+        var gem_material := (
+            gem_mesh.material_override as ShaderMaterial if gem_mesh != null else null
+        )
+        if shared_mesh == null and gem_mesh != null:
+            shared_mesh = gem_mesh.mesh
+        if gem_material != null:
+            body_colors.append(gem_material.get_shader_parameter(&"body_color") as Color)
+
+        passed = _expect(
+            gem != null \
+                and gem.carried_item == gem_items[index] \
+                and is_equal_approx(float(gem_items[index].get("weight")), 1.0) \
+                and int(gem_items[index].get("treasure_value")) == expected_values[index],
+            "%s uses one sack unit and its scaled gem value" \
+                % String(gem_items[index].get("display_name"))
+        ) and _expect(
+            gem_mesh != null \
+                and gem_mesh.mesh == shared_mesh \
+                and gem_material != null \
+                and gem_material.shader.resource_path \
+                    == "res://placeables/treasure/gems/gem_stylized.gdshader",
+            "%s shares the gem GLB and stylized shader" \
+                % String(gem_items[index].get("display_name"))
+        ) and passed
+        gem.free()
+
+    passed = _expect(
+        body_colors.size() == gem_items.size() \
+            and body_colors[0].r > 0.7 \
+            and body_colors[1].r > body_colors[1].g * 10.0 \
+            and body_colors[2].b > body_colors[2].r * 8.0 \
+            and body_colors[3].g > body_colors[3].r * 10.0 \
+            and body_colors[4].b > body_colors[4].g * 5.0,
+        "gem palettes read as white, red, blue, green, and purple"
+    ) and passed
     return passed
 
 
@@ -205,6 +497,63 @@ func _test_audio_fallback_is_deterministic() -> bool:
 
     return _expect(picked_stream == first_stream, "audio fallback picks the first stream deterministically") \
         and _expect(is_equal_approx(midpoint, 0.5), "audio fallback uses deterministic midpoint variation")
+
+
+func _test_png_profile_store_only_accepts_level_subfolders() -> bool:
+    var profile_store := PNG_TO_GRIDMAP_PROFILE_STORE.new(null, PNG_TO_GRIDMAP_SETTINGS)
+    var rejected_save_result: Error = profile_store.save(
+        PNG_TO_GRIDMAP_SETTINGS.new(),
+        "res://player/player.tscn"
+    )
+    return _expect(
+        profile_store.path_for_scene("res://levels/7/level.tscn") \
+        == "res://levels/7/png_to_gridmap_settings.tres",
+        "PNG profile settings resolve beside scenes in a level subfolder"
+    ) and _expect(
+        profile_store.path_for_scene("res://player/player.tscn") == "",
+        "PNG profile settings do not resolve a file beside non-level scenes"
+    ) and _expect(
+        profile_store.path_for_scene("res://placeables/torch/torch.tscn") == "",
+        "PNG profile settings do not resolve a file beside reusable placeables"
+    ) and _expect(
+        rejected_save_result == ERR_INVALID_PARAMETER,
+        "PNG profile saves reject non-level scenes before writing any settings"
+    ) and _expect(
+        PNG_TO_GRIDMAP_PROFILE_STORE.is_scene_in_levels_subfolder(
+            "res://levels/7/level.tscn"
+        ),
+        "PNG profile settings accept scenes in a level subfolder"
+    ) and _expect(
+        PNG_TO_GRIDMAP_PROFILE_STORE.is_scene_in_levels_subfolder(
+            "res://levels/tutorial/rooms/entrance.tscn"
+        ),
+        "PNG profile settings accept scenes nested below a level subfolder"
+    ) and _expect(
+        not PNG_TO_GRIDMAP_PROFILE_STORE.is_scene_in_levels_subfolder(
+            "res://levels/level.tscn"
+        ),
+        "PNG profile settings reject scenes directly inside the levels root"
+    ) and _expect(
+        not PNG_TO_GRIDMAP_PROFILE_STORE.is_scene_in_levels_subfolder(
+            "res://placeables/torch/torch.tscn"
+        ),
+        "PNG profile settings reject reusable placeable scenes"
+    ) and _expect(
+        not PNG_TO_GRIDMAP_PROFILE_STORE.is_scene_in_levels_subfolder(
+            "res://player/player.tscn"
+        ),
+        "PNG profile settings reject non-level scenes"
+    ) and _expect(
+        not PNG_TO_GRIDMAP_PROFILE_STORE.is_scene_in_levels_subfolder(
+            "res://levels_backup/7/level.tscn"
+        ),
+        "PNG profile settings reject similarly named folders"
+    ) and _expect(
+        not PNG_TO_GRIDMAP_PROFILE_STORE.is_scene_in_levels_subfolder(
+            "res://levels/../player/player.tscn"
+        ),
+        "PNG profile settings reject paths that traverse out of levels"
+    )
 
 
 func _test_torch_scene_and_persistent_activation() -> bool:
@@ -236,7 +585,7 @@ func _test_torch_scene_and_persistent_activation() -> bool:
     ) and _expect(
         particles.draw_pass_1.material is ShaderMaterial \
         and (particles.draw_pass_1.material as ShaderMaterial).shader.resource_path \
-        == "res://levels/common/torch_flame.gdshader",
+        == "res://placeables/torch/torch_flame.gdshader",
         "torch flame uses the animated procedural flame material"
     ) and _expect(
         embers != null and embers.get_parent() == particles.get_parent(),
@@ -279,7 +628,7 @@ func _test_torch_scene_and_persistent_activation() -> bool:
     var outline_material := outline_mesh.material_overlay as ShaderMaterial
     passed = _expect(
         outline_material.shader.resource_path \
-        == "res://levels/common/torch_outline.gdshader" \
+        == "res://placeables/torch/torch_outline.gdshader" \
         and float(outline_material.get_shader_parameter(&"outline_intensity")) > 0.0,
         "an unlit torch gains a subtle shader outline when the player approaches"
     ) and _expect(
@@ -370,8 +719,8 @@ func _test_indoor_lighting_strengthens_occlusion() -> bool:
     var headlamp := SpotLight3D.new()
     headlamp.shadow_enabled = true
     headlamp.position.y = 1.05
-    headlamp.shadow_bias = 0.0
-    headlamp.shadow_normal_bias = 0.0
+    headlamp.shadow_bias = 0.03
+    headlamp.shadow_normal_bias = 0.6
     headlamp.spot_angle = 82.0
     headlamp.spot_range = 60.0
     headlamp.spot_attenuation = 1.25
@@ -379,8 +728,8 @@ func _test_indoor_lighting_strengthens_occlusion() -> bool:
     level.add_child(headlamp)
     var light := OmniLight3D.new()
     light.shadow_enabled = true
-    light.shadow_bias = 0.0
-    light.shadow_normal_bias = 0.0
+    light.shadow_bias = 0.03
+    light.shadow_normal_bias = 0.6
     light.name = "PlayerLight"
     light.position = headlamp.position
     level.add_child(light)
@@ -422,11 +771,11 @@ func _test_indoor_lighting_strengthens_occlusion() -> bool:
         ) \
         and _expect(is_equal_approx(room_light.shadow_opacity, 1.0), \
             "indoor room-light shadows are fully opaque") \
-        and _expect(is_zero_approx(room_light.shadow_bias), \
-            "indoor room-light shadows stay attached to occluders") \
+        and _expect(is_equal_approx(room_light.shadow_bias, 0.03), \
+            "indoor room-light shadows avoid surface acne") \
         and _expect(
-            is_zero_approx(room_light.shadow_normal_bias),
-            "indoor room-light wall shadows seal against the floor"
+            is_equal_approx(room_light.shadow_normal_bias, 0.6),
+            "indoor room-light wall faces avoid self-shadowing"
         ) \
         and _expect(_player_scene_owns_light_tuning(), \
             "player light tuning is authored in the player scene") \
@@ -455,10 +804,10 @@ func _player_scene_owns_light_tuning() -> bool:
         and is_equal_approx(headlamp.spot_angle, 82.0) \
         and is_equal_approx(headlamp.spot_range, 60.0) \
         and is_equal_approx(headlamp.spot_attenuation, 1.25) \
-        and is_zero_approx(headlamp.shadow_bias) \
-        and is_zero_approx(headlamp.shadow_normal_bias) \
-        and is_zero_approx(fill_light.shadow_bias) \
-        and is_zero_approx(fill_light.shadow_normal_bias)
+        and is_equal_approx(headlamp.shadow_bias, 0.03) \
+        and is_equal_approx(headlamp.shadow_normal_bias, 0.6) \
+        and is_equal_approx(fill_light.shadow_bias, 0.03) \
+        and is_equal_approx(fill_light.shadow_normal_bias, 0.6)
     player.free()
     return passed
 
@@ -566,15 +915,203 @@ func _test_drop_direction_variation_is_deterministic_and_compact() -> bool:
     return passed
 
 
-func _test_coin_absorption_does_not_complete_level() -> bool:
-    var graveyard := TestGraveyard.new()
-    graveyard.max_coins_collected = 3
-    graveyard.coins_collected = 2
-    graveyard._on_coin_absorbed(1)
+func _test_gold_treasure_stays_lit_and_uses_indoor_bloom() -> bool:
+    var coin := GOLD_COIN_SCENE.instantiate() as GDGoldCoin
+    var coin_mesh := coin.get_node_or_null("CoinMesh") as MeshInstance3D
+    var coin_material: Material = (
+        coin_mesh.get_active_material(0) if coin_mesh != null else null
+    )
+    var bar := GOLD_BAR_SCENE.instantiate() as GDGoldBar
+    root.add_child(bar)
+    var bar_meshes := bar.find_children("*", "MeshInstance3D", true, false)
+    var bar_mesh := bar_meshes[0] as MeshInstance3D if not bar_meshes.is_empty() else null
+    var bar_material: Material = (
+        bar_mesh.get_surface_override_material(0) if bar_mesh != null else null
+    )
+    var indoor_lighting := INDOOR_LIGHTING_SCENE.instantiate() as GDIndoorLighting
+    var world_environment := (
+        indoor_lighting.get_node_or_null("WorldEnvironment") as WorldEnvironment
+    )
+    var environment: Environment = (
+        world_environment.environment if world_environment != null else null
+    )
+    var gold_material := GOLD_TREASURE_MATERIAL as StandardMaterial3D
 
-    var passed := _expect(graveyard.coins_collected == 3, "coin absorption still updates result coin count") \
-        and _expect(not graveyard.win_requested, "banking the last coin does not complete the level")
+    var passed := _expect(
+        coin_material == GOLD_TREASURE_MATERIAL,
+        "coins use the shared gold treasure material"
+    ) and _expect(
+        bar_material == GOLD_TREASURE_MATERIAL,
+        "the imported gold-bar model receives the shared material override"
+    ) and _expect(
+        gold_material.metallic > 0.0 and gold_material.roughness > 0.0,
+        "gold treasure retains reflective lighting and visible surface shape"
+    ) and _expect(
+        gold_material.emission_enabled \
+            and gold_material.emission.r * gold_material.emission_energy_multiplier > 1.0 \
+            and gold_material.emission_energy_multiplier < 2.0,
+        "gold treasure stays visible unlit without the previous solid-fill emission strength"
+    ) and _expect(
+        environment != null and environment.glow_enabled and environment.glow_bloom > 0.0,
+        "indoor lighting enables a modest bloom for emissive treasure"
+    )
+
+    indoor_lighting.free()
+    bar.free()
+    coin.free()
+    return passed
+
+
+func _test_gold_bar_uses_inventory_capacity_and_physics_drop() -> bool:
+    var authored_bar := GOLD_BAR_SCENE.instantiate() as GDGoldBar
+    root.add_child(authored_bar)
+    var authored_collision := authored_bar.get_node_or_null("CollisionShape3D") as CollisionShape3D
+    var authored_shape: Shape3D = authored_collision.shape if authored_collision != null else null
+    var world_body := StaticBody3D.new()
+    world_body.collision_layer = 1
+    root.add_child(world_body)
+    authored_bar.call("_on_body_entered", world_body)
+    var landing_audio := authored_bar.get_node_or_null("GoldBarLandingAudio") as AudioStreamPlayer3D
+    var inventory := GDPlayerInventory.new()
+    inventory._add_item(GOLD_BAR_ITEM)
+    var bar_uses_45_units := is_equal_approx(inventory.get_carried_weight(), 45.0) \
+        and inventory.get_used_inventory_units() == 45
+    inventory._add_item(GOLD_COIN_ITEM)
+    var capacity_updates: Array[int] = []
+    inventory.inventory_capacity_changed.connect(
+        func(max_units: int) -> void:
+            capacity_updates.append(max_units)
+    )
+    inventory.increase_inventory_space(12)
+
+    var passed := _expect(
+        authored_bar is RigidBody3D and not authored_bar.freeze,
+        "gold bar is an active physics body"
+    ) and _expect(
+        authored_shape is BoxShape3D,
+        "gold bar physics body has an authored box collider"
+    ) and _expect(
+        authored_bar.get_node_or_null("GoldBarModel") != null,
+        "gold bar scene uses the supplied model"
+    ) and _expect(
+        GOLD_BAR_ITEM.pickup_sound.resource_path == "res://Assets/audio/gold-bar-pickup.mp3",
+        "gold bar item uses its dedicated pickup sound"
+    ) and _expect(
+        landing_audio != null \
+            and landing_audio.stream.resource_path == "res://Assets/audio/gold-hits-floor.mp3",
+        "gold bar plays its dedicated sound on first contact with level geometry"
+    ) and _expect(
+        is_equal_approx(float(GOLD_BAR_ITEM.weight), 45.0),
+        "gold bar consumes exactly 45 inventory units"
+    ) and _expect(
+        bar_uses_45_units,
+        "carrying a gold bar occupies 45 sack units"
+    ) and _expect(
+        is_equal_approx(inventory.get_carried_weight(), 46.0) \
+            and inventory.get_used_inventory_units() == 46,
+        "inventory capacity combines gold-bar and coin weight"
+    ) and _expect(
+        inventory._item_type(inventory._get_next_drop_item()) == &"gold_bar",
+        "carried-item drop prioritizes the 45-unit gold bar over individual coins"
+    ) and _expect(
+        inventory.get_max_inventory_units() == 112 and capacity_updates == [112],
+        "inventory capacity upgrades report the new treasure sack capacity"
+    )
+
+    var player := PLAYER_SCENE.instantiate() as GDPlayer
+    root.add_child(player)
+    var player_inventory := player.get_node("PlayerInventory") as GDPlayerInventory
+    authored_bar.global_position = player.global_position
+    var collected := player_inventory.try_collect_item_pickup(authored_bar)
+    var pickup_audio := player.get_node_or_null("PickupItemAudio") as AudioStreamPlayer
+    var dropped := player_inventory.drop_item_of_type(&"gold_bar")
+    var dropped_bar: RigidBody3D
+    for node in get_nodes_in_group("gold_bar"):
+        if node != authored_bar and node is RigidBody3D and node.get_script() == GOLD_BAR_SCRIPT:
+            dropped_bar = node as RigidBody3D
+            break
+
+    passed = _expect(
+        collected and pickup_audio != null and pickup_audio.stream == GOLD_BAR_ITEM.pickup_sound,
+        "collecting a gold bar plays the dedicated pickup sound"
+    ) and _expect(dropped, "gold bar can be dropped through the carried-item flow") \
+        and _expect(
+            dropped_bar != null and dropped_bar is RigidBody3D and not dropped_bar.freeze,
+            "dropping a gold bar spawns an active rigid body"
+        ) \
+        and _expect(
+            player_inventory.get_item_count(&"gold_bar") == 0 \
+                and player_inventory.get_used_inventory_units() == 0,
+            "dropping a gold bar releases its 45 inventory units"
+        ) \
+        and passed
+
+    if dropped_bar != null:
+        var drop_start_y := dropped_bar.global_position.y
+        await physics_frame
+        await physics_frame
+        passed = _expect(
+            dropped_bar.global_position.y < drop_start_y,
+            "dropped gold bar falls under rigid-body physics"
+        ) and passed
+
+    if dropped_bar != null:
+        dropped_bar.free()
+    player.free()
+    world_body.free()
+    inventory.free()
+    authored_bar.free()
+    return passed
+
+
+func _test_treasure_absorption_does_not_complete_level() -> bool:
+    var graveyard := TestGraveyard.new()
+    graveyard.max_treasure_value = 3
+    graveyard.treasure_collected = 2
+    graveyard._on_treasure_absorbed(1)
+
+    var passed := _expect(
+        graveyard.treasure_collected == 3,
+        "treasure absorption updates the deposited treasure value"
+    ) and _expect(
+        not graveyard.win_requested,
+        "banking the last treasure does not complete the level"
+    )
     graveyard.free()
+    return passed
+
+
+func _test_result_percentage_uses_mixed_treasure_value() -> bool:
+    var available_treasure := GOLD_COIN_ITEM.treasure_value * 2 \
+        + DIAMOND_ITEM.treasure_value \
+        + GOLD_BAR_ITEM.treasure_value * 2
+    var recovered_treasure := DIAMOND_ITEM.treasure_value + GOLD_BAR_ITEM.treasure_value
+    var expected_percentage := roundi(
+        float(recovered_treasure) / float(available_treasure) * 100.0
+    )
+    var result_stats := GDResultStats.new()
+    result_stats.set_result(recovered_treasure, available_treasure)
+
+    var level_selection := TestLevelSelection.new()
+    level_selection.record_level_result(
+        0,
+        recovered_treasure,
+        result_stats.get_completion_percentage(),
+        true
+    )
+    var stored_result := level_selection.get_level_result(0)
+    var passed := _expect(
+        available_treasure == 102 \
+            and recovered_treasure == 55 \
+            and result_stats.get_completion_percentage() == expected_percentage,
+        "result percentage compares recovered mixed treasure value with all available value"
+    ) and _expect(
+        int(stored_result.get("best_percentage", 0)) == expected_percentage,
+        "level selection stores the mixed-treasure completion percentage"
+    )
+
+    level_selection.free()
+    result_stats.free()
     return passed
 
 
@@ -587,11 +1124,11 @@ func _test_gate_completion_completes_level() -> bool:
     return passed
 
 
-func _test_reusable_gate_and_coin_deposit_coffin_scenes() -> bool:
+func _test_reusable_gate_and_treasure_deposit_coffin_scenes() -> bool:
     var gate := LOCKED_GATE_SCENE.instantiate() as GDLockableHingedPassage
-    var coffin := COIN_DEPOSIT_COFFIN_SCENE.instantiate() as Node3D
+    var coffin := TREASURE_DEPOSIT_COFFIN_SCENE.instantiate() as Node3D
     if not _expect(gate != null, "locked gate scene instantiates with passage behavior") \
-        or not _expect(coffin != null, "coin deposit coffin scene instantiates"):
+        or not _expect(coffin != null, "treasure deposit coffin scene instantiates"):
         if gate != null:
             gate.free()
         if coffin != null:
@@ -600,26 +1137,69 @@ func _test_reusable_gate_and_coin_deposit_coffin_scenes() -> bool:
 
     root.add_child(gate)
     root.add_child(coffin)
-    var deposit := coffin.get_node_or_null("CoinDeposit") as GDCoinDeposit
-    var deposit_coin: MeshInstance3D = deposit._create_visual_coin() if deposit != null else null
+    var deposit := coffin.get_node_or_null("TreasureDeposit") as GDTreasureDeposit
+    var deposit_coin: Node3D = (
+        deposit._create_visual_treasure(GOLD_COIN_ITEM) if deposit != null else null
+    )
+    var deposit_diamond: Node3D = (
+        deposit._create_visual_treasure(DIAMOND_ITEM) if deposit != null else null
+    )
+    var deposit_gold_bar: Node3D = (
+        deposit._create_visual_treasure(GOLD_BAR_ITEM) if deposit != null else null
+    )
+    var deposit_inventory := GDPlayerInventory.new()
+    deposit_inventory._add_item(GOLD_COIN_ITEM)
+    deposit_inventory._add_item(DIAMOND_ITEM)
+    deposit_inventory._add_item(GOLD_BAR_ITEM)
+    var selected_deposit_item := deposit_inventory.take_highest_value_carried_treasure()
+    var absorbed_values: Array[int] = []
+    if deposit != null:
+        deposit.treasure_absorbed.connect(
+            func(value: int) -> void:
+                absorbed_values.append(value)
+        )
+        deposit._absorb_treasure(DIAMOND_ITEM.treasure_value)
     var world_coin := GOLD_COIN_SCENE.instantiate() as GDGoldCoin
     var world_coin_mesh := world_coin.get_node_or_null("CoinMesh") as MeshInstance3D
     var passed := _expect(gate.completes_level, "locked gate scene completes the level") \
         and _expect(gate.get_node_or_null("Leaves/LeftGateLeaf") != null, "locked gate includes its left leaf") \
         and _expect(gate.get_node_or_null("Leaves/RightGateLeaf") != null, "locked gate includes its right leaf") \
-        and _expect(deposit != null, "coin deposit coffin includes deposit behavior") \
+        and _expect(deposit != null, "treasure deposit coffin includes deposit behavior") \
         and _expect(
             deposit != null and is_equal_approx(deposit.position.y, 0.42),
-            "coin deposit coffin keeps the working Level 1 deposit offset"
+            "treasure deposit coffin keeps the working Level 1 deposit offset"
         ) \
         and _expect(
             deposit != null and deposit.get_node_or_null("DepositArea/CollisionShape3D") != null,
-            "coin deposit coffin creates its player detection area"
+            "treasure deposit coffin creates its player detection area"
         ) \
         and _expect(
-            deposit_coin != null \
-                and deposit_coin.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF,
-            "coins flying into a deposit do not cast distracting shadows"
+            deposit_coin is GDGoldCoin \
+                and _all_geometry_has_shadow_mode(
+                    deposit_coin,
+                    GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+                ),
+            "coins retain their visual without casting distracting deposit-flight shadows"
+        ) \
+        and _expect(
+            deposit_diamond is GDDiamond \
+                and absorbed_values == [DIAMOND_ITEM.treasure_value],
+            "diamonds retain their visual and award their full value when deposited"
+        ) \
+        and _expect(
+            deposit_gold_bar is GDGoldBar \
+                and GOLD_BAR_ITEM.treasure_value == 45 \
+                and _all_geometry_has_shadow_mode(
+                    deposit_gold_bar,
+                    GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+                ),
+            "gold bars use their real visual and carry 45 treasure value into the coffin"
+        ) \
+        and _expect(
+            selected_deposit_item == GOLD_BAR_ITEM \
+                and deposit_inventory.get_carried_treasure_value() \
+                    == DIAMOND_ITEM.treasure_value + GOLD_COIN_ITEM.treasure_value,
+            "the coffin deposit flow selects a carried gold bar before lower-value treasure"
         ) \
         and _expect(
             world_coin_mesh != null \
@@ -628,6 +1208,11 @@ func _test_reusable_gate_and_coin_deposit_coffin_scenes() -> bool:
         )
     if deposit_coin != null:
         deposit_coin.free()
+    if deposit_diamond != null:
+        deposit_diamond.free()
+    if deposit_gold_bar != null:
+        deposit_gold_bar.free()
+    deposit_inventory.free()
     world_coin.free()
     gate.queue_free()
     coffin.queue_free()
@@ -686,15 +1271,16 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
         test_mapping.level_entries.append({
             "available": true,
             "folder_name": str(index + 1),
+            "id": "test_level_%02d" % (index + 1),
             "name": "Test Level %d" % (index + 1),
             "tutorial": index == 0,
         })
     level_selection.level_mapping = test_mapping
     level_selection.last_highlighted_level_index = 12
     level_selection.level_results = {
-        "01": {"best_percentage": 40, "escaped": false, "play_count": 2, "played": true},
-        "02": {"best_percentage": 70, "escaped": true, "play_count": 3, "played": true},
-        "03": {"best_percentage": 100, "escaped": true, "play_count": 1, "played": true},
+        "test_level_01": {"best_percentage": 40, "escaped": false, "play_count": 2, "played": true},
+        "test_level_02": {"best_percentage": 70, "escaped": true, "play_count": 3, "played": true},
+        "test_level_03": {"best_percentage": 100, "escaped": true, "play_count": 1, "played": true},
     }
 
     var screen := LEVEL_SELECT_SCENE.instantiate() as GDLevelSelectScreen
@@ -805,13 +1391,13 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
     return passed
 
 
-func _test_level_lookup_supports_tutorials_and_sixteen_slots() -> bool:
+func _test_level_lookup_supports_debug_and_stable_ids() -> bool:
     var mapping := load("res://levels/level_mapping.tres") as GDLevelMapping
-    return _expect(mapping.get_level_count() == 16, "level lookup exposes sixteen slots") \
-        and _expect(mapping.is_level_tutorial(0), "level lookup can mark a tutorial") \
-        and _expect(not mapping.is_level_tutorial(1), "tutorial marking is opt-in") \
+    return _expect(mapping.get_level_count() == 17, "level lookup exposes the debug level and sixteen slots") \
+        and _expect(mapping.get_level_id(0) == "debug_level", "debug level has a stable mapping ID") \
+        and _expect(mapping.get_level_id(1) == "level_01", "level 1 has a stable mapping ID") \
         and _expect(
-            mapping.get_level_scene_path(8) == "res://levels/1/level.tscn",
+            mapping.get_level_scene_path(9) == "res://levels/1/level.tscn",
             "dummy level slots can reuse an existing level scene"
         )
 
@@ -845,9 +1431,9 @@ func _test_level_selection_tracks_outcomes_and_highlight() -> bool:
         "a later failed attempt cannot turn an earlier partial escape into full success"
     ) and passed
 
-    passed = _expect(level_selection.select_level(15), "the final dummy level can be selected") and passed
+    passed = _expect(level_selection.select_level(16), "the final dummy level can be selected") and passed
     passed = _expect(
-        level_selection.get_last_highlighted_level_index() == 15,
+        level_selection.get_last_highlighted_level_index() == 16,
         "selecting a level remembers it for the next menu visit"
     ) and passed
     passed = _expect(
@@ -855,6 +1441,60 @@ func _test_level_selection_tracks_outcomes_and_highlight() -> bool:
         and level_selection.get_last_highlighted_level_index() == 3,
         "moving focus remembers the highlighted level without launching it"
     ) and passed
+    level_selection.free()
+    return passed
+
+
+func _test_level_progress_uses_stable_mapping_ids() -> bool:
+    var level_selection := TestLevelSelection.new()
+    var mapping := GDLevelMapping.new()
+    mapping.level_entries = [
+        {
+            "available": true,
+            "folder_name": "alpha",
+            "id": "alpha",
+            "legacy_result_key": "01",
+            "name": "Alpha",
+        },
+        {
+            "available": true,
+            "folder_name": "bravo",
+            "id": "bravo",
+            "legacy_result_key": "02",
+            "name": "Bravo",
+        },
+    ]
+    level_selection.level_mapping = mapping
+    level_selection.level_results = level_selection.migrate_results_for_test({
+        "02": {
+            "best_percentage": 73,
+            "escaped": true,
+            "play_count": 4,
+            "played": true,
+        },
+    })
+
+    mapping.level_entries.insert(0, {
+        "available": true,
+        "folder_name": "new",
+        "id": "new_level",
+        "name": "New Level",
+    })
+    var moved_result := level_selection.get_level_result(2)
+    var new_result := level_selection.get_level_result(0)
+    var passed := _expect(
+        int(moved_result.get("best_percentage", 0)) == 73,
+        "saved progress follows a stable level ID after mappings are inserted"
+    ) and _expect(
+        not bool(new_result.get("played", false)),
+        "a newly inserted mapping does not inherit another level's progress"
+    ) and _expect(
+        level_selection.resolve_highlighted_index_for_test({
+            "last_highlighted_level_index": 1,
+        }) == 2,
+        "legacy highlighted indices migrate through legacy level keys"
+    )
+
     level_selection.free()
     return passed
 
@@ -1212,6 +1852,35 @@ func _test_kill_boundary_speed_edit_retimes_incoming_linear_interval() -> bool:
     return passed
 
 
+func _test_graveyard_starts_refactored_kill_boundary_animation() -> bool:
+    var graveyard := TestGraveyard.new()
+    var passed := true
+    for level_path in ["res://levels/1/level.tscn", "res://levels/2/level.tscn"]:
+        var level_scene := load(level_path) as PackedScene
+        var level := level_scene.instantiate() as Node3D
+        root.add_child(level)
+        graveyard.current_level = level
+
+        var boundary := level.get_node("KillBoundary3D") as GDKillBoundary3D
+        var animation_player := boundary.get_node("BoundaryAnimationPlayer") as AnimationPlayer
+        animation_player.stop()
+        graveyard.start_kill_boundary_for_test()
+
+        passed = _expect(
+            graveyard.get_kill_boundary_for_test() == boundary,
+            "%s finds the concrete refactored kill-boundary script" % level_path
+        ) and passed
+        passed = _expect(
+            animation_player.is_playing(),
+            "%s starts the refactored kill-boundary animation" % level_path
+        ) and passed
+
+        root.remove_child(level)
+        level.free()
+    graveyard.free()
+    return passed
+
+
 func _test_production_kill_boundaries_use_equivalent_size_tracks() -> bool:
     var level_expectations: Array[Dictionary] = [
         {
@@ -1475,6 +2144,106 @@ func _test_skeleton_facing_is_driven_by_movement() -> bool:
 
     skeleton.queue_free()
     return passed
+
+
+func _test_enemies_use_fake_shadows_without_warning_light_blobs() -> bool:
+    var zombie := ZOMBIE_SCENE.instantiate()
+    var skeleton := SKELETON_SCENE.instantiate()
+    root.add_child(zombie)
+    root.add_child(skeleton)
+
+    var zombie_character := zombie.get_node("ZombieBody/DropPivot/Pivot/Character")
+    var skeleton_character := skeleton.get_node("PathFollow3D/DropPivot/Pivot/Character")
+    var zombie_shadow := zombie.get_node_or_null("ZombieBody/ZombieShadow") as GeometryInstance3D
+    var skeleton_shadow := (
+        skeleton.get_node_or_null("PathFollow3D/SkeletonShadow") as GeometryInstance3D
+    )
+    var zombie_light := zombie.get_node("ZombieBody/DropPivot/Pivot/ZombieLight") as OmniLight3D
+    var skeleton_light := (
+        skeleton.get_node("PathFollow3D/DropPivot/Pivot/SkeletonLight") as OmniLight3D
+    )
+    var passed := _expect(
+        zombie_shadow != null \
+            and zombie_shadow.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF,
+        "zombie scene retains its fake ground shadow"
+    ) and _expect(
+        skeleton_shadow != null \
+            and skeleton_shadow.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF,
+        "skeleton scene retains its fake ground shadow"
+    ) and _expect(
+        _all_geometry_casts_normal_shadows(zombie_character),
+        "zombie model geometry casts normal light shadows"
+    ) and _expect(
+        _all_geometry_casts_normal_shadows(skeleton_character),
+        "skeleton model geometry casts normal light shadows"
+    ) and _expect(
+        _light_illuminates_but_does_not_shadow_geometry(zombie_light, zombie_character),
+        "zombie warning light illuminates its model without using it as a shadow caster"
+    ) and _expect(
+        _light_illuminates_but_does_not_shadow_geometry(skeleton_light, skeleton_character),
+        "skeleton warning light illuminates its model without using it as a shadow caster"
+    ) and _expect(
+        zombie_light.shadow_enabled and (zombie_light.shadow_caster_mask & 1) == 1,
+        "zombie warning light retains shadows from level geometry"
+    ) and _expect(
+        skeleton_light.shadow_enabled and (skeleton_light.shadow_caster_mask & 1) == 1,
+        "skeleton warning light retains shadows from level geometry"
+    )
+
+    zombie.queue_free()
+    skeleton.queue_free()
+    return passed
+
+
+func _all_geometry_casts_normal_shadows(node: Node) -> bool:
+    var geometry_instances: Array[GeometryInstance3D] = []
+    _collect_shadow_test_geometry(node, geometry_instances)
+    if geometry_instances.is_empty():
+        return false
+
+    for geometry in geometry_instances:
+        if geometry.cast_shadow != GeometryInstance3D.SHADOW_CASTING_SETTING_ON:
+            return false
+
+    return true
+
+
+func _all_geometry_has_shadow_mode(node: Node, shadow_mode: int) -> bool:
+    var geometry_instances: Array[GeometryInstance3D] = []
+    _collect_shadow_test_geometry(node, geometry_instances)
+    if geometry_instances.is_empty():
+        return false
+
+    for geometry in geometry_instances:
+        if geometry.cast_shadow != shadow_mode:
+            return false
+
+    return true
+
+
+func _light_illuminates_but_does_not_shadow_geometry(light: Light3D, node: Node) -> bool:
+    var geometry_instances: Array[GeometryInstance3D] = []
+    _collect_shadow_test_geometry(node, geometry_instances)
+    if geometry_instances.is_empty():
+        return false
+
+    for geometry in geometry_instances:
+        if (light.light_cull_mask & geometry.layers) != geometry.layers \
+                or (light.shadow_caster_mask & geometry.layers) != 0:
+            return false
+
+    return true
+
+
+func _collect_shadow_test_geometry(
+        node: Node,
+        geometry_instances: Array[GeometryInstance3D]
+) -> void:
+    if node is GeometryInstance3D:
+        geometry_instances.append(node as GeometryInstance3D)
+
+    for child in node.get_children():
+        _collect_shadow_test_geometry(child, geometry_instances)
 
 
 func _test_gridmap_repair_uses_configured_connection_groups() -> bool:

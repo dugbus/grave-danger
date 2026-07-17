@@ -3,6 +3,7 @@ class_name GDLevelSelection
 
 const DEFAULT_LEVEL_MAPPING := preload("res://levels/level_mapping.tres")
 const RESULTS_PATH := "user://level_results.json"
+const RESULTS_VERSION := 2
 
 var level_mapping = DEFAULT_LEVEL_MAPPING
 var selected_level_index := 0
@@ -182,11 +183,9 @@ func _load_results() -> void:
 
 	var parsed = JSON.parse_string(results_file.get_as_text())
 	if parsed is Dictionary:
-		level_results = parsed.get("levels", {})
-		last_highlighted_level_index = int(parsed.get(
-			"last_highlighted_level_index",
-			parsed.get("last_played_level_index", -1)
-		))
+		var parsed_results: Dictionary = parsed.get("levels", {})
+		level_results = _migrate_legacy_results(parsed_results)
+		last_highlighted_level_index = _resolve_saved_highlighted_level_index(parsed)
 	else:
 		push_warning("Level results file is not valid JSON: %s" % RESULTS_PATH)
 		level_results = {}
@@ -203,13 +202,58 @@ func _save_results() -> void:
 		return
 
 	results_file.store_string(JSON.stringify({
+		"version": RESULTS_VERSION,
+		"last_highlighted_level_id": _get_level_id(last_highlighted_level_index),
 		"last_highlighted_level_index": last_highlighted_level_index,
 		"levels": level_results,
 	}, "\t"))
 
 
 func _get_result_key(index: int) -> String:
-	return "%02d" % (index + 1)
+	return _get_level_id(index)
+
+
+func _get_level_id(index: int) -> String:
+	if level_mapping == null or index < 0 or index >= get_level_count():
+		return ""
+
+	return String(level_mapping.get_level_id(index))
+
+
+func _migrate_legacy_results(stored_results: Dictionary) -> Dictionary:
+	var migrated_results := stored_results.duplicate(true)
+	if level_mapping == null:
+		return migrated_results
+
+	for index in get_level_count():
+		var level_id := _get_level_id(index)
+		var legacy_key := String(level_mapping.get_legacy_result_key(index))
+		if level_id.is_empty() or legacy_key.is_empty() or level_id == legacy_key:
+			continue
+		if stored_results.has(legacy_key) and not migrated_results.has(level_id):
+			migrated_results[level_id] = stored_results[legacy_key]
+		migrated_results.erase(legacy_key)
+
+	return migrated_results
+
+
+func _resolve_saved_highlighted_level_index(parsed_results: Dictionary) -> int:
+	var highlighted_level_id := String(parsed_results.get("last_highlighted_level_id", ""))
+	if not highlighted_level_id.is_empty() and level_mapping != null:
+		var highlighted_index := int(level_mapping.find_level_index_by_id(highlighted_level_id))
+		if highlighted_index >= 0:
+			return highlighted_index
+
+	var legacy_index := int(parsed_results.get(
+		"last_highlighted_level_index",
+		parsed_results.get("last_played_level_index", -1)
+	))
+	if legacy_index < 0 or level_mapping == null:
+		return legacy_index
+
+	var legacy_key := "%02d" % (legacy_index + 1)
+	var migrated_index := int(level_mapping.find_level_index_by_legacy_result_key(legacy_key))
+	return migrated_index if migrated_index >= 0 else legacy_index
 
 
 func _normalize_lit_torches(stored_value: Variant) -> Array[String]:

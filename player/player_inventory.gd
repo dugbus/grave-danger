@@ -3,7 +3,13 @@ class_name GDPlayerInventory
 
 
 const GOLD_COIN_ITEM_TYPE := &"gold_coin"
-const DEFAULT_GOLD_COIN_ITEM := preload("res://inventory/items/gold_coin.tres")
+const GEM_ITEM_TYPES: Array[StringName] = [
+	&"diamond",
+	&"ruby",
+	&"sapphire",
+	&"emerald",
+	&"amethyst",
+]
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 
 # A carried item can only be collected if it is roughly in front of the character.
@@ -33,7 +39,7 @@ const ITEM_SOUND_VOLUME_MIN_DB := -4.0
 const ITEM_SOUND_VOLUME_MAX_DB := 0.5
 
 signal item_count_changed(item_type: StringName, carried_count: int)
-signal carried_gold_coins_changed(carried_count: int)
+signal inventory_capacity_changed(max_units: int)
 
 ## Visual pivot used to determine pickup facing and drop direction.
 @export var pivot_path: NodePath = ^"../Pivot"
@@ -211,24 +217,44 @@ func get_carried_weight() -> float:
 	return total
 
 
-func try_collect_gold_coin(gold_coin: Node3D) -> bool:
-	return try_collect_item_pickup(gold_coin)
+## Returns the score value of all treasure currently carried in the sack.
+func get_carried_treasure_value() -> int:
+	var total := 0
+	for item_type in _get_sorted_carried_item_types():
+		var item: Resource = peek_item_of_type(item_type)
+		if item == null:
+			continue
+
+		total += _item_treasure_value(item) * get_item_count(_item_type(item))
+
+	return total
 
 
-func spend_carried_gold_coin() -> bool:
-	return take_item(GOLD_COIN_ITEM_TYPE)
+## Returns the occupied sack capacity shown to the player.
+func get_used_inventory_units() -> int:
+	return ceili(get_carried_weight())
 
 
-func get_carried_gold_coins() -> int:
-	return get_item_count(GOLD_COIN_ITEM_TYPE)
+## Returns the total sack capacity shown to the player.
+func get_max_inventory_units() -> int:
+	return maxi(floori(max_carry_weight), 1)
 
 
-func get_max_carried_gold_coins() -> int:
-	var item: Resource = peek_item_of_type(GOLD_COIN_ITEM_TYPE)
-	if item != null:
-		return _get_effective_item_max_count(item)
+## Removes and returns the most valuable carried treasure available for depositing.
+func take_highest_value_carried_treasure() -> Resource:
+	var best_item: Resource = null
+	for item_type in _get_sorted_carried_item_types():
+		var item: Resource = peek_item_of_type(item_type)
+		if item == null or _item_treasure_value(item) <= 0:
+			continue
+		if best_item == null or _item_treasure_value(item) > _item_treasure_value(best_item):
+			best_item = item
 
-	return _get_effective_item_max_count(DEFAULT_GOLD_COIN_ITEM)
+	if best_item == null:
+		return null
+
+	take_item(_item_type(best_item))
+	return best_item
 
 
 func weight_multiplier(empty_value: float, full_value: float) -> float:
@@ -242,7 +268,7 @@ func increase_inventory_space(extra_space: int) -> bool:
 
 	bonus_inventory_space += extra_space
 	max_carry_weight += float(extra_space)
-	_emit_item_count_changed(GOLD_COIN_ITEM_TYPE)
+	inventory_capacity_changed.emit(get_max_inventory_units())
 	return true
 
 
@@ -386,8 +412,6 @@ func _weight_ratio() -> float:
 func _emit_item_count_changed(item_type: StringName) -> void:
 	var carried_count := get_item_count(item_type)
 	item_count_changed.emit(item_type, carried_count)
-	if item_type == GOLD_COIN_ITEM_TYPE:
-		carried_gold_coins_changed.emit(carried_count)
 
 
 func _item_type(item: Resource) -> StringName:
@@ -407,6 +431,10 @@ func _get_effective_item_max_count(item: Resource) -> int:
 
 func _item_weight(item: Resource) -> float:
 	return maxf(float(item.get("weight")), 0.0) if item != null else 0.0
+
+
+func _item_treasure_value(item: Resource) -> int:
+	return maxi(int(item.get("treasure_value")), 0) if item != null else 0
 
 
 func _item_drop_order(item: Resource) -> int:
@@ -435,7 +463,7 @@ func _play_item_sound(item: Resource, sound: AudioStream, player_name: String) -
 
 	var pitch_scale := ITEM_SOUND_PITCH_MIN
 	var volume_db := ITEM_SOUND_VOLUME_MIN_DB
-	if _item_type(item) == GOLD_COIN_ITEM_TYPE:
+	if _uses_coin_sound_profile(item):
 		pitch_scale = audio_rng.randf_range(COIN_SOUND_PITCH_MIN, COIN_SOUND_PITCH_MAX)
 		volume_db = audio_rng.randf_range(
 			ITEM_SOUND_VOLUME_MIN_DB + COIN_SOUND_VOLUME_OFFSET_DB,
@@ -448,6 +476,11 @@ func _play_item_sound(item: Resource, sound: AudioStream, player_name: String) -
 	var audio_parent: Node = player as Node if player != null else self as Node
 	var sound_name := player_name if not player_name.is_empty() else "InventoryItemAudio"
 	GDAudio.play_one_shot(audio_parent, sound, sound_name, volume_db, pitch_scale)
+
+
+func _uses_coin_sound_profile(item: Resource) -> bool:
+	var item_type := _item_type(item)
+	return item_type == GOLD_COIN_ITEM_TYPE or item_type in GEM_ITEM_TYPES
 
 
 func _get_sorted_carried_item_types() -> Array[StringName]:

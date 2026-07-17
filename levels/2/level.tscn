@@ -3,22 +3,22 @@
 [ext_resource type="PackedScene" path="res://enemies/bat_nest.tscn" id="1_1rlxb"]
 [ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/kenney-graveyard/coffin.glb" id="1_coffin"]
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
-[ext_resource type="PackedScene" uid="uid://cw45377f21i2v" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
-[ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="4_flame"]
-[ext_resource type="PackedScene" path="res://collectibles/silver_key.tscn" id="5_lm540"]
-[ext_resource type="PackedScene" path="res://collectibles/key.tscn" id="6_1rlxb"]
-[ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="6_deposit"]
+[ext_resource type="PackedScene" uid="uid://cw45377f21i2v" path="res://placeables/treasure/gold_coin_pile.tscn" id="3_coinpile"]
+[ext_resource type="PackedScene" path="res://placeables/kill_boundary/kill_boundary.tscn" id="4_flame"]
+[ext_resource type="PackedScene" path="res://inventory/silver_key.tscn" id="5_lm540"]
+[ext_resource type="PackedScene" path="res://inventory/key.tscn" id="6_1rlxb"]
+[ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://placeables/treasure_deposit/treasure_deposit.gd" id="6_deposit"]
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="6_e2jp1"]
 [ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://Assets/environment/shaders/level.gdshader" id="10_3xhgt"]
 [ext_resource type="PackedScene" uid="uid://cp58o88h2j8e7" path="res://enemies/zombie.tscn" id="10_veeoo"]
-[ext_resource type="PackedScene" uid="uid://mbxax50al4bn" path="res://collectibles/health_flask.tscn" id="11_haq2d"]
-[ext_resource type="PackedScene" uid="uid://4qkicc6gkfuv" path="res://levels/common/locked_door.tscn" id="12_fhv3i"]
-[ext_resource type="PackedScene" path="res://levels/common/locked_gate.tscn" id="16_mx8o4"]
+[ext_resource type="PackedScene" uid="uid://mbxax50al4bn" path="res://placeables/collectibles/health_flask.tscn" id="11_haq2d"]
+[ext_resource type="PackedScene" uid="uid://4qkicc6gkfuv" path="res://placeables/lockables/locked_door.tscn" id="12_fhv3i"]
+[ext_resource type="PackedScene" path="res://placeables/lockables/locked_gate.tscn" id="16_mx8o4"]
 [ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="16_yyw7i"]
-[ext_resource type="PackedScene" path="res://pushables/hay_bale_pushable.tscn" id="18_fhv3i"]
+[ext_resource type="PackedScene" path="res://placeables/pushables/hay_bale_pushable.tscn" id="18_fhv3i"]
 [ext_resource type="PackedScene" path="res://enemies/skeleton.tscn" id="19_haq2d"]
-[ext_resource type="PackedScene" path="res://levels/common/spike_trap.tscn" id="20_yyw7i"]
-[ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
+[ext_resource type="PackedScene" path="res://placeables/spike_trap/spike_trap.tscn" id="20_yyw7i"]
+[ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]
 
 [sub_resource type="Curve3D" id="Curve3D_mx8o4"]
 resource_local_to_scene = true
@@ -200,7 +200,7 @@ transform = Transform3D(0.80160874, 0, -0.597849, 0, 1, 0, 0.597849, 0, 0.801608
 [node name="coffin3" parent="Objects/Coffins" unique_id=1894824003 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -5.691139, -5.9604645e-08, -1.5755367)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/coffin3" unique_id=894045105]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/Coffins/coffin3" unique_id=894045105]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
@@ -208,7 +208,7 @@ metadata/_edit_lock_ = true
 [node name="coffin8" parent="Objects/Coffins" unique_id=973520463 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -1.9275005, -5.9604645e-08, 9.521939)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/coffin8" unique_id=1479578]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/Coffins/coffin8" unique_id=1479578]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
@@ -216,7 +216,7 @@ metadata/_edit_lock_ = true
 [node name="coffin4" parent="Objects/Coffins" unique_id=656476163 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -0.58958143, -5.9604645e-08, 4.991891)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/coffin4" unique_id=1391479990]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/Coffins/coffin4" unique_id=1391479990]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
@@ -224,7 +224,7 @@ metadata/_edit_lock_ = true
 [node name="coffin5" parent="Objects/Coffins" unique_id=618843990 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -3.2204406, -5.9604645e-08, 19.088963)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/coffin5" unique_id=1410385554]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/Coffins/coffin5" unique_id=1410385554]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
@@ -232,7 +232,7 @@ metadata/_edit_lock_ = true
 [node name="coffin9" parent="Objects/Coffins" unique_id=1364150830 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 12.69909, -5.9604645e-08, -0.6666956)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/coffin9" unique_id=559612101]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/Coffins/coffin9" unique_id=559612101]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
@@ -240,7 +240,7 @@ metadata/_edit_lock_ = true
 [node name="coffin10" parent="Objects/Coffins" unique_id=342160619 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -0.90127367, -5.9604645e-08, -1.9565535)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/coffin10" unique_id=1933067736]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/Coffins/coffin10" unique_id=1933067736]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
@@ -248,7 +248,7 @@ metadata/_edit_lock_ = true
 [node name="coffin6" parent="Objects/Coffins" unique_id=1577827533 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, 5.0818415, -5.9604645e-08, -2.3906522)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/coffin6" unique_id=888618192]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/Coffins/coffin6" unique_id=888618192]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true
@@ -256,7 +256,7 @@ metadata/_edit_lock_ = true
 [node name="coffin7" parent="Objects/Coffins" unique_id=1406157899 instance=ExtResource("1_coffin")]
 transform = Transform3D(0.80160874, 0, 0.597849, 0, 1, 0, -0.597849, 0, 0.80160874, -1.1850202, -5.9604645e-08, -10.881008)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/Coffins/coffin7" unique_id=1570529832]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/Coffins/coffin7" unique_id=1570529832]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 metadata/_edit_lock_ = true

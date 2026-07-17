@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://mbxax50al4bn"]
+
+[ext_resource type="PackedScene" uid="uid://cx1gj06246clp" path="res://placeables/collectibles/flask_base.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://bq8alqc0ds10h" path="res://placeables/collectibles/health_flask.gd" id="2_script"]
+
+[node name="GDHealthFlask" unique_id=1387496220 instance=ExtResource("1_base")]
+script = ExtResource("2_script")
+liquid_color = Color(0.95, 0.05, 0.02, 1)
+hud_effect_id = &"health_flask"
+show_hud_countdown = true

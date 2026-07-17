@@ -1,0 +1,6 @@
+[gd_resource type="PhysicsMaterial" format=3]
+
+[resource]
+resource_name = "Gem Physics Material"
+friction = 0.9
+bounce = 0.02

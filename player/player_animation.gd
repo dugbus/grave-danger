@@ -12,7 +12,7 @@ signal footstep_phase_reached
 const MIN_WALK_ANIMATION_SPEED = 0.45
 const MAX_WALK_ANIMATION_SPEED = 1.0
 
-# Lowest animation speed multiplier when carrying the maximum number of coins.
+# Lowest animation speed multiplier when carrying the maximum treasure weight.
 const MIN_WEIGHT_ANIMATION_MULTIPLIER = 0.65
 
 # The character mesh is lit separately from the point light carried by the player.
@@ -71,7 +71,7 @@ func _ready() -> void:
 	_play_animation(idle_animation)
 
 
-func update_movement(input_strength: float, gold_inventory: Node) -> void:
+func update_movement(input_strength: float, inventory: Node) -> void:
 	# Movement returns the same analogue strength it used for speed, so animation
 	# playback can stay visually synchronized with actual movement.
 	if input_strength <= 0.05:
@@ -83,7 +83,7 @@ func update_movement(input_strength: float, gold_inventory: Node) -> void:
 
 	if animation_player != null:
 		# Carrying gold slows the walk cycle as well as the player's movement.
-		var weight_animation_multiplier: float = gold_inventory.weight_multiplier(1.0, MIN_WEIGHT_ANIMATION_MULTIPLIER)
+		var weight_animation_multiplier: float = inventory.weight_multiplier(1.0, MIN_WEIGHT_ANIMATION_MULTIPLIER)
 		animation_player.speed_scale = (
 			lerpf(MIN_WALK_ANIMATION_SPEED, MAX_WALK_ANIMATION_SPEED, input_strength)
 			* weight_animation_multiplier

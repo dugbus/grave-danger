@@ -1,0 +1,17 @@
+[gd_resource type="Resource" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://inventory/carried_item.gd" id="1_item"]
+[ext_resource type="AudioStream" path="res://Assets/audio/coin-pickup.mp3" id="2_coin_sound"]
+
+[resource]
+script = ExtResource("1_item")
+item_type = &"amethyst"
+display_name = "Amethyst"
+max_count = 100
+weight = 1.0
+treasure_value = 2
+drop_order = 10
+world_scene_path = "res://placeables/treasure/gems/amethyst.tscn"
+require_facing_for_pickup = true
+pickup_sound = ExtResource("2_coin_sound")
+drop_sound = ExtResource("2_coin_sound")

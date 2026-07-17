@@ -72,7 +72,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_lose")
 result_texture = ExtResource("2_texture")
-coins_rect = Rect2(585, 456, 376, 88)
+treasure_rect = Rect2(585, 456, 376, 88)
 percentage_rect = Rect2(586, 623, 376, 88)
 
 [node name="ResultImage" type="TextureRect" parent="." unique_id=1387477389]
@@ -91,7 +91,7 @@ stretch_mode = 6
 [node name="ValueLayer" type="CanvasLayer" parent="." unique_id=1108771390]
 layer = 20
 
-[node name="CoinsValue" type="Label" parent="ValueLayer" unique_id=1156512226]
+[node name="TreasureValue" type="Label" parent="ValueLayer" unique_id=1156512226]
 z_index = 10
 offset_left = 775.0
 offset_top = 419.0

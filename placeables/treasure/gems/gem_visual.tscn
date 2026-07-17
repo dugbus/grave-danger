@@ -1,0 +1,11 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" uid="uid://bddflwk42x3lp" path="res://Assets/placeables/treasure/gems/diamond.glb" id="1_model"]
+[ext_resource type="Script" path="res://placeables/treasure/gems/gem_visual.gd" id="2_script"]
+[ext_resource type="Material" path="res://placeables/treasure/gems/diamond_material.tres" id="3_material"]
+
+[node name="GemVisual" type="Node3D"]
+script = ExtResource("2_script")
+gem_material = ExtResource("3_material")
+
+[node name="GemModel" parent="." instance=ExtResource("1_model")]

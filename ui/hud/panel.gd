@@ -12,7 +12,7 @@ enum HealthSegmentState {
 
 const ACTIVE_HEALTH_SEGMENTS := 6
 const TOTAL_HEALTH_SEGMENTS := 12
-const DEFAULT_LEVEL_COIN_TOTAL := 0
+const DEFAULT_LEVEL_TREASURE_TOTAL := 0
 
 @export_group("Placement Help")
 ## Inspector note: edit ScreenContainer/PanelPlacement to move or resize the panel inside the reference canvas.
@@ -50,7 +50,7 @@ const DEFAULT_LEVEL_COIN_TOTAL := 0
 @export var locked_health_texture: Texture2D
 
 var treasure_collected := 0
-var treasure_available := DEFAULT_LEVEL_COIN_TOTAL
+var treasure_available := DEFAULT_LEVEL_TREASURE_TOTAL
 var sack_used := 0
 var sack_available := 1
 var health_available := ACTIVE_HEALTH_SEGMENTS
@@ -73,7 +73,7 @@ func _ready() -> void:
 		placement_guide.visible = false
 	if screen_guide != null and not Engine.is_editor_hint():
 		screen_guide.visible = false
-	add_to_group("coin_score_display")
+	add_to_group("treasure_score_display")
 	_update_labels()
 	_update_health_segments()
 

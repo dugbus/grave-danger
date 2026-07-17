@@ -2,14 +2,14 @@
 
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_ef483"]
 [ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/kenney-graveyard/coffin.glb" id="4_jo3om"]
-[ext_resource type="Script" uid="uid://bvowj5mveddhm" path="res://levels/common/level_settings.gd" id="5_level_settings"]
-[ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://levels/common/coin_deposit.gd" id="5_xsjys"]
-[ext_resource type="PackedScene" uid="uid://cw45377f21i2v" path="res://collectibles/gold_coin_pile.tscn" id="6_1rl82"]
+[ext_resource type="Script" uid="uid://bvowj5mveddhm" path="res://levels/level_settings.gd" id="5_level_settings"]
+[ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://placeables/treasure_deposit/treasure_deposit.gd" id="5_xsjys"]
+[ext_resource type="PackedScene" uid="uid://cw45377f21i2v" path="res://placeables/treasure/gold_coin_pile.tscn" id="6_1rl82"]
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="6_ivkoh"]
-[ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="8_sqtlf"]
+[ext_resource type="PackedScene" path="res://placeables/kill_boundary/kill_boundary.tscn" id="8_sqtlf"]
 [ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://Assets/environment/shaders/level.gdshader" id="8_t5rcl"]
 [ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="9_ywqr7"]
-[ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
+[ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]
 
 [sub_resource type="Curve3D" id="Curve3D_ywqr7"]
 resource_local_to_scene = true
@@ -135,10 +135,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, 0, 23)
 coin_count = 10
 random_seed = 4009
 
-[node name="CoinDepositCoffin" parent="Objects" unique_id=555409895 instance=ExtResource("4_jo3om")]
+[node name="TreasureDepositCoffin" parent="Objects" unique_id=555409895 instance=ExtResource("4_jo3om")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 4, 0, -2)
 
-[node name="CoinDeposit" type="Node3D" parent="Objects/CoinDepositCoffin" unique_id=1957911807]
+[node name="TreasureDeposit" type="Node3D" parent="Objects/TreasureDepositCoffin" unique_id=1957911807]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("5_xsjys")
 

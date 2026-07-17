@@ -14,7 +14,7 @@ const FLOOR_LEVEL_Y := 0.0
 const FALL_DEATH_DEPTH := 4.0
 
 # Player stays as the public API for other gameplay objects.
-# Coins and kill-boundary areas still talk to this CharacterBody3D, while the actual
+# Treasure pickups and kill-boundary areas still talk to this CharacterBody3D, while the actual
 # behavior is split into focused child components below.
 @onready var movement: Node = $PlayerMovement
 @onready var inventory: Node = $PlayerInventory
@@ -57,10 +57,6 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	_die_if_fallen_below_floor()
 	_push_slide_colliders(push_velocity, delta)
-
-
-func try_collect_gold_coin(gold_coin: Node3D) -> bool:
-	return try_collect_carried_item(gold_coin)
 
 
 func try_collect_carried_item(pickup: Node3D) -> bool:
@@ -126,15 +122,11 @@ func show_flask_effect_countdown(effect_id: StringName, liquid_color: Color, dur
 	flask_effect_started.emit(effect_id, liquid_color, duration)
 
 
-func spend_carried_gold_coin() -> bool:
+func take_highest_value_carried_treasure() -> Resource:
 	if death_controller.is_dead:
-		return false
+		return null
 
-	return inventory.spend_carried_gold_coin()
-
-
-func get_carried_gold_coins() -> int:
-	return inventory.get_carried_gold_coins()
+	return inventory.take_highest_value_carried_treasure()
 
 
 func take_carried_item_of_type(item_type: StringName):

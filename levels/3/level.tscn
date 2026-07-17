@@ -1,13 +1,13 @@
 [gd_scene format=3 uid="uid://c7k5wvrum4far"]
 
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
-[ext_resource type="PackedScene" path="res://levels/common/locked_gate.tscn" id="2_rakk4"]
-[ext_resource type="PackedScene" uid="uid://cw45377f21i2v" path="res://collectibles/gold_coin_pile.tscn" id="3_coinpile"]
+[ext_resource type="PackedScene" path="res://placeables/lockables/locked_gate.tscn" id="2_rakk4"]
+[ext_resource type="PackedScene" uid="uid://cw45377f21i2v" path="res://placeables/treasure/gold_coin_pile.tscn" id="3_coinpile"]
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="4_cogbq"]
-[ext_resource type="PackedScene" path="res://levels/common/kill_boundary.tscn" id="4_flame"]
+[ext_resource type="PackedScene" path="res://placeables/kill_boundary/kill_boundary.tscn" id="4_flame"]
 [ext_resource type="Material" uid="uid://6xa14siv3rq4" path="res://Assets/environment/shaders/level_shader.tres" id="6_ej6ns"]
-[ext_resource type="PackedScene" path="res://collectibles/key.tscn" id="8_46uyn"]
-[ext_resource type="PackedScene" path="res://levels/common/gd_indoor_lighting.tscn" id="100_indoor"]
+[ext_resource type="PackedScene" path="res://inventory/key.tscn" id="8_46uyn"]
+[ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]
 
 [sub_resource type="Curve3D" id="Curve3D_46uyn"]
 resource_local_to_scene = true

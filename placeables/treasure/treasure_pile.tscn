@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://placeables/treasure/treasure_pile.gd" id="1_script"]
+
+[node name="TreasurePile" type="Node3D"]
+script = ExtResource("1_script")
+pile_radius = 0.5
+spawn_height = 1.0
+spawn_interval = 0.05
+preview_base_height = 0.025
+preview_center_height = 0.1
+preview_item_spacing = 0.055

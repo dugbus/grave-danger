@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://lighting/gd_indoor_lighting.gd" id="1_script"]
+
+[sub_resource type="Environment" id="Environment_indoor"]
+background_mode = 1
+background_color = Color(0, 0, 0, 1)
+ambient_light_source = 1
+ambient_light_energy = 0.0
+reflected_light_source = 1
+tonemap_exposure = 1.0
+glow_enabled = true
+glow_bloom = 0.40
+
+[node name="GDIndoorLighting" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_indoor")

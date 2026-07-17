@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Assets/environment/level-crypt.blend" id="1_crypt"]
+[ext_resource type="Script" path="res://levels/graveyard/level_select_crypt.gd" id="2_script"]
+
+[node name="LevelSelectCrypt" instance=ExtResource("1_crypt")]
+script = ExtResource("2_script")

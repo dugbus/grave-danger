@@ -39,6 +39,43 @@ func get_level_folder_name(index: int) -> String:
     return String(level_data.get("folder_name", ""))
 
 
+func get_level_id(index: int) -> String:
+    var level_data := get_level_entry(index)
+    var level_id := String(level_data.get("id", ""))
+    if not level_id.is_empty():
+        return level_id
+
+    var level_name := String(level_data.get("name", ""))
+    if not level_name.is_empty():
+        return level_name.to_snake_case()
+
+    return get_level_folder_name(index).to_snake_case()
+
+
+func get_legacy_result_key(index: int) -> String:
+    return String(get_level_entry(index).get("legacy_result_key", ""))
+
+
+func find_level_index_by_id(level_id: String) -> int:
+    if level_id.is_empty():
+        return -1
+
+    for index in level_entries.size():
+        if get_level_id(index) == level_id:
+            return index
+    return -1
+
+
+func find_level_index_by_legacy_result_key(legacy_result_key: String) -> int:
+    if legacy_result_key.is_empty():
+        return -1
+
+    for index in level_entries.size():
+        if get_legacy_result_key(index) == legacy_result_key:
+            return index
+    return -1
+
+
 func is_level_available(index: int) -> bool:
     var level_data := get_level_entry(index)
     return bool(level_data.get("available", false))

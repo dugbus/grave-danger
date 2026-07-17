@@ -2,7 +2,7 @@ extends Control
 class_name GDActiveFlaskHud
 
 
-const FLASK_SCENE := preload("res://Assets/environment/flask.glb")
+const FLASK_SCENE := preload("res://Assets/placeables/collectibles/flask.glb")
 const LIQUID_MATERIAL_NAME := "FlaskLiquidMaterial"
 const SLOT_SIZE := Vector2(328.0, 408.0)
 const VIEWPORT_SIZE := Vector2i(288, 288)

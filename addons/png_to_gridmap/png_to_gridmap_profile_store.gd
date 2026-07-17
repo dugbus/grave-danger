@@ -10,7 +10,6 @@ const UI_STATE_SECTION := "png_to_gridmap"
 const UI_STATE_ADVANCED_VISIBLE := "advanced_visible"
 const UI_STATE_OPERATION_ID := "operation_id"
 const LEVELS_ROOT := "res://levels"
-const LEVELS_COMMON_ROOT := "res://levels/common"
 const LEVEL_SETTINGS_FILE := "png_to_gridmap_settings.tres"
 const GLOBAL_PROPERTIES := [&"mesh_library_path", &"color_mappings", &"floor_materials_folder"]
 const LEVEL_PROPERTIES := [
@@ -125,15 +124,12 @@ func path_for_scene(scene_path: String) -> String:
 	return normalized_path.get_base_dir().path_join(LEVEL_SETTINGS_FILE)
 
 
-## Reports whether a scene is in a level folder, excluding the shared levels/common tree.
+## Reports whether a scene is inside a level-specific folder.
 static func is_scene_in_levels_subfolder(scene_path: String) -> bool:
 	if scene_path == "":
 		return false
 	var normalized_path := scene_path.replace("\\", "/").simplify_path()
 	var scene_directory := normalized_path.get_base_dir()
-	if scene_directory == LEVELS_COMMON_ROOT \
-			or scene_directory.begins_with(LEVELS_COMMON_ROOT + "/"):
-		return false
 	return scene_directory.begins_with(LEVELS_ROOT + "/")
 
 

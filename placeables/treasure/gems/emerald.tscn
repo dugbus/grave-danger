@@ -1,0 +1,11 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://placeables/treasure/gems/gem.tscn" id="1_gem"]
+[ext_resource type="Resource" path="res://placeables/treasure/gems/emerald_inventory.tres" id="2_item"]
+[ext_resource type="Material" path="res://placeables/treasure/gems/emerald_material.tres" id="3_material"]
+
+[node name="Emerald" groups=["treasure_pile_compatible"] instance=ExtResource("1_gem")]
+carried_item = ExtResource("2_item")
+
+[node name="GemVisual" parent="." index="0"]
+gem_material = ExtResource("3_material")

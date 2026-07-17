@@ -15,13 +15,13 @@ const DECELERATION = 22.0
 # How much analogue stick input is needed before the player starts walking.
 const WALK_INPUT_THRESHOLD = 0.05
 
-# Lowest movement multipliers when carrying the maximum number of coins.
+# Lowest movement multipliers when carrying the maximum treasure weight.
 const MIN_WEIGHT_SPEED_MULTIPLIER = 0.35
 const MIN_WEIGHT_ACCELERATION_MULTIPLIER = 0.28
 const MIN_WEIGHT_DECELERATION_MULTIPLIER = 0.2
 const MIN_WEIGHT_ROTATION_MULTIPLIER = 0.35
 
-const JUMP_SETTINGS := preload("res://game/player_jump_settings.tres")
+const JUMP_SETTINGS := preload("res://player/player_jump_settings.tres")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const FOOTSTEP_SOUND_PATHS: Array[String] = [
 	"res://Assets/audio/footstep1.mp3",
@@ -77,7 +77,7 @@ func _ready() -> void:
 	_randomize_next_footstep_distance()
 
 
-func apply_gravity_and_jump(delta: float, gold_inventory: Node) -> void:
+func apply_gravity_and_jump(delta: float, inventory: Node) -> void:
 	# Vertical motion is handled before horizontal movement so jumping and
 	# falling are independent of analogue stick direction.
 	if player == null:
@@ -87,15 +87,15 @@ func apply_gravity_and_jump(delta: float, gold_inventory: Node) -> void:
 		player.velocity += player.get_gravity() * delta
 
 	if Input.is_action_just_pressed("jump") and player.is_on_floor():
-		# Carrying coins makes jumps shorter through the inventory weight curve.
+		# Carrying treasure makes jumps shorter through the inventory weight curve.
 		var settings := JUMP_SETTINGS as GDPlayerJumpSettings
 		var gravity_magnitude := player.get_gravity().length()
 		var jump_velocity := settings.get_jump_velocity(gravity_magnitude)
-		player.velocity.y = jump_velocity * gold_inventory.weight_multiplier(1.0, settings.min_weight_jump_multiplier)
+		player.velocity.y = jump_velocity * inventory.weight_multiplier(1.0, settings.min_weight_jump_multiplier)
 		_play_jump_sound(settings)
 
 
-func update_walk(delta: float, gold_inventory: Node) -> float:
+func update_walk(delta: float, inventory: Node) -> float:
 	# Returns input strength so the animation component can match walk playback
 	# speed to the same analogue input used for movement.
 	if player == null:
@@ -113,10 +113,10 @@ func update_walk(delta: float, gold_inventory: Node) -> float:
 
 	# The inventory component owns the carrying-weight curve; movement only asks
 	# for the multiplier it needs for each tuning value.
-	var speed: float = SPEED * gold_inventory.weight_multiplier(1.0, MIN_WEIGHT_SPEED_MULTIPLIER)
-	var acceleration: float = ACCELERATION * gold_inventory.weight_multiplier(1.0, MIN_WEIGHT_ACCELERATION_MULTIPLIER)
-	var deceleration: float = DECELERATION * gold_inventory.weight_multiplier(1.0, MIN_WEIGHT_DECELERATION_MULTIPLIER)
-	var rotation_speed: float = ROTATION_SPEED * gold_inventory.weight_multiplier(1.0, MIN_WEIGHT_ROTATION_MULTIPLIER)
+	var speed: float = SPEED * inventory.weight_multiplier(1.0, MIN_WEIGHT_SPEED_MULTIPLIER)
+	var acceleration: float = ACCELERATION * inventory.weight_multiplier(1.0, MIN_WEIGHT_ACCELERATION_MULTIPLIER)
+	var deceleration: float = DECELERATION * inventory.weight_multiplier(1.0, MIN_WEIGHT_DECELERATION_MULTIPLIER)
+	var rotation_speed: float = ROTATION_SPEED * inventory.weight_multiplier(1.0, MIN_WEIGHT_ROTATION_MULTIPLIER)
 
 	if input_strength > WALK_INPUT_THRESHOLD:
 		var squeeze_speed_multiplier := _get_squeeze_speed_multiplier(direction)

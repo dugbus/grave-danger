@@ -13,8 +13,8 @@ const FADE_LAYER_INDEX := 100
 @export var result_texture: Texture2D
 ## Seconds used by both fade-in and return-to-title fade transitions.
 @export var fade_duration := 0.8
-## Fallback rectangle, in source image pixels, used only if the scene has no CoinsValue label.
-@export var coins_rect := Rect2(581.0, 522.0, 382.0, 90.0)
+## Fallback rectangle, in source image pixels, used only if the scene has no TreasureValue label.
+@export var treasure_rect := Rect2(581.0, 522.0, 382.0, 90.0)
 ## Fallback rectangle, in source image pixels, used only if the scene has no PercentageValue label.
 @export var percentage_rect := Rect2(581.0, 609.0, 382.0, 90.0)
 ## Color used for result value text.
@@ -27,12 +27,12 @@ const FADE_LAYER_INDEX := 100
 var returning_to_title := false
 var result_image: TextureRect
 var value_layer: CanvasLayer
-var coins_label: Label
+var treasure_label: Label
 var percentage_label: Label
 var value_overlay: ResultValueOverlay
-var authored_coins_rect := Rect2()
+var authored_treasure_rect := Rect2()
 var authored_percentage_rect := Rect2()
-var has_authored_coins_rect := false
+var has_authored_treasure_rect := false
 var has_authored_percentage_rect := false
 var authored_screen_size := Vector2(1920.0, 1080.0)
 
@@ -104,17 +104,17 @@ func _bind_value_layer() -> void:
 
 
 func _bind_labels() -> void:
-	coins_label = value_layer.get_node_or_null("CoinsValue") as Label
-	if coins_label == null:
-		coins_label = get_node_or_null("CoinsValue") as Label
-	if coins_label == null:
-		coins_label = _create_value_label("CoinsValue")
-		value_layer.add_child(coins_label)
+	treasure_label = value_layer.get_node_or_null("TreasureValue") as Label
+	if treasure_label == null:
+		treasure_label = get_node_or_null("TreasureValue") as Label
+	if treasure_label == null:
+		treasure_label = _create_value_label("TreasureValue")
+		value_layer.add_child(treasure_label)
 	else:
-		authored_coins_rect = _screen_rect_to_image_rect(_get_label_rect(coins_label), authored_screen_size)
-		has_authored_coins_rect = true
-		_reparent_value_label_to_layer(coins_label)
-		_configure_value_label(coins_label)
+		authored_treasure_rect = _screen_rect_to_image_rect(_get_label_rect(treasure_label), authored_screen_size)
+		has_authored_treasure_rect = true
+		_reparent_value_label_to_layer(treasure_label)
+		_configure_value_label(treasure_label)
 
 	percentage_label = value_layer.get_node_or_null("PercentageValue") as Label
 	if percentage_label == null:
@@ -128,7 +128,7 @@ func _bind_labels() -> void:
 		_reparent_value_label_to_layer(percentage_label)
 		_configure_value_label(percentage_label)
 
-	coins_label.visible = false
+	treasure_label.visible = false
 	percentage_label.visible = false
 
 
@@ -181,13 +181,13 @@ func _configure_value_label(label: Label) -> void:
 func _update_result_text() -> void:
 	var stats := get_node_or_null("/root/ResultStats")
 	if stats == null:
-		coins_label.text = "0"
+		treasure_label.text = "0"
 		percentage_label.text = "0"
 		_update_value_overlay_text()
 		_layout_value_labels()
 		return
 
-	coins_label.text = "%d" % stats.coins_collected
+	treasure_label.text = "%d" % stats.treasure_collected
 	percentage_label.text = "%d" % stats.get_completion_percentage()
 	_update_value_overlay_text()
 	_layout_value_labels()
@@ -195,13 +195,13 @@ func _update_result_text() -> void:
 
 func _record_level_result() -> void:
 	var stats := get_node_or_null("/root/ResultStats")
-	if stats == null or stats.max_coins_collected <= 0:
+	if stats == null or stats.max_treasure_value <= 0:
 		return
 
 	var level_selection := get_node_or_null("/root/LevelSelection")
 	if level_selection != null and level_selection.has_method("record_selected_level_result"):
 		level_selection.record_selected_level_result(
-			stats.coins_collected,
+			stats.treasure_collected,
 			stats.get_completion_percentage()
 		)
 
@@ -212,7 +212,7 @@ func _sync_screen_layout() -> void:
 
 
 func _layout_value_labels() -> void:
-	_place_label_in_rect(coins_label, _get_coins_value_rect())
+	_place_label_in_rect(treasure_label, _get_treasure_value_rect())
 	_place_label_in_rect(percentage_label, _get_percentage_value_rect())
 	_fit_value_labels()
 	_layout_value_overlay()
@@ -224,21 +224,21 @@ func _layout_value_overlay() -> void:
 
 	value_overlay.size = size
 	value_overlay.set_value_layout(
-		_get_coins_value_rect(),
+		_get_treasure_value_rect(),
 		_get_percentage_value_rect(),
 		value_padding,
-		_resolve_label_color(coins_label, "font_color", text_color),
-		_resolve_label_color(coins_label, "font_shadow_color", shadow_color),
+		_resolve_label_color(treasure_label, "font_color", text_color),
+		_resolve_label_color(treasure_label, "font_shadow_color", shadow_color),
 		Vector2(
-			float(coins_label.get_theme_constant("shadow_offset_x")),
-			float(coins_label.get_theme_constant("shadow_offset_y"))
+			float(treasure_label.get_theme_constant("shadow_offset_x")),
+			float(treasure_label.get_theme_constant("shadow_offset_y"))
 		)
 	)
 
 
 func _update_value_overlay_text() -> void:
 	if value_overlay != null:
-		value_overlay.set_value_text(coins_label.text, percentage_label.text)
+		value_overlay.set_value_text(treasure_label.text, percentage_label.text)
 
 
 func _resolve_label_color(label: Label, color_name: StringName, fallback: Color) -> Color:
@@ -269,11 +269,11 @@ func _get_label_rect(label: Label) -> Rect2:
 	return Rect2(label.position, label.size)
 
 
-func _get_coins_value_rect() -> Rect2:
-	if has_authored_coins_rect:
-		return _image_rect_to_screen_rect(authored_coins_rect)
+func _get_treasure_value_rect() -> Rect2:
+	if has_authored_treasure_rect:
+		return _image_rect_to_screen_rect(authored_treasure_rect)
 
-	return _image_rect_to_screen_rect(coins_rect)
+	return _image_rect_to_screen_rect(treasure_rect)
 
 
 func _get_percentage_value_rect() -> Rect2:
@@ -316,7 +316,7 @@ func _image_rect_to_screen_rect(image_rect: Rect2) -> Rect2:
 
 
 func _fit_value_labels() -> void:
-	_fit_label_font_size(coins_label)
+	_fit_label_font_size(treasure_label)
 	_fit_label_font_size(percentage_label)
 
 
@@ -383,9 +383,9 @@ func _is_primary_event(event: InputEvent) -> bool:
 class ResultValueOverlay:
 	extends Control
 
-	var coins_text := ""
+	var treasure_text := ""
 	var percentage_text := ""
-	var coins_box := Rect2()
+	var treasure_box := Rect2()
 	var percentage_box := Rect2()
 	var value_padding := Vector2(16.0, 10.0)
 	var text_color := Color.WHITE
@@ -393,21 +393,21 @@ class ResultValueOverlay:
 	var shadow_offset := Vector2(3.0, 3.0)
 
 
-	func set_value_text(next_coins_text: String, next_percentage_text: String) -> void:
-		coins_text = next_coins_text
+	func set_value_text(next_treasure_text: String, next_percentage_text: String) -> void:
+		treasure_text = next_treasure_text
 		percentage_text = next_percentage_text
 		queue_redraw()
 
 
 	func set_value_layout(
-		next_coins_box: Rect2,
+		next_treasure_box: Rect2,
 		next_percentage_box: Rect2,
 		next_padding: Vector2,
 		next_text_color: Color,
 		next_shadow_color: Color,
 		next_shadow_offset: Vector2
 	) -> void:
-		coins_box = next_coins_box
+		treasure_box = next_treasure_box
 		percentage_box = next_percentage_box
 		value_padding = next_padding
 		text_color = next_text_color
@@ -417,7 +417,7 @@ class ResultValueOverlay:
 
 
 	func _draw() -> void:
-		_draw_centered_value(coins_text, coins_box)
+		_draw_centered_value(treasure_text, treasure_box)
 		_draw_centered_value(percentage_text, percentage_box)
 
 

@@ -1,0 +1,36 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="PackedScene" path="res://Assets/placeables/treasure/gold_bar.glb" id="1_model"]
+[ext_resource type="Script" path="res://placeables/treasure/gold_bar.gd" id="2_script"]
+[ext_resource type="Resource" path="res://placeables/treasure/gold_bar_inventory.tres" id="3_item"]
+[ext_resource type="Material" path="res://placeables/treasure/gold_treasure_material.tres" id="4_gold_material"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gold_bar"]
+size = Vector3(0.466434, 0.125, 0.234578)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_pickup"]
+radius = 0.45
+
+[node name="GoldBar" type="RigidBody3D" groups=["treasure_pile_compatible"]]
+collision_layer = 4
+collision_mask = 5
+mass = 2.25
+continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 8
+script = ExtResource("2_script")
+carried_item = ExtResource("3_item")
+gold_material = ExtResource("4_gold_material")
+
+[node name="GoldBarModel" parent="." instance=ExtResource("1_model")]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_gold_bar")
+
+[node name="PickupArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PickupArea"]
+shape = SubResource("SphereShape3D_pickup")

@@ -10,5 +10,5 @@ display_name = "Key"
 max_count = 99
 weight = 5.0
 drop_order = 10
-world_scene_path = "res://collectibles/key.tscn"
+world_scene_path = "res://inventory/key.tscn"
 pickup_sound = ExtResource("key_pickup_sound")

@@ -14,7 +14,7 @@ var score_label: Label
 
 func _ready() -> void:
 	layer = 30
-	add_to_group("coin_score_display")
+	add_to_group("treasure_score_display")
 	_bind_label()
 	_update_label()
 
@@ -49,4 +49,4 @@ func _create_fallback_label() -> Label:
 
 func _update_label() -> void:
 	if score_label != null:
-		score_label.text = "Coins %d" % score
+		score_label.text = "Treasure %d" % score

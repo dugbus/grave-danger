@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://wakxwbb1skgm" path="res://levels/graveyard/level.gd" id="1_level5_script"]
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
-[ext_resource type="Texture2D" uid="uid://gadfwxebefkl" path="res://Assets/graveyard-grass.png" id="4_grass"]
+[ext_resource type="Texture2D" uid="uid://gadfwxebefkl" path="res://Assets/environment/textures/graveyard_grass.png" id="4_grass"]
 [ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="6_2lsge"]
 [ext_resource type="PackedScene" uid="uid://fv08wdi8kict" path="res://Assets/kenney-graveyard/pine.glb" id="8_m3ptj"]
 [ext_resource type="Script" uid="uid://bov7w0cyy2jl7" path="res://game/follow_camera.gd" id="9_7eg3p"]
@@ -23,7 +23,7 @@
 [ext_resource type="PackedScene" uid="uid://bjuxf3v3gaxby" path="res://Assets/kenney-graveyard/rocks.glb" id="22_7rxge"]
 [ext_resource type="Material" uid="uid://cu5fhcmgsc4va" path="res://Assets/environment/road.material" id="22_xj8vh"]
 [ext_resource type="PackedScene" uid="uid://dathjrgpejj8w" path="res://Assets/kenney-graveyard/rocks-tall.glb" id="23_vcbxs"]
-[ext_resource type="PackedScene" path="res://levels/common/level_select_crypt.tscn" id="23_xj8vh"]
+[ext_resource type="PackedScene" path="res://levels/graveyard/level_select_crypt.tscn" id="23_xj8vh"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hill_grass"]
 resource_local_to_scene = true

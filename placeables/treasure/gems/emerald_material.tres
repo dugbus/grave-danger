@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://placeables/treasure/gems/gem_stylized.gdshader" id="1_shader"]
+
+[resource]
+resource_name = "Stylized Emerald Material"
+shader = ExtResource("1_shader")
+shader_parameter/shadow_color = Color(0.006, 0.14, 0.055, 1)
+shader_parameter/body_color = Color(0.018, 0.68, 0.24, 1)
+shader_parameter/light_color = Color(0.42, 1, 0.62, 1)
+shader_parameter/glint_color = Color(1, 0.95, 0.68, 1)
+shader_parameter/facet_contrast = 1.15
+shader_parameter/rim_energy = 0.7
+shader_parameter/glint_energy = 1.8

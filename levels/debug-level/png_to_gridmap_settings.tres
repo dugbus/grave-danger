@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PNGToGridMapSettings" format=3 uid="uid://y5ul71jcyky1"]
+
+[ext_resource type="Script" uid="uid://bhrpqhaebhdyj" path="res://addons/png_to_gridmap/png_to_gridmap_settings.gd" id="1_m5qtk"]
+
+[resource]
+script = ExtResource("1_m5qtk")
+png_path = "res://levels/debug-level/level.png"
+target_gridmap_path = NodePath("PNGGridMap")
+auto_repair = true
+export_size = Vector2i(256, 16)
+floor_gridmap_path = NodePath("PNGFloorGridMap")
+floor_material_path = "res://Assets/environment/floors/flagstones_floor.material"

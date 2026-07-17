@@ -29,7 +29,7 @@ stretch_mode = 6
 [node name="ValueLayer" type="CanvasLayer" parent="." unique_id=275505203]
 layer = 20
 
-[node name="CoinsValue" type="Label" parent="ValueLayer" unique_id=1439764713]
+[node name="TreasureValue" type="Label" parent="ValueLayer" unique_id=1439764713]
 z_index = 10
 offset_left = 755.0
 offset_top = 398.0

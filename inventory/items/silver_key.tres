@@ -10,5 +10,5 @@ display_name = "Silver Key"
 max_count = 99
 weight = 5.0
 drop_order = 10
-world_scene_path = "res://collectibles/silver_key.tscn"
+world_scene_path = "res://inventory/silver_key.tscn"
 pickup_sound = ExtResource("2_sound")

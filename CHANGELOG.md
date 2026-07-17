@@ -1,3 +1,37 @@
+- Contributors now retain explicit rename history for the relocated gold coin pile files.
+- PNG-to-GridMap profile storage no longer carries special handling for the removed `levels/common` folder.
+- Level progress and lit torches now follow stable level IDs when mappings are reordered or inserted, with existing numeric saves migrated to their original levels.
+- Flame boundaries in existing levels now start moving again after their placeable-folder refactor.
+- Artists and developers now find authored asset families beside matching `placeables` domains, while environment construction art and the original Kenney pack retain their distinct organisation.
+- Level editors and contributors now have concise folder-placement criteria for the project's main domains.
+- Level editors now have Godot filesystem favorites for every placeable scene, all enemy scenes, keys, reusable lighting, and the player, making common drag-and-drop authoring assets immediately accessible.
+- HUD authors now find the minimap implementation and shared view settings together under `ui/hud/minimap`, while player jump tuning lives with player movement under `player`.
+- Level editors now find reusable free-position objects under `placeables`, with kill boundaries, locks, traps, triggers, torches, pushables, and treasure deposits grouped by behaviour; lighting, graveyard-specific crypt presentation, HUD flask text, level settings, and legacy layouts now live with their owning systems instead of a shared level folder.
+- Level editors now find treasure and collectible placeables under `placeables/treasure` and `placeables/collectibles`; each treasure's world and `*_inventory.tres` resources remain together, gem resources are grouped in `placeables/treasure/gems`, keys remain under `inventory`, and shared treasure systems use treasure-wide names.
+- The PNG-to-GridMap dock and settings persistence now reserve converter settings for actual level folders while reusable placeables live outside `levels`.
+- The PNG-to-GridMap dock now repairs blank tab wrappers left by Godot script hot reloads, keeps its Godot-created wrapper populated across plugin reloads, and appears only for saved scenes inside a `levels` subfolder.
+- Treasure piles can now independently place diamonds, rubies, sapphires, emeralds, and amethysts; all five share the same polished gem behaviour and weigh one sack unit, with values of 10, 9, 5, 6, and 2 treasure respectively. Their implementation assets are grouped under `placeables/treasure/gems`, while the configurable pile remains directly available to level editors.
+- Diamonds now use a purpose-built brilliant-cut GLB model and a single bold, opaque jewel material, giving players a readable game-style gemstone without the old glass and edge-overlay shader stack.
+- Level-select completion percentages now explicitly represent recovered treasure value against all available treasure value, including coins, diamonds, and gold bars.
+- Coffin deposits now accept every positive-value carried treasure and animate its real collectible model into the coffin; gold bars contribute 45 treasure and use their dedicated sound while diamonds continue to contribute five.
+- Mixed treasure piles now show their configured coins, diamonds, and gold bars as lightweight material-correct meshes in the 3D editor, matching the established coin-pile preview behaviour.
+- Level editors can now configure coins, diamonds, and gold bars through ordinary exported fields in a visible Pile Contents inspector group; marked future treasure types are still added by the editor scene scan.
+- Diamond facets now receive stronger stable per-face colour and brightness contrast, keeping the cut readable without relying on level-light specular highlights.
+- Diamond faces now use stylized cool-and-warm emissive studio lighting with a moving sparkle sweep, making the cut lively and readable instead of physically realistic and dull.
+- Diamonds now ignore coloured torch tint while refracting the scene behind them, with subtle colour dispersion and sharp view-dependent facet sparkles supporting their edge bloom.
+- Diamond bloom now follows the cut edges through a separate Fresnel overlay, keeping the glass transparent and its individual facets readable instead of solid white.
+- Diamonds now settle on their faceted faces using a convex jewel-shaped collider, high friction, minimal bounce, and stronger angular damping.
+- Diamonds now use clearer, nearly colourless glass with tighter reflections and neutral bloom instead of a cyan-filled appearance.
+- Each emissive, refractive diamond uses one sack unit, carries five treasure value, and temporarily reuses coin sounds.
+- Coins and gold bars now share a reflective gold finish that stays visible in darkness, responds to nearby lights, and produces a clearer indoor bloom.
+- The PNG-to-GridMap dock now yields to the available editor width and height instead of collapsing Godot's bottom panel when several scenes or scripts are restored.
+- PNG-to-GridMap settings are now persisted only for scenes inside a subfolder of `levels`, preventing editor configuration files from appearing beside player and other shared scenes.
+- Windows level editors can now run one-click normal and Compatibility PNG-to-GridMap diagnostics that find Godot automatically and package verbose logs, graphics details, Windows errors, and crash dumps for sharing.
+- PNG-to-GridMap resource discovery now follows Godot's edited-scene, filesystem-scan, and reimport lifecycle, preventing startup crashes on freshly imported colleague machines.
+- Zombies and skeletons again use compact fake ground shadows; their overhead warning lights still cast level-geometry shadows without projecting oversized character silhouettes.
+- Gold bars use distinct landing and pickup sounds and can be included in configurable mixed treasure piles.
+- Gold bars can now be collected into 45 sack units and dropped back into the world as physical objects.
+- Indoor walls and other lit faces no longer turn black from zero-bias self-shadowing.
 - Indoor lighting now preserves the torch's authored shadow bias, preventing zero-bias concentric shadow acne around lit torches.
 - Torch OmniLights use a dedicated shadow-caster mask to ignore their own model while still illuminating it and casting shadows.
 - Nearby unlit torches now gain a subtle warm shader outline that fades with distance and disappears once lit.
@@ -49,9 +83,9 @@
 - Indoor headlamps now use a wide, shadow-safe 82-degree cone with a 60-metre range and gentler falloff while retaining their authored height.
 - Indoor levels now place the player's shadow-casting omnidirectional fill at the headlamp, approximating local reflections around the visible area.
 - Player light cone, range, falloff, placement, visibility, and shadow settings now live in the player scene, while flicker colours are exposed in the editor.
-- Coins stop casting shadows only while flying into a coin collector, while collectible and dropped coins retain their shadows.
+- Coins stop casting shadows only while flying into a treasure deposit, while collectible and dropped coins retain their shadows.
 - Level 7 draft.
 - Gold and silver keys now include dedicated player pickup areas, making collection more reliable without changing their physical rigid-body collisions.
 - Holding the drop action now accelerates from deliberate individual drops to rapid unloading, while dropped items spread across a small deterministic angle instead of piling into one line.
-- Coin-deposit behavior is now packaged with its coffin as a reusable scene, reducing per-level setup and keeping every placed deposit consistently configured.
+- Treasure-deposit behavior is now packaged with its coffin as a reusable scene, reducing per-level setup and keeping every placed deposit consistently configured.
 - Scene validation now covers relevant addon scenes while excluding only intentionally unsupported addon/test paths, and lint reporting now counts the same production scripts that are actually linted.

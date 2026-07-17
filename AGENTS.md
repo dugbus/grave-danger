@@ -28,6 +28,20 @@
 
 - No absolute paths, the team members use different os's.
 
+## Folder ownership
+
+- `placeables/`: reusable, non-grid-aligned level objects without a dedicated root; group distinct behaviours such as treasure, collectibles, pushables, traps, and triggers in subfolders.
+- `levels/`: level-specific scenes and data only; put theme-specific content in its level folder, such as `levels/graveyard/`.
+- `lighting/`: reusable indoor and outdoor lighting rigs.
+- `enemies/`: enemy scenes, behaviour, and enemy-specific resources.
+- `player/`: player scenes, behaviour, and player-only settings.
+- `ui/`: screens and HUD features; keep each substantial HUD feature in its own `ui/hud/` subfolder.
+- `inventory/`: carried-item data, inventory systems, and key scenes and resources.
+- `game/` and `autoload/`: runtime orchestration and truly global services respectively, not feature implementation.
+- `Assets/`: art and audio grouped by implementation owner; mirror `placeables/` for runtime art, while preserving artist source workspaces and third-party packs.
+- `addons/` and `tests/`: plugins and long-lived tests respectively.
+- Keep a feature's scene, script, and resources together. Choose folders by what owns a file, not what consumes it.
+
 ## Project target
 - Target Godot 4.7+ unless project.godot or CI says otherwise.
 - Prefer current Godot 4.x APIs. Do not use Godot 3.x APIs.
@@ -46,6 +60,7 @@
 - Prefer small, composable scenes and scripts over large inheritance trees.
 - Use signals or typed dependencies for decoupling; avoid global singletons unless already established.
 - Do not invent nodes, autoloads, input actions, groups, or resources without checking existing files first.
+- Moving a file should use git mv to ensure that history is preserved.
 
 ## CHANGELOG.md 
 - On every task update the changelog with the updates as bullet points describing the changes in terms of a player or as a level editor.

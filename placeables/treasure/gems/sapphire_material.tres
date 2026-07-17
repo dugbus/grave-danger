@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://placeables/treasure/gems/gem_stylized.gdshader" id="1_shader"]
+
+[resource]
+resource_name = "Stylized Sapphire Material"
+shader = ExtResource("1_shader")
+shader_parameter/shadow_color = Color(0.025, 0.12, 0.28, 1)
+shader_parameter/body_color = Color(0.05, 0.58, 0.92, 1)
+shader_parameter/light_color = Color(0.62, 0.96, 1, 1)
+shader_parameter/glint_color = Color(1, 0.96, 0.72, 1)
+shader_parameter/facet_contrast = 1.15
+shader_parameter/rim_energy = 0.7
+shader_parameter/glint_energy = 1.8
