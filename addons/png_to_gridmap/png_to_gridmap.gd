@@ -44,6 +44,9 @@ var _next_auto_repair_check_msec := 0
 var _auto_repair_due_msec := 0
 var _resource_refresh_pending := true
 var _level_settings_loaded := false
+var _editor_dock: EditorDock
+var _dock_is_open := false
+var _dock_visibility_initialized := false
 
 
 ## Creates the dock and service objects when the editor enables the addon.
@@ -59,14 +62,26 @@ func _enter_tree() -> void:
 	_exporter = ExporterResource.new()
 	_repairer = RepairerResource.new()
 	_floor_builder = FloorBuilderResource.new()
+	_remove_stale_editor_docks()
 	var ui_state := _profile_store.load_ui_state(PNGToGridMapDock.OPERATION_IMPORT)
 	_operation_id = int(ui_state["operation_id"])
 	_advanced_visible = bool(ui_state["advanced_visible"])
 	_dock = DockResource.new()
 	_dock.setup(_dock_title(), _settings, ui_state)
-	_connect_dock_signals()
+	# Let Godot create and attach its compatibility EditorDock wrapper. Constructing
+	# that wrapper directly can leave its tab detached from the content after a plugin reload.
 	add_control_to_dock(DOCK_SLOT_RIGHT_UL, _dock)
-	_trace("Dock created; waiting for the edited scene and project filesystem.")
+	_editor_dock = _dock.get_parent() as EditorDock
+	# This contextual dock is controlled by the edited scene rather than the global
+	# Editor Docks menu or a saved open/closed state in Godot's editor layout.
+	if _editor_dock != null:
+		_editor_dock.global = false
+		_editor_dock.transient = true
+	_update_dock_visibility(get_editor_interface().get_edited_scene_root())
+	# Connect editor callbacks only after the dock is ready because Godot can emit a
+	# scene change immediately while enabling or restoring editor plugins.
+	_connect_dock_signals()
+	_trace("Dock UI created; waiting for an eligible level scene and project filesystem.")
 	# A deferred check supports enabling the plugin after a scene is already open. During
 	# editor startup, scene_changed supplies the readiness event after scenes are restored.
 	_dock.set_validation_text("Waiting for Godot to finish opening the edited scene...")
@@ -78,10 +93,13 @@ func _enter_tree() -> void:
 func _exit_tree() -> void:
 	_trace("Disabling plugin.")
 	set_process(false)
-	if _dock != null:
+	_disconnect_editor_signals()
+	_resource_refresh_pending = false
+	if is_instance_valid(_dock):
 		remove_control_from_docks(_dock)
 		_dock.queue_free()
-		_dock = null
+	_editor_dock = null
+	_dock = null
 
 
 ## Watches the selected GridMap at a low frequency and repairs once painting has paused.
@@ -122,9 +140,24 @@ func _dock_title() -> String:
 	return "PNG to GridMap %s" % version if version != "" else "PNG to GridMap"
 
 
+## Removes wrappers orphaned when Godot hot-reloaded a previous plugin script version.
+func _remove_stale_editor_docks() -> void:
+	var base_control := get_editor_interface().get_base_control()
+	var stale_dock_count := 0
+	for node in base_control.find_children("*", "EditorDock", true, false):
+		var stale_dock := node as EditorDock
+		if stale_dock == null or stale_dock.title != "PNG to GridMap":
+			continue
+		remove_dock(stale_dock)
+		stale_dock.queue_free()
+		stale_dock_count += 1
+	if stale_dock_count > 0:
+		_trace("Removed %s stale dock wrapper(s) left by a plugin hot reload." % stale_dock_count)
+
+
 ## Connects dock UI actions to plugin-level orchestration handlers.
 func _connect_dock_signals() -> void:
-	scene_changed.connect(_on_first_edited_scene_changed)
+	scene_changed.connect(_on_edited_scene_changed)
 	var editor_filesystem := get_editor_interface().get_resource_filesystem()
 	editor_filesystem.filesystem_changed.connect(_on_editor_filesystem_activity_finished)
 	editor_filesystem.resources_reimporting.connect(_on_editor_resources_reimporting)
@@ -143,17 +176,55 @@ func _connect_dock_signals() -> void:
 	_dock.mapping_changed.connect(_on_mapping_changed)
 
 
-## Schedules initial discovery when the editor restores or opens its first edited scene.
-func _on_first_edited_scene_changed(scene_root: Node) -> void:
-	_trace("Edited scene changed to %s." % _scene_diagnostic_name(scene_root))
-	if _level_settings_loaded:
+## Stops editor-owned callbacks before the dock and its content begin shutting down.
+func _disconnect_editor_signals() -> void:
+	if scene_changed.is_connected(_on_edited_scene_changed):
+		scene_changed.disconnect(_on_edited_scene_changed)
+	var editor_filesystem := get_editor_interface().get_resource_filesystem()
+	if editor_filesystem.filesystem_changed.is_connected(_on_editor_filesystem_activity_finished):
+		editor_filesystem.filesystem_changed.disconnect(_on_editor_filesystem_activity_finished)
+	if editor_filesystem.resources_reimporting.is_connected(_on_editor_resources_reimporting):
+		editor_filesystem.resources_reimporting.disconnect(_on_editor_resources_reimporting)
+	if editor_filesystem.resources_reimported.is_connected(_on_editor_resources_reimported):
+		editor_filesystem.resources_reimported.disconnect(_on_editor_resources_reimported)
+
+
+## Shows the dock and schedules discovery only for scenes below res://levels/.
+func _on_edited_scene_changed(scene_root: Node) -> void:
+	if not is_instance_valid(_editor_dock):
 		return
-	if scene_root == null:
+	_trace("Edited scene changed to %s." % _scene_diagnostic_name(scene_root))
+	_update_dock_visibility(scene_root)
+	_level_settings_loaded = false
+	if not _scene_supports_dock(scene_root):
 		_resource_refresh_pending = false
-		_dock.set_validation_text("Open a scene before running the converter.")
 		return
 	_resource_refresh_pending = true
 	call_deferred(&"_try_complete_resource_refresh")
+
+
+## Opens or closes the registered transient dock to avoid stale saved-layout tabs.
+func _update_dock_visibility(scene_root: Node) -> void:
+	if not is_instance_valid(_editor_dock):
+		return
+	var should_open := _scene_supports_dock(scene_root)
+	if _dock_visibility_initialized and should_open == _dock_is_open:
+		return
+	_dock_visibility_initialized = true
+	_dock_is_open = should_open
+	if should_open:
+		_editor_dock.open()
+		_trace("Dock opened for %s." % _scene_diagnostic_name(scene_root))
+		return
+	_editor_dock.close()
+	_reset_auto_repair_watch()
+	_trace("Dock closed because the edited scene is outside res://levels/<subfolder>/.")
+
+
+## Limits the level-building dock to saved scenes inside a subfolder of levels.
+func _scene_supports_dock(scene_root: Node) -> bool:
+	return scene_root != null \
+		and ProfileStoreResource.is_scene_in_levels_subfolder(scene_root.scene_file_path)
 
 
 ## Retries queued discovery after the editor finishes a filesystem update.
@@ -165,6 +236,8 @@ func _on_editor_filesystem_activity_finished() -> void:
 
 ## Suspends discovery when Godot begins replacing imported resource data.
 func _on_editor_resources_reimporting(resources: PackedStringArray) -> void:
+	if not is_instance_valid(_dock):
+		return
 	_trace("Resource reimport started for %s file(s)." % resources.size())
 	_resource_refresh_pending = true
 	_dock.set_validation_text("Waiting for Godot to finish importing project files...")
@@ -179,11 +252,14 @@ func _on_editor_resources_reimported(resources: PackedStringArray) -> void:
 
 ## Runs discovery only when an edited scene exists and the project filesystem is idle.
 func _try_complete_resource_refresh() -> void:
+	# A refresh may already be queued when Godot disables or reloads the plugin.
+	if not is_instance_valid(_editor_dock) or not is_instance_valid(_dock):
+		return
 	var root := get_editor_interface().get_edited_scene_root()
-	if root == null:
-		_trace("Resource refresh paused: there is no edited scene.")
+	_update_dock_visibility(root)
+	if not _scene_supports_dock(root):
+		_trace("Resource refresh skipped: the edited scene is not an eligible level scene.")
 		_resource_refresh_pending = false
-		_dock.set_validation_text("Open a scene before running the converter.")
 		return
 	if not _editor_filesystem_is_ready():
 		var editor_filesystem := get_editor_interface().get_resource_filesystem()
