@@ -1,4 +1,4 @@
-- Contributors now retain explicit rename history for the relocated gold coin pile files.
+- Contributors now retain explicit rename history for the relocated gold coin pile and kill boundary files.
 - PNG-to-GridMap profile storage no longer carries special handling for the removed `levels/common` folder.
 - Level progress and lit torches now follow stable level IDs when mappings are reordered or inserted, with existing numeric saves migrated to their original levels.
 - Flame boundaries in existing levels now start moving again after their placeable-folder refactor.
