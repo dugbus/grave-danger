@@ -5,8 +5,8 @@
 [resource]
 resource_name = "Stylized Diamond Material"
 shader = ExtResource("1_shader")
-shader_parameter/shadow_color = Color(0.09, 0.12, 0.17, 1)
-shader_parameter/body_color = Color(0.72, 0.78, 0.84, 1)
+shader_parameter/shadow_color = Color(0.055, 0.12, 0.24, 1)
+shader_parameter/body_color = Color(0.72, 0.82, 0.98, 1)
 shader_parameter/light_color = Color(1, 0.99, 0.96, 1)
 shader_parameter/glint_color = Color(1, 0.96, 0.72, 1)
 shader_parameter/facet_contrast = 1.15

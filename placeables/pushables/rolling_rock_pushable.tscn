@@ -36,4 +36,4 @@ shape = SubResource("SphereShape3D_rock")
 stream = ExtResource("3_rolling_audio")
 volume_db = -80.0
 max_distance = 50.0
-bus = "Master"
+bus = &"SFX"

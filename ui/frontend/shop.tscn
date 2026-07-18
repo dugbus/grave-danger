@@ -1,0 +1,502 @@
+[gd_scene format=3 uid="uid://c1fpfw5bwyc8c"]
+
+[ext_resource type="Script" uid="uid://oj5darsj6ybs" path="res://ui/frontend/shop.gd" id="1_shop"]
+[ext_resource type="PackedScene" path="res://ui/frontend/panel_surround.tscn" id="2_surround"]
+[ext_resource type="Texture2D" uid="uid://dlflkaldftomu" path="res://Assets/frontend/shop-item-bone-knife.png" id="3_fpcec"]
+[ext_resource type="Texture2D" uid="uid://2yw0g8aeqvrx" path="res://Assets/frontend/content-separator.png" id="4_separator"]
+[ext_resource type="Texture2D" uid="uid://g6a4r1w15uo2" path="res://Assets/frontend/coin-icon.png" id="7_coin_source"]
+[ext_resource type="FontFile" uid="uid://ipq4de64yjtd" path="res://Assets/fonts/Almendra-Bold.ttf" id="8_almendra_bold"]
+[ext_resource type="FontFile" uid="uid://dmi52r7puaba7" path="res://Assets/fonts/Almendra-Italic.ttf" id="9_almendra_italic"]
+[ext_resource type="Resource" path="res://ui/frontend/shop_catalog.tres" id="10_catalog"]
+[ext_resource type="Script" uid="uid://b8f4tryemxj2a" path="res://ui/frontend/focus_scroll_list.gd" id="11_focus_list"]
+[ext_resource type="PackedScene" path="res://ui/frontend/treasure_balance_tile.tscn" id="12_balance_tile"]
+[ext_resource type="Texture2D" uid="uid://q7vfqk2mpb32" path="res://Assets/frontend/diamond-icon.png" id="13_diamond_icon"]
+[ext_resource type="Texture2D" uid="uid://1kg1ng1x7kk8" path="res://Assets/frontend/ruby-icon.png" id="14_ruby_icon"]
+[ext_resource type="Texture2D" uid="uid://b2sui7un6ukb4" path="res://Assets/frontend/sapphire-icon.png" id="15_sapphire_icon"]
+[ext_resource type="Texture2D" uid="uid://cumchsyopcvdv" path="res://Assets/frontend/emerald-icon.png" id="16_emerald_icon"]
+[ext_resource type="Texture2D" uid="uid://buk7tvegqood0" path="res://Assets/frontend/amethyst-icon.png" id="17_amethyst_icon"]
+[ext_resource type="Texture2D" uid="uid://by01ttd275cja" path="res://Assets/frontend/gold-bar-icon.png" id="18_gold_bar_icon"]
+[ext_resource type="Texture2D" uid="uid://ba0bqdkt340fe" path="res://Assets/frontend/level-select.png" id="19_background"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_price_coin"]
+atlas = ExtResource("7_coin_source")
+region = Rect2(1400, 449, 55, 55)
+filter_clip = true
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_details"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_shop_heading"]
+font = ExtResource("8_almendra_bold")
+font_size = 34
+font_color = Color(0.59, 0.4, 0.72, 1)
+outline_size = 3
+outline_color = Color(0.035, 0.02, 0.05, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_item_name"]
+font = ExtResource("8_almendra_bold")
+font_size = 58
+font_color = Color(0.48, 0.72, 0.29, 1)
+outline_size = 5
+outline_color = Color(0.008, 0.012, 0.008, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_description"]
+font = ExtResource("9_almendra_italic")
+font_size = 31
+font_color = Color(0.9, 0.84, 0.7, 1)
+outline_size = 2
+outline_color = Color(0.04, 0.035, 0.03, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_section"]
+font = ExtResource("8_almendra_bold")
+font_size = 30
+font_color = Color(0.59, 0.4, 0.72, 1)
+outline_size = 3
+outline_color = Color(0.035, 0.02, 0.05, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_price"]
+font = ExtResource("8_almendra_bold")
+font_size = 48
+font_color = Color(0.95, 0.8, 0.31, 1)
+outline_size = 4
+outline_color = Color(0.05, 0.035, 0.008, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_normal"]
+bg_color = Color(0.018, 0.023, 0.029, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.24, 0.26, 0.27, 0.9)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_pressed"]
+bg_color = Color(0.11, 0.095, 0.025, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.78, 0.66, 0.16, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_hover"]
+bg_color = Color(0.055, 0.06, 0.05, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.46, 0.43, 0.25, 0.95)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_focus"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 0.86, 0.08, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="Shop" type="Control" unique_id=926448709]
+editor_description = "Shop screen root. Lay out controls inside the 1920x1080 ScreenContainer; it is uniformly fitted and centred in the output viewport at runtime."
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_shop")
+catalog = ExtResource("10_catalog")
+
+[node name="ScreenContainer" type="Control" parent="." unique_id=721768425]
+editor_description = "Reference 1920x1080 shop canvas. Position and resize the two frame instances here."
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="Backdrop" type="TextureRect" parent="ScreenContainer" unique_id=1509297784]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("19_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="BackdropShade" type="ColorRect" parent="ScreenContainer" unique_id=757017276]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.015, 0.01, 0.015, 0.7)
+
+[node name="ScreenTitleLabel" type="Label" parent="ScreenContainer" unique_id=584912563]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 8.0
+offset_right = 1700.0
+offset_bottom = 72.0
+theme_override_colors/font_color = Color(0.59, 0.4, 0.72, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("8_almendra_bold")
+theme_override_font_sizes/font_size = 56
+text = "SHOP"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScreenTitleSeparator" type="TextureRect" parent="ScreenContainer" unique_id=1075025097]
+layout_mode = 0
+offset_left = 777.0
+offset_top = 70.0
+offset_right = 1143.0
+offset_bottom = 79.0
+mouse_filter = 2
+texture = ExtResource("4_separator")
+
+[node name="WalletTiles" type="HBoxContainer" parent="ScreenContainer" unique_id=1634684175]
+editor_description = "Persistent treasure balances shown with compact half-scale tiled surrounds above both shop panels."
+layout_mode = 0
+offset_left = 84.0
+offset_top = 88.0
+offset_right = 1836.0
+offset_bottom = 192.0
+theme_override_constants/separation = 12
+alignment = 2
+
+[node name="GoldCoinTile" parent="ScreenContainer/WalletTiles" unique_id=1890716715 instance=ExtResource("12_balance_tile")]
+layout_mode = 2
+metadata/treasure_type = &"gold_coin"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/WalletTiles/GoldCoinTile" index="1"]
+texture = SubResource("AtlasTexture_price_coin")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/WalletTiles/GoldCoinTile" index="2"]
+text = "GOLD COINS"
+
+[node name="GoldBarTile" parent="ScreenContainer/WalletTiles" unique_id=734393126 instance=ExtResource("12_balance_tile")]
+layout_mode = 2
+metadata/treasure_type = &"gold_bar"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/WalletTiles/GoldBarTile" index="1"]
+texture = ExtResource("18_gold_bar_icon")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/WalletTiles/GoldBarTile" index="2"]
+text = "GOLD BARS"
+
+[node name="DiamondTile" parent="ScreenContainer/WalletTiles" unique_id=1306834795 instance=ExtResource("12_balance_tile")]
+layout_mode = 2
+metadata/treasure_type = &"diamond"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/WalletTiles/DiamondTile" index="1"]
+texture = ExtResource("13_diamond_icon")
+
+[node name="RubyTile" parent="ScreenContainer/WalletTiles" unique_id=1011675249 instance=ExtResource("12_balance_tile")]
+layout_mode = 2
+metadata/treasure_type = &"ruby"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/WalletTiles/RubyTile" index="1"]
+texture = ExtResource("14_ruby_icon")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/WalletTiles/RubyTile" index="2"]
+text = "RUBIES"
+
+[node name="SapphireTile" parent="ScreenContainer/WalletTiles" unique_id=501574621 instance=ExtResource("12_balance_tile")]
+layout_mode = 2
+metadata/treasure_type = &"sapphire"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/WalletTiles/SapphireTile" index="1"]
+texture = ExtResource("15_sapphire_icon")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/WalletTiles/SapphireTile" index="2"]
+text = "SAPPHIRES"
+
+[node name="EmeraldTile" parent="ScreenContainer/WalletTiles" unique_id=1332673140 instance=ExtResource("12_balance_tile")]
+layout_mode = 2
+metadata/treasure_type = &"emerald"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/WalletTiles/EmeraldTile" index="1"]
+texture = ExtResource("16_emerald_icon")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/WalletTiles/EmeraldTile" index="2"]
+text = "EMERALDS"
+
+[node name="AmethystTile" parent="ScreenContainer/WalletTiles" unique_id=474019701 instance=ExtResource("12_balance_tile")]
+layout_mode = 2
+metadata/treasure_type = &"amethyst"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/WalletTiles/AmethystTile" index="1"]
+texture = ExtResource("17_amethyst_icon")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/WalletTiles/AmethystTile" index="2"]
+text = "AMETHYSTS"
+
+[node name="InventoryFrame" parent="ScreenContainer" unique_id=1907076482 instance=ExtResource("2_surround")]
+editor_description = "Large starter frame intended for the shop inventory or item grid. Resize and reposition it inside ScreenContainer."
+layout_mode = 0
+offset_left = 64.0
+offset_top = 216.0
+offset_right = 672.0
+offset_bottom = 906.0
+
+[node name="ShopItemsPanel" type="Panel" parent="ScreenContainer/InventoryFrame/Content" index="0" unique_id=2015509967]
+editor_description = "Data-driven list of shop items whose availability permits them to appear. Focused rows update the selected-item details panel."
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_details")
+
+[node name="ShopItemsHeadingLabel" type="Label" parent="ScreenContainer/InventoryFrame/Content/ShopItemsPanel" unique_id=602381131]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 48.0
+grow_horizontal = 2
+text = "UPGRADES"
+label_settings = SubResource("LabelSettings_shop_heading")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeadingSeparatorTexture" type="TextureRect" parent="ScreenContainer/InventoryFrame/Content/ShopItemsPanel" unique_id=2117063242]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -183.0
+offset_top = 49.0
+offset_right = 183.0
+offset_bottom = 58.0
+grow_horizontal = 2
+mouse_filter = 2
+texture = ExtResource("4_separator")
+
+[node name="AvailableItemsScroll" type="ScrollContainer" parent="ScreenContainer/InventoryFrame/Content/ShopItemsPanel" unique_id=1524418655]
+editor_description = "Scrollable viewport for currently available shop-item rows. Focus changes are eased into view by the shop screen."
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 64.0
+grow_horizontal = 2
+grow_vertical = 2
+scroll_vertical_custom_step = 94.0
+horizontal_scroll_mode = 0
+script = ExtResource("11_focus_list")
+
+[node name="ItemsMargin" type="MarginContainer" parent="ScreenContainer/InventoryFrame/Content/ShopItemsPanel/AvailableItemsScroll" unique_id=1638655022]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
+
+[node name="AvailableItemsList" type="VBoxContainer" parent="ScreenContainer/InventoryFrame/Content/ShopItemsPanel/AvailableItemsScroll/ItemsMargin" unique_id=705611862]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="DetailsFrame" parent="ScreenContainer" unique_id=1705298226 instance=ExtResource("2_surround")]
+editor_description = "Narrow starter frame intended for item details, price, and purchase controls. Resize and reposition it inside ScreenContainer."
+layout_mode = 0
+offset_left = 702.0
+offset_top = 216.0
+offset_right = 1856.0
+offset_bottom = 906.0
+
+[node name="SelectedItemPanel" type="Panel" parent="ScreenContainer/DetailsFrame/Content" index="0" unique_id=381153464]
+editor_description = "All editor-authored presentation for the currently selected shop item. Future selection logic can replace the named artwork, text, price, and modifier nodes inside this panel."
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_details")
+
+[node name="ItemArtworkTexture" type="TextureRect" parent="ScreenContainer/DetailsFrame/Content/SelectedItemPanel" unique_id=1948895523]
+editor_description = "Artwork for the currently selected shop item."
+layout_mode = 0
+offset_left = 5.0
+offset_top = 6.0
+offset_right = 483.0
+offset_bottom = 536.0
+mouse_filter = 2
+texture = ExtResource("3_fpcec")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ItemNameLabel" type="Label" parent="ScreenContainer/DetailsFrame/Content/SelectedItemPanel" unique_id=329327423]
+editor_description = "Display name of the currently selected shop item."
+layout_mode = 0
+offset_left = 510.0
+offset_right = 980.0
+offset_bottom = 72.0
+text = "BONE CHARM"
+label_settings = SubResource("LabelSettings_item_name")
+vertical_alignment = 1
+
+[node name="TitleSeparatorTexture" type="TextureRect" parent="ScreenContainer/DetailsFrame/Content/SelectedItemPanel" unique_id=497409094]
+layout_mode = 0
+offset_left = 510.0
+offset_top = 78.0
+offset_right = 876.0
+offset_bottom = 87.0
+mouse_filter = 2
+texture = ExtResource("4_separator")
+
+[node name="ItemDescriptionLabel" type="Label" parent="ScreenContainer/DetailsFrame/Content/SelectedItemPanel" unique_id=555621714]
+editor_description = "Description of the currently selected shop item."
+layout_mode = 0
+offset_left = 510.0
+offset_top = 96.0
+offset_right = 970.0
+offset_bottom = 230.0
+text = "A cursed trinket that
+boosts attack power at
+a small health cost."
+label_settings = SubResource("LabelSettings_description")
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="DescriptionSeparatorTexture" type="TextureRect" parent="ScreenContainer/DetailsFrame/Content/SelectedItemPanel" unique_id=525404819]
+layout_mode = 0
+offset_left = 510.0
+offset_top = 238.0
+offset_right = 876.0
+offset_bottom = 247.0
+mouse_filter = 2
+texture = ExtResource("4_separator")
+
+[node name="PricePanel" type="Panel" parent="ScreenContainer/DetailsFrame/Content/SelectedItemPanel" unique_id=1601357912]
+editor_description = "Price presentation for the currently selected item. Update PriceValueLabel and PriceCoinIconTexture for other currencies or costs."
+layout_mode = 0
+offset_left = 510.0
+offset_top = 250.0
+offset_right = 970.0
+offset_bottom = 312.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_details")
+
+[node name="PriceHeadingLabel" type="Label" parent="ScreenContainer/DetailsFrame/Content/SelectedItemPanel/PricePanel" unique_id=1597173749]
+layout_mode = 0
+offset_right = 270.0
+offset_bottom = 62.0
+text = "PRICE: DIAMONDS"
+label_settings = SubResource("LabelSettings_section")
+vertical_alignment = 1
+
+[node name="PriceCoinIconTexture" type="TextureRect" parent="ScreenContainer/DetailsFrame/Content/SelectedItemPanel/PricePanel" unique_id=1260827448]
+editor_description = "Currency icon for the selected item's price."
+layout_mode = 0
+offset_left = 274.0
+offset_top = 6.0
+offset_right = 324.0
+offset_bottom = 56.0
+mouse_filter = 2
+texture = SubResource("AtlasTexture_price_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PriceValueLabel" type="Label" parent="ScreenContainer/DetailsFrame/Content/SelectedItemPanel/PricePanel" unique_id=2031121932]
+editor_description = "Numeric price of the currently selected shop item."
+layout_mode = 0
+offset_left = 330.0
+offset_top = -4.0
+offset_right = 455.0
+offset_bottom = 62.0
+text = "95"
+label_settings = SubResource("LabelSettings_price")
+vertical_alignment = 1
+
+[node name="PriceSeparatorTexture" type="TextureRect" parent="ScreenContainer/DetailsFrame/Content/SelectedItemPanel" unique_id=888529268]
+layout_mode = 0
+offset_left = 510.0
+offset_top = 316.0
+offset_right = 876.0
+offset_bottom = 325.0
+mouse_filter = 2
+texture = ExtResource("4_separator")
+
+[node name="StatEffectsPanel" type="Panel" parent="ScreenContainer/DetailsFrame/Content/SelectedItemPanel" unique_id=586299192]
+editor_description = "Modifier rows enabled by the selected item. Rows are independently named so future selection logic can replace, hide, or add effects."
+layout_mode = 0
+offset_left = 510.0
+offset_top = 328.0
+offset_right = 970.0
+offset_bottom = 520.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_details")
+
+[node name="StatEffectsHeadingLabel" type="Label" parent="ScreenContainer/DetailsFrame/Content/SelectedItemPanel/StatEffectsPanel" unique_id=19899613]
+layout_mode = 0
+offset_right = 300.0
+offset_bottom = 48.0
+text = "STAT EFFECTS:"
+label_settings = SubResource("LabelSettings_section")
+vertical_alignment = 1
+
+[node name="ModifierRows" type="VBoxContainer" parent="ScreenContainer/DetailsFrame/Content/SelectedItemPanel/StatEffectsPanel" unique_id=307941015]
+editor_description = "Runtime modifier rows for the currently selected item. Each row is created from typed catalog data."
+layout_mode = 0
+offset_top = 50.0
+offset_right = 430.0
+offset_bottom = 182.0
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="BottomActions" type="HBoxContainer" parent="ScreenContainer" unique_id=1089248874]
+editor_description = "Single bottom action returning players to level selection; item rows purchase directly when activated."
+layout_mode = 0
+offset_left = 84.0
+offset_top = 936.0
+offset_right = 1836.0
+offset_bottom = 1008.0
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="BackButton" type="Button" parent="ScreenContainer/BottomActions" unique_id=1077135081]
+custom_minimum_size = Vector2(260, 72)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_fonts/font = ExtResource("8_almendra_bold")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_action_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_action_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_action_focus")
+text = "LEVEL SELECT"
+
+[editable path="ScreenContainer/WalletTiles/GoldCoinTile"]
+[editable path="ScreenContainer/WalletTiles/GoldBarTile"]
+[editable path="ScreenContainer/WalletTiles/DiamondTile"]
+[editable path="ScreenContainer/WalletTiles/RubyTile"]
+[editable path="ScreenContainer/WalletTiles/SapphireTile"]
+[editable path="ScreenContainer/WalletTiles/EmeraldTile"]
+[editable path="ScreenContainer/WalletTiles/AmethystTile"]
+[editable path="ScreenContainer/InventoryFrame"]
+[editable path="ScreenContainer/DetailsFrame"]

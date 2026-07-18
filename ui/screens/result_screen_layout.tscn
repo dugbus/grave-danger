@@ -1,0 +1,227 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://ui/screens/result_screen.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/level-select.png" id="2_background"]
+[ext_resource type="PackedScene" path="res://ui/frontend/panel_surround.tscn" id="3_surround"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/content-separator.png" id="4_separator"]
+[ext_resource type="PackedScene" path="res://ui/screens/result_treasure_tile.tscn" id="5_tile"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/coin-icon.png" id="6_coin_source"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/gold-bar-icon.png" id="7_gold_bar"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/diamond-icon.png" id="8_diamond"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/ruby-icon.png" id="9_ruby"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/sapphire-icon.png" id="10_sapphire"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/emerald-icon.png" id="11_emerald"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/amethyst-icon.png" id="12_amethyst"]
+[ext_resource type="Theme" path="res://ui/frontend/frontend_theme.tres" id="13_theme"]
+
+[sub_resource type="AtlasTexture" id="CoinAtlas"]
+atlas = ExtResource("6_coin_source")
+region = Rect2(1400, 449, 55, 55)
+filter_clip = true
+
+[node name="ResultScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("13_theme")
+script = ExtResource("1_script")
+
+[node name="ScreenContainer" type="Control" parent="."]
+editor_description = "Reference 1920x1080 result canvas, uniformly fitted to the runtime viewport."
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="Background" type="TextureRect" parent="ScreenContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Shade" type="ColorRect" parent="ScreenContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.015, 0.01, 0.015, 0.68)
+
+[node name="ScreenTitleLabel" type="Label" parent="ScreenContainer"]
+offset_left = 220.0
+offset_top = 12.0
+offset_right = 1700.0
+offset_bottom = 88.0
+theme_override_colors/font_color = Color(0.59, 0.4, 0.72, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 64
+text = "ESCAPED THE GRAVE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TitleSeparator" type="TextureRect" parent="ScreenContainer"]
+offset_left = 777.0
+offset_top = 88.0
+offset_right = 1143.0
+offset_bottom = 97.0
+mouse_filter = 2
+texture = ExtResource("4_separator")
+
+[node name="ResultFrame" parent="ScreenContainer" instance=ExtResource("3_surround")]
+editor_description = "Result content stays vertically centred as the visible newly collected treasure tiles reflow between one and two rows."
+offset_left = 64.0
+offset_top = 130.0
+offset_right = 1856.0
+offset_bottom = 886.0
+
+[node name="ResultContentCenter" type="CenterContainer" parent="ScreenContainer/ResultFrame/Content"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ResultContent" type="VBoxContainer" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="PercentageHeadingLabel" type="Label" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent"]
+custom_minimum_size = Vector2(1414, 42)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.59, 0.4, 0.72, 1)
+theme_override_font_sizes/font_size = 30
+text = "TREASURE RECOVERED"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PercentageValueLabel" type="Label" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent"]
+custom_minimum_size = Vector2(1414, 100)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.8, 0.31, 1)
+theme_override_font_sizes/font_size = 84
+text = "0%"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ContentSeparator" type="TextureRect" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent"]
+custom_minimum_size = Vector2(366, 9)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+texture = ExtResource("4_separator")
+
+[node name="TreasureTiles" type="HFlowContainer" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent"]
+custom_minimum_size = Vector2(1414, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 18
+alignment = 1
+last_wrap_alignment = 1
+
+[node name="GoldCoinTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" instance=ExtResource("5_tile")]
+metadata/treasure_type = &"gold_coin"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/GoldCoinTile" index="1"]
+texture = SubResource("CoinAtlas")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/GoldCoinTile" index="2"]
+text = "GOLD COINS"
+
+[node name="GoldBarTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" instance=ExtResource("5_tile")]
+metadata/treasure_type = &"gold_bar"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/GoldBarTile" index="1"]
+texture = ExtResource("7_gold_bar")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/GoldBarTile" index="2"]
+text = "GOLD BARS"
+
+[node name="DiamondTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" instance=ExtResource("5_tile")]
+metadata/treasure_type = &"diamond"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/DiamondTile" index="1"]
+texture = ExtResource("8_diamond")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/DiamondTile" index="2"]
+text = "DIAMONDS"
+
+[node name="RubyTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" instance=ExtResource("5_tile")]
+metadata/treasure_type = &"ruby"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/RubyTile" index="1"]
+texture = ExtResource("9_ruby")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/RubyTile" index="2"]
+text = "RUBIES"
+
+[node name="SapphireTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" instance=ExtResource("5_tile")]
+metadata/treasure_type = &"sapphire"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/SapphireTile" index="1"]
+texture = ExtResource("10_sapphire")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/SapphireTile" index="2"]
+text = "SAPPHIRES"
+
+[node name="EmeraldTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" instance=ExtResource("5_tile")]
+metadata/treasure_type = &"emerald"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/EmeraldTile" index="1"]
+texture = ExtResource("11_emerald")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/EmeraldTile" index="2"]
+text = "EMERALDS"
+
+[node name="AmethystTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" instance=ExtResource("5_tile")]
+metadata/treasure_type = &"amethyst"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/AmethystTile" index="1"]
+texture = ExtResource("12_amethyst")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/AmethystTile" index="2"]
+text = "AMETHYSTS"
+
+[node name="BottomActions" type="HBoxContainer" parent="ScreenContainer"]
+offset_left = 84.0
+offset_top = 936.0
+offset_right = 1836.0
+offset_bottom = 1008.0
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="BackButton" type="Button" parent="ScreenContainer/BottomActions"]
+custom_minimum_size = Vector2(260, 72)
+layout_mode = 2
+focus_mode = 2
+text = "LEVEL SELECT"
+
+[node name="SecondaryButton" type="Button" parent="ScreenContainer/BottomActions"]
+custom_minimum_size = Vector2(260, 72)
+layout_mode = 2
+focus_mode = 2
+text = "RETRY"
+
+[editable path="ScreenContainer/ResultFrame"]
+[editable path="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/GoldCoinTile"]
+[editable path="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/GoldBarTile"]
+[editable path="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/DiamondTile"]
+[editable path="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/RubyTile"]
+[editable path="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/SapphireTile"]
+[editable path="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/EmeraldTile"]
+[editable path="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/AmethystTile"]

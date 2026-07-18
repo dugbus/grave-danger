@@ -11,6 +11,8 @@ const ABSORB_SOUND_VOLUME_MAX_DB := 1.0
 
 ## Treasure value added to the level score when an item reaches the deposit.
 signal treasure_absorbed(value: int)
+## Exact treasure object absorbed, used to bank typed currency after the attempt.
+signal treasure_item_absorbed(item_type: StringName, value: int)
 
 ## Radius around the deposit that accepts players carrying treasure.
 @export var detection_radius := 1.4
@@ -206,6 +208,7 @@ func _finish_deposit_treasure(
 func _absorb_treasure(treasure_value: int, item: Resource = null) -> void:
 	var safe_value := maxi(treasure_value, 0)
 	treasure_absorbed.emit(safe_value)
+	treasure_item_absorbed.emit(_get_treasure_type(item), safe_value)
 	get_tree().call_group("treasure_score_display", "add_score", safe_value)
 	_play_absorb_sound(item)
 	_wobble()
@@ -213,6 +216,10 @@ func _absorb_treasure(treasure_value: int, item: Resource = null) -> void:
 
 func _get_treasure_value(item: Resource) -> int:
 	return maxi(int(item.get("treasure_value")), 0) if item != null else 0
+
+
+func _get_treasure_type(item: Resource) -> StringName:
+	return StringName(item.get("item_type")) if item != null else &""
 
 
 func _wobble() -> void:

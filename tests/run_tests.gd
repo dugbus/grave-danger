@@ -3,6 +3,8 @@ extends SceneTree
 const BAT_NEST_SCRIPT := preload("res://enemies/bat_nest.gd")
 const TREASURE_DEPOSIT_COFFIN_SCENE := preload("res://placeables/treasure_deposit/treasure_deposit_coffin.tscn")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
+const RUN_RECORDER_SCRIPT := preload("res://game/run_recorder.gd")
+const RUN_RECORDING_SCRIPT := preload("res://game/run_recording.gd")
 const AMETHYST_ITEM := preload("res://placeables/treasure/gems/amethyst_inventory.tres")
 const AMETHYST_SCENE := preload("res://placeables/treasure/gems/amethyst.tscn")
 const DIAMOND_ITEM := preload("res://placeables/treasure/gems/diamond_inventory.tres")
@@ -18,6 +20,7 @@ const GOLD_COIN_SCENE := preload("res://placeables/treasure/gold_coin.tscn")
 const GOLD_COIN_PILE_SCRIPT := preload("res://placeables/treasure/gold_coin_pile.gd")
 const GOLD_TREASURE_MATERIAL := preload("res://placeables/treasure/gold_treasure_material.tres")
 const KEY_SCENE := preload("res://inventory/key.tscn")
+const KILL_BOUNDARY_SCENE := preload("res://placeables/kill_boundary/kill_boundary.tscn")
 const LEVEL_SETTINGS_SCRIPT := preload("res://levels/level_settings.gd")
 const LEVEL_SELECT_SCENE := preload("res://ui/screens/level_select_screen.tscn")
 const LOW_HEALTH_VIGNETTE_SCRIPT := preload("res://ui/hud/low_health_vignette.gd")
@@ -31,6 +34,11 @@ const RUBY_ITEM := preload("res://placeables/treasure/gems/ruby_inventory.tres")
 const RUBY_SCENE := preload("res://placeables/treasure/gems/ruby.tscn")
 const SAPPHIRE_ITEM := preload("res://placeables/treasure/gems/sapphire_inventory.tres")
 const SAPPHIRE_SCENE := preload("res://placeables/treasure/gems/sapphire.tscn")
+const SHOP_SCENE := preload("res://ui/frontend/shop.tscn")
+const SETTINGS_SCENE := preload("res://ui/frontend/settings.tscn")
+const FRONTEND_GALLERY_SCENE := preload("res://ui/frontend/frontend_gallery.tscn")
+const WIN_SCREEN_SCENE := preload("res://ui/screens/win_screen.tscn")
+const LOSE_SCREEN_SCENE := preload("res://ui/screens/lose_screen.tscn")
 const PNG_TO_GRIDMAP_ALTERNATIVE := preload("res://addons/png_to_gridmap/png_to_gridmap_autotile_alternative.gd")
 const PNG_TO_GRIDMAP_COLOR_MAPPING := preload("res://addons/png_to_gridmap/png_to_gridmap_color_mapping.gd")
 const PNG_TO_GRIDMAP_FLOOR_BUILDER := preload("res://addons/png_to_gridmap/png_to_gridmap_floor_builder.gd")
@@ -41,6 +49,7 @@ const PNG_TO_GRIDMAP_SETTINGS := preload("res://addons/png_to_gridmap/png_to_gri
 const SKELETON_SCENE := preload("res://enemies/skeleton.tscn")
 const SILVER_KEY_SCENE := preload("res://inventory/silver_key.tscn")
 const TEST_TEXT_OVERLAY_VISUAL_LAYER := 1 << 19
+const TEST_RUN_RECORDING_DIRECTORY := "res://.godot/test_run_playbacks"
 const TORCH_SCENE := preload("res://placeables/torch/torch.tscn")
 const TREASURE_PILE_SCENE := preload("res://placeables/treasure/treasure_pile.tscn")
 const ZOMBIE_SCENE := preload("res://enemies/zombie.tscn")
@@ -66,6 +75,10 @@ class TestGraveyard:
 
     func _store_result_stats() -> void:
         pass
+
+
+    func _get_result_stats() -> Node:
+        return null
 
 
     func _show_win_screen() -> void:
@@ -108,6 +121,25 @@ class TestLevelSelection:
 
     func resolve_highlighted_index_for_test(stored_results: Dictionary) -> int:
         return _resolve_saved_highlighted_level_index(stored_results)
+
+
+class TestGameSettings:
+    extends GDGameSettings
+
+    var save_count := 0
+
+
+    func _load_settings() -> void:
+        pass
+
+
+    func _apply_audio_settings() -> void:
+        pass
+
+
+    func _save_settings() -> void:
+        save_count += 1
+        save_pending = false
 
 
 class TestMinimapBoundary:
@@ -154,12 +186,15 @@ func _init() -> void:
 func _run_tests() -> void:
     var failed := false
     failed = not _test_deterministic_seed_helper_is_stable() or failed
+    failed = not _test_run_recording_preserves_compact_frame_timing_and_controls() or failed
     failed = not _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() or failed
     failed = not _test_treasure_pile_discovers_compatible_scenes_and_spawns_mixed_counts() \
         or failed
     failed = not _test_diamond_collectible_value_and_material() or failed
-    failed = not _test_gem_variants_share_model_and_scale_values() or failed
+    failed = not _test_gem_variants_use_icon_cuts_and_scale_values() or failed
     failed = not _test_audio_fallback_is_deterministic() or failed
+    failed = not _test_frontend_audio_uses_shared_support() or failed
+    failed = not await _test_game_settings_batch_disk_writes() or failed
     failed = not _test_player_fall_death_threshold() or failed
     failed = not _test_torch_scene_and_persistent_activation() or failed
     failed = not _test_indoor_lighting_strengthens_occlusion() or failed
@@ -168,6 +203,7 @@ func _run_tests() -> void:
     failed = not _test_gold_treasure_stays_lit_and_uses_indoor_bloom() or failed
     failed = not await _test_gold_bar_uses_inventory_capacity_and_physics_drop() or failed
     failed = not _test_result_percentage_uses_mixed_treasure_value() or failed
+    failed = not _test_typed_treasure_wallet_and_shop_purchases() or failed
     failed = not _test_treasure_absorption_does_not_complete_level() or failed
     failed = not _test_gate_completion_completes_level() or failed
     failed = not _test_reusable_gate_and_treasure_deposit_coffin_scenes() or failed
@@ -195,8 +231,12 @@ func _run_tests() -> void:
     failed = not _test_level_settings_control_minimap_visibility() or failed
     failed = not _test_low_health_vignette_maps_health_to_warning_intensity() or failed
     failed = not _test_hud_panel_sets_split_value_labels() or failed
+    failed = not await _test_shop_uses_reusable_resizable_frames() or failed
+    failed = not _test_frontend_gallery_instances_navigable_screens() or failed
+    failed = not await _test_result_screens_and_settings_share_frontend_design() or failed
     failed = not _test_enemies_use_fake_shadows_without_warning_light_blobs() or failed
     failed = not _test_skeleton_facing_is_driven_by_movement() or failed
+    failed = not await _test_ground_enemies_fall_before_moving() or failed
     failed = not _test_minimap_disables_processing_and_rendering() or failed
     failed = not _test_minimap_camera_scrolls_wide_level_without_empty_space() or failed
     failed = not _test_minimap_camera_scrolls_tall_level_without_empty_space() or failed
@@ -221,6 +261,100 @@ func _test_deterministic_seed_helper_is_stable() -> bool:
         and _expect(first_seed != different_seed, "deterministic seed helper changes with salt")
 
 
+func _test_run_recording_preserves_compact_frame_timing_and_controls() -> bool:
+    var recorder := RUN_RECORDER_SCRIPT.new() as RUN_RECORDER_SCRIPT
+    var first_player_position := Vector3(1.25, 0.4, -3.75)
+    var first_camera_transform := Transform3D(
+        Basis.from_euler(Vector3(-0.45, 0.2, 0.0)),
+        Vector3(1.25, 6.2, 3.1)
+    )
+    recorder.capture_sample(
+        1.0 / 60.0,
+        Vector2(0.375, -0.8),
+        Vector2(-0.25, 0.5),
+        true,
+        false,
+        first_player_position,
+        0.65,
+        first_camera_transform
+    )
+    recorder.capture_sample(
+        1.0 / 30.0,
+        Vector2(0.5, -0.25),
+        Vector2.ZERO,
+        false,
+        true,
+        first_player_position + Vector3(0.0014, 0.0, -0.0024),
+        0.7,
+        first_camera_transform.translated(Vector3(0.0034, 0.0, -0.0014))
+    )
+    var teleported_player_position := Vector3(80.0, 1.0, -90.0)
+    recorder.capture_sample(
+        0.02,
+        Vector2.ZERO,
+        Vector2.ZERO,
+        false,
+        false,
+        teleported_player_position,
+        -2.2,
+        Transform3D(Basis.IDENTITY, Vector3(80.0, 7.0, -84.0))
+    )
+    var payload := recorder.finish_recording(false)
+    var decoded := RUN_RECORDING_SCRIPT.decode_payload(payload, recorder.frame_count, 41.0)
+    var deltas := decoded.get("frame_deltas", PackedFloat32Array()) as PackedFloat32Array
+    var movement := decoded.get("movement_inputs", PackedVector2Array()) as PackedVector2Array
+    var button_states := decoded.get("button_states", PackedByteArray()) as PackedByteArray
+    var positions := decoded.get("player_positions", PackedVector3Array()) \
+        as PackedVector3Array
+    var storage_level_id := "run_recording_round_trip_test"
+    var saved := RUN_RECORDING_SCRIPT.save_for_level(
+        storage_level_id,
+        payload,
+        recorder.frame_count,
+        41.0,
+        TEST_RUN_RECORDING_DIRECTORY
+    )
+    var stored_recording := RUN_RECORDING_SCRIPT.load_for_level(
+        storage_level_id,
+        TEST_RUN_RECORDING_DIRECTORY
+    )
+    RUN_RECORDING_SCRIPT.remove_for_level(storage_level_id, TEST_RUN_RECORDING_DIRECTORY)
+    var passed := _expect(decoded.size() > 0, "run recording binary payload decodes") \
+        and _expect(
+            deltas.size() == 3 \
+                and is_equal_approx(deltas[0], 1.0 / 60.0) \
+                and is_equal_approx(deltas[1], 1.0 / 30.0) \
+                and is_equal_approx(deltas[2], 0.02),
+            "run recording preserves each physics-frame delta"
+        ) \
+        and _expect(
+            movement[0].distance_to(Vector2(0.375, -0.8)) <= 2.0 / 32767.0 \
+                and movement[1].distance_to(Vector2(0.5, -0.25)) <= 2.0 / 32767.0,
+            "run recording preserves analogue joypad controls"
+        ) \
+        and _expect(
+            bool(button_states[0] & RUN_RECORDING_SCRIPT.FrameFlags.JumpPressed) \
+                and bool(button_states[1] & RUN_RECORDING_SCRIPT.FrameFlags.DropPressed),
+            "run recording preserves per-frame joypad buttons"
+        ) \
+        and _expect(
+            positions[1].is_equal_approx(first_player_position + Vector3(0.001, 0.0, -0.002)) \
+                and positions[2].is_equal_approx(teleported_player_position),
+            "run recording uses millimetre deltas and lossless teleport keyframes"
+        ) \
+        and _expect(
+            payload.size() == RUN_RECORDER_SCRIPT.ABSOLUTE_FRAME_SIZE * 2 \
+                + RUN_RECORDER_SCRIPT.NORMAL_FRAME_SIZE,
+            "run recording keeps ordinary frames to a compact fixed binary size"
+        ) \
+        and _expect(
+            saved and is_equal_approx(float(stored_recording.get("duration", 0.0)), 0.07),
+            "run recording stores a compressed file independently for each level"
+        )
+    recorder.free()
+    return passed
+
+
 func _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() -> bool:
     var parent := Node3D.new()
     parent.name = "DeterministicSeedParent"
@@ -232,6 +366,23 @@ func _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() -
 
     var expected_seed := DETERMINISTIC_SEED.from_node(pile, 0, &"gold_coin_pile")
     var runtime_seed := int(pile.get_runtime_random_seed())
+    var editor_preview_pile := TREASURE_PILE_SCENE.instantiate() as GDTreasurePile
+    editor_preview_pile.pile_radius = 0.75
+    editor_preview_pile.call("_configure_editor_selection_placeholder")
+    var selection_placeholder := editor_preview_pile.get_node(
+        "EditorSelectionPlaceholder"
+    ) as MeshInstance3D
+    var selection_mesh := selection_placeholder.mesh as CylinderMesh
+    var gold_pile_scene_text := FileAccess.get_file_as_string(
+        "res://placeables/treasure/gold_coin_pile.tscn"
+    )
+    var treasure_pile_scene_text := FileAccess.get_file_as_string(
+        "res://placeables/treasure/treasure_pile.tscn"
+    )
+    var both_pile_scenes_author_placeholder := gold_pile_scene_text.contains(
+        "[node name=\"EditorSelectionPlaceholder\""
+    ) and treasure_pile_scene_text.contains("[node name=\"EditorSelectionPlaceholder\"")
+    parent.add_child(editor_preview_pile)
     var passed := _expect(runtime_seed == expected_seed, "coin pile derives a stable fallback seed") \
         and _expect(
             pile.get_max_coin_count() == 200 and pile.get_max_item_count() == 200,
@@ -240,6 +391,17 @@ func _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() -
         and _expect(
             not bool(pile.get("spawn_when_near_camera")),
             "coin pile does not camera-gate spawn timing by default"
+        ) \
+        and _expect(
+            both_pile_scenes_author_placeholder \
+                and selection_mesh != null \
+                and is_equal_approx(selection_mesh.top_radius, 0.75) \
+                and selection_placeholder.position.y > 0.0,
+            "gold coin and mixed treasure piles author selectable placeholder geometry"
+        ) \
+        and _expect(
+            not selection_placeholder.visible,
+            "pile selection placeholder geometry is hidden during gameplay"
         )
 
     parent.free()
@@ -362,10 +524,9 @@ func _test_diamond_collectible_value_and_material() -> bool:
     var diamond_shape := (
         diamond_collision.shape as ConvexPolygonShape3D if diamond_collision != null else null
     )
-    var diamond_meshes := diamond.find_children("*", "MeshInstance3D", true, false)
-    var diamond_mesh := (
-        diamond_meshes[0] as MeshInstance3D if not diamond_meshes.is_empty() else null
-    )
+    var diamond_visual := diamond.get_node_or_null("GemVisual") as Node3D
+    var diamond_cut := diamond_visual.get_node_or_null("DiamondCut") as Node3D
+    var diamond_mesh := diamond_cut.get_node_or_null("Crown") as MeshInstance3D
     var surface_material: Material = (
         diamond_mesh.material_override if diamond_mesh != null else null
     )
@@ -391,17 +552,18 @@ func _test_diamond_collectible_value_and_material() -> bool:
         "diamond mesh receives the authored stylized material"
     ) and _expect(
         diamond_mesh != null \
-            and diamond_mesh.mesh != null \
-            and diamond_mesh.mesh.resource_path.begins_with("res://Assets/placeables/treasure/gems/diamond.glb") \
-            and diamond_mesh.mesh.get_faces().size() >= 200,
-        "diamond uses a purpose-built, densely faceted GLB model"
+            and diamond_mesh.mesh is CylinderMesh \
+            and (diamond_mesh.mesh as CylinderMesh).radial_segments == 8 \
+            and diamond_cut.get_node_or_null("Pavilion") is MeshInstance3D,
+        "diamond uses an authored eight-sided crown and pointed pavilion matching its icon"
     ) and _expect(
         diamond_material.shader.resource_path \
             == "res://placeables/treasure/gems/gem_stylized.gdshader" \
             and (diamond_material.get_shader_parameter(&"body_color") as Color).a == 1.0 \
             and float(diamond_material.get_shader_parameter(&"rim_energy")) > 0.0 \
+            and diamond_material.shader.code.contains("dFdx") \
             and diamond_mesh.material_overlay == null,
-        "diamond uses one opaque game-styled facet shader without a corrective overlay"
+        "diamond keeps one opaque material while deriving crisp facets from the new geometry"
     ) and _expect(
         is_equal_approx(DIAMOND_ITEM.weight, GOLD_COIN_ITEM.weight) \
             and DIAMOND_ITEM.treasure_value == 10 \
@@ -423,7 +585,7 @@ func _test_diamond_collectible_value_and_material() -> bool:
     return passed
 
 
-func _test_gem_variants_share_model_and_scale_values() -> bool:
+func _test_gem_variants_use_icon_cuts_and_scale_values() -> bool:
     var gem_items: Array[Resource] = [
         DIAMOND_ITEM,
         RUBY_ITEM,
@@ -439,22 +601,22 @@ func _test_gem_variants_share_model_and_scale_values() -> bool:
         AMETHYST_SCENE,
     ]
     var expected_values := [10, 9, 5, 6, 2]
-    var shared_mesh: Mesh
+    var expected_cuts := [0, 1, 2, 3, 1]
+    var expected_cut_nodes := ["DiamondCut", "RubyCut", "SapphireCut", "EmeraldCut", "RubyCut"]
     var body_colors: Array[Color] = []
     var passed := true
 
     for index in gem_items.size():
         var gem := gem_scenes[index].instantiate() as GDInventoryPickup
         root.add_child(gem)
-        var gem_meshes := gem.find_children("*", "MeshInstance3D", true, false)
-        var gem_mesh := (
-            gem_meshes[0] as MeshInstance3D if not gem_meshes.is_empty() else null
-        )
+        var gem_visual := gem.get_node_or_null("GemVisual") as Node3D
+        var cut_node := gem_visual.get_node_or_null(expected_cut_nodes[index]) as Node3D
+        var cut_meshes := cut_node.find_children("*", "MeshInstance3D", true, false) \
+            if cut_node != null else []
+        var gem_mesh := cut_meshes[0] as MeshInstance3D if not cut_meshes.is_empty() else null
         var gem_material := (
             gem_mesh.material_override as ShaderMaterial if gem_mesh != null else null
         )
-        if shared_mesh == null and gem_mesh != null:
-            shared_mesh = gem_mesh.mesh
         if gem_material != null:
             body_colors.append(gem_material.get_shader_parameter(&"body_color") as Color)
 
@@ -466,12 +628,15 @@ func _test_gem_variants_share_model_and_scale_values() -> bool:
             "%s uses one sack unit and its scaled gem value" \
                 % String(gem_items[index].get("display_name"))
         ) and _expect(
-            gem_mesh != null \
-                and gem_mesh.mesh == shared_mesh \
+            gem_visual != null \
+                and int(gem_visual.get("cut")) == expected_cuts[index] \
+                and cut_node != null \
+                and cut_node.visible \
+                and gem_mesh != null \
                 and gem_material != null \
                 and gem_material.shader.resource_path \
                     == "res://placeables/treasure/gems/gem_stylized.gdshader",
-            "%s shares the gem GLB and stylized shader" \
+            "%s uses its icon-matched authored cut and the shared stylized shader" \
                 % String(gem_items[index].get("display_name"))
         ) and passed
         gem.free()
@@ -497,6 +662,47 @@ func _test_audio_fallback_is_deterministic() -> bool:
 
     return _expect(picked_stream == first_stream, "audio fallback picks the first stream deterministically") \
         and _expect(is_equal_approx(midpoint, 0.5), "audio fallback uses deterministic midpoint variation")
+
+
+func _test_frontend_audio_uses_shared_support() -> bool:
+    var frontend_audio: Node = root.get_node_or_null("FrontendAudio")
+    if not _expect(frontend_audio != null, "frontend audio is available to every menu scene"):
+        return false
+
+    var sound_streams := frontend_audio.get("sound_streams") as Dictionary
+    var all_streams_loaded := sound_streams.size() == 3
+    for stream: AudioStream in sound_streams.values():
+        all_streams_loaded = all_streams_loaded and stream != null
+    frontend_audio.call("play_select")
+    var select_player := frontend_audio.get_node_or_null("FrontendSelect") as AudioStreamPlayer
+    var passed := _expect(
+        all_streams_loaded,
+        "frontend audio loads the supplied select, movement, and purchase sounds"
+    ) and _expect(
+        select_player != null and select_player.bus == GDAudio.SFX_BUS,
+        "frontend audio one-shots use the shared audio support and SFX bus"
+    )
+    if select_player != null:
+        select_player.stop()
+        select_player.queue_free()
+    return passed
+
+
+func _test_game_settings_batch_disk_writes() -> bool:
+    var game_settings := TestGameSettings.new()
+    root.add_child(game_settings)
+    game_settings.call("_queue_settings_save")
+    game_settings.call("_queue_settings_save")
+    var saves_immediately := game_settings.save_count
+    await create_timer(GDGameSettings.SETTINGS_SAVE_DELAY + 0.05).timeout
+    var passed := _expect(
+        saves_immediately == 0 and game_settings.save_count == 1 \
+            and not game_settings.save_pending,
+        "rapid audio-setting changes are persisted in one delayed disk write"
+    )
+    game_settings.queue_free()
+    await process_frame
+    return passed
 
 
 func _test_png_profile_store_only_accepts_level_subfolders() -> bool:
@@ -1115,6 +1321,97 @@ func _test_result_percentage_uses_mixed_treasure_value() -> bool:
     return passed
 
 
+func _test_typed_treasure_wallet_and_shop_purchases() -> bool:
+    var result_stats := GDResultStats.new()
+    result_stats.begin_attempt(100)
+    result_stats.add_treasure(&"diamond", DIAMOND_ITEM.treasure_value)
+    result_stats.add_treasure(&"diamond", DIAMOND_ITEM.treasure_value)
+    result_stats.add_treasure(&"gold_coin", GOLD_COIN_ITEM.treasure_value)
+    var banked_treasure := result_stats.take_unbanked_treasure()
+
+    var level_selection := TestLevelSelection.new()
+    var initial_credit := level_selection.record_selected_level_result(
+        21,
+        21,
+        true,
+        banked_treasure
+    )
+    var loss_credit := level_selection.record_selected_level_result(
+        40,
+        40,
+        false,
+        {"diamond": 4, "gold_coin": 5, "ruby": 3}
+    )
+    var incompatible_credit := level_selection.record_selected_level_result(
+        32,
+        32,
+        true,
+        {"diamond": 1, "gold_coin": 5, "ruby": 2}
+    )
+    var wallet_after_incompatible_replay := level_selection.treasure_wallet.duplicate(true)
+    var counts_after_incompatible_replay: Dictionary = level_selection.get_level_result(0).get(
+        "banked_treasure_counts",
+        {}
+    )
+    var superset_credit := level_selection.record_selected_level_result(
+        42,
+        42,
+        true,
+        {"diamond": 3, "gold_coin": 5, "ruby": 2}
+    )
+    level_selection.record_selected_level_result(
+        22,
+        22,
+        true,
+        {"diamond": 2, "gold_coin": 1, "ruby": 1}
+    )
+    var purchased := level_selection.purchase_shop_item(&"bone_charm", &"diamond", 2, 5)
+    var repeated_without_funds := level_selection.purchase_shop_item(
+        &"bone_charm",
+        &"diamond",
+        2,
+        5
+    )
+    var passed := _expect(
+        banked_treasure == {"diamond": 2, "gold_coin": 1},
+        "result stats retain deposited object counts for every treasure type"
+    ) and _expect(
+        initial_credit == {"diamond": 2, "gold_coin": 1} \
+            and loss_credit.is_empty() \
+            and incompatible_credit.is_empty() \
+            and superset_credit == {"diamond": 1, "gold_coin": 4, "ruby": 2},
+        "level results report only treasure newly credited by each qualifying win"
+    ) and _expect(
+        result_stats.take_unbanked_treasure().is_empty(),
+        "an attempt's treasure can only be banked once"
+    ) and _expect(
+        wallet_after_incompatible_replay == {"diamond": 2, "gold_coin": 1} \
+            and counts_after_incompatible_replay == {"diamond": 2, "gold_coin": 1},
+        "a different partial haul cannot combine currencies across successful runs"
+    ) and _expect(
+        level_selection.get_level_result(0).get("banked_treasure_counts") \
+            == {"diamond": 3, "gold_coin": 5, "ruby": 2},
+        "reward-bearing replays must contain the level's complete previously banked haul"
+    ) and _expect(
+        purchased and not repeated_without_funds,
+        "shop purchases atomically validate and deduct their authored treasure currency"
+    ) and _expect(
+        level_selection.get_treasure_count(&"diamond") == 1 \
+            and level_selection.get_treasure_count(&"gold_coin") == 5 \
+            and level_selection.get_treasure_count(&"ruby") == 2 \
+            and level_selection.get_shop_item_purchase_count(&"bone_charm") == 1,
+        "losses and incompatible replay hauls add nothing while a superset run funds purchases"
+    ) and _expect(
+        level_selection.player_progress.get_script().resource_path \
+            == "res://autoload/player_progress.gd",
+        "level navigation delegates persisted results, treasure, and shop stock"
+    )
+
+    level_selection.free()
+    result_stats.free()
+    return passed
+
+
 func _test_gate_completion_completes_level() -> bool:
     var graveyard := TestGraveyard.new()
     graveyard._on_level_completed()
@@ -1153,12 +1450,17 @@ func _test_reusable_gate_and_treasure_deposit_coffin_scenes() -> bool:
     deposit_inventory._add_item(GOLD_BAR_ITEM)
     var selected_deposit_item := deposit_inventory.take_highest_value_carried_treasure()
     var absorbed_values: Array[int] = []
+    var absorbed_types: Array[StringName] = []
     if deposit != null:
         deposit.treasure_absorbed.connect(
             func(value: int) -> void:
                 absorbed_values.append(value)
         )
-        deposit._absorb_treasure(DIAMOND_ITEM.treasure_value)
+        deposit.treasure_item_absorbed.connect(
+            func(item_type: StringName, _value: int) -> void:
+                absorbed_types.append(item_type)
+        )
+        deposit._absorb_treasure(DIAMOND_ITEM.treasure_value, DIAMOND_ITEM)
     var world_coin := GOLD_COIN_SCENE.instantiate() as GDGoldCoin
     var world_coin_mesh := world_coin.get_node_or_null("CoinMesh") as MeshInstance3D
     var passed := _expect(gate.completes_level, "locked gate scene completes the level") \
@@ -1183,8 +1485,9 @@ func _test_reusable_gate_and_treasure_deposit_coffin_scenes() -> bool:
         ) \
         and _expect(
             deposit_diamond is GDDiamond \
-                and absorbed_values == [DIAMOND_ITEM.treasure_value],
-            "diamonds retain their visual and award their full value when deposited"
+                and absorbed_values == [DIAMOND_ITEM.treasure_value] \
+                and absorbed_types == [&"diamond"],
+            "diamonds retain their visual and report exact type and value when deposited"
         ) \
         and _expect(
             deposit_gold_bar is GDGoldBar \
@@ -1279,9 +1582,18 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
     level_selection.last_highlighted_level_index = 12
     level_selection.level_results = {
         "test_level_01": {"best_percentage": 40, "escaped": false, "play_count": 2, "played": true},
-        "test_level_02": {"best_percentage": 70, "escaped": true, "play_count": 3, "played": true},
+        "test_level_02": {
+            "banked_treasure_counts": {"diamond": 2, "gold_coin": 7},
+            "best_percentage": 70,
+            "escaped": true,
+            "play_count": 3,
+            "played": true,
+        },
         "test_level_03": {"best_percentage": 100, "escaped": true, "play_count": 1, "played": true},
     }
+    var replay_state_before := level_selection.level_results.duplicate(true)
+    var replay_wallet_before := level_selection.treasure_wallet.duplicate(true)
+    var replay_purchases_before := level_selection.shop_purchases.duplicate(true)
 
     var screen := LEVEL_SELECT_SCENE.instantiate() as GDLevelSelectScreen
     root.add_child(screen)
@@ -1289,23 +1601,175 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
     await process_frame
 
     var scroll := screen.scroll_container
+    var shop_button := screen.shop_button
+    var settings_button := screen.settings_button
+    var back_button := screen.back_button
+    var screen_container := screen.get_node("ScreenContainer") as Control
+    var background := screen.get_node("ScreenContainer/Background") as TextureRect
+    var background_shade := screen.get_node("ScreenContainer/Shade") as ColorRect
+    var level_select_frame := screen.get_node(
+        "ScreenContainer/LevelListFrame"
+    ) as NinePatchRect
+    var loot_frame := screen.get_node("ScreenContainer/LootFrame") as NinePatchRect
+    var level_run_playback := screen.get_node(
+        "ScreenContainer/LootFrame/Content/LevelRunPlayback"
+    ) as SubViewportContainer
+    var playback_viewport := level_run_playback.get_node("PlaybackViewport") as SubViewport
+    var preview_root := Node3D.new()
+    var preview_world_body := StaticBody3D.new()
+    var preview_player := PLAYER_SCENE.instantiate() as GDPlayer
+    var preview_camera := Camera3D.new()
+    var preview_coin_pile := GOLD_COIN_PILE_SCRIPT.new() as GDGoldCoinPile
+    var preview_coin := GOLD_COIN_SCENE.instantiate() as GDInventoryPickup
+    var preview_gate := LOCKED_GATE_SCENE.instantiate() as GDLockableHingedPassage
+    var preview_boundary := KILL_BOUNDARY_SCENE.instantiate() as GDKillBoundary3D
+    var preview_audio := AudioStreamPlayer.new()
+    var preview_tutorial_area := Area3D.new()
+    preview_world_body.collision_layer = 1
+    preview_player.name = "Player"
+    preview_coin_pile.coin_count = 1
+    preview_coin_pile.spawn_interval = 0.0
+    preview_coin_pile.position = Vector3(3.0, 0.0, 0.0)
+    preview_coin.pickup_delay = 0.0
+    preview_coin.freeze = true
+    preview_coin.position = Vector3(0.0, 0.4, 0.0)
+    preview_root.add_child(preview_world_body)
+    preview_root.add_child(preview_player)
+    preview_root.add_child(preview_camera)
+    preview_root.add_child(preview_coin_pile)
+    preview_root.add_child(preview_coin)
+    preview_root.add_child(preview_gate)
+    preview_root.add_child(preview_boundary)
+    preview_root.add_child(preview_tutorial_area)
+    level_run_playback.call("_prepare_preview_tree", preview_root)
+    level_run_playback.call("_configure_playback_player", preview_player)
+    root.add_child(preview_root)
+    level_run_playback.call("_configure_playback_player", preview_player)
+    level_run_playback.call("_isolate_preview_state", preview_root)
+    level_run_playback.call("_start_preview_runtime", preview_root)
+    level_run_playback.playback_level = preview_root
+    preview_root.add_child(preview_audio)
+    level_run_playback.playback_level = null
+    level_run_playback.call("_disable_preview_area", preview_tutorial_area, false)
+    var level_select_title := screen.get_node("ScreenContainer/ScreenTitleLabel") as Label
+    var liberated_heading := screen.get_node(
+        "ScreenContainer/LootFrame/Content/SelectedTombPanel/LiberatedLootHeadingLabel"
+    ) as Label
+    var level_loot_tiles := screen.get_node(
+        "ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles"
+    ) as GridContainer
+    var level_diamond_tile := level_loot_tiles.get_node("DiamondTile") as Control
+    var level_coin_tile := level_loot_tiles.get_node("GoldCoinTile") as Control
+    var level_ruby_tile := level_loot_tiles.get_node("RubyTile") as Control
+    var diamond_loot_quantity := screen.get_node(
+        "ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/DiamondTile/TreasureQuantityLabel"
+    ) as Label
+    var gold_coin_loot_quantity := screen.get_node(
+        "ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/GoldCoinTile/TreasureQuantityLabel"
+    ) as Label
+    var level_focus_style := screen.level_buttons[0].get_theme_stylebox(&"focus") as StyleBoxFlat
     var initial_button_rect := screen.level_buttons[12].get_global_rect()
     var initial_viewport_rect := scroll.get_global_rect()
-    var passed := _expect(scroll != null, "level selection places cards in a scrolling viewport") \
+    var scaled_focus_margin := GDLevelSelectScreen.FOCUS_SCROLL_MARGIN * screen_container.scale.y
+    var passed := _expect(scroll != null, "level selection places rows in a scrolling viewport") \
         and _expect(
-            screen.background.texture.resource_path \
-            == "res://Assets/frontend/level-select.png",
-            "level selection retains its page background"
+            background.texture.resource_path == "res://Assets/frontend/level-select.png" \
+            and background_shade.color == Color(0.015, 0.01, 0.015, 0.68),
+            "level selection shares the illustrated frontend background and shade"
         ) \
         and _expect(
-            screen.level_buttons[0].get_node("CardBackground").texture.resource_path \
-            == "res://Assets/frontend/level-background.png",
-            "each level card uses the authored card background"
+            level_select_title.text == "CHOOSE YOUR TOMB" \
+            and level_select_title.get_global_rect().end.y \
+                <= level_select_frame.get_global_rect().position.y,
+            "level selection carries its title above and outside the surrounds"
         ) \
         and _expect(
-            screen.level_buttons[0].get_node("Title").get_theme_font("font") \
-            == GDGameFont.get_almendra_font(),
-            "level cards use the bold Almendra game font"
+            level_select_frame.axis_stretch_horizontal == NinePatchRect.AXIS_STRETCH_MODE_TILE \
+            and level_select_frame.axis_stretch_vertical == NinePatchRect.AXIS_STRETCH_MODE_TILE \
+            and level_select_frame.texture.resource_path \
+            == "res://Assets/frontend/panel-surround.png",
+            "level selection shares the shop's tiled nine-slice surround"
+        ) \
+        and _expect(
+            loot_frame.axis_stretch_horizontal == NinePatchRect.AXIS_STRETCH_MODE_TILE \
+            and loot_frame.axis_stretch_vertical == NinePatchRect.AXIS_STRETCH_MODE_TILE \
+            and loot_frame.texture == level_select_frame.texture \
+            and loot_frame.position.x > level_select_frame.position.x,
+            "level selection mirrors the shop's separate list and detail surrounds"
+        ) \
+        and _expect(
+            is_equal_approx(level_run_playback.modulate.a, 0.65) \
+                and level_run_playback.stretch_shrink == 2 \
+                and playback_viewport.render_target_update_mode == SubViewport.UPDATE_DISABLED,
+            "last-run playback is readable, low resolution, and idle until asynchronously loaded"
+        ) \
+        and _expect(
+            preview_root.process_mode != Node.PROCESS_MODE_DISABLED \
+                and preview_world_body.process_mode != Node.PROCESS_MODE_DISABLED \
+                and preview_world_body.collision_layer == 1 \
+                and preview_player.process_mode != Node.PROCESS_MODE_DISABLED \
+                and preview_player.collision_layer == 2 \
+                and preview_player.collision_mask == 0,
+            "last-run playback simulates world logic with a pickup-capable recorded player"
+        ) \
+        and _expect(
+            preview_audio.bus == GDLevelRunPlayback.MUTED_AUDIO_BUS \
+                and AudioServer.is_bus_mute(
+                    AudioServer.get_bus_index(GDLevelRunPlayback.MUTED_AUDIO_BUS)
+                ),
+            "last-run playback routes dynamically created sounds to a muted bus"
+        ) \
+        and _expect(
+            preview_gate.completion_area != null \
+                and preview_gate.completion_area.collision_mask == 0,
+            "last-run playback disables level completion triggers"
+        ) \
+        and _expect(
+            preview_tutorial_area.monitoring \
+                and preview_tutorial_area.collision_mask == 0,
+            "replay tutorial triggers remain queryable while unable to detect the player"
+        ) \
+        and _expect(
+            preview_boundary.strip_meshes.any(
+                func(mesh: MeshInstance3D) -> bool: return mesh.visible
+            ) \
+                and preview_boundary.get_node("BoundaryAnimationPlayer").is_playing(),
+            "last-run playback keeps the kill boundary visible and moving"
+        ) \
+        and _expect(
+            liberated_heading.text == "LIBERATED LOOT" \
+            and not liberated_heading.visible \
+            and not level_loot_tiles.visible \
+            and not screen.liberated_summary_label.visible,
+            "unplayed tombs hide the complete liberated-loot section"
+        ) \
+        and _expect(
+            is_equal_approx(screen_container.scale.x, screen_container.scale.y),
+            "level selection scales its shop-style reference canvas uniformly"
+        ) \
+        and _expect(
+            screen.level_buttons[0].get_node("LevelIconTexture").texture.resource_path \
+            == "res://Assets/frontend/health-icon.png",
+            "level rows expose a replaceable placeholder icon"
+        ) \
+        and _expect(
+            screen.level_buttons[1].position.y > screen.level_buttons[0].position.y \
+            and is_equal_approx(
+                screen.level_buttons[1].position.x,
+                screen.level_buttons[0].position.x
+            ) \
+            and screen.level_buttons[0].size.y < 150.0,
+            "level selection replaces the old card grid with one compact vertical list"
+        ) \
+        and _expect(
+            level_focus_style != null and level_focus_style.border_width_left == 5 \
+            and level_focus_style.border_color == Color(1, 0.86, 0.08, 1),
+            "level rows share the shop's five-pixel yellow selection surround"
+        ) \
+        and _expect(
+            screen.level_buttons[0].get_node("Title").label_settings.font.resource_path \
+            == "res://Assets/fonts/Almendra-Bold.ttf",
+            "level rows use the bold Almendra game font"
         ) \
         and _expect(
             screen.selected_button_index == 12,
@@ -1321,20 +1785,20 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
         ) \
         and _expect(
             initial_button_rect.position.y \
-            >= initial_viewport_rect.position.y + GDLevelSelectScreen.FOCUS_SCROLL_MARGIN \
+            >= initial_viewport_rect.position.y + scaled_focus_margin \
             and initial_button_rect.end.y \
-            <= initial_viewport_rect.end.y - GDLevelSelectScreen.FOCUS_SCROLL_MARGIN,
-            "the remembered level card and its focus surround start fully visible"
+            <= initial_viewport_rect.end.y - scaled_focus_margin,
+            "the remembered level row and its focus surround start fully visible"
         ) \
         and _expect(
             screen.level_buttons[0].get_node("LevelStatus").text.begins_with("TUTORIAL"),
-            "tutorial levels are identified on their cards"
+            "tutorial levels are identified on their rows"
         ) \
         and _expect(
             screen.level_buttons[0].get_node("LevelStatus").text == "TUTORIAL  •  FAILED" \
             and screen.level_buttons[0].get_node("Percentage").text == "40%" \
             and screen.level_buttons[0].get_node("Plays").text == "2 PLAYS",
-            "failed level cards separate status, treasure percentage, and play count"
+            "failed level rows separate status, treasure percentage, and play count"
         ) \
         and _expect(
             screen.level_buttons[1].get_node("LevelStatus").text == "COMPLETE" \
@@ -1345,28 +1809,274 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
             screen.level_buttons[2].get_node("LevelStatus").text == "SUCCESS" \
             and screen.level_buttons[2].get_node("Percentage").text == "100%",
             "full treasure completion has a distinct success status"
+        ) \
+        and _expect(
+            back_button != null and back_button.text == "BACK" \
+            and settings_button != null and settings_button.text == "SETTINGS" \
+            and shop_button != null and shop_button.text == "SHOP" \
+            and screen.shop_scene_path == "res://ui/frontend/shop.tscn",
+            "level selection provides Back, Settings, and Shop actions beneath the list"
+        ) \
+        and _expect(
+            back_button.get_global_rect().position.y >= level_select_frame.get_global_rect().end.y \
+            and shop_button.get_global_rect().position.y \
+                >= level_select_frame.get_global_rect().end.y \
+            and back_button.size.is_equal_approx(Vector2(260.0, 72.0)) \
+            and shop_button.size.is_equal_approx(Vector2(260.0, 72.0)),
+            "level-select actions sit outside the surround and match the compact shop buttons"
+        ) \
+        and _expect(
+            screen.level_buttons[0].get_node(screen.level_buttons[0].focus_neighbor_left) \
+            == back_button \
+            and screen.level_buttons[0].get_node(
+                screen.level_buttons[0].focus_neighbor_right
+            ) == shop_button,
+            "left and right move directly from a level row to the bottom actions"
         )
+
+    await physics_frame
+    await physics_frame
+    var preview_coin_spawned := false
+    for preview_child in preview_root.get_children():
+        if preview_child.is_in_group(&"gold_coin"):
+            preview_coin_spawned = true
+            break
+    passed = _expect(
+        preview_coin_spawned,
+        "last-run playback advances level physics such as coin-pile spawning"
+    ) and passed
+    passed = _expect(
+        preview_coin.is_being_collected \
+            and preview_player.inventory.get_item_count(&"gold_coin") >= 1,
+        "the recorded player collects nearby items into its replay-only inventory"
+    ) and passed
+    passed = _expect(
+        level_selection.level_results == replay_state_before \
+            and level_selection.treasure_wallet == replay_wallet_before \
+            and level_selection.shop_purchases == replay_purchases_before,
+        "replay collection and completion isolation leave saved player progress unchanged"
+    ) and passed
+    var preview_animation_player := level_run_playback.call(
+        "_find_animation_player",
+        preview_player
+    ) as AnimationPlayer
+    level_run_playback.playback_player = preview_player
+    level_run_playback.animation_player = preview_animation_player
+    level_run_playback.death_animation = level_run_playback.call(
+        "_find_animation",
+        preview_animation_player,
+        GDLevelRunPlayback.DEATH_ANIMATION_CANDIDATES
+    ) as String
+    level_run_playback.recording = {
+        "movement_inputs": PackedVector2Array([Vector2.ONE]),
+    }
+    preview_player.die_from_flames()
+    level_run_playback.call("_update_animation", 1.0 / 60.0, 0)
+    passed = _expect(
+        preview_player.is_dead() \
+            and not level_run_playback.death_animation.is_empty() \
+            and level_run_playback.current_animation == level_run_playback.death_animation \
+            and preview_animation_player.current_animation == level_run_playback.death_animation \
+            and is_equal_approx(preview_animation_player.speed_scale, 0.5),
+        "replay hazards play the local death animation without a recorded death flag"
+    ) and passed
+    var final_pose_camera := Camera3D.new()
+    playback_viewport.add_child(final_pose_camera)
+    level_run_playback.playback_camera = final_pose_camera
+    level_run_playback.recording = {
+        "player_positions": PackedVector3Array([Vector3.ZERO, Vector3(9.0, 1.0, -3.0)]),
+        "player_yaws": PackedFloat32Array([0.0, 1.0]),
+        "camera_positions": PackedVector3Array([Vector3.ZERO, Vector3(8.0, 6.0, 2.0)]),
+        "camera_rotations": PackedVector4Array([
+            Vector4(0.0, 0.0, 0.0, 1.0),
+            Vector4(0.0, 0.0, 0.0, 1.0),
+        ]),
+    }
+    level_run_playback.call("_apply_frame", 1, 0.5)
+    passed = _expect(
+        preview_player.global_position.is_equal_approx(Vector3(9.0, 1.0, -3.0)) \
+            and final_pose_camera.global_position.is_equal_approx(Vector3(8.0, 6.0, 2.0)),
+        "the replay final frame holds its last player and camera pose"
+    ) and passed
+    playback_viewport.remove_child(final_pose_camera)
+    final_pose_camera.free()
+    level_run_playback.playback_camera = null
+    level_run_playback.pending_level_id = "queued_preview"
+    level_run_playback.pending_scene_path = "res://levels/1/level.tscn"
+    level_run_playback.stop_for_scene_change()
+    passed = _expect(
+        level_run_playback.pending_level_id.is_empty() \
+            and level_run_playback.pending_scene_path.is_empty() \
+            and level_run_playback.load_state == GDLevelRunPlayback.LoadState.Idle \
+            and playback_viewport.render_target_update_mode == SubViewport.UPDATE_DISABLED,
+        "starting gameplay stops pending and active level-select replay work"
+    ) and passed
+
+    var loop_level_source := Node3D.new()
+    var loop_player := PLAYER_SCENE.instantiate() as GDPlayer
+    var loop_coin := GOLD_COIN_SCENE.instantiate() as GDInventoryPickup
+    var loop_particles := GPUParticles3D.new()
+    loop_player.name = "Player"
+    loop_coin.name = "LoopCoin"
+    loop_particles.name = "LoopParticles"
+    loop_particles.emitting = true
+    loop_coin.position = Vector3(20.0, 0.0, 0.0)
+    loop_level_source.add_child(loop_player)
+    loop_level_source.add_child(loop_coin)
+    loop_level_source.add_child(loop_particles)
+    loop_player.owner = loop_level_source
+    loop_coin.owner = loop_level_source
+    loop_particles.owner = loop_level_source
+    var loop_level_scene := PackedScene.new()
+    var loop_pack_error := loop_level_scene.pack(loop_level_source)
+    loop_level_source.free()
+    level_run_playback.recording = {
+        "camera_fov": 34.0,
+        "duration": 0.1,
+        "frame_times": PackedFloat32Array([0.0]),
+        "frame_deltas": PackedFloat32Array([0.1]),
+        "player_positions": PackedVector3Array([Vector3.ZERO]),
+        "player_yaws": PackedFloat32Array([0.0]),
+        "camera_positions": PackedVector3Array([Vector3(0.0, 6.0, 8.0)]),
+        "camera_rotations": PackedVector4Array([Vector4(0.0, 0.0, 0.0, 1.0)]),
+        "movement_inputs": PackedVector2Array([Vector2.ZERO]),
+    }
+    level_run_playback.call("_create_preview", loop_level_scene)
+    level_run_playback.load_state = GDLevelRunPlayback.LoadState.Idle
+    var first_loop_instance := level_run_playback.playback_level as Node3D
+    var first_loop_player := first_loop_instance.get_node("Player") as GDLevelRunPlaybackPlayer
+    var first_loop_inventory := first_loop_player.inventory as GDPlayerInventory
+    var collected_loop_coin := first_loop_instance.get_node("LoopCoin") as GDInventoryPickup
+    first_loop_inventory.call("_add_item", collected_loop_coin.get_carried_item())
+    collected_loop_coin.visible = false
+    collected_loop_coin.queue_free()
+    level_run_playback.playback_time = 0.09
+    level_run_playback.call("_advance_playback", 0.02)
+    var reset_loop_instance := level_run_playback.playback_level as Node3D
+    var reset_loop_coin := reset_loop_instance.get_node_or_null("LoopCoin") as GDInventoryPickup
+    var reset_loop_player := reset_loop_instance.get_node("Player") as GDLevelRunPlaybackPlayer
+    var reset_loop_inventory := reset_loop_player.inventory as GDPlayerInventory
+    var reset_loop_particles := reset_loop_instance.get_node(
+        "LoopParticles"
+    ) as GPUParticles3D
+    passed = _expect(
+        loop_pack_error == OK \
+            and not is_instance_valid(first_loop_instance) \
+            and reset_loop_instance != first_loop_instance \
+            and playback_viewport.own_world_3d \
+            and reset_loop_coin != null \
+            and reset_loop_coin.visible \
+            and reset_loop_inventory.get_used_inventory_units() == 0 \
+            and reset_loop_inventory.get_item_count(&"gold_coin") == 0,
+        "looping a last-run playback replaces its isolated session and replay inventory"
+    ) and passed
+    passed = _expect(
+        reset_loop_particles.emitting,
+        "last-run playback preserves authored particle emitters across loops"
+    ) and passed
+    level_run_playback.stop_for_scene_change()
 
     screen.level_buttons[6].grab_focus()
     await create_timer(GDLevelSelectScreen.FOCUS_SCROLL_DURATION + 0.05).timeout
     screen._move_focus(Vector2i.DOWN)
     screen._move_focus(Vector2i.DOWN)
     passed = _expect(
-        screen.selected_button_index == 12,
+        screen.selected_button_index == 8,
         "a double down tap moves focus twice without waiting for scrolling"
     ) and passed
     passed = _expect(
-        screen.scroll_tween != null and screen.scroll_tween.is_running(),
-        "a double down tap retargets one active smooth scroll"
+        screen.scroll_tween != null,
+        "the shared level list owns the eased focus-scroll tween"
     ) and passed
+
+    screen.level_buttons[0].grab_focus()
+    await process_frame
+    passed = _expect(
+        not liberated_heading.visible \
+        and not level_loot_tiles.visible \
+        and not screen.liberated_summary_label.visible,
+        "played tombs without liberated loot keep the liberated-loot section hidden"
+    ) and passed
+
+    screen.level_buttons[1].grab_focus()
+    await process_frame
+    passed = _expect(
+        liberated_heading.visible \
+        and diamond_loot_quantity.text == "x2" \
+        and gold_coin_loot_quantity.text == "x7" \
+        and level_diamond_tile.visible \
+        and level_coin_tile.visible \
+        and not level_ruby_tile.visible \
+        and level_loot_tiles.visible \
+        and screen.liberated_summary_label.text == "9 PIECES LIBERATED  •  70% RECOVERED",
+        "played tombs show the liberated-loot section only when it contains treasure"
+    ) and passed
+    screen.level_buttons[8].grab_focus()
     await create_timer(GDLevelSelectScreen.FOCUS_SCROLL_DURATION + 0.05).timeout
     passed = _expect(
-        screen.selected_button_index == 12,
-        "joypad-style grid navigation reaches later level rows"
+        screen.selected_button_index == 8,
+        "joypad-style list navigation reaches later level rows"
     ) and passed
     passed = _expect(
         scroll.scroll_vertical > 0,
         "focused joypad selections automatically scroll into view"
+    ) and passed
+
+    screen.level_buttons[8].grab_focus()
+    var first_up_flick := InputEventJoypadMotion.new()
+    first_up_flick.axis = JOY_AXIS_LEFT_Y
+    first_up_flick.axis_value = -1.0
+    screen._input(first_up_flick)
+    var frontend_move_player := root.get_node_or_null(
+        "FrontendAudio/FrontendMoveCursor"
+    ) as AudioStreamPlayer
+    passed = _expect(
+        frontend_move_player != null and frontend_move_player.bus == GDAudio.SFX_BUS,
+        "level and shop list movement plays cursor audio through shared SFX support"
+    ) and passed
+    screen._input(first_up_flick)
+    var partial_up_release := InputEventJoypadMotion.new()
+    partial_up_release.axis = JOY_AXIS_LEFT_Y
+    partial_up_release.axis_value = -0.45
+    screen._input(partial_up_release)
+    var second_up_flick := InputEventJoypadMotion.new()
+    second_up_flick.axis = JOY_AXIS_LEFT_Y
+    second_up_flick.axis_value = -0.9
+    screen._input(second_up_flick)
+    passed = _expect(
+        screen.selected_button_index == 6,
+        "two analog flicks move twice after a partial release without unwanted hold repeat"
+    ) and passed
+    scroll._process(scroll.navigation_repeat_delay + 0.01)
+    passed = _expect(
+        screen.selected_button_index == 5,
+        "holding the level-select stick repeats movement after the configured delay"
+    ) and passed
+    var full_up_release := InputEventJoypadMotion.new()
+    full_up_release.axis = JOY_AXIS_LEFT_Y
+    full_up_release.axis_value = 0.0
+    screen._input(full_up_release)
+
+    screen.level_buttons[15].grab_focus()
+    screen._move_focus(Vector2i.LEFT)
+    passed = _expect(
+        back_button.has_focus(),
+        "left from the level list moves to Back"
+    ) and passed
+    screen._move_focus(Vector2i.RIGHT)
+    passed = _expect(
+        settings_button.has_focus(),
+        "right moves across the bottom actions to Settings"
+    ) and passed
+    screen._move_focus(Vector2i.RIGHT)
+    passed = _expect(
+        shop_button.has_focus(),
+        "a second right movement reaches Shop"
+    ) and passed
+    screen._move_focus(Vector2i.UP)
+    passed = _expect(
+        screen.level_buttons[15].has_focus(),
+        "up returns from a bottom action to the previously selected level row"
     ) and passed
 
     screen._on_button_gui_input(InputEventMouseMotion.new(), 3)
@@ -1388,6 +2098,7 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
     level_selection.level_results = original_results
     level_selection.persistence_enabled = original_persistence_enabled
     screen.queue_free()
+    preview_root.queue_free()
     return passed
 
 
@@ -2124,6 +2835,692 @@ func _test_hud_panel_sets_split_value_labels() -> bool:
     return passed
 
 
+func _test_shop_uses_reusable_resizable_frames() -> bool:
+    var level_selection := root.get_node_or_null("LevelSelection") as GDLevelSelection
+    if not _expect(level_selection != null, "level selection autoload supplies the shop wallet"):
+        return false
+    var original_wallet := level_selection.treasure_wallet.duplicate(true)
+    var original_purchases := level_selection.shop_purchases.duplicate(true)
+    var original_persistence_enabled := level_selection.persistence_enabled
+    level_selection.persistence_enabled = false
+    level_selection.treasure_wallet = {"diamond": 2, "gold_coin": 60}
+    level_selection.shop_purchases = {}
+
+    var shop := SHOP_SCENE.instantiate() as Control
+    root.add_child(shop)
+    shop.set_anchors_preset(Control.PRESET_TOP_LEFT)
+    shop.size = Vector2(2560.0, 1080.0)
+    shop.call("_sync_screen_container")
+    await process_frame
+
+    var screen_container := shop.get_node("ScreenContainer") as Control
+    var shop_title := shop.get_node("ScreenContainer/ScreenTitleLabel") as Label
+    var inventory_frame := shop.get_node("ScreenContainer/InventoryFrame") as NinePatchRect
+    var details_frame := shop.get_node("ScreenContainer/DetailsFrame") as NinePatchRect
+    var scroll := shop.get_node(
+        "ScreenContainer/InventoryFrame/Content/ShopItemsPanel/AvailableItemsScroll"
+    ) as ScrollContainer
+    var item_rows := shop.get("item_rows") as Array
+    var available_items := shop.get("available_items") as Array
+    var item_name_label := shop.get_node(
+        "ScreenContainer/DetailsFrame/Content/SelectedItemPanel/ItemNameLabel"
+    ) as Label
+    var selected_item_panel := shop.get_node(
+        "ScreenContainer/DetailsFrame/Content/SelectedItemPanel"
+    ) as Panel
+    var bottom_actions := shop.get_node("ScreenContainer/BottomActions") as HBoxContainer
+    var back_button := shop.get_node("ScreenContainer/BottomActions/BackButton") as Button
+    var wallet_tiles := shop.get_node("ScreenContainer/WalletTiles") as HBoxContainer
+    var gold_coin_tile := shop.get_node(
+        "ScreenContainer/WalletTiles/GoldCoinTile"
+    ) as Control
+    var diamond_tile := shop.get_node(
+        "ScreenContainer/WalletTiles/DiamondTile"
+    ) as Control
+    var ruby_tile := shop.get_node(
+        "ScreenContainer/WalletTiles/RubyTile"
+    ) as Control
+    var gold_coin_quantity := gold_coin_tile.get_node("TreasureQuantityLabel") as Label
+    var diamond_quantity := diamond_tile.get_node("TreasureQuantityLabel") as Label
+    var diamond_icon := diamond_tile.get_node("TreasureIconTexture") as TextureRect
+    var compact_surround := diamond_tile.get_node("ScaledSurround") as NinePatchRect
+    var unavailable_item_was_filtered := true
+    for row: Button in item_rows:
+        if StringName(row.get_meta(&"shop_item_id", &"")) == &"royal_coffin_lining":
+            unavailable_item_was_filtered = false
+            break
+
+    var focus_style := item_rows[0].get_theme_stylebox(&"focus") as StyleBoxFlat
+    var moth_cloak_row := item_rows[3] as Button
+    var cursed_lantern_row := item_rows[4] as Button
+    var bone_charm_row := item_rows[5] as Button
+    var stock_count_label := item_rows[0].get_node("StockCountLabel") as Label
+    var passed := _expect(
+        inventory_frame.patch_margin_left > 0,
+        "shop inventory frame preserves nine-slice corners"
+    ) and _expect(
+        shop_title.text == "SHOP",
+        "shop carries the unified screen title"
+    ) and _expect(
+        inventory_frame.axis_stretch_horizontal == NinePatchRect.AXIS_STRETCH_MODE_TILE
+            and inventory_frame.axis_stretch_vertical == NinePatchRect.AXIS_STRETCH_MODE_TILE,
+        "shop frame tiles its edge artwork instead of stretching it"
+    ) and _expect(
+        details_frame.patch_margin_right == inventory_frame.patch_margin_right,
+        "shop frames share the reusable panel surround"
+    ) and _expect(
+        inventory_frame.get_node_or_null("Content") != null
+            and details_frame.get_node_or_null("Content") != null,
+        "shop frames expose inset content areas"
+    ) and _expect(
+        not is_equal_approx(inventory_frame.size.x, details_frame.size.x),
+        "shop demonstrates that panel surrounds can be resized independently"
+    ) and _expect(
+        is_equal_approx(screen_container.scale.x, screen_container.scale.y),
+        "shop scales its reference screen uniformly"
+    ) and _expect(
+        is_equal_approx(screen_container.position.x, 320.0),
+        "shop centres its reference screen on wide viewports"
+    ) and _expect(
+        available_items.size() == 12 and item_rows.size() == 12,
+        "shop catalog supplies enough available items to exercise scrolling"
+    ) and _expect(
+        unavailable_item_was_filtered,
+        "shop filters unavailable catalog items before building the list"
+    ) and _expect(
+        focus_style != null and focus_style.border_width_left == 5 \
+            and focus_style.border_width_top == 5 \
+            and focus_style.border_width_right == 5 \
+            and focus_style.border_width_bottom == 5,
+        "shop selection uses a five-pixel focus rectangle"
+    ) and _expect(
+        item_name_label.text == "BONE CHARM",
+        "shop starts on the catalog's configured initial item"
+    ) and _expect(
+        stock_count_label.text == "x5",
+        "shop rows show their authored stock count"
+    ) and _expect(
+        not cursed_lantern_row.disabled \
+            and cursed_lantern_row.focus_mode == Control.FOCUS_ALL \
+            and cursed_lantern_row.modulate.is_equal_approx(Color(0.43, 0.43, 0.43, 1.0)),
+        "items without enough matching treasure stay grey but remain focusable"
+    ) and _expect(
+        not bone_charm_row.disabled,
+        "an item priced at the current balance remains selectable"
+    ) and _expect(
+        moth_cloak_row.get_node(moth_cloak_row.focus_neighbor_bottom) == cursed_lantern_row,
+        "joypad navigation can move onto greyed-out shop rows"
+    ) and _expect(
+        bone_charm_row.get_node(bone_charm_row.focus_neighbor_left) == back_button \
+            and bone_charm_row.get_node(bone_charm_row.focus_neighbor_right) == back_button,
+        "shop rows route left and right to the sole Level Select action"
+    ) and _expect(
+        gold_coin_quantity.text == "x60" \
+            and diamond_quantity.text == "x2" \
+            and gold_coin_tile.visible \
+            and diamond_tile.visible \
+            and not ruby_tile.visible \
+            and diamond_icon.texture.resource_path \
+            == "res://Assets/frontend/diamond-icon.png",
+        "the shop displays owned balances and hides empty resource boxes"
+    ) and _expect(
+        compact_surround.axis_stretch_horizontal == NinePatchRect.AXIS_STRETCH_MODE_TILE \
+            and compact_surround.axis_stretch_vertical == NinePatchRect.AXIS_STRETCH_MODE_TILE \
+            and compact_surround.scale.is_equal_approx(Vector2(0.5, 0.5)) \
+            and inventory_frame.position.y > diamond_tile.get_global_rect().end.y,
+        "compact balance borders tile at half scale above the shifted shop panels"
+    ) and _expect(
+        gold_coin_tile.get_global_rect().position.y >= 48.0 \
+            and bottom_actions.get_child_count() == 1 \
+            and back_button.text == "LEVEL SELECT" \
+            and back_button.size.is_equal_approx(Vector2(260.0, 72.0)),
+        "shop balances have top breathing room and Level Select is the only bottom action"
+    ) and _expect(
+        scroll.get_v_scroll_bar().max_value > scroll.get_v_scroll_bar().page,
+        "shop item placeholders extend beyond the visible scrolling area"
+    )
+
+    bone_charm_row.grab_focus()
+    var shop_first_up_flick := InputEventJoypadMotion.new()
+    shop_first_up_flick.axis = JOY_AXIS_LEFT_Y
+    shop_first_up_flick.axis_value = -1.0
+    shop._input(shop_first_up_flick)
+    var shop_partial_up_release := InputEventJoypadMotion.new()
+    shop_partial_up_release.axis = JOY_AXIS_LEFT_Y
+    shop_partial_up_release.axis_value = -0.45
+    shop._input(shop_partial_up_release)
+    var shop_second_up_flick := InputEventJoypadMotion.new()
+    shop_second_up_flick.axis = JOY_AXIS_LEFT_Y
+    shop_second_up_flick.axis_value = -0.9
+    shop._input(shop_second_up_flick)
+    var shop_up_release := InputEventJoypadMotion.new()
+    shop_up_release.axis = JOY_AXIS_LEFT_Y
+    shop_up_release.axis_value = 0.0
+    shop._input(shop_up_release)
+    passed = _expect(
+        int(shop.get("selected_item_index")) == 3 and item_name_label.text == "MOTH CLOAK",
+        "shop navigation shares partial-release analog flick handling"
+    ) and passed
+
+    cursed_lantern_row.grab_focus()
+    await process_frame
+    passed = _expect(
+        item_name_label.text == "CURSED LANTERN",
+        "selecting an unaffordable item still populates its details"
+    ) and _expect(
+        selected_item_panel.modulate.is_equal_approx(Color(0.43, 0.43, 0.43, 1.0)),
+        "unaffordable selected-item artwork and details use the grey treatment"
+    ) and passed
+
+    bone_charm_row.grab_focus()
+    await process_frame
+    passed = _expect(
+        selected_item_panel.modulate.is_equal_approx(Color.WHITE),
+        "affordable selected-item details return to full colour"
+    ) and passed
+
+    bone_charm_row.button_down.emit()
+    await process_frame
+    var bone_stock_label := bone_charm_row.get_node("StockCountLabel") as Label
+    passed = _expect(
+        level_selection.get_treasure_count(&"diamond") == 0 \
+            and level_selection.get_shop_item_purchase_count(&"bone_charm") == 1,
+        "clicking an item buys it, deducts its currency, and saves the purchase"
+    ) and _expect(
+        bone_stock_label.text == "x4" \
+            and selected_item_panel.modulate.is_equal_approx(Color(0.43, 0.43, 0.43, 1.0)),
+        "direct purchases immediately refresh remaining stock and affordability"
+    ) and _expect(
+        diamond_quantity.text == "x0" and not diamond_tile.visible,
+        "spending the final resource immediately removes its empty balance box"
+    ) and passed
+
+    level_selection.treasure_wallet.clear()
+    shop.call("_update_wallet_tiles")
+    passed = _expect(
+        not wallet_tiles.visible,
+        "the shop hides the complete balance row when every resource count is empty"
+    ) and passed
+
+    scroll.scroll_vertical = 0
+    (item_rows[item_rows.size() - 1] as Button).grab_focus()
+    await process_frame
+    var scroll_tween := scroll.get("scroll_tween") as Tween
+    passed = _expect(
+        scroll_tween != null and scroll_tween.is_running(),
+        "joypad-style focus changes start eased shop scrolling"
+    ) and passed
+    await create_timer(0.25).timeout
+    passed = _expect(
+        scroll.scroll_vertical > 0,
+        "focused shop items scroll smoothly into view"
+    ) and _expect(
+        item_name_label.text == "BLACK CANDLE",
+        "focused shop rows update the selected-item details"
+    ) and passed
+
+    shop.queue_free()
+    level_selection.treasure_wallet = original_wallet
+    level_selection.shop_purchases = original_purchases
+    level_selection.persistence_enabled = original_persistence_enabled
+    return passed
+
+
+func _test_frontend_gallery_instances_navigable_screens() -> bool:
+    var gallery := FRONTEND_GALLERY_SCENE.instantiate() as Control
+    var preview_paths := [
+        ^"TitleCard/TitleScreenPreview",
+        ^"ShopCard/ShopPreview",
+        ^"SettingsCard/SettingsPreview",
+        ^"WinCard/WinPreview",
+        ^"LoseCard/LosePreview",
+    ]
+    var all_previews_are_linked_and_scaled := true
+    for preview_path: NodePath in preview_paths:
+        var preview := gallery.get_node_or_null(preview_path) as Control
+        if preview == null or not preview.scale.is_equal_approx(Vector2(0.27, 0.27)):
+            all_previews_are_linked_and_scaled = false
+            break
+
+    var title_card := gallery.get_node("TitleCard") as Panel
+    var level_preview_viewport := gallery.get_node(
+        "LevelSelectCard/PreviewViewportContainer/PreviewViewport"
+    ) as SubViewport
+    var level_preview_container := level_preview_viewport.get_parent() as SubViewportContainer
+    var level_preview := level_preview_viewport.get_node_or_null(
+        "LevelSelectPreview"
+    ) as Control
+    var settings_card := gallery.get_node("SettingsCard") as Panel
+    var lose_card := gallery.get_node("LoseCard") as Panel
+    var win_preview := gallery.get_node("WinCard/WinPreview") as Control
+    var lose_preview := gallery.get_node("LoseCard/LosePreview") as Control
+    var win_title := win_preview.get_node("ScreenContainer/ScreenTitleLabel") as Label
+    var lose_title := lose_preview.get_node("ScreenContainer/ScreenTitleLabel") as Label
+    var win_actions := win_preview.get_node("ScreenContainer/BottomActions") as HBoxContainer
+    var lose_actions := lose_preview.get_node("ScreenContainer/BottomActions") as HBoxContainer
+    var passed := _expect(
+        all_previews_are_linked_and_scaled \
+            and level_preview != null \
+            and level_preview_viewport.size == Vector2i(1920, 1080) \
+            and not level_preview_container.stretch \
+            and level_preview_container.size.is_equal_approx(Vector2(1920, 1080)) \
+            and level_preview_container.scale.is_equal_approx(Vector2(0.27, 0.27)),
+        "frontend gallery links and consistently frames all six navigable screens"
+    ) and _expect(
+        level_preview_viewport.get_parent().clip_contents \
+            and level_preview_viewport.render_target_update_mode \
+                == SubViewport.UPDATE_ALWAYS,
+        "level-select preview is isolated so its own screen scaler cannot escape its card"
+    ) and _expect(
+        settings_card.position.y > title_card.position.y \
+            and lose_card.position.x > settings_card.position.x,
+        "frontend gallery arranges its screen previews side by side in two rows"
+    ) and _expect(
+        lose_title.text == "YOU DIED!" \
+            and lose_title.position.is_equal_approx(win_title.position) \
+            and lose_title.size.is_equal_approx(win_title.size),
+        "lose title is editor-authored at the shared result title position"
+    ) and _expect(
+        lose_actions.position.is_equal_approx(win_actions.position) \
+            and lose_actions.size.is_equal_approx(win_actions.size),
+        "lose buttons retain the shared result-screen action placement"
+    )
+    gallery.free()
+    return passed
+
+
+func _test_result_screens_and_settings_share_frontend_design() -> bool:
+    var level_selection := root.get_node_or_null("LevelSelection") as GDLevelSelection
+    var result_stats := root.get_node_or_null("ResultStats") as GDResultStats
+    var game_settings := root.get_node_or_null("GameSettings")
+    if not _expect(
+        level_selection != null and result_stats != null and game_settings != null,
+        "frontend result and settings test has its persistent services"
+    ):
+        return false
+
+    var original_results := level_selection.level_results.duplicate(true)
+    var original_wallet := level_selection.treasure_wallet.duplicate(true)
+    var original_purchases := level_selection.shop_purchases.duplicate(true)
+    var original_highlight := level_selection.last_highlighted_level_index
+    var original_persistence := level_selection.persistence_enabled
+    var original_music := float(game_settings.get("music_volume_percent"))
+    var original_sound_effects := float(game_settings.get("sound_effect_volume_percent"))
+    var original_settings_persistence := bool(game_settings.get("persistence_enabled"))
+    level_selection.persistence_enabled = false
+    level_selection.level_results = {}
+    level_selection.treasure_wallet = {}
+    level_selection.shop_purchases = {}
+    game_settings.set("persistence_enabled", false)
+
+    result_stats.begin_attempt(100)
+    result_stats.add_treasure(&"gold_coin", 1)
+    var win_screen := WIN_SCREEN_SCENE.instantiate() as GDResultScreen
+    root.add_child(win_screen)
+    await process_frame
+    var win_title := win_screen.get_node("ScreenContainer/ScreenTitleLabel") as Label
+    var win_percentage := win_screen.get_node(
+        "ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/PercentageValueLabel"
+    ) as Label
+    var win_tiles := win_screen.get_node(
+        "ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles"
+    ) as HFlowContainer
+    var win_coin_tile := win_tiles.get_node("GoldCoinTile") as Control
+    var win_coin_count := win_coin_tile.get_node(
+        "TreasureQuantityLabel"
+    ) as Label
+    var win_diamond_tile := win_tiles.get_node("DiamondTile") as Control
+    var result_frame := win_screen.get_node("ScreenContainer/ResultFrame") as NinePatchRect
+    var win_back := win_screen.get_node(
+        "ScreenContainer/BottomActions/BackButton"
+    ) as Button
+    var win_retry := win_screen.get_node(
+        "ScreenContainer/BottomActions/SecondaryButton"
+    ) as Button
+    var result_primary := InputEventJoypadButton.new()
+    result_primary.button_index = JOY_BUTTON_A
+    result_primary.pressed = true
+    var passed := _expect(
+        win_title.text == "ESCAPED THE GRAVE" \
+            and win_title.get_global_rect().end.y <= result_frame.get_global_rect().position.y \
+            and win_screen.get_node_or_null(
+                "ScreenContainer/ResultFrame/Content/OutcomeHeadingLabel"
+            ) == null \
+            and win_screen.get_node_or_null(
+                "ScreenContainer/ResultFrame/Content/OutcomeMessageLabel"
+            ) == null,
+        "the result title sits outside the surround without duplicate internal copy"
+    ) and _expect(
+        win_coin_tile.visible \
+            and win_coin_count.text == "x1" \
+            and not win_diamond_tile.visible \
+            and win_percentage.text == "1%",
+        "a coin-only win shows only the newly liberated coin tile and percentage"
+    ) and _expect(
+        win_coin_tile.custom_minimum_size.x == 340.0 \
+            and win_coin_tile.custom_minimum_size.y == 176.0,
+        "result resource tiles use the larger presentation"
+    ) and _expect(
+        result_frame.axis_stretch_horizontal == NinePatchRect.AXIS_STRETCH_MODE_TILE \
+            and result_frame.axis_stretch_vertical == NinePatchRect.AXIS_STRETCH_MODE_TILE,
+        "result screens use the shared tiled stone surround"
+    ) and _expect(
+        win_screen.get_script().get_base_script().resource_path \
+            == "res://ui/frontend/frontend_screen.gd",
+        "frontend screens inherit shared scaling and primary-input support"
+    ) and _expect(
+        win_back.text == "LEVEL SELECT" \
+            and win_back.has_focus() \
+            and win_retry.text == "RETRY" \
+            and not win_retry.has_focus(),
+        "successful results initially highlight Back while retaining Retry"
+    )
+    win_screen.size = Vector2(1280.0, 720.0)
+    win_screen.call("_sync_screen_container")
+    var win_container := win_screen.get_node("ScreenContainer") as Control
+    passed = _expect(
+        win_container.scale.is_equal_approx(Vector2(2.0 / 3.0, 2.0 / 3.0)) \
+            and win_container.position.is_equal_approx(Vector2.ZERO),
+        "win results scale their complete reference canvas to the viewport"
+    ) and _expect(
+        win_back.button_down.get_connections().size() == 1 \
+            and win_retry.button_down.get_connections().size() == 1,
+        "win result actions respond immediately to mouse and joypad button presses"
+    ) and passed
+    win_screen.call("_unhandled_input", result_primary)
+    passed = _expect(
+        win_screen.transitioning,
+        "joypad primary activates the focused Level Select action on a win"
+    ) and passed
+    win_screen.queue_free()
+    await process_frame
+
+    result_stats.begin_attempt(100)
+    result_stats.add_treasure(&"gold_coin", 1)
+    var replay_screen := WIN_SCREEN_SCENE.instantiate() as GDResultScreen
+    root.add_child(replay_screen)
+    await process_frame
+    var replay_tiles := replay_screen.get_node(
+        "ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles"
+    ) as HFlowContainer
+    passed = _expect(
+        not replay_tiles.visible,
+        "a successful replay with no additional treasure shows no resource tiles"
+    ) and passed
+    var replay_retry := replay_screen.get_node(
+        "ScreenContainer/BottomActions/SecondaryButton"
+    ) as Button
+    replay_retry.grab_focus()
+    replay_screen.call("_unhandled_input", result_primary)
+    passed = _expect(
+        replay_screen.transitioning,
+        "joypad primary activates the focused Retry action on a win"
+    ) and passed
+    replay_screen.queue_free()
+    await process_frame
+
+    result_stats.begin_attempt(100)
+    result_stats.add_treasure(&"gold_coin", 1)
+    result_stats.add_treasure(&"gold_bar", 45)
+    result_stats.add_treasure(&"diamond", 10)
+    result_stats.add_treasure(&"ruby", 9)
+    result_stats.add_treasure(&"sapphire", 5)
+    result_stats.add_treasure(&"emerald", 6)
+    result_stats.add_treasure(&"amethyst", 2)
+    var multi_loot_screen := WIN_SCREEN_SCENE.instantiate() as GDResultScreen
+    root.add_child(multi_loot_screen)
+    await process_frame
+    await process_frame
+    var multi_loot_tiles := multi_loot_screen.get_node(
+        "ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles"
+    ) as HFlowContainer
+    var multi_gold_bar := multi_loot_tiles.get_node("GoldBarTile") as Control
+    var multi_amethyst := multi_loot_tiles.get_node("AmethystTile") as Control
+    passed = _expect(
+        multi_gold_bar.visible \
+            and multi_amethyst.visible \
+            and multi_amethyst.position.y > multi_gold_bar.position.y,
+        "larger newly liberated resource tiles wrap into two centred rows"
+    ) and passed
+    multi_loot_screen.queue_free()
+    await process_frame
+
+    level_selection.level_results.erase(level_selection.get_selected_level_id())
+    result_stats.begin_attempt(0)
+    var treasure_free_win_screen := WIN_SCREEN_SCENE.instantiate() as GDResultScreen
+    root.add_child(treasure_free_win_screen)
+    await process_frame
+    var treasure_free_result := level_selection.get_level_result(
+        level_selection.selected_level_index
+    )
+    passed = _expect(
+        bool(treasure_free_result.get("escaped", false)),
+        "treasure-free levels still record a successful escape"
+    ) and passed
+    treasure_free_win_screen.queue_free()
+    await process_frame
+
+    result_stats.begin_attempt(100)
+    result_stats.add_treasure(&"ruby", 9)
+    var lose_screen := LOSE_SCREEN_SCENE.instantiate() as GDResultScreen
+    root.add_child(lose_screen)
+    await process_frame
+    var lose_title := lose_screen.get_node("ScreenContainer/ScreenTitleLabel") as Label
+    var lose_ruby_tile := lose_screen.get_node(
+        "ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/RubyTile"
+    ) as Control
+    var lose_coin_tile := lose_screen.get_node(
+        "ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/GoldCoinTile"
+    ) as Control
+    var lose_ruby_count := lose_ruby_tile.get_node("TreasureQuantityLabel") as Label
+    var lose_secondary := lose_screen.get_node(
+        "ScreenContainer/BottomActions/SecondaryButton"
+    ) as Button
+    var lose_back := lose_screen.get_node(
+        "ScreenContainer/BottomActions/BackButton"
+    ) as Button
+    passed = _expect(
+        lose_screen is GDLoseScreen \
+            and lose_screen.outcome == GDResultScreen.ResultOutcome.Lose \
+            and lose_title.text == "YOU DIED!" \
+            and lose_ruby_count.text == "x1" \
+            and lose_ruby_tile.visible \
+            and not lose_coin_tile.visible \
+            and lose_ruby_tile.modulate.r < 0.5 \
+            and lose_secondary.text == "RETRY" \
+            and lose_secondary.has_focus() \
+            and not lose_back.has_focus(),
+        "death shows the exact lost haul and initially highlights Retry"
+    ) and passed
+    lose_screen.size = Vector2(2560.0, 1080.0)
+    lose_screen.call("_sync_screen_container")
+    var lose_container := lose_screen.get_node("ScreenContainer") as Control
+    passed = _expect(
+        lose_container.scale.is_equal_approx(Vector2.ONE) \
+            and lose_container.position.is_equal_approx(Vector2(320.0, 0.0)),
+        "lose results centre their complete reference canvas on wide viewports"
+    ) and _expect(
+        lose_back.button_down.get_connections().size() == 1 \
+            and lose_secondary.button_down.get_connections().size() == 1,
+        "lose result actions respond immediately to mouse and joypad button presses"
+    ) and passed
+    lose_screen.call("_unhandled_input", result_primary)
+    passed = _expect(
+        lose_screen.transitioning,
+        "joypad primary activates the focused Retry action on a loss"
+    ) and passed
+    lose_screen.queue_free()
+    await process_frame
+
+    level_selection.level_results = {"test": {"played": true}}
+    level_selection.treasure_wallet = {"diamond": 4}
+    level_selection.shop_purchases = {"bone_charm": 1}
+    var settings_screen := SETTINGS_SCENE.instantiate() as Control
+    root.add_child(settings_screen)
+    await process_frame
+    var settings_title := settings_screen.get_node(
+        "ScreenContainer/ScreenTitleLabel"
+    ) as Label
+    var music_slider := settings_screen.get_node(
+        "ScreenContainer/SettingsFrame/Content/SettingsPanel/MusicRow/MusicContent/MusicSlider"
+    ) as HSlider
+    var sound_slider := settings_screen.get_node(
+        "ScreenContainer/SettingsFrame/Content/SettingsPanel/SoundEffectRow/SoundEffectContent/SoundEffectSlider"
+    ) as HSlider
+    var music_icon := settings_screen.get_node(
+        "ScreenContainer/SettingsFrame/Content/SettingsPanel/MusicRow/MusicContent/MusicIcon"
+    ) as TextureRect
+    var sound_icon := settings_screen.get_node(
+        "ScreenContainer/SettingsFrame/Content/SettingsPanel/SoundEffectRow/SoundEffectContent/SoundEffectIcon"
+    ) as TextureRect
+    var confirmation_frame := settings_screen.get_node(
+        "ScreenContainer/ResetConfirmationFrame"
+    ) as NinePatchRect
+    var settings_frame := settings_screen.get_node(
+        "ScreenContainer/SettingsFrame"
+    ) as NinePatchRect
+    var settings_back := settings_screen.get_node(
+        "ScreenContainer/BottomActions/BackButton"
+    ) as Button
+    var reset_button := settings_screen.get_node(
+        "ScreenContainer/SettingsFrame/Content/SettingsPanel/ResetProgressButton"
+    ) as Button
+    var confirmation_no := settings_screen.get_node(
+        "ScreenContainer/ResetConfirmationFrame/Content/ConfirmationActions/NoButton"
+    ) as Button
+    var confirmation_yes := settings_screen.get_node(
+        "ScreenContainer/ResetConfirmationFrame/Content/ConfirmationActions/YesButton"
+    ) as Button
+    var music_focus_border := settings_screen.get_node(
+        "ScreenContainer/SettingsFrame/Content/SettingsPanel/MusicRow/FocusBorder"
+    ) as Panel
+    var sound_focus_border := settings_screen.get_node(
+        "ScreenContainer/SettingsFrame/Content/SettingsPanel/SoundEffectRow/FocusBorder"
+    ) as Panel
+    var volume_focus_style := music_focus_border.get_theme_stylebox(&"panel") as StyleBoxFlat
+    var volume_track_style := music_slider.get_theme_stylebox(&"slider") as StyleBoxFlat
+    var music_was_highlighted := music_focus_border.visible
+    sound_slider.grab_focus()
+    await process_frame
+    var sound_was_highlighted := sound_focus_border.visible and not music_focus_border.visible
+    settings_screen.size = Vector2(1280.0, 720.0)
+    settings_screen.call("_sync_screen_container")
+    var settings_container := settings_screen.get_node("ScreenContainer") as Control
+    var settings_fits_viewport := settings_container.scale.is_equal_approx(
+        Vector2(2.0 / 3.0, 2.0 / 3.0)
+    ) and settings_container.position.is_equal_approx(Vector2.ZERO)
+    var joypad_primary := InputEventJoypadButton.new()
+    joypad_primary.button_index = JOY_BUTTON_A
+    joypad_primary.pressed = true
+    reset_button.grab_focus()
+    settings_screen.call("_unhandled_input", joypad_primary)
+    var confirmation_shade := settings_screen.get_node(
+        "ScreenContainer/ResetConfirmationShade"
+    ) as ColorRect
+    var confirmation_was_shown := confirmation_frame.visible \
+        and confirmation_shade.visible \
+        and confirmation_frame.z_index > confirmation_shade.z_index
+    settings_screen.call("_unhandled_input", joypad_primary)
+    var confirmation_was_cancelled := not confirmation_frame.visible
+    reset_button.grab_focus()
+    settings_screen.call("_unhandled_input", joypad_primary)
+    confirmation_yes.grab_focus()
+    settings_screen.call("_unhandled_input", joypad_primary)
+    passed = _expect(
+        settings_title.text == "SETTINGS" \
+            and music_slider != null and sound_slider != null \
+            and AudioServer.get_bus_index(&"Music") >= 0 \
+            and AudioServer.get_bus_index(&"SFX") >= 0,
+        "settings provides separate persistent music and sound-effect controls"
+    ) and _expect(
+        volume_track_style != null \
+            and volume_track_style.content_margin_top == 20.0 \
+            and volume_track_style.content_margin_bottom == 20.0 \
+            and music_slider.size_flags_vertical == Control.SIZE_SHRINK_CENTER \
+            and sound_slider.size_flags_vertical == Control.SIZE_SHRINK_CENTER \
+            and is_equal_approx(
+                music_slider.get_global_rect().get_center().y,
+                music_icon.get_global_rect().get_center().y
+            ) \
+            and is_equal_approx(
+                sound_slider.get_global_rect().get_center().y,
+                sound_icon.get_global_rect().get_center().y
+            ),
+        "volume sliders use double-thickness tracks centred beside their icons and labels"
+    ) and _expect(
+        settings_frame.size.x >= 1000.0 \
+            and settings_back.visible \
+            and settings_back.get_global_rect().position.y \
+                >= settings_frame.get_global_rect().end.y,
+        "settings uses a substantial surround with a clear external Back action"
+    ) and _expect(
+        settings_fits_viewport \
+            and reset_button.button_down.get_connections().size() == 1 \
+            and settings_back.button_down.get_connections().size() == 1 \
+            and GDSettingsScreen.LEVEL_SELECT_SCENE_PATH \
+                == "res://ui/screens/level_select_screen.tscn" \
+            and LEVEL_SELECT_SCENE.can_instantiate(),
+        "settings fills the viewport and wires its Reset Progress and Back actions"
+    ) and _expect(
+        music_was_highlighted \
+            and sound_was_highlighted \
+            and volume_focus_style != null \
+            and volume_focus_style.border_width_left == 5 \
+            and volume_focus_style.border_color == Color(1, 0.86, 0.08, 1),
+        "music and sound controls share the reset button's yellow focus treatment"
+    ) and _expect(
+        confirmation_was_shown \
+            and confirmation_was_cancelled \
+            and not confirmation_frame.visible \
+            and level_selection.level_results.is_empty() \
+            and level_selection.treasure_wallet.is_empty() \
+            and level_selection.shop_purchases.is_empty(),
+        "styled confirmation guards a complete progress reset " \
+            + "(shown=%s, cancelled=%s, results=%s, wallet=%s, purchases=%s)" % [
+                confirmation_was_shown,
+                confirmation_was_cancelled,
+                level_selection.level_results.is_empty(),
+                level_selection.treasure_wallet.is_empty(),
+                level_selection.shop_purchases.is_empty(),
+            ]
+    ) and passed
+    settings_screen.queue_free()
+
+    level_selection.level_results = original_results
+    level_selection.treasure_wallet = original_wallet
+    level_selection.shop_purchases = original_purchases
+    level_selection.last_highlighted_level_index = original_highlight
+    level_selection.persistence_enabled = original_persistence
+    game_settings.set("persistence_enabled", false)
+    game_settings.call("set_music_volume_percent", original_music)
+    game_settings.call("set_sound_effect_volume_percent", original_sound_effects)
+    game_settings.set("persistence_enabled", original_settings_persistence)
+
+    await process_frame
+    var navigation_settings := SETTINGS_SCENE.instantiate() as GDSettingsScreen
+    root.add_child(navigation_settings)
+    current_scene = navigation_settings
+    await process_frame
+    var navigation_back := navigation_settings.get_node(
+        "ScreenContainer/BottomActions/BackButton"
+    ) as Button
+    navigation_back.grab_focus()
+    navigation_settings.call("_unhandled_input", joypad_primary)
+    await process_frame
+    await process_frame
+    var returned_to_level_select := current_scene is GDLevelSelectScreen
+    passed = _expect(
+        returned_to_level_select,
+        "settings Back performs a real transition to the level-select scene"
+    ) and passed
+    if current_scene != null:
+        var loaded_scene := current_scene
+        current_scene = null
+        loaded_scene.queue_free()
+        await process_frame
+    return passed
+
+
 func _test_skeleton_facing_is_driven_by_movement() -> bool:
     var skeleton := SKELETON_SCENE.instantiate()
     root.add_child(skeleton)
@@ -2143,6 +3540,84 @@ func _test_skeleton_facing_is_driven_by_movement() -> bool:
         and _expect(is_equal_approx(pivot.rotation.y, PI / 2.0), "skeleton visual faces rightward patrol movement")
 
     skeleton.queue_free()
+    return passed
+
+
+func _test_ground_enemies_fall_before_moving() -> bool:
+    var floor_body := StaticBody3D.new()
+    floor_body.collision_layer = 1
+    var floor_shape := CollisionShape3D.new()
+    var floor_box := BoxShape3D.new()
+    floor_box.size = Vector3(12.0, 0.2, 12.0)
+    floor_shape.shape = floor_box
+    floor_shape.position.y = -0.1
+    floor_body.add_child(floor_shape)
+    root.add_child(floor_body)
+
+    var skeleton := SKELETON_SCENE.instantiate()
+    skeleton.position = Vector3(0.0, 2.0, 0.0)
+    root.add_child(skeleton)
+
+    var zombie := ZOMBIE_SCENE.instantiate()
+    zombie.position = Vector3(3.0, 2.0, 0.0)
+    root.add_child(zombie)
+    var zombie_body := zombie.get_node("ZombieBody") as CharacterBody3D
+
+    var low_skeleton := SKELETON_SCENE.instantiate()
+    low_skeleton.position = Vector3(-2.0, -0.08, 0.0)
+    root.add_child(low_skeleton)
+
+    var low_zombie := ZOMBIE_SCENE.instantiate()
+    low_zombie.position = Vector3(2.0, -0.08, 2.0)
+    root.add_child(low_zombie)
+    var low_zombie_body := low_zombie.get_node("ZombieBody") as CharacterBody3D
+
+    await physics_frame
+    var airborne_enemies_remained_above_floor: bool = skeleton.global_position.y > 1.0 \
+        and zombie_body.global_position.y > 1.0
+    for frame_index in range(3):
+        await physics_frame
+    var low_skeleton_shifted_up: bool = bool(low_skeleton.get("has_landed")) \
+        and low_skeleton.get_node("PathFollow3D").global_position.y >= -0.001
+    var low_zombie_shifted_up := low_zombie_body.global_position.y >= -0.001
+    var skeleton_start_x := float(skeleton.global_position.x)
+    var zombie_start_x := float(zombie_body.global_position.x)
+    for frame_index in range(10):
+        await physics_frame
+
+    var stayed_on_patrol_start_while_falling := (
+        is_equal_approx(skeleton.global_position.x, skeleton_start_x)
+        and is_equal_approx(zombie_body.global_position.x, zombie_start_x)
+    )
+
+    for frame_index in range(80):
+        await physics_frame
+
+    var passed := _expect(
+        airborne_enemies_remained_above_floor,
+        "ground enemies spawned in the air are not snapped down to the floor"
+    ) and _expect(
+        low_skeleton_shifted_up,
+        "skeletons spawned slightly below the floor are shifted up before falling"
+    ) and _expect(
+        low_zombie_shifted_up,
+        "zombies spawned slightly below the floor are shifted up before falling"
+    ) and _expect(
+        stayed_on_patrol_start_while_falling,
+        "ground enemies do not follow their patrol while falling"
+    ) and _expect(
+        bool(skeleton.get("has_landed")) and absf(skeleton.global_position.y) <= 0.01,
+        "a skeleton placed in mid-air falls to the floor before patrolling"
+    ) and _expect(
+        zombie_body.is_on_floor() and absf(zombie_body.global_position.y) <= 0.02,
+        "a zombie placed in mid-air falls to the floor even while its AI is waiting"
+    )
+
+    skeleton.queue_free()
+    zombie.queue_free()
+    low_skeleton.queue_free()
+    low_zombie.queue_free()
+    floor_body.queue_free()
     return passed
 
 

@@ -38,6 +38,7 @@ script = ExtResource("5_preview")
 stream = ExtResource("3_music")
 volume_db = -6.0
 autoplay = true
+bus = &"Music"
 
 [node name="ElapsedTimeHud" type="CanvasLayer" parent="." unique_id=351507658]
 script = ExtResource("9_elapsed")

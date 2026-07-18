@@ -11,7 +11,10 @@ uniform float glint_energy : hint_range(0.0, 5.0, 0.05) = 1.8;
 
 
 void fragment() {
-    vec3 facet_normal = normalize(NORMAL);
+    vec3 facet_normal = normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));
+    if (dot(facet_normal, NORMAL) < 0.0) {
+        facet_normal = -facet_normal;
+    }
     vec3 view_direction = normalize(VIEW);
     vec3 key_direction = normalize(vec3(-0.45, 0.72, 0.53));
     vec3 glint_direction = normalize(vec3(0.35, 0.55, 0.76));

@@ -26,6 +26,7 @@ script = ExtResource("1_passage")
 key_requirement = 1
 
 [node name="UnlockAudioPlayer" type="AudioStreamPlayer3D" parent="."]
+bus = &"SFX"
 stream = ExtResource("5_unlock_sound")
 
 [node name="Leaves" type="Node3D" parent="." unique_id=1571038465]

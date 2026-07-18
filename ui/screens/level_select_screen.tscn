@@ -1,120 +1,55 @@
-[gd_scene format=3 uid="uid://pmuofl7veu10"]
+[gd_scene load_steps=18 format=3 uid="uid://pmuofl7veu10"]
 
 [ext_resource type="Script" uid="uid://todmlhvnf50e" path="res://ui/screens/level_select_screen.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://ba0bqdkt340fe" path="res://Assets/frontend/level-select.png" id="2_texture"]
-[ext_resource type="Texture2D" uid="uid://7wrf3dj6qtlq" path="res://Assets/frontend/level-background.png" id="3_card_texture"]
-[ext_resource type="FontFile" uid="uid://ipq4de64yjtd" path="res://Assets/fonts/Almendra-Bold.ttf" id="4_almendra_bold"]
+[ext_resource type="PackedScene" path="res://ui/frontend/panel_surround.tscn" id="2_surround"]
+[ext_resource type="Texture2D" uid="uid://2yw0g8aeqvrx" path="res://Assets/frontend/content-separator.png" id="3_separator"]
+[ext_resource type="Script" path="res://ui/frontend/focus_scroll_list.gd" id="4_focus_list"]
+[ext_resource type="PackedScene" path="res://ui/frontend/treasure_balance_tile.tscn" id="5_loot_tile"]
+[ext_resource type="Texture2D" uid="uid://g6a4r1w15uo2" path="res://Assets/frontend/coin-icon.png" id="6_coin_source"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/gold-bar-icon.png" id="7_gold_bar"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/diamond-icon.png" id="8_diamond"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/ruby-icon.png" id="9_ruby"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/sapphire-icon.png" id="10_sapphire"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/emerald-icon.png" id="11_emerald"]
+[ext_resource type="Texture2D" path="res://Assets/frontend/amethyst-icon.png" id="12_amethyst"]
+[ext_resource type="Theme" path="res://ui/frontend/frontend_theme.tres" id="13_theme"]
+[ext_resource type="Texture2D" uid="uid://ba0bqdkt340fe" path="res://Assets/frontend/level-select.png" id="14_background"]
+[ext_resource type="Script" path="res://ui/screens/level_run_playback.gd" id="15_playback"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frame"]
-bg_color = Color(0.035, 0.027, 0.027, 0.93)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.66, 0.48, 0.22, 0.78)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-shadow_color = Color(0, 0, 0, 0.72)
-shadow_size = 28
-shadow_offset = Vector2(0, 12)
+[sub_resource type="AtlasTexture" id="CoinAtlas"]
+atlas = ExtResource("6_coin_source")
+region = Rect2(1400, 449, 55, 55)
+filter_clip = true
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scroll"]
-bg_color = Color(0.015, 0.012, 0.014, 0.7)
+[sub_resource type="StyleBoxFlat" id="ScrollStyle"]
+bg_color = Color(0.008, 0.01, 0.014, 0.76)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.52, 0.39, 0.21, 0.38)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_normal"]
-bg_color = Color(0.075, 0.065, 0.065, 0.94)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.62, 0.46, 0.22, 0.7)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-shadow_color = Color(0, 0, 0, 0.44)
-shadow_size = 10
-shadow_offset = Vector2(0, 5)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_pressed"]
-bg_color = Color(0.24, 0.15, 0.065, 0.99)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 0.88, 0.42, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-shadow_color = Color(0, 0, 0, 0.4)
-shadow_size = 8
-shadow_offset = Vector2(0, 3)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_hover"]
-bg_color = Color(0.17, 0.125, 0.08, 0.98)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 0.76, 0.25, 0.9)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-shadow_color = Color(0, 0, 0, 0.42)
-shadow_size = 12
-shadow_offset = Vector2(0, 5)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_disabled"]
-bg_color = Color(0.035, 0.033, 0.035, 0.78)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.35, 0.32, 0.28, 0.38)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_focus"]
-bg_color = Color(0.21, 0.145, 0.07, 0.4)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(1, 0.87, 0.42, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-shadow_color = Color(1, 0.58, 0.12, 0.2)
-shadow_size = 14
-shadow_offset = Vector2(0, 3)
+border_color = Color(0.24, 0.26, 0.27, 0.62)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [node name="LevelSelectScreen" type="Control" unique_id=1744003434]
+editor_description = "Level selection uses the same two-panel 1920x1080 presentation as the shop. The selected tomb's liberated loot is shown in the right panel."
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("13_theme")
 script = ExtResource("1_script")
-background_texture = ExtResource("2_texture")
 
-[node name="Background" type="TextureRect" parent="." unique_id=773270236]
+[node name="ScreenContainer" type="Control" parent="."]
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="Background" type="TextureRect" parent="ScreenContainer"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -122,11 +57,11 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("2_texture")
+texture = ExtResource("14_background")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Shade" type="ColorRect" parent="." unique_id=981206661]
+[node name="Shade" type="ColorRect" parent="ScreenContainer"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -134,154 +69,298 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.015, 0.01, 0.015, 0.58)
+color = Color(0.015, 0.01, 0.015, 0.68)
 
-[node name="LevelSelectFrame" type="PanelContainer" parent="." unique_id=929869806]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -940.0
-offset_top = -520.0
-offset_right = 940.0
-offset_bottom = 520.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_frame")
-
-[node name="Margin" type="MarginContainer" parent="LevelSelectFrame" unique_id=1033775950]
-layout_mode = 2
-theme_override_constants/margin_left = 38
-theme_override_constants/margin_top = 28
-theme_override_constants/margin_right = 38
-theme_override_constants/margin_bottom = 22
-
-[node name="LevelSelectPanel" type="VBoxContainer" parent="LevelSelectFrame/Margin" unique_id=421454747]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="Header" type="VBoxContainer" parent="LevelSelectFrame/Margin/LevelSelectPanel" unique_id=2146098723]
-layout_mode = 2
-theme_override_constants/separation = -4
-
-[node name="Title" type="Label" parent="LevelSelectFrame/Margin/LevelSelectPanel/Header" unique_id=1487271135]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.84, 0.34, 1)
+[node name="ScreenTitleLabel" type="Label" parent="ScreenContainer"]
+offset_left = 220.0
+offset_top = 8.0
+offset_right = 1700.0
+offset_bottom = 72.0
+theme_override_colors/font_color = Color(0.59, 0.4, 0.72, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
 theme_override_constants/shadow_offset_x = 3
 theme_override_constants/shadow_offset_y = 3
-theme_override_fonts/font = ExtResource("4_almendra_bold")
-theme_override_font_sizes/font_size = 76
+theme_override_font_sizes/font_size = 56
 text = "CHOOSE YOUR TOMB"
 horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="Accent" type="ColorRect" parent="LevelSelectFrame/Margin/LevelSelectPanel" unique_id=1111507151]
-custom_minimum_size = Vector2(0, 2)
-layout_mode = 2
+[node name="ScreenTitleSeparator" type="TextureRect" parent="ScreenContainer"]
+offset_left = 777.0
+offset_top = 70.0
+offset_right = 1143.0
+offset_bottom = 79.0
 mouse_filter = 2
-color = Color(0.7, 0.5, 0.2, 0.58)
+texture = ExtResource("3_separator")
 
-[node name="LevelScroll" type="ScrollContainer" parent="LevelSelectFrame/Margin/LevelSelectPanel" unique_id=1196102514]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_scroll")
-scroll_vertical_custom_step = 384.0
-horizontal_scroll_mode = 0
+[node name="LevelListFrame" parent="ScreenContainer" instance=ExtResource("2_surround")]
+editor_description = "Scrollable tomb list matching the shop inventory frame."
+offset_left = 64.0
+offset_top = 104.0
+offset_right = 820.0
+offset_bottom = 906.0
 
-[node name="GridMargin" type="MarginContainer" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll" unique_id=722211005]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 24
+[node name="TombListHeadingLabel" type="Label" parent="ScreenContainer/LevelListFrame/Content"]
+offset_right = 596.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.59, 0.4, 0.72, 1)
+theme_override_colors/font_outline_color = Color(0.035, 0.02, 0.05, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 34
+text = "TOMBS"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="LevelGrid" type="GridContainer" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll/GridMargin" unique_id=1831174116]
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_constants/h_separation = 24
-theme_override_constants/v_separation = 24
-columns = 3
+[node name="TombListSeparator" type="TextureRect" parent="ScreenContainer/LevelListFrame/Content"]
+offset_left = 115.0
+offset_top = 49.0
+offset_right = 481.0
+offset_bottom = 58.0
+mouse_filter = 2
+texture = ExtResource("3_separator")
 
-[node name="LevelButtonTemplate" type="Button" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll/GridMargin/LevelGrid" unique_id=1842819667]
-custom_minimum_size = Vector2(550, 360)
-layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_level_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_level_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_level_hover")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_level_disabled")
-theme_override_styles/focus = SubResource("StyleBoxFlat_level_focus")
-
-[node name="CardBackground" type="TextureRect" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll/GridMargin/LevelGrid/LevelButtonTemplate" unique_id=1612761150]
-modulate = Color(0.72, 0.72, 0.72, 1)
+[node name="LevelScroll" type="ScrollContainer" parent="ScreenContainer/LevelListFrame/Content"]
+editor_description = "Scrollable viewport for tomb rows. Focus changes are eased into view by the shared frontend list controller."
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 6.0
-offset_top = 6.0
-offset_right = -6.0
-offset_bottom = -6.0
+offset_top = 64.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("ScrollStyle")
+scroll_vertical_custom_step = 104.0
+horizontal_scroll_mode = 0
+follow_focus = false
+script = ExtResource("4_focus_list")
+focus_scroll_margin = 12.0
+focus_scroll_duration = 0.16
+
+[node name="ListMargin" type="MarginContainer" parent="ScreenContainer/LevelListFrame/Content/LevelScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
+
+[node name="LevelList" type="VBoxContainer" parent="ScreenContainer/LevelListFrame/Content/LevelScroll/ListMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="LootFrame" parent="ScreenContainer" instance=ExtResource("2_surround")]
+editor_description = "Selected tomb summary. The last run plays behind saved loot details without blocking frontend loading."
+offset_left = 850.0
+offset_top = 104.0
+offset_right = 1856.0
+offset_bottom = 906.0
+
+[node name="LevelRunPlayback" type="SubViewportContainer" parent="ScreenContainer/LootFrame/Content"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("3_card_texture")
-expand_mode = 1
-stretch_mode = 6
+modulate = Color(1, 1, 1, 0.65)
+stretch = true
+stretch_shrink = 2
+script = ExtResource("15_playback")
 
-[node name="Title" type="Label" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll/GridMargin/LevelGrid/LevelButtonTemplate" unique_id=2115129994]
-layout_mode = 0
-offset_left = 19.0
-offset_top = 46.0
-offset_right = 521.0
-offset_bottom = 123.0
-theme_override_colors/font_color = Color(1, 0.86, 0.35, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
-theme_override_constants/shadow_offset_x = 2
-theme_override_constants/shadow_offset_y = 2
-theme_override_fonts/font = ExtResource("4_almendra_bold")
-theme_override_font_sizes/font_size = 56
-text = "Level Name"
+[node name="PlaybackViewport" type="SubViewport" parent="ScreenContainer/LootFrame/Content/LevelRunPlayback"]
+size = Vector2i(846, 642)
+handle_input_locally = false
+render_target_update_mode = 0
+
+[node name="DetailsShade" type="ColorRect" parent="ScreenContainer/LootFrame/Content"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.012, 0.008, 0.016, 0.32)
+
+[node name="SelectedTombPanel" type="Control" parent="ScreenContainer/LootFrame/Content"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="SelectedTombNameLabel" type="Label" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel"]
+offset_right = 846.0
+offset_bottom = 66.0
+theme_override_colors/font_color = Color(0.48, 0.72, 0.29, 1)
+theme_override_colors/font_outline_color = Color(0.008, 0.012, 0.008, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 48
+text = "LEVEL 1"
 horizontal_alignment = 1
-max_lines_visible = 2
+vertical_alignment = 1
+text_overrun_behavior = 3
 
-[node name="LevelStatus" type="Label" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll/GridMargin/LevelGrid/LevelButtonTemplate" unique_id=126792022]
-layout_mode = 0
-offset_left = 23.0
-offset_top = 110.0
-offset_right = 525.0
-offset_bottom = 149.0
-theme_override_colors/font_color = Color(0.58, 0.86, 0.82, 1)
-theme_override_fonts/font = ExtResource("4_almendra_bold")
-theme_override_font_sizes/font_size = 28
-text = "TUTORIAL"
+[node name="SelectedTombSeparator" type="TextureRect" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel"]
+offset_left = 240.0
+offset_top = 70.0
+offset_right = 606.0
+offset_bottom = 79.0
+mouse_filter = 2
+texture = ExtResource("3_separator")
+
+[node name="SelectedTombStatusLabel" type="Label" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel"]
+offset_top = 84.0
+offset_right = 846.0
+offset_bottom = 126.0
+theme_override_colors/font_color = Color(0.9, 0.84, 0.7, 1)
+theme_override_font_sizes/font_size = 25
+text = "UNPLAYED  •  0 PLAYS"
 horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="Percentage" type="Label" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll/GridMargin/LevelGrid/LevelButtonTemplate" unique_id=846358815]
-layout_mode = 0
-offset_left = 22.0
-offset_top = 158.0
-offset_right = 524.0
-offset_bottom = 257.0
-theme_override_colors/font_color = Color(1, 0.82, 0.3, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
-theme_override_constants/shadow_offset_x = 2
-theme_override_constants/shadow_offset_y = 2
-theme_override_fonts/font = ExtResource("4_almendra_bold")
-theme_override_font_sizes/font_size = 72
-text = "100%"
+[node name="LiberatedLootHeadingLabel" type="Label" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel"]
+offset_top = 142.0
+offset_right = 846.0
+offset_bottom = 192.0
+theme_override_colors/font_color = Color(0.59, 0.4, 0.72, 1)
+theme_override_colors/font_outline_color = Color(0.035, 0.02, 0.05, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 34
+text = "LIBERATED LOOT"
 horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="Plays" type="Label" parent="LevelSelectFrame/Margin/LevelSelectPanel/LevelScroll/GridMargin/LevelGrid/LevelButtonTemplate" unique_id=1990337750]
-layout_mode = 0
-offset_left = 217.0
-offset_top = 273.0
-offset_right = 467.0
-offset_bottom = 309.0
-theme_override_colors/font_color = Color(0.7, 0.66, 0.58, 1)
-theme_override_fonts/font = ExtResource("4_almendra_bold")
-theme_override_font_sizes/font_size = 26
-text = "0 PLAYS"
-horizontal_alignment = 2
+[node name="LootTiles" type="GridContainer" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel"]
+offset_left = 87.0
+offset_top = 204.0
+offset_right = 759.0
+offset_bottom = 528.0
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 6
+columns = 3
+
+[node name="GoldCoinTile" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles" instance=ExtResource("5_loot_tile")]
+metadata/treasure_type = &"gold_coin"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/GoldCoinTile" index="1"]
+texture = SubResource("CoinAtlas")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/GoldCoinTile" index="2"]
+text = "GOLD COINS"
+
+[node name="GoldBarTile" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles" instance=ExtResource("5_loot_tile")]
+metadata/treasure_type = &"gold_bar"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/GoldBarTile" index="1"]
+texture = ExtResource("7_gold_bar")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/GoldBarTile" index="2"]
+text = "GOLD BARS"
+
+[node name="DiamondTile" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles" instance=ExtResource("5_loot_tile")]
+metadata/treasure_type = &"diamond"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/DiamondTile" index="1"]
+texture = ExtResource("8_diamond")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/DiamondTile" index="2"]
+text = "DIAMONDS"
+
+[node name="RubyTile" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles" instance=ExtResource("5_loot_tile")]
+metadata/treasure_type = &"ruby"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/RubyTile" index="1"]
+texture = ExtResource("9_ruby")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/RubyTile" index="2"]
+text = "RUBIES"
+
+[node name="SapphireTile" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles" instance=ExtResource("5_loot_tile")]
+metadata/treasure_type = &"sapphire"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/SapphireTile" index="1"]
+texture = ExtResource("10_sapphire")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/SapphireTile" index="2"]
+text = "SAPPHIRES"
+
+[node name="EmeraldTile" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles" instance=ExtResource("5_loot_tile")]
+metadata/treasure_type = &"emerald"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/EmeraldTile" index="1"]
+texture = ExtResource("11_emerald")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/EmeraldTile" index="2"]
+text = "EMERALDS"
+
+[node name="AmethystTile" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles" instance=ExtResource("5_loot_tile")]
+metadata/treasure_type = &"amethyst"
+
+[node name="TreasureIconTexture" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/AmethystTile" index="1"]
+texture = ExtResource("12_amethyst")
+
+[node name="TreasureNameLabel" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/AmethystTile" index="2"]
+text = "AMETHYSTS"
+
+[node name="LootSummarySeparator" type="TextureRect" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel"]
+offset_left = 240.0
+offset_top = 544.0
+offset_right = 606.0
+offset_bottom = 553.0
+mouse_filter = 2
+texture = ExtResource("3_separator")
+
+[node name="LiberatedSummaryLabel" type="Label" parent="ScreenContainer/LootFrame/Content/SelectedTombPanel"]
+offset_top = 566.0
+offset_right = 846.0
+offset_bottom = 620.0
+theme_override_colors/font_color = Color(0.95, 0.8, 0.31, 1)
+theme_override_font_sizes/font_size = 30
+text = "NO TREASURE LIBERATED YET"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BottomActions" type="HBoxContainer" parent="ScreenContainer"]
+offset_left = 84.0
+offset_top = 936.0
+offset_right = 1836.0
+offset_bottom = 1008.0
+theme_override_constants/separation = 24
+alignment = 1
+editor_description = "Shared compact action area outside both surrounds, matching the shop."
+
+[node name="BackButton" type="Button" parent="ScreenContainer/BottomActions"]
+custom_minimum_size = Vector2(260, 72)
+layout_mode = 2
+focus_mode = 2
+mouse_default_cursor_shape = 2
+text = "BACK"
+
+[node name="SettingsButton" type="Button" parent="ScreenContainer/BottomActions"]
+custom_minimum_size = Vector2(260, 72)
+layout_mode = 2
+focus_mode = 2
+mouse_default_cursor_shape = 2
+text = "SETTINGS"
+
+[node name="ShopButton" type="Button" parent="ScreenContainer/BottomActions"]
+custom_minimum_size = Vector2(260, 72)
+layout_mode = 2
+focus_mode = 2
+mouse_default_cursor_shape = 2
+text = "SHOP"
+
+[editable path="ScreenContainer/LevelListFrame"]
+[editable path="ScreenContainer/LootFrame"]
+[editable path="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/GoldCoinTile"]
+[editable path="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/GoldBarTile"]
+[editable path="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/DiamondTile"]
+[editable path="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/RubyTile"]
+[editable path="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/SapphireTile"]
+[editable path="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/EmeraldTile"]
+[editable path="ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles/AmethystTile"]

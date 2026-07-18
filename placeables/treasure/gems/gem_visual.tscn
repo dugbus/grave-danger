@@ -1,11 +1,100 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=10 format=3]
 
-[ext_resource type="PackedScene" uid="uid://bddflwk42x3lp" path="res://Assets/placeables/treasure/gems/diamond.glb" id="1_model"]
-[ext_resource type="Script" path="res://placeables/treasure/gems/gem_visual.gd" id="2_script"]
-[ext_resource type="Material" path="res://placeables/treasure/gems/diamond_material.tres" id="3_material"]
+[ext_resource type="Script" path="res://placeables/treasure/gems/gem_visual.gd" id="1_script"]
+[ext_resource type="Material" path="res://placeables/treasure/gems/diamond_material.tres" id="2_material"]
+
+[sub_resource type="CylinderMesh" id="DiamondPavilionMesh"]
+top_radius = 0.12
+bottom_radius = 0.0
+height = 0.085
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="DiamondCrownMesh"]
+top_radius = 0.073
+bottom_radius = 0.12
+height = 0.052
+radial_segments = 8
+rings = 1
+
+[sub_resource type="SphereMesh" id="RubyBodyMesh"]
+radius = 0.11
+height = 0.17
+radial_segments = 6
+rings = 3
+
+[sub_resource type="SphereMesh" id="SapphireBodyMesh"]
+radius = 0.11
+height = 0.15
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CylinderMesh" id="EmeraldPavilionMesh"]
+top_radius = 0.115
+bottom_radius = 0.087
+height = 0.052
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="EmeraldCrownMesh"]
+top_radius = 0.088
+bottom_radius = 0.115
+height = 0.055
+radial_segments = 8
+rings = 1
+
+[sub_resource type="BoxMesh" id="EmeraldTableMesh"]
+size = Vector3(0.115, 0.012, 0.115)
 
 [node name="GemVisual" type="Node3D"]
-script = ExtResource("2_script")
-gem_material = ExtResource("3_material")
+script = ExtResource("1_script")
+gem_material = ExtResource("2_material")
 
-[node name="GemModel" parent="." instance=ExtResource("1_model")]
+[node name="DiamondCut" type="Node3D" parent="."]
+editor_description = "Eight-sided brilliant cut matching the diamond icon, constructed from a pointed pavilion and broad crown."
+
+[node name="Pavilion" type="MeshInstance3D" parent="DiamondCut"]
+position = Vector3(0, 0.0425, 0)
+mesh = SubResource("DiamondPavilionMesh")
+
+[node name="Crown" type="MeshInstance3D" parent="DiamondCut"]
+position = Vector3(0, 0.111, 0)
+mesh = SubResource("DiamondCrownMesh")
+
+[node name="RubyCut" type="Node3D" parent="."]
+visible = false
+rotation = Vector3(0.12, 0.18, -0.08)
+scale = Vector3(0.82, 1, 1.08)
+editor_description = "Asymmetric six-sided crystal cut matching the elongated ruby icon. Amethyst temporarily shares this cut."
+
+[node name="FacetedBody" type="MeshInstance3D" parent="RubyCut"]
+position = Vector3(0, 0.085, 0)
+mesh = SubResource("RubyBodyMesh")
+
+[node name="SapphireCut" type="Node3D" parent="."]
+visible = false
+rotation = Vector3(0.04, -0.16, 0.08)
+scale = Vector3(1.12, 1, 0.84)
+editor_description = "Low-poly oval cut matching the rounded sapphire icon."
+
+[node name="FacetedBody" type="MeshInstance3D" parent="SapphireCut"]
+position = Vector3(0, 0.075, 0)
+mesh = SubResource("SapphireBodyMesh")
+
+[node name="EmeraldCut" type="Node3D" parent="."]
+visible = false
+rotation = Vector3(0.05, 0.392699, -0.04)
+scale = Vector3(0.72, 1, 1.14)
+editor_description = "Elongated octagonal step cut matching the emerald icon."
+
+[node name="Pavilion" type="MeshInstance3D" parent="EmeraldCut"]
+position = Vector3(0, 0.026, 0)
+mesh = SubResource("EmeraldPavilionMesh")
+
+[node name="Crown" type="MeshInstance3D" parent="EmeraldCut"]
+position = Vector3(0, 0.0795, 0)
+mesh = SubResource("EmeraldCrownMesh")
+
+[node name="Table" type="MeshInstance3D" parent="EmeraldCut"]
+position = Vector3(0, 0.113, 0)
+mesh = SubResource("EmeraldTableMesh")

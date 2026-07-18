@@ -1,0 +1,273 @@
+[gd_resource type="Resource" script_class="GDShopCatalog" format=3 uid="uid://dfg2medfrbaxh"]
+
+[ext_resource type="Script" uid="uid://qpi6vmlshavw" path="res://ui/frontend/shop_catalog.gd" id="1_catalog"]
+[ext_resource type="Script" uid="uid://bpxrj84kvk3hu" path="res://ui/frontend/shop_item_definition.gd" id="2_item"]
+[ext_resource type="Script" uid="uid://chkh8qycjedcs" path="res://ui/frontend/shop_stat_modifier.gd" id="3_modifier"]
+[ext_resource type="Texture2D" uid="uid://dlflkaldftomu" path="res://Assets/frontend/shop-item-bone-knife.png" id="4_placeholder_art"]
+[ext_resource type="Texture2D" uid="uid://g2wvncjt8bck" path="res://Assets/frontend/strength-icon.png" id="5_strength_icon"]
+[ext_resource type="Texture2D" uid="uid://ok1rvje8ysg5" path="res://Assets/frontend/health-icon.png" id="6_health_icon"]
+[ext_resource type="Texture2D" uid="uid://q7vfqk2mpb32" path="res://Assets/frontend/diamond-icon.png" id="7_diamond_icon"]
+[ext_resource type="Texture2D" uid="uid://1kg1ng1x7kk8" path="res://Assets/frontend/ruby-icon.png" id="8_ruby_icon"]
+[ext_resource type="Texture2D" uid="uid://b2sui7un6ukb4" path="res://Assets/frontend/sapphire-icon.png" id="9_sapphire_icon"]
+[ext_resource type="Texture2D" uid="uid://cumchsyopcvdv" path="res://Assets/frontend/emerald-icon.png" id="10_emerald_icon"]
+[ext_resource type="Texture2D" uid="uid://buk7tvegqood0" path="res://Assets/frontend/amethyst-icon.png" id="11_amethyst_icon"]
+[ext_resource type="Texture2D" uid="uid://by01ttd275cja" path="res://Assets/frontend/gold-bar-icon.png" id="12_gold_bar_icon"]
+
+[sub_resource type="Resource" id="ShopStatModifier_strength_plus_one"]
+script = ExtResource("3_modifier")
+icon = ExtResource("5_strength_icon")
+
+[sub_resource type="Resource" id="ShopItem_rusty_shovel_edge"]
+script = ExtResource("2_item")
+item_id = &"rusty_shovel_edge"
+display_name = "Rusty Shovel Edge"
+description = "A chipped iron edge that makes every shovel strike hit harder."
+price = 75
+icon = ExtResource("4_placeholder_art")
+detail_texture = ExtResource("4_placeholder_art")
+stat_modifiers = Array[ExtResource("3_modifier")]([SubResource("ShopStatModifier_strength_plus_one")])
+
+[sub_resource type="Resource" id="ShopStatModifier_health_plus_two"]
+script = ExtResource("3_modifier")
+display_name = "HEALTH"
+value_text = "+2"
+icon = ExtResource("6_health_icon")
+display_color = Color(0.36, 0.9, 0.29, 1)
+
+[sub_resource type="Resource" id="ShopItem_coffin_padding"]
+script = ExtResource("2_item")
+item_id = &"coffin_padding"
+display_name = "Coffin Padding"
+list_summary_bbcode = "[color=#70bf45]+2 Health[/color]"
+description = "Comfortable crypt padding that helps the gravedigger survive two extra blows."
+price = 5
+payment_treasure_type = &"amethyst"
+payment_treasure_name = "AMETHYSTS"
+payment_icon = ExtResource("11_amethyst_icon")
+icon = ExtResource("4_placeholder_art")
+detail_texture = ExtResource("4_placeholder_art")
+stat_modifiers = Array[ExtResource("3_modifier")]([SubResource("ShopStatModifier_health_plus_two")])
+
+[sub_resource type="Resource" id="ShopStatModifier_speed_plus_one"]
+script = ExtResource("3_modifier")
+display_name = "SPEED"
+icon = ExtResource("5_strength_icon")
+display_color = Color(0.28, 0.69, 0.94, 1)
+
+[sub_resource type="Resource" id="ShopItem_ghost_sneakers"]
+script = ExtResource("2_item")
+item_id = &"ghost_sneakers"
+display_name = "Ghost Sneakers"
+list_summary_bbcode = "[color=#48afea]+1 Speed[/color]"
+description = "Ethereal footwear that carries its wearer more quickly through haunted ground."
+price = 3
+payment_treasure_type = &"sapphire"
+payment_treasure_name = "SAPPHIRES"
+payment_icon = ExtResource("9_sapphire_icon")
+icon = ExtResource("4_placeholder_art")
+detail_texture = ExtResource("4_placeholder_art")
+stat_modifiers = Array[ExtResource("3_modifier")]([SubResource("ShopStatModifier_speed_plus_one")])
+
+[sub_resource type="Resource" id="ShopStatModifier_stealth_plus_one"]
+script = ExtResource("3_modifier")
+display_name = "STEALTH"
+icon = ExtResource("5_strength_icon")
+display_color = Color(0.65, 0.38, 0.82, 1)
+
+[sub_resource type="Resource" id="ShopItem_moth_cloak"]
+script = ExtResource("2_item")
+item_id = &"moth_cloak"
+display_name = "Moth Cloak"
+list_summary_bbcode = "[color=#a660d1]+1 Stealth[/color]"
+description = "A silent cloak whose dusty wings make the wearer harder to notice."
+price = 3
+payment_treasure_type = &"emerald"
+payment_treasure_name = "EMERALDS"
+payment_icon = ExtResource("10_emerald_icon")
+icon = ExtResource("4_placeholder_art")
+detail_texture = ExtResource("4_placeholder_art")
+stat_modifiers = Array[ExtResource("3_modifier")]([SubResource("ShopStatModifier_stealth_plus_one")])
+
+[sub_resource type="Resource" id="ShopStatModifier_reveal_loot"]
+script = ExtResource("3_modifier")
+display_name = "HIDDEN LOOT"
+value_text = "ON"
+icon = ExtResource("5_strength_icon")
+
+[sub_resource type="Resource" id="ShopItem_cursed_lantern"]
+script = ExtResource("2_item")
+item_id = &"cursed_lantern"
+display_name = "Cursed Lantern"
+list_summary_bbcode = "[color=#70bf45]Reveal hidden loot[/color]"
+description = "Its sickly flame exposes treasure that ordinary torchlight cannot reveal."
+price = 3
+payment_treasure_type = &"ruby"
+payment_treasure_name = "RUBIES"
+payment_icon = ExtResource("8_ruby_icon")
+icon = ExtResource("4_placeholder_art")
+detail_texture = ExtResource("4_placeholder_art")
+stat_modifiers = Array[ExtResource("3_modifier")]([SubResource("ShopStatModifier_reveal_loot")])
+
+[sub_resource type="Resource" id="ShopStatModifier_health_minus_one"]
+script = ExtResource("3_modifier")
+display_name = "HEALTH"
+value_text = "-1"
+icon = ExtResource("6_health_icon")
+display_color = Color(0.95, 0.24, 0.24, 1)
+
+[sub_resource type="Resource" id="ShopItem_bone_charm"]
+script = ExtResource("2_item")
+item_id = &"bone_charm"
+display_name = "Bone Charm"
+list_summary_bbcode = "[color=#70bf45]+1 Strength[/color], [color=#e34747]-1 Health[/color]"
+description = "A cursed trinket that boosts attack power at a small health cost."
+price = 2
+payment_treasure_type = &"diamond"
+payment_treasure_name = "DIAMONDS"
+payment_icon = ExtResource("7_diamond_icon")
+icon = ExtResource("4_placeholder_art")
+detail_texture = ExtResource("4_placeholder_art")
+stat_modifiers = Array[ExtResource("3_modifier")]([SubResource("ShopStatModifier_strength_plus_one"), SubResource("ShopStatModifier_health_minus_one")])
+
+[sub_resource type="Resource" id="ShopStatModifier_temporary_stealth"]
+script = ExtResource("3_modifier")
+display_name = "STEALTH BOOST"
+value_text = "TEMP"
+icon = ExtResource("5_strength_icon")
+display_color = Color(0.65, 0.38, 0.82, 1)
+
+[sub_resource type="Resource" id="ShopItem_grave_dust_vial"]
+script = ExtResource("2_item")
+item_id = &"grave_dust_vial"
+display_name = "Grave Dust Vial"
+list_summary_bbcode = "[color=#a660d1]Temporary stealth boost[/color]"
+description = "A single-use vial that briefly muffles footsteps and dims the living silhouette."
+price = 4
+payment_treasure_type = &"amethyst"
+payment_treasure_name = "AMETHYSTS"
+payment_icon = ExtResource("11_amethyst_icon")
+icon = ExtResource("4_placeholder_art")
+detail_texture = ExtResource("4_placeholder_art")
+stat_modifiers = Array[ExtResource("3_modifier")]([SubResource("ShopStatModifier_temporary_stealth")])
+
+[sub_resource type="Resource" id="ShopStatModifier_carry_plus_one"]
+script = ExtResource("3_modifier")
+display_name = "CARRY CAPACITY"
+icon = ExtResource("5_strength_icon")
+display_color = Color(0.86, 0.67, 0.25, 1)
+
+[sub_resource type="Resource" id="ShopItem_gravedigger_gloves"]
+script = ExtResource("2_item")
+item_id = &"gravedigger_gloves"
+display_name = "Gravedigger Gloves"
+list_summary_bbcode = "[color=#dbaa40]+1 Carry Capacity[/color]"
+description = "Reinforced gloves that make hauling one more burden feel almost effortless."
+price = 1
+payment_treasure_type = &"gold_bar"
+payment_treasure_name = "GOLD BAR"
+payment_icon = ExtResource("12_gold_bar_icon")
+icon = ExtResource("4_placeholder_art")
+detail_texture = ExtResource("4_placeholder_art")
+stat_modifiers = Array[ExtResource("3_modifier")]([SubResource("ShopStatModifier_carry_plus_one")])
+
+[sub_resource type="Resource" id="ShopStatModifier_reveal_exits"]
+script = ExtResource("3_modifier")
+display_name = "EXITS"
+value_text = "ON"
+icon = ExtResource("5_strength_icon")
+display_color = Color(0.32, 0.78, 0.73, 1)
+
+[sub_resource type="Resource" id="ShopItem_crypt_compass"]
+script = ExtResource("2_item")
+item_id = &"crypt_compass"
+display_name = "Crypt Compass"
+list_summary_bbcode = "[color=#52c7ba]Reveal nearby exits[/color]"
+description = "Its restless needle points toward escape routes through the deadliest crypts."
+price = 5
+payment_treasure_type = &"sapphire"
+payment_treasure_name = "SAPPHIRES"
+payment_icon = ExtResource("9_sapphire_icon")
+icon = ExtResource("4_placeholder_art")
+detail_texture = ExtResource("4_placeholder_art")
+stat_modifiers = Array[ExtResource("3_modifier")]([SubResource("ShopStatModifier_reveal_exits")])
+
+[sub_resource type="Resource" id="ShopStatModifier_health_plus_one"]
+script = ExtResource("3_modifier")
+display_name = "HEALTH"
+icon = ExtResource("6_health_icon")
+display_color = Color(0.36, 0.9, 0.29, 1)
+
+[sub_resource type="Resource" id="ShopItem_iron_rib_guard"]
+script = ExtResource("2_item")
+item_id = &"iron_rib_guard"
+display_name = "Iron Rib Guard"
+list_summary_bbcode = "[color=#70bf45]+1 Health[/color]"
+description = "A narrow iron guard that turns aside one wound without slowing its wearer."
+price = 4
+payment_treasure_type = &"ruby"
+payment_treasure_name = "RUBIES"
+payment_icon = ExtResource("8_ruby_icon")
+icon = ExtResource("4_placeholder_art")
+detail_texture = ExtResource("4_placeholder_art")
+stat_modifiers = Array[ExtResource("3_modifier")]([SubResource("ShopStatModifier_health_plus_one")])
+
+[sub_resource type="Resource" id="ShopStatModifier_speed_plus_two"]
+script = ExtResource("3_modifier")
+display_name = "SPEED"
+value_text = "+2"
+icon = ExtResource("5_strength_icon")
+display_color = Color(0.28, 0.69, 0.94, 1)
+
+[sub_resource type="Resource" id="ShopItem_spectral_soles"]
+script = ExtResource("2_item")
+item_id = &"spectral_soles"
+display_name = "Spectral Soles"
+list_summary_bbcode = "[color=#48afea]+2 Speed[/color]"
+description = "Rare spirit-touched soles that glide over broken stone with unnatural speed."
+price = 4
+payment_treasure_type = &"diamond"
+payment_treasure_name = "DIAMONDS"
+payment_icon = ExtResource("7_diamond_icon")
+icon = ExtResource("4_placeholder_art")
+detail_texture = ExtResource("4_placeholder_art")
+stat_modifiers = Array[ExtResource("3_modifier")]([SubResource("ShopStatModifier_speed_plus_two")])
+
+[sub_resource type="Resource" id="ShopStatModifier_torch_duration"]
+script = ExtResource("3_modifier")
+display_name = "TORCH DURATION"
+value_text = "+25%"
+icon = ExtResource("5_strength_icon")
+display_color = Color(0.94, 0.61, 0.2, 1)
+
+[sub_resource type="Resource" id="ShopItem_black_candle"]
+script = ExtResource("2_item")
+item_id = &"black_candle"
+display_name = "Black Candle"
+list_summary_bbcode = "[color=#ef9b33]+25% Torch Duration[/color]"
+description = "A slow-burning grave candle that keeps borrowed flames alive for longer."
+price = 60
+icon = ExtResource("4_placeholder_art")
+detail_texture = ExtResource("4_placeholder_art")
+stat_modifiers = Array[ExtResource("3_modifier")]([SubResource("ShopStatModifier_torch_duration")])
+
+[sub_resource type="Resource" id="ShopStatModifier_strength_plus_three"]
+script = ExtResource("3_modifier")
+value_text = "+3"
+icon = ExtResource("5_strength_icon")
+
+[sub_resource type="Resource" id="ShopItem_royal_coffin_lining"]
+script = ExtResource("2_item")
+item_id = &"royal_coffin_lining"
+display_name = "Royal Coffin Lining"
+list_summary_bbcode = "[color=#70bf45]+3 Strength[/color]"
+description = "An unavailable royal upgrade reserved for a later shop tier."
+price = 250
+stock_count = 1
+availability = 1
+icon = ExtResource("4_placeholder_art")
+detail_texture = ExtResource("4_placeholder_art")
+stat_modifiers = Array[ExtResource("3_modifier")]([SubResource("ShopStatModifier_strength_plus_three")])
+
+[resource]
+script = ExtResource("1_catalog")
+items = Array[ExtResource("2_item")]([SubResource("ShopItem_rusty_shovel_edge"), SubResource("ShopItem_coffin_padding"), SubResource("ShopItem_ghost_sneakers"), SubResource("ShopItem_moth_cloak"), SubResource("ShopItem_cursed_lantern"), SubResource("ShopItem_bone_charm"), SubResource("ShopItem_grave_dust_vial"), SubResource("ShopItem_gravedigger_gloves"), SubResource("ShopItem_crypt_compass"), SubResource("ShopItem_iron_rib_guard"), SubResource("ShopItem_spectral_soles"), SubResource("ShopItem_black_candle"), SubResource("ShopItem_royal_coffin_lining")])

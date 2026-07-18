@@ -146,11 +146,5 @@ display_name = "#060401FF"
 
 [resource]
 script = ExtResource("2_8r5vs")
-png_path = "res://levels/debug-level/level.png"
-target_gridmap_path = NodePath("PNGGridMap")
 mesh_library_path = "res://Assets/environment/graveyard.res"
-auto_repair = true
-export_size = Vector2i(256, 16)
 color_mappings = Array[Resource]([SubResource("Resource_2sf17"), SubResource("Resource_eq3mc"), SubResource("Resource_2s3yr"), SubResource("Resource_7hgml"), SubResource("Resource_kvfjf"), SubResource("Resource_8r5vs"), SubResource("Resource_og7v6"), SubResource("Resource_bx4n4"), SubResource("Resource_s5ukk"), SubResource("Resource_rmf38"), SubResource("Resource_ug0ke"), SubResource("Resource_8lvk6"), SubResource("Resource_hoefr"), SubResource("Resource_84add"), SubResource("Resource_f305w"), SubResource("Resource_4ec7g"), SubResource("Resource_bqhbv"), SubResource("Resource_fxhhw"), SubResource("Resource_dak61"), SubResource("Resource_r4clu"), SubResource("Resource_73bbm"), SubResource("Resource_f2dpr")])
-floor_gridmap_path = NodePath("PNGFloorGridMap")
-floor_material_path = "res://Assets/environment/floors/flagstones_floor.material"

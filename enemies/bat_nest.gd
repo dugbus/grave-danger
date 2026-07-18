@@ -451,6 +451,7 @@ func _update_flap_audio(delta: float) -> void:
 	var flap_audio_player := AudioStreamPlayer3D.new()
 	flap_audio_player.name = "BatFlapOneShotAudio"
 	flap_audio_player.stream = flap_sound
+	flap_audio_player.bus = &"SFX"
 	flap_audio_player.volume_db = _get_faded_audio_volume_db(flap_sound_volume_db)
 	flap_audio_player.pitch_scale = rng.randf_range(
 		minf(flap_sound_pitch_min, flap_sound_pitch_max),
@@ -496,6 +497,7 @@ func _update_squeak_audio(delta: float) -> void:
 	var squeak_audio_player := AudioStreamPlayer3D.new()
 	squeak_audio_player.name = "BatSqueakOneShotAudio"
 	squeak_audio_player.stream = stream
+	squeak_audio_player.bus = &"SFX"
 	squeak_audio_player.volume_db = _get_faded_audio_volume_db(squeak_sound_volume_db)
 	squeak_audio_player.pitch_scale = rng.randf_range(
 		minf(squeak_sound_pitch_min, squeak_sound_pitch_max),

@@ -248,6 +248,7 @@ func _create_near_flame_audio() -> void:
 
 	near_flame_audio_player = AudioStreamPlayer.new()
 	near_flame_audio_player.name = "NearFlameAudio"
+	near_flame_audio_player.bus = &"SFX"
 	var loop_stream := stream.duplicate() as AudioStream
 	if loop_stream is AudioStreamMP3:
 		(loop_stream as AudioStreamMP3).loop = true

@@ -5,8 +5,10 @@ extends Node3D
 
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const PREVIEW_CONTAINER_NAME := "EditorPreviewItems"
+const EDITOR_SELECTION_PLACEHOLDER_NAME := "EditorSelectionPlaceholder"
 const GAMEPLAY_PROCESS_GROUP := &"deterministic_gameplay_process"
 const USEC_PER_SECOND := 1000000
+const EDITOR_SELECTION_MINIMUM_HEIGHT := 0.25
 
 ## Radius of the circular spawn area around this node.
 @export_range(0.05, 10.0, 0.05) var pile_radius := 0.5:
@@ -73,9 +75,11 @@ var rng := RandomNumberGenerator.new()
 func _ready() -> void:
     add_to_group(GAMEPLAY_PROCESS_GROUP)
     if Engine.is_editor_hint():
+        _configure_editor_selection_placeholder()
         _refresh_editor_preview()
         return
 
+    _hide_editor_selection_placeholder()
     runtime_seed = DETERMINISTIC_SEED.from_node(self, random_seed, _get_seed_salt())
     rng.seed = runtime_seed
     spawn_started = trigger_time <= 0.0
@@ -257,6 +261,7 @@ func _refresh_editor_preview() -> void:
     if not Engine.is_editor_hint() or not is_inside_tree():
         return
 
+    _configure_editor_selection_placeholder()
     var preview_container := _get_or_create_preview_container()
     for child in preview_container.get_children():
         preview_container.remove_child(child)
@@ -307,6 +312,36 @@ func _get_or_create_preview_container() -> Node3D:
     add_child(preview_container)
     preview_container.owner = null
     return preview_container
+
+
+func _configure_editor_selection_placeholder() -> void:
+    var placeholder := get_node_or_null(
+        EDITOR_SELECTION_PLACEHOLDER_NAME
+    ) as MeshInstance3D
+    if placeholder == null:
+        return
+
+    var placeholder_mesh := placeholder.mesh as CylinderMesh
+    if placeholder_mesh == null:
+        return
+
+    var placeholder_height := maxf(
+        preview_base_height + preview_center_height + preview_item_spacing * 5.0,
+        EDITOR_SELECTION_MINIMUM_HEIGHT
+    )
+    placeholder_mesh.top_radius = pile_radius
+    placeholder_mesh.bottom_radius = pile_radius
+    placeholder_mesh.height = placeholder_height
+    placeholder.position.y = placeholder_height * 0.5
+    placeholder.visible = true
+
+
+func _hide_editor_selection_placeholder() -> void:
+    var placeholder := get_node_or_null(
+        EDITOR_SELECTION_PLACEHOLDER_NAME
+    ) as MeshInstance3D
+    if placeholder != null:
+        placeholder.visible = false
 
 
 func _disable_preview_collisions(node: Node) -> void:

@@ -1,0 +1,310 @@
+[gd_scene format=3 uid="uid://2nwumd7hki5t"]
+
+[ext_resource type="Script" uid="uid://bmdkb551rncmk" path="res://ui/frontend/settings.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://ba0bqdkt340fe" path="res://Assets/frontend/level-select.png" id="2_background"]
+[ext_resource type="PackedScene" path="res://ui/frontend/panel_surround.tscn" id="3_surround"]
+[ext_resource type="Texture2D" uid="uid://2yw0g8aeqvrx" path="res://Assets/frontend/content-separator.png" id="4_separator"]
+[ext_resource type="Theme" uid="uid://ns8cvcx8f3ns" path="res://ui/frontend/frontend_theme.tres" id="5_theme"]
+[ext_resource type="Texture2D" uid="uid://dhyo7s0k1bs8u" path="res://Assets/frontend/music-volume-icon.png" id="6_music_icon"]
+[ext_resource type="Texture2D" uid="uid://bnxqxcswjbi8i" path="res://Assets/frontend/sound-volume-icon.png" id="7_sound_icon"]
+[ext_resource type="Texture2D" uid="uid://braxmxq2swyoe" path="res://Assets/frontend/remove-progress-icon.png" id="8_reset_icon"]
+
+[sub_resource type="StyleBoxFlat" id="SettingRowStyle"]
+bg_color = Color(0.008, 0.01, 0.014, 0.82)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.24, 0.26, 0.27, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SettingRowFocus"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 0.86, 0.08, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="Settings" type="Control" unique_id=397308170]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("5_theme")
+script = ExtResource("1_script")
+
+[node name="ScreenContainer" type="Control" parent="." unique_id=1408383789]
+editor_description = "Reference 1920x1080 settings canvas, uniformly fitted to the runtime viewport."
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="Background" type="TextureRect" parent="ScreenContainer" unique_id=1770590844]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Shade" type="ColorRect" parent="ScreenContainer" unique_id=175707693]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.015, 0.01, 0.015, 0.66)
+
+[node name="ScreenTitleLabel" type="Label" parent="ScreenContainer" unique_id=1810555562]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 16.0
+offset_right = 1700.0
+offset_bottom = 92.0
+theme_override_colors/font_color = Color(0.59, 0.4, 0.72, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 64
+text = "SETTINGS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TitleSeparator" type="TextureRect" parent="ScreenContainer" unique_id=748147675]
+layout_mode = 0
+offset_left = 777.0
+offset_top = 92.0
+offset_right = 1143.0
+offset_bottom = 101.0
+mouse_filter = 2
+texture = ExtResource("4_separator")
+
+[node name="SettingsFrame" parent="ScreenContainer" unique_id=1241305861 instance=ExtResource("3_surround")]
+editor_description = "Full-page settings surround with an external Back action, matching the other frontend screens."
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -522.0
+offset_top = -346.0
+offset_right = 537.0
+offset_bottom = 271.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SettingsPanel" type="VBoxContainer" parent="ScreenContainer/SettingsFrame/Content" index="0" unique_id=563610387]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 22
+alignment = 1
+
+[node name="AudioHeading" type="Label" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel" unique_id=1716399185]
+custom_minimum_size = Vector2(0, 62)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.48, 0.72, 0.29, 1)
+theme_override_font_sizes/font_size = 40
+text = "AUDIO"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MusicRow" type="PanelContainer" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel" unique_id=518611657]
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SettingRowStyle")
+
+[node name="MusicContent" type="HBoxContainer" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel/MusicRow" unique_id=289091322]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="MusicIcon" type="TextureRect" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel/MusicRow/MusicContent" unique_id=1569840587]
+custom_minimum_size = Vector2(90, 90)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("6_music_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MusicLabel" type="Label" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel/MusicRow/MusicContent" unique_id=2146753003]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+text = "MUSIC VOLUME"
+vertical_alignment = 1
+
+[node name="MusicSlider" type="HSlider" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel/MusicRow/MusicContent" unique_id=1938140778]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+offset_transform_enabled = true
+step = 5.0
+value = 80.0
+
+[node name="MusicValueLabel" type="Label" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel/MusicRow/MusicContent" unique_id=450033013]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "80%"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FocusBorder" type="Panel" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel/MusicRow" unique_id=205118539]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SettingRowFocus")
+
+[node name="SoundEffectRow" type="PanelContainer" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel" unique_id=1786173718]
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SettingRowStyle")
+
+[node name="SoundEffectContent" type="HBoxContainer" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel/SoundEffectRow" unique_id=727057097]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="SoundEffectIcon" type="TextureRect" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel/SoundEffectRow/SoundEffectContent" unique_id=375887333]
+custom_minimum_size = Vector2(90, 90)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("7_sound_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SoundEffectLabel" type="Label" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel/SoundEffectRow/SoundEffectContent" unique_id=268172999]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+text = "SOUND EFFECT VOLUME"
+vertical_alignment = 1
+
+[node name="SoundEffectSlider" type="HSlider" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel/SoundEffectRow/SoundEffectContent" unique_id=436212858]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 5.0
+value = 80.0
+
+[node name="SoundEffectValueLabel" type="Label" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel/SoundEffectRow/SoundEffectContent" unique_id=1117115376]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "80%"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FocusBorder" type="Panel" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel/SoundEffectRow" unique_id=41185499]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SettingRowFocus")
+
+[node name="ResetProgressButton" type="Button" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel" unique_id=992359934]
+custom_minimum_size = Vector2(0, 82)
+layout_mode = 2
+text = "RESET PROGRESS"
+icon = ExtResource("8_reset_icon")
+expand_icon = true
+
+[node name="StatusLabel" type="Label" parent="ScreenContainer/SettingsFrame/Content/SettingsPanel" unique_id=1916129312]
+visible = false
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.48, 0.72, 0.29, 1)
+text = "PROGRESS RESET"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BottomActions" type="HBoxContainer" parent="ScreenContainer" unique_id=630877730]
+layout_mode = 0
+offset_left = 84.0
+offset_top = 936.0
+offset_right = 1836.0
+offset_bottom = 1008.0
+alignment = 1
+
+[node name="BackButton" type="Button" parent="ScreenContainer/BottomActions" unique_id=126130630]
+custom_minimum_size = Vector2(260, 72)
+layout_mode = 2
+text = "BACK"
+
+[node name="ResetConfirmationShade" type="ColorRect" parent="ScreenContainer" unique_id=2002227711]
+visible = false
+z_index = 100
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.76)
+
+[node name="ResetConfirmationFrame" parent="ScreenContainer" unique_id=100300947 instance=ExtResource("3_surround")]
+visible = false
+z_index = 101
+layout_mode = 0
+offset_left = 500.0
+offset_top = 290.0
+offset_right = 1420.0
+offset_bottom = 790.0
+
+[node name="ConfirmationTitle" type="Label" parent="ScreenContainer/ResetConfirmationFrame/Content" index="0" unique_id=1031962248]
+layout_mode = 0
+offset_right = 696.0
+offset_bottom = 70.0
+theme_override_colors/font_color = Color(0.92, 0.42, 0.35, 1)
+theme_override_font_sizes/font_size = 42
+text = "RESET ALL PROGRESS?"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ConfirmationMessage" type="Label" parent="ScreenContainer/ResetConfirmationFrame/Content" index="1" unique_id=2064853993]
+layout_mode = 0
+offset_top = 78.0
+offset_right = 696.0
+offset_bottom = 164.0
+theme_override_colors/font_color = Color(0.9, 0.84, 0.7, 1)
+theme_override_font_sizes/font_size = 25
+text = "Level results, treasure, purchases and lit torches will be permanently cleared."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="ConfirmationActions" type="HBoxContainer" parent="ScreenContainer/ResetConfirmationFrame/Content" index="2" unique_id=282770763]
+layout_mode = 0
+offset_top = 194.0
+offset_right = 696.0
+offset_bottom = 266.0
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="NoButton" type="Button" parent="ScreenContainer/ResetConfirmationFrame/Content/ConfirmationActions" unique_id=717039507]
+custom_minimum_size = Vector2(220, 72)
+layout_mode = 2
+text = "NO"
+
+[node name="YesButton" type="Button" parent="ScreenContainer/ResetConfirmationFrame/Content/ConfirmationActions" unique_id=789638412]
+custom_minimum_size = Vector2(220, 72)
+layout_mode = 2
+text = "YES"
+
+[editable path="ScreenContainer/SettingsFrame"]
+[editable path="ScreenContainer/ResetConfirmationFrame"]

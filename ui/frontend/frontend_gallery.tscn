@@ -1,0 +1,262 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="PackedScene" path="res://ui/screens/title_screen.tscn" id="1_title"]
+[ext_resource type="PackedScene" path="res://ui/screens/level_select_screen.tscn" id="2_levels"]
+[ext_resource type="PackedScene" path="res://ui/frontend/shop.tscn" id="3_shop"]
+[ext_resource type="PackedScene" path="res://ui/frontend/settings.tscn" id="4_settings"]
+[ext_resource type="PackedScene" path="res://ui/screens/win_screen.tscn" id="5_win"]
+[ext_resource type="PackedScene" path="res://ui/screens/lose_screen.tscn" id="6_lose"]
+[ext_resource type="FontFile" uid="uid://ipq4de64yjtd" path="res://Assets/fonts/Almendra-Bold.ttf" id="7_font"]
+
+[sub_resource type="StyleBoxFlat" id="PreviewCardStyle"]
+bg_color = Color(0.018, 0.015, 0.024, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.34, 0.23, 0.42, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="FrontendGallery" type="Control"]
+custom_minimum_size = Vector2(1920, 820)
+offset_right = 1920.0
+offset_bottom = 820.0
+editor_description = "Editor overview of the six navigable frontend screens. Each labelled preview is a live scene instance scaled from its authored 1920x1080 canvas, so source-scene changes remain visible here."
+
+[node name="GalleryBackground" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.008, 0.006, 0.011, 1)
+
+[node name="GalleryTitle" type="Label" parent="."]
+offset_left = 40.0
+offset_top = 8.0
+offset_right = 1880.0
+offset_bottom = 62.0
+theme_override_colors/font_color = Color(0.59, 0.4, 0.72, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 40
+text = "FRONTEND SCREEN GALLERY"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TitleCard" type="Panel" parent="."]
+clip_contents = true
+offset_left = 40.0
+offset_top = 70.0
+offset_right = 600.0
+offset_bottom = 415.0
+theme_override_styles/panel = SubResource("PreviewCardStyle")
+
+[node name="PreviewLabel" type="Label" parent="TitleCard"]
+offset_left = 12.0
+offset_top = 4.0
+offset_right = 548.0
+offset_bottom = 38.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.9, 0.84, 0.7, 1)
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 24
+text = "TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TitleScreenPreview" parent="TitleCard" instance=ExtResource("1_title")]
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 21.0
+offset_top = 43.0
+offset_right = 1941.0
+offset_bottom = 1123.0
+grow_horizontal = 1
+grow_vertical = 1
+scale = Vector2(0.27, 0.27)
+
+[node name="LevelSelectCard" type="Panel" parent="."]
+clip_contents = true
+offset_left = 680.0
+offset_top = 70.0
+offset_right = 1240.0
+offset_bottom = 415.0
+theme_override_styles/panel = SubResource("PreviewCardStyle")
+
+[node name="PreviewLabel" type="Label" parent="LevelSelectCard"]
+offset_left = 12.0
+offset_top = 4.0
+offset_right = 548.0
+offset_bottom = 38.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.9, 0.84, 0.7, 1)
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 24
+text = "CHOOSE YOUR TOMB"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PreviewViewportContainer" type="SubViewportContainer" parent="LevelSelectCard"]
+clip_contents = true
+layout_mode = 0
+offset_left = 21.0
+offset_top = 43.0
+offset_right = 1941.0
+offset_bottom = 1123.0
+scale = Vector2(0.27, 0.27)
+mouse_filter = 2
+editor_description = "Native 1920x1080 Level Select render target, isolated and then scaled as one card so its authored canvas is shown in full without escaping the gallery."
+
+[node name="PreviewViewport" type="SubViewport" parent="LevelSelectCard/PreviewViewportContainer"]
+handle_input_locally = false
+size = Vector2i(1920, 1080)
+render_target_update_mode = 4
+gui_disable_input = true
+
+[node name="LevelSelectPreview" parent="LevelSelectCard/PreviewViewportContainer/PreviewViewport" instance=ExtResource("2_levels")]
+
+[node name="ShopCard" type="Panel" parent="."]
+clip_contents = true
+offset_left = 1320.0
+offset_top = 70.0
+offset_right = 1880.0
+offset_bottom = 415.0
+theme_override_styles/panel = SubResource("PreviewCardStyle")
+
+[node name="PreviewLabel" type="Label" parent="ShopCard"]
+offset_left = 12.0
+offset_top = 4.0
+offset_right = 548.0
+offset_bottom = 38.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.9, 0.84, 0.7, 1)
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 24
+text = "SHOP"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ShopPreview" parent="ShopCard" instance=ExtResource("3_shop")]
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 21.0
+offset_top = 43.0
+offset_right = 1941.0
+offset_bottom = 1123.0
+grow_horizontal = 1
+grow_vertical = 1
+scale = Vector2(0.27, 0.27)
+
+[node name="SettingsCard" type="Panel" parent="."]
+clip_contents = true
+offset_left = 40.0
+offset_top = 455.0
+offset_right = 600.0
+offset_bottom = 800.0
+theme_override_styles/panel = SubResource("PreviewCardStyle")
+
+[node name="PreviewLabel" type="Label" parent="SettingsCard"]
+offset_left = 12.0
+offset_top = 4.0
+offset_right = 548.0
+offset_bottom = 38.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.9, 0.84, 0.7, 1)
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 24
+text = "SETTINGS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SettingsPreview" parent="SettingsCard" instance=ExtResource("4_settings")]
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 21.0
+offset_top = 43.0
+offset_right = 1941.0
+offset_bottom = 1123.0
+grow_horizontal = 1
+grow_vertical = 1
+scale = Vector2(0.27, 0.27)
+
+[node name="WinCard" type="Panel" parent="."]
+clip_contents = true
+offset_left = 680.0
+offset_top = 455.0
+offset_right = 1240.0
+offset_bottom = 800.0
+theme_override_styles/panel = SubResource("PreviewCardStyle")
+
+[node name="PreviewLabel" type="Label" parent="WinCard"]
+offset_left = 12.0
+offset_top = 4.0
+offset_right = 548.0
+offset_bottom = 38.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.9, 0.84, 0.7, 1)
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 24
+text = "ESCAPED THE GRAVE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="WinPreview" parent="WinCard" instance=ExtResource("5_win")]
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 21.0
+offset_top = 43.0
+offset_right = 1941.0
+offset_bottom = 1123.0
+grow_horizontal = 1
+grow_vertical = 1
+scale = Vector2(0.27, 0.27)
+
+[node name="LoseCard" type="Panel" parent="."]
+clip_contents = true
+offset_left = 1320.0
+offset_top = 455.0
+offset_right = 1880.0
+offset_bottom = 800.0
+theme_override_styles/panel = SubResource("PreviewCardStyle")
+
+[node name="PreviewLabel" type="Label" parent="LoseCard"]
+offset_left = 12.0
+offset_top = 4.0
+offset_right = 548.0
+offset_bottom = 38.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.9, 0.84, 0.7, 1)
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 24
+text = "YOU DIED!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LosePreview" parent="LoseCard" instance=ExtResource("6_lose")]
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 21.0
+offset_top = 43.0
+offset_right = 1941.0
+offset_bottom = 1123.0
+grow_horizontal = 1
+grow_vertical = 1
+scale = Vector2(0.27, 0.27)

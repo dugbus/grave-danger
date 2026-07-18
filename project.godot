@@ -44,6 +44,8 @@ config/icon="res://Assets/frontend/icon.svg"
 quick_exit="*res://autoload/quick_exit.gd"
 ResultStats="*res://autoload/result_stats.gd"
 LevelSelection="*res://autoload/level_selection.gd"
+GameSettings="*res://autoload/game_settings.gd"
+FrontendAudio="*res://autoload/frontend_audio.gd"
 SimpleGrass="*uid://bfq0snth8sj3h"
 
 [display]

@@ -3,6 +3,7 @@ set -euo pipefail
 
 godot --headless --check-only --quit --path . --log-file scene_scan.log 2>&1 | sed '/^Godot Engine /d'
 godot --headless --path . --script res://tools/check_all_scenes.gd --debug --log-file scene_scan.log 2>&1 | sed '/^Godot Engine /d'
+godot --headless --path . --script res://tests/run_tests.gd --log-file scene_scan.log 2>&1 | sed '/^Godot Engine /d'
 
 if ! lint_output="$(gdlint . 2>&1)"; then
 	printf '%s\n' "$lint_output" | tee -a scene_scan.log

@@ -12,6 +12,7 @@ const ENEMY_FOOTSTEP_UNIT_SIZE := 8.0
 const PLAYER_FOOTSTEP_MAX_DISTANCE := 0.0
 const PLAYER_FOOTSTEP_UNIT_SIZE := 10.0
 const FOOTSTEP_ANIMATION_PHASES: Array[float] = [0.25, 0.75]
+const SFX_BUS := &"SFX"
 
 
 static func load_stream(sound_path: String) -> AudioStream:
@@ -54,6 +55,7 @@ static func play_one_shot(
     sound_player.stream = stream
     sound_player.volume_db = volume_db
     sound_player.pitch_scale = pitch_scale
+    sound_player.bus = SFX_BUS
     sound_player.finished.connect(sound_player.queue_free)
     parent.add_child(sound_player)
     sound_player.play()
@@ -78,6 +80,7 @@ static func play_one_shot_3d(
     sound_player.stream = stream
     sound_player.volume_db = volume_db
     sound_player.pitch_scale = pitch_scale
+    sound_player.bus = SFX_BUS
     if max_distance > 0.0:
         sound_player.max_distance = max_distance
     sound_player.unit_size = unit_size

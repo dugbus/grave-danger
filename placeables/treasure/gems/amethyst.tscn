@@ -9,3 +9,4 @@ carried_item = ExtResource("2_item")
 
 [node name="GemVisual" parent="." index="0"]
 gem_material = ExtResource("3_material")
+cut = 1

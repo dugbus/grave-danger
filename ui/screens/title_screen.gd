@@ -56,6 +56,9 @@ func _bind_title_image() -> void:
 func _start_game() -> void:
 	# Switch from the title screen to the level selection scene.
 
+	var frontend_audio: Node = get_node_or_null("/root/FrontendAudio")
+	if frontend_audio != null:
+		frontend_audio.call("play_select")
 	starting = true
 	get_tree().change_scene_to_file(LEVEL_SELECT_SCENE)
 

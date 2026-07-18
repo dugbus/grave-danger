@@ -1,178 +1,70 @@
 [gd_scene format=3 uid="uid://bvdv2d8npbqry"]
 
-[ext_resource type="Script" path="res://ui/screens/lose_screen.gd" id="1_lose"]
-[ext_resource type="Texture2D" path="res://Assets/frontend/lose-screen.png" id="2_texture"]
+[ext_resource type="PackedScene" path="res://ui/screens/result_screen_layout.tscn" id="1_layout"]
+[ext_resource type="Script" uid="uid://b8keqjxxl3qqh" path="res://ui/screens/lose_screen.gd" id="2_lose_script"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_normal"]
-bg_color = Color(0.08, 0.07, 0.08, 0.88)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.86, 0.68, 0.32, 0.62)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.42)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
+[node name="LoseScreen" unique_id=730798704 instance=ExtResource("1_layout")]
+script = ExtResource("2_lose_script")
+outcome = 1
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_pressed"]
-bg_color = Color(0.2, 0.13, 0.08, 0.98)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 0.88, 0.42, 0.95)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.42)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
+[node name="ScreenTitleLabel" parent="ScreenContainer" index="2"]
+visible = true
+layout_mode = 0
+offset_left = 220.0
+offset_top = 12.0
+offset_right = 1700.0
+offset_bottom = 88.0
+text = "YOU DIED!"
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_hover"]
-bg_color = Color(0.15, 0.12, 0.11, 0.96)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 0.78, 0.28, 0.86)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.42)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
+[node name="TitleSeparator" parent="ScreenContainer" index="3"]
+layout_mode = 0
+offset_left = 777.0
+offset_top = 88.0
+offset_right = 1143.0
+offset_bottom = 97.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_focus"]
-bg_color = Color(0.18, 0.12, 0.08, 0.38)
-border_width_left = 5
-border_width_top = 5
-border_width_right = 5
-border_width_bottom = 5
-border_color = Color(0.72, 1, 0.62, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0.25, 0.98, 0.34, 0.32)
-shadow_size = 12
-shadow_offset = Vector2(0, 0)
+[node name="ResultFrame" parent="ScreenContainer" index="4"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 130.0
+offset_right = 1856.0
+offset_bottom = 886.0
 
-[node name="LoseScreen" type="Control" unique_id=98674996]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 1920.0
-offset_bottom = 1080.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("1_lose")
-result_texture = ExtResource("2_texture")
-treasure_rect = Rect2(585, 456, 376, 88)
-percentage_rect = Rect2(586, 623, 376, 88)
+[node name="GoldCoinTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" index="0"]
+layout_mode = 2
 
-[node name="ResultImage" type="TextureRect" parent="." unique_id=1387477389]
-z_index = -10
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("2_texture")
-expand_mode = 1
-stretch_mode = 6
+[node name="GoldBarTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" index="1"]
+layout_mode = 2
 
-[node name="ValueLayer" type="CanvasLayer" parent="." unique_id=1108771390]
-layer = 20
+[node name="DiamondTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" index="2"]
+layout_mode = 2
 
-[node name="TreasureValue" type="Label" parent="ValueLayer" unique_id=1156512226]
-z_index = 10
-offset_left = 775.0
-offset_top = 419.0
-offset_right = 1274.0
-offset_bottom = 551.0
-theme_override_colors/font_color = Color(0.96, 0.89, 0.63, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
-theme_override_constants/shadow_offset_x = 3
-theme_override_constants/shadow_offset_y = 3
-theme_override_font_sizes/font_size = 96
-text = "000"
-horizontal_alignment = 1
-vertical_alignment = 1
-clip_text = true
+[node name="RubyTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" index="3"]
+layout_mode = 2
 
-[node name="ButtonsLayer" type="CanvasLayer" parent="." unique_id=1974546693]
-layer = 30
+[node name="SapphireTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" index="4"]
+layout_mode = 2
 
-[node name="ActionButtons" type="HBoxContainer" parent="ButtonsLayer" unique_id=1045238104]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -328.0
-offset_top = -218.0
-offset_right = 328.0
-offset_bottom = -112.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_constants/separation = 40
+[node name="EmeraldTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" index="5"]
+layout_mode = 2
+
+[node name="AmethystTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" index="6"]
+layout_mode = 2
+
+[node name="BottomActions" parent="ScreenContainer" index="5"]
+layout_mode = 0
+offset_left = 84.0
+offset_top = 936.0
+offset_right = 1836.0
+offset_bottom = 1008.0
+theme_override_constants/separation = 24
 alignment = 1
 
-[node name="BackButton" type="Button" parent="ButtonsLayer/ActionButtons" unique_id=1627401960]
-custom_minimum_size = Vector2(308, 96)
-layout_mode = 2
-focus_mode = 2
-theme_override_colors/font_color = Color(1, 0.86, 0.35, 1)
-theme_override_colors/font_focus_color = Color(1, 0.94, 0.62, 1)
-theme_override_colors/font_hover_color = Color(1, 0.9, 0.48, 1)
-theme_override_colors/font_pressed_color = Color(1, 0.94, 0.62, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
-theme_override_constants/shadow_offset_x = 2
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxFlat_action_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_action_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_action_hover")
-theme_override_styles/focus = SubResource("StyleBoxFlat_action_focus")
-text = "Back"
-
-[node name="RetryButton" type="Button" parent="ButtonsLayer/ActionButtons" unique_id=1921377068]
-custom_minimum_size = Vector2(308, 96)
-layout_mode = 2
-focus_mode = 2
-theme_override_colors/font_color = Color(1, 0.86, 0.35, 1)
-theme_override_colors/font_focus_color = Color(1, 0.94, 0.62, 1)
-theme_override_colors/font_hover_color = Color(1, 0.9, 0.48, 1)
-theme_override_colors/font_pressed_color = Color(1, 0.94, 0.62, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
-theme_override_constants/shadow_offset_x = 2
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxFlat_action_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_action_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_action_hover")
-theme_override_styles/focus = SubResource("StyleBoxFlat_action_focus")
-text = "Retry"
-
-[node name="PercentageValue" type="Label" parent="ValueLayer" unique_id=1986082415]
-z_index = 10
-offset_left = 779.0
-offset_top = 636.0
-offset_right = 1278.0
-offset_bottom = 768.0
-theme_override_colors/font_color = Color(0.96, 0.89, 0.63, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
-theme_override_constants/shadow_offset_x = 3
-theme_override_constants/shadow_offset_y = 3
-theme_override_font_sizes/font_size = 96
-text = "000"
-horizontal_alignment = 1
-vertical_alignment = 1
-clip_text = true
+[editable path="ScreenContainer/ResultFrame"]
+[editable path="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/GoldCoinTile"]
+[editable path="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/GoldBarTile"]
+[editable path="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/DiamondTile"]
+[editable path="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/RubyTile"]
+[editable path="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/SapphireTile"]
+[editable path="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/EmeraldTile"]
+[editable path="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/AmethystTile"]

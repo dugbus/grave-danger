@@ -1,0 +1,74 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" uid="uid://bb4yoxyeu47wk" path="res://Assets/frontend/panel-surround.png" id="1_surround"]
+[ext_resource type="Texture2D" uid="uid://ok1rvje8ysg5" path="res://Assets/frontend/health-icon.png" id="2_icon"]
+[ext_resource type="FontFile" uid="uid://ipq4de64yjtd" path="res://Assets/fonts/Almendra-Bold.ttf" id="3_font"]
+
+[sub_resource type="LabelSettings" id="NameSettings"]
+font = ExtResource("3_font")
+font_size = 29
+font_color = Color(0.9, 0.84, 0.7, 1)
+outline_size = 2
+outline_color = Color(0.035, 0.03, 0.025, 1)
+
+[sub_resource type="LabelSettings" id="QuantitySettings"]
+font = ExtResource("3_font")
+font_size = 50
+font_color = Color(0.95, 0.8, 0.31, 1)
+outline_size = 4
+outline_color = Color(0.05, 0.035, 0.008, 1)
+
+[node name="ResultTreasureTile" type="Control"]
+custom_minimum_size = Vector2(340, 176)
+offset_right = 340.0
+offset_bottom = 176.0
+mouse_filter = 2
+editor_description = "Large result-screen treasure tile. Hidden zero-count tiles reflow through the centred two-row result container."
+
+[node name="ScaledSurround" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_right = 680.0
+offset_bottom = 352.0
+scale = Vector2(0.5, 0.5)
+mouse_filter = 2
+texture = ExtResource("1_surround")
+patch_margin_left = 112
+patch_margin_top = 104
+patch_margin_right = 112
+patch_margin_bottom = 104
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="TreasureIconTexture" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 30.0
+offset_right = 148.0
+offset_bottom = 146.0
+mouse_filter = 2
+texture = ExtResource("2_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TreasureNameLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 24.0
+offset_right = 320.0
+offset_bottom = 76.0
+mouse_filter = 2
+text = "DIAMONDS"
+label_settings = SubResource("NameSettings")
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="TreasureQuantityLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 72.0
+offset_right = 320.0
+offset_bottom = 150.0
+mouse_filter = 2
+text = "x0"
+label_settings = SubResource("QuantitySettings")
+vertical_alignment = 1

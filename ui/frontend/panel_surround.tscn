@@ -1,0 +1,31 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://bb4yoxyeu47wk" path="res://Assets/frontend/panel-surround.png" id="1_surround"]
+
+[node name="PanelSurround" type="NinePatchRect"]
+custom_minimum_size = Vector2(224, 208)
+offset_right = 616.0
+offset_bottom = 576.0
+mouse_filter = 2
+texture = ExtResource("1_surround")
+patch_margin_left = 112
+patch_margin_top = 104
+patch_margin_right = 112
+patch_margin_bottom = 104
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+editor_description = "Reusable tiled nine-slice frontend frame. Resize this node freely; the corners remain fixed while the edge artwork repeats instead of stretching. Place controls inside Content."
+
+[node name="Content" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 80.0
+offset_top = 72.0
+offset_right = -80.0
+offset_bottom = -72.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+editor_description = "Safe layout area inside the decorative frame. Add the frame's labels, buttons, lists, and other controls here."

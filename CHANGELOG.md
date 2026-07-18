@@ -1,3 +1,54 @@
+- Frontend screens now share one reference-canvas, primary-input, and selection-audio implementation, keeping Level Select, Shop, Settings, and results consistent as they evolve.
+- Gold coin and mixed treasure piles now include ordinary translucent placeholder geometry for normal editor selection, while hiding that geometry during gameplay.
+- Level progress, recovered treasure, shop stock, and replay cleanup now live behind a dedicated persistence component instead of being implemented by level navigation.
+- Successful treasure-free levels now record their escape correctly, and looping run previews hold their final pose instead of interpolating back toward the start.
+- Audio settings now apply immediately while batching disk saves until interaction settles or the player leaves Settings.
+- The standard project check now runs the long-lived Godot test suite, including stable held-navigation coverage for shop focus details.
+- Looping a level-select replay now immediately replaces its complete isolated preview session, clearing the replay inventory and restoring pickups, enemies, hazards, and authored particle effects.
+- Level-select replays now show the moving kill boundary throughout the recorded run.
+- Starting a level now shuts down its level-select replay before changing scenes, and replay tutorial triggers no longer raise a deferred overlap error that could halt debug runs.
+- Replay hazards and enemies now trigger the character's local death animation in level selection while the recorded camera close-up continues, without storing a separate death flag or opening the loss screen.
+- Level-select replays now collect nearby treasure into a replay-only inventory, remain fully silent, and isolate completion, deposits, tutorials, torches, damage, and flask effects from saved player progress.
+- Level-select run previews now simulate coin drops, enemy movement, and other level logic while keeping the recorded player isolated, and are shown more clearly behind the level details.
+- Skeletons and zombies placed slightly below a walkable floor now shift up onto it when spawned, while enemies intentionally placed in the air still fall naturally before moving.
+- Level selection now replays the most recent run for each tomb at half opacity behind its details, with threaded loading that keeps menu navigation responsive.
+- Every run now stores compact, compressed per-physics-frame joypad actions, timing, player motion, and camera motion under the level's stable ID for faithful fixed-timing playback.
+- Successful result screens now initially highlight Level Select while retaining Retry, and death screens explicitly highlight Retry so players can immediately re-enter the lost level.
+- The Level Select gallery card now keeps its isolated viewport at the screen's native 1920x1080 size and scales the completed render, fixing the previous top-left-only preview.
+- The gallery's Level Select preview now renders through an isolated 1920x1080 SubViewport, preventing its independently scaled title and backdrop from spilling behind the other preview cards.
+- Level selection once again uses the shared illustrated graveyard backdrop and shade, matching Shop, Settings, and the result screens.
+- The Lose scene now explicitly authors its "YOU DIED!" title and bottom action bounds at the shared result-screen positions, keeping both visible and correctly placed in the editor.
+- Frontend authors can now open a single labelled gallery scene to compare the Title, Level Select, Shop, Settings, Win, and Lose screens side by side as linked miniature scene instances.
+- Result screens now retain their editor-authored titles at runtime, keeping gallery previews and the actual Win and Lose presentations in sync.
+- Level selection now hides zero-count loot tiles and removes the empty loot area entirely for tombs where the player has recovered nothing.
+- Win and loss results now restore a Retry action as their initial highlighted choice, letting players immediately replay the selected tomb after either outcome.
+- Settings now uses a full-page surround with a persistent external Back action, while Music and Sound Effect rows receive the same five-pixel yellow controller-focus highlight as other frontend actions.
+- Win and loss results now keep their title outside a vertically centred surround, prioritise completion percentage, and show only non-zero relevant treasure in larger tiles that wrap across two centred rows; successful replays with no newly credited treasure show no resource tiles.
+- Player deaths now load a dedicated loss-outcome scene script, ensuring the result title always reads "Claimed by the Grave" rather than reporting an escape.
+- Level selection now mirrors the shop's two-panel layout: its title sits above the surrounds, the illustrated backdrop has been removed, and selecting a tomb shows the exact treasure liberated from that level in a dedicated right-hand panel.
+- Win and loss screens now share the frontend's graveyard backdrop, tiled stone frame, Almendra typography, compact actions, distinct titles, exact per-treasure haul counts, total value, and recovered percentage; failed hauls are clearly shown as lost.
+- A new Settings screen is available from level selection with supplied Music and Sound Effect icons, persistent sliders, separate audio buses, and a styled Yes/No confirmation before resetting all progress.
+- Choose Your Tomb, Shop, Settings, Escaped the Grave, and Claimed by the Grave now use explicit coordinated screen titles, while the shop also shares the graveyard backdrop treatment.
+- Level selection now provides a compact Settings action between Back and Shop, with shared focus navigation supporting all three bottom actions.
+- Replaying a level now awards additional treasure only when that run also contains its entire previously credited haul, preventing different partial runs from being combined into an unearned 100% reward.
+- Level-select and shop analog navigation now accept a partial stick release between deliberate flicks, making quick repeated movements responsive without adding held-stick repeats.
+- The level-select Back and Shop buttons now sit outside the stone surround and use the same compact proportions as the shop actions.
+- The shop now gives its treasure balances more breathing room at the top and uses smaller, neater Back and Buy buttons at the bottom.
+- The shop now shows icon, name, and saved quantity for all seven treasure types in compact half-scale tiled frames above the shifted inventory and detail panels.
+- Successful level exits now credit only treasure beyond that level's previously rewarded qualifying haul; losses, lower runs, and incompatible partial hauls never duplicate wallet rewards.
+- Diamonds, rubies, sapphires, and emeralds now use distinct authored 3D cuts matching their frontend icons while retaining the established jewel material rendering and physical scale.
+- Gem palettes now use a more consistent shadow, body, and highlight progression, with face-derived normals keeping facets crisp across the new primitive geometry.
+- Level selection now uses a compact vertical row list instead of the old card grid, sharing smooth focus scrolling and five-pixel selection styling with the shop.
+- Frontend lists now move left and right to their bottom actions; level selection provides Back and Shop, while the shop provides Back and Buy.
+- Deposited coins, gold bars, and all five gem types now accumulate by exact object count in player progress and can fund data-driven shop purchases.
+- Shop purchases now deduct their authored treasure type, persist purchased stock, refresh affordability immediately, and show all saved treasure balances.
+- Shop item rows show authored stock and grey out upgrades the player cannot afford while still allowing their subdued artwork and details to be inspected.
+- Level selection now shares the shop's tiled stone surround, purple divider treatment, dark panels, five-pixel yellow focus border, and replaceable heart placeholder icons.
+- Players can open the populated upgrade shop from a dedicated joypad-accessible button beneath level selection.
+- Players can browse an availability-filtered shop catalog with a clear yellow selection, smooth joypad scrolling, and item details that update from authored resource data.
+- Shop item details now present the selected item artwork, Almendra-styled name and description, price, and clearly grouped stat-effect rows using the new frontend graphics.
+- Level editors now have a 1920x1080 shop layout starter with two resizeable tiled nine-slice stone frames that scale uniformly to the output display.
+- Skeletons and zombies placed above the ground now fall to the floor before beginning their ground movement.
 - Contributors now retain explicit rename history for the relocated gold coin pile and kill boundary files.
 - PNG-to-GridMap profile storage no longer carries special handling for the removed `levels/common` folder.
 - Level progress and lit torches now follow stable level IDs when mappings are reordered or inserted, with existing numeric saves migrated to their original levels.
@@ -89,3 +140,14 @@
 - Holding the drop action now accelerates from deliberate individual drops to rapid unloading, while dropped items spread across a small deterministic angle instead of piling into one line.
 - Treasure-deposit behavior is now packaged with its coffin as a reusable scene, reducing per-level setup and keeping every placed deposit consistently configured.
 - Scene validation now covers relevant addon scenes while excluding only intentionally unsupported addon/test paths, and lint reporting now counts the same production scripts that are actually linted.
+- Settings now fills the active display, Reset Progress raises a clearly layered confirmation as soon as it is clicked before clearing saved progress, and Back reliably returns players to level selection.
+- Settings volume sliders now use double-thickness tracks centred vertically beside their icons and labels.
+- Settings Back navigation now responds immediately to both mouse and joypad presses and reports scene-loading failures instead of silently remaining on the page.
+- Settings now explicitly activates the focused Reset, Back, Yes, or No control from the joypad primary button, matching mouse activation throughout the complete settings flow.
+- Win and Lose screens now scale their complete 1920x1080 layouts to the active display and explicitly activate focused Level Select or Retry actions from mouse, keyboard, and joypad primary presses.
+- Shop items now purchase immediately when their row is clicked or activated, and Level Select is the only remaining bottom action.
+- Shop resource balances now hide individual zero-count boxes and remove the complete balance row when the player owns no spendable resources.
+- Frontend buttons now play selection feedback, successful shop purchases have a distinct sound, and joypad focus movement is audible across menus.
+- Holding a joypad stick or directional button now repeatedly scrolls through level and shop lists after a short delay.
+- Shop and level-list joypad movement now plays cursor feedback directly after focus reaches a different row, avoiding input-order-dependent silence.
+- Level selection now hides the Liberated Loot heading and its complete section until a played tomb has actually yielded liberated treasure.

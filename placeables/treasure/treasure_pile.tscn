@@ -1,6 +1,7 @@
-[gd_scene format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://placeables/treasure/treasure_pile.gd" id="1_script"]
+[ext_resource type="CylinderMesh" path="res://placeables/treasure/pile_selection_placeholder.tres" id="2_selection"]
 
 [node name="TreasurePile" type="Node3D"]
 script = ExtResource("1_script")
@@ -10,3 +11,7 @@ spawn_interval = 0.05
 preview_base_height = 0.025
 preview_center_height = 0.1
 preview_item_spacing = 0.055
+
+[node name="EditorSelectionPlaceholder" type="MeshInstance3D" parent="."]
+cast_shadow = 3
+mesh = ExtResource("2_selection")

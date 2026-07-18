@@ -1,0 +1,64 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" uid="uid://g2wvncjt8bck" path="res://Assets/frontend/strength-icon.png" id="1_icon"]
+[ext_resource type="FontFile" uid="uid://ipq4de64yjtd" path="res://Assets/fonts/Almendra-Bold.ttf" id="2_almendra_bold"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row"]
+bg_color = Color(0.012, 0.016, 0.022, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.18, 0.2, 0.22, 0.85)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="LabelSettings" id="LabelSettings_effect"]
+font = ExtResource("2_almendra_bold")
+font_size = 30
+font_color = Color(0.43, 0.75, 0.25, 1)
+outline_size = 3
+outline_color = Color(0.02, 0.035, 0.015, 1)
+
+[node name="ShopStatModifierRow" type="Panel"]
+custom_minimum_size = Vector2(430, 62)
+offset_right = 430.0
+offset_bottom = 62.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_row")
+editor_description = "Reusable selected-item stat modifier row populated from shop catalog data."
+
+[node name="ModifierIconTexture" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 5.0
+offset_right = 60.0
+offset_bottom = 57.0
+mouse_filter = 2
+texture = ExtResource("1_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ModifierNameLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 72.0
+offset_right = 310.0
+offset_bottom = 62.0
+mouse_filter = 2
+text = "STRENGTH"
+label_settings = SubResource("LabelSettings_effect")
+vertical_alignment = 1
+
+[node name="ModifierValueLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 330.0
+offset_top = -2.0
+offset_right = 418.0
+offset_bottom = 62.0
+mouse_filter = 2
+text = "+1"
+label_settings = SubResource("LabelSettings_effect")
+horizontal_alignment = 2
+vertical_alignment = 1
