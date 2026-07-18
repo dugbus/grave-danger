@@ -40,19 +40,32 @@ func _physics_process(delta: float) -> void:
 	if is_dead:
 		return
 
+	has_moved_body_this_frame = false
+	_apply_gravity(delta)
+	if not zombie_body.is_on_floor():
+		_stop_body()
+		_move_body()
+		_update_animation(0.0)
+		return
+
 	if not _update_drop_in(delta):
+		_stop_body()
+		_move_body()
 		_update_animation(0.0)
 		return
 
 	if not navigation_ready:
 		_change_state(ZombieState.LevelStart)
 		_stop_body()
+		_move_body()
 		_update_animation(0.0)
 		return
 
 	_resolve_player()
 	_update_rolling_ball_death(delta)
 	_update_state(delta)
+	if not has_moved_body_this_frame:
+		_move_body()
 
 func set_navigation_ready(is_ready: bool) -> void:
 	navigation_ready = is_ready

@@ -257,6 +257,7 @@ var has_dropped_in := false
 var is_dropping_in := false
 var is_dead := false
 var is_disappearing := false
+var has_moved_body_this_frame := false
 
 
 func _get_body_position() -> Vector3:

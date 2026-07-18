@@ -20,6 +20,8 @@ const ENEMY_LIGHT_SHADOW_CASTER_MASK := (
     ALL_SHADOW_CASTER_LAYERS & ~ENEMY_GEOMETRY_VISUAL_LAYER
 )
 const MODEL_FORWARD_YAW_OFFSET := 0.0
+const FLOOR_PROBE_MARGIN := 0.05
+const FLOOR_SNAP_DISTANCE := 0.1
 
 ## PathFollow3D that carries the skeleton visual and contact area.
 @export var path_follow_path: NodePath = ^"PathFollow3D"
@@ -153,6 +155,8 @@ var has_dropped_in := false
 var is_dropping_in := false
 var is_dead := false
 var is_disappearing := false
+var fall_velocity := 0.0
+var has_landed := false
 
 
 func _ready() -> void:
@@ -198,6 +202,10 @@ func _physics_process(delta: float) -> void:
     if is_dead:
         return
 
+    if not _update_fall(delta):
+        _update_animation(0.0)
+        return
+
     if not _update_drop_in(delta):
         _update_animation(0.0)
         return
@@ -214,6 +222,38 @@ func _physics_process(delta: float) -> void:
     _update_footsteps(delta, horizontal_speed)
     _update_kill_overlaps(delta)
     _update_rolling_ball_death()
+
+
+func _update_fall(delta: float) -> bool:
+    if has_landed:
+        return true
+
+    var world := get_world_3d()
+    if world == null:
+        return false
+
+    var gravity := float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
+    fall_velocity -= gravity * delta
+    var current_floor_position := path_follow.global_position
+    var probe_start := current_floor_position + Vector3.UP * FLOOR_PROBE_MARGIN
+    var fall_distance := maxf(-fall_velocity * delta, 0.0) + FLOOR_PROBE_MARGIN + FLOOR_SNAP_DISTANCE
+    var query := PhysicsRayQueryParameters3D.create(
+        probe_start,
+        probe_start + Vector3.DOWN * fall_distance,
+        map_collision_mask
+    )
+    query.collide_with_areas = false
+    query.collide_with_bodies = true
+    var hit := world.direct_space_state.intersect_ray(query)
+    if not hit.is_empty():
+        var floor_position := hit.get("position", current_floor_position) as Vector3
+        global_position.y += floor_position.y - current_floor_position.y
+        fall_velocity = 0.0
+        has_landed = true
+        return false
+
+    global_position.y += fall_velocity * delta
+    return false
 
 
 func _apply_start_progress() -> void:

@@ -77,7 +77,7 @@ func _follow_navigation_target(
     var movement_velocity := _update_locomotion_velocity_for_direction(requested_speed, direction, delta)
     zombie_body.velocity.x = movement_velocity.x
     zombie_body.velocity.z = movement_velocity.z
-    zombie_body.move_and_slide()
+    _move_body()
 
     if _has_blocking_slide_collision() and not routed_with_grid:
         var slide_direction := _get_wall_slide_direction(direction)
@@ -85,7 +85,7 @@ func _follow_navigation_target(
             movement_velocity = _update_locomotion_velocity_for_direction(requested_speed, slide_direction, delta)
             zombie_body.velocity.x = movement_velocity.x
             zombie_body.velocity.z = movement_velocity.z
-            zombie_body.move_and_slide()
+            _move_body()
             repath_timer = 0.0
             direction = slide_direction
 
@@ -99,7 +99,7 @@ func _follow_navigation_target(
                 movement_velocity = _update_locomotion_velocity_for_direction(requested_speed, direction, delta)
                 zombie_body.velocity.x = movement_velocity.x
                 zombie_body.velocity.z = movement_velocity.z
-                zombie_body.move_and_slide()
+                _move_body()
                 repath_timer = 0.0
                 routed_with_grid = true
 
@@ -372,7 +372,26 @@ func _stop_body() -> void:
     current_movement_velocity = Vector3.ZERO
     if zombie_body == null:
         return
-    zombie_body.velocity = Vector3.ZERO
+    zombie_body.velocity.x = 0.0
+    zombie_body.velocity.z = 0.0
+
+func _apply_gravity(delta: float) -> void:
+    if zombie_body == null:
+        return
+
+    if zombie_body.is_on_floor():
+        zombie_body.velocity.y = 0.0
+        return
+
+    var gravity := float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
+    zombie_body.velocity.y -= gravity * delta
+
+func _move_body() -> void:
+    if zombie_body == null:
+        return
+
+    zombie_body.move_and_slide()
+    has_moved_body_this_frame = true
 
 func _update_locomotion_velocity_for_direction(requested_speed: float, direction: Vector3, delta: float) -> Vector3:
     var target_speed := _get_turn_limited_speed(requested_speed, direction)
