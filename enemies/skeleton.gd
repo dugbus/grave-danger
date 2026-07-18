@@ -12,6 +12,7 @@ const CHARACTER_GROUP: StringName = &"character"
 const SKELETON_GROUP: StringName = &"skeleton"
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
+const GROUND_SPAWN := preload("res://enemies/ground_spawn.gd")
 const WORLD_COLLISION_LAYER := 1
 const ENEMY_GEOMETRY_VISUAL_LAYER := 1 << 18
 const ALL_VISUAL_LAYERS := (1 << 20) - 1
@@ -157,6 +158,7 @@ var is_dead := false
 var is_disappearing := false
 var fall_velocity := 0.0
 var has_landed := false
+var spawn_floor_checked := false
 
 
 func _ready() -> void:
@@ -227,6 +229,19 @@ func _physics_process(delta: float) -> void:
 func _update_fall(delta: float) -> bool:
     if has_landed:
         return true
+
+    if not spawn_floor_checked:
+        spawn_floor_checked = true
+        if GROUND_SPAWN.shift_above_nearby_floor(
+            self,
+            path_follow,
+            self,
+            map_collision_mask,
+            map_collision_floor_normal_y
+        ):
+            fall_velocity = 0.0
+            has_landed = true
+            return false
 
     var world := get_world_3d()
     if world == null:

@@ -2,6 +2,9 @@ extends "res://enemies/zombie/zombie_combat.gd"
 class_name GDZombiePath
 
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
+const GROUND_SPAWN := preload("res://enemies/ground_spawn.gd")
+
+var spawn_floor_checked := false
 
 
 func _ready() -> void:
@@ -40,6 +43,7 @@ func _physics_process(delta: float) -> void:
 	if is_dead:
 		return
 
+	_correct_below_floor_spawn()
 	has_moved_body_this_frame = false
 	_apply_gravity(delta)
 	if not zombie_body.is_on_floor():
@@ -66,6 +70,20 @@ func _physics_process(delta: float) -> void:
 	_update_state(delta)
 	if not has_moved_body_this_frame:
 		_move_body()
+
+func _correct_below_floor_spawn() -> void:
+	if spawn_floor_checked or zombie_body == null:
+		return
+
+	spawn_floor_checked = true
+	GROUND_SPAWN.shift_above_nearby_floor(
+		self,
+		zombie_body,
+		zombie_body,
+		map_collision_mask,
+		navigation_collision_floor_normal_y,
+		[zombie_body.get_rid()]
+	)
 
 func set_navigation_ready(is_ready: bool) -> void:
 	navigation_ready = is_ready
