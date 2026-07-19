@@ -1,3 +1,4 @@
+- Skeleton avoidance bodies now use their own collision layer, preventing invisible player obstacles at skeleton patrol positions while enemies continue to avoid one another.
 - Level-select actions now open immediately while a previous run recording finishes saving in the background, and title fades reliably reach full brightness after paused gameplay.
 - Level treasure totals now include authored loose valuables as well as piles, while avoiding double-counting treasure spawned from piles at runtime.
 - The selected-Path3D editor gizmo now validates clicked point data and uses explicit scalar conversions, preventing malformed editor selection data from breaking the add-on.

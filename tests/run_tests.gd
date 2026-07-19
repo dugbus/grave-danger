@@ -3710,6 +3710,9 @@ func _test_ground_enemies_block_each_other() -> bool:
     var zombie := ZOMBIE_SCENE.instantiate()
     zombie.set_physics_process(false)
     root.add_child(zombie)
+    var player := PLAYER_SCENE.instantiate() as GDPlayer
+    player.set_physics_process(false)
+    root.add_child(player)
     await physics_frame
 
     var skeleton_body := skeleton.get_node(
@@ -3736,6 +3739,9 @@ func _test_ground_enemies_block_each_other() -> bool:
         (zombie_body.collision_mask & skeleton_body.collision_layer) != 0,
         "zombie bodies collide with skeleton bodies"
     ) and _expect(
+        (player.collision_mask & skeleton_body.collision_layer) == 0,
+        "skeleton avoidance bodies do not create invisible obstacles for the player"
+    ) and _expect(
         detects_skeleton_ahead,
         "skeletons reverse before overlapping another skeleton"
     )
@@ -3743,6 +3749,7 @@ func _test_ground_enemies_block_each_other() -> bool:
     skeleton.queue_free()
     other_skeleton.queue_free()
     zombie.queue_free()
+    player.queue_free()
     return passed
 
 

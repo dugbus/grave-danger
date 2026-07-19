@@ -33,7 +33,7 @@ loop = false
 [node name="DropPivot" type="Node3D" parent="PathFollow3D"]
 
 [node name="SkeletonBody" type="AnimatableBody3D" parent="PathFollow3D/DropPivot"]
-collision_layer = 16
+collision_layer = 32
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="PathFollow3D/DropPivot/SkeletonBody"]
