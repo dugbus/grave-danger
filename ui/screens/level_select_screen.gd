@@ -345,9 +345,7 @@ func _start_level(index: int) -> void:
         return
     _play_select_sound()
     starting = true
-    if level_run_playback != null:
-        level_run_playback.stop_for_scene_change()
-    get_tree().change_scene_to_file(game_scene)
+    await _change_scene_after_playback_shutdown(game_scene)
 
 
 func _return_to_title() -> void:
@@ -355,7 +353,7 @@ func _return_to_title() -> void:
         return
     _play_select_sound()
     starting = true
-    get_tree().change_scene_to_file(TITLE_SCENE_PATH)
+    await _change_scene_after_playback_shutdown(TITLE_SCENE_PATH)
 
 
 func _open_shop() -> void:
@@ -363,7 +361,7 @@ func _open_shop() -> void:
         return
     _play_select_sound()
     starting = true
-    get_tree().change_scene_to_file(shop_scene_path)
+    await _change_scene_after_playback_shutdown(shop_scene_path)
 
 
 func _open_settings() -> void:
@@ -371,4 +369,15 @@ func _open_settings() -> void:
         return
     _play_select_sound()
     starting = true
-    get_tree().change_scene_to_file(SETTINGS_SCENE_PATH)
+    await _change_scene_after_playback_shutdown(SETTINGS_SCENE_PATH)
+
+
+func _change_scene_after_playback_shutdown(scene_path: String) -> void:
+    if level_run_playback != null:
+        await level_run_playback.stop_for_scene_change()
+    if not is_inside_tree():
+        return
+    var change_error := get_tree().change_scene_to_file(scene_path)
+    if change_error != OK:
+        starting = false
+        push_warning("Could not open scene '%s'." % scene_path)

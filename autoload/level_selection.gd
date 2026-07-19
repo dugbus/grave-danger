@@ -104,6 +104,14 @@ func get_selected_level_id() -> String:
     return _get_level_id(selected_level_index)
 
 
+func register_run_recording_save_task(level_id: String, task_id: int) -> bool:
+    return player_progress.register_run_recording_save_task(level_id, task_id)
+
+
+func take_run_recording_save_task(level_id: String) -> int:
+    return player_progress.take_run_recording_save_task(level_id)
+
+
 func get_level_result(index: int) -> Dictionary:
     return player_progress.get_level_result(_get_result_key(index))
 

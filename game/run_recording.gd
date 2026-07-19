@@ -6,12 +6,20 @@ class_name GDRunRecording
 const STORAGE_DIRECTORY := "user://run_playbacks"
 const FILE_EXTENSION := ".gdr"
 const FILE_MAGIC := 0x47445250
-const FILE_VERSION := 2
+const INVALID_TASK_ID := -1
 const MAX_PAYLOAD_BYTES := 512 * 1024 * 1024
+const MAX_METADATA_BYTES := 16 * 1024 * 1024
 const NORMAL_FRAME_MINIMUM_SIZE := 35
 const MIN_FRAME_DELTA := 0.000001
 const POSITION_SCALE := 1000.0
 const ROTATION_SCALE := 32767.0
+
+enum FileVersion {
+    PoseFrames = 2,
+    RunMetadata = 3,
+}
+
+const FILE_VERSION := FileVersion.RunMetadata
 
 enum FrameFlags {
     JumpPressed = 1 << 0,
@@ -20,25 +28,30 @@ enum FrameFlags {
     CameraAvailable = 1 << 3,
 }
 
-
 static func save_for_level(
     level_id: String,
     frame_payload: PackedByteArray,
     frame_count: int,
     camera_fov: float,
-    storage_directory: String = STORAGE_DIRECTORY
+    storage_directory: String = STORAGE_DIRECTORY,
+    run_metadata: Dictionary = {},
+    used_payload_size: int = -1
 ) -> bool:
-    if level_id.is_empty() or frame_count <= 0 or frame_payload.is_empty() \
-            or frame_payload.size() > MAX_PAYLOAD_BYTES:
+    var payload_size := frame_payload.size() if used_payload_size < 0 else used_payload_size
+    if not _is_valid_recording(level_id, frame_payload, frame_count, payload_size):
         return false
     if not _ensure_storage_directory(storage_directory):
         return false
 
+    var payload_to_save := frame_payload.slice(0, payload_size)
+    var metadata_bytes := JSON.stringify(run_metadata).to_utf8_buffer()
+    if metadata_bytes.size() > MAX_METADATA_BYTES:
+        return false
     var safe_id := level_id.validate_filename()
     var temporary_name := "%s%s.tmp" % [safe_id, FILE_EXTENSION]
     var final_name := "%s%s" % [safe_id, FILE_EXTENSION]
     var temporary_path := "%s/%s" % [storage_directory, temporary_name]
-    var compressed_payload := frame_payload.compress(FileAccess.COMPRESSION_ZSTD)
+    var compressed_payload := payload_to_save.compress(FileAccess.COMPRESSION_ZSTD)
     if compressed_payload.is_empty():
         return false
     var recording_file := FileAccess.open(temporary_path, FileAccess.WRITE)
@@ -50,8 +63,10 @@ static func save_for_level(
     recording_file.store_16(FILE_VERSION)
     recording_file.store_32(frame_count)
     recording_file.store_float(camera_fov)
-    recording_file.store_32(frame_payload.size())
+    recording_file.store_32(metadata_bytes.size())
+    recording_file.store_32(payload_to_save.size())
     recording_file.store_32(compressed_payload.size())
+    recording_file.store_buffer(metadata_bytes)
     recording_file.store_buffer(compressed_payload)
     recording_file.close()
 
@@ -70,6 +85,41 @@ static func save_for_level(
     return true
 
 
+static func queue_save_for_level(
+    level_id: String,
+    frame_payload: PackedByteArray,
+    frame_count: int,
+    camera_fov: float,
+    storage_directory: String = STORAGE_DIRECTORY,
+    run_metadata: Dictionary = {},
+    used_payload_size: int = -1
+) -> int:
+    var payload_size := frame_payload.size() if used_payload_size < 0 else used_payload_size
+    if not _is_valid_recording(level_id, frame_payload, frame_count, payload_size):
+        return INVALID_TASK_ID
+
+    # The recorder transfers ownership of this immutable snapshot so even large metadata stays
+    # off the gameplay thread rather than being deep-copied before the worker starts.
+    var metadata_snapshot := run_metadata
+    var save_task_id := WorkerThreadPool.add_task(
+        func() -> void:
+            save_for_level(
+                level_id,
+                frame_payload,
+                frame_count,
+                camera_fov,
+                storage_directory,
+                metadata_snapshot,
+                payload_size
+            ),
+        false,
+        "Save run recording"
+    )
+    if save_task_id == INVALID_TASK_ID:
+        return INVALID_TASK_ID
+    return save_task_id
+
+
 static func load_for_level(
     level_id: String,
     storage_directory: String = STORAGE_DIRECTORY
@@ -83,26 +133,55 @@ static func load_for_level(
     )
     if recording_file == null:
         return {}
-    if recording_file.get_32() != FILE_MAGIC or recording_file.get_16() != FILE_VERSION:
+    if recording_file.get_32() != FILE_MAGIC:
+        return {}
+    var file_version := recording_file.get_16()
+    if file_version != FileVersion.PoseFrames and file_version != FileVersion.RunMetadata:
         return {}
 
     var frame_count := recording_file.get_32()
     var camera_fov := recording_file.get_float()
+    var metadata_size := recording_file.get_32() if file_version >= FileVersion.RunMetadata else 0
     var payload_size := recording_file.get_32()
     var compressed_size := recording_file.get_32()
-    if frame_count <= 0 or payload_size <= 0 or payload_size > MAX_PAYLOAD_BYTES \
-            or compressed_size <= 0 or compressed_size > recording_file.get_length() \
+    if frame_count <= 0 or metadata_size < 0 or metadata_size > MAX_METADATA_BYTES \
+            or payload_size <= 0 or payload_size > MAX_PAYLOAD_BYTES \
+            or compressed_size <= 0 \
+            or metadata_size + compressed_size > recording_file.get_length() - recording_file.get_position() \
             or frame_count > floori(
                 float(payload_size) / float(NORMAL_FRAME_MINIMUM_SIZE)
             ) + 1:
         return {}
+    var run_metadata: Dictionary = {}
+    if metadata_size > 0:
+        var metadata_bytes := recording_file.get_buffer(metadata_size)
+        if metadata_bytes.size() != metadata_size:
+            return {}
+        var parsed_metadata: Variant = JSON.parse_string(metadata_bytes.get_string_from_utf8())
+        if parsed_metadata is Dictionary:
+            run_metadata = parsed_metadata
+        else:
+            return {}
     var compressed_payload := recording_file.get_buffer(compressed_size)
     if compressed_payload.size() != compressed_size:
         return {}
     var payload := compressed_payload.decompress(payload_size, FileAccess.COMPRESSION_ZSTD)
     if payload.size() != payload_size:
         return {}
-    return decode_payload(payload, frame_count, camera_fov)
+    var decoded := decode_payload(payload, frame_count, camera_fov)
+    if not decoded.is_empty():
+        decoded["run_metadata"] = run_metadata
+    return decoded
+
+
+static func load_for_level_after_task(
+    level_id: String,
+    save_task_id: int,
+    storage_directory: String = STORAGE_DIRECTORY
+) -> Dictionary:
+    if save_task_id != INVALID_TASK_ID:
+        WorkerThreadPool.wait_for_task_completion(save_task_id)
+    return load_for_level(level_id, storage_directory)
 
 
 static func decode_payload(
@@ -259,6 +338,21 @@ static func _ensure_storage_directory(storage_directory: String) -> bool:
     if DirAccess.dir_exists_absolute(global_storage_path):
         return true
     return DirAccess.make_dir_recursive_absolute(global_storage_path) == OK
+
+
+static func _is_valid_recording(
+    level_id: String,
+    frame_payload: PackedByteArray,
+    frame_count: int,
+    used_payload_size: int = -1
+) -> bool:
+    var payload_size := frame_payload.size() if used_payload_size < 0 else used_payload_size
+    return not level_id.is_empty() \
+        and frame_count > 0 \
+        and not frame_payload.is_empty() \
+        and payload_size > 0 \
+        and payload_size <= frame_payload.size() \
+        and payload_size <= MAX_PAYLOAD_BYTES
 
 
 static func _decode_signed(encoded: int) -> int:

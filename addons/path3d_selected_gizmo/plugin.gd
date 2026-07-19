@@ -61,10 +61,12 @@ func _forward_3d_gui_input(camera: Camera3D, event: InputEvent) -> EditorPlugin.
     if selected_point.is_empty():
         return EditorPlugin.AFTER_GUI_INPUT_PASS
 
-    var path := selected_point["path"] as Path3D
-    var point_index := selected_point["point_index"] as int
+    var path := selected_point.get("path") as Path3D
+    var point_index := int(selected_point.get("point_index", -1))
+    if path == null or point_index < 0:
+        return EditorPlugin.AFTER_GUI_INPUT_PASS
     if path.has_method("preview_path_point_in_animation"):
-        var point_time := path.call("preview_path_point_in_animation", point_index) as float
+        var point_time := float(path.call("preview_path_point_in_animation", point_index))
         if point_time >= 0.0:
             _center_animation_timeline.call_deferred(point_time)
     return EditorPlugin.AFTER_GUI_INPUT_PASS

@@ -10,10 +10,13 @@ const FOOTSTEP_SOUND_PATHS: Array[String] = [
 ]
 const CHARACTER_GROUP: StringName = &"character"
 const SKELETON_GROUP: StringName = &"skeleton"
+const SMART_ZOMBIE_GROUP: StringName = &"smart_zombie"
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const GROUND_SPAWN := preload("res://enemies/ground_spawn.gd")
 const WORLD_COLLISION_LAYER := 1
+const ZOMBIE_COLLISION_LAYER := 1 << 3
+const SKELETON_COLLISION_LAYER := 1 << 4
 const ENEMY_GEOMETRY_VISUAL_LAYER := 1 << 18
 const ALL_VISUAL_LAYERS := (1 << 20) - 1
 const ALL_SHADOW_CASTER_LAYERS := (1 << 32) - 1
@@ -28,6 +31,8 @@ const FLOOR_SNAP_DISTANCE := 0.1
 @export var path_follow_path: NodePath = ^"PathFollow3D"
 ## Node moved vertically while the skeleton drops in.
 @export var drop_pivot_path: NodePath = ^"PathFollow3D/DropPivot"
+## Body exposed to other enemies so skeletons and zombies cannot pass through this skeleton.
+@export var skeleton_body_path: NodePath = ^"PathFollow3D/DropPivot/SkeletonBody"
 ## Visual pivot rotated toward the skeleton's current shuffle direction.
 @export var pivot_path: NodePath = ^"PathFollow3D/DropPivot/Pivot"
 ## Imported skeleton character subtree containing the AnimationPlayer.
@@ -58,6 +63,10 @@ const FLOOR_SNAP_DISTANCE := 0.1
 @export var turn_speed := 1.5
 ## Physics layers that make the skeleton reverse when detected ahead on its path.
 @export_flags_3d_physics var map_collision_mask := WORLD_COLLISION_LAYER
+## Enemy body layers that make the skeleton reverse before overlapping another enemy.
+@export_flags_3d_physics var enemy_collision_mask := (
+    ZOMBIE_COLLISION_LAYER | SKELETON_COLLISION_LAYER
+)
 ## Height above the path used for the map collision probe.
 @export_range(0.0, 2.0, 0.01) var map_collision_probe_height := 0.45
 ## Extra distance ahead of the skeleton checked for map blockers.
@@ -133,6 +142,7 @@ const FLOOR_SNAP_DISTANCE := 0.1
 
 @onready var path_follow := get_node_or_null(path_follow_path) as PathFollow3D
 @onready var drop_pivot := get_node_or_null(drop_pivot_path) as Node3D
+@onready var skeleton_body := get_node_or_null(skeleton_body_path) as AnimatableBody3D
 @onready var pivot := get_node_or_null(pivot_path) as Node3D
 @onready var character := get_node_or_null(character_path) as Node3D
 @onready var kill_area := get_node_or_null(kill_area_path) as Area3D
@@ -334,6 +344,7 @@ func _set_active_visible(active: bool) -> void:
         shadow.visible = active
     if skeleton_light != null:
         skeleton_light.visible = active and skeleton_light_enabled
+    _set_skeleton_body_enabled(active and has_dropped_in and not is_dead)
     _set_kill_area_enabled(active and has_dropped_in)
 
 
@@ -341,6 +352,13 @@ func _set_kill_area_enabled(enabled: bool) -> void:
     kill_overlap_times.clear()
     if kill_area != null:
         kill_area.monitoring = enabled
+
+
+func _set_skeleton_body_enabled(enabled: bool) -> void:
+    if skeleton_body == null:
+        return
+
+    skeleton_body.collision_layer = SKELETON_COLLISION_LAYER if enabled else 0
 
 
 func _set_skeleton_transparency(transparency: float) -> void:
@@ -428,7 +446,7 @@ func _advance_patrol(delta: float) -> void:
 
 
 func _would_hit_map_collision(target_progress: float, travel_distance: float) -> bool:
-    if map_collision_mask == 0 or path_follow == null or curve == null:
+    if path_follow == null or curve == null:
         return false
 
     var world := get_world_3d()
@@ -446,6 +464,11 @@ func _would_hit_map_collision(target_progress: float, travel_distance: float) ->
     var probe_direction := horizontal_displacement.normalized()
     var probe_origin := current_position + Vector3.UP * map_collision_probe_height
     var probe_distance := map_collision_probe_distance + maxf(horizontal_displacement.length(), travel_distance)
+    if _would_hit_enemy_collision(world, probe_origin, probe_direction, probe_distance):
+        return true
+    if map_collision_mask == 0:
+        return false
+
     var query := PhysicsRayQueryParameters3D.create(
         probe_origin,
         probe_origin + probe_direction * probe_distance,
@@ -463,6 +486,67 @@ func _would_hit_map_collision(target_progress: float, travel_distance: float) ->
         return true
 
     return _would_hit_pushable_collision(world, current_position, probe_direction, probe_distance)
+
+
+func _would_hit_enemy_collision(
+    world: World3D,
+    probe_origin: Vector3,
+    probe_direction: Vector3,
+    probe_distance: float
+) -> bool:
+    if enemy_collision_mask == 0:
+        return false
+
+    var probe_shape := SphereShape3D.new()
+    probe_shape.radius = map_collision_pushable_probe_radius
+    var query := PhysicsShapeQueryParameters3D.new()
+    query.shape = probe_shape
+    query.collision_mask = enemy_collision_mask
+    query.collide_with_areas = false
+    query.collide_with_bodies = true
+    if skeleton_body != null:
+        query.exclude = [skeleton_body.get_rid()]
+
+    var sample_count := maxi(map_collision_pushable_probe_steps, 1)
+    for sample_index in range(sample_count):
+        var sample_ratio := float(sample_index + 1) / float(sample_count)
+        query.transform = Transform3D(
+            Basis.IDENTITY,
+            probe_origin + probe_direction * probe_distance * sample_ratio
+        )
+        for hit: Dictionary in world.direct_space_state.intersect_shape(query, 8):
+            var collider := hit.get("collider") as Object
+            if _is_enemy_collision(collider) \
+                    and _is_enemy_ahead(collider, probe_origin, probe_direction):
+                return true
+
+    return false
+
+
+func _is_enemy_collision(collider: Object) -> bool:
+    if collider == null or not collider is Node:
+        return false
+
+    var node := collider as Node
+    while node != null and node != self:
+        if node.is_in_group(SKELETON_GROUP) or node.is_in_group(SMART_ZOMBIE_GROUP):
+            return true
+        node = node.get_parent()
+    return false
+
+
+func _is_enemy_ahead(
+    collider: Object,
+    probe_origin: Vector3,
+    probe_direction: Vector3
+) -> bool:
+    var collider_node := collider as Node3D
+    if collider_node == null:
+        return false
+
+    var direction_to_enemy := collider_node.global_position - probe_origin
+    direction_to_enemy.y = 0.0
+    return direction_to_enemy.dot(probe_direction) > 0.001
 
 
 func _would_hit_pushable_collision(
@@ -700,6 +784,7 @@ func _die_from_rolling_ball() -> void:
 
     is_dead = true
     footstep_distance_accumulator = 0.0
+    _set_skeleton_body_enabled(false)
     _set_kill_area_enabled(false)
     _play_death_scream()
     _play_death_animation()

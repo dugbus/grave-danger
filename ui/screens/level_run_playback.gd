@@ -11,6 +11,7 @@ const DEATH_ANIMATION_CANDIDATES: Array[String] = ["death", "die", "fall"]
 const PREVIEW_DWELL_SECONDS := 0.18
 const MUTED_AUDIO_BUS: StringName = &"RunPlaybackMuted"
 const FLASK_COLLECTION_DISTANCE := 0.8
+const DRIFT_POSITION_TOLERANCE := 0.05
 
 enum LoadState {
     Idle,
@@ -42,6 +43,9 @@ var death_animation := ""
 var current_animation := ""
 var playback_time := 0.0
 var request_delay_remaining := 0.0
+var drift_checkpoint_index := 0
+var drift_warned_paths: Dictionary = {}
+var pending_level_load_paths: Dictionary = {}
 
 
 func _ready() -> void:
@@ -58,7 +62,9 @@ func show_level_run(level_id: String, scene_path: String) -> void:
     pending_level_id = level_id
     pending_scene_path = scene_path
     request_delay_remaining = PREVIEW_DWELL_SECONDS
+    drift_warned_paths.clear()
     _clear_preview()
+    set_process(true)
 
 
 func stop_for_scene_change() -> void:
@@ -67,12 +73,16 @@ func stop_for_scene_change() -> void:
     pending_scene_path = ""
     request_delay_remaining = 0.0
     _clear_preview()
+    set_process(false)
+    await _finish_background_loading()
+    active_scene_path = ""
 
 
 func _process(delta: float) -> void:
     request_delay_remaining = maxf(request_delay_remaining - delta, 0.0)
     _poll_recording_read()
     _poll_level_load()
+    _poll_abandoned_level_loads()
     if load_state == LoadState.Idle and recording_thread == null \
             and request_delay_remaining <= 0.0 and not pending_level_id.is_empty():
         _start_recording_read()
@@ -81,9 +91,11 @@ func _process(delta: float) -> void:
 
 
 func _exit_tree() -> void:
+    request_generation += 1
     if recording_thread != null and recording_thread.is_started():
         recording_thread.wait_to_finish()
     recording_thread = null
+    _finish_background_loading_blocking()
 
 
 func _start_recording_read() -> void:
@@ -97,9 +109,18 @@ func _start_recording_read() -> void:
     pending_level_id = ""
     pending_scene_path = ""
     recording_thread = Thread.new()
-    var callable := Callable(RUN_RECORDING, &"load_for_level").bind(level_id)
+    var level_selection := get_node_or_null("/root/LevelSelection") as GDLevelSelection
+    var save_task_id := RUN_RECORDING.INVALID_TASK_ID
+    if level_selection != null:
+        save_task_id = level_selection.take_run_recording_save_task(level_id)
+    var callable := Callable(RUN_RECORDING, &"load_for_level_after_task").bind(
+        level_id,
+        save_task_id
+    )
     var start_error := recording_thread.start(callable)
     if start_error != OK:
+        if level_selection != null and save_task_id != RUN_RECORDING.INVALID_TASK_ID:
+            level_selection.register_run_recording_save_task(level_id, save_task_id)
         recording_thread = null
         load_state = LoadState.Idle
         return
@@ -115,12 +136,19 @@ func _poll_recording_read() -> void:
     if active_generation == request_generation and loaded_recording is Dictionary \
             and not loaded_recording.is_empty():
         recording = loaded_recording
-        var load_error := ResourceLoader.load_threaded_request(
-            active_scene_path,
-            "PackedScene",
-            true
-        )
-        load_state = LoadState.LoadingLevel if load_error == OK else LoadState.Idle
+        if pending_level_load_paths.has(active_scene_path):
+            load_state = LoadState.LoadingLevel
+        else:
+            var load_error := ResourceLoader.load_threaded_request(
+                active_scene_path,
+                "PackedScene",
+                true
+            )
+            if load_error == OK:
+                pending_level_load_paths[active_scene_path] = true
+                load_state = LoadState.LoadingLevel
+            else:
+                load_state = LoadState.Idle
     else:
         load_state = LoadState.Idle
 
@@ -142,14 +170,52 @@ func _poll_level_load() -> void:
     if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
         return
     if status != ResourceLoader.THREAD_LOAD_LOADED:
+        pending_level_load_paths.erase(active_scene_path)
         load_state = LoadState.Idle
         return
 
     var level_scene := ResourceLoader.load_threaded_get(active_scene_path) as PackedScene
+    pending_level_load_paths.erase(active_scene_path)
     if level_scene == null:
         load_state = LoadState.Idle
         return
     _create_preview(level_scene)
+
+
+func _poll_abandoned_level_loads() -> void:
+    for stored_path: Variant in pending_level_load_paths.keys():
+        var scene_path := String(stored_path)
+        if load_state == LoadState.LoadingLevel and scene_path == active_scene_path:
+            continue
+        var status := ResourceLoader.load_threaded_get_status(scene_path)
+        if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+            continue
+        if status == ResourceLoader.THREAD_LOAD_LOADED:
+            ResourceLoader.load_threaded_get(scene_path)
+        pending_level_load_paths.erase(scene_path)
+
+
+func _finish_background_loading() -> void:
+    while recording_thread != null and recording_thread.is_alive():
+        await get_tree().process_frame
+    if recording_thread != null and recording_thread.is_started():
+        recording_thread.wait_to_finish()
+    recording_thread = null
+
+    while not pending_level_load_paths.is_empty():
+        _poll_abandoned_level_loads()
+        if not pending_level_load_paths.is_empty():
+            await get_tree().process_frame
+
+
+func _finish_background_loading_blocking() -> void:
+    for stored_path: Variant in pending_level_load_paths.keys():
+        var scene_path := String(stored_path)
+        var status := ResourceLoader.load_threaded_get_status(scene_path)
+        if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS \
+                or status == ResourceLoader.THREAD_LOAD_LOADED:
+            ResourceLoader.load_threaded_get(scene_path)
+    pending_level_load_paths.clear()
 
 
 func _create_preview(level_scene: PackedScene) -> void:
@@ -174,6 +240,7 @@ func _create_preview(level_scene: PackedScene) -> void:
     playback_session_root.add_child(playback_level)
     _configure_playback_player(playback_player)
     _isolate_preview_state(playback_level)
+    _apply_recorded_run_settings()
     _start_preview_runtime(playback_level)
     playback_pivot = playback_player.get_node_or_null(^"Pivot") as Node3D
     playback_camera = Camera3D.new()
@@ -189,6 +256,7 @@ func _create_preview(level_scene: PackedScene) -> void:
         animation_player.process_mode = Node.PROCESS_MODE_DISABLED
 
     playback_time = 0.0
+    drift_checkpoint_index = 0
     _apply_frame(0, 0.0)
     playback_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
     visible = true
@@ -216,6 +284,7 @@ func _advance_playback(delta: float) -> void:
     _apply_frame(frame_index, interpolation)
     _update_animation(delta, frame_index)
     _collect_preview_flasks()
+    _report_playback_drift()
 
 
 func _apply_frame(frame_index: int, interpolation: float) -> void:
@@ -352,6 +421,78 @@ func _collect_preview_flasks() -> void:
             flask.queue_free()
 
 
+func _apply_recorded_run_settings() -> void:
+    if playback_player == null:
+        return
+    var run_metadata := recording.get("run_metadata", {}) as Dictionary
+    var settings := run_metadata.get("settings", {}) as Dictionary
+    if playback_player.has_method("apply_recorded_run_settings"):
+        playback_player.call("apply_recorded_run_settings", settings)
+    else:
+        playback_player.set_meta(&"recorded_run_settings", settings.duplicate(true))
+
+
+func _report_playback_drift() -> void:
+    if not OS.is_debug_build() or playback_level == null:
+        return
+    var run_metadata := recording.get("run_metadata", {}) as Dictionary
+    var checkpoints := run_metadata.get("drift_checkpoints", []) as Array
+    while drift_checkpoint_index < checkpoints.size():
+        var checkpoint := checkpoints[drift_checkpoint_index] as Dictionary
+        if float(checkpoint.get("time", 0.0)) > playback_time:
+            return
+        _report_checkpoint_drift(checkpoint, String(run_metadata.get("level_id", "unknown")))
+        drift_checkpoint_index += 1
+
+
+func _report_checkpoint_drift(checkpoint: Dictionary, recorded_level_id: String) -> void:
+    var checkpoint_time := float(checkpoint.get("time", 0.0))
+    var states := checkpoint.get("states", []) as Array
+    for stored_state: Variant in states:
+        var state := stored_state as Dictionary
+        var stored_path := String(state.get("path", ""))
+        if stored_path.is_empty() or drift_warned_paths.has(stored_path):
+            continue
+        var actual_node := playback_level.get_node_or_null(NodePath(stored_path)) as Node3D
+        if actual_node == null:
+            push_warning(
+                "Run playback drift in level '%s' at %.2fs: missing tracked node '%s'." \
+                % [recorded_level_id, checkpoint_time, stored_path]
+            )
+            drift_warned_paths[stored_path] = true
+            continue
+        var expected_position := _array_to_vector3(state.get("position", []))
+        var position_error := actual_node.global_position.distance_to(expected_position)
+        if position_error <= DRIFT_POSITION_TOLERANCE:
+            continue
+        var warning_text := (
+            "Run playback drift in level '%s' at %.2fs: '%s' is %.3fm from its recording "
+            + "(expected %s, actual %s)."
+        ) % [
+            recorded_level_id,
+            checkpoint_time,
+            stored_path,
+            position_error,
+            expected_position,
+            actual_node.global_position,
+        ]
+        push_warning(warning_text)
+        drift_warned_paths[stored_path] = true
+
+
+func _array_to_vector3(value: Variant) -> Vector3:
+    if not value is Array:
+        return Vector3.ZERO
+    var components := value as Array
+    if components.size() != 3:
+        return Vector3.ZERO
+    return Vector3(
+        float(components[0]),
+        float(components[1]),
+        float(components[2])
+    )
+
+
 func _ensure_muted_audio_bus() -> void:
     if AudioServer.get_bus_index(MUTED_AUDIO_BUS) < 0:
         AudioServer.add_bus()
@@ -420,6 +561,7 @@ func _remove_preview_world() -> void:
     death_animation = ""
     current_animation = ""
     playback_time = 0.0
+    drift_checkpoint_index = 0
 
     if previous_session != null and is_instance_valid(previous_session):
         previous_session.free()

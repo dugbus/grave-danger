@@ -133,7 +133,12 @@ func force_state_for_test(next_state: ZombieState) -> void:
 func _configure_nodes() -> void:
 	if zombie_body != null:
 		zombie_body.collision_layer |= ZOMBIE_COLLISION_LAYER
-		zombie_body.collision_mask |= WORLD_COLLISION_LAYER | PLAYER_COLLISION_LAYER | ZOMBIE_COLLISION_LAYER
+		zombie_body.collision_mask |= (
+			WORLD_COLLISION_LAYER
+			| PLAYER_COLLISION_LAYER
+			| ZOMBIE_COLLISION_LAYER
+			| SKELETON_COLLISION_LAYER
+		)
 
 	if navigation_agent != null:
 		navigation_agent.path_desired_distance = 0.18

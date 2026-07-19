@@ -116,7 +116,12 @@ func _begin_run_recording() -> void:
 	run_recorder.begin_recording(
 		level_selection.get_selected_level_id(),
 		player,
-		get_viewport().get_camera_3d()
+		get_viewport().get_camera_3d(),
+		level_selection,
+		current_level,
+		{
+			"shop_purchases": level_selection.shop_purchases.duplicate(true),
+		}
 	)
 
 

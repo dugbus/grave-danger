@@ -190,6 +190,7 @@ func _run_tests() -> void:
     failed = not _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() or failed
     failed = not _test_treasure_pile_discovers_compatible_scenes_and_spawns_mixed_counts() \
         or failed
+    failed = not _test_debug_level_total_includes_authored_loose_treasure() or failed
     failed = not _test_diamond_collectible_value_and_material() or failed
     failed = not _test_gem_variants_use_icon_cuts_and_scale_values() or failed
     failed = not _test_audio_fallback_is_deterministic() or failed
@@ -236,6 +237,7 @@ func _run_tests() -> void:
     failed = not await _test_result_screens_and_settings_share_frontend_design() or failed
     failed = not _test_enemies_use_fake_shadows_without_warning_light_blobs() or failed
     failed = not _test_skeleton_facing_is_driven_by_movement() or failed
+    failed = not await _test_ground_enemies_block_each_other() or failed
     failed = not await _test_ground_enemies_fall_before_moving() or failed
     failed = not _test_minimap_disables_processing_and_rendering() or failed
     failed = not _test_minimap_camera_scrolls_wide_level_without_empty_space() or failed
@@ -263,6 +265,26 @@ func _test_deterministic_seed_helper_is_stable() -> bool:
 
 func _test_run_recording_preserves_compact_frame_timing_and_controls() -> bool:
     var recorder := RUN_RECORDER_SCRIPT.new() as RUN_RECORDER_SCRIPT
+    var save_task_owner := TestLevelSelection.new()
+    var storage_level_id := "run_recording_round_trip_test"
+    recorder.level_id = storage_level_id
+    recorder.storage_directory = TEST_RUN_RECORDING_DIRECTORY
+    recorder.save_task_owner = save_task_owner
+    recorder.run_settings = {
+        "shop_purchases": {
+            "ghost_sneakers": 1,
+        },
+    }
+    var recording_root := Node3D.new()
+    recording_root.name = "RecordedLevel"
+    var tracked_pushable := Node3D.new()
+    tracked_pushable.name = "TrackedPushable"
+    tracked_pushable.position = Vector3(2.0, 0.5, -4.0)
+    tracked_pushable.add_to_group(&"pushable")
+    recording_root.add_child(tracked_pushable)
+    root.add_child(recording_root)
+    recorder.recording_root = recording_root
+    recorder._discover_drift_nodes()
     var first_player_position := Vector3(1.25, 0.4, -3.75)
     var first_camera_transform := Transform3D(
         Basis.from_euler(Vector3(-0.45, 0.2, 0.0)),
@@ -299,25 +321,44 @@ func _test_run_recording_preserves_compact_frame_timing_and_controls() -> bool:
         -2.2,
         Transform3D(Basis.IDENTITY, Vector3(80.0, 7.0, -84.0))
     )
-    var payload := recorder.finish_recording(false)
+    var payload := recorder.frame_payload.slice(0, recorder.bytes_used)
+    recorder.finish_recording()
     var decoded := RUN_RECORDING_SCRIPT.decode_payload(payload, recorder.frame_count, 41.0)
     var deltas := decoded.get("frame_deltas", PackedFloat32Array()) as PackedFloat32Array
     var movement := decoded.get("movement_inputs", PackedVector2Array()) as PackedVector2Array
     var button_states := decoded.get("button_states", PackedByteArray()) as PackedByteArray
     var positions := decoded.get("player_positions", PackedVector3Array()) \
         as PackedVector3Array
-    var storage_level_id := "run_recording_round_trip_test"
-    var saved := RUN_RECORDING_SCRIPT.save_for_level(
+    var save_task_id := recorder.get_save_task_id()
+    var pending_save_task_id := save_task_owner.take_run_recording_save_task(storage_level_id)
+    var stored_recording := RUN_RECORDING_SCRIPT.load_for_level_after_task(
         storage_level_id,
-        payload,
-        recorder.frame_count,
-        41.0,
+        pending_save_task_id,
         TEST_RUN_RECORDING_DIRECTORY
     )
-    var stored_recording := RUN_RECORDING_SCRIPT.load_for_level(
-        storage_level_id,
-        TEST_RUN_RECORDING_DIRECTORY
-    )
+    var stored_metadata := stored_recording.get("run_metadata", {}) as Dictionary
+    var stored_settings := stored_metadata.get("settings", {}) as Dictionary
+    var stored_purchases := stored_settings.get("shop_purchases", {}) as Dictionary
+    var stored_checkpoints := stored_metadata.get("drift_checkpoints", []) as Array
+    var first_checkpoint := stored_checkpoints[0] as Dictionary \
+        if not stored_checkpoints.is_empty() else {}
+    var checkpoint_states := first_checkpoint.get("states", []) as Array
+    var first_checkpoint_state := checkpoint_states[0] as Dictionary \
+        if not checkpoint_states.is_empty() else {}
+    var checkpoint_position_values := first_checkpoint_state.get("position", []) as Array
+    var checkpoint_position := Vector3.ZERO
+    if checkpoint_position_values.size() == 3:
+        checkpoint_position = Vector3(
+            float(checkpoint_position_values[0]),
+            float(checkpoint_position_values[1]),
+            float(checkpoint_position_values[2])
+        )
+    var saved := save_task_id == pending_save_task_id \
+        and save_task_id != RUN_RECORDING_SCRIPT.INVALID_TASK_ID \
+        and FileAccess.file_exists(RUN_RECORDING_SCRIPT.get_path_for_level(
+            storage_level_id,
+            TEST_RUN_RECORDING_DIRECTORY
+        ))
     RUN_RECORDING_SCRIPT.remove_for_level(storage_level_id, TEST_RUN_RECORDING_DIRECTORY)
     var passed := _expect(decoded.size() > 0, "run recording binary payload decodes") \
         and _expect(
@@ -348,10 +389,27 @@ func _test_run_recording_preserves_compact_frame_timing_and_controls() -> bool:
             "run recording keeps ordinary frames to a compact fixed binary size"
         ) \
         and _expect(
+            RUN_RECORDER_SCRIPT.INITIAL_BUFFER_SIZE \
+                >= RUN_RECORDER_SCRIPT.ABSOLUTE_FRAME_SIZE \
+                    * Engine.physics_ticks_per_second * 300,
+            "run recording avoids buffer reallocations during a typical five-minute level"
+        ) \
+        and _expect(
             saved and is_equal_approx(float(stored_recording.get("duration", 0.0)), 0.07),
-            "run recording stores a compressed file independently for each level"
+            "run recording asynchronously stores a compressed file for each level"
+        ) \
+        and _expect(
+            int(stored_purchases.get("ghost_sneakers", 0)) == 1,
+            "run recording retains the shop upgrades active for the attempt"
+        ) \
+        and _expect(
+            String(first_checkpoint_state.get("path", "")) == "TrackedPushable" \
+                and checkpoint_position.is_equal_approx(tracked_pushable.global_position),
+            "run recording stores periodic world checkpoints for playback drift diagnostics"
         )
+    save_task_owner.free()
     recorder.free()
+    recording_root.free()
     return passed
 
 
@@ -514,6 +572,37 @@ func _test_treasure_pile_discovers_compatible_scenes_and_spawns_mixed_counts() -
     ) and passed
 
     parent.free()
+    return passed
+
+
+func _test_debug_level_total_includes_authored_loose_treasure() -> bool:
+    var debug_level_scene := load("res://levels/debug-level/level.tscn") as PackedScene
+    var debug_level := debug_level_scene.instantiate() as Node3D
+    var treasure_pile := debug_level.get_node("TreasurePile") as GDTreasurePile
+    treasure_pile.call("_load_treasure_catalog")
+    var graveyard := TestGraveyard.new()
+    graveyard.current_level = debug_level
+    var authored_total := graveyard._calculate_max_treasure_value()
+    var loose_treasure_value := AMETHYST_ITEM.treasure_value \
+        + DIAMOND_ITEM.treasure_value \
+        + EMERALD_ITEM.treasure_value \
+        + RUBY_ITEM.treasure_value \
+        + SAPPHIRE_ITEM.treasure_value \
+        + GOLD_BAR_ITEM.treasure_value
+    var runtime_pickup := DIAMOND_SCENE.instantiate() as GDInventoryPickup
+    debug_level.add_child(runtime_pickup)
+    var total_with_runtime_pickup := graveyard._calculate_max_treasure_value()
+    var passed := _expect(
+        authored_total == 590 + loose_treasure_value and authored_total == 667,
+        "debug level total includes every authored loose treasure pickup (got %d)" \
+            % authored_total
+    ) and _expect(
+        total_with_runtime_pickup == authored_total,
+        "runtime-spawned treasure does not duplicate its source pile value"
+    )
+
+    graveyard.free()
+    debug_level.free()
     return passed
 
 
@@ -1901,15 +1990,28 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
     playback_viewport.remove_child(final_pose_camera)
     final_pose_camera.free()
     level_run_playback.playback_camera = null
+    var shutdown_scene_path := "res://ui/screens/level_select_screen.tscn"
+    var shutdown_load_error := ResourceLoader.load_threaded_request(
+        shutdown_scene_path,
+        "PackedScene",
+        true
+    )
+    if shutdown_load_error == OK:
+        level_run_playback.pending_level_load_paths[shutdown_scene_path] = true
+        level_run_playback.active_scene_path = shutdown_scene_path
+        level_run_playback.load_state = GDLevelRunPlayback.LoadState.LoadingLevel
     level_run_playback.pending_level_id = "queued_preview"
-    level_run_playback.pending_scene_path = "res://levels/1/level.tscn"
-    level_run_playback.stop_for_scene_change()
+    level_run_playback.pending_scene_path = shutdown_scene_path
+    await level_run_playback.stop_for_scene_change()
     passed = _expect(
-        level_run_playback.pending_level_id.is_empty() \
+        shutdown_load_error == OK \
+            and level_run_playback.pending_level_id.is_empty() \
             and level_run_playback.pending_scene_path.is_empty() \
             and level_run_playback.load_state == GDLevelRunPlayback.LoadState.Idle \
+            and not level_run_playback.is_processing() \
+            and level_run_playback.pending_level_load_paths.is_empty() \
             and playback_viewport.render_target_update_mode == SubViewport.UPDATE_DISABLED,
-        "starting gameplay stops pending and active level-select replay work"
+        "starting gameplay fully stops pending and active level-select replay work"
     ) and passed
 
     var loop_level_source := Node3D.new()
@@ -1974,7 +2076,7 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
         reset_loop_particles.emitting,
         "last-run playback preserves authored particle emitters across loops"
     ) and passed
-    level_run_playback.stop_for_scene_change()
+    await level_run_playback.stop_for_scene_change()
 
     screen.level_buttons[6].grab_focus()
     await create_timer(GDLevelSelectScreen.FOCUS_SCROLL_DURATION + 0.05).timeout
@@ -3540,6 +3642,57 @@ func _test_skeleton_facing_is_driven_by_movement() -> bool:
         and _expect(is_equal_approx(pivot.rotation.y, PI / 2.0), "skeleton visual faces rightward patrol movement")
 
     skeleton.queue_free()
+    return passed
+
+
+func _test_ground_enemies_block_each_other() -> bool:
+    var skeleton := SKELETON_SCENE.instantiate()
+    skeleton.set_physics_process(false)
+    skeleton.set("has_landed", true)
+    root.add_child(skeleton)
+
+    var other_skeleton := SKELETON_SCENE.instantiate()
+    other_skeleton.set_physics_process(false)
+    other_skeleton.set("has_landed", true)
+    other_skeleton.position.x = 0.45
+    root.add_child(other_skeleton)
+
+    var zombie := ZOMBIE_SCENE.instantiate()
+    zombie.set_physics_process(false)
+    root.add_child(zombie)
+    await physics_frame
+
+    var skeleton_body := skeleton.get_node(
+        "PathFollow3D/DropPivot/SkeletonBody"
+    ) as AnimatableBody3D
+    var zombie_body := zombie.get_node("ZombieBody") as CharacterBody3D
+    var path_follow := skeleton.get_node("PathFollow3D") as PathFollow3D
+    var enemy_collision_mask := int(skeleton.get("enemy_collision_mask"))
+    var detects_skeleton_ahead := bool(skeleton.call(
+        "_would_hit_map_collision",
+        path_follow.progress + 0.01,
+        0.01
+    ))
+    var passed := _expect(
+        skeleton_body.collision_layer != 0,
+        "skeletons expose an authored enemy collision body"
+    ) and _expect(
+        (enemy_collision_mask & skeleton_body.collision_layer) != 0,
+        "skeleton patrol probes include other skeletons"
+    ) and _expect(
+        (enemy_collision_mask & zombie_body.collision_layer) != 0,
+        "skeleton patrol probes include zombies"
+    ) and _expect(
+        (zombie_body.collision_mask & skeleton_body.collision_layer) != 0,
+        "zombie bodies collide with skeleton bodies"
+    ) and _expect(
+        detects_skeleton_ahead,
+        "skeletons reverse before overlapping another skeleton"
+    )
+
+    skeleton.queue_free()
+    other_skeleton.queue_free()
+    zombie.queue_free()
     return passed
 
 

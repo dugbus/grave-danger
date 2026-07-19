@@ -12,6 +12,7 @@ var treasure_wallet: Dictionary = {}
 var shop_purchases: Dictionary = {}
 var last_highlighted_level_index := -1
 var persistence_enabled := true
+var pending_run_recording_save_tasks: Dictionary = {}
 
 
 func get_level_result(level_id: String) -> Dictionary:
@@ -71,12 +72,46 @@ func mark_torch_lit(level_id: String, torch_id: StringName) -> bool:
 
 
 func reset() -> void:
+    wait_for_run_recording_saves()
     level_results.clear()
     treasure_wallet.clear()
     shop_purchases.clear()
     last_highlighted_level_index = -1
     if persistence_enabled:
         RUN_RECORDING.clear_all()
+
+
+func register_run_recording_save_task(level_id: String, task_id: int) -> bool:
+    if level_id.is_empty() or task_id == RUN_RECORDING.INVALID_TASK_ID:
+        return false
+
+    var previous_task_id := int(pending_run_recording_save_tasks.get(
+        level_id,
+        RUN_RECORDING.INVALID_TASK_ID
+    ))
+    if previous_task_id != RUN_RECORDING.INVALID_TASK_ID:
+        WorkerThreadPool.wait_for_task_completion(previous_task_id)
+    pending_run_recording_save_tasks[level_id] = task_id
+    return true
+
+
+func take_run_recording_save_task(level_id: String) -> int:
+    var task_id := int(pending_run_recording_save_tasks.get(
+        level_id,
+        RUN_RECORDING.INVALID_TASK_ID
+    ))
+    pending_run_recording_save_tasks.erase(level_id)
+    return task_id
+
+
+func wait_for_run_recording_saves() -> void:
+    var task_ids: Array[int] = []
+    for task_id in pending_run_recording_save_tasks.values():
+        task_ids.append(int(task_id))
+    pending_run_recording_save_tasks.clear()
+
+    for task_id in task_ids:
+        WorkerThreadPool.wait_for_task_completion(task_id)
 
 
 func get_treasure_count(treasure_type: StringName) -> int:

@@ -45,6 +45,14 @@ func get_carried_item() -> Resource:
 	return carried_item
 
 
+## Returns this authored pickup's contribution to the level treasure total.
+## Runtime-spawned pickups have no scene owner because their value is represented by their pile.
+func get_max_treasure_value() -> int:
+	if owner == null or carried_item == null:
+		return 0
+	return maxi(int(carried_item.get("treasure_value")), 0)
+
+
 func throw_from(spawn_transform: Transform3D, impulse: Vector3) -> void:
 	global_transform = spawn_transform
 	linear_velocity = Vector3.ZERO

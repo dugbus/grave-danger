@@ -5,6 +5,7 @@ class_name GDLevelRunPlaybackPlayer
 
 var playback_dead := false
 var playback_flame_energy := 100.0
+var recorded_run_settings: Dictionary = {}
 
 
 func _ready() -> void:
@@ -15,6 +16,10 @@ func _ready() -> void:
 
 func _physics_process(_delta: float) -> void:
     pass
+
+
+func apply_recorded_run_settings(settings: Dictionary) -> void:
+    recorded_run_settings = settings.duplicate(true)
 
 
 func try_collect_health_flask(

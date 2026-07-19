@@ -1,4 +1,9 @@
+- Level treasure totals now include authored loose valuables as well as piles, while avoiding double-counting treasure spawned from piles at runtime.
+- The selected-Path3D editor gizmo now validates clicked point data and uses explicit scalar conversions, preventing malformed editor selection data from breaking the add-on.
 - Frontend screens now share one reference-canvas, primary-input, and selection-audio implementation, keeping Level Select, Shop, Settings, and results consistent as they evolve.
+- Run recording now avoids periodic buffer reallocations during typical levels and moves compression and disk writes off the gameplay thread to prevent recording-related frame stalls.
+- Run recordings now retain the shop upgrades active for each attempt and include periodic world checkpoints that report actionable playback drift warnings in debug builds.
+- Opening a level or another frontend screen now waits for level-select playback loading to shut down cleanly, preventing slower machines from carrying preview work into the next scene.
 - Gold coin and mixed treasure piles now include ordinary translucent placeholder geometry for normal editor selection, while hiding that geometry during gameplay.
 - Level progress, recovered treasure, shop stock, and replay cleanup now live behind a dedicated persistence component instead of being implemented by level navigation.
 - Successful treasure-free levels now record their escape correctly, and looping run previews hold their final pose instead of interpolating back toward the start.
@@ -151,3 +156,4 @@
 - Holding a joypad stick or directional button now repeatedly scrolls through level and shop lists after a short delay.
 - Shop and level-list joypad movement now plays cursor feedback directly after focus reaches a different row, avoiding input-order-dependent silence.
 - Level selection now hides the Liberated Loot heading and its complete section until a played tomb has actually yielded liberated treasure.
+- Skeletons and zombies now block one another, with skeleton patrols reversing before enemies overlap instead of walking through or over them.
