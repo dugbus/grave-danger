@@ -7,7 +7,7 @@
 render_priority = 0
 shader = ExtResource("1_c08ej")
 shader_parameter/tiled_texture = ExtResource("2_7svxn")
-shader_parameter/level_width = 150.0
+shader_parameter/level_width = 24.0
 shader_parameter/level_height = 24.0
 shader_parameter/floor_overscan = Vector2(2, 2)
 shader_parameter/floor_tile_size = Vector2(8, 8)

@@ -31,8 +31,8 @@ const MAX_EDITOR_VIEWPORTS := 4
 const CURVE_HANDLE_EPSILON := 0.001
 
 enum OverlayPass {
-    OUTLINE,
-    CORE,
+	OUTLINE,
+	CORE,
 }
 
 var _editor_interface: EditorInterface
@@ -41,110 +41,110 @@ var _point_core_mesh := BoxMesh.new()
 
 
 func _init(editor_interface: EditorInterface) -> void:
-    _editor_interface = editor_interface
-    _point_outline_mesh.size = POINT_OUTLINE_SIZE
-    _point_core_mesh.size = POINT_CORE_SIZE
-    add_material(RIBBON_OUTLINE_MATERIAL, _create_overlay_material(Color.BLACK, 0))
-    add_material(RIBBON_CORE_MATERIAL, _create_overlay_material(Color.WHITE, 1))
-    add_material(ARROW_OUTLINE_MATERIAL, _create_overlay_material(Color.BLACK, 2))
-    add_material(ARROW_CORE_MATERIAL, _create_overlay_material(Color.WHITE, 3))
-    add_material(POINT_OUTLINE_MATERIAL, _create_overlay_material(Color.BLACK, 4))
-    add_material(POINT_CORE_MATERIAL, _create_overlay_material(Color.WHITE, 5))
+	_editor_interface = editor_interface
+	_point_outline_mesh.size = POINT_OUTLINE_SIZE
+	_point_core_mesh.size = POINT_CORE_SIZE
+	add_material(RIBBON_OUTLINE_MATERIAL, _create_overlay_material(Color.BLACK, 0))
+	add_material(RIBBON_CORE_MATERIAL, _create_overlay_material(Color.WHITE, 1))
+	add_material(ARROW_OUTLINE_MATERIAL, _create_overlay_material(Color.BLACK, 2))
+	add_material(ARROW_CORE_MATERIAL, _create_overlay_material(Color.WHITE, 3))
+	add_material(POINT_OUTLINE_MATERIAL, _create_overlay_material(Color.BLACK, 4))
+	add_material(POINT_CORE_MATERIAL, _create_overlay_material(Color.WHITE, 5))
 
 
 func _get_gizmo_name() -> String:
-    return "Selected Path3D"
+	return "Selected Path3D"
 
 
 func _get_priority() -> int:
-    return 1
+	return 1
 
 
 func _can_be_hidden() -> bool:
-    return true
+	return true
 
 
 func _has_gizmo(for_node_3d: Node3D) -> bool:
-    return for_node_3d is Path3D
+	return for_node_3d is Path3D
 
 
 func _redraw(gizmo: EditorNode3DGizmo) -> void:
-    gizmo.clear()
+	gizmo.clear()
 
-    var path := gizmo.get_node_3d() as Path3D
-    if path == null or path.curve == null:
-        return
-    if not _is_selected_path(path):
-        return
+	var path := gizmo.get_node_3d() as Path3D
+	if path == null or path.curve == null:
+		return
+	if not _is_selected_path(path):
+		return
 
-    var point_positions := _curve_point_positions(path.curve)
-    if point_positions.is_empty():
-        return
+	var point_positions := _curve_point_positions(path.curve)
+	if point_positions.is_empty():
+		return
 
-    var overlay_scale := _overlay_scale(path, point_positions)
-    var sampled_positions := _sampled_curve_positions(path.curve)
-    if sampled_positions.size() >= 2:
-        _draw_ribbon(gizmo, sampled_positions, overlay_scale)
-        _draw_direction_arrows(gizmo, sampled_positions, overlay_scale)
-    _draw_points(gizmo, point_positions, overlay_scale)
+	var overlay_scale := _overlay_scale(path, point_positions)
+	var sampled_positions := _sampled_curve_positions(path.curve)
+	if sampled_positions.size() >= 2:
+		_draw_ribbon(gizmo, sampled_positions, overlay_scale)
+		_draw_direction_arrows(gizmo, sampled_positions, overlay_scale)
+	_draw_points(gizmo, point_positions, overlay_scale)
 
 
 func _is_selected_path(path: Path3D) -> bool:
-    if _editor_interface == null:
-        return false
+	if _editor_interface == null:
+		return false
 
-    for node in _editor_interface.get_selection().get_selected_nodes():
-        if node == path:
-            return true
-    return false
+	for node in _editor_interface.get_selection().get_selected_nodes():
+		if node == path:
+			return true
+	return false
 
 
 func _curve_point_positions(curve: Curve3D) -> PackedVector3Array:
-    var positions := PackedVector3Array()
-    for index in curve.point_count:
-        positions.append(curve.get_point_position(index))
-    return positions
+	var positions := PackedVector3Array()
+	for index in curve.point_count:
+		positions.append(curve.get_point_position(index))
+	return positions
 
 
 func _sampled_curve_positions(curve: Curve3D) -> PackedVector3Array:
-    if _is_straight_polyline(curve):
-        return _curve_point_positions(curve)
+	if _is_straight_polyline(curve):
+		return _curve_point_positions(curve)
 
-    var length := curve.get_baked_length()
-    if length <= 0.0:
-        return _curve_point_positions(curve)
+	var length := curve.get_baked_length()
+	if length <= 0.0:
+		return _curve_point_positions(curve)
 
-    var sample_count := maxi(2, mini(CURVE_SAMPLE_COUNT, ceili(length * CURVE_SAMPLES_PER_UNIT)))
-    var positions := PackedVector3Array()
-    for index in sample_count:
-        var ratio := float(index) / float(sample_count - 1)
-        positions.append(curve.sample_baked(length * ratio, true))
-    return positions
+	var sample_count := maxi(2, mini(CURVE_SAMPLE_COUNT, ceili(length * CURVE_SAMPLES_PER_UNIT)))
+	var positions := PackedVector3Array()
+	for index in sample_count:
+		var ratio := float(index) / float(sample_count - 1)
+		positions.append(curve.sample_baked(length * ratio, true))
+	return positions
 
 
 func _is_straight_polyline(curve: Curve3D) -> bool:
-    for index in curve.point_count:
-        if curve.get_point_in(index).length() > CURVE_HANDLE_EPSILON:
-            return false
-        if curve.get_point_out(index).length() > CURVE_HANDLE_EPSILON:
-            return false
-    return true
+	for index in curve.point_count:
+		if curve.get_point_in(index).length() > CURVE_HANDLE_EPSILON:
+			return false
+		if curve.get_point_out(index).length() > CURVE_HANDLE_EPSILON:
+			return false
+	return true
 
 
 func _draw_ribbon(gizmo: EditorNode3DGizmo, positions: PackedVector3Array, overlay_scale: float) -> void:
-    for overlay_pass_value in OverlayPass.values():
-        var overlay_pass := overlay_pass_value as OverlayPass
-        var material_name := RIBBON_OUTLINE_MATERIAL if overlay_pass == OverlayPass.OUTLINE else RIBBON_CORE_MATERIAL
-        gizmo.add_mesh(_build_ribbon_mesh(positions, overlay_pass, overlay_scale), get_material(material_name, gizmo))
+	for overlay_pass_value in OverlayPass.values():
+		var overlay_pass := overlay_pass_value as OverlayPass
+		var material_name := RIBBON_OUTLINE_MATERIAL if overlay_pass == OverlayPass.OUTLINE else RIBBON_CORE_MATERIAL
+		gizmo.add_mesh(_build_ribbon_mesh(positions, overlay_pass, overlay_scale), get_material(material_name, gizmo))
 
 
 func _draw_points(gizmo: EditorNode3DGizmo, positions: PackedVector3Array, overlay_scale: float) -> void:
-    var outline_material := get_material(POINT_OUTLINE_MATERIAL, gizmo)
-    var core_material := get_material(POINT_CORE_MATERIAL, gizmo)
-    var outline_basis := Basis().scaled(Vector3.ONE * overlay_scale)
-    var core_basis := Basis().scaled(Vector3.ONE * overlay_scale)
-    for position in positions:
-        # Keep the marker origin on the exact Curve3D point so it lines up with Godot's selectable handle.
+	var outline_material := get_material(POINT_OUTLINE_MATERIAL, gizmo)
+	var core_material := get_material(POINT_CORE_MATERIAL, gizmo)
+	var outline_basis := Basis().scaled(Vector3.ONE * overlay_scale)
+	var core_basis := Basis().scaled(Vector3.ONE * overlay_scale)
+	for position in positions:
+		# Keep the marker origin on the exact Curve3D point so it lines up with Godot's selectable handle.
         var outline_position := position + Vector3(0.0, POINT_OUTLINE_Y_OFFSET * overlay_scale, 0.0)
         var core_position := position + Vector3(0.0, POINT_CORE_Y_OFFSET * overlay_scale, 0.0)
         gizmo.add_mesh(_point_outline_mesh, outline_material, Transform3D(outline_basis, outline_position))

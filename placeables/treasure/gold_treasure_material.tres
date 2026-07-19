@@ -1,10 +1,10 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://0p7vx4hws63b"]
 
 [resource]
 resource_name = "Gold Treasure Material"
-albedo_color = Color(1, 0.72, 0.08, 1)
-metallic = 0.72
-roughness = 0.24
+albedo_color = Color(1, 1, 0.3, 1)
+metallic = 0.95
+roughness = 0.35
 emission_enabled = true
-emission = Color(0.72, 0.3, 0.025, 1)
-emission_energy_multiplier = 1.55
+emission = Color(1, 0.98333335, 0, 1)
+emission_energy_multiplier = 0.0
