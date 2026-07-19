@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" path="res://inventory/key.tscn" id="8_46uyn"]
 [ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]
 
-[sub_resource type="Curve3D" id="Curve3D_nst7r"]
+[sub_resource type="Curve3D" id="Curve3D_xr1q8"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, 51.87783, 0.01753807, -21.473944, 0, 0, 0, 0, 0, 0, 203.2475, 0.0094509125, -21.709044, 0, 0, 0, 0, 0, 0, 43.09236, -2.250557, -22.905432),
@@ -18,7 +18,7 @@ _data = {
 }
 point_count = 3
 
-[sub_resource type="Animation" id="Animation_u6dqf"]
+[sub_resource type="Animation" id="Animation_c2irs"]
 resource_local_to_scene = true
 resource_name = "kill_boundary"
 length = 95.8600604717548
@@ -97,9 +97,9 @@ tracks/4/keys = {
 "values": [0.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_rwgeq"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_nst7r"]
 _data = {
-&"kill_boundary": SubResource("Animation_u6dqf")
+&"kill_boundary": SubResource("Animation_c2irs")
 }
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_u6dqf"]
@@ -136,8 +136,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -74.16736, 11.999611, -9.1696
 
 [node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, -125.43729, 0, 21.607485)
-curve = SubResource("Curve3D_nst7r")
-boundary_animation = SubResource("Animation_u6dqf")
+curve = SubResource("Curve3D_xr1q8")
+boundary_animation = SubResource("Animation_c2irs")
 movement_speed = 3.25
 boundary_size_x = 17.6
 boundary_size_y = 17.6
@@ -147,7 +147,7 @@ bounds_size = Vector2(17.6, 17.6)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.87783, 0.01753807, -21.473944)
 
 [node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_rwgeq")
+libraries/ = SubResource("AnimationLibrary_nst7r")
 
 [node name="Objects" type="Node3D" parent="." unique_id=1030726652]
 
