@@ -1,3 +1,4 @@
+- Level-select actions now open immediately while a previous run recording finishes saving in the background, and title fades reliably reach full brightness after paused gameplay.
 - Level treasure totals now include authored loose valuables as well as piles, while avoiding double-counting treasure spawned from piles at runtime.
 - The selected-Path3D editor gizmo now validates clicked point data and uses explicit scalar conversions, preventing malformed editor selection data from breaking the add-on.
 - Frontend screens now share one reference-canvas, primary-input, and selection-audio implementation, keeping Level Select, Shop, Settings, and results consistent as they evolve.

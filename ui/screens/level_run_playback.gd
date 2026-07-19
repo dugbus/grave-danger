@@ -15,6 +15,7 @@ const DRIFT_POSITION_TOLERANCE := 0.05
 
 enum LoadState {
     Idle,
+    WaitingForSave,
     ReadingRecording,
     LoadingLevel,
     Playing,
@@ -25,9 +26,11 @@ enum LoadState {
 var load_state := LoadState.Idle
 var request_generation := 0
 var active_generation := 0
+var active_level_id := ""
 var active_scene_path := ""
 var pending_level_id := ""
 var pending_scene_path := ""
+var recording_save_task_id := RUN_RECORDING.INVALID_TASK_ID
 var recording_thread: Thread
 var recording: Dictionary = {}
 var active_level_scene: PackedScene
@@ -59,6 +62,7 @@ func _ready() -> void:
 
 func show_level_run(level_id: String, scene_path: String) -> void:
     request_generation += 1
+    _release_recording_save_task()
     pending_level_id = level_id
     pending_scene_path = scene_path
     request_delay_remaining = PREVIEW_DWELL_SECONDS
@@ -69,6 +73,7 @@ func show_level_run(level_id: String, scene_path: String) -> void:
 
 func stop_for_scene_change() -> void:
     request_generation += 1
+    _release_recording_save_task()
     pending_level_id = ""
     pending_scene_path = ""
     request_delay_remaining = 0.0
@@ -81,6 +86,7 @@ func stop_for_scene_change() -> void:
 func _process(delta: float) -> void:
     request_delay_remaining = maxf(request_delay_remaining - delta, 0.0)
     _poll_recording_read()
+    _poll_recording_save()
     _poll_level_load()
     _poll_abandoned_level_loads()
     if load_state == LoadState.Idle and recording_thread == null \
@@ -92,6 +98,7 @@ func _process(delta: float) -> void:
 
 func _exit_tree() -> void:
     request_generation += 1
+    _release_recording_save_task()
     if recording_thread != null and recording_thread.is_started():
         recording_thread.wait_to_finish()
     recording_thread = null
@@ -104,27 +111,60 @@ func _start_recording_read() -> void:
         return
 
     active_generation = request_generation
+    active_level_id = pending_level_id
     active_scene_path = pending_scene_path
-    var level_id := pending_level_id
     pending_level_id = ""
     pending_scene_path = ""
-    recording_thread = Thread.new()
     var level_selection := get_node_or_null("/root/LevelSelection") as GDLevelSelection
-    var save_task_id := RUN_RECORDING.INVALID_TASK_ID
     if level_selection != null:
-        save_task_id = level_selection.take_run_recording_save_task(level_id)
-    var callable := Callable(RUN_RECORDING, &"load_for_level_after_task").bind(
-        level_id,
-        save_task_id
-    )
+        recording_save_task_id = level_selection.take_run_recording_save_task(active_level_id)
+    if recording_save_task_id != RUN_RECORDING.INVALID_TASK_ID:
+        if not WorkerThreadPool.is_task_completed(recording_save_task_id):
+            load_state = LoadState.WaitingForSave
+            return
+        WorkerThreadPool.wait_for_task_completion(recording_save_task_id)
+        recording_save_task_id = RUN_RECORDING.INVALID_TASK_ID
+    _start_recording_thread()
+
+
+func _start_recording_thread() -> void:
+    recording_thread = Thread.new()
+    var callable := Callable(RUN_RECORDING, &"load_for_level").bind(active_level_id)
     var start_error := recording_thread.start(callable)
     if start_error != OK:
-        if level_selection != null and save_task_id != RUN_RECORDING.INVALID_TASK_ID:
-            level_selection.register_run_recording_save_task(level_id, save_task_id)
         recording_thread = null
         load_state = LoadState.Idle
         return
     load_state = LoadState.ReadingRecording
+
+
+func _poll_recording_save() -> void:
+    if load_state != LoadState.WaitingForSave \
+            or recording_save_task_id == RUN_RECORDING.INVALID_TASK_ID \
+            or not WorkerThreadPool.is_task_completed(recording_save_task_id):
+        return
+
+    WorkerThreadPool.wait_for_task_completion(recording_save_task_id)
+    recording_save_task_id = RUN_RECORDING.INVALID_TASK_ID
+    if active_generation != request_generation:
+        load_state = LoadState.Idle
+        return
+    _start_recording_thread()
+
+
+func _release_recording_save_task() -> void:
+    if recording_save_task_id == RUN_RECORDING.INVALID_TASK_ID:
+        return
+    if WorkerThreadPool.is_task_completed(recording_save_task_id):
+        WorkerThreadPool.wait_for_task_completion(recording_save_task_id)
+    else:
+        var level_selection := get_node_or_null("/root/LevelSelection") as GDLevelSelection
+        if level_selection != null and not active_level_id.is_empty():
+            level_selection.register_run_recording_save_task(
+                active_level_id,
+                recording_save_task_id
+            )
+    recording_save_task_id = RUN_RECORDING.INVALID_TASK_ID
 
 
 func _poll_recording_read() -> void:

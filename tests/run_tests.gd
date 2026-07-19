@@ -5,6 +5,7 @@ const TREASURE_DEPOSIT_COFFIN_SCENE := preload("res://placeables/treasure_deposi
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const RUN_RECORDER_SCRIPT := preload("res://game/run_recorder.gd")
 const RUN_RECORDING_SCRIPT := preload("res://game/run_recording.gd")
+const SCREEN_FADE_SCRIPT := preload("res://ui/screens/screen_fade.gd")
 const AMETHYST_ITEM := preload("res://placeables/treasure/gems/amethyst_inventory.tres")
 const AMETHYST_SCENE := preload("res://placeables/treasure/gems/amethyst.tscn")
 const DIAMOND_ITEM := preload("res://placeables/treasure/gems/diamond_inventory.tres")
@@ -195,6 +196,7 @@ func _run_tests() -> void:
     failed = not _test_gem_variants_use_icon_cuts_and_scale_values() or failed
     failed = not _test_audio_fallback_is_deterministic() or failed
     failed = not _test_frontend_audio_uses_shared_support() or failed
+    failed = not await _test_screen_fade_finishes_while_paused() or failed
     failed = not await _test_game_settings_batch_disk_writes() or failed
     failed = not _test_player_fall_death_threshold() or failed
     failed = not _test_torch_scene_and_persistent_activation() or failed
@@ -775,6 +777,24 @@ func _test_frontend_audio_uses_shared_support() -> bool:
         select_player.stop()
         select_player.queue_free()
     return passed
+
+
+func _test_screen_fade_finishes_while_paused() -> bool:
+    var fade_owner := Control.new()
+    root.add_child(fade_owner)
+    paused = true
+    var fade_tween := SCREEN_FADE_SCRIPT.fade_in(fade_owner, "PausedTreeFade", 0.01)
+    await create_timer(0.05, true).timeout
+    await process_frame
+    var fade := fade_owner.get_node_or_null("PausedTreeFade") as ColorRect
+    var fade_finished := not fade_tween.is_running() \
+        and (fade == null or is_zero_approx(fade.color.a))
+    paused = false
+    fade_owner.queue_free()
+    return _expect(
+        fade_finished,
+        "screen fades finish even when gameplay leaves the scene tree paused"
+    )
 
 
 func _test_game_settings_batch_disk_writes() -> bool:
@@ -1990,6 +2010,36 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
     playback_viewport.remove_child(final_pose_camera)
     final_pose_camera.free()
     level_run_playback.playback_camera = null
+    var delayed_save_level_id := "test_delayed_preview_save"
+    var delayed_save_task_id := WorkerThreadPool.add_task(
+        func() -> void:
+            OS.delay_msec(1000),
+        false,
+        "Test delayed preview save"
+    )
+    level_selection.register_run_recording_save_task(
+        delayed_save_level_id,
+        delayed_save_task_id
+    )
+    level_run_playback.pending_level_id = delayed_save_level_id
+    level_run_playback.pending_scene_path = "res://levels/1/level.tscn"
+    level_run_playback.call("_start_recording_read")
+    var delayed_stop_started_at := Time.get_ticks_msec()
+    await level_run_playback.stop_for_scene_change()
+    var delayed_stop_duration := Time.get_ticks_msec() - delayed_stop_started_at
+    var returned_save_task_id := level_selection.take_run_recording_save_task(
+        delayed_save_level_id
+    )
+    var delayed_save_still_running := not WorkerThreadPool.is_task_completed(
+        returned_save_task_id
+    )
+    WorkerThreadPool.wait_for_task_completion(returned_save_task_id)
+    passed = _expect(
+        delayed_save_task_id == returned_save_task_id \
+            and delayed_save_still_running \
+            and delayed_stop_duration < 500,
+        "leaving level selection does not wait for a run recording still saving"
+    ) and passed
     var shutdown_scene_path := "res://ui/screens/level_select_screen.tscn"
     var shutdown_load_error := ResourceLoader.load_threaded_request(
         shutdown_scene_path,

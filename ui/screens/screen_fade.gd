@@ -56,5 +56,7 @@ static func create_overlay(
 
 static func tween_alpha(owner: Node, fade: ColorRect, target_alpha: float, duration: float) -> Tween:
 	var tween := owner.create_tween()
+	# Menu transitions must finish even if outgoing gameplay briefly leaves the tree paused.
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_property(fade, "color:a", target_alpha, maxf(duration, 0.0))
 	return tween
