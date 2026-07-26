@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Changelog"
+  short_description: "Add timestamped player-facing changelog entries"
+  default_prompt: "Use $write-changelog to add the current change to CHANGELOG.md."

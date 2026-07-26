@@ -1,3 +1,19 @@
+# Changelog
+
+## 2026-07-26
+
+### 1400
+
+- Level editors can now see the originating request summarized beneath each timestamped changelog entry.
+  - Prompt: Add a concise summary of the user request to every generated changelog entry.
+
+### 1300
+
+- Level editors can now scan changelog updates grouped by local date and hour through the shared repository workflow.
+  - Prompt: Create a shared changelog skill with daily and hourly headings.
+
+## Undated entries
+
 - Changing the generated Vampire Maze size now repositions the player at its entrance and the Vampire beside the rebuilt gate, preventing stale larger-map positions from dropping the boss below the floor while its proximity fog remains active.
 - The Vampire Maze now waits for its generated gate before validating and starting the boss, and its restored gate/content references ensure the Vampire immediately receives its entrance hunt instead of standing idle for the entire level.
 - The Vampire now turns smoothly into its first junction inspection, resets every retained clue and prediction when reused, distinguishes failed routes from successful arrivals, recovers immediately from unreachable evidence, documents strict non-omniscient perception rules, and reports missing gameplay dependencies together.
