@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" path="res://game/game_runtime.tscn" id="2_runtime"]
 [ext_resource type="PackedScene" path="res://levels/1/level.tscn" id="3_level1"]
 [ext_resource type="PackedScene" path="res://ui/screens/pause_screen.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://ui/hud/codex_test_instruction/codex_test_instruction.tscn" id="5_codex_instruction"]
+[ext_resource type="PackedScene" path="res://ui/hud/player_feedback/player_feedback.tscn" id="6_player_feedback"]
 
 [node name="Graveyard" type="Node3D" unique_id=1224200127]
 script = ExtResource("1_graveyard")
@@ -12,3 +14,7 @@ default_level_scene = ExtResource("3_level1")
 [node name="GameRuntime" parent="." instance=ExtResource("2_runtime")]
 
 [node name="PauseScreen" parent="." instance=ExtResource("4_pause")]
+
+[node name="CodexTestInstruction" parent="." instance=ExtResource("5_codex_instruction")]
+
+[node name="PlayerFeedback" parent="." instance=ExtResource("6_player_feedback")]

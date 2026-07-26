@@ -336,6 +336,66 @@ func is_disabled_for_testing() -> bool:
 	return disable_vampire_for_testing
 
 
+## Captures focused replay evidence when a player marks a Vampire problem for Codex.
+func get_codex_diagnostics() -> Dictionary:
+	var state_names := VampireState.keys()
+	var navigation_diagnostics := {}
+	if navigation != null:
+		var route := navigation.get_route_points() as Array[Vector3]
+		navigation_diagnostics = {
+			"has_target": bool(navigation.get("has_target")),
+			"target_position": _vector3_to_array(
+				navigation.get("target_position") as Vector3
+			),
+			"route_index": int(navigation.get("route_index")),
+			"route_points": route.size(),
+			"route_search_status": _enum_name(
+				GDVampireNavigation.RouteSearchStatus.keys(),
+				int(navigation.get_last_route_search_status())
+			),
+			"route_traversal_status": _enum_name(
+				GDVampireNavigation.RouteTraversalStatus.keys(),
+				int(navigation.get_route_traversal_status())
+			),
+			"route_rebuilds": int(navigation.get_route_rebuild_count()),
+			"stall_recoveries": int(navigation.get_wall_stall_recovery_count()),
+			"using_visible_shortcut": bool(
+				navigation.is_using_visible_player_shortcut()
+			),
+		}
+	var hunt_diagnostics := {}
+	if hunt != null:
+		hunt_diagnostics = {
+			"player_visible": bool(hunt.is_player_visible()),
+			"awareness_source": _enum_name(
+				GDVampireHunt.AwarenessSource.keys(),
+				int(hunt.get_awareness_source())
+			),
+			"last_confirmed_player_position": _vector3_to_array(
+				hunt.get("last_confirmed_player_position") as Vector3
+			),
+			"noise_target_active": bool(hunt.get("noise_target_active")),
+			"searching": bool(hunt.get("searching")),
+		}
+	return {
+		"position": _vector3_to_array(global_position),
+		"velocity": _vector3_to_array(velocity),
+		"state": _enum_name(state_names, state),
+		"visible": visible,
+		"disabled_for_testing": disable_vampire_for_testing,
+		"navigation": navigation_diagnostics,
+		"hunt": hunt_diagnostics,
+	}
+
+
+func _enum_name(names: Array, value: int) -> String:
+	return String(names[value]) if value >= 0 and value < names.size() else "Unknown"
+
+
+func _vector3_to_array(value: Vector3) -> Array[float]:
+	return [value.x, value.y, value.z]
+
+
 func _collect_physics_bodies(
 		root: Node,
 		found: Array[PhysicsBody3D]

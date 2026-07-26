@@ -2,6 +2,28 @@
 
 ## 2026-07-26
 
+### 1600
+
+- Closing the game now waits for pending playback saves before shutdown, preventing the macOS exit crash.
+  - Prompt: Stop the game crashing when a recorded run closes.
+- Players can write multiline feedback and use joypad-focusable Proceed or Cancel buttons before gameplay resumes.
+  - Prompt: Use a multiline feedback area with joypad-operable actions.
+- The centred feedback form now uses the game's standard font at more than twice its previous size. Feedback report 20260726T150541Z-graveyard marked at 2.73s in graveyard is archived with feedback/archive/2026-07-26/20260726T150541Z-graveyard.gdr.
+  - Prompt: Resolve feedback report 20260726T150541Z-graveyard: i walked a bit and then submitted this feedback. The feedback is that the feedback form is too small to see clearly. More than double the font sizes please and use the games standard font.
+- Player feedback reports preserve the played level scene so visual playback keeps its original layout after later level edits.
+  - Prompt: Make player feedback conflict-free, prominent, paused, and independent of later level edits.
+- Players can press Square to open a centred feedback dialog that pauses gameplay until the note is submitted or dismissed.
+  - Prompt: Make player feedback conflict-free, prominent, paused, and independent of later level edits.
+
+### 1500
+
+- Level designers can now commit Triangle-marked bug reports with their exact playback time, while corrected reports retain their fix and playback in a size-limited archive recorded in the changelog.
+  - Prompt: Let level designers commit replay-backed bug reports and archive corrected evidence without growing the repository indefinitely.
+- Players can press Triangle during any run to mark a debounced feedback moment for Codex, optionally add a note with Cross, and return to Codex without first closing the game.
+  - Prompt: Keep an always-available controller marker so Codex can inspect new player feedback immediately.
+- Players can now accept a Codex-directed level test with an in-game instruction, while Codex can replay the newest recorded run using only the requested position, input, camera, button, metadata, summary, or drift logs.
+  - Prompt: Let Codex request a confirmed player test and replay the latest session with selectable command-line logs.
+
 ### 1400
 
 - Level editors can now see the originating request summarized beneath each timestamped changelog entry.

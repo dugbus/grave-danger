@@ -1,0 +1,4 @@
+interface:
+  display_name: "Duplicate Level"
+  short_description: "Duplicate or scaffold playable Godot levels"
+  default_prompt: "Use $duplicate-level to list available base levels and create a safely referenced copy."

@@ -6,8 +6,8 @@
 
 [resource]
 script = ExtResource("1_config")
-width = 32
-height = 32
+width = 34
+height = 34
 internal_connection_percent = 14.0
 wall_repair_settings = ExtResource("2_repair")
 content_configuration = ExtResource("3_content")

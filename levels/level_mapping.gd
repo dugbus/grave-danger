@@ -66,6 +66,22 @@ func find_level_index_by_id(level_id: String) -> int:
     return -1
 
 
+func find_level_index(level_reference: String) -> int:
+    var normalized_reference := level_reference.strip_edges().to_lower()
+    if normalized_reference.is_empty():
+        return -1
+
+    for index in level_entries.size():
+        var level_data := get_level_entry(index)
+        if normalized_reference in [
+            get_level_id(index).to_lower(),
+            String(level_data.get("name", "")).to_lower(),
+            get_level_folder_name(index).to_lower(),
+        ]:
+            return index
+    return -1
+
+
 func find_level_index_by_legacy_result_key(legacy_result_key: String) -> int:
     if legacy_result_key.is_empty():
         return -1

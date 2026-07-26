@@ -3,6 +3,7 @@ extends SceneTree
 const BAT_NEST_SCRIPT := preload("res://enemies/bat_nest.gd")
 const TREASURE_DEPOSIT_COFFIN_SCENE := preload("res://placeables/treasure_deposit/treasure_deposit_coffin.tscn")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
+const CODEX_SESSION_OPTIONS := preload("res://game/codex_session_options.gd")
 const RUN_RECORDER_SCRIPT := preload("res://game/run_recorder.gd")
 const RUN_RECORDING_SCRIPT := preload("res://game/run_recording.gd")
 const SCREEN_FADE_SCRIPT := preload("res://ui/screens/screen_fade.gd")
@@ -151,6 +152,21 @@ class TestLevelSelection:
         return _resolve_saved_highlighted_level_index(stored_results)
 
 
+class TestShutdownRecorder:
+    extends Node
+
+    var finish_called := false
+
+
+    func _ready() -> void:
+        add_to_group(GDRunRecorder.RUN_RECORDER_GROUP)
+
+
+    func finish_recording() -> PackedByteArray:
+        finish_called = true
+        return PackedByteArray()
+
+
 class TestGameSettings:
     extends GDGameSettings
 
@@ -287,7 +303,9 @@ func _init() -> void:
 func _run_tests() -> void:
     var failed := false
     failed = not _test_deterministic_seed_helper_is_stable() or failed
+    failed = not _test_codex_session_options_require_explicit_directed_test_data() or failed
     failed = not _test_run_recording_preserves_compact_frame_timing_and_controls() or failed
+    failed = not await _test_quick_exit_flushes_run_recording_tasks() or failed
     failed = not _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() or failed
     failed = not _test_treasure_pile_discovers_compatible_scenes_and_spawns_mixed_counts() \
         or failed
@@ -297,6 +315,8 @@ func _run_tests() -> void:
     failed = not _test_audio_fallback_is_deterministic() or failed
     failed = not _test_frontend_audio_uses_shared_support() or failed
     failed = not await _test_screen_fade_finishes_while_paused() or failed
+    failed = not await _test_feedback_pause_restores_prior_pause_state() or failed
+    failed = not await _test_feedback_dialog_uses_large_game_font() or failed
     failed = not await _test_game_settings_batch_disk_writes() or failed
     failed = not _test_player_fall_death_threshold() or failed
     failed = not _test_torch_scene_and_persistent_activation() or failed
@@ -374,17 +394,110 @@ func _test_deterministic_seed_helper_is_stable() -> bool:
         and _expect(first_seed != different_seed, "deterministic seed helper changes with salt")
 
 
+func _test_codex_session_options_require_explicit_directed_test_data() -> bool:
+    var directed_test := CODEX_SESSION_OPTIONS.parse(PackedStringArray([
+        "--codex-test",
+        "Walk through the exit gate.",
+        "--codex-level",
+        "vampire_boss",
+        "--codex-confirmed",
+    ]))
+    var replay := CODEX_SESSION_OPTIONS.parse(PackedStringArray([
+        "--codex-replay",
+        "--codex-level",
+        "latest",
+        "--codex-logs",
+        "summary,position,buttons",
+        "--codex-sample-seconds",
+        "0.25",
+    ]))
+    var invalid := CODEX_SESSION_OPTIONS.parse(PackedStringArray([
+        "--codex-replay",
+        "--codex-logs",
+        "summary,omniscience",
+    ]))
+    var feedback := CODEX_SESSION_OPTIONS.parse(PackedStringArray([
+        "--codex-new-feedback",
+        "--codex-logs",
+        "feedback,position",
+        "--codex-feedback-before",
+        "1.5",
+        "--codex-feedback-after",
+        "2.5",
+    ]))
+
+    return _expect(
+        int(directed_test.get("mode", CODEX_SESSION_OPTIONS.SessionMode.Disabled)) \
+            == CODEX_SESSION_OPTIONS.SessionMode.DirectedTest \
+            and String(directed_test.get("instruction", "")) \
+                == "Walk through the exit gate." \
+            and String(directed_test.get("level", "")) == "vampire_boss" \
+            and bool(directed_test.get("confirmed", false)) \
+            and String(directed_test.get("report_button", "")) == "square" \
+            and String(directed_test.get("text_button", "")) == "disabled",
+        "Codex directed tests preserve the request and use a conflict-free feedback button"
+    ) and _expect(
+        int(replay.get("mode", CODEX_SESSION_OPTIONS.SessionMode.Disabled)) \
+            == CODEX_SESSION_OPTIONS.SessionMode.Replay \
+            and is_equal_approx(float(replay.get("sample_seconds", 0.0)), 0.25) \
+            and CODEX_SESSION_OPTIONS.has_log_channel(
+                replay,
+                CODEX_SESSION_OPTIONS.LogChannel.Position
+            ) \
+            and not CODEX_SESSION_OPTIONS.has_log_channel(
+                replay,
+                CODEX_SESSION_OPTIONS.LogChannel.Camera
+            ),
+        "Codex replay options select only the requested logging channels"
+    ) and _expect(
+        not (invalid.get("errors", []) as Array).is_empty(),
+        "Codex replay options reject unknown logging channels"
+    ) and _expect(
+        int(feedback.get("mode", CODEX_SESSION_OPTIONS.SessionMode.Disabled)) \
+            == CODEX_SESSION_OPTIONS.SessionMode.Feedback \
+            and CODEX_SESSION_OPTIONS.has_log_channel(
+                feedback,
+                CODEX_SESSION_OPTIONS.LogChannel.Feedback
+            ) \
+            and is_equal_approx(
+                float(feedback.get("feedback_before_seconds", 0.0)),
+                1.5
+            ) \
+            and is_equal_approx(
+                float(feedback.get("feedback_after_seconds", 0.0)),
+                2.5
+            ),
+        "Codex feedback options select a bounded diagnostic window"
+    )
+
+
 func _test_run_recording_preserves_compact_frame_timing_and_controls() -> bool:
     var recorder := RUN_RECORDER_SCRIPT.new() as RUN_RECORDER_SCRIPT
     var save_task_owner := TestLevelSelection.new()
     var storage_level_id := "run_recording_round_trip_test"
     recorder.level_id = storage_level_id
     recorder.storage_directory = TEST_RUN_RECORDING_DIRECTORY
+    var live_feedback_path := TEST_RUN_RECORDING_DIRECTORY.path_join(
+        "latest_feedback.json"
+    )
+    recorder.live_feedback_path = live_feedback_path
+    var repository_report_directory := TEST_RUN_RECORDING_DIRECTORY.path_join(
+        "feedback_reports"
+    )
+    recorder.repository_report_directory = repository_report_directory
+    recorder.repository_archive_directory = TEST_RUN_RECORDING_DIRECTORY.path_join(
+        "feedback_archive"
+    )
+    recorder.level_scene_path = "res://levels/1/level.tscn"
     recorder.save_task_owner = save_task_owner
     recorder.run_settings = {
         "shop_purchases": {
             "ghost_sneakers": 1,
         },
+    }
+    recorder.session_context = {
+        "source": "codex_directed_test",
+        "instruction": "Walk through the gate.",
     }
     var recording_root := Node3D.new()
     recording_root.name = "RecordedLevel"
@@ -411,6 +524,15 @@ func _test_run_recording_preserves_compact_frame_timing_and_controls() -> bool:
         0.65,
         first_camera_transform
     )
+    recorder.recording_enabled = true
+    recorder.mark_feedback("Vampire stuck.", {
+        "nodes": [{
+            "path": "Vampire",
+            "state": {"state": "Hunting"},
+        }],
+    })
+    var repository_report_id := recorder.latest_repository_report_id
+    recorder.update_latest_feedback_note("Vampire stuck beside the coffin.")
     recorder.capture_sample(
         1.0 / 30.0,
         Vector2(0.5, -0.25),
@@ -448,9 +570,33 @@ func _test_run_recording_preserves_compact_frame_timing_and_controls() -> bool:
         TEST_RUN_RECORDING_DIRECTORY
     )
     var stored_metadata := stored_recording.get("run_metadata", {}) as Dictionary
+    var live_feedback: Variant = JSON.parse_string(
+        FileAccess.get_file_as_string(live_feedback_path)
+    )
+    var repository_report_path := repository_report_directory.path_join(
+        "%s.json" % repository_report_id
+    )
+    var repository_report: Variant = JSON.parse_string(
+        FileAccess.get_file_as_string(repository_report_path)
+    )
+    var repository_playback_path := RUN_RECORDING_SCRIPT.get_path_for_level(
+        repository_report_id,
+        repository_report_directory
+    )
+    var repository_playback_saved := FileAccess.file_exists(repository_playback_path)
+    var repository_level_scene_path := repository_report_directory.path_join(
+        "%s.tscn" % repository_report_id
+    )
+    var repository_level_scene_saved := FileAccess.file_exists(
+        repository_level_scene_path
+    )
     var stored_settings := stored_metadata.get("settings", {}) as Dictionary
+    var stored_session := stored_metadata.get("session", {}) as Dictionary
     var stored_purchases := stored_settings.get("shop_purchases", {}) as Dictionary
     var stored_checkpoints := stored_metadata.get("drift_checkpoints", []) as Array
+    var stored_feedback_markers := stored_metadata.get("feedback_markers", []) as Array
+    var stored_feedback := stored_feedback_markers[0] as Dictionary \
+        if not stored_feedback_markers.is_empty() else {}
     var first_checkpoint := stored_checkpoints[0] as Dictionary \
         if not stored_checkpoints.is_empty() else {}
     var checkpoint_states := first_checkpoint.get("states", []) as Array
@@ -470,7 +616,20 @@ func _test_run_recording_preserves_compact_frame_timing_and_controls() -> bool:
             storage_level_id,
             TEST_RUN_RECORDING_DIRECTORY
         ))
+    var listed_recordings := RUN_RECORDING_SCRIPT.list_recordings(
+        TEST_RUN_RECORDING_DIRECTORY
+    )
+    var latest_recording_id := RUN_RECORDING_SCRIPT.get_latest_level_id(
+        TEST_RUN_RECORDING_DIRECTORY
+    )
     RUN_RECORDING_SCRIPT.remove_for_level(storage_level_id, TEST_RUN_RECORDING_DIRECTORY)
+    DirAccess.remove_absolute(ProjectSettings.globalize_path(live_feedback_path))
+    RUN_RECORDING_SCRIPT.remove_for_level(
+        repository_report_id,
+        repository_report_directory
+    )
+    DirAccess.remove_absolute(ProjectSettings.globalize_path(repository_level_scene_path))
+    DirAccess.remove_absolute(ProjectSettings.globalize_path(repository_report_path))
     var passed := _expect(decoded.size() > 0, "run recording binary payload decodes") \
         and _expect(
             deltas.size() == 3 \
@@ -514,6 +673,40 @@ func _test_run_recording_preserves_compact_frame_timing_and_controls() -> bool:
             "run recording retains the shop upgrades active for the attempt"
         ) \
         and _expect(
+            String(stored_session.get("instruction", "")) == "Walk through the gate.",
+            "run recording retains the Codex-directed playtest instruction"
+        ) \
+        and _expect(
+            String(stored_feedback.get("note", "")) \
+                == "Vampire stuck beside the coffin." \
+                and int(stored_feedback.get("frame", -1)) == 0,
+            "run recording stores player feedback at one precise replay frame"
+        ) \
+        and _expect(
+            live_feedback is Dictionary \
+                and String((live_feedback as Dictionary).get("level_id", "")) \
+                    == storage_level_id,
+            "player feedback is available to Codex before the run finishes"
+        ) \
+        and _expect(
+            repository_report is Dictionary \
+                and String((repository_report as Dictionary).get(
+                    "playback_status",
+                    ""
+                )) == "ready" \
+                and repository_playback_saved \
+                and String((repository_report as Dictionary).get(
+                    "level_scene_status",
+                    ""
+                )) == "ready" \
+                and repository_level_scene_saved,
+            "player feedback creates commit-ready playback and an immutable level snapshot"
+        ) \
+        and _expect(
+            listed_recordings.size() == 1 and latest_recording_id == storage_level_id,
+            "run recording lookup identifies the newest player session"
+        ) \
+        and _expect(
             String(first_checkpoint_state.get("path", "")) == "TrackedPushable" \
                 and checkpoint_position.is_equal_approx(tracked_pushable.global_position),
             "run recording stores periodic world checkpoints for playback drift diagnostics"
@@ -521,6 +714,45 @@ func _test_run_recording_preserves_compact_frame_timing_and_controls() -> bool:
     save_task_owner.free()
     recorder.free()
     recording_root.free()
+    return passed
+
+
+func _test_quick_exit_flushes_run_recording_tasks() -> bool:
+    var quick_exit := root.get_node_or_null("quick_exit") as GDQuickExit
+    var level_selection := root.get_node_or_null("LevelSelection") as GDLevelSelection
+    if not _expect(
+        quick_exit != null and level_selection != null,
+        "shutdown recording test has its persistent services"
+    ):
+        return false
+
+    var shutdown_recorder := TestShutdownRecorder.new()
+    root.add_child(shutdown_recorder)
+    var delayed_level_id := "test_shutdown_recording"
+    var delayed_task_id := WorkerThreadPool.add_task(
+        func() -> void:
+            OS.delay_msec(75),
+        false,
+        "Test shutdown recording save"
+    )
+    level_selection.register_run_recording_save_task(delayed_level_id, delayed_task_id)
+    var wait_started_at := Time.get_ticks_msec()
+    quick_exit.call("_finish_pending_run_recordings")
+    var wait_duration := Time.get_ticks_msec() - wait_started_at
+    var remaining_task_id := level_selection.take_run_recording_save_task(
+        delayed_level_id
+    )
+    if remaining_task_id != GDRunRecording.INVALID_TASK_ID:
+        WorkerThreadPool.wait_for_task_completion(remaining_task_id)
+    var passed := _expect(
+        not auto_accept_quit \
+            and shutdown_recorder.finish_called \
+            and wait_duration >= 50 \
+            and remaining_task_id == GDRunRecording.INVALID_TASK_ID,
+        "quitting finalizes active recorders and joins every playback save before teardown"
+    )
+    shutdown_recorder.queue_free()
+    await process_frame
     return passed
 
 
@@ -921,6 +1153,98 @@ func _test_screen_fade_finishes_while_paused() -> bool:
         fade_finished,
         "screen fades finish even when gameplay leaves the scene tree paused"
     )
+
+
+func _test_feedback_pause_restores_prior_pause_state() -> bool:
+    var pause_scene := load("res://ui/screens/pause_screen.tscn") as PackedScene
+    var pause_screen := pause_scene.instantiate() as GDPauseScreen
+    root.add_child(pause_screen)
+    await process_frame
+
+    pause_screen.begin_feedback_pause()
+    var newly_paused_without_overlay := paused and not pause_screen.visible
+    pause_screen.end_feedback_pause()
+    var resumed_after_feedback := not paused and not pause_screen.visible
+
+    paused = true
+    pause_screen.begin_feedback_pause()
+    pause_screen.end_feedback_pause()
+    var prior_pause_restored := paused and pause_screen.visible
+    paused = false
+    pause_screen.queue_free()
+    await process_frame
+    return _expect(
+        newly_paused_without_overlay and resumed_after_feedback and prior_pause_restored,
+        "feedback pauses gameplay without covering its dialog and restores prior pause state"
+    )
+
+
+func _test_feedback_dialog_uses_large_game_font() -> bool:
+    var feedback_scene := load(
+        "res://ui/hud/player_feedback/player_feedback.tscn"
+    ) as PackedScene
+    var feedback := feedback_scene.instantiate() as GDPlayerFeedback
+    root.add_child(feedback)
+    await process_frame
+    var prompt := feedback.get_node_or_null(
+        "NotePanel/Center/Panel/Margin/VBox/Prompt"
+    ) as Label
+    var instructions := feedback.get_node_or_null(
+        "NotePanel/Center/Panel/Margin/VBox/Instructions"
+    ) as Label
+    var note_field := feedback.get_node_or_null(
+        "NotePanel/Center/Panel/Margin/VBox/NoteField"
+    ) as TextEdit
+    var cancel_button := feedback.get_node_or_null(
+        "NotePanel/Center/Panel/Margin/VBox/Actions/CancelButton"
+    ) as Button
+    var proceed_button := feedback.get_node_or_null(
+        "NotePanel/Center/Panel/Margin/VBox/Actions/ProceedButton"
+    ) as Button
+    var submitted_note := {"value": ""}
+    feedback.feedback_note_submitted.connect(
+        func(note: String) -> void:
+            submitted_note["value"] = note
+    )
+    feedback.call("_show_note_field")
+    note_field.text = "The first line.\nThe second line."
+    proceed_button.pressed.emit()
+    var multiline_note_submitted := String(submitted_note["value"]) \
+        == "The first line.\nThe second line."
+    feedback.call("_show_note_field")
+    note_field.text = "Discard this note."
+    cancel_button.pressed.emit()
+    var cancel_discarded_note := String(submitted_note["value"]) \
+        == "The first line.\nThe second line."
+    var passed := _expect(
+        prompt != null \
+            and prompt.get_theme_font_size("font_size") >= 64 \
+            and prompt.has_theme_font_override("font"),
+        "feedback title uses the large shared game font"
+    ) and _expect(
+        instructions != null \
+            and instructions.get_theme_font_size("font_size") >= 40 \
+            and instructions.has_theme_font_override("font") \
+            and note_field != null \
+            and note_field.get_theme_font_size("font_size") >= 48 \
+            and note_field.has_theme_font_override("font"),
+        "feedback instructions and entry field more than double their original font sizes"
+    ) and _expect(
+        multiline_note_submitted \
+            and cancel_discarded_note \
+            and proceed_button != null \
+            and proceed_button.focus_mode == Control.FOCUS_ALL \
+            and proceed_button.has_theme_font_override("font") \
+            and cancel_button != null \
+            and cancel_button.focus_mode == Control.FOCUS_ALL \
+            and cancel_button.has_theme_font_override("font") \
+            and not proceed_button.focus_neighbor_left.is_empty() \
+            and not cancel_button.focus_neighbor_right.is_empty(),
+        "feedback supports multiline notes and joypad-focusable Proceed and Cancel actions"
+    )
+    feedback.queue_free()
+    await process_frame
+    return passed
 
 
 func _test_game_settings_batch_disk_writes() -> bool:
@@ -2083,9 +2407,33 @@ func _test_graveyard_scene_does_not_embed_default_level() -> bool:
         return false
 
     var graveyard := scene.instantiate()
+    var pause_screen := graveyard.get_node_or_null("PauseScreen") as CanvasLayer
+    var feedback := graveyard.get_node_or_null("PlayerFeedback") as CanvasLayer
+    var note_panel := graveyard.get_node_or_null("PlayerFeedback/NotePanel") as Control
+    var feedback_settings := feedback.get("settings") as GDPlayerFeedbackSettings \
+        if feedback != null else null
     var passed := _expect(
         graveyard.get_node_or_null("CurrentLevel") == null,
         "graveyard editor scene does not embed level 1"
+    ) and _expect(
+        graveyard.get_node_or_null("CodexTestInstruction") != null,
+        "gameplay owns a hidden Codex-directed test instruction panel"
+    ) and _expect(
+        feedback != null \
+            and pause_screen != null \
+            and feedback.layer > pause_screen.layer \
+            and feedback.process_mode == Node.PROCESS_MODE_ALWAYS \
+            and note_panel != null \
+            and is_equal_approx(note_panel.anchor_right, 1.0) \
+            and is_equal_approx(note_panel.anchor_bottom, 1.0),
+        "gameplay feedback owns a full-screen centered modal above the pause layer"
+    ) and _expect(
+        feedback_settings != null \
+            and feedback_settings.report_button \
+                == GDPlayerFeedbackSettings.FeedbackButton.FaceLeft \
+            and feedback_settings.text_button \
+                == GDPlayerFeedbackSettings.FeedbackButton.Disabled,
+        "gameplay feedback defaults to the unclaimed Square face button"
     )
     graveyard.queue_free()
     return passed
@@ -2712,6 +3060,11 @@ func _test_level_lookup_supports_debug_and_stable_ids() -> bool:
     return _expect(mapping.get_level_count() == 17, "level lookup exposes the debug level and sixteen slots") \
         and _expect(mapping.get_level_id(0) == "debug_level", "debug level has a stable mapping ID") \
         and _expect(mapping.get_level_id(1) == "level_01", "level 1 has a stable mapping ID") \
+        and _expect(
+            mapping.find_level_index("Vampire Boss") == 9 \
+                and mapping.find_level_index("vampire-maze") == 9,
+            "level lookup resolves Codex CLI references by name and folder"
+        ) \
         and _expect(
             bool(mapping.get_level_data(9).get("run_playback_enabled", true)) \
                 and not mapping.get_level_data(9).has(

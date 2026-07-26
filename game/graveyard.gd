@@ -7,6 +7,10 @@ const KILL_BOUNDARY_SCRIPT := preload("res://placeables/kill_boundary/kill_bound
 const LEVEL_SETTINGS_SCRIPT := preload("res://levels/level_settings.gd")
 const NAVIGATION_BOOTSTRAP := preload("res://game/navigation_bootstrap.gd")
 const RUN_RECORDER_SCRIPT := preload("res://game/run_recorder.gd")
+const CODEX_SESSION_OPTIONS := preload("res://game/codex_session_options.gd")
+const PLAYER_FEEDBACK_SETTINGS := preload(
+	"res://ui/hud/player_feedback/player_feedback_settings.gd"
+)
 
 const CURRENT_LEVEL_NAME := "CurrentLevel"
 
@@ -20,14 +24,19 @@ var max_treasure_value := 0
 var showing_result := false
 var current_level: Node
 var run_recorder: RUN_RECORDER_SCRIPT
+var codex_session_options: Dictionary = {}
 
 
 func _ready() -> void:
+	if not _configure_codex_directed_test():
+		return
 	_load_selected_level()
 	await NAVIGATION_BOOTSTRAP.prepare_level(current_level)
 	_configure_runtime_references()
 	_activate_current_level_camera()
+	_show_codex_test_instruction()
 	_begin_run_recording()
+	_configure_player_feedback()
 	_configure_kill_boundary_animation()
 	max_treasure_value = _calculate_max_treasure_value()
 	_begin_result_stats()
@@ -113,6 +122,9 @@ func _begin_run_recording() -> void:
 	run_recorder = RUN_RECORDER_SCRIPT.new() as RUN_RECORDER_SCRIPT
 	run_recorder.name = "RunRecorder"
 	add_child(run_recorder)
+	run_recorder.repository_feedback_status.connect(
+		_on_repository_feedback_status
+	)
 	run_recorder.begin_recording(
 		level_selection.get_selected_level_id(),
 		player,
@@ -121,8 +133,157 @@ func _begin_run_recording() -> void:
 		current_level,
 		{
 			"shop_purchases": level_selection.shop_purchases.duplicate(true),
-		}
+		},
+		_get_codex_session_context()
 	)
+	var feedback_hud := get_node_or_null("PlayerFeedback")
+	if feedback_hud != null:
+		run_recorder.configure_feedback_repository(feedback_hud.get("settings") as Resource)
+
+
+func _configure_codex_directed_test() -> bool:
+	codex_session_options = CODEX_SESSION_OPTIONS.parse(OS.get_cmdline_user_args())
+	for error: String in codex_session_options.get("errors", []) as Array[String]:
+		push_warning(error)
+	if int(codex_session_options.get(
+		"mode",
+		CODEX_SESSION_OPTIONS.SessionMode.Disabled
+	)) != CODEX_SESSION_OPTIONS.SessionMode.DirectedTest:
+		return true
+	if not bool(codex_session_options.get("confirmed", false)):
+		push_error(
+			"Codex directed test refused to start without explicit user readiness confirmation."
+		)
+		get_tree().quit(4)
+		return false
+
+	var level_reference := String(codex_session_options.get("level", "")).strip_edges()
+	if level_reference.is_empty():
+		return true
+	var level_selection := get_node_or_null("/root/LevelSelection") as GDLevelSelection
+	if level_selection == null or level_selection.level_mapping == null:
+		push_warning("Codex directed test could not access the level mapping.")
+		return true
+	var level_index := int(level_selection.level_mapping.find_level_index(level_reference))
+	if level_index < 0 or not level_selection.select_level(level_index):
+		push_warning("Codex directed test could not select level '%s'." % level_reference)
+	return true
+
+
+func _show_codex_test_instruction() -> void:
+	if int(codex_session_options.get(
+		"mode",
+		CODEX_SESSION_OPTIONS.SessionMode.Disabled
+	)) != CODEX_SESSION_OPTIONS.SessionMode.DirectedTest:
+		return
+	var instruction_hud := get_node_or_null("CodexTestInstruction")
+	if instruction_hud != null and instruction_hud.has_method("show_instruction"):
+		instruction_hud.show_instruction(
+			String(codex_session_options.get("instruction", ""))
+		)
+
+
+func _get_codex_session_context() -> Dictionary:
+	if int(codex_session_options.get(
+		"mode",
+		CODEX_SESSION_OPTIONS.SessionMode.Disabled
+	)) != CODEX_SESSION_OPTIONS.SessionMode.DirectedTest:
+		return {}
+	return {
+		"source": "codex_directed_test",
+		"instruction": String(codex_session_options.get("instruction", "")),
+		"requested_level": String(codex_session_options.get("level", "")),
+	}
+
+
+func _configure_player_feedback() -> void:
+	var feedback_hud := get_node_or_null("PlayerFeedback")
+	if feedback_hud == null:
+		return
+	if feedback_hud.has_signal("feedback_submitted") \
+			and not feedback_hud.feedback_submitted.is_connected(_on_feedback_submitted):
+		feedback_hud.feedback_submitted.connect(_on_feedback_submitted)
+	if feedback_hud.has_signal("feedback_note_submitted") \
+			and not feedback_hud.feedback_note_submitted.is_connected(
+				_on_feedback_note_submitted
+			):
+		feedback_hud.feedback_note_submitted.connect(_on_feedback_note_submitted)
+	if feedback_hud.has_signal("feedback_dialog_opened") \
+			and not feedback_hud.feedback_dialog_opened.is_connected(
+				_on_feedback_dialog_opened
+			):
+		feedback_hud.feedback_dialog_opened.connect(_on_feedback_dialog_opened)
+	if feedback_hud.has_signal("feedback_dialog_closed") \
+			and not feedback_hud.feedback_dialog_closed.is_connected(
+				_on_feedback_dialog_closed
+			):
+		feedback_hud.feedback_dialog_closed.connect(_on_feedback_dialog_closed)
+	if not feedback_hud.has_method("configure_buttons"):
+		return
+	var default_report := PLAYER_FEEDBACK_SETTINGS.FeedbackButton.FaceLeft
+	var default_text := PLAYER_FEEDBACK_SETTINGS.FeedbackButton.Disabled
+	feedback_hud.configure_buttons(
+		PLAYER_FEEDBACK_SETTINGS.get_button_from_name(
+			String(codex_session_options.get("report_button", "square")),
+			default_report
+		),
+		PLAYER_FEEDBACK_SETTINGS.get_button_from_name(
+			String(codex_session_options.get("text_button", "disabled")),
+			default_text
+		)
+	)
+
+
+func _on_feedback_submitted(note: String) -> void:
+	if run_recorder == null:
+		return
+	run_recorder.mark_feedback(note, _capture_feedback_snapshot())
+
+
+func _on_feedback_note_submitted(note: String) -> void:
+	if run_recorder == null:
+		return
+	run_recorder.update_latest_feedback_note(note)
+
+
+func _on_feedback_dialog_opened() -> void:
+	var pause_screen := get_node_or_null("PauseScreen")
+	if pause_screen != null and pause_screen.has_method("begin_feedback_pause"):
+		pause_screen.begin_feedback_pause()
+
+
+func _on_feedback_dialog_closed() -> void:
+	var pause_screen := get_node_or_null("PauseScreen")
+	if pause_screen != null and pause_screen.has_method("end_feedback_pause"):
+		pause_screen.end_feedback_pause()
+
+
+func _on_repository_feedback_status(message: String, succeeded: bool) -> void:
+	var feedback_hud := get_node_or_null("PlayerFeedback")
+	if feedback_hud != null and feedback_hud.has_method("show_repository_status"):
+		feedback_hud.call_deferred("show_repository_status", message, succeeded)
+
+
+func _capture_feedback_snapshot() -> Dictionary:
+	var snapshot := {
+		"treasure_collected": treasure_collected,
+		"max_treasure_value": max_treasure_value,
+		"showing_result": showing_result,
+		"nodes": [] as Array[Dictionary],
+	}
+	if current_level == null:
+		return snapshot
+	var diagnostic_nodes := snapshot["nodes"] as Array[Dictionary]
+	for node in _get_descendants(current_level):
+		if not node.has_method("get_codex_diagnostics"):
+			continue
+		var diagnostics: Variant = node.call("get_codex_diagnostics")
+		if diagnostics is Dictionary:
+			diagnostic_nodes.append({
+				"path": String(current_level.get_path_to(node)),
+				"state": diagnostics,
+			})
+	return snapshot
 
 
 func _get_result_stats() -> Node:

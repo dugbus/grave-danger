@@ -16,7 +16,7 @@
 script = ExtResource("101_level")
 
 [node name="Player" parent="." unique_id=244343110 instance=ExtResource("2_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.167923, 11.877796, -13.741524)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 0.05, -15.5)
 
 [node name="IndoorLighting" parent="." unique_id=343606488 instance=ExtResource("100_indoor")]
 
@@ -25,7 +25,7 @@ script = ExtResource("106_level_settings")
 show_minimap = true
 
 [node name="Vampire" parent="." unique_id=93193051 instance=ExtResource("102_vampire")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 0.05, 18.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0.05, 15.5)
 
 [node name="VampireDebugHUD" parent="." unique_id=1970276169 instance=ExtResource("111_vampire_debug_hud")]
 
@@ -49,7 +49,7 @@ floor_grid_map_path = NodePath("")
 maze_seed = 7
 baked_generation_version = 11
 baked_maze_seed = 7
-baked_width = 32
-baked_height = 32
+baked_width = 34
+baked_height = 34
 
 [editable path="IndoorLighting"]

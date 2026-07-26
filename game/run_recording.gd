@@ -314,6 +314,44 @@ static func get_path_for_level(
     return "%s/%s%s" % [storage_directory, level_id.validate_filename(), FILE_EXTENSION]
 
 
+static func list_recordings(
+    storage_directory: String = STORAGE_DIRECTORY
+) -> Array[Dictionary]:
+    var storage := DirAccess.open(storage_directory)
+    if storage == null:
+        return []
+
+    var recordings: Array[Dictionary] = []
+    for file_name in storage.get_files():
+        if not file_name.ends_with(FILE_EXTENSION):
+            continue
+        var level_id := file_name.trim_suffix(FILE_EXTENSION)
+        var path := "%s/%s" % [storage_directory, file_name]
+        recordings.append({
+            "level_id": level_id,
+            "modified_unix_time": FileAccess.get_modified_time(path),
+            "path": path,
+        })
+    recordings.sort_custom(
+        func(left: Dictionary, right: Dictionary) -> bool:
+            var left_modified := int(left.get("modified_unix_time", 0))
+            var right_modified := int(right.get("modified_unix_time", 0))
+            if left_modified != right_modified:
+                return left_modified > right_modified
+            return String(left.get("level_id", "")) < String(right.get("level_id", ""))
+    )
+    return recordings
+
+
+static func get_latest_level_id(
+    storage_directory: String = STORAGE_DIRECTORY
+) -> String:
+    var recordings := list_recordings(storage_directory)
+    if recordings.is_empty():
+        return ""
+    return String(recordings[0].get("level_id", ""))
+
+
 static func remove_for_level(
     level_id: String,
     storage_directory: String = STORAGE_DIRECTORY

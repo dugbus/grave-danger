@@ -1,0 +1,59 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://ui/hud/codex_test_instruction/codex_test_instruction.gd" id="1_instruction"]
+
+[node name="CodexTestInstruction" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_instruction")
+
+[node name="Layout" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="InstructionPanel" type="PanelContainer" parent="Layout"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.2
+anchor_right = 0.8
+offset_top = 24.0
+offset_bottom = 174.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="Margin" type="MarginContainer" parent="Layout/InstructionPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 16
+
+[node name="Content" type="VBoxContainer" parent="Layout/InstructionPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Layout/InstructionPanel/Margin/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.36, 1)
+theme_override_font_sizes/font_size = 24
+text = "CODEX PLAYTEST"
+horizontal_alignment = 1
+
+[node name="Instruction" type="Label" parent="Layout/InstructionPanel/Margin/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Test instruction"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Hint" type="Label" parent="Layout/InstructionPanel/Margin/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.78, 0.84, 1)
+text = "Complete the request, then finish the run or close the game so Codex can inspect it."
+horizontal_alignment = 1
+autowrap_mode = 2
+

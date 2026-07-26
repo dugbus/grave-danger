@@ -4,5 +4,3 @@
 
 [resource]
 script = ExtResource("1_settings")
-obstacle_stride_vertical_speed = 6.0
-noise_evidence_half_life_seconds = 6.0
