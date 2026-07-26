@@ -9,9 +9,9 @@ class_name GDVampireSettings
 ## Radius of the wall-occluded instant-kill contact around the doubled Vampire model.
 @export_range(0.1, 2.0, 0.05, "suffix:m") var instant_kill_contact_radius := 0.8
 ## Horizontal acceleration used while the vampire starts hunting.
-@export_range(0.1, 50.0, 0.1) var acceleration := 22.0
+@export_range(0.1, 50.0, 0.1) var acceleration := 1.0
 ## Horizontal deceleration used when the vampire reaches the heard location.
-@export_range(0.1, 50.0, 0.1) var deceleration := 28.0
+@export_range(0.1, 50.0, 0.1) var deceleration := 7.0
 ## Radians per second used to turn the vampire model toward its route.
 @export_range(0.1, 30.0, 0.1) var turn_speed := 12.0
 ## Distance at which an intermediate maze route point is considered reached.

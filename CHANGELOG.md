@@ -2,6 +2,18 @@
 
 ## 2026-07-26
 
+### 1800
+
+- Gold coins and their pile previews now use the textured metallic skull model at its authored size, with matching shared convex physics and the existing treasure outline.
+  - Prompt: Integrate the newly added skull-coin model.
+
+### 1700
+
+- Gold coins now build their convex physics hull from the displayed coin mesh, including transformed meshes inside replacement model hierarchies.
+  - Prompt: Make coin physics follow the current and incoming replacement mesh.
+- The Vampire Maze minimap now shows the boss's facing, current belief and uncertainty, actual player, route destination, perception source, search plan, route progress, and movement state.
+  - Prompt: Show the Vampire's behaviour and believed player position on the minimap.
+
 ### 1600
 
 - Closing the game now waits for pending playback saves before shutdown, preventing the macOS exit crash.

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://3w0dhwvg7s4a"]
+[gd_scene load_steps=15 format=3 uid="uid://3w0dhwvg7s4a"]
 
 [ext_resource type="Script" uid="uid://bov7w0cyy2jl7" path="res://game/follow_camera.gd" id="1_camera"]
 [ext_resource type="AudioStream" uid="uid://bcd4h7b10r85q" path="res://Assets/audio/music-track.mp3" id="3_music"]
@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" path="res://ui/hud/panel.tscn" id="12_panel"]
 [ext_resource type="Script" path="res://ui/hud/low_health_vignette.gd" id="13_vignette"]
 [ext_resource type="Shader" path="res://ui/hud/low_health_vignette.gdshader" id="14_vignette_shader"]
+[ext_resource type="Script" path="res://ui/hud/minimap/vampire_minimap_overlay.gd" id="15_vampire_overlay"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vignette"]
 shader = ExtResource("14_vignette_shader")
@@ -138,3 +139,50 @@ handle_input_locally = false
 [node name="MinimapCamera" type="Camera3D" parent="MinimapHud/MinimapView/ViewportContainer/MinimapViewport"]
 current = true
 fov = 42.0
+
+[node name="VampireOverlay" type="Control" parent="MinimapHud/MinimapView"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+clip_contents = true
+script = ExtResource("15_vampire_overlay")
+
+[node name="StatusBackdrop" type="ColorRect" parent="MinimapHud/MinimapView/VampireOverlay"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 82.0
+grow_horizontal = 2
+mouse_filter = 2
+color = Color(0.025, 0.01, 0.04, 0.84)
+
+[node name="StatusLabel" type="Label" parent="MinimapHud/MinimapView/VampireOverlay/StatusBackdrop"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 2.0
+offset_right = -5.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.93, 0.86, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.95)
+theme_override_constants/line_spacing = -2
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 13
+text = "IDLE  •  LOS NO  •  NONE
+BELIEF UNKNOWN  •  ±0.0m  •  ERROR --
+SEARCH NONE  •  ROUTE 0/0  •  SPEED 0.0m/s
+EVIDENCE 0.0s  •  CONF --  •  DEST NONE"
+clip_text = true

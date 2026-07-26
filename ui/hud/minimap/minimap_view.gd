@@ -6,6 +6,7 @@ const DEFAULT_SETTINGS := preload("res://ui/hud/minimap/minimap_view_settings.tr
 const VIEWPORT_CONTAINER_NAME := "ViewportContainer"
 const MINIMAP_VIEWPORT_NAME := "MinimapViewport"
 const MINIMAP_CAMERA_NAME := "MinimapCamera"
+const VAMPIRE_OVERLAY_NAME := "VampireOverlay"
 const CAMERA_ENVIRONMENT_PROPERTY := "environment"
 const DEFAULT_CAMERA_CULL_MASK := (1 << 20) - 1
 const MINIMAP_ROUTE_VISUAL_LAYER := 1 << 18
@@ -31,6 +32,9 @@ var minimap_enabled := false
 )
 @onready var minimap_camera := (
 	get_node_or_null("%s/%s/%s" % [VIEWPORT_CONTAINER_NAME, MINIMAP_VIEWPORT_NAME, MINIMAP_CAMERA_NAME]) as Camera3D
+)
+@onready var vampire_overlay: Control = (
+	get_node_or_null(VAMPIRE_OVERLAY_NAME) as Control
 )
 
 
@@ -58,6 +62,7 @@ func set_runtime_references(target_node: Node, kill_boundary_node: Node, level_r
 	_refresh_level_bounds()
 	if minimap_enabled:
 		_update_camera_transform()
+	_configure_vampire_overlay()
 
 
 func clear_runtime_references() -> void:
@@ -66,6 +71,8 @@ func clear_runtime_references() -> void:
 	level_root = null
 	level_bounds = AABB()
 	has_level_bounds = false
+	if vampire_overlay != null:
+		vampire_overlay.call("clear_runtime_references")
 
 
 func set_minimap_enabled(enabled: bool) -> void:
@@ -86,6 +93,9 @@ func set_minimap_enabled(enabled: bool) -> void:
 	if enabled:
 		_configure_viewport()
 		_update_camera_transform()
+		_configure_vampire_overlay()
+	elif vampire_overlay != null:
+		vampire_overlay.call("clear_runtime_references")
 
 
 func _configure_viewport() -> void:
@@ -123,6 +133,20 @@ func _configure_disabled_viewport() -> void:
 
 	if minimap_camera != null:
 		minimap_camera.current = false
+
+
+func _configure_vampire_overlay() -> void:
+	if vampire_overlay == null:
+		return
+	if not minimap_enabled:
+		vampire_overlay.call("clear_runtime_references")
+		return
+	vampire_overlay.call(
+		"set_runtime_references",
+		target,
+		minimap_camera,
+		viewport_container
+	)
 
 
 func _update_camera_transform() -> void:

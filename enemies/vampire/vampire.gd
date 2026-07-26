@@ -388,12 +388,137 @@ func get_codex_diagnostics() -> Dictionary:
 	}
 
 
+## Captures live spatial perception details for the Vampire minimap diagnostics overlay.
+func get_minimap_debug_snapshot() -> Dictionary:
+	var has_belief := false
+	var belief_position := Vector3.ZERO
+	var belief_kind := "Unknown"
+	var awareness_name := "None"
+	var player_visible := false
+	var uncertainty_radius := 0.0
+	var evidence_age := 0.0
+	var evidence_confidence := -1.0
+	var search_plan_name := "None"
+	var has_actual_player := false
+	var actual_player_position := Vector3.ZERO
+
+	if hunt != null:
+		player_visible = bool(hunt.is_player_visible())
+		awareness_name = _enum_name(
+			GDVampireHunt.AwarenessSource.keys(),
+			int(hunt.get_awareness_source())
+		)
+		has_actual_player = is_instance_valid(hunt.get("player") as Node3D)
+		if has_actual_player:
+			actual_player_position = (hunt.get("player") as Node3D).global_position
+
+		var has_visible_observation := bool(hunt.get("has_visible_observation"))
+		var has_noise_position := bool(hunt.get("has_noise_position"))
+		var has_chase_target := bool(hunt.get("has_chase_target"))
+		var pursuing_last_seen := bool(hunt.get("pursuing_last_seen_position"))
+		if player_visible:
+			has_belief = true
+			belief_position = hunt.get("last_confirmed_player_position") as Vector3
+			belief_kind = "Confirmed Sight"
+			evidence_confidence = 1.0
+		elif pursuing_last_seen and has_chase_target:
+			has_belief = true
+			belief_position = hunt.get("last_chase_target") as Vector3
+			belief_kind = "Predicted Sight"
+			uncertainty_radius = float(hunt.get_last_seen_uncertainty_radius())
+			evidence_age = float(hunt.get("player_location_unknown_elapsed"))
+		elif has_visible_observation:
+			has_belief = true
+			belief_position = hunt.get("last_confirmed_player_position") as Vector3
+			belief_kind = "Last Confirmed"
+			uncertainty_radius = float(hunt.get_last_seen_uncertainty_radius())
+			evidence_age = float(hunt.get("player_location_unknown_elapsed"))
+		elif has_noise_position:
+			has_belief = true
+			belief_position = hunt.get("last_noise_position") as Vector3
+			belief_kind = "Sound Origin"
+			uncertainty_radius = float(hunt.get_noise_uncertainty_radius())
+			evidence_age = float(hunt.get("noise_elapsed_seconds"))
+			evidence_confidence = float(hunt.get_noise_evidence_relevance())
+
+		if bool(hunt.get("junction_scan_active")):
+			search_plan_name = _enum_name(
+				GDVampireHunt.SearchPlan.keys(),
+				int(hunt.get("search_plan_after_scan"))
+			)
+		elif bool(hunt.get("searching")):
+			search_plan_name = _enum_name(
+				GDVampireHunt.SearchPlan.keys(),
+				int(hunt.get("active_search_plan"))
+			)
+		elif pursuing_last_seen:
+			search_plan_name = _enum_name(
+				GDVampireHunt.SearchPlan.keys(),
+				GDVampireHunt.SearchPlan.LastSeenDirection
+			)
+		elif bool(hunt.get("noise_target_active")):
+			search_plan_name = _enum_name(
+				GDVampireHunt.SearchPlan.keys(),
+				GDVampireHunt.SearchPlan.NoiseRadius
+			)
+
+	var has_navigation_target := navigation != null \
+		and bool(navigation.get("has_target"))
+	var navigation_target := navigation.get("target_position") as Vector3 \
+		if has_navigation_target else Vector3.ZERO
+	var route := navigation.get_route_points() as Array[Vector3] \
+		if navigation != null else []
+	var route_status := _enum_name(
+		GDVampireNavigation.RouteTraversalStatus.keys(),
+		int(navigation.get_route_traversal_status())
+	) if navigation != null else "Unavailable"
+	var facing_direction := pivot.global_basis.z if pivot != null else Vector3.FORWARD
+	var horizontal_velocity := Vector2(velocity.x, velocity.z)
+	var belief_error := _horizontal_distance(
+		belief_position,
+		actual_player_position
+	) if has_belief and has_actual_player else 0.0
+	var destination_distance := _horizontal_distance(
+		global_position,
+		navigation_target
+	) if has_navigation_target else 0.0
+
+	return {
+		"state": _enum_name(VampireState.keys(), state),
+		"vampire_position": global_position,
+		"facing_direction": facing_direction,
+		"speed": horizontal_velocity.length(),
+		"player_visible": player_visible,
+		"awareness_source": awareness_name,
+		"has_belief": has_belief,
+		"belief_position": belief_position,
+		"belief_kind": belief_kind,
+		"uncertainty_radius": uncertainty_radius,
+		"evidence_age": evidence_age,
+		"evidence_confidence": evidence_confidence,
+		"has_actual_player": has_actual_player,
+		"actual_player_position": actual_player_position,
+		"belief_error": belief_error,
+		"search_plan": search_plan_name,
+		"has_navigation_target": has_navigation_target,
+		"navigation_target": navigation_target,
+		"destination_distance": destination_distance,
+		"route_index": int(navigation.get("route_index")) if navigation != null else 0,
+		"route_points": route.size(),
+		"route_status": route_status,
+	}
+
+
 func _enum_name(names: Array, value: int) -> String:
 	return String(names[value]) if value >= 0 and value < names.size() else "Unknown"
 
 
 func _vector3_to_array(value: Vector3) -> Array[float]:
 	return [value.x, value.y, value.z]
+
+
+func _horizontal_distance(first: Vector3, second: Vector3) -> float:
+	return Vector2(first.x - second.x, first.z - second.z).length()
 
 
 func _collect_physics_bodies(

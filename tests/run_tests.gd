@@ -36,6 +36,9 @@ const NO_BOUNDARY_FLASK_SCENE := preload(
 const INDOOR_LIGHTING_SCENE := preload("res://lighting/gd_indoor_lighting.tscn")
 const MINIMAP_VIEW_SCRIPT := preload("res://ui/hud/minimap/minimap_view.gd")
 const MINIMAP_VIEW_SETTINGS := preload("res://ui/hud/minimap/minimap_view_settings.tres")
+const VAMPIRE_MINIMAP_OVERLAY_SCRIPT := preload(
+    "res://ui/hud/minimap/vampire_minimap_overlay.gd"
+)
 const PANEL_SCENE := preload("res://ui/hud/panel.tscn")
 const PLAYER_SCENE := preload("res://player/player.tscn")
 const RUBY_ITEM := preload("res://placeables/treasure/gems/ruby_inventory.tres")
@@ -364,6 +367,7 @@ func _run_tests() -> void:
     failed = not await _test_vampire_boss_routes_to_noise_and_kills_on_contact() or failed
     failed = not _test_vampire_navigation_reports_scaled_search_contract() or failed
     failed = not _test_vampire_maze_owns_its_development_view() or failed
+    failed = not _test_vampire_minimap_reports_live_belief_and_route_state() or failed
     failed = not _test_vampire_maze_generates_seeded_grid_maps() or failed
     failed = not _test_vampire_maze_exit_key_requires_exploration() or failed
     failed = not _test_vampire_maze_minimap_shows_all_shortest_routes() or failed
@@ -767,6 +771,12 @@ func _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() -
 
     var expected_seed := DETERMINISTIC_SEED.from_node(pile, 0, &"gold_coin_pile")
     var runtime_seed := int(pile.get_runtime_random_seed())
+    var coin_pile_preview := pile.call("_create_preview_item", 0) as Node3D
+    var coin_pile_preview_meshes := coin_pile_preview.find_children(
+        "*", "MeshInstance3D", true, false
+    )
+    var coin_pile_preview_mesh := coin_pile_preview_meshes[0] as MeshInstance3D \
+        if not coin_pile_preview_meshes.is_empty() else null
     var editor_preview_pile := TREASURE_PILE_SCENE.instantiate() as GDTreasurePile
     editor_preview_pile.pile_radius = 0.75
     editor_preview_pile.call("_configure_editor_selection_placeholder")
@@ -794,6 +804,15 @@ func _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() -
             "coin pile does not camera-gate spawn timing by default"
         ) \
         and _expect(
+            coin_pile_preview_mesh != null \
+                and coin_pile_preview_mesh.get_aabb().size.is_equal_approx(
+                    Vector3(0.1280421, 0.0160053, 0.1280421)
+                ) \
+                and coin_pile_preview_mesh.material_overlay \
+                    == TREASURE_OUTLINE_MATERIAL,
+            "coin pile previews use the textured skull coin at its authored size"
+        ) \
+        and _expect(
             both_pile_scenes_author_placeholder \
                 and selection_mesh != null \
                 and is_equal_approx(selection_mesh.top_radius, 0.75) \
@@ -805,6 +824,7 @@ func _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() -
             "pile selection placeholder geometry is hidden during gameplay"
         )
 
+    coin_pile_preview.free()
     parent.free()
     return passed
 
@@ -1690,13 +1710,25 @@ func _test_drop_direction_variation_is_deterministic_and_compact() -> bool:
 
 func _test_all_treasure_uses_indoor_lighting_and_coin_outline() -> bool:
     var coin := GOLD_COIN_SCENE.instantiate() as GDGoldCoin
-    var coin_mesh := coin.get_node_or_null("CoinMesh") as MeshInstance3D
+    root.add_child(coin)
+    var coin_meshes := coin.find_children("*", "MeshInstance3D", true, false)
+    var coin_mesh := coin_meshes[0] as MeshInstance3D \
+        if not coin_meshes.is_empty() else null
+    var coin_model_root := coin.get_node_or_null("CoinMesh") as Node3D
+    var coin_collision := coin.get_node_or_null("CollisionShape3D") as CollisionShape3D
+    var coin_convex_shape := coin_collision.shape as ConvexPolygonShape3D \
+        if coin_collision != null else null
     var coin_material: Material = (
         coin_mesh.get_active_material(0) if coin_mesh != null else null
     )
     var coin_outline: ShaderMaterial = (
         coin_mesh.material_overlay as ShaderMaterial if coin_mesh != null else null
     )
+    var shared_shape_coin := GOLD_COIN_SCENE.instantiate() as GDGoldCoin
+    root.add_child(shared_shape_coin)
+    var shared_shape_collision := shared_shape_coin.get_node(
+        "CollisionShape3D"
+    ) as CollisionShape3D
     var bar := GOLD_BAR_SCENE.instantiate() as GDGoldBar
     root.add_child(bar)
     var bar_meshes := bar.find_children("*", "MeshInstance3D", true, false)
@@ -1718,10 +1750,59 @@ func _test_all_treasure_uses_indoor_lighting_and_coin_outline() -> bool:
         world_environment.environment if world_environment != null else null
     )
     var gold_material := GOLD_TREASURE_MATERIAL as StandardMaterial3D
+    var incoming_coin := GOLD_COIN_SCENE.instantiate() as GDGoldCoin
+    var incoming_mesh_root := incoming_coin.get_node("CoinMesh") as Node3D
+    var incoming_meshes := incoming_mesh_root.find_children(
+        "*", "MeshInstance3D", true, false
+    )
+    var incoming_nested_mesh := incoming_meshes[0] as MeshInstance3D
+    var incoming_mesh_width := incoming_nested_mesh.get_aabb().size.x
+    incoming_nested_mesh.position = Vector3(0.25, 0.0, 0.0)
+    incoming_nested_mesh.scale = Vector3(2.0, 1.0, 1.0)
+    root.add_child(incoming_coin)
+    var incoming_collision := incoming_coin.get_node("CollisionShape3D") as CollisionShape3D
+    var incoming_shape := incoming_collision.shape as ConvexPolygonShape3D
+    var incoming_bounds := AABB()
+    var has_incoming_bounds := incoming_shape != null and not incoming_shape.points.is_empty()
+    if has_incoming_bounds:
+        incoming_bounds = AABB(incoming_shape.points[0], Vector3.ZERO)
+        for point in incoming_shape.points:
+            incoming_bounds = incoming_bounds.expand(point)
 
     var passed := _expect(
-        coin_material == GOLD_TREASURE_MATERIAL,
-        "coins use the shared gold treasure material"
+        coin_material is StandardMaterial3D \
+            and (coin_material as StandardMaterial3D).metallic > 0.0 \
+            and (coin_material as StandardMaterial3D).normal_texture != null \
+            and (coin_material as StandardMaterial3D).normal_texture.resource_path \
+                == "res://Assets/environment/skull-coin_skulldugger.png",
+        "coins use the textured metallic skull model"
+    ) and _expect(
+        coin_model_root != null \
+            and coin_model_root.scene_file_path \
+                == "res://Assets/environment/skull-coin.glb" \
+            and coin_mesh != null \
+            and coin_mesh.get_aabb().size.is_equal_approx(
+                Vector3(0.1280421, 0.0160053, 0.1280421)
+            ),
+        "coins retain the skull model's authored hierarchy and dimensions"
+    ) and _expect(
+        coin_convex_shape != null and coin_convex_shape.points.size() >= 4,
+        "coin physics builds a convex hull from its visual mesh"
+    ) and _expect(
+        shared_shape_collision.shape == coin_convex_shape,
+        "identical coins share one cached convex physics hull"
+    ) and _expect(
+        has_incoming_bounds \
+            and absf(incoming_bounds.size.x - incoming_mesh_width * 2.0) <= 0.001 \
+            and is_equal_approx(incoming_bounds.get_center().x, 0.25),
+        (
+            "coin physics follows transformed meshes inside an incoming model hierarchy "
+            + "(width %.6f/%.6f, centre %.6f/0.250000)"
+        ) % [
+            incoming_bounds.size.x,
+            incoming_mesh_width * 2.0,
+            incoming_bounds.get_center().x,
+        ]
     ) and _expect(
         bar_material == GOLD_TREASURE_MATERIAL,
         "the imported gold-bar model receives the shared material override"
@@ -1760,6 +1841,8 @@ func _test_all_treasure_uses_indoor_lighting_and_coin_outline() -> bool:
     )
 
     indoor_lighting.free()
+    incoming_coin.free()
+    shared_shape_coin.free()
     gem.free()
     bar.free()
     coin.free()
@@ -2135,7 +2218,11 @@ func _test_reusable_gate_and_treasure_deposit_coffin_scenes() -> bool:
         )
         deposit._absorb_treasure(DIAMOND_ITEM.treasure_value, DIAMOND_ITEM)
     var world_coin := GOLD_COIN_SCENE.instantiate() as GDGoldCoin
-    var world_coin_mesh := world_coin.get_node_or_null("CoinMesh") as MeshInstance3D
+    var world_coin_meshes := world_coin.find_children(
+        "*", "MeshInstance3D", true, false
+    )
+    var world_coin_mesh := world_coin_meshes[0] as MeshInstance3D \
+        if not world_coin_meshes.is_empty() else null
     var gate_exit_staircase := gate.get_node_or_null("ProceduralStaircase") as Node3D
     var gate_exit_completion := gate.get_node_or_null(
         "ProceduralStaircase/CompletionArea"
@@ -6361,6 +6448,96 @@ func _test_vampire_maze_owns_its_development_view() -> bool:
     default_target.free()
     graveyard.free()
     level.free()
+    return passed
+
+
+func _test_vampire_minimap_reports_live_belief_and_route_state() -> bool:
+    var holder := Node3D.new()
+    root.add_child(holder)
+    var vampire := VAMPIRE_SCENE.instantiate() as GDVampire
+    holder.add_child(vampire)
+    var player := Node3D.new()
+    holder.add_child(player)
+    player.global_position = Vector3(8.0, 0.0, 4.0)
+
+    var hunt := vampire.get_node("VampireHunt") as GDVampireHunt
+    var navigation := vampire.get_node("VampireNavigation")
+    hunt.set("player", player)
+    hunt.set("settings", vampire.settings)
+    hunt.set("has_noise_position", true)
+    hunt.set("last_noise_position", Vector3(3.0, 0.0, 4.0))
+    hunt.set("noise_elapsed_seconds", 2.0)
+    hunt.set("noise_target_active", true)
+    hunt.set("awareness_source", GDVampireHunt.AwarenessSource.Noise)
+    navigation.set("has_target", true)
+    navigation.set("target_position", Vector3(6.0, 0.0, 4.0))
+    navigation.set("route_index", 1)
+    navigation.set(
+        "route_points",
+        [Vector3(4.0, 0.0, 4.0), Vector3(6.0, 0.0, 4.0)] as Array[Vector3]
+    )
+    navigation.set(
+        "route_traversal_status",
+        GDVampireNavigation.RouteTraversalStatus.Following
+    )
+    vampire.set("state", GDVampire.VampireState.Hunting)
+
+    var status_backdrop := ColorRect.new()
+    status_backdrop.name = "StatusBackdrop"
+    var status_label := Label.new()
+    status_label.name = "StatusLabel"
+    status_backdrop.add_child(status_label)
+    var overlay := VAMPIRE_MINIMAP_OVERLAY_SCRIPT.new() as Control
+    overlay.add_child(status_backdrop)
+    var viewport_container := SubViewportContainer.new()
+    var minimap_viewport := SubViewport.new()
+    minimap_viewport.size = Vector2i(256, 256)
+    var minimap_camera := Camera3D.new()
+    viewport_container.add_child(minimap_viewport)
+    minimap_viewport.add_child(minimap_camera)
+    root.add_child(viewport_container)
+    root.add_child(overlay)
+    overlay.set_runtime_references(vampire, minimap_camera, viewport_container)
+    var snapshot := overlay.call("get_snapshot") as Dictionary
+
+    var game_runtime_scene := load("res://game/game_runtime.tscn") as PackedScene
+    var game_runtime := game_runtime_scene.instantiate()
+    var authored_overlay := game_runtime.get_node_or_null(
+        "MinimapHud/MinimapView/VampireOverlay"
+    ) as Control
+    var passed := _expect(
+        bool(snapshot.get("has_belief", false)) \
+            and snapshot.get("belief_kind") == "Sound Origin" \
+            and snapshot.get("belief_position") == Vector3(3.0, 0.0, 4.0) \
+            and is_equal_approx(float(snapshot.get("belief_error")), 5.0),
+        "Vampire minimap distinguishes its sound belief from the player's actual position"
+    ) and _expect(
+        snapshot.get("search_plan") == "NoiseRadius" \
+            and bool(snapshot.get("has_navigation_target", false)) \
+            and snapshot.get("navigation_target") == Vector3(6.0, 0.0, 4.0) \
+            and int(snapshot.get("route_index")) == 1 \
+            and int(snapshot.get("route_points")) == 2,
+        "Vampire minimap reports its search plan, destination, and route progress"
+    ) and _expect(
+        status_label.text.contains("BELIEF SOUND ORIGIN") \
+            and status_label.text.contains("SEARCH NOISE RADIUS") \
+            and status_label.text.contains("ROUTE 1/2"),
+        "Vampire minimap overlays readable live AI diagnostics"
+    ) and _expect(
+        authored_overlay != null \
+            and authored_overlay.get_node_or_null("StatusBackdrop/StatusLabel") is Label,
+        "game runtime authors the Vampire diagnostics directly over the minimap"
+    )
+
+    game_runtime.free()
+    overlay.call("clear_runtime_references")
+    passed = _expect(
+        not overlay.visible and not overlay.is_processing(),
+        "hidden minimaps stop Vampire diagnostics processing"
+    ) and passed
+    overlay.queue_free()
+    viewport_container.queue_free()
+    holder.queue_free()
     return passed
 
 
