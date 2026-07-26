@@ -112,6 +112,11 @@ func take_run_recording_save_task(level_id: String) -> int:
     return player_progress.take_run_recording_save_task(level_id)
 
 
+## Waits until every queued last-run playback is completely written.
+func wait_for_run_recording_saves() -> void:
+    player_progress.wait_for_run_recording_saves()
+
+
 func get_level_result(index: int) -> Dictionary:
     return player_progress.get_level_result(_get_result_key(index))
 

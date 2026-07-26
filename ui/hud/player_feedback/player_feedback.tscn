@@ -1,0 +1,110 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://ui/hud/player_feedback/player_feedback.gd" id="1_feedback"]
+[ext_resource type="Resource" path="res://ui/hud/player_feedback/player_feedback_settings.tres" id="2_settings"]
+
+[node name="PlayerFeedback" type="CanvasLayer"]
+process_mode = 3
+layer = 210
+script = ExtResource("1_feedback")
+settings = ExtResource("2_settings")
+
+[node name="Confirmation" type="Label" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.84, 0.2, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 64
+text = "FEEDBACK MARKED"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NotePanel" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="DimOverlay" type="ColorRect" parent="NotePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.72)
+
+[node name="Center" type="CenterContainer" parent="NotePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="NotePanel/Center"]
+custom_minimum_size = Vector2(1040, 680)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="NotePanel/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="VBox" type="VBoxContainer" parent="NotePanel/Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Prompt" type="Label" parent="NotePanel/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "FEEDBACK PAUSED"
+horizontal_alignment = 1
+
+[node name="Instructions" type="Label" parent="NotePanel/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Write as much detail as you need.\nChoose Proceed to attach the note, or Cancel to continue without it."
+horizontal_alignment = 1
+
+[node name="NoteField" type="TextEdit" parent="NotePanel/Center/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 280)
+layout_mode = 2
+focus_mode = 2
+theme_override_font_sizes/font_size = 48
+placeholder_text = "What should Codex inspect?"
+wrap_mode = 1
+
+[node name="Actions" type="HBoxContainer" parent="NotePanel/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="CancelButton" type="Button" parent="NotePanel/Center/Panel/Margin/VBox/Actions"]
+custom_minimum_size = Vector2(320, 88)
+layout_mode = 2
+focus_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "CANCEL"
+
+[node name="ProceedButton" type="Button" parent="NotePanel/Center/Panel/Margin/VBox/Actions"]
+custom_minimum_size = Vector2(320, 88)
+layout_mode = 2
+focus_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "PROCEED"

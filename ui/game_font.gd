@@ -28,3 +28,21 @@ static func apply_to_button(button: Button) -> void:
     var font := get_almendra_font()
     if font != null:
         button.add_theme_font_override("font", font)
+
+
+static func apply_to_line_edit(line_edit: LineEdit) -> void:
+    if line_edit == null:
+        return
+
+    var font := get_almendra_font()
+    if font != null:
+        line_edit.add_theme_font_override("font", font)
+
+
+static func apply_to_text_edit(text_edit: TextEdit) -> void:
+    if text_edit == null:
+        return
+
+    var font := get_almendra_font()
+    if font != null:
+        text_edit.add_theme_font_override("font", font)

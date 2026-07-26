@@ -1,0 +1,4 @@
+interface:
+  display_name: "Replay Player Session"
+  short_description: "Inspect and archive replay-backed bug reports"
+  default_prompt: "Use $replay-player-session to request a focused playtest, inspect my newest committed feedback report, or archive a corrected report with its changelog record."
