@@ -213,6 +213,8 @@ func _play_jump_sound(settings: GDPlayerJumpSettings) -> void:
 		settings.jump_volume_db,
 		audio_rng.randf_range(settings.jump_pitch_min, settings.jump_pitch_max)
 	)
+	if player != null and player.has_method("emit_noise"):
+		player.emit_noise()
 
 
 func _play_footstep(horizontal_speed: float) -> void:
@@ -232,6 +234,8 @@ func _play_footstep(horizontal_speed: float) -> void:
 		audio_rng,
 		footstep_volume_variance_db
 	)
+	if player != null and player.has_method("emit_noise"):
+		player.emit_noise()
 
 
 func _can_play_footstep(horizontal_speed: float) -> bool:

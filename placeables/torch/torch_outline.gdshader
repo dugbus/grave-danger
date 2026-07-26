@@ -2,7 +2,7 @@ shader_type spatial;
 render_mode unshaded, cull_back, depth_draw_never, blend_add;
 
 uniform vec4 outline_color : source_color = vec4(1.0, 0.46, 0.12, 0.5);
-uniform float outline_intensity : hint_range(0.0, 1.0, 0.01) = 0.0;
+instance uniform float outline_intensity : hint_range(0.0, 1.0, 0.01) = 0.0;
 uniform float rim_power : hint_range(1.0, 8.0, 0.1) = 3.2;
 
 

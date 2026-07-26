@@ -211,13 +211,16 @@ func _update_selected_level_details(index: int) -> void:
 		level_data.get("name", "Level %d" % (index + 1))
 	).to_upper()
 	selected_tomb_status_label.text = _get_selected_tomb_status(index, available, result)
-	if level_run_playback != null:
-		level_run_playback.show_level_run(
-			String(level_data.get("id", "")),
-			String(level_data.get("scene_path", ""))
-		)
-
 	var level_was_played := bool(result.get("played", false))
+	if level_run_playback != null:
+		if _should_show_level_run_playback(level_data, result):
+			level_run_playback.show_level_run(
+				String(level_data.get("id", "")),
+				String(level_data.get("scene_path", ""))
+			)
+		else:
+			level_run_playback.clear_level_run()
+
 	var liberated_counts := result.get("banked_treasure_counts", {}) as Dictionary
 	var liberated_total := 0
 	for loot_tile: Control in loot_tiles.get_children():
@@ -239,6 +242,11 @@ func _update_selected_level_details(index: int) -> void:
 			"" if liberated_total == 1 else "S",
 			int(result.get("best_percentage", 0)),
 		]
+
+
+func _should_show_level_run_playback(level_data: Dictionary, result: Dictionary) -> bool:
+	return bool(level_data.get("run_playback_enabled", true)) \
+		and bool(result.get("played", false))
 
 
 func _get_selected_tomb_status(index: int, available: bool, result: Dictionary) -> String:

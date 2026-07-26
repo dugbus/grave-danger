@@ -120,6 +120,8 @@ func drop_item_of_type(item_type: StringName) -> bool:
 
 	take_item(item_type)
 	_play_item_sound(item, _item_drop_sound(item), "DropItemAudio")
+	if player.has_method("emit_noise"):
+		player.emit_noise()
 	return true
 
 
@@ -315,6 +317,8 @@ func _drop_unstored_pickup(item: Resource) -> bool:
 		return false
 
 	_play_item_sound(item, _item_drop_sound(item), "DropItemAudio")
+	if player != null and player.has_method("emit_noise"):
+		player.emit_noise()
 	return true
 
 

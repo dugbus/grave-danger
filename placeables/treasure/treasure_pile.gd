@@ -68,7 +68,10 @@ var spawn_plan: Array[PackedScene] = []
 
 
 func _ready() -> void:
-    _refresh_treasure_catalog()
+    # The base pile builds the complete editor preview synchronously in its
+    # ready pass, so only refresh the catalog here. Scheduling a second preview
+    # rebuild can invalidate Node3D child ordering while generated piles enter.
+    _refresh_treasure_catalog(false, false)
     if Engine.is_editor_hint():
         _connect_editor_filesystem_scan()
     super._ready()
@@ -239,10 +242,14 @@ func _create_preview_item(index: int) -> Node3D:
     return visual_preview
 
 
-func _refresh_treasure_catalog(force_scan := false) -> void:
+func _refresh_treasure_catalog(
+    force_scan := false,
+    refresh_preview := true
+) -> void:
     _load_treasure_catalog(force_scan)
     notify_property_list_changed()
-    _refresh_preview_when_editing()
+    if refresh_preview:
+        _refresh_preview_when_editing()
 
 
 func _load_treasure_catalog(force_scan := false) -> void:

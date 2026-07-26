@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="PNGToGridMapSettings" format=3 uid="uid://c7pla2npymxwd"]
+
+[ext_resource type="Script" uid="uid://sqp5sti0kxob" path="res://addons/png_to_gridmap/png_to_gridmap_color_mapping.gd" id="1_mapping"]
+[ext_resource type="Script" uid="uid://bhrpqhaebhdyj" path="res://addons/png_to_gridmap/png_to_gridmap_settings.gd" id="2_settings"]
+
+[sub_resource type="Resource" id="Resource_generated_wall"]
+script = ExtResource("1_mapping")
+colour = Color(0, 0, 0, 1)
+display_name = "Generated maze wall"
+base_item_ref = "Wall"
+autotile_enabled = true
+solo_item_ref = "WallSolo"
+end_item_ref = "WallEnd"
+end_rotation_offset = 2
+corner_item_ref = "WallCorner"
+corner_rotation_offset = 3
+tee_item_ref = "WallTee"
+tee_rotation_offset = 2
+cross_item_ref = "WallCross"
+
+[resource]
+script = ExtResource("2_settings")
+color_mappings = Array[Resource]([SubResource("Resource_generated_wall")])

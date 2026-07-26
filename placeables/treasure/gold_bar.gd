@@ -11,6 +11,8 @@ const LANDING_AUDIO_NAME := "GoldBarLandingAudio"
 @export var despawn_below_y := -5.0
 ## Shared reflective and gently emissive finish applied to every surface in the imported model.
 @export var gold_material: Material
+## Shared outline overlay that keeps this treasure visible in dark spaces.
+@export var edge_glow_material: Material
 
 var has_played_landing_sound := false
 
@@ -18,8 +20,7 @@ var has_played_landing_sound := false
 func _ready() -> void:
     if carried_item == null:
         carried_item = GOLD_BAR_ITEM
-    if gold_material != null:
-        _apply_gold_material(self)
+    _apply_treasure_materials(self)
     add_to_group(GOLD_BAR_GROUP)
     add_to_group("pickup_radius_scalable")
     set_pickup_radius_multiplier(_get_runtime_pickup_radius_multiplier())
@@ -39,18 +40,20 @@ func _after_collection_deactivated() -> void:
     remove_from_group(GOLD_BAR_GROUP)
 
 
-func _apply_gold_material(node: Node) -> void:
+func _apply_treasure_materials(node: Node) -> void:
     if node is MeshInstance3D:
         var mesh_instance := node as MeshInstance3D
+        mesh_instance.material_overlay = edge_glow_material
         var surface_count := 0
         if mesh_instance.mesh != null:
             surface_count = mesh_instance.mesh.get_surface_count()
 
         for surface_index in surface_count:
-            mesh_instance.set_surface_override_material(surface_index, gold_material)
+            if gold_material != null:
+                mesh_instance.set_surface_override_material(surface_index, gold_material)
 
     for child in node.get_children():
-        _apply_gold_material(child)
+        _apply_treasure_materials(child)
 
 
 func _on_body_entered(body: Node) -> void:

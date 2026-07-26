@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="GDFollowCameraProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/follow_camera_profile.gd" id="1_profile"]
+
+[resource]
+script = ExtResource("1_profile")
+camera_offset = Vector3(0, 12, 16)
+view_elevation_degrees = 36.0
+look_ahead = Vector3(0, 0.55, 0)
+forward_look_ahead = 1.5
+follow_lag = 5.0
+zoom_distance = 32.0
+min_zoom_distance = 18.0
+max_zoom_distance = 44.0
+manual_zoom_speed = 10.0
+field_of_view = 42.0
+boundary_padding = 1.25
+boundary_zoom_lag = 3.0
+max_boundary_zoom_distance = 44.0
+boundary_fit_iterations = 12
+rotation_speed = 1.8
+camera_input_deadzone = 0.35
+death_zoom_distance = 2.4
+death_look_offset = Vector3(0, 0.38, 0)
+death_zoom_lag = 4.5

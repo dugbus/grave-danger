@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="PackedScene" path="res://Assets/placeables/treasure/gold_bar.glb" id="1_model"]
 [ext_resource type="Script" path="res://placeables/treasure/gold_bar.gd" id="2_script"]
 [ext_resource type="Resource" path="res://placeables/treasure/gold_bar_inventory.tres" id="3_item"]
 [ext_resource type="Material" path="res://placeables/treasure/gold_treasure_material.tres" id="4_gold_material"]
+[ext_resource type="Material" path="res://placeables/treasure/treasure_outline_material.tres" id="5_outline_material"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gold_bar"]
 size = Vector3(0.466434, 0.125, 0.234578)
@@ -21,6 +22,7 @@ max_contacts_reported = 8
 script = ExtResource("2_script")
 carried_item = ExtResource("3_item")
 gold_material = ExtResource("4_gold_material")
+edge_glow_material = ExtResource("5_outline_material")
 
 [node name="GoldBarModel" parent="." instance=ExtResource("1_model")]
 transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 0, 0)

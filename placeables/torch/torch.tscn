@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://placeables/torch/torch.gd" id="1_torch"]
 [ext_resource type="PackedScene" path="res://Assets/placeables/torch/torch.glb" id="2_model"]
@@ -6,7 +6,6 @@
 [ext_resource type="Shader" path="res://placeables/torch/torch_outline.gdshader" id="4_outline_shader"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_outline"]
-resource_local_to_scene = true
 render_priority = 2
 shader = ExtResource("4_outline_shader")
 shader_parameter/outline_color = Color(1, 0.46, 0.12, 0.5)
@@ -61,19 +60,6 @@ height = 0.012
 radial_segments = 4
 rings = 2
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_ember"]
-emission_shape = 1
-emission_sphere_radius = 0.025
-direction = Vector3(0, 1, 0)
-spread = 24.0
-gravity = Vector3(0, 0.18, 0)
-initial_velocity_min = 0.28
-initial_velocity_max = 0.55
-damping_min = 0.08
-damping_max = 0.2
-scale_min = 0.5
-scale_max = 1.35
-
 [node name="Torch" type="Node3D"]
 script = ExtResource("1_torch")
 
@@ -102,7 +88,7 @@ visibility_aabb = AABB(-0.2, -0.08, -0.2, 0.4, 0.55, 0.4)
 process_material = SubResource("ParticleProcessMaterial_flame")
 draw_pass_1 = SubResource("QuadMesh_flame")
 
-[node name="EmberParticles" type="GPUParticles3D" parent="RaisedWallMount/FabricFlameAttachment"]
+[node name="EmberParticles" type="CPUParticles3D" parent="RaisedWallMount/FabricFlameAttachment"]
 unique_name_in_owner = true
 visible = false
 cast_shadow = 0
@@ -111,8 +97,18 @@ amount = 10
 lifetime = 0.75
 randomness = 0.8
 visibility_aabb = AABB(-0.18, -0.04, -0.18, 0.36, 0.65, 0.36)
-process_material = SubResource("ParticleProcessMaterial_ember")
-draw_pass_1 = SubResource("SphereMesh_ember")
+emission_shape = 1
+emission_sphere_radius = 0.025
+direction = Vector3(0, 1, 0)
+spread = 24.0
+gravity = Vector3(0, 0.18, 0)
+initial_velocity_min = 0.28
+initial_velocity_max = 0.55
+damping_min = 0.08
+damping_max = 0.2
+scale_amount_min = 0.5
+scale_amount_max = 1.35
+mesh = SubResource("SphereMesh_ember")
 
 [node name="FlameLight" type="OmniLight3D" parent="RaisedWallMount/FabricFlameAttachment" groups=["authored_shadow_settings"]]
 unique_name_in_owner = true

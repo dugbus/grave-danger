@@ -1,7 +1,8 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://placeables/treasure/gems/gem_visual.gd" id="1_script"]
 [ext_resource type="Material" path="res://placeables/treasure/gems/diamond_material.tres" id="2_material"]
+[ext_resource type="Material" path="res://placeables/treasure/treasure_outline_material.tres" id="3_outline_material"]
 
 [sub_resource type="CylinderMesh" id="DiamondPavilionMesh"]
 top_radius = 0.12
@@ -49,6 +50,7 @@ size = Vector3(0.115, 0.012, 0.115)
 [node name="GemVisual" type="Node3D"]
 script = ExtResource("1_script")
 gem_material = ExtResource("2_material")
+edge_glow_material = ExtResource("3_outline_material")
 
 [node name="DiamondCut" type="Node3D" parent="."]
 editor_description = "Eight-sided brilliant cut matching the diamond icon, constructed from a pointed pavilion and broad crown."

@@ -6,6 +6,7 @@ extends RefCounted
 ## Profiles are associated with their source assets so repeat imports use consistent intent.
 
 const SETTINGS_DIR := "res://addons/png_to_gridmap/settings"
+const PROJECT_CONFIGURATION_PREFIX := "png_to_gridmap_configuration_for_"
 const UI_STATE_SECTION := "png_to_gridmap"
 const UI_STATE_ADVANCED_VISIBLE := "advanced_visible"
 const UI_STATE_OPERATION_ID := "operation_id"
@@ -63,8 +64,10 @@ func save_ui_state(operation_id: int, advanced_visible: bool) -> void:
 func path_for_mesh_library(mesh_library_path: String) -> String:
 	if mesh_library_path == "":
 		return ""
-	var key := mesh_library_path.trim_prefix("res://").get_basename().replace("/", "__").replace("\\", "__")
-	return SETTINGS_DIR.path_join("%s_png_to_gridmap.tres" % key)
+	var mesh_library_name := mesh_library_path.get_file().get_basename()
+	return SETTINGS_DIR.path_join(
+		"%s%s.tres" % [PROJECT_CONFIGURATION_PREFIX, mesh_library_name]
+	)
 
 
 ## Loads the automatic mapping profile for a selected MeshLibrary.

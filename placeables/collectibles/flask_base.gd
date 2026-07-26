@@ -212,6 +212,8 @@ func _try_collect(body: Node3D) -> bool:
 	is_being_collected = true
 
 	if _apply_effect(body):
+		if body.has_method("emit_pickup_noise"):
+			body.emit_pickup_noise()
 		_show_hud_countdown(body)
 		_collect()
 		return true

@@ -1,0 +1,63 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://placeables/stairs/procedural_staircase.gd" id="1_staircase"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stone"]
+albedo_color = Color(0.46, 0.39, 0.5, 1)
+roughness = 0.9
+emission_enabled = true
+emission = Color(0.055, 0.018, 0.075, 1)
+emission_energy_multiplier = 1.35
+
+[sub_resource type="BoxMesh" id="BoxMesh_approach_floor"]
+material = SubResource("StandardMaterial3D_stone")
+size = Vector3(1.25, 0.1, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_approach_floor"]
+size = Vector3(1.25, 0.1, 3)
+
+[node name="ProceduralStaircase" type="Node3D"]
+script = ExtResource("1_staircase")
+stair_material = SubResource("StandardMaterial3D_stone")
+
+[node name="EditorPreview" type="CSGPolygon3D" parent="."]
+position = Vector3(0, 0, 1.5)
+polygon = PackedVector2Array(1.25, -0.1, 12.05, -0.1, 12.05, 1.996803, 10.85, 1.996803, 10.05, 1.996803, 10.05, 1.830403, 9.25, 1.830403, 9.25, 1.664002, 8.45, 1.664002, 8.45, 1.497602, 7.65, 1.497602, 7.65, 1.331202, 6.85, 1.331202, 6.85, 1.164802, 6.05, 1.164802, 6.05, 0.998401, 5.25, 0.998401, 5.25, 0.832001, 4.45, 0.832001, 4.45, 0.665601, 3.65, 0.665601, 3.65, 0.499201, 2.85, 0.499201, 2.85, 0.3328, 2.05, 0.3328, 2.05, 0.1664, 1.25, 0.1664, 1.25, 0)
+depth = 3.0
+material = SubResource("StandardMaterial3D_stone")
+
+[node name="GeneratedStairMesh" type="MeshInstance3D" parent="."]
+
+[node name="ApproachFloor" type="MeshInstance3D" parent="."]
+position = Vector3(0.625, -0.04, 0)
+mesh = SubResource("BoxMesh_approach_floor")
+
+[node name="StairCollision" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 2
+
+[node name="ApproachFloorShape" type="CollisionShape3D" parent="StairCollision"]
+position = Vector3(0.625, -0.05, 0)
+shape = SubResource("BoxShape3D_approach_floor")
+
+[node name="RampShape" type="CollisionShape3D" parent="StairCollision"]
+
+[node name="TopLandingShape" type="CollisionShape3D" parent="StairCollision"]
+
+[node name="LeftSideGuardShape" type="CollisionShape3D" parent="StairCollision"]
+
+[node name="RightSideGuardShape" type="CollisionShape3D" parent="StairCollision"]
+
+[node name="CompletionArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CompletionArea"]
+
+[node name="StairwellSafetyArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StairwellSafetyArea"]
+
+[node name="TopMarker" type="Marker3D" parent="."]

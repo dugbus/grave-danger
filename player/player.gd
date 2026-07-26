@@ -3,6 +3,10 @@ class_name GDPlayer
 
 
 signal flask_effect_started(effect_id: StringName, liquid_color: Color, duration: float)
+## Emitted for any player-owned gameplay sound that can attract listening enemies.
+signal noise_emitted(noise_position: Vector3)
+## Emitted after a pickup succeeds so level-specific listeners can react at the player's location.
+signal pickup_noise_emitted(noise_position: Vector3)
 
 const CHARACTER_GROUP: StringName = &"character"
 const FLAME_VULNERABLE_GROUP: StringName = &"flame_vulnerable"
@@ -25,13 +29,14 @@ var pickup_radius_multiplier := 1.0
 var base_pickup_radius_multiplier := 1.0
 var active_pickup_radius_multipliers: Array[float] = []
 var floor_push_ignore_timers: Dictionary = {}
+var kill_boundary_immunity_sources: Array[Node] = []
 
 
 func _ready() -> void:
 	add_to_group(CHARACTER_GROUP)
 	add_to_group(PLAYER_GROUP)
 	add_to_group(FLAME_VULNERABLE_GROUP)
-	collision_mask |= BOUNDARY_BLOCKER_COLLISION_LAYER
+	_refresh_kill_boundary_blocker_collision()
 	if animation_controller.has_signal("footstep_phase_reached"):
 		animation_controller.connect(&"footstep_phase_reached", Callable(movement, "play_animation_footstep"))
 
@@ -64,6 +69,15 @@ func try_collect_carried_item(pickup: Node3D) -> bool:
 		return false
 
 	return inventory.try_collect_item_pickup(pickup)
+
+
+func emit_pickup_noise() -> void:
+	pickup_noise_emitted.emit(global_position)
+	emit_noise()
+
+
+func emit_noise() -> void:
+	noise_emitted.emit(global_position)
 
 
 func try_collect_health_flask(_health_flask: Node3D, heal_percent_of_max: float, heal_duration: float) -> bool:
@@ -144,6 +158,25 @@ func is_dead() -> bool:
 	return death_controller != null and death_controller.is_dead
 
 
+## Adds or removes one scoped source of kill-boundary damage and blocker immunity.
+func set_kill_boundary_immunity(source: Node, enabled: bool) -> void:
+	if source == null:
+		return
+	_prune_kill_boundary_immunity_sources()
+	if enabled:
+		if not kill_boundary_immunity_sources.has(source):
+			kill_boundary_immunity_sources.append(source)
+	else:
+		kill_boundary_immunity_sources.erase(source)
+	_refresh_kill_boundary_blocker_collision()
+
+
+## Returns whether an active stairwell or other scoped source protects this player.
+func is_immune_to_kill_boundary() -> bool:
+	_prune_kill_boundary_immunity_sources()
+	return not kill_boundary_immunity_sources.is_empty()
+
+
 func die_from_flames() -> void:
 	# KillBoundary calls this on any body that exposes the method.
 	death_controller.die_from_flames()
@@ -152,6 +185,11 @@ func die_from_flames() -> void:
 func die_from_fall() -> void:
 	# Falling out of the level uses the same death sequence as other lethal hazards.
 	death_controller.die_from_fall()
+
+
+func die_from_vampire() -> void:
+	# Vampire contact is immediately lethal and uses the standard death presentation.
+	death_controller.die_from_vampire()
 
 
 func is_below_fall_death_height() -> bool:
@@ -188,6 +226,22 @@ func _restore_pickup_radius_after(multiplier: float, seconds: float) -> void:
 	await get_tree().create_timer(maxf(seconds, 0.01)).timeout
 	active_pickup_radius_multipliers.erase(multiplier)
 	_refresh_pickup_radius_multiplier()
+
+
+func _prune_kill_boundary_immunity_sources() -> void:
+	var source_count_before := kill_boundary_immunity_sources.size()
+	for source in kill_boundary_immunity_sources.duplicate():
+		if not is_instance_valid(source) or not source.is_inside_tree():
+			kill_boundary_immunity_sources.erase(source)
+	if kill_boundary_immunity_sources.size() != source_count_before:
+		_refresh_kill_boundary_blocker_collision()
+
+
+func _refresh_kill_boundary_blocker_collision() -> void:
+	if kill_boundary_immunity_sources.is_empty():
+		collision_mask |= BOUNDARY_BLOCKER_COLLISION_LAYER
+	else:
+		collision_mask &= ~BOUNDARY_BLOCKER_COLLISION_LAYER
 
 
 func _refresh_pickup_radius_multiplier() -> void:

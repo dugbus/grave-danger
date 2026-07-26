@@ -20,12 +20,18 @@ const GOLD_COIN_ITEM := preload("res://placeables/treasure/gold_coin_inventory.t
 const GOLD_COIN_SCENE := preload("res://placeables/treasure/gold_coin.tscn")
 const GOLD_COIN_PILE_SCRIPT := preload("res://placeables/treasure/gold_coin_pile.gd")
 const GOLD_TREASURE_MATERIAL := preload("res://placeables/treasure/gold_treasure_material.tres")
+const TREASURE_OUTLINE_MATERIAL := preload(
+    "res://placeables/treasure/treasure_outline_material.tres"
+)
 const KEY_SCENE := preload("res://inventory/key.tscn")
 const KILL_BOUNDARY_SCENE := preload("res://placeables/kill_boundary/kill_boundary.tscn")
 const LEVEL_SETTINGS_SCRIPT := preload("res://levels/level_settings.gd")
 const LEVEL_SELECT_SCENE := preload("res://ui/screens/level_select_screen.tscn")
 const LOW_HEALTH_VIGNETTE_SCRIPT := preload("res://ui/hud/low_health_vignette.gd")
 const LOCKED_GATE_SCENE := preload("res://placeables/lockables/locked_gate.tscn")
+const NO_BOUNDARY_FLASK_SCENE := preload(
+    "res://placeables/collectibles/flask_no_boundary.tscn"
+)
 const INDOOR_LIGHTING_SCENE := preload("res://lighting/gd_indoor_lighting.tscn")
 const MINIMAP_VIEW_SCRIPT := preload("res://ui/hud/minimap/minimap_view.gd")
 const MINIMAP_VIEW_SETTINGS := preload("res://ui/hud/minimap/minimap_view_settings.tres")
@@ -37,6 +43,12 @@ const SAPPHIRE_ITEM := preload("res://placeables/treasure/gems/sapphire_inventor
 const SAPPHIRE_SCENE := preload("res://placeables/treasure/gems/sapphire.tscn")
 const SHOP_SCENE := preload("res://ui/frontend/shop.tscn")
 const SETTINGS_SCENE := preload("res://ui/frontend/settings.tscn")
+const PROCEDURAL_STAIRCASE_SCRIPT := preload(
+    "res://placeables/stairs/procedural_staircase.gd"
+)
+const PROCEDURAL_STAIRCASE_SCENE := preload(
+    "res://placeables/stairs/procedural_staircase.tscn"
+)
 const FRONTEND_GALLERY_SCENE := preload("res://ui/frontend/frontend_gallery.tscn")
 const WIN_SCREEN_SCENE := preload("res://ui/screens/win_screen.tscn")
 const LOSE_SCREEN_SCENE := preload("res://ui/screens/lose_screen.tscn")
@@ -49,11 +61,26 @@ const PNG_TO_GRIDMAP_REPAIRER := preload("res://addons/png_to_gridmap/png_to_gri
 const PNG_TO_GRIDMAP_SETTINGS := preload("res://addons/png_to_gridmap/png_to_gridmap_settings.gd")
 const SKELETON_SCENE := preload("res://enemies/skeleton.tscn")
 const SILVER_KEY_SCENE := preload("res://inventory/silver_key.tscn")
+const TEST_BOUNDARY_BLOCKER_COLLISION_LAYER := 16
 const TEST_TEXT_OVERLAY_VISUAL_LAYER := 1 << 19
 const TEST_RUN_RECORDING_DIRECTORY := "res://.godot/test_run_playbacks"
 const TORCH_SCENE := preload("res://placeables/torch/torch.tscn")
 const TREASURE_PILE_SCENE := preload("res://placeables/treasure/treasure_pile.tscn")
+const VAMPIRE_MINIMAP_ROUTE_SCENE := preload(
+    "res://levels/vampire-maze/minimap_route_overlay.tscn"
+)
+const VAMPIRE_GENERATED_MAZE_SCENE := preload(
+    "res://levels/vampire-maze/generated_maze/generated_maze.tscn"
+)
+const VAMPIRE_GENERATED_CONTENT_PLANNER := preload(
+    "res://levels/vampire-maze/generated_maze/generated_content_planner.gd"
+)
+const VAMPIRE_DEBUG_HUD_SCENE := preload(
+    "res://ui/hud/vampire_debug/vampire_debug_hud.tscn"
+)
+const VAMPIRE_SCENE := preload("res://enemies/vampire/vampire.tscn")
 const ZOMBIE_SCENE := preload("res://enemies/zombie.tscn")
+const TEST_MINIMAP_ROUTE_VISUAL_LAYER := 1 << 18
 
 enum TestAutotileItem {
     Base = 1,
@@ -180,6 +207,79 @@ class TestTorch:
         return level_selection
 
 
+class TestVampireVictim:
+    extends Node3D
+
+    var killed := false
+
+
+    func _ready() -> void:
+        add_to_group(&"player")
+
+
+    func is_dead() -> bool:
+        return killed
+
+
+    func die_from_vampire() -> void:
+        killed = true
+
+
+class TestGeneratedPlayer:
+    extends CharacterBody3D
+
+
+class TestVampireSearchBody:
+    extends CharacterBody3D
+
+    var selected_search_target := Vector3.ZERO
+
+
+    func search_route(search_position: Vector3) -> void:
+        selected_search_target = search_position
+
+
+class TestVampireLayoutNavigation:
+    extends Node
+
+
+    func get_path_distance(origin: Vector3, destination: Vector3) -> float:
+        var offset := destination - origin
+        return Vector2(offset.x, offset.z).length()
+
+
+    func get_path_departure_direction(
+        origin: Vector3,
+        destination: Vector3
+    ) -> Vector3:
+        var direction := destination - origin
+        direction.y = 0.0
+        return direction.normalized()
+
+
+class TestVampirePositionSenses:
+    extends Node
+
+
+    func can_verify_position_is_empty(_position: Vector3) -> bool:
+        return true
+
+
+class TestKillBoundaryVictim:
+    extends Node3D
+
+    var immune_to_kill_boundary := true
+    var received_damage := 0.0
+
+
+    func is_immune_to_kill_boundary() -> bool:
+        return immune_to_kill_boundary
+
+
+    func apply_flame_damage(amount: float) -> void:
+        received_damage += amount
+
+
 func _init() -> void:
     _run_tests.call_deferred()
 
@@ -203,13 +303,14 @@ func _run_tests() -> void:
     failed = not _test_indoor_lighting_strengthens_occlusion() or failed
     failed = not _test_held_drop_input_accelerates() or failed
     failed = not _test_drop_direction_variation_is_deterministic_and_compact() or failed
-    failed = not _test_gold_treasure_stays_lit_and_uses_indoor_bloom() or failed
+    failed = not _test_all_treasure_uses_indoor_lighting_and_coin_outline() or failed
     failed = not await _test_gold_bar_uses_inventory_capacity_and_physics_drop() or failed
     failed = not _test_result_percentage_uses_mixed_treasure_value() or failed
     failed = not _test_typed_treasure_wallet_and_shop_purchases() or failed
     failed = not _test_treasure_absorption_does_not_complete_level() or failed
     failed = not _test_gate_completion_completes_level() or failed
     failed = not _test_reusable_gate_and_treasure_deposit_coffin_scenes() or failed
+    failed = not _test_stairwell_scopes_kill_boundary_immunity() or failed
     failed = not _test_key_scenes_have_authored_pickup_areas() or failed
     failed = not _test_graveyard_scene_does_not_embed_default_level() or failed
     failed = not _test_level_lookup_supports_debug_and_stable_ids() or failed
@@ -238,6 +339,14 @@ func _run_tests() -> void:
     failed = not _test_frontend_gallery_instances_navigable_screens() or failed
     failed = not await _test_result_screens_and_settings_share_frontend_design() or failed
     failed = not _test_enemies_use_fake_shadows_without_warning_light_blobs() or failed
+    failed = not _test_vampire_layout_knowledge_ages_and_filters_evidence() or failed
+    failed = not _test_vampire_hunt_resets_and_scans_with_frame_delta() or failed
+    failed = not await _test_vampire_boss_routes_to_noise_and_kills_on_contact() or failed
+    failed = not _test_vampire_navigation_reports_scaled_search_contract() or failed
+    failed = not _test_vampire_maze_owns_its_development_view() or failed
+    failed = not _test_vampire_maze_generates_seeded_grid_maps() or failed
+    failed = not _test_vampire_maze_exit_key_requires_exploration() or failed
+    failed = not _test_vampire_maze_minimap_shows_all_shortest_routes() or failed
     failed = not _test_skeleton_facing_is_driven_by_movement() or failed
     failed = not await _test_ground_enemies_block_each_other() or failed
     failed = not await _test_ground_enemies_fall_before_moving() or failed
@@ -481,6 +590,15 @@ func _test_treasure_pile_discovers_compatible_scenes_and_spawns_mixed_counts() -
     var diamond_preview := pile._create_preview_item(0)
     var gold_bar_preview := pile._create_preview_item(3)
     var gold_coin_preview := pile._create_preview_item(6)
+    var diamond_preview_meshes := diamond_preview.find_children(
+        "*", "MeshInstance3D", true, false
+    )
+    var gold_bar_preview_meshes := gold_bar_preview.find_children(
+        "*", "MeshInstance3D", true, false
+    )
+    var gold_coin_preview_meshes := gold_coin_preview.find_children(
+        "*", "MeshInstance3D", true, false
+    )
     parent.add_child(pile)
     var passed := _expect(
         compatible_types == [
@@ -510,13 +628,9 @@ func _test_treasure_pile_discovers_compatible_scenes_and_spawns_mixed_counts() -
             and inspector_properties.has(&"gold_bar_count"),
         "treasure pile exposes every built-in gem count as an ordinary editor property"
     ) and _expect(
-        not diamond_preview.find_children("*", "MeshInstance3D", true, false).is_empty() \
-            and not gold_bar_preview.find_children(
-                "*", "MeshInstance3D", true, false
-            ).is_empty() \
-            and not gold_coin_preview.find_children(
-                "*", "MeshInstance3D", true, false
-            ).is_empty() \
+        not diamond_preview_meshes.is_empty() \
+            and not gold_bar_preview_meshes.is_empty() \
+            and not gold_coin_preview_meshes.is_empty() \
             and diamond_preview.find_children(
                 "*", "CollisionObject3D", true, false
             ).is_empty() \
@@ -524,6 +638,17 @@ func _test_treasure_pile_discovers_compatible_scenes_and_spawns_mixed_counts() -
                 "*", "CollisionObject3D", true, false
             ).is_empty(),
         "mixed pile editor previews contain visible meshes without physics bodies"
+    ) and _expect(
+        not diamond_preview_meshes.is_empty() \
+            and not gold_bar_preview_meshes.is_empty() \
+            and not gold_coin_preview_meshes.is_empty() \
+            and (diamond_preview_meshes[0] as MeshInstance3D).material_overlay \
+                == TREASURE_OUTLINE_MATERIAL \
+            and (gold_bar_preview_meshes[0] as MeshInstance3D).material_overlay \
+                == TREASURE_OUTLINE_MATERIAL \
+            and (gold_coin_preview_meshes[0] as MeshInstance3D).material_overlay \
+                == TREASURE_OUTLINE_MATERIAL,
+        "mixed pile editor previews retain the shared treasure outline"
     )
 
     diamond_preview.free()
@@ -653,8 +778,8 @@ func _test_diamond_collectible_value_and_material() -> bool:
             and (diamond_material.get_shader_parameter(&"body_color") as Color).a == 1.0 \
             and float(diamond_material.get_shader_parameter(&"rim_energy")) > 0.0 \
             and diamond_material.shader.code.contains("dFdx") \
-            and diamond_mesh.material_overlay == null,
-        "diamond keeps one opaque material while deriving crisp facets from the new geometry"
+            and diamond_mesh.material_overlay == TREASURE_OUTLINE_MATERIAL,
+        "diamond keeps its opaque facet material beneath the shared treasure outline"
     ) and _expect(
         is_equal_approx(DIAMOND_ITEM.weight, GOLD_COIN_ITEM.weight) \
             and DIAMOND_ITEM.treasure_value == 10 \
@@ -726,8 +851,9 @@ func _test_gem_variants_use_icon_cuts_and_scale_values() -> bool:
                 and gem_mesh != null \
                 and gem_material != null \
                 and gem_material.shader.resource_path \
-                    == "res://placeables/treasure/gems/gem_stylized.gdshader",
-            "%s uses its icon-matched authored cut and the shared stylized shader" \
+                    == "res://placeables/treasure/gems/gem_stylized.gdshader" \
+                and gem_mesh.material_overlay == TREASURE_OUTLINE_MATERIAL,
+            "%s uses its icon-matched cut, stylized shader, and treasure outline" \
                 % String(gem_items[index].get("display_name"))
         ) and passed
         gem.free()
@@ -821,6 +947,10 @@ func _test_png_profile_store_only_accepts_level_subfolders() -> bool:
         "res://player/player.tscn"
     )
     return _expect(
+        profile_store.path_for_mesh_library("res://Assets/environment/graveyard.res") \
+        == "res://addons/png_to_gridmap/settings/png_to_gridmap_configuration_for_graveyard.tres",
+        "PNG project configuration names the MeshLibrary it configures"
+    ) and _expect(
         profile_store.path_for_scene("res://levels/7/level.tscn") \
         == "res://levels/7/png_to_gridmap_settings.tres",
         "PNG profile settings resolve beside scenes in a level subfolder"
@@ -879,7 +1009,7 @@ func _test_torch_scene_and_persistent_activation() -> bool:
     ) as GPUParticles3D
     var embers := torch_scene.get_node(
         "RaisedWallMount/FabricFlameAttachment/EmberParticles"
-    ) as GPUParticles3D
+    ) as CPUParticles3D
     var light := torch_scene.get_node(
         "RaisedWallMount/FabricFlameAttachment/FlameLight"
     ) as OmniLight3D
@@ -944,7 +1074,9 @@ func _test_torch_scene_and_persistent_activation() -> bool:
     passed = _expect(
         outline_material.shader.resource_path \
         == "res://placeables/torch/torch_outline.gdshader" \
-        and float(outline_material.get_shader_parameter(&"outline_intensity")) > 0.0,
+        and float(
+            outline_mesh.get_instance_shader_parameter(&"outline_intensity")
+        ) > 0.0,
         "an unlit torch gains a subtle shader outline when the player approaches"
     ) and _expect(
         torch_scene.find_children("*", "MeshInstance3D", true, false).size() == 1,
@@ -952,7 +1084,9 @@ func _test_torch_scene_and_persistent_activation() -> bool:
     ) and passed
     torch_scene._set_lit(false)
     passed = _expect(
-        is_zero_approx(float(outline_material.get_shader_parameter(&"outline_intensity"))),
+        is_zero_approx(float(
+            outline_mesh.get_instance_shader_parameter(&"outline_intensity")
+        )),
         "lighting a torch immediately removes its proximity outline"
     ) and passed
     outline_player.queue_free()
@@ -1230,11 +1364,14 @@ func _test_drop_direction_variation_is_deterministic_and_compact() -> bool:
     return passed
 
 
-func _test_gold_treasure_stays_lit_and_uses_indoor_bloom() -> bool:
+func _test_all_treasure_uses_indoor_lighting_and_coin_outline() -> bool:
     var coin := GOLD_COIN_SCENE.instantiate() as GDGoldCoin
     var coin_mesh := coin.get_node_or_null("CoinMesh") as MeshInstance3D
     var coin_material: Material = (
         coin_mesh.get_active_material(0) if coin_mesh != null else null
+    )
+    var coin_outline: ShaderMaterial = (
+        coin_mesh.material_overlay as ShaderMaterial if coin_mesh != null else null
     )
     var bar := GOLD_BAR_SCENE.instantiate() as GDGoldBar
     root.add_child(bar)
@@ -1243,6 +1380,12 @@ func _test_gold_treasure_stays_lit_and_uses_indoor_bloom() -> bool:
     var bar_material: Material = (
         bar_mesh.get_surface_override_material(0) if bar_mesh != null else null
     )
+    var bar_outline: Material = bar_mesh.material_overlay if bar_mesh != null else null
+    var gem := DIAMOND_SCENE.instantiate() as GDDiamond
+    root.add_child(gem)
+    var gem_meshes := gem.find_children("*", "MeshInstance3D", true, false)
+    var gem_mesh := gem_meshes[0] as MeshInstance3D if not gem_meshes.is_empty() else null
+    var gem_outline: Material = gem_mesh.material_overlay if gem_mesh != null else null
     var indoor_lighting := INDOOR_LIGHTING_SCENE.instantiate() as GDIndoorLighting
     var world_environment := (
         indoor_lighting.get_node_or_null("WorldEnvironment") as WorldEnvironment
@@ -1263,15 +1406,37 @@ func _test_gold_treasure_stays_lit_and_uses_indoor_bloom() -> bool:
         "gold treasure retains reflective lighting and visible surface shape"
     ) and _expect(
         gold_material.emission_enabled \
-            and gold_material.emission.r * gold_material.emission_energy_multiplier > 1.0 \
-            and gold_material.emission_energy_multiplier < 2.0,
-        "gold treasure stays visible unlit without the previous solid-fill emission strength"
+            and is_zero_approx(gold_material.emission_energy_multiplier),
+        "gold treasure depends on scene lighting instead of flat fill emission"
+    ) and _expect(
+        coin_outline != null \
+            and coin_outline == TREASURE_OUTLINE_MATERIAL \
+            and coin_outline.shader.resource_path \
+            == "res://placeables/treasure/coin_outline.gdshader" \
+            and (coin_outline.get_shader_parameter(&"outline_color") as Color) \
+            == Color(1.0, 0.72, 0.12, 0.45) \
+            and float(coin_outline.get_shader_parameter(&"outline_emission")) \
+            * (coin_outline.get_shader_parameter(&"outline_color") as Color).a > 1.0 \
+            and float(coin_outline.get_shader_parameter(&"outline_width")) > 0.0 \
+            and coin_outline.shader.code.contains("unshaded") \
+            and coin_outline.shader.code.contains("blend_add") \
+            and coin_outline.shader.code.contains("cull_front") \
+            and not coin_outline.shader.code.contains("shadow_to_opacity"),
+        "the shared treasure outline remains visible and bloom-capable under every light condition"
+    ) and _expect(
+        bar_outline == TREASURE_OUTLINE_MATERIAL \
+            and gem_outline == TREASURE_OUTLINE_MATERIAL,
+        "gold bars and gems use the same outline material as coins"
+    ) and _expect(
+        coin.find_children("*", "MeshInstance3D", true, false).size() == 1,
+        "coin guidance reuses the existing mesh instead of adding duplicate geometry"
     ) and _expect(
         environment != null and environment.glow_enabled and environment.glow_bloom > 0.0,
         "indoor lighting enables a modest bloom for emissive treasure"
     )
 
     indoor_lighting.free()
+    gem.free()
     bar.free()
     coin.free()
     return passed
@@ -1543,6 +1708,81 @@ func _test_reusable_gate_and_treasure_deposit_coffin_scenes() -> bool:
 
     root.add_child(gate)
     root.add_child(coffin)
+    var level_one_scene := load("res://levels/1/level.tscn") as PackedScene
+    var level_one := level_one_scene.instantiate() as Node3D
+    var level_one_gate := level_one.get_node_or_null("LockedGate") as Node3D
+    var level_one_staircase := level_one.get_node_or_null(
+        "LockedGate/ProceduralStaircase"
+    ) as Node3D
+    if level_one_staircase != null:
+        level_one_staircase.call(&"rebuild")
+    var level_one_stair_mesh := level_one.get_node_or_null(
+        "LockedGate/ProceduralStaircase/GeneratedStairMesh"
+    ) as MeshInstance3D
+    var configurable_staircase := PROCEDURAL_STAIRCASE_SCENE.instantiate() as Node3D
+    var authored_editor_preview := configurable_staircase.get_node_or_null(
+        "EditorPreview"
+    ) as CSGPolygon3D
+    var editor_preview_is_serialized_and_visible := authored_editor_preview != null \
+        and authored_editor_preview.visible \
+        and authored_editor_preview.polygon.size() >= 8 \
+        and is_equal_approx(authored_editor_preview.polygon[0].x, 1.25) \
+        and is_equal_approx(authored_editor_preview.position.z, 1.5) \
+        and is_equal_approx(authored_editor_preview.depth, 3.0) \
+        and authored_editor_preview.material != null
+    configurable_staircase.set(&"step_count", 5)
+    configurable_staircase.set(&"steepness_degrees", 15.0)
+    configurable_staircase.set(&"step_depth", 0.6)
+    root.add_child(configurable_staircase)
+    var configured_mesh_instance := configurable_staircase.get_node_or_null(
+        "GeneratedStairMesh"
+    ) as MeshInstance3D
+    var configured_mesh := configured_mesh_instance.mesh as ArrayMesh \
+        if configured_mesh_instance != null else null
+    var configured_top_marker := configurable_staircase.get_node_or_null(
+        "TopMarker"
+    ) as Marker3D
+    var configured_completion_area := configurable_staircase.get_node_or_null(
+        "CompletionArea"
+    ) as Area3D
+    var configured_approach_floor := configurable_staircase.get_node_or_null(
+        "ApproachFloor"
+    ) as MeshInstance3D
+    var configured_approach_mesh := configured_approach_floor.mesh as BoxMesh \
+        if configured_approach_floor != null else null
+    var configured_approach_collision := configurable_staircase.get_node_or_null(
+        "StairCollision/ApproachFloorShape"
+    ) as CollisionShape3D
+    var configured_approach_shape := configured_approach_collision.shape as BoxShape3D \
+        if configured_approach_collision != null else null
+    var configured_faces_use_clockwise_winding := configured_mesh != null
+    var configured_lowest_walkable_surface_y := INF
+    if configured_mesh != null:
+        var configured_arrays := configured_mesh.surface_get_arrays(0)
+        var configured_vertices := configured_arrays[Mesh.ARRAY_VERTEX] \
+            as PackedVector3Array
+        var configured_normals := configured_arrays[Mesh.ARRAY_NORMAL] \
+            as PackedVector3Array
+        configured_faces_use_clockwise_winding = configured_vertices.size() >= 3 \
+            and configured_vertices.size() == configured_normals.size() \
+            and configured_vertices.size() % 3 == 0
+        for vertex_index in configured_vertices.size():
+            if configured_normals[vertex_index].dot(Vector3.UP) >= 0.99:
+                configured_lowest_walkable_surface_y = minf(
+                    configured_lowest_walkable_surface_y,
+                    configured_vertices[vertex_index].y
+                )
+        for triangle_start in range(0, configured_vertices.size(), 3):
+            var conventional_normal := (
+                configured_vertices[triangle_start + 1] \
+                    - configured_vertices[triangle_start]
+            ).cross(
+                configured_vertices[triangle_start + 2] \
+                    - configured_vertices[triangle_start]
+            )
+            if conventional_normal.dot(configured_normals[triangle_start]) >= 0.0:
+                configured_faces_use_clockwise_winding = false
+                break
     var deposit := coffin.get_node_or_null("TreasureDeposit") as GDTreasureDeposit
     var deposit_coin: Node3D = (
         deposit._create_visual_treasure(GOLD_COIN_ITEM) if deposit != null else null
@@ -1572,9 +1812,117 @@ func _test_reusable_gate_and_treasure_deposit_coffin_scenes() -> bool:
         deposit._absorb_treasure(DIAMOND_ITEM.treasure_value, DIAMOND_ITEM)
     var world_coin := GOLD_COIN_SCENE.instantiate() as GDGoldCoin
     var world_coin_mesh := world_coin.get_node_or_null("CoinMesh") as MeshInstance3D
+    var gate_exit_staircase := gate.get_node_or_null("ProceduralStaircase") as Node3D
+    var gate_exit_completion := gate.get_node_or_null(
+        "ProceduralStaircase/CompletionArea"
+    ) as Area3D
+    var gate_exit_left_guard := gate.get_node_or_null(
+        "ProceduralStaircase/StairCollision/LeftSideGuardShape"
+    ) as CollisionShape3D
+    var gate_exit_top_landing := gate.get_node_or_null(
+        "ProceduralStaircase/StairCollision/TopLandingShape"
+    ) as CollisionShape3D
+    var gate_exit_mesh := gate.get_node_or_null(
+        "ProceduralStaircase/GeneratedStairMesh"
+    ) as MeshInstance3D
     var passed := _expect(gate.completes_level, "locked gate scene completes the level") \
         and _expect(gate.get_node_or_null("Leaves/LeftGateLeaf") != null, "locked gate includes its left leaf") \
         and _expect(gate.get_node_or_null("Leaves/RightGateLeaf") != null, "locked gate includes its right leaf") \
+        and _expect(
+            gate_exit_staircase != null \
+                and gate_exit_completion != null \
+                and gate_exit_left_guard != null \
+                and gate_exit_top_landing != null \
+                and gate.completion_area == gate_exit_completion \
+                and gate_exit_completion.position.x \
+                    < gate_exit_top_landing.position.x \
+                and gate.to_local(gate_exit_completion.global_position).x < 0.0 \
+                and gate.to_local(gate_exit_top_landing.global_position).x \
+                    < gate.to_local(gate_exit_completion.global_position).x,
+            "every reusable locked gate owns the guarded staircase and its runoff trigger"
+        ) \
+        and _expect(
+            gate_exit_staircase.get_script() == PROCEDURAL_STAIRCASE_SCRIPT \
+                and (gate_exit_staircase.get_script() as Script).is_tool() \
+                and gate_exit_staircase.position.is_equal_approx(
+                    Vector3(-0.16, 0.0, 0.0)
+                ) \
+                and gate_exit_staircase.scene_file_path \
+                    == "res://placeables/stairs/procedural_staircase.tscn" \
+                and gate_exit_mesh != null \
+                and gate_exit_mesh.mesh is ArrayMesh \
+                and gate_exit_mesh.mesh.get_surface_count() == 1 \
+                and gate_exit_staircase.get_node_or_null("Steps") == null,
+            "LockedGate instances one procedural mesh with no authored staircase remnants"
+        ) \
+        and _expect(
+            configured_mesh != null \
+                and configured_mesh.get_surface_count() == 1 \
+                and configured_top_marker != null \
+                and configured_completion_area != null \
+                and is_equal_approx(configured_mesh.get_aabb().size.x, 4.2) \
+                and is_equal_approx(configured_mesh.get_aabb().size.z, 3.0) \
+                and configured_top_marker.position.is_equal_approx(
+                    Vector3(
+                        5.45,
+                        tan(deg_to_rad(15.0)) * 0.6 * 5.0,
+                        0.0
+                    )
+                ),
+            "the procedural staircase rebuilds from count, steepness, and tread depth"
+        ) \
+        and _expect(
+            configured_lowest_walkable_surface_y > 0.1 \
+                and configurable_staircase.get_node_or_null(
+                    "StairCollision/GateThresholdShape"
+                ) == null,
+            "procedural staircase begins at its first tread without a floor-level threshold"
+        ) \
+        and _expect(
+            configured_approach_floor != null \
+                and configured_approach_mesh != null \
+                and configured_approach_collision != null \
+                and configured_approach_shape != null \
+                and configured_approach_mesh.size.is_equal_approx(
+                    Vector3(1.25, 0.1, 3.0)
+                ) \
+                and is_equal_approx(
+                    configured_approach_floor.position.y \
+                        + configured_approach_mesh.size.y * 0.5,
+                    0.01
+                ) \
+                and is_equal_approx(
+                    configured_approach_collision.position.y \
+                        + configured_approach_shape.size.y * 0.5,
+                    0.0
+                ),
+            "gate approach floor renders above ground while its collision stays flush"
+        ) \
+        and _expect(
+            configured_faces_use_clockwise_winding,
+            "procedural staircase faces use Godot's visible clockwise winding"
+        ) \
+        and _expect(
+            editor_preview_is_serialized_and_visible \
+                and authored_editor_preview.polygon.size() == 2 * 5 + 4 \
+                and is_equal_approx(
+                    authored_editor_preview.position.z,
+                    authored_editor_preview.depth * 0.5
+                ) \
+                and not authored_editor_preview.visible,
+            "procedural staircase editor preview stays centred and hides at runtime"
+        ) \
+        and _expect(
+            level_one_gate != null \
+                and level_one_gate.scene_file_path \
+                    == "res://placeables/lockables/locked_gate.tscn" \
+                and level_one_staircase != null \
+                and level_one_staircase.visible \
+                and level_one_stair_mesh != null \
+                and level_one_stair_mesh.visible \
+                and level_one_stair_mesh.mesh != null,
+            "Level 1 inherits the visible staircase from its LockedGate instance"
+        ) \
         and _expect(deposit != null, "treasure deposit coffin includes deposit behavior") \
         and _expect(
             deposit != null and is_equal_approx(deposit.position.y, 0.42),
@@ -1626,8 +1974,83 @@ func _test_reusable_gate_and_treasure_deposit_coffin_scenes() -> bool:
         deposit_gold_bar.free()
     deposit_inventory.free()
     world_coin.free()
+    level_one.free()
+    configurable_staircase.free()
     gate.queue_free()
     coffin.queue_free()
+    return passed
+
+
+func _test_stairwell_scopes_kill_boundary_immunity() -> bool:
+    var staircase := PROCEDURAL_STAIRCASE_SCENE.instantiate() as Node3D
+    var player := PLAYER_SCENE.instantiate() as GDPlayer
+    root.add_child(staircase)
+    root.add_child(player)
+    var safety_area := staircase.get_node_or_null("StairwellSafetyArea") as Area3D
+    var safety_collision := staircase.get_node_or_null(
+        "StairwellSafetyArea/CollisionShape3D"
+    ) as CollisionShape3D
+    var safety_box := safety_collision.shape as BoxShape3D \
+        if safety_collision != null else null
+    var no_boundary_was_present := get_nodes_in_group(&"kill_boundary").is_empty()
+    staircase.call("_on_safety_area_body_entered", player)
+    var boundary_free_level_keeps_normal_player_state := \
+        not bool(player.call("is_immune_to_kill_boundary")) \
+        and (player.collision_mask & TEST_BOUNDARY_BLOCKER_COLLISION_LAYER) != 0
+
+    var boundary := KILL_BOUNDARY_SCENE.instantiate() as GDKillBoundary3D
+    boundary.autoplay_boundary_animation = false
+    root.add_child(boundary)
+    staircase.call("_on_safety_area_body_entered", player)
+    var stairs_grant_damage_and_blocker_immunity := \
+        bool(player.call("is_immune_to_kill_boundary")) \
+        and (player.collision_mask & TEST_BOUNDARY_BLOCKER_COLLISION_LAYER) == 0
+    staircase.call("_on_safety_area_body_exited", player)
+    var leaving_stairs_restores_boundary := \
+        not bool(player.call("is_immune_to_kill_boundary")) \
+        and (player.collision_mask & TEST_BOUNDARY_BLOCKER_COLLISION_LAYER) != 0
+    staircase.call("_on_safety_area_body_entered", player)
+    staircase.call("_on_safety_area_body_exited", player)
+    var doubling_back_restores_boundary := \
+        not bool(player.call("is_immune_to_kill_boundary")) \
+        and (player.collision_mask & TEST_BOUNDARY_BLOCKER_COLLISION_LAYER) != 0
+
+    var victim := TestKillBoundaryVictim.new()
+    victim.add_to_group(&"flame_vulnerable")
+    victim.position = Vector3(50.0, 0.0, 0.0)
+    root.add_child(victim)
+    boundary.call("_apply_flame_heat", 1.0)
+    var immune_victim_ignored_damage := is_zero_approx(victim.received_damage)
+    victim.immune_to_kill_boundary = false
+    boundary.call("_apply_flame_heat", 1.0)
+    var ordinary_victim_received_damage := victim.received_damage > 0.0
+
+    var passed := _expect(
+        safety_area != null \
+            and safety_area.collision_mask == 2 \
+            and safety_box != null \
+            and safety_area.position.x - safety_box.size.x * 0.5 <= -0.4 \
+            and safety_area.position.x + safety_box.size.x * 0.5 \
+                >= float(staircase.call("get_end_distance")) - 0.01 \
+            and safety_box.size.z >= 2.9,
+        "procedural staircase owns a player-only safety area covering its full run"
+    ) and _expect(
+        no_boundary_was_present and boundary_free_level_keeps_normal_player_state,
+        "stairwells do not grant immunity in levels without a kill boundary"
+    ) and _expect(
+        stairs_grant_damage_and_blocker_immunity,
+        "entering gate stairs ignores kill-boundary damage and blocker collision"
+    ) and _expect(
+        leaving_stairs_restores_boundary and doubling_back_restores_boundary,
+        "leaving or doubling back from the stairs restores boundary damage and collision"
+    ) and _expect(
+        immune_victim_ignored_damage and ordinary_victim_received_damage,
+        "kill-boundary damage respects and immediately resumes after scoped immunity"
+    )
+    victim.free()
+    player.free()
+    boundary.free()
+    staircase.free()
     return passed
 
 
@@ -1732,6 +2155,8 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
     var preview_coin := GOLD_COIN_SCENE.instantiate() as GDInventoryPickup
     var preview_gate := LOCKED_GATE_SCENE.instantiate() as GDLockableHingedPassage
     var preview_boundary := KILL_BOUNDARY_SCENE.instantiate() as GDKillBoundary3D
+    var preview_no_boundary_flask := NO_BOUNDARY_FLASK_SCENE.instantiate() \
+        as GDFlaskNoBoundary
     var preview_audio := AudioStreamPlayer.new()
     var preview_tutorial_area := Area3D.new()
     preview_world_body.collision_layer = 1
@@ -1742,6 +2167,7 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
     preview_coin.pickup_delay = 0.0
     preview_coin.freeze = true
     preview_coin.position = Vector3(0.0, 0.4, 0.0)
+    preview_no_boundary_flask.position = Vector3(20.0, 0.0, 0.0)
     preview_root.add_child(preview_world_body)
     preview_root.add_child(preview_player)
     preview_root.add_child(preview_camera)
@@ -1749,6 +2175,7 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
     preview_root.add_child(preview_coin)
     preview_root.add_child(preview_gate)
     preview_root.add_child(preview_boundary)
+    preview_root.add_child(preview_no_boundary_flask)
     preview_root.add_child(preview_tutorial_area)
     level_run_playback.call("_prepare_preview_tree", preview_root)
     level_run_playback.call("_configure_playback_player", preview_player)
@@ -1809,8 +2236,23 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
         and _expect(
             is_equal_approx(level_run_playback.modulate.a, 0.65) \
                 and level_run_playback.stretch_shrink == 2 \
-                and playback_viewport.render_target_update_mode == SubViewport.UPDATE_DISABLED,
+                and playback_viewport.render_target_update_mode == SubViewport.UPDATE_DISABLED \
+                and level_run_playback.pending_level_id.is_empty() \
+                and not level_run_playback.is_processing(),
             "last-run playback is readable, low resolution, and idle until asynchronously loaded"
+        ) \
+        and _expect(
+            bool(screen.call(
+                "_should_show_level_run_playback",
+                {"run_playback_enabled": true},
+                {"played": true}
+            )) \
+                and not bool(screen.call(
+                    "_should_show_level_run_playback",
+                    {"run_playback_enabled": false},
+                    {"played": true}
+                )),
+            "individual procedural levels can disable replay previews without affecting other levels"
         ) \
         and _expect(
             preview_root.process_mode != Node.PROCESS_MODE_DISABLED \
@@ -1943,6 +2385,18 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
             "left and right move directly from a level row to the bottom actions"
         )
 
+    level_run_playback.playback_level = preview_root
+    level_run_playback.playback_player = preview_player
+    preview_no_boundary_flask.global_position = preview_player.global_position
+    level_run_playback.call("_collect_preview_flasks")
+    passed = _expect(
+        preview_no_boundary_flask.is_being_collected \
+            and preview_boundary.boundary_removed_for_level,
+        "last-run playback applies the no-boundary flask effect before consuming it"
+    ) and passed
+    level_run_playback.playback_level = null
+    level_run_playback.playback_player = null
+
     await physics_frame
     await physics_frame
     var preview_coin_spawned := false
@@ -2040,28 +2494,27 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
             and delayed_stop_duration < 500,
         "leaving level selection does not wait for a run recording still saving"
     ) and passed
-    var shutdown_scene_path := "res://ui/screens/level_select_screen.tscn"
-    var shutdown_load_error := ResourceLoader.load_threaded_request(
-        shutdown_scene_path,
-        "PackedScene",
-        true
+    var shutdown_scene_path := "res://levels/vampire-maze/level.tscn"
+    level_run_playback.active_scene_path = shutdown_scene_path
+    level_run_playback.recording = {"camera_fov": 34.0}
+    var constructed_preview_started_at := Time.get_ticks_msec()
+    var constructed_preview_loaded := bool(
+        level_run_playback.call("_load_active_level_scene")
     )
-    if shutdown_load_error == OK:
-        level_run_playback.pending_level_load_paths[shutdown_scene_path] = true
-        level_run_playback.active_scene_path = shutdown_scene_path
-        level_run_playback.load_state = GDLevelRunPlayback.LoadState.LoadingLevel
+    var constructed_preview_load_duration := Time.get_ticks_msec() \
+        - constructed_preview_started_at
     level_run_playback.pending_level_id = "queued_preview"
     level_run_playback.pending_scene_path = shutdown_scene_path
     await level_run_playback.stop_for_scene_change()
     passed = _expect(
-        shutdown_load_error == OK \
+        constructed_preview_loaded \
+            and constructed_preview_load_duration < 2000 \
             and level_run_playback.pending_level_id.is_empty() \
             and level_run_playback.pending_scene_path.is_empty() \
             and level_run_playback.load_state == GDLevelRunPlayback.LoadState.Idle \
             and not level_run_playback.is_processing() \
-            and level_run_playback.pending_level_load_paths.is_empty() \
             and playback_viewport.render_target_update_mode == SubViewport.UPDATE_DISABLED,
-        "starting gameplay fully stops pending and active level-select replay work"
+        "the shared loader starts and cleanly stops a constructed-level replay"
     ) and passed
 
     var loop_level_source := Node3D.new()
@@ -2259,6 +2712,13 @@ func _test_level_lookup_supports_debug_and_stable_ids() -> bool:
     return _expect(mapping.get_level_count() == 17, "level lookup exposes the debug level and sixteen slots") \
         and _expect(mapping.get_level_id(0) == "debug_level", "debug level has a stable mapping ID") \
         and _expect(mapping.get_level_id(1) == "level_01", "level 1 has a stable mapping ID") \
+        and _expect(
+            bool(mapping.get_level_data(9).get("run_playback_enabled", true)) \
+                and not mapping.get_level_data(9).has(
+                    "run_playback_background_load_enabled"
+                ),
+            "Vampire Boss recordings use the shared safe preview loader"
+        ) \
         and _expect(
             mapping.get_level_scene_path(9) == "res://levels/1/level.tscn",
             "dummy level slots can reuse an existing level scene"
@@ -3670,6 +4130,3035 @@ func _test_result_screens_and_settings_share_frontend_design() -> bool:
         current_scene = null
         loaded_scene.queue_free()
         await process_frame
+    return passed
+
+
+func _test_vampire_layout_knowledge_ages_and_filters_evidence() -> bool:
+    var navigation := TestVampireLayoutNavigation.new()
+    var evidence_position := Vector3.ZERO
+    var visible_end_gate_position := Vector3(10.0, 0.0, 0.0)
+    var alternative_key_position := Vector3(-10.0, 0.0, 0.0)
+    var landmarks: Array[Dictionary] = [
+        {
+            "id": &"heard_gold_key",
+            "kind": &"gold_key",
+            "position": evidence_position,
+        },
+        {
+            "id": &"likely_end_gate",
+            "kind": &"end_gate",
+            "position": visible_end_gate_position,
+        },
+        {
+            "id": &"alternative_gold_key",
+            "kind": &"gold_key",
+            "position": alternative_key_position,
+        },
+        {
+            "id": &"unreachable_gold_key",
+            "kind": &"gold_key",
+            "position": Vector3(30.0, 0.0, 0.0),
+        },
+    ]
+
+    var fresh_knowledge := GDVampireLayoutKnowledge.new()
+    fresh_knowledge.configure(landmarks)
+    fresh_knowledge.record_noise_evidence(evidence_position, 0.5)
+    var fresh_destination := fresh_knowledge.select_likely_destination(
+        evidence_position,
+        15.0,
+        Vector3.ZERO,
+        -1.0,
+        navigation,
+        1.0
+    ) as Dictionary
+
+    var old_knowledge := GDVampireLayoutKnowledge.new()
+    old_knowledge.configure(landmarks)
+    old_knowledge.record_noise_evidence(evidence_position, 0.5)
+    var old_destination := old_knowledge.select_likely_destination(
+        evidence_position,
+        15.0,
+        Vector3.ZERO,
+        -1.0,
+        navigation,
+        0.0
+    ) as Dictionary
+
+    var filtered_knowledge := GDVampireLayoutKnowledge.new()
+    filtered_knowledge.configure(landmarks)
+    filtered_knowledge.record_noise_evidence(evidence_position, 0.5)
+    var rule_out_visible_end_gate := func(candidate: Vector3) -> bool:
+        return candidate.is_equal_approx(visible_end_gate_position)
+    var filtered_destination := filtered_knowledge.select_likely_destination(
+        evidence_position,
+        15.0,
+        Vector3.ZERO,
+        -1.0,
+        navigation,
+        1.0,
+        rule_out_visible_end_gate
+    ) as Dictionary
+
+    var settings := load(
+        "res://enemies/vampire/vampire_settings.tres"
+    ).duplicate(true) as Resource
+    var hunt := GDVampireHunt.new()
+    hunt.settings = settings
+    var half_life_seconds := float(settings.get("noise_evidence_half_life_seconds"))
+    hunt.noise_elapsed_seconds = half_life_seconds
+    var half_life_relevance := hunt.get_noise_evidence_relevance()
+    var half_life_radius := hunt.get_noise_uncertainty_radius()
+    hunt.noise_elapsed_seconds = half_life_seconds * 2.0
+    var two_half_life_relevance := hunt.get_noise_evidence_relevance()
+    var two_half_life_radius := hunt.get_noise_uncertainty_radius()
+
+    var observed_player := Node3D.new()
+    observed_player.position = visible_end_gate_position
+    var position_senses := TestVampirePositionSenses.new()
+    root.add_child(observed_player)
+    root.add_child(position_senses)
+    hunt.player = observed_player
+    hunt.senses = position_senses
+    hunt.player_is_visible = true
+    var confirmed_player_remains_possible := not bool(hunt.call(
+        "_is_possible_player_position_ruled_out",
+        visible_end_gate_position
+    ))
+    var visible_empty_position_is_ruled_out := bool(hunt.call(
+        "_is_possible_player_position_ruled_out",
+        alternative_key_position
+    ))
+
+    var fresh_landmark_uses_sound_context := not fresh_destination.is_empty() \
+        and (fresh_destination["position"] as Vector3).is_equal_approx(
+            visible_end_gate_position
+        )
+    var old_landmark_returns_to_general_knowledge := not old_destination.is_empty() \
+        and (old_destination["position"] as Vector3).is_equal_approx(
+            alternative_key_position
+        )
+    var visible_landmark_is_filtered := not filtered_destination.is_empty() \
+        and (filtered_destination["position"] as Vector3).is_equal_approx(
+            alternative_key_position
+        )
+    var passed := _expect(
+        fresh_landmark_uses_sound_context \
+            and old_landmark_returns_to_general_knowledge,
+        "vampire layout clues lose influence as their reachable noise circle grows"
+    ) and _expect(
+        is_equal_approx(half_life_relevance, 0.5) \
+            and is_equal_approx(two_half_life_relevance, 0.25) \
+            and two_half_life_radius > half_life_radius,
+        "vampire noise age expands possible movement while decaying clue confidence"
+    ) and _expect(
+        visible_landmark_is_filtered \
+            and confirmed_player_remains_possible \
+            and visible_empty_position_is_ruled_out,
+        "vampire excludes visibly empty predictions but retains a confirmed player tile"
+    )
+    navigation.free()
+    fresh_knowledge.free()
+    old_knowledge.free()
+    filtered_knowledge.free()
+    hunt.free()
+    observed_player.free()
+    position_senses.free()
+    return passed
+
+
+func _test_vampire_hunt_resets_and_scans_with_frame_delta() -> bool:
+    var holder := Node3D.new()
+    root.add_child(holder)
+    var player := Node3D.new()
+    player.position = Vector3(1000.0, 0.0, 1000.0)
+    holder.add_child(player)
+    var end_gate := Node3D.new()
+    end_gate.position = Vector3(8.0, 0.0, 8.0)
+    holder.add_child(end_gate)
+    var wall_grid_map := GridMap.new()
+    holder.add_child(wall_grid_map)
+    var vampire := VAMPIRE_SCENE.instantiate() as GDVampire
+    vampire.set_physics_process(false)
+    holder.add_child(vampire)
+    vampire.configure_navigation(wall_grid_map)
+
+    var hunt := vampire.get_node("VampireHunt") as GDVampireHunt
+    var navigation := vampire.get_node("VampireNavigation") as GDVampireNavigation
+    var senses := vampire.get_node("VampireSenses") as GDVampireSenses
+    var layout_knowledge := vampire.get_node(
+        "VampireLayoutKnowledge"
+    ) as GDVampireLayoutKnowledge
+    var settings := vampire.get("settings") as Resource
+    hunt.configure(
+        vampire,
+        navigation,
+        senses,
+        layout_knowledge,
+        player,
+        end_gate,
+        settings
+    )
+
+    hunt.set("noise_target_active", true)
+    hunt.set("player_was_visible", true)
+    hunt.set("player_is_visible", true)
+    hunt.set("searching", true)
+    hunt.set("pursuing_last_seen_position", true)
+    hunt.set("junction_scan_active", true)
+    hunt.set("has_visible_observation", true)
+    hunt.set("has_noise_position", true)
+    hunt.set("last_seen_player_velocity", Vector3(3.0, 0.0, 1.0))
+    hunt.set("last_confirmed_player_position", Vector3(7.0, 0.0, 2.0))
+    hunt.set("noise_elapsed_seconds", 9.0)
+    hunt.set("sight_loss_elapsed", 2.0)
+    hunt.set("awareness_source", GDVampireHunt.AwarenessSource.Sight)
+    (hunt.get("noise_search_rng") as RandomNumberGenerator).randi()
+    navigation.set("has_target", true)
+    navigation.set("route_points", [Vector3.ONE] as Array[Vector3])
+    navigation.set(
+        "route_traversal_status",
+        GDVampireNavigation.RouteTraversalStatus.Following
+    )
+    layout_knowledge.set("investigation_counts", {&"stale_landmark": 3})
+    layout_knowledge.set(
+        "last_evidence_kind",
+        GDVampireLayoutKnowledge.LandmarkKind.GoldKey
+    )
+    vampire.velocity = Vector3(4.0, 0.0, 2.0)
+
+    hunt.reset_runtime_state()
+    var expected_rng := RandomNumberGenerator.new()
+    expected_rng.seed = int(settings.get("noise_search_seed"))
+    var reset_rng_matches_seed := (
+        hunt.get("noise_search_rng") as RandomNumberGenerator
+    ).randi() == expected_rng.randi()
+    var stale_observations_are_cleared := \
+        not bool(hunt.get("noise_target_active")) \
+        and not bool(hunt.get("player_was_visible")) \
+        and not bool(hunt.get("player_is_visible")) \
+        and not bool(hunt.get("searching")) \
+        and not bool(hunt.get("pursuing_last_seen_position")) \
+        and not bool(hunt.get("junction_scan_active")) \
+        and not bool(hunt.get("has_visible_observation")) \
+        and not bool(hunt.get("has_noise_position")) \
+        and (hunt.get("last_seen_player_velocity") as Vector3).is_zero_approx() \
+        and (hunt.get("last_confirmed_player_position") as Vector3).is_zero_approx() \
+        and is_zero_approx(float(hunt.get("noise_elapsed_seconds"))) \
+        and is_zero_approx(float(hunt.get("sight_loss_elapsed"))) \
+        and int(hunt.get_awareness_source()) == GDVampireHunt.AwarenessSource.None \
+        and not bool(navigation.get("has_target")) \
+        and navigation.get_route_points().is_empty() \
+        and navigation.get_route_traversal_status() \
+            == GDVampireNavigation.RouteTraversalStatus.Idle \
+        and (layout_knowledge.get("investigation_counts") as Dictionary).is_empty() \
+        and int(layout_knowledge.get("last_evidence_kind")) \
+            == GDVampireLayoutKnowledge.LandmarkKind.Unknown \
+        and vampire.velocity.is_zero_approx() \
+        and reset_rng_matches_seed
+
+    var pivot := vampire.get_node("Pivot") as Node3D
+    pivot.rotation.y = 0.0
+    var scan_delta := 1.0 / 60.0
+    var expected_first_yaw := lerp_angle(
+        0.0,
+        atan2(Vector3.FORWARD.x, Vector3.FORWARD.z),
+        float(settings.get("turn_speed")) * scan_delta
+    )
+    hunt.call(
+        "_begin_junction_scan",
+        GDVampireHunt.SearchPlan.StrategicRoute,
+        scan_delta
+    )
+    var first_scan_turn_uses_frame_delta := is_equal_approx(
+        pivot.rotation.y,
+        expected_first_yaw
+    )
+    var complete_configuration_has_no_errors := vampire.get_configuration_errors(
+        player,
+        end_gate,
+        wall_grid_map
+    ).is_empty()
+    var missing_dependencies_are_named := vampire.get_configuration_errors(
+        null,
+        null,
+        null
+    ) == PackedStringArray(["player", "wall GridMap", "end gate"])
+
+    var passed := _expect(
+        first_scan_turn_uses_frame_delta,
+        "vampire junction scanning turns through one frame instead of snapping initially"
+    ) and _expect(
+        stale_observations_are_cleared,
+        "vampire reuse clears perception, prediction, search, movement, and RNG state"
+    ) and _expect(
+        complete_configuration_has_no_errors and missing_dependencies_are_named,
+        "vampire startup validation reports all missing gameplay dependencies together"
+    )
+    holder.free()
+    return passed
+
+
+func _test_vampire_boss_routes_to_noise_and_kills_on_contact() -> bool:
+    var level_controller := load(
+        "res://levels/vampire-maze/vampire_maze.gd"
+    ).new() as Node3D
+    level_controller.set(&"end_gate_path", NodePath("LockedGate"))
+    level_controller.set(&"wall_grid_map_path", NodePath("NavigationWalls"))
+    var grid_map := GridMap.new()
+    grid_map.name = "NavigationWalls"
+    var mesh_library := MeshLibrary.new()
+    mesh_library.create_item(0)
+    mesh_library.set_item_name(0, "Wall Test")
+    grid_map.mesh_library = mesh_library
+    for coordinate in range(5):
+        grid_map.set_cell_item(Vector3i(coordinate, 0, 0), 0)
+        grid_map.set_cell_item(Vector3i(coordinate, 0, 4), 0)
+        grid_map.set_cell_item(Vector3i(0, 0, coordinate), 0)
+        grid_map.set_cell_item(Vector3i(4, 0, coordinate), 0)
+    grid_map.set_cell_item(Vector3i(2, 0, 1), 0)
+    grid_map.set_cell_item(Vector3i(2, 0, 2), 0)
+
+    var vampire := VAMPIRE_SCENE.instantiate() as CharacterBody3D
+    vampire.name = "Vampire"
+    vampire.set_physics_process(false)
+    var player := PLAYER_SCENE.instantiate() as GDPlayer
+    player.name = "Player"
+    player.set_physics_process(false)
+    vampire.position = grid_map.map_to_local(Vector3i(1, 0, 1))
+    player.position = grid_map.map_to_local(Vector3i(3, 0, 1))
+    var coffin := TREASURE_DEPOSIT_COFFIN_SCENE.instantiate() as Node3D
+    coffin.position = Vector3(1.0, 0.0, 3.0)
+    var gate := Node3D.new()
+    gate.name = "LockedGate"
+    gate.position = grid_map.map_to_local(Vector3i(3, 0, 3))
+    var sight_wall := StaticBody3D.new()
+    sight_wall.collision_layer = 1
+    sight_wall.position = (
+        vampire.position + player.position
+    ) * 0.5 + Vector3.UP * 0.8
+    var sight_wall_shape := CollisionShape3D.new()
+    var sight_wall_box := BoxShape3D.new()
+    sight_wall_box.size = Vector3(0.8, 1.6, 0.8)
+    sight_wall_shape.shape = sight_wall_box
+    sight_wall.add_child(sight_wall_shape)
+    var sight_floor := StaticBody3D.new()
+    sight_floor.collision_layer = 1
+    sight_floor.position = Vector3(2.0, -0.25, 2.0)
+    var sight_floor_shape := CollisionShape3D.new()
+    var sight_floor_box := BoxShape3D.new()
+    sight_floor_box.size = Vector3(8.0, 0.5, 8.0)
+    sight_floor_shape.shape = sight_floor_box
+    sight_floor.add_child(sight_floor_shape)
+    level_controller.add_child(grid_map)
+    level_controller.add_child(vampire)
+    level_controller.add_child(player)
+    level_controller.add_child(coffin)
+    level_controller.add_child(gate)
+    level_controller.add_child(sight_wall)
+    level_controller.add_child(sight_floor)
+    var debug_hud := VAMPIRE_DEBUG_HUD_SCENE.instantiate() as CanvasLayer
+    level_controller.add_child(debug_hud)
+
+    var selected_targets: Array[Vector3] = []
+    vampire.target_selected.connect(
+        func(noise_position: Vector3) -> void:
+            selected_targets.append(noise_position)
+    )
+    root.add_child(level_controller)
+    await process_frame
+    var hunt := vampire.get_node("VampireHunt")
+    var starts_hunting_entrance: bool = selected_targets.size() == 1 \
+        and selected_targets[0] == player.global_position \
+        and vampire.get_vampire_state() == GDVampire.VampireState.Hunting \
+        and int(hunt.call("get_awareness_source")) \
+            == GDVampireHunt.AwarenessSource.Entrance
+    var placed_coffin_bodies: Array[PhysicsBody3D] = []
+    for coffin_body_node in coffin.find_children("*", "PhysicsBody3D", true, false):
+        var coffin_body := coffin_body_node as PhysicsBody3D
+        if coffin_body != null \
+                and (player.collision_mask & coffin_body.collision_layer) != 0:
+            placed_coffin_bodies.append(coffin_body)
+    var placed_coffin_blocks_only_player := not placed_coffin_bodies.is_empty()
+    for coffin_body in placed_coffin_bodies:
+        placed_coffin_blocks_only_player = placed_coffin_blocks_only_player \
+            and vampire.get_collision_exceptions().has(coffin_body) \
+            and coffin_body.get_collision_exceptions().has(vampire) \
+            and not player.get_collision_exceptions().has(coffin_body)
+    await physics_frame
+    for _settle_step in 3:
+        vampire.velocity = Vector3.DOWN * 10.0
+        vampire.move_and_slide()
+        await physics_frame
+    var stride_pivot := vampire.get_node("Pivot") as Node3D
+    var stride_rest_position := stride_pivot.position
+    var stride_test_position := vampire.global_position
+    var stride_sample_position := coffin.global_position
+    for coffin_body in placed_coffin_bodies:
+        var body_shapes := coffin_body.find_children(
+            "*",
+            "CollisionShape3D",
+            true,
+            false
+        )
+        if body_shapes.is_empty():
+            continue
+        var coffin_shape := body_shapes[0] as CollisionShape3D
+        var debug_mesh := coffin_shape.shape.get_debug_mesh()
+        var world_bounds := coffin_shape.global_transform * debug_mesh.get_aabb()
+        stride_sample_position = world_bounds.get_center()
+        break
+    stride_sample_position.y = stride_test_position.y
+    vampire.global_position = stride_sample_position
+    vampire.velocity = Vector3.ZERO
+    vampire.call("_update_passthrough_obstacle_stride", 1.0)
+    var coffin_stride_lifts_model := stride_pivot.position.y \
+        > stride_rest_position.y + 0.05
+    vampire.global_position = stride_test_position
+    vampire.velocity = Vector3.ZERO
+    vampire.call("_update_passthrough_obstacle_stride", 1.0)
+    var coffin_stride_returns_to_floor := stride_pivot.position.is_equal_approx(
+        stride_rest_position
+    )
+    var settings := vampire.get("settings") as Resource
+    var navigation := vampire.get_node("VampireNavigation")
+    var wall_side_search_body := TestVampireSearchBody.new()
+    level_controller.add_child(wall_side_search_body)
+    wall_side_search_body.global_position = grid_map.to_global(
+        grid_map.map_to_local(Vector3i(3, 0, 1))
+    )
+    var wall_side_navigation := GDVampireNavigation.new()
+    level_controller.add_child(wall_side_navigation)
+    wall_side_navigation.configure(
+        wall_side_search_body,
+        vampire.get_node("Pivot") as Node3D,
+        settings
+    )
+    wall_side_navigation.set_wall_grid_map(grid_map)
+    var wall_cell_centre := grid_map.to_global(
+        grid_map.map_to_local(Vector3i(2, 0, 1))
+    )
+    var player_side_wall_target := wall_cell_centre + Vector3(-0.49, 0.0, 0.0)
+    var wall_side_route := wall_side_navigation.build_route_to(
+        player_side_wall_target
+    ) as Array[Vector3]
+    var resolved_wall_side_cell := Vector3i(3, 0, 1)
+    if not wall_side_route.is_empty():
+        resolved_wall_side_cell = grid_map.local_to_map(
+            grid_map.to_local(wall_side_route.back())
+        )
+        resolved_wall_side_cell.y = 0
+    var wall_adjacent_target_uses_player_side: bool = not wall_side_route.is_empty() \
+        and resolved_wall_side_cell == Vector3i(1, 0, 1)
+    var noise_search_rng := hunt.get("noise_search_rng") as RandomNumberGenerator
+    var expected_noise_search_rng := RandomNumberGenerator.new()
+    expected_noise_search_rng.seed = int(settings.get("noise_search_seed"))
+    var noise_search_is_replay_stable: bool = noise_search_rng != null \
+        and noise_search_rng.seed == expected_noise_search_rng.seed \
+        and noise_search_rng.state == expected_noise_search_rng.state \
+        and player.process_physics_priority < vampire.process_physics_priority \
+        and vampire.process_physics_priority \
+            < (vampire.get_node("VampireSenses") as Node).process_physics_priority
+    var ordered_search_points := navigation.get_reachable_search_points(
+        vampire.global_position,
+        float(settings.get("assumed_player_max_speed")) * 5.0,
+        0.0
+    ) as Array[Vector3]
+    var search_candidates_are_stably_ordered := true
+    for point_index in range(1, ordered_search_points.size()):
+        var previous_point := ordered_search_points[point_index - 1]
+        var current_point := ordered_search_points[point_index]
+        if previous_point.x > current_point.x \
+                or (previous_point.x == current_point.x \
+                and previous_point.z > current_point.z):
+            search_candidates_are_stably_ordered = false
+            break
+    var target_position := grid_map.to_global(grid_map.map_to_local(Vector3i(3, 0, 1)))
+    vampire.hear_noise(target_position)
+    var route_points := navigation.get_route_points() as Array[Vector3]
+    var simplified_route := navigation.build_route_to(target_position) as Array[Vector3]
+    var active_route_keeps_safe_cell_steps := route_points.size() > simplified_route.size()
+    var routes_around_wall := false
+    for route_point in route_points:
+        var cell := grid_map.local_to_map(grid_map.to_local(route_point))
+        if cell.z >= 3:
+            routes_around_wall = true
+            break
+    navigation.call(
+        "_update_wall_stall_recovery",
+        float(settings.get("wall_stall_recovery_seconds")),
+        true,
+        0.0,
+        float(settings.get("max_speed"))
+    )
+    var recovers_after_wall_stall: bool = int(
+        navigation.call("get_wall_stall_recovery_count")
+    ) == 1 and not (navigation.get_route_points() as Array[Vector3]).is_empty()
+    navigation.call(
+        "_update_wall_stall_recovery",
+        float(settings.get("wall_stall_recovery_seconds")),
+        false,
+        0.0,
+        float(settings.get("max_speed"))
+    )
+    var recovers_after_collisionless_stall: bool = int(
+        navigation.call("get_wall_stall_recovery_count")
+    ) == 2 and not (navigation.get_route_points() as Array[Vector3]).is_empty()
+    navigation.call(
+        "select_visible_target",
+        target_position,
+        vampire.global_position,
+        true
+    )
+    var safe_tile_direction := navigation.call("get_active_route_direction") as Vector3
+    var crossing_direction := Vector3(
+        -safe_tile_direction.z,
+        0.0,
+        safe_tile_direction.x
+    ).normalized()
+    navigation.call(
+        "update_visible_player_position",
+        vampire.global_position + crossing_direction * 0.1,
+        true
+    )
+    navigation.call("update_velocity", 0.016)
+    var pursues_closer_visible_player := bool(
+        navigation.call("is_using_visible_player_shortcut")
+    ) and Vector2(
+        vampire.velocity.x,
+        vampire.velocity.z
+    ).normalized().dot(Vector2(crossing_direction.x, crossing_direction.z)) > 0.999
+    var route_rebuilds_before_direct_recovery := int(
+        navigation.call("get_route_rebuild_count")
+    )
+    navigation.call("_abandon_blocked_visible_shortcut")
+    var blocked_direct_shortcut_recovers_immediately: bool = not bool(
+        navigation.call("is_using_visible_player_shortcut")
+    ) and not bool(navigation.get("visible_player_direct_path_clear")) \
+        and int(navigation.call("get_direct_shortcut_recovery_count")) == 1 \
+        and int(navigation.call("get_route_rebuild_count")) \
+            == route_rebuilds_before_direct_recovery + 1 \
+        and not (navigation.get_route_points() as Array[Vector3]).is_empty()
+    navigation.set(
+        "current_horizontal_velocity",
+        crossing_direction * float(settings.get("max_speed"))
+    )
+    navigation.call(
+        "update_visible_player_position",
+        vampire.global_position + crossing_direction * 10.0,
+        true
+    )
+    navigation.call("update_velocity", 0.016)
+    var follows_tile_route_without_lateral_drift := not bool(
+        navigation.call("is_using_visible_player_shortcut")
+    ) and Vector2(
+        vampire.velocity.x,
+        vampire.velocity.z
+    ).normalized().dot(Vector2(safe_tile_direction.x, safe_tile_direction.z)) > 0.999
+    navigation.set(
+        "route_index",
+        (navigation.get_route_points() as Array[Vector3]).size()
+    )
+    navigation.set("has_target", true)
+    navigation.set("current_horizontal_velocity", Vector3.ZERO)
+    navigation.call(
+        "update_visible_player_position",
+        vampire.global_position + crossing_direction * 0.8,
+        true
+    )
+    navigation.call("update_velocity", 0.016)
+    var completed_tile_route_keeps_chasing_visible_player: bool = bool(
+        navigation.get("has_target")
+    ) and bool(navigation.call("is_using_visible_player_shortcut")) \
+        and Vector2(vampire.velocity.x, vampire.velocity.z).length() > 0.0
+    navigation.call("select_target", target_position)
+    navigation.set("current_horizontal_velocity", Vector3.ZERO)
+    vampire.velocity.x = 0.0
+    vampire.velocity.z = 0.0
+
+    var senses := vampire.get_node("VampireSenses") as ShapeCast3D
+    var vampire_process_mode := vampire.process_mode
+    vampire.process_mode = Node.PROCESS_MODE_DISABLED
+    player.position.y = vampire.position.y
+    var current_sight_direction := player.position - vampire.position
+    current_sight_direction.y = 0.0
+    current_sight_direction = current_sight_direction.normalized()
+    var sight_edge_direction := Vector3(
+        -current_sight_direction.z,
+        0.0,
+        current_sight_direction.x
+    )
+    var sight_wall_centre := (
+        vampire.position + player.position
+    ) * 0.5 + Vector3.UP * 0.8
+    var sight_wall_clear_offset := sight_edge_direction * 8.0
+    sight_wall.position = sight_wall_centre
+    await physics_frame
+    var blocked_by_body_height_wall := not bool(senses.call("can_see_player"))
+    sight_wall.position = sight_wall_centre + sight_wall_clear_offset
+    await physics_frame
+    var blocked_by_grid_wall := not bool(senses.call("can_see_player"))
+    grid_map.set_cell_item(Vector3i(2, 0, 1), GridMap.INVALID_CELL_ITEM)
+    grid_map.set_cell_item(Vector3i(2, 0, 2), GridMap.INVALID_CELL_ITEM)
+    await physics_frame
+    var sees_clear_player := bool(senses.call("can_see_player"))
+    var clear_sight_allows_direct_chase := bool(
+        senses.call("is_player_direct_path_clear")
+    )
+    var visible_empty_position := vampire.global_position.lerp(
+        player.global_position,
+        0.5
+    )
+    var clear_empty_tile_is_verified := bool(senses.call(
+        "can_verify_position_is_empty",
+        visible_empty_position
+    ))
+    var visible_player_tile_is_not_empty := not bool(senses.call(
+        "can_verify_position_is_empty",
+        player.global_position
+    ))
+    sight_wall.position = sight_wall_centre + sight_edge_direction * 0.9
+    await physics_frame
+    var edge_sight_target := Vector3(
+        player.global_position.x,
+        senses.global_position.y,
+        player.global_position.z
+    )
+    var sees_past_body_width_wall_edge := bool(senses.call("can_see_player")) \
+        and bool(senses.call("_sight_ray_hits_player", edge_sight_target)) \
+        and not bool(senses.call("is_player_direct_path_clear"))
+    sight_wall_box.size = Vector3(0.08, 1.6, 0.08)
+    sight_wall.position = sight_wall_centre
+    await physics_frame
+    var centre_ray_blocked_by_thin_wall := not bool(
+        senses.call("_sight_ray_hits_player", edge_sight_target)
+    )
+    var body_samples_see_around_thin_wall := bool(senses.call("can_see_player"))
+    sight_wall_box.size = Vector3(0.8, 1.6, 0.8)
+    sight_wall.position = sight_wall_centre
+    await physics_frame
+    var offset_sight_still_respects_full_wall := not bool(
+        senses.call("can_see_player")
+    )
+    senses.call("sample_player_visibility")
+    var ordinary_player_position := player.global_position
+    player.global_position = vampire.global_position + sight_edge_direction * 1.25
+    await physics_frame
+    var notices_player_passing_close := bool(senses.call("sample_player_visibility"))
+    var close_pass_target := navigation.get("target_position") as Vector3
+    var close_pass_is_chasing: bool = vampire.get_vampire_state() \
+        == GDVampire.VampireState.ChasingPlayer
+    var close_pass_targets_player := close_pass_target.is_equal_approx(
+        player.global_position
+    )
+    var close_pass_retains_visible_position := bool(
+        navigation.get("has_visible_player_position")
+    )
+    sight_wall.position = sight_wall_centre + sight_wall_clear_offset
+    var wall_pressed_player_position := grid_map.to_global(
+        grid_map.map_to_local(Vector3i(3, 0, 1))
+    ) + Vector3(0.0, 0.0, -0.51)
+    wall_pressed_player_position.y = vampire.global_position.y
+    player.global_position = wall_pressed_player_position
+    await physics_frame
+    var wall_pressed_player_cell := grid_map.local_to_map(
+        grid_map.to_local(player.global_position)
+    )
+    wall_pressed_player_cell.y = 0
+    grid_map.set_cell_item(wall_pressed_player_cell, 0)
+    await physics_frame
+    var player_endpoint_is_logical_wall := bool(
+        senses.call("_world_position_is_wall", player.global_position)
+    )
+    var sees_player_pressed_into_wall_cell := player_endpoint_is_logical_wall \
+        and bool(senses.call("can_see_player"))
+    grid_map.set_cell_item(wall_pressed_player_cell, GridMap.INVALID_CELL_ITEM)
+    player.global_position = ordinary_player_position
+    sight_wall.position = sight_wall_centre + sight_wall_clear_offset
+    vampire.process_mode = vampire_process_mode
+    await physics_frame
+    senses.call("set_wall_grid_map", null)
+    var vampire_pivot := vampire.get_node("Pivot") as Node3D
+    var behind_vampire_direction := -vampire_pivot.global_basis.z.normalized()
+    player.global_position = vampire.global_position + behind_vampire_direction * 1.25
+    await physics_frame
+    var omnidirectional_sight_remains_active := bool(senses.call("can_see_player"))
+    player.global_position = vampire.global_position + Vector3(64.0, 0.0, 0.0)
+    await physics_frame
+    var sees_player_within_64_metres := bool(senses.call("can_see_player"))
+    player.global_position = vampire.global_position + Vector3(64.5, 0.0, 0.0)
+    await physics_frame
+    var cannot_see_player_beyond_64_metres := not bool(senses.call("can_see_player"))
+    player.global_position = ordinary_player_position
+    senses.call("set_wall_grid_map", grid_map)
+    await physics_frame
+    var sight_samples_before := int(senses.call("get_visibility_sample_count"))
+    await physics_frame
+    await physics_frame
+    var sight_samples_continuously := senses.is_physics_processing() \
+        and int(senses.call("get_visibility_sample_count")) \
+            >= sight_samples_before + 2
+    var corner_cell_centre := grid_map.to_global(
+        grid_map.map_to_local(Vector3i(1, 0, 1))
+    )
+    var corner_player_target := corner_cell_centre + Vector3(-0.2, 0.0, 0.32)
+    navigation.call("select_target", corner_player_target)
+    var corner_route := navigation.get_route_points() as Array[Vector3]
+    var corner_target_is_within_contact_reach := not corner_route.is_empty() \
+        and Vector2(
+            corner_route.back().x - corner_player_target.x,
+            corner_route.back().z - corner_player_target.z
+        ).length() <= float(settings.get("visible_route_contact_distance"))
+    var wall_safe_target_tracks_open_lane := not corner_route.is_empty() \
+        and is_equal_approx(corner_route.back().z, corner_player_target.z)
+
+    vampire.finish_search()
+    grid_map.set_cell_item(Vector3i(2, 0, 1), 0)
+    await physics_frame
+    var pickup := GOLD_COIN_SCENE.instantiate() as RigidBody3D
+    level_controller.add_child(pickup)
+    pickup.global_position = player.global_position
+    pickup.set("can_be_collected", true)
+    vampire.hear_noise(gate.global_position)
+    var targets_before_pickup := selected_targets.size()
+    var collected := bool(pickup.call("_try_collect", player))
+    var pickup_route := navigation.get_route_points() as Array[Vector3]
+    var pickup_has_active_player_route: bool = vampire.get_vampire_state() \
+        == GDVampire.VampireState.Hunting \
+        and bool(navigation.get("has_target")) \
+        and not pickup_route.is_empty() \
+        and (navigation.get("target_position") as Vector3).is_equal_approx(
+            player.global_position
+        )
+    var deposit := coffin.get_node("TreasureDeposit") as GDTreasureDeposit
+    var targets_before_deposit := selected_targets.size()
+    deposit._absorb_treasure(GOLD_COIN_ITEM.treasure_value, GOLD_COIN_ITEM)
+    var route_rebuilds_after_first_deposit := int(
+        navigation.call("get_route_rebuild_count")
+    )
+    for _additional_coin in 19:
+        deposit._absorb_treasure(GOLD_COIN_ITEM.treasure_value, GOLD_COIN_ITEM)
+    vampire.hear_noise(deposit.global_position + Vector3(0.25, 0.0, 0.25))
+    var repeated_deposits_reuse_route: bool = selected_targets.size() \
+        == targets_before_deposit + 1 \
+        and int(navigation.call("get_route_rebuild_count")) \
+            == route_rebuilds_after_first_deposit
+
+    var victim := TestVampireVictim.new()
+    root.add_child(victim)
+    var contact := vampire.get_node("VampireContact")
+    var contact_collision_shape := contact.get_node("CollisionShape3D") as CollisionShape3D
+    var contact_capsule := contact_collision_shape.shape as CapsuleShape3D
+    var contact_matches_doubled_model := contact_capsule != null \
+        and is_equal_approx(
+            contact_capsule.radius,
+            float(settings.get("instant_kill_contact_radius"))
+        ) \
+        and contact_capsule.radius > 0.52
+    victim.global_position = vampire.global_position
+    contact._on_body_entered(victim)
+
+    var character := vampire.get_node("Pivot/Character") as Node3D
+    var headlamp := vampire.get_node("Pivot/VampireHeadlampLight") as SpotLight3D
+    var fill_light := vampire.get_node("Pivot/VampireLight") as OmniLight3D
+    var debug_state_label := debug_hud.get_node("Screen/StateLabel") as Label
+    var passed := _expect(
+        starts_hunting_entrance,
+        "vampire immediately hunts the player's level entrance"
+    ) and _expect(
+        settings != null and is_equal_approx(float(settings.get("model_scale")), 2.0) \
+            and character.scale.is_equal_approx(Vector3.ONE * 2.0),
+        "vampire model is authored at double scale"
+    ) and _expect(
+        is_equal_approx(
+            float(settings.get("max_speed")),
+            GDPlayerMovement.SPEED * 1.1
+        ),
+        "vampire maximum speed is 1.1 times the player's maximum speed"
+    ) and _expect(
+        noise_search_is_replay_stable and search_candidates_are_stably_ordered,
+        "vampire search decisions use replay-stable seeds, candidates, and physics ordering"
+    ) and _expect(
+        routes_around_wall,
+        "vampire routes around maze walls to its selected noise target"
+    ) and _expect(
+        placed_coffin_blocks_only_player \
+            and coffin_stride_lifts_model \
+            and coffin_stride_returns_to_floor,
+        "editor-placed coffins block the player while the larger vampire strides over them"
+    ) and _expect(
+        wall_adjacent_target_uses_player_side,
+        "wall-adjacent sightings resolve to the player's side instead of fixed neighbour order"
+    ) and _expect(
+        active_route_keeps_safe_cell_steps,
+        "vampire active routes retain safe cell-by-cell turns instead of cutting wall corners"
+    ) and _expect(
+        follows_tile_route_without_lateral_drift,
+        "vampire movement stays aligned with its next safe tile waypoint"
+    ) and _expect(
+        pursues_closer_visible_player,
+        "vampire only leaves its tile route when the visible player is closer than its waypoint"
+    ) and _expect(
+        blocked_direct_shortcut_recovers_immediately,
+        "a colliding direct shortcut immediately returns to the safe tile route"
+    ) and _expect(
+        completed_tile_route_keeps_chasing_visible_player,
+        "vampire keeps moving toward a body-clear player after exhausting its tile waypoints"
+    ) and _expect(
+        recovers_after_wall_stall and recovers_after_collisionless_stall,
+        "vampire rebuilds a detailed route after any sustained movement stall"
+    ) and _expect(
+        corner_target_is_within_contact_reach,
+        "vampire final chase waypoint reaches a player pressed into a reachable corner"
+    ) and _expect(
+        wall_safe_target_tracks_open_lane,
+        "vampire final chase waypoint follows a wall-side player along the open lane"
+    ) and _expect(
+        headlamp.light_color.b > headlamp.light_color.r \
+            and fill_light.light_color.b > fill_light.light_color.r \
+            and is_equal_approx(headlamp.spot_range, 60.0),
+        "vampire carries a purple version of the player's headlamp"
+    ) and _expect(
+        contact_matches_doubled_model,
+        "vampire instant-kill contact covers its doubled visible body"
+    ) and _expect(victim.killed, "touching the vampire kills the player immediately")
+    var pickup_passed := _expect(
+        collected \
+            and pickup_has_active_player_route \
+            and targets_before_deposit == targets_before_pickup + 1 \
+            and selected_targets[targets_before_pickup] == player.global_position,
+        "successful player pickups retarget the Vampire Maze boss"
+    )
+    var landmark_sound_uses_event_evidence := pickup_passed \
+        and int(hunt.call("get_awareness_source")) \
+            == GDVampireHunt.AwarenessSource.Noise
+    var deposit_passed := _expect(
+        selected_targets.size() == targets_before_deposit + 1 \
+            and selected_targets[targets_before_deposit] == deposit.global_position \
+            and repeated_deposits_reuse_route,
+        "multi-item coffin deposits reuse one nearby Vampire route without stuttering"
+    )
+    var targets_before_footstep := selected_targets.size()
+    var movement := player.get_node("PlayerMovement")
+    movement.call("_play_footstep", GDPlayerMovement.SPEED)
+    var footstep_passed := _expect(
+        selected_targets.size() == targets_before_footstep,
+        "player footsteps do not alert the Vampire Maze boss"
+    )
+    var targets_before_bats := selected_targets.size()
+    level_controller.call("_on_bat_noise", player.global_position)
+    var bat_noise_passed := _expect(
+        selected_targets.size() == targets_before_bats + 1 \
+            and selected_targets[targets_before_bats] == player.global_position,
+        "disturbed bats retarget the Vampire Maze boss to the player's position"
+    )
+    var ordinary_sound_uses_only_event_position := bat_noise_passed \
+        and int(hunt.call("get_awareness_source")) \
+            == GDVampireHunt.AwarenessSource.Noise
+
+    grid_map.set_cell_item(Vector3i(2, 0, 1), GridMap.INVALID_CELL_ITEM)
+    sight_wall.position = sight_wall_centre + sight_wall_clear_offset
+    await physics_frame
+    hunt.update_hunt(0.016)
+    var ruthlessly_chases_visible_player: bool = vampire.get_vampire_state() \
+        == GDVampire.VampireState.ChasingPlayer \
+        and bool(hunt.call("is_player_visible")) \
+        and int(hunt.call("get_awareness_source")) \
+            == GDVampireHunt.AwarenessSource.Sight
+    debug_hud.call("_process", 0.0)
+    var debug_reports_visible_chase: bool = debug_state_label.text.contains("ChasingPlayer") \
+        and debug_state_label.text.contains("LOS: YES")
+    var visible_chase_route := navigation.get_route_points() as Array[Vector3]
+    var visible_chase_target := navigation.get("target_position") as Vector3
+    var visible_chase_uses_navigation: bool = bool(navigation.get("has_target")) \
+        and not visible_chase_route.is_empty() \
+        and Vector2(visible_chase_target.x, visible_chase_target.z).is_equal_approx(
+            Vector2(player.global_position.x, player.global_position.z)
+        )
+    var targets_before_visible_noise := selected_targets.size()
+    vampire.hear_noise(gate.global_position)
+    var search_started_during_sight := bool(hunt.call("begin_search"))
+    var priority_target := navigation.get("target_position") as Vector3
+    var visible_player_overrides_other_modes: bool = not search_started_during_sight \
+        and selected_targets.size() == targets_before_visible_noise \
+        and vampire.get_vampire_state() == GDVampire.VampireState.ChasingPlayer \
+        and Vector2(priority_target.x, priority_target.z).is_equal_approx(
+            Vector2(player.global_position.x, player.global_position.z)
+        )
+    var visible_player_position_before_brief_loss := player.global_position
+    player.global_position = vampire.global_position + Vector3(
+        float(settings.get("sight_distance")) + 1.0,
+        0.0,
+        0.0
+    )
+    await physics_frame
+    var targets_before_brief_loss_noise := selected_targets.size()
+    vampire.hear_noise(gate.global_position)
+    var brief_loss_target := navigation.get("target_position") as Vector3
+    var sound_does_not_interrupt_confirmed_chase: bool = \
+        not bool(senses.call("can_see_player")) \
+        and selected_targets.size() == targets_before_brief_loss_noise \
+        and vampire.get_vampire_state() == GDVampire.VampireState.ChasingPlayer \
+        and brief_loss_target.is_equal_approx(priority_target) \
+        and bool(hunt.get("player_was_visible")) \
+        and not bool(hunt.get("noise_target_active")) \
+        and not bool(hunt.get("has_noise_position")) \
+        and int(hunt.call("get_awareness_source")) \
+            == GDVampireHunt.AwarenessSource.Sight
+    player.global_position = visible_player_position_before_brief_loss
+    await physics_frame
+    hunt.update_hunt(0.0)
+    var sight_memory_survives_chase_refresh: bool = \
+        not bool(hunt.get("noise_target_active")) \
+        and not bool(hunt.get("has_noise_position")) \
+        and int(hunt.call("get_awareness_source")) \
+            == GDVampireHunt.AwarenessSource.Sight
+    vampire.begin_junction_scan()
+    hunt.set("junction_scan_active", true)
+    var targets_before_visible_scan_repair := selected_targets.size()
+    hunt.update_hunt(0.0)
+    var visible_sight_cancels_junction_scan: bool = vampire.get_vampire_state() \
+        == GDVampire.VampireState.ChasingPlayer \
+        and not bool(hunt.get("junction_scan_active")) \
+        and bool(navigation.get("has_target")) \
+        and selected_targets.size() == targets_before_visible_scan_repair + 1
+    player.global_position = target_position + Vector3(0.0, 0.0, 2.0)
+    navigation.set("has_target", false)
+    hunt.set("last_chase_target", player.global_position)
+    var targets_before_completed_visible_route := selected_targets.size()
+    hunt.call("_update_visible_chase", player.global_position)
+    var completed_visible_route_retries: bool = selected_targets.size() \
+        == targets_before_completed_visible_route + 1 \
+        and bool(navigation.get("has_target")) \
+        and vampire.get_vampire_state() == GDVampire.VampireState.ChasingPlayer \
+        and (navigation.get("target_position") as Vector3).is_equal_approx(
+            player.global_position
+        )
+    var straight_corridor_vampire_position := grid_map.to_global(
+        grid_map.map_to_local(Vector3i(1, 0, 3))
+    )
+    straight_corridor_vampire_position.y = vampire.global_position.y
+    var straight_corridor_player_position := grid_map.to_global(
+        grid_map.map_to_local(Vector3i(3, 0, 3))
+    )
+    straight_corridor_player_position.y = straight_corridor_vampire_position.y
+    vampire_process_mode = vampire.process_mode
+    vampire.process_mode = Node.PROCESS_MODE_DISABLED
+    vampire.global_position = straight_corridor_vampire_position
+    player.global_position = straight_corridor_player_position
+    sight_wall.position = sight_wall_centre + sight_wall_clear_offset
+    await physics_frame
+    vampire.process_mode = vampire_process_mode
+    var visible_chase_state_stays_stable := true
+    for _completed_corridor_route in 3:
+        navigation.set("has_target", false)
+        hunt.update_hunt(0.016)
+        if vampire.get_vampire_state() != GDVampire.VampireState.ChasingPlayer \
+                or not bool(hunt.call("is_player_visible")) \
+                or bool(hunt.get("junction_scan_active")) \
+                or not bool(navigation.get("has_target")):
+            visible_chase_state_stays_stable = false
+            break
+    var junction_position := grid_map.to_global(grid_map.map_to_local(Vector3i(2, 0, 3)))
+    var stale_left_target := grid_map.to_global(grid_map.map_to_local(Vector3i(1, 0, 3)))
+    var visible_right_target := grid_map.to_global(grid_map.map_to_local(Vector3i(3, 0, 3)))
+    vampire.global_position = junction_position
+    vampire.chase_visible_player(stale_left_target, stale_left_target, false)
+    hunt.set("has_chase_target", true)
+    hunt.set("last_chase_target", stale_left_target)
+    player.global_position = visible_right_target
+    var targets_before_visible_branch_change := selected_targets.size()
+    hunt.call("_update_visible_chase", player.global_position)
+    var visible_branch_change_repaths_immediately: bool = selected_targets.size() \
+        == targets_before_visible_branch_change + 1 \
+        and (navigation.get("target_position") as Vector3).is_equal_approx(
+            visible_right_target
+        )
+    var straight_chase_start := grid_map.to_global(
+        grid_map.map_to_local(Vector3i(1, 0, 3))
+    )
+    var straight_chase_first_target := grid_map.to_global(
+        grid_map.map_to_local(Vector3i(2, 0, 3))
+    )
+    vampire.global_position = straight_chase_start
+    player.global_position = straight_chase_first_target
+    hunt.set("has_chase_target", false)
+    hunt.call("_update_visible_chase", player.global_position)
+    navigation.call("update_velocity", 0.016)
+    var initial_straight_route := navigation.get_route_points() as Array[Vector3]
+    var straight_route_omits_current_cell := initial_straight_route.size() == 1 \
+        and initial_straight_route[0].distance_to(straight_chase_start) > 0.5
+    var rebuilds_before_route_refresh := int(navigation.call("get_route_rebuild_count"))
+    var shifted_same_cell_target := straight_chase_first_target + Vector3(0.0, 0.0, 0.2)
+    player.global_position = shifted_same_cell_target
+    navigation.call("update_visible_player_position", player.global_position, false)
+    hunt.call("_update_visible_chase", player.global_position)
+    var same_cell_target_moves_without_rebuild := int(
+        navigation.call("get_route_rebuild_count")
+    ) == rebuilds_before_route_refresh \
+        and (navigation.get_route_points() as Array[Vector3])[-1].is_equal_approx(
+            shifted_same_cell_target
+        )
+    var straight_chase_second_target := grid_map.to_global(
+        grid_map.map_to_local(Vector3i(3, 0, 3))
+    ) + Vector3(0.0, 0.0, 0.2)
+    var route_size_before_extension := (
+        navigation.get_route_points() as Array[Vector3]
+    ).size()
+    player.global_position = straight_chase_second_target
+    navigation.call("update_visible_player_position", player.global_position, false)
+    hunt.call("_update_visible_chase", player.global_position)
+    var straight_route_extends_without_rebuild := int(
+        navigation.call("get_route_rebuild_count")
+    ) == rebuilds_before_route_refresh \
+        and (navigation.get_route_points() as Array[Vector3]).size() \
+            == route_size_before_extension + 1 \
+        and (navigation.get("target_position") as Vector3).is_equal_approx(
+            straight_chase_second_target
+        )
+    var stopped_player_position := grid_map.to_global(grid_map.map_to_local(Vector3i(1, 0, 2)))
+    var visible_velocity := Vector3.RIGHT * float(settings.get("assumed_player_max_speed"))
+    vampire.global_position = grid_map.to_global(grid_map.map_to_local(Vector3i(1, 0, 3)))
+    player.global_position = stopped_player_position
+    hunt.set("last_seen_player_velocity", visible_velocity)
+    hunt.set("has_chase_target", false)
+    var stale_visible_intercept := navigation.predict_reachable_target(
+        stopped_player_position,
+        visible_velocity,
+        0.75,
+        4.0,
+        float(settings.get("last_seen_prediction_alignment")),
+        true
+    ) as Vector3
+    vampire.chase_visible_player(
+        stale_visible_intercept,
+        stopped_player_position,
+        false
+    )
+    hunt.set("has_chase_target", true)
+    hunt.set("last_chase_observed_player_position", stopped_player_position)
+    var stale_endpoint_misses_contact := not bool(
+        navigation.call(
+            "is_route_endpoint_within_distance",
+            stopped_player_position,
+            float(settings.get("visible_route_contact_distance"))
+        )
+    )
+    var targets_before_contact_repath := selected_targets.size()
+    hunt.call(
+        "_update_visible_chase",
+        player.global_position
+    )
+    var visible_chase_does_not_overshoot_stopped_player: bool = \
+        stale_endpoint_misses_contact \
+        and selected_targets.size() == targets_before_contact_repath + 1 \
+        and (navigation.get("target_position") as Vector3).is_equal_approx(
+            stopped_player_position
+        )
+    var prediction_origin := grid_map.to_global(
+        grid_map.map_to_local(Vector3i(1, 0, 2))
+    )
+    var confirmed_velocity := Vector3.RIGHT * float(settings.get("assumed_player_max_speed"))
+    hunt.set("last_confirmed_player_position", prediction_origin)
+    hunt.set("previous_visible_player_position", prediction_origin)
+    hunt.set("last_seen_player_velocity", confirmed_velocity)
+    hunt.set("has_visible_observation", true)
+    var expected_predicted_target := navigation.predict_reachable_target(
+        prediction_origin,
+        confirmed_velocity,
+        float(settings.get("last_seen_prediction_seconds")),
+        float(settings.get("last_seen_prediction_max_distance")),
+        float(settings.get("last_seen_prediction_alignment"))
+    ) as Vector3
+    sight_wall.position = (
+        vampire.position + player.position
+    ) * 0.5 + Vector3.UP * 0.8
+    await physics_frame
+    expected_predicted_target = navigation.predict_reachable_target(
+        prediction_origin,
+        confirmed_velocity,
+        float(settings.get("last_seen_prediction_seconds")),
+        float(settings.get("last_seen_prediction_max_distance")),
+        float(settings.get("last_seen_prediction_alignment")),
+        false,
+        Callable(hunt, &"_is_possible_player_position_ruled_out")
+    ) as Vector3
+    var predicted_target_is_not_visibly_empty := not bool(hunt.call(
+        "_is_possible_player_position_ruled_out",
+        expected_predicted_target
+    ))
+    var sight_loss_grace := float(settings.get("sight_loss_grace_seconds"))
+    hunt.update_hunt(sight_loss_grace * 0.5)
+    var brief_sight_loss_keeps_chasing: bool = vampire.get_vampire_state() \
+        == GDVampire.VampireState.ChasingPlayer \
+        and not bool(hunt.call("is_player_visible"))
+    hunt.update_hunt(sight_loss_grace * 0.5 + 0.001)
+    var pursues_last_seen_after_losing_player: bool = vampire.get_vampire_state() \
+        == GDVampire.VampireState.PursuingLastSeen \
+        and (navigation.get("target_position") as Vector3).is_equal_approx(
+            expected_predicted_target
+        )
+    debug_hud.call("_process", 0.0)
+    var debug_reports_last_seen_pursuit: bool = debug_state_label.text.contains(
+        "PursuingLastSeen"
+    ) and debug_state_label.text.contains("LOS: NO") \
+        and debug_state_label.text.contains("Target: Last Seen")
+    var vampire_position_before_prediction_completion := vampire.global_position
+    vampire.global_position = grid_map.to_global(
+        grid_map.map_to_local(Vector3i(2, 0, 2))
+    )
+    senses.set("player", null)
+    sight_wall.position = (
+        vampire.position + player.position
+    ) * 0.5 + Vector3.UP * 0.8
+    await physics_frame
+    hunt.set("player_was_visible", false)
+    hunt.set("player_is_visible", false)
+    navigation.set("last_completed_route_direction", confirmed_velocity.normalized())
+    navigation.set("has_target", false)
+    hunt.update_hunt(0.0)
+    var scans_after_last_seen_position: bool = vampire.get_vampire_state() \
+        == GDVampire.VampireState.ScanningJunction \
+        and vampire.velocity.is_zero_approx()
+    var scan_direction_count := maxi(
+        (hunt.get("junction_scan_directions") as Array[Vector3]).size(),
+        1
+    )
+    hunt.update_hunt(
+        float(settings.get("junction_scan_seconds_per_direction")) \
+            * scan_direction_count + 0.001
+    )
+    var followup_distance := float(hunt.call("get_last_seen_uncertainty_radius"))
+    var followup_prediction_origin := vampire.global_position
+    var expected_followup_target := navigation.predict_reachable_target(
+        followup_prediction_origin,
+        confirmed_velocity,
+        followup_distance / confirmed_velocity.length(),
+        followup_distance,
+        float(settings.get("last_seen_prediction_alignment")),
+        false,
+        Callable(hunt, &"_is_possible_player_position_ruled_out")
+    ) as Vector3
+    var last_seen_uncertainty_expands_during_pursuit: bool = followup_distance \
+        > float(settings.get("prediction_followup_distance"))
+    var followup_target := navigation.get("target_position") as Vector3
+    var followup_target_is_not_visibly_empty := not bool(hunt.call(
+        "_is_possible_player_position_ruled_out",
+        followup_target
+    ))
+    var followup_plan := int(hunt.get("active_search_plan"))
+    var has_followup_target := bool(navigation.get("has_target"))
+    var search_after_junction_scan_respects_visibility: bool = \
+        not has_followup_target \
+        or (
+            vampire.get_vampire_state() == GDVampire.VampireState.SearchingRoute \
+            and followup_target_is_not_visibly_empty \
+            and (
+            (
+                followup_plan == GDVampireHunt.SearchPlan.LastSeenDirection \
+                and followup_target.is_equal_approx(expected_followup_target)
+            ) \
+            or followup_plan == GDVampireHunt.SearchPlan.StrategicRoute
+            )
+        )
+    if not scans_after_last_seen_position:
+        vampire.begin_junction_scan()
+    debug_hud.call("_process", 0.0)
+    var debug_reports_junction_scan: bool = debug_state_label.text.contains(
+        "ScanningJunction"
+    ) and debug_state_label.text.contains("Target: Junction Scan")
+    vampire.global_position = vampire_position_before_prediction_completion
+
+    var preceding_noise_position := grid_map.to_global(
+        grid_map.map_to_local(Vector3i(1, 0, 1))
+    )
+    var branch_noise_position := grid_map.to_global(
+        grid_map.map_to_local(Vector3i(2, 0, 1))
+    )
+    var known_key_position := grid_map.to_global(
+        grid_map.map_to_local(Vector3i(3, 0, 1))
+    )
+    var known_layout_landmarks: Array[Dictionary] = [
+        {
+            "id": &"known_branch_treasure",
+            "kind": &"treasure_pile",
+            "position": branch_noise_position,
+        },
+        {
+            "id": &"known_branch_key",
+            "kind": &"silver_key",
+            "position": known_key_position,
+        },
+    ]
+    vampire.configure_layout_knowledge(known_layout_landmarks)
+    hunt.set("has_noise_position", false)
+    hunt.set("noise_path_direction_hint", Vector3.ZERO)
+    hunt.call("refresh_noise_origin", preceding_noise_position)
+    var single_noise_uses_last_spotted_direction: bool = (
+        hunt.get("noise_path_direction_hint") as Vector3
+    ).dot(confirmed_velocity.normalized()) > 0.9
+    hunt.set("noise_elapsed_seconds", 1.0)
+    var one_second_noise_radius := float(hunt.call("get_noise_uncertainty_radius"))
+    hunt.set("noise_elapsed_seconds", 5.0)
+    var five_second_noise_radius := float(hunt.call("get_noise_uncertainty_radius"))
+    var noise_uncertainty_radius_grows_over_time := is_equal_approx(
+        one_second_noise_radius,
+        float(settings.get("assumed_player_max_speed"))
+    ) and is_equal_approx(
+        five_second_noise_radius,
+        float(settings.get("assumed_player_max_speed")) * 5.0
+    ) and five_second_noise_radius > one_second_noise_radius
+    hunt.call("refresh_noise_origin", preceding_noise_position)
+    navigation.call("select_target", gate.global_position)
+    vampire.hear_landmark_noise(branch_noise_position)
+    var consecutive_sounds_infer_path_direction: bool = (
+        hunt.get("noise_path_direction_hint") as Vector3
+    ).dot(Vector3.RIGHT) > 0.9
+    player.global_position += Vector3(0.23, 0.0, 0.37)
+    sight_wall.position = (
+        vampire.position + player.position
+    ) * 0.5 + Vector3.UP * 0.8
+    await physics_frame
+    hunt.update_hunt(2.0)
+    navigation.set("has_target", false)
+    hunt.update_hunt(0.0)
+    var noise_scan_direction_count := maxi(
+        (hunt.get("junction_scan_directions") as Array[Vector3]).size(),
+        1
+    )
+    hunt.update_hunt(
+        float(settings.get("junction_scan_seconds_per_direction")) \
+            * noise_scan_direction_count + 0.001
+    )
+    var noise_search_uses_layout_without_cheating: bool = vampire.get_vampire_state() \
+        == GDVampire.VampireState.SearchingRoute \
+        and bool(navigation.get("has_target")) \
+        and (navigation.get("target_position") as Vector3).is_equal_approx(
+            known_key_position
+        ) \
+        and not (navigation.get("target_position") as Vector3).is_equal_approx(
+            player.global_position
+        )
+
+    var dead_end_grid_map := GridMap.new()
+    dead_end_grid_map.mesh_library = mesh_library
+    for x_coordinate in 9:
+        for z_coordinate in 7:
+            dead_end_grid_map.set_cell_item(Vector3i(x_coordinate, 0, z_coordinate), 0)
+    var dead_end_origin_cell := Vector3i(4, 0, 3)
+    var dead_end_walkable_cells: Array[Vector3i] = [
+        dead_end_origin_cell,
+        Vector3i(5, 0, 3),
+        Vector3i(6, 0, 3),
+        Vector3i(3, 0, 3),
+        Vector3i(2, 0, 3),
+        Vector3i(1, 0, 3),
+        Vector3i(1, 0, 2),
+        Vector3i(1, 0, 1),
+        Vector3i(2, 0, 1),
+        Vector3i(3, 0, 1),
+        Vector3i(4, 0, 1),
+        Vector3i(5, 0, 1),
+        Vector3i(6, 0, 1),
+    ]
+    for walkable_cell in dead_end_walkable_cells:
+        dead_end_grid_map.set_cell_item(walkable_cell, GridMap.INVALID_CELL_ITEM)
+    level_controller.add_child(dead_end_grid_map)
+    var dead_end_navigation := GDVampireNavigation.new()
+    level_controller.add_child(dead_end_navigation)
+    dead_end_navigation.configure(
+        wall_side_search_body,
+        vampire.get_node("Pivot") as Node3D,
+        settings
+    )
+    dead_end_navigation.set_wall_grid_map(dead_end_grid_map)
+    var dead_end_origin := dead_end_grid_map.to_global(
+        dead_end_grid_map.map_to_local(dead_end_origin_cell)
+    )
+    var dead_end_search_points := dead_end_navigation.get_reachable_search_points(
+        dead_end_origin,
+        10.0,
+        float(settings.get("noise_search_minimum_distance_fraction")),
+        Vector3.RIGHT,
+        float(settings.get("noise_path_hint_minimum_alignment"))
+    ) as Array[Vector3]
+    var short_dead_end_is_investigated := not dead_end_search_points.is_empty() \
+        and dead_end_navigation.get_last_search_direction_match() \
+            == GDVampireNavigation.SearchDirectionMatch.Forward
+    for dead_end_search_point in dead_end_search_points:
+        if dead_end_search_point.x <= dead_end_origin.x:
+            short_dead_end_is_investigated = false
+            break
+    var sub_tile_uncertainty_points := dead_end_navigation.get_reachable_search_points(
+        dead_end_origin,
+        dead_end_grid_map.cell_size.x * 0.5,
+        0.0,
+        Vector3.RIGHT,
+        float(settings.get("noise_path_hint_minimum_alignment"))
+    ) as Array[Vector3]
+    var uncertainty_radius_never_selects_an_unreachable_tile := (
+        sub_tile_uncertainty_points.is_empty()
+    )
+    var dead_end_tip := dead_end_grid_map.to_global(
+        dead_end_grid_map.map_to_local(Vector3i(6, 0, 3))
+    )
+    wall_side_search_body.global_position = dead_end_tip
+    wall_side_search_body.selected_search_target = Vector3.ZERO
+    var dead_end_hunt := GDVampireHunt.new()
+    level_controller.add_child(dead_end_hunt)
+    dead_end_hunt.set("body", wall_side_search_body)
+    dead_end_hunt.set("navigation", dead_end_navigation)
+    dead_end_hunt.set("settings", settings)
+    dead_end_hunt.set(
+        "prediction_search_direction",
+        Vector3.RIGHT * float(settings.get("assumed_player_max_speed"))
+    )
+    dead_end_hunt.set(
+        "last_seen_player_velocity",
+        Vector3.RIGHT * float(settings.get("assumed_player_max_speed"))
+    )
+    dead_end_hunt.set("has_visible_observation", true)
+    dead_end_hunt.set("last_confirmed_player_position", dead_end_origin)
+    dead_end_hunt.set("prediction_followup_searches_remaining", 1)
+    var continues_search_from_dead_end := bool(
+        dead_end_hunt.call("begin_last_seen_direction_search")
+    )
+    var dead_end_followup_target := wall_side_search_body.selected_search_target
+    var dead_end_departure_direction := dead_end_navigation.get_path_departure_direction(
+        dead_end_tip,
+        dead_end_followup_target
+    ) as Vector3
+    var exhausted_dead_end_is_not_reselected: bool = continues_search_from_dead_end \
+        and not dead_end_followup_target.is_equal_approx(dead_end_tip) \
+        and dead_end_departure_direction.dot(Vector3.LEFT) > 0.9
+
+    senses.set("player", null)
+    vampire.configure_layout_knowledge([] as Array[Dictionary])
+    vampire.hear_noise(gate.global_position)
+    var hidden_route_target := navigation.get("target_position") as Vector3
+    var hidden_player_position := hidden_route_target + Vector3(0.37, 0.0, 1.41)
+    player.global_position = hidden_player_position
+    var targets_before_hidden_timeout := selected_targets.size()
+    var grounded_vampire_height := vampire.global_position.y
+    hunt.update_hunt(300.0)
+    var hidden_player_is_never_revealed_by_timeout: bool = vampire.get_node_or_null(
+        "VampireAerialScan"
+    ) == null and is_equal_approx(vampire.global_position.y, grounded_vampire_height) \
+        and selected_targets.size() == targets_before_hidden_timeout \
+        and (navigation.get("target_position") as Vector3).is_equal_approx(
+            hidden_route_target
+        ) \
+        and not (navigation.get("target_position") as Vector3).is_equal_approx(
+            hidden_player_position
+        ) \
+        and int(hunt.call("get_awareness_source")) \
+            == GDVampireHunt.AwarenessSource.Noise
+
+    var strategic_search_started := bool(hunt.call("begin_search"))
+    var strategic_target := navigation.get("target_position") as Vector3
+    var strategic_search_avoids_visible_empty_tiles: bool = strategic_search_started \
+        and vampire.get_vampire_state() == GDVampire.VampireState.SearchingRoute \
+        and not bool(hunt.call(
+            "_is_possible_player_position_ruled_out",
+            strategic_target
+        )) \
+        and not strategic_target.is_equal_approx(hidden_player_position)
+
+    var noise_interrupt_position := preceding_noise_position
+    vampire.hear_noise(noise_interrupt_position)
+    var sound_becomes_route_without_revealing_player: bool = vampire.get_vampire_state() \
+        == GDVampire.VampireState.Hunting \
+        and (navigation.get("target_position") as Vector3).is_equal_approx(
+            noise_interrupt_position
+        ) \
+        and not (navigation.get("target_position") as Vector3).is_equal_approx(
+            hidden_player_position
+        ) \
+        and int(hunt.call("get_awareness_source")) \
+            == GDVampireHunt.AwarenessSource.Noise
+
+    var fog := vampire.get_node("VampireProximityFog")
+    var fog_distance := float(settings.get("proximity_fog_distance"))
+    var fog_full_distance := float(settings.get("proximity_fog_full_distance"))
+    var disabled_victim := TestVampireVictim.new()
+    root.add_child(disabled_victim)
+    var enabled_visibility := vampire.visible
+    var enabled_process_mode := vampire.process_mode
+    var enabled_collision_layer := vampire.collision_layer
+    var enabled_collision_mask := vampire.collision_mask
+    var enabled_contact_monitoring := bool(contact.get("monitoring"))
+    var enabled_contact_mask := int(contact.get("collision_mask"))
+    var enabled_senses := bool(senses.get("enabled"))
+    var targets_before_development_disable := selected_targets.size()
+    vampire.set("disable_vampire_for_testing", true)
+    vampire.hear_noise(player.global_position)
+    contact._on_body_entered(disabled_victim)
+    debug_hud.call("_process", 0.0)
+    var development_toggle_disables_vampire: bool = bool(
+        vampire.call("is_disabled_for_testing")
+    ) and vampire.get_vampire_state() == GDVampire.VampireState.Disabled \
+        and vampire.process_mode == Node.PROCESS_MODE_DISABLED \
+        and not vampire.visible \
+        and vampire.collision_layer == 0 \
+        and vampire.collision_mask == 0 \
+        and not bool(contact.get("monitoring")) \
+        and int(contact.get("collision_mask")) == 0 \
+        and not bool(senses.get("enabled")) \
+        and bool(fog.call("is_suppressed")) \
+        and not disabled_victim.killed \
+        and selected_targets.size() == targets_before_development_disable \
+        and debug_state_label.text.contains("Disabled")
+    vampire.set("disable_vampire_for_testing", false)
+    var development_toggle_restores_vampire: bool = not bool(
+        vampire.call("is_disabled_for_testing")
+    ) and vampire.get_vampire_state() == GDVampire.VampireState.Idle \
+        and vampire.process_mode == enabled_process_mode \
+        and vampire.visible == enabled_visibility \
+        and vampire.collision_layer == enabled_collision_layer \
+        and vampire.collision_mask == enabled_collision_mask \
+        and bool(contact.get("monitoring")) == enabled_contact_monitoring \
+        and int(contact.get("collision_mask")) == enabled_contact_mask \
+        and bool(senses.get("enabled")) == enabled_senses \
+        and not bool(fog.call("is_suppressed"))
+    var fog_passed := _expect(
+        is_zero_approx(float(fog.call("calculate_intensity", fog_distance + 1.0))) \
+            and is_equal_approx(
+                float(fog.call("calculate_intensity", fog_full_distance)),
+                float(settings.get("proximity_fog_max_intensity"))
+            ),
+        "vampire proximity fog uses its configured distance and maximum purple intensity"
+    )
+    var senses_passed := _expect(
+        is_equal_approx(senses.position.y, float(settings.get("sight_origin_height"))) \
+            and senses.shape is SphereShape3D \
+            and is_equal_approx(
+                (senses.shape as SphereShape3D).radius,
+                float(settings.get("sight_clearance_radius")) \
+                    + float(settings.get("direct_path_clearance_margin"))
+            ) \
+            and senses.position.y < headlamp.position.y,
+        "vampire sight cast is margin-expanded and authored low on the doubled model"
+    ) and _expect(
+        blocked_by_body_height_wall,
+        "maze walls block the vampire's low floor-level sight cast"
+    ) and _expect(
+        blocked_by_grid_wall,
+        "occupied maze wall tiles block sight even when their physics has a seam"
+    ) and _expect(
+        sees_past_body_width_wall_edge,
+        "low sight acquires around a block edge without authorizing a direct body shortcut"
+    ) and _expect(
+        centre_ray_blocked_by_thin_wall,
+        "thin sightline scenery blocks the vampire's centre sight ray"
+    ) and _expect(
+        body_samples_see_around_thin_wall,
+        "vampire sees visible player body edges around thin sightline scenery"
+    ) and _expect(
+        offset_sight_still_respects_full_wall,
+        "low sight remains occluded by a complete wall"
+    ) and _expect(
+        sees_clear_player and clear_sight_allows_direct_chase,
+        "vampire's floor-level clearance cast permits a direct unobstructed chase"
+    ) and _expect(
+        clear_empty_tile_is_verified and visible_player_tile_is_not_empty,
+        "vampire sight distinguishes an empty visible tile from the observed player tile"
+    ) and _expect(
+        is_equal_approx(float(settings.get("sight_distance")), 64.0) \
+            and sees_player_within_64_metres \
+            and cannot_see_player_beyond_64_metres,
+        "vampire sight reaches 64 metres but not beyond its configured range"
+    ) and _expect(
+        notices_player_passing_close,
+        "vampire notices a nearby player even when wide sight brushes a wall edge"
+    ) and _expect(
+        sees_player_pressed_into_wall_cell,
+        "coarse wall-cell occupancy cannot hide a physically visible wall-side player"
+    ) and _expect(
+        omnidirectional_sight_remains_active,
+        "vampire sight remains omnidirectional around its moving body"
+    ) and _expect(
+        close_pass_is_chasing,
+        "vampire immediately enters its chase state after reacquiring a nearby player"
+    ) and _expect(
+        close_pass_targets_player,
+        "vampire immediately routes to the nearby player's confirmed position"
+    ) and _expect(
+        close_pass_retains_visible_position,
+        "vampire navigation immediately retains the nearby visible player position"
+    ) and _expect(
+        sight_samples_continuously,
+        "vampire sight samples continuously during every physics frame"
+    ) and _expect(
+        ruthlessly_chases_visible_player \
+            and visible_chase_uses_navigation \
+            and visible_player_overrides_other_modes \
+            and sound_does_not_interrupt_confirmed_chase \
+            and sight_memory_survives_chase_refresh,
+        "confirmed sight overrides every other mode and routes directly after the player"
+    ) and _expect(
+        visible_sight_cancels_junction_scan,
+        "confirmed sight immediately cancels an invalid junction-scan state"
+    ) and _expect(
+        completed_visible_route_retries,
+        "vampire immediately refreshes a completed visible route to the confirmed player"
+    ) and _expect(
+        visible_chase_state_stays_stable,
+        "vampire remains in one continuous chase state down a clear corridor"
+    ) and _expect(
+        straight_route_omits_current_cell \
+            and same_cell_target_moves_without_rebuild \
+            and straight_route_extends_without_rebuild,
+        "visible straight-corridor pursuit advances without route rebuild stop-starts"
+    ) and _expect(
+        visible_branch_change_repaths_immediately,
+        "visible players changing junction branches immediately replace the stale chase route"
+    ) and _expect(
+        visible_chase_does_not_overshoot_stopped_player,
+        "visible chase immediately replaces a route that could miss a player beside a wall"
+    ) and _expect(
+        brief_sight_loss_keeps_chasing,
+        "vampire tolerates brief corner occlusion without abandoning its chase route"
+    ) and _expect(
+        pursues_last_seen_after_losing_player \
+            and predicted_target_is_not_visibly_empty,
+        "vampire predicts a reachable non-visible pursuit target from last-seen movement"
+    ) and _expect(
+        search_after_junction_scan_respects_visibility \
+            and last_seen_uncertainty_expands_during_pursuit,
+        "vampire expands its hidden search and abandons positions current sight rules out"
+    ) and _expect(
+        exhausted_dead_end_is_not_reselected,
+        "vampire continues from an exhausted dead end instead of returning to stale evidence"
+    ) and _expect(
+        single_noise_uses_last_spotted_direction,
+        "a new noise search favours the player's last confirmed walking direction"
+    ) and _expect(
+        noise_uncertainty_radius_grows_over_time \
+            and uncertainty_radius_never_selects_an_unreachable_tile,
+        "noise uncertainty expands with elapsed travel time without exceeding its radius"
+    ) and _expect(
+        consecutive_sounds_infer_path_direction \
+            and noise_search_uses_layout_without_cheating \
+            and short_dead_end_is_investigated,
+        "vampire combines sound direction with layout knowledge without cheating"
+    ) and _expect(
+        debug_state_label.visible \
+            and debug_reports_visible_chase \
+            and debug_reports_last_seen_pursuit \
+            and debug_reports_junction_scan \
+            and vampire.get_node_or_null("DebugStateLabel") == null,
+        "Vampire HUD shows its current state and confirmed line of sight"
+    ) and _expect(
+        hidden_player_is_never_revealed_by_timeout,
+        "elapsed time never reveals or targets a hidden player's live position"
+    ) and _expect(
+        starts_hunting_entrance \
+            and landmark_sound_uses_event_evidence \
+            and ordinary_sound_uses_only_event_position \
+            and ruthlessly_chases_visible_player \
+            and hidden_player_is_never_revealed_by_timeout,
+        "entrance, ordinary sound, landmark sound, and direct sight obey explicit perception rules"
+    ) and _expect(
+        strategic_search_avoids_visible_empty_tiles,
+        "without fresh evidence the vampire strategically searches only hidden positions"
+    ) and _expect(
+        sound_becomes_route_without_revealing_player,
+        "an allowed noise becomes the route without consulting the hidden player"
+    ) and _expect(
+        development_toggle_disables_vampire and development_toggle_restores_vampire,
+        "the editor development toggle completely disables and cleanly restores the vampire"
+    )
+    passed = pickup_passed \
+        and deposit_passed \
+        and footstep_passed \
+        and bat_noise_passed \
+        and fog_passed \
+        and senses_passed \
+        and passed
+
+    victim.free()
+    disabled_victim.free()
+    level_controller.free()
+    return passed
+
+
+func _test_vampire_navigation_reports_scaled_search_contract() -> bool:
+    var holder := Node3D.new()
+    root.add_child(holder)
+    var body := CharacterBody3D.new()
+    holder.add_child(body)
+    var body_collision := CollisionShape3D.new()
+    body_collision.name = "CollisionShape3D"
+    var body_shape := CapsuleShape3D.new()
+    body_shape.radius = 0.3
+    body_shape.height = 1.6
+    body_collision.shape = body_shape
+    body.add_child(body_collision)
+    var pivot := Node3D.new()
+    body.add_child(pivot)
+    var navigation := GDVampireNavigation.new()
+    holder.add_child(navigation)
+    var settings := load(
+        "res://enemies/vampire/vampire_settings.tres"
+    ).duplicate(true) as Resource
+    navigation.configure(body, pivot, settings)
+
+    var no_grid_target_selected := navigation.select_target(Vector3.ONE)
+    var no_grid_route := navigation.build_route_to(Vector3.ONE) as Array[Vector3]
+    var no_grid_status_is_explicit: bool = no_grid_route.is_empty() \
+        and not no_grid_target_selected \
+        and not bool(navigation.get("has_target")) \
+        and navigation.get_last_route_search_status() \
+            == GDVampireNavigation.RouteSearchStatus.NoGridMap \
+        and navigation.get_route_traversal_status() \
+            == GDVampireNavigation.RouteTraversalStatus.Failed
+
+    var wall_grid_map := GridMap.new()
+    holder.add_child(wall_grid_map)
+    wall_grid_map.cell_size = Vector3(2.0, 1.0, 3.0)
+    wall_grid_map.scale = Vector3(2.0, 1.0, 0.5)
+    var mesh_library := MeshLibrary.new()
+    mesh_library.create_item(0)
+    mesh_library.set_item_name(0, "Wall Test")
+    mesh_library.create_item(1)
+    mesh_library.set_item_name(1, "Decoration Test")
+    wall_grid_map.mesh_library = mesh_library
+    for coordinate in 7:
+        wall_grid_map.set_cell_item(Vector3i(coordinate, 0, 0), 0)
+        wall_grid_map.set_cell_item(Vector3i(coordinate, 0, 6), 0)
+        wall_grid_map.set_cell_item(Vector3i(0, 0, coordinate), 0)
+        wall_grid_map.set_cell_item(Vector3i(6, 0, coordinate), 0)
+    wall_grid_map.set_cell_item(Vector3i(100, 0, 100), 1)
+    navigation.set_wall_grid_map(wall_grid_map)
+
+    var origin_cell := Vector3i(1, 0, 1)
+    var target_cell := Vector3i(3, 0, 2)
+    body.global_position = wall_grid_map.to_global(
+        wall_grid_map.map_to_local(origin_cell)
+    )
+    var target_position := wall_grid_map.to_global(
+        wall_grid_map.map_to_local(target_cell)
+    )
+    var complete_route := navigation.build_route_to(target_position) as Array[Vector3]
+    var x_edge_length := wall_grid_map.to_global(
+        wall_grid_map.map_to_local(origin_cell + Vector3i.RIGHT)
+    ).distance_to(body.global_position)
+    var z_edge_length := wall_grid_map.to_global(
+        wall_grid_map.map_to_local(origin_cell + Vector3i.BACK)
+    ).distance_to(body.global_position)
+    var scaled_route_distance := navigation.get_path_distance(
+        body.global_position,
+        target_position
+    )
+    var explicit_scaled_grid_is_respected: bool = not complete_route.is_empty() \
+        and navigation.get("grid_bounds") == Rect2i(0, 0, 7, 7) \
+        and is_equal_approx(scaled_route_distance, x_edge_length * 2.0 + z_edge_length) \
+        and is_equal_approx(float(navigation.call("_get_body_clearance_world")), 0.32)
+
+    var projected_target_cell := Vector3i(3, 0, 3)
+    wall_grid_map.set_cell_item(projected_target_cell, 0)
+    body.global_position = wall_grid_map.to_global(
+        wall_grid_map.map_to_local(Vector3i(5, 0, 3))
+    )
+    var projected_target := wall_grid_map.to_global(
+        wall_grid_map.map_to_local(projected_target_cell) + Vector3(0.49, 0.0, 0.0)
+    )
+    navigation.select_visible_target(projected_target, projected_target, false)
+    var projected_route := navigation.get_route_points()
+    var projected_route_cell := wall_grid_map.local_to_map(
+        wall_grid_map.to_local(projected_route.back())
+    ) if not projected_route.is_empty() else Vector3i(-1, -1, -1)
+    projected_route_cell.y = 0
+    var projected_refresh_target := wall_grid_map.to_global(
+        wall_grid_map.map_to_local(projected_route_cell) + Vector3(0.0, 0.0, 0.1)
+    )
+    var projected_endpoint_refreshes: bool = not projected_route.is_empty() \
+        and projected_route_cell == Vector3i(4, 0, 3) \
+        and navigation.refresh_visible_route_target(projected_refresh_target)
+
+    body.global_position = wall_grid_map.to_global(
+        wall_grid_map.map_to_local(origin_cell)
+    )
+    navigation.select_target(target_position)
+    var successful_route_is_following := navigation.get_route_traversal_status() \
+        == GDVampireNavigation.RouteTraversalStatus.Following
+    var half_recovery_seconds := float(
+        settings.get("wall_stall_recovery_seconds")
+    ) * 0.5
+    navigation.call(
+        "_update_wall_stall_recovery",
+        half_recovery_seconds,
+        false,
+        float(settings.get("wall_stall_minimum_progress_speed")) * 2.0,
+        float(settings.get("max_speed"))
+    )
+    navigation.call(
+        "_update_wall_stall_recovery",
+        half_recovery_seconds,
+        false,
+        0.0,
+        float(settings.get("max_speed"))
+    )
+    var useful_window_progress_avoids_recovery: bool = navigation \
+        .get_wall_stall_recovery_count() == 0
+    navigation.call(
+        "_update_wall_stall_recovery",
+        half_recovery_seconds,
+        false,
+        0.0,
+        float(settings.get("max_speed"))
+    )
+    navigation.call(
+        "_update_wall_stall_recovery",
+        half_recovery_seconds,
+        false,
+        0.0,
+        float(settings.get("max_speed"))
+    )
+    var sustained_window_stall_recovers: bool = navigation \
+        .get_wall_stall_recovery_count() == 1
+
+    settings.set("maximum_route_search_cells", 2)
+    var budget_target := wall_grid_map.to_global(
+        wall_grid_map.map_to_local(Vector3i(5, 0, 5))
+    )
+    var budget_route := navigation.build_route_to(budget_target) as Array[Vector3]
+    navigation.get_reachable_search_points(body.global_position, 100.0, 0.0)
+    var bounded_searches_report_truncation: bool = budget_route.is_empty() \
+        and navigation.get_last_route_search_status() \
+            == GDVampireNavigation.RouteSearchStatus.SearchBudgetExhausted \
+        and navigation.was_last_frontier_search_truncated()
+
+    settings.set("maximum_route_search_cells", 32768)
+    var outside_target := wall_grid_map.to_global(
+        wall_grid_map.map_to_local(Vector3i(100, 0, 100))
+    )
+    var clamped_route := navigation.build_route_to(outside_target) as Array[Vector3]
+    navigation.set("last_movement_direction", Vector3.RIGHT)
+    navigation.stop_immediately()
+    var public_search_handles_partial_configuration := GDVampireNavigation.new()
+    holder.add_child(public_search_handles_partial_configuration)
+    public_search_handles_partial_configuration.set_wall_grid_map(wall_grid_map)
+    var unconfigured_points := public_search_handles_partial_configuration \
+        .get_reachable_search_points(body.global_position, 10.0, 0.0)
+    var edge_cases_are_safe: bool = not clamped_route.is_empty() \
+        and navigation.get_last_route_search_status() \
+            == GDVampireNavigation.RouteSearchStatus.Complete \
+        and (navigation.get("last_movement_direction") as Vector3).is_zero_approx() \
+        and unconfigured_points.is_empty()
+
+    navigation.set("route_points", [body.global_position] as Array[Vector3])
+    navigation.set("route_index", 0)
+    navigation.set("has_target", true)
+    navigation.set(
+        "route_traversal_status",
+        GDVampireNavigation.RouteTraversalStatus.Following
+    )
+    navigation.call("_advance_reached_route_points")
+    var completed_route_reports_arrival := not bool(navigation.get("has_target")) \
+        and navigation.get_route_traversal_status() \
+            == GDVampireNavigation.RouteTraversalStatus.Arrived
+
+    var passed := _expect(
+        no_grid_status_is_explicit \
+            and explicit_scaled_grid_is_respected \
+            and projected_endpoint_refreshes,
+        "vampire navigation uses its explicit wall layer, physical body, and scaled cell edges"
+    ) and _expect(
+        useful_window_progress_avoids_recovery \
+            and sustained_window_stall_recovers \
+            and bounded_searches_report_truncation,
+        "vampire navigation distinguishes route-budget exhaustion and truncated frontiers"
+    ) and _expect(
+        edge_cases_are_safe \
+            and successful_route_is_following \
+            and completed_route_reports_arrival,
+        "vampire navigation separates route failure, active travel, arrival, and cancellation"
+    )
+    holder.free()
+    return passed
+
+
+func _test_vampire_maze_owns_its_development_view() -> bool:
+    var vampire_maze_uid := ResourceLoader.get_resource_uid(
+        "res://levels/vampire-maze/level.tscn"
+    )
+    var level_one_uid := ResourceLoader.get_resource_uid("res://levels/1/level.tscn")
+    var level_scene := load("res://levels/vampire-maze/level.tscn") as PackedScene
+    var level := level_scene.instantiate() as Node3D
+    var vampire := level.get_node_or_null("Vampire") as CharacterBody3D
+    var level_settings := level.get_node_or_null("LevelSettings") as GDLevelSettings
+    var development_view := level.get_node_or_null("VampireDevelopmentView") as Node3D
+    var debug_hud := level.get_node_or_null("VampireDebugHUD") as CanvasLayer
+    var camera := level.get_node_or_null("VampireDevelopmentView/Camera3D") as Camera3D
+    var route_overlay := level.get_node_or_null("MinimapRouteOverlay") as MultiMeshInstance3D
+    var generated_maze := level.get_node_or_null("GeneratedMaze") as Node3D
+    var wall_grid_map := level.get_node_or_null("GeneratedMaze/PNGGridMap") as GridMap
+    var floor_grid_map := level.get_node_or_null("GeneratedMaze/PNGFloorGridMap") as GridMap
+    var camera_profile := camera.get("camera_profile") as Resource if camera != null else null
+    var maze_configuration := generated_maze.get("configuration") as Resource \
+        if generated_maze != null else null
+    var configured_width := int(maze_configuration.get("width")) \
+        if maze_configuration != null else 0
+    var configured_height := int(maze_configuration.get("height")) \
+        if maze_configuration != null else 0
+    var serialized_floor_cells := floor_grid_map.get_used_cells() \
+        if floor_grid_map != null else []
+    var serialized_wall_cells := wall_grid_map.get_used_cells() \
+        if wall_grid_map != null else []
+    var has_no_baked_cells := serialized_floor_cells.is_empty() \
+        and serialized_wall_cells.is_empty()
+    var has_current_baked_cells := serialized_floor_cells.size() \
+        == configured_width * configured_height
+    for wall_cell_value in serialized_wall_cells:
+        var wall_cell := wall_cell_value as Vector3i
+        if wall_cell.x < 0 or wall_cell.x >= configured_width \
+                or wall_cell.z < 0 or wall_cell.z >= configured_height:
+            has_current_baked_cells = false
+            break
+    root.add_child(level)
+    var authored_player := level.get_node_or_null("Player") as Node3D
+    var stale_character_position := Vector3(512.0, 32.0, 512.0)
+    if authored_player != null:
+        authored_player.global_position = stale_character_position
+    if vampire != null:
+        vampire.global_position = stale_character_position
+    var regeneration_result := generated_maze.call("regenerate_maze") as Dictionary \
+        if generated_maze != null else {}
+    var regenerated_player_spawn := regeneration_result.get(
+        "player_spawn",
+        Transform3D.IDENTITY
+    ) as Transform3D
+    var regenerated_vampire_spawn := regeneration_result.get(
+        "vampire_spawn",
+        Transform3D.IDENTITY
+    ) as Transform3D
+    var automatic_regeneration_repositions_characters := authored_player != null \
+        and vampire != null \
+        and not (generated_maze.get("player_path") as NodePath).is_empty() \
+        and not (generated_maze.get("vampire_path") as NodePath).is_empty() \
+        and authored_player.global_transform.is_equal_approx(
+            regenerated_player_spawn
+        ) \
+        and vampire.global_transform.is_equal_approx(
+            regenerated_vampire_spawn
+        )
+    var passed := _expect(
+        vampire_maze_uid != ResourceUID.INVALID_ID and vampire_maze_uid != level_one_uid,
+        "Vampire Maze has a unique scene identity"
+    ) and _expect(
+        level.get_script().resource_path == "res://levels/vampire-maze/vampire_maze.gd" \
+            and vampire != null \
+            and not (level.get("end_gate_path") as NodePath).is_empty() \
+            and not (level.get("generated_content_path") as NodePath).is_empty(),
+        "Vampire Maze owns its boss and noise wiring"
+    ) and _expect(
+        automatic_regeneration_repositions_characters,
+        "Vampire Maze resizing repositions the player and Vampire onto the regenerated floor"
+    ) and _expect(
+        level_settings != null \
+            and level_settings.show_minimap \
+            and level.call("get_minimap_target") == vampire,
+        "Vampire Maze enables the minimap and makes it track the vampire"
+    ) and _expect(
+        route_overlay != null \
+            and route_overlay.layers == TEST_MINIMAP_ROUTE_VISUAL_LAYER,
+        "Vampire Maze owns its minimap-only route overlay"
+    ) and _expect(
+        generated_maze != null \
+            and generated_maze.get_script().resource_path.ends_with("generated_maze.gd") \
+            and wall_grid_map != null \
+            and floor_grid_map != null \
+            and int(generated_maze.get("maze_seed")) >= 0,
+        "Vampire Maze owns its seeded GridMap generator and generated maps"
+    ) and _expect(
+        (has_no_baked_cells or has_current_baked_cells) \
+            and level.get_node_or_null("Objects") == null,
+        "Vampire Maze contains only empty or current generated GridMap cells and no obsolete content"
+    ) and _expect(
+        development_view != null \
+            and development_view.visible \
+            and is_equal_approx(float(development_view.get("development_ambient_energy")), 0.24) \
+            and camera != null,
+        "Vampire Maze exposes its development camera and ambient helper as a visible scene node"
+    ) and _expect(
+        camera_profile != null \
+            and is_equal_approx(float(camera_profile.get("zoom_distance")), 32.0) \
+            and camera.has_method("is_runtime_camera_enabled"),
+        "Vampire Maze development camera is level-local and further zoomed out"
+    ) and _expect(
+        debug_hud != null \
+            and debug_hud.get_node_or_null("Screen/StateLabel") is Label,
+        "Vampire Maze owns its level-local Vampire diagnostics HUD"
+    )
+
+    var graveyard := TestGraveyard.new()
+    var default_target := Node3D.new()
+    graveyard.current_level = level
+    passed = _expect(
+        graveyard.call("_get_minimap_target", default_target) == vampire,
+        "level-specific minimap targets override the normal player target"
+    ) and passed
+    graveyard.current_level = Node3D.new()
+    passed = _expect(
+        graveyard.call("_get_minimap_target", default_target) == default_target,
+        "levels without a minimap override continue tracking the player"
+    ) and passed
+    graveyard.current_level.free()
+    default_target.free()
+    graveyard.free()
+    level.free()
+    return passed
+
+
+func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
+    var generated_maze := VAMPIRE_GENERATED_MAZE_SCENE.instantiate() as Node3D
+    root.add_child(generated_maze)
+    var walls := generated_maze.get_node("PNGGridMap") as GridMap
+    var floor := generated_maze.get_node("PNGFloorGridMap") as GridMap
+    var configuration := generated_maze.get("configuration") as Resource
+    var configured_width := int(configuration.get("width"))
+    var configured_height := int(configuration.get("height"))
+    var hallway_width := int(configuration.get("hallway_width"))
+    var configured_internal_connection_percent := float(
+        configuration.get("internal_connection_percent")
+    )
+    var configured_internal_connection_count := int(generated_maze.call(
+        "_get_internal_connection_count",
+        configured_width,
+        configured_height,
+        hallway_width,
+        configured_internal_connection_percent
+    ))
+    var compact_internal_connection_count := int(generated_maze.call(
+        "_get_internal_connection_count",
+        22,
+        22,
+        hallway_width,
+        configured_internal_connection_percent
+    ))
+    var tree_floor_cells := generated_maze.call(
+        "_build_floor_cells",
+        configured_width,
+        configured_height,
+        hallway_width,
+        1730,
+        0
+    ) as Dictionary
+    var loop_floor_cells := generated_maze.call(
+        "_build_floor_cells",
+        configured_width,
+        configured_height,
+        hallway_width,
+        1730,
+        configured_internal_connection_percent
+    ) as Dictionary
+    var repeated_loop_floor_cells := generated_maze.call(
+        "_build_floor_cells",
+        configured_width,
+        configured_height,
+        hallway_width,
+        1730,
+        configured_internal_connection_percent
+    ) as Dictionary
+    var added_internal_floor_cells := 0
+    var internal_connections_preserve_outer_wall := true
+    for cell_value in loop_floor_cells:
+        var cell := cell_value as Vector2i
+        if tree_floor_cells.has(cell):
+            continue
+        added_internal_floor_cells += 1
+        if cell.x <= 0 or cell.y <= 0 \
+                or cell.x >= configured_width - 1 \
+                or cell.y >= configured_height - 1:
+            internal_connections_preserve_outer_wall = false
+    var internal_connections_are_deterministic := loop_floor_cells \
+        == repeated_loop_floor_cells \
+        and configured_internal_connection_count > compact_internal_connection_count \
+        and compact_internal_connection_count > 0 \
+        and added_internal_floor_cells \
+            == configured_internal_connection_count * hallway_width \
+        and internal_connections_preserve_outer_wall
+    var scene_seed_floor_cells := generated_maze.call(
+        "_build_floor_cells",
+        configured_width,
+        configured_height,
+        hallway_width,
+        2,
+        configured_internal_connection_percent
+    ) as Dictionary
+    var isolated_wall_count := 0
+    var isolated_wall_x_bands := {}
+    var isolated_wall_y_bands := {}
+    for z_coordinate in range(1, configured_height - 1):
+        for x_coordinate in range(1, configured_width - 1):
+            var wall_cell := Vector2i(x_coordinate, z_coordinate)
+            if scene_seed_floor_cells.has(wall_cell):
+                continue
+            var wall_is_isolated := true
+            for direction in [
+                Vector2i.UP,
+                Vector2i.RIGHT,
+                Vector2i.DOWN,
+                Vector2i.LEFT,
+            ]:
+                if not scene_seed_floor_cells.has(wall_cell + direction):
+                    wall_is_isolated = false
+                    break
+            if not wall_is_isolated:
+                continue
+            isolated_wall_count += 1
+            isolated_wall_x_bands[x_coordinate * 4 / configured_width] = true
+            isolated_wall_y_bands[z_coordinate * 4 / configured_height] = true
+    var isolated_walls_are_not_clustered := isolated_wall_count <= 8 \
+        and isolated_wall_x_bands.size() >= 3 \
+        and isolated_wall_y_bands.size() >= 3
+    var player := TestGeneratedPlayer.new()
+    var vampire := CharacterBody3D.new()
+    generated_maze.add_child(player)
+    generated_maze.add_child(vampire)
+
+    var first_result := generated_maze.call(
+        "generate_from_config",
+        configuration,
+        1729,
+        player,
+        vampire
+    ) as Dictionary
+    var first_wall_cells := walls.get_used_cells()
+    first_wall_cells.sort()
+    var first_signature := str(first_wall_cells)
+    var repeat_result := generated_maze.call(
+        "generate_from_config",
+        configuration,
+        1729,
+        player,
+        vampire
+    ) as Dictionary
+    var repeat_wall_cells := walls.get_used_cells()
+    repeat_wall_cells.sort()
+    var repeat_signature := str(repeat_wall_cells)
+    var changed_result := generated_maze.call(
+        "generate_from_config",
+        configuration,
+        1730,
+        player,
+        vampire
+    ) as Dictionary
+    var changed_wall_cells := walls.get_used_cells()
+    changed_wall_cells.sort()
+    var changed_signature := str(changed_wall_cells)
+
+    var wall_item_ids := {}
+    for wall_cell in walls.get_used_cells():
+        wall_item_ids[walls.get_cell_item(wall_cell)] = true
+    var gate_opening_origin_x := int(
+        changed_result.get("end_gate_opening_origin_x", -1)
+    )
+    var gate_opening_width_tiles := int(
+        changed_result.get("end_gate_opening_width_tiles", 0)
+    )
+    var gate_aperture_is_clear := true
+    for x_coordinate in range(
+        gate_opening_origin_x,
+        gate_opening_origin_x + gate_opening_width_tiles
+    ):
+        if walls.get_cell_item(Vector3i(x_coordinate, 0, configured_height - 1)) \
+                != GridMap.INVALID_CELL_ITEM:
+            gate_aperture_is_clear = false
+            break
+    var gate_aperture_has_wall_shoulders := walls.get_cell_item(Vector3i(
+        gate_opening_origin_x - 1,
+        0,
+        configured_height - 1
+    )) != GridMap.INVALID_CELL_ITEM and walls.get_cell_item(Vector3i(
+        gate_opening_origin_x + gate_opening_width_tiles,
+        0,
+        configured_height - 1
+    )) != GridMap.INVALID_CELL_ITEM
+    var bottom_right_corner_is_enclosed := true
+    for corner_cell in [
+        Vector3i(configured_width - 2, 0, configured_height - 1),
+        Vector3i(configured_width - 1, 0, configured_height - 1),
+        Vector3i(configured_width - 1, 0, configured_height - 2),
+    ]:
+        if walls.get_cell_item(corner_cell) == GridMap.INVALID_CELL_ITEM:
+            bottom_right_corner_is_enclosed = false
+            break
+    var player_cell := changed_result.get("player_cell") as Vector3i
+    var vampire_cell := changed_result.get("vampire_cell") as Vector3i
+    var end_gate_cell := changed_result.get("end_gate_cell") as Vector3i
+    var maze_origin := changed_result.get("maze_origin") as Vector2i
+    var logical_width := int(changed_result.get("logical_width", 0))
+    var logical_height := int(changed_result.get("logical_height", 0))
+    var generated_floor_cells := {}
+    var used_edge_lanes := {
+        &"top": false,
+        &"right": false,
+        &"bottom": false,
+        &"left": false,
+    }
+    for cell_value in changed_result.get("floor_cells", []):
+        var floor_cell := cell_value as Vector2i
+        generated_floor_cells[floor_cell] = true
+        if floor_cell.y <= hallway_width:
+            used_edge_lanes[&"top"] = true
+        if floor_cell.x >= configured_width - 1 - hallway_width:
+            used_edge_lanes[&"right"] = true
+        if floor_cell.y >= configured_height - 1 - hallway_width:
+            used_edge_lanes[&"bottom"] = true
+        if floor_cell.x <= hallway_width:
+            used_edge_lanes[&"left"] = true
+    var perimeter_break_sides := {
+        &"top": false,
+        &"right": false,
+        &"bottom": false,
+        &"left": false,
+    }
+    var perimeter_break_count := 0
+    var allowed_perimeter_connection_count := 0
+    var open_perimeter_connection_count := 0
+    for logical_x in range(logical_width - 1):
+        var top_from := Vector2i(logical_x, 0)
+        var top_to := Vector2i(logical_x + 1, 0)
+        var top_connection_is_allowed := bool(generated_maze.call(
+            "_logical_transition_is_allowed",
+            top_from,
+            top_to,
+            logical_width,
+            logical_height
+        ))
+        if top_connection_is_allowed:
+            allowed_perimeter_connection_count += 1
+        else:
+            perimeter_break_sides[&"top"] = true
+            perimeter_break_count += 1
+        var top_connection_is_open := bool(generated_maze.call(
+            "_logical_connection_is_open",
+            generated_floor_cells,
+            top_from,
+            top_to,
+            hallway_width,
+            maze_origin
+        ))
+        if top_connection_is_open:
+            open_perimeter_connection_count += 1
+        var bottom_from := Vector2i(logical_x, logical_height - 1)
+        var bottom_to := Vector2i(logical_x + 1, logical_height - 1)
+        var bottom_connection_is_allowed := bool(generated_maze.call(
+            "_logical_transition_is_allowed",
+            bottom_from,
+            bottom_to,
+            logical_width,
+            logical_height
+        ))
+        if bottom_connection_is_allowed:
+            allowed_perimeter_connection_count += 1
+        else:
+            perimeter_break_sides[&"bottom"] = true
+            perimeter_break_count += 1
+        var bottom_connection_is_open := bool(generated_maze.call(
+            "_logical_connection_is_open",
+            generated_floor_cells,
+            bottom_from,
+            bottom_to,
+            hallway_width,
+            maze_origin
+        ))
+        if bottom_connection_is_open:
+            open_perimeter_connection_count += 1
+    for logical_y in range(logical_height - 1):
+        var left_from := Vector2i(0, logical_y)
+        var left_to := Vector2i(0, logical_y + 1)
+        var left_connection_is_allowed := bool(generated_maze.call(
+            "_logical_transition_is_allowed",
+            left_from,
+            left_to,
+            logical_width,
+            logical_height
+        ))
+        if left_connection_is_allowed:
+            allowed_perimeter_connection_count += 1
+        else:
+            perimeter_break_sides[&"left"] = true
+            perimeter_break_count += 1
+        var left_connection_is_open := bool(generated_maze.call(
+            "_logical_connection_is_open",
+            generated_floor_cells,
+            left_from,
+            left_to,
+            hallway_width,
+            maze_origin
+        ))
+        if left_connection_is_open:
+            open_perimeter_connection_count += 1
+        var right_from := Vector2i(logical_width - 1, logical_y)
+        var right_to := Vector2i(logical_width - 1, logical_y + 1)
+        var right_connection_is_allowed := bool(generated_maze.call(
+            "_logical_transition_is_allowed",
+            right_from,
+            right_to,
+            logical_width,
+            logical_height
+        ))
+        if right_connection_is_allowed:
+            allowed_perimeter_connection_count += 1
+        else:
+            perimeter_break_sides[&"right"] = true
+            perimeter_break_count += 1
+        var right_connection_is_open := bool(generated_maze.call(
+            "_logical_connection_is_open",
+            generated_floor_cells,
+            right_from,
+            right_to,
+            hallway_width,
+            maze_origin
+        ))
+        if right_connection_is_open:
+            open_perimeter_connection_count += 1
+    var full_map_edges_are_used := true
+    for edge_name in used_edge_lanes:
+        if not bool(used_edge_lanes[edge_name]):
+            full_map_edges_are_used = false
+            break
+    var sparse_perimeter_breaks_prevent_border_bypass := perimeter_break_count > 0 \
+        and allowed_perimeter_connection_count > perimeter_break_count * 2 \
+        and open_perimeter_connection_count > perimeter_break_count
+    for edge_name in perimeter_break_sides:
+        if not bool(perimeter_break_sides[edge_name]):
+            sparse_perimeter_breaks_prevent_border_bypass = false
+            break
+    var content_plan := changed_result.get("content_plan", {}) as Dictionary
+    var content_configuration := configuration.get("content_configuration") as Resource
+    var doors := content_plan.get("doors", []) as Array
+    var keys := content_plan.get("keys", []) as Array
+    var coffins := content_plan.get("coffins", []) as Array
+    var treasure_caches := content_plan.get("treasure_caches", []) as Array
+    var bat_nests := content_plan.get("bat_nests", []) as Array
+    var exploration_bat_count := 0
+    for bat_value in bat_nests:
+        var bat := bat_value as Dictionary
+        if int(bat["placement_band"]) \
+                == VAMPIRE_GENERATED_CONTENT_PLANNER.PlacementBand.Exploration:
+            exploration_bat_count += 1
+    var configured_bat_count := int(content_configuration.get("bat_nest_count"))
+    var expected_exploration_bat_count := clampi(
+        roundi(
+            float(configured_bat_count)
+            * float(content_configuration.get("bat_off_path_percent"))
+            / 100.0
+        ),
+        0,
+        configured_bat_count
+    )
+    var generated_content := generated_maze.get_node("GeneratedContent")
+    var generated_treasure_pile_count := 0
+    var generated_preview_roots_are_transient := true
+    for child in generated_content.get_children():
+        if child.owner != null:
+            generated_preview_roots_are_transient = false
+        if child.name.begins_with("GeneratedTreasureCache"):
+            generated_treasure_pile_count += 1
+    var vampire_layout_landmarks := generated_content.call(
+        "get_vampire_layout_landmarks"
+    ) as Array[Dictionary]
+    var generated_gate := generated_content.get_node_or_null("GeneratedLockedGate") as Node3D
+    var generated_staircase := generated_gate.get_node_or_null(
+        "ProceduralStaircase"
+    ) as Node3D if generated_gate != null else null
+    var generated_gate_uses_authored_scale := generated_gate != null \
+        and generated_gate.scale.is_equal_approx(Vector3.ONE)
+    var staircase_mesh_instance := generated_staircase.get_node_or_null(
+        "GeneratedStairMesh"
+    ) as MeshInstance3D if generated_staircase != null else null
+    var staircase_mesh := staircase_mesh_instance.mesh as ArrayMesh \
+        if staircase_mesh_instance != null else null
+    var staircase_material := staircase_mesh_instance.material_override \
+        as StandardMaterial3D if staircase_mesh_instance != null else null
+    var generated_staircase_is_visible: bool = generated_staircase != null \
+        and generated_staircase.scale.is_equal_approx(Vector3.ONE) \
+        and staircase_mesh_instance != null \
+        and staircase_mesh_instance.visible \
+        and staircase_mesh != null \
+        and staircase_material != null \
+        and staircase_material.albedo_color.get_luminance() >= 0.35 \
+        and staircase_material.emission_enabled
+    var staircase_is_single_procedural_mesh: bool = generated_staircase != null \
+        and generated_staircase.get_script() == PROCEDURAL_STAIRCASE_SCRIPT \
+        and staircase_mesh != null \
+        and staircase_mesh.get_surface_count() == 1 \
+        and staircase_mesh.get_aabb().position.y <= -0.09 \
+        and generated_staircase.get_node_or_null("Steps") == null
+    var staircase_threshold: CollisionShape3D = null
+    var staircase_ramp: CollisionShape3D = null
+    var staircase_top_landing: CollisionShape3D = null
+    var staircase_left_guard: CollisionShape3D = null
+    var staircase_right_guard: CollisionShape3D = null
+    if generated_staircase != null:
+        staircase_threshold = generated_staircase.get_node_or_null(
+            "StairCollision/GateThresholdShape"
+        ) as CollisionShape3D
+        staircase_ramp = generated_staircase.get_node_or_null(
+            "StairCollision/RampShape"
+        ) as CollisionShape3D
+        staircase_top_landing = generated_staircase.get_node_or_null(
+            "StairCollision/TopLandingShape"
+        ) as CollisionShape3D
+        staircase_left_guard = generated_staircase.get_node_or_null(
+            "StairCollision/LeftSideGuardShape"
+        ) as CollisionShape3D
+        staircase_right_guard = generated_staircase.get_node_or_null(
+            "StairCollision/RightSideGuardShape"
+        ) as CollisionShape3D
+    var staircase_has_walkable_transition := false
+    if staircase_ramp != null and staircase_top_landing != null:
+        var ramp_box := staircase_ramp.shape as BoxShape3D
+        var landing_box := staircase_top_landing.shape as BoxShape3D
+        if ramp_box != null and landing_box != null:
+            var ramp_direction := staircase_ramp.transform.basis.x.normalized()
+            var ramp_surface_normal := staircase_ramp.transform.basis.y.normalized()
+            var lower_ramp_surface := staircase_ramp.position \
+                - ramp_direction * ramp_box.size.x * 0.5 \
+                + ramp_surface_normal * ramp_box.size.y * 0.5
+            var upper_ramp_surface := staircase_ramp.position \
+                + ramp_direction * ramp_box.size.x * 0.5 \
+                + ramp_surface_normal * ramp_box.size.y * 0.5
+            var landing_start := staircase_top_landing.position.x \
+                - landing_box.size.x * 0.5
+            var landing_top := staircase_top_landing.position.y \
+                + landing_box.size.y * 0.5
+            var ramp_angle_degrees := rad_to_deg(asin(ramp_direction.y))
+            staircase_has_walkable_transition = staircase_threshold == null \
+                and lower_ramp_surface.x >= 1.2 \
+                and lower_ramp_surface.x <= 1.3 \
+                and absf(lower_ramp_surface.y) <= 0.02 \
+                and landing_start <= upper_ramp_surface.x \
+                and absf(upper_ramp_surface.y - landing_top) <= 0.02 \
+                and ramp_angle_degrees <= 15.0 \
+                and ramp_box.size.z >= 2.8
+    var staircase_completion_area := generated_staircase.get_node_or_null(
+        "CompletionArea"
+    ) as Area3D if generated_staircase != null else null
+    var staircase_has_guarded_victory_runoff := false
+    if staircase_top_landing != null \
+            and staircase_left_guard != null \
+            and staircase_right_guard != null \
+            and staircase_completion_area != null:
+        var top_landing_box := staircase_top_landing.shape as BoxShape3D
+        var left_guard_box := staircase_left_guard.shape as BoxShape3D
+        var right_guard_box := staircase_right_guard.shape as BoxShape3D
+        if top_landing_box != null \
+                and left_guard_box != null \
+                and right_guard_box != null:
+            var top_landing_end := staircase_top_landing.position.x \
+                + top_landing_box.size.x * 0.5
+            var top_landing_top := staircase_top_landing.position.y \
+                + top_landing_box.size.y * 0.5
+            var guard_start := staircase_left_guard.position.x \
+                - left_guard_box.size.x * 0.5
+            var guard_end := staircase_left_guard.position.x \
+                + left_guard_box.size.x * 0.5
+            var guard_top := staircase_left_guard.position.y \
+                + left_guard_box.size.y * 0.5
+            var guarded_walkway_width := staircase_right_guard.position.z \
+                - right_guard_box.size.z * 0.5 \
+                - staircase_left_guard.position.z \
+                - left_guard_box.size.z * 0.5
+            staircase_has_guarded_victory_runoff = \
+                top_landing_end - staircase_completion_area.position.x >= 4.0 \
+                and guard_start <= -0.4 \
+                and guard_end >= top_landing_end - 0.01 \
+                and guard_top >= top_landing_top + 3.0 \
+                and guarded_walkway_width >= 2.5 \
+                and staircase_left_guard.position.z < 0.0 \
+                and staircase_right_guard.position.z > 0.0
+    var locked_staircase_rejects_completion := generated_gate != null \
+        and not bool(generated_gate.call("try_complete_with", player))
+    var staircase_completion_count: Array[int] = [0]
+    generated_content.connect(
+        &"level_completed",
+        func() -> void:
+            staircase_completion_count[0] += 1
+    )
+    if generated_gate != null:
+        generated_gate.set("locked", false)
+        generated_gate.emit_signal(&"unlocked")
+    var unlocked_staircase_completes := generated_gate != null \
+        and bool(generated_gate.call("try_complete_with", player)) \
+        and staircase_completion_count[0] == 1
+    var staircase_is_outside_gate := generated_gate != null \
+        and generated_staircase != null \
+        and staircase_completion_area != null \
+        and staircase_completion_area.global_position.z > generated_gate.global_position.z \
+        and staircase_completion_area.global_position.y > generated_gate.global_position.y
+    var generated_doors: Array[Node3D] = []
+    for child in generated_content.get_children():
+        if child.name.begins_with("GeneratedLockedDoor"):
+            generated_doors.append(child as Node3D)
+    var generated_passages_use_authored_leaves := generated_doors.size() == doors.size()
+    for generated_door in generated_doors:
+        var door_leaf := generated_door.get_node_or_null("Leaves/DoorLeaf") as RigidBody3D
+        if generated_door.scene_file_path != "res://placeables/lockables/locked_door.tscn" \
+                or door_leaf == null \
+                or door_leaf.global_position.distance_to(generated_door.global_position) > 2.0 \
+                or not bool(generated_door.call("is_locked")):
+            generated_passages_use_authored_leaves = false
+            break
+    var gate_left_leaf := generated_gate.get_node_or_null("Leaves/LeftGateLeaf") as RigidBody3D \
+        if generated_gate != null else null
+    var generated_gate_keeps_its_leaves: bool = generated_gate != null \
+        and gate_left_leaf != null \
+        and gate_left_leaf.global_position.distance_to(generated_gate.global_position) < 3.0
+    var coffin_cells := {}
+    for coffin_value in coffins:
+        var planned_coffin := coffin_value as Dictionary
+        coffin_cells[planned_coffin["cell"] as Vector2i] = true
+    var door_approaches_are_clear := true
+    for door_value in doors:
+        var planned_door := door_value as Dictionary
+        var travel_direction := planned_door["travel_direction"] as Vector2i
+        for blocked_cell_value in planned_door.get("blocked_cells", []):
+            var blocked_cell := blocked_cell_value as Vector2i
+            for distance in range(
+                0,
+                VAMPIRE_GENERATED_CONTENT_PLANNER.DOOR_APPROACH_CLEARANCE_TILES + 1
+            ):
+                if coffin_cells.has(blocked_cell + travel_direction * distance) \
+                        or coffin_cells.has(blocked_cell - travel_direction * distance):
+                    door_approaches_are_clear = false
+                    break
+    var bat_noise_positions: Array[Vector3] = []
+    generated_content.connect(
+        &"bat_noise_triggered",
+        func(noise_position: Vector3) -> void:
+            bat_noise_positions.append(noise_position)
+    )
+    var vampire_collision_bodies := generated_content.call(
+        "get_vampire_collision_bodies"
+    ) as Array[PhysicsBody3D]
+    var vampire_ignores_every_generated_blocker := vampire_collision_bodies.size() \
+        >= doors.size() * 2 + coffins.size()
+    for collision_body in vampire_collision_bodies:
+        if not vampire.get_collision_exceptions().has(collision_body):
+            vampire_ignores_every_generated_blocker = false
+            break
+    var bat_noise := generated_content.get_node_or_null("GeneratedBatNoise01")
+    if bat_noise != null:
+        var bat_nest := bat_noise.get_node("BatNest")
+        bat_nest.call("force_take_flight", player)
+        bat_noise.call("_physics_process", 0.0)
+    var generation_constants: Dictionary = generated_maze.get_script().get_script_constant_map()
+    generated_maze.set(
+        "baked_generation_version",
+        int(generation_constants.get("CURRENT_GENERATION_VERSION", 0))
+    )
+    generated_maze.set("baked_maze_seed", int(generated_maze.get("maze_seed")))
+    generated_maze.set("baked_width", configured_width)
+    generated_maze.set("baked_height", configured_height)
+    var current_bake_is_reusable := bool(
+        generated_maze.call("_can_reuse_runtime_grid_maps", configuration)
+    )
+    var total_treasure_weight := float(content_plan.get("total_treasure_weight", 0.0))
+    var target_load_weight := float(content_configuration.get("assumed_carry_capacity")) \
+        * float(content_configuration.get("target_carry_load_percent")) / 100.0
+    var expected_coffin_count := maxi(
+        ceili(total_treasure_weight / target_load_weight) \
+            if total_treasure_weight > 0.0 else 0,
+        int(content_configuration.get("minimum_coffin_count"))
+    )
+    var minimum_coins_per_pile := int(content_configuration.get("minimum_coins_per_pile"))
+    var maximum_coins_per_pile := maxi(
+        int(content_configuration.get("maximum_coins_per_pile")),
+        minimum_coins_per_pile
+    )
+    var pile_coin_counts_are_in_range := treasure_caches.size() \
+        == int(content_configuration.get("treasure_pile_count"))
+    var supports_large_treasure_pile_budgets := false
+    var treasure_pile_count_hint := ""
+    for property_value in content_configuration.get_property_list():
+        var property := property_value as Dictionary
+        if property.get("name") == &"treasure_pile_count":
+            treasure_pile_count_hint = String(property.get("hint_string", ""))
+            var hint_parts := treasure_pile_count_hint.split(",")
+            supports_large_treasure_pile_budgets = hint_parts.size() >= 2 \
+                and roundi(float(hint_parts[1])) >= 256
+            break
+    var treasure_spatial_regions := {}
+    var treasure_x_bands := {}
+    var treasure_y_bands := {}
+    var treasure_uses_open_escape_areas := true
+    var main_path_pile_count := 0
+    for cache_value in treasure_caches:
+        var cache := cache_value as Dictionary
+        var counts := cache["counts"] as Dictionary
+        var coin_count := int(counts.get(&"gold_coin", 0))
+        if coin_count < minimum_coins_per_pile or coin_count > maximum_coins_per_pile:
+            pile_coin_counts_are_in_range = false
+            break
+        var cache_cell := cache["cell"] as Vector2i
+        var x_band := clampi(
+            floori(float(cache_cell.x) * 4.0 / float(configured_width)),
+            0,
+            3
+        )
+        var y_band := clampi(
+            floori(float(cache_cell.y) * 4.0 / float(configured_height)),
+            0,
+            3
+        )
+        treasure_spatial_regions[Vector2i(x_band, y_band)] = true
+        treasure_x_bands[x_band] = true
+        treasure_y_bands[y_band] = true
+        if int(cache.get("escape_option_count", 0)) \
+                    < VAMPIRE_GENERATED_CONTENT_PLANNER.MIN_TREASURE_ESCAPE_OPTION_COUNT \
+                or int(cache.get("open_area_cell_count", 0)) \
+                    < VAMPIRE_GENERATED_CONTENT_PLANNER.MIN_TREASURE_OPEN_AREA_CELL_COUNT \
+                or int(cache.get("map_edge_clearance_tiles", 0)) \
+                    < VAMPIRE_GENERATED_CONTENT_PLANNER.MIN_TREASURE_MAP_EDGE_CLEARANCE_TILES:
+            treasure_uses_open_escape_areas = false
+        if int(cache["placement_band"]) \
+                == VAMPIRE_GENERATED_CONTENT_PLANNER.PlacementBand.MainPath:
+            main_path_pile_count += 1
+    var treasure_is_distributed_through_safe_areas := treasure_caches.size() < 4 \
+        or (treasure_uses_open_escape_areas \
+            and treasure_spatial_regions.size() >= 8 \
+            and treasure_x_bands.size() >= 3 \
+            and treasure_y_bands.size() >= 3 \
+            and main_path_pile_count < treasure_caches.size() / 2)
+    var treasure_pile_cells: Array[Vector2i] = []
+    var treasure_piles_use_distinct_cells := true
+    for cache_value in treasure_caches:
+        var cache := cache_value as Dictionary
+        var cache_cell := cache["cell"] as Vector2i
+        for other_cell in treasure_pile_cells:
+            if cache_cell == other_cell:
+                treasure_piles_use_distinct_cells = false
+                break
+        treasure_pile_cells.append(cache_cell)
+    var coffins_do_not_overlap_treasure := true
+    for coffin_value in coffins:
+        var planned_coffin := coffin_value as Dictionary
+        var coffin_cell := planned_coffin["cell"] as Vector2i
+        for treasure_cell in treasure_pile_cells:
+            if coffin_cell == treasure_cell:
+                coffins_do_not_overlap_treasure = false
+                break
+
+    var challenging_configuration := content_configuration.duplicate(true) as Resource
+    challenging_configuration.set("treasure_pile_count", 4)
+    challenging_configuration.set("minimum_coins_per_pile", 2)
+    challenging_configuration.set("maximum_coins_per_pile", 4)
+    challenging_configuration.set("main_path_treasure_percent", 100.0)
+    challenging_configuration.set("gold_bar_budget", 0)
+    var gem_types: Array[StringName] = [
+        &"diamond",
+        &"ruby",
+        &"sapphire",
+        &"emerald",
+        &"amethyst",
+    ]
+    for gem_type in gem_types:
+        challenging_configuration.set(StringName("%s_budget" % gem_type), 1)
+    var generated_walkable := {}
+    for cell_value in changed_result.get("floor_cells", []):
+        generated_walkable[cell_value as Vector2i] = true
+    var challenging_planner := VAMPIRE_GENERATED_CONTENT_PLANNER.new()
+    var challenging_plan := challenging_planner.build_plan(
+        generated_walkable,
+        player_cell,
+        vampire_cell,
+        end_gate_cell,
+        Vector2i(configured_width, configured_height),
+        1730,
+        challenging_configuration
+    ) as Dictionary
+    var challenging_caches := challenging_plan.get("treasure_caches", []) as Array
+    var challenging_gem_totals := {}
+    for gem_type in gem_types:
+        challenging_gem_totals[gem_type] = 0
+    var gems_use_only_challenging_piles := (
+        challenging_plan.get("errors", []) as Array
+    ).is_empty()
+    for cache_value in challenging_caches:
+        var cache := cache_value as Dictionary
+        var counts := cache["counts"] as Dictionary
+        for gem_type in gem_types:
+            var gem_count := int(counts.get(gem_type, 0))
+            challenging_gem_totals[gem_type] = int(challenging_gem_totals[gem_type]) \
+                + gem_count
+            if gem_count > 0 and int(cache["placement_band"]) \
+                    != VAMPIRE_GENERATED_CONTENT_PLANNER.PlacementBand.Exploration:
+                gems_use_only_challenging_piles = false
+    for gem_type in gem_types:
+        if int(challenging_gem_totals[gem_type]) != 1:
+            gems_use_only_challenging_piles = false
+            break
+    var spacious_coffins_avoid_nearby_treasure := (
+        challenging_plan.get("errors", []) as Array
+    ).is_empty()
+    var challenging_treasure_cells: Array[Vector2i] = []
+    for cache_value in challenging_caches:
+        var cache := cache_value as Dictionary
+        challenging_treasure_cells.append(cache["cell"] as Vector2i)
+    var preferred_coffin_clearance := int(
+        challenging_configuration.get("preferred_coffin_treasure_clearance_tiles")
+    )
+    for coffin_value in challenging_plan.get("coffins", []):
+        var planned_coffin := coffin_value as Dictionary
+        var coffin_cell := planned_coffin["cell"] as Vector2i
+        for treasure_cell in challenging_treasure_cells:
+            if coffin_cell.distance_to(treasure_cell) < float(preferred_coffin_clearance):
+                spacious_coffins_avoid_nearby_treasure = false
+                break
+    var freeze_generated_level_action := generated_maze.get(
+        "freeze_generated_level_action"
+    ) as Callable
+    var passed := _expect(
+        (first_result.get("errors", []) as Array).is_empty() \
+            and (repeat_result.get("errors", []) as Array).is_empty() \
+            and (changed_result.get("errors", []) as Array).is_empty(),
+        "seeded GridMap maze generation completes without configuration or repair errors"
+    ) and _expect(
+        first_signature == repeat_signature and first_signature != changed_signature,
+        "the same maze seed is stable and changing the seed creates a different map"
+    ) and _expect(
+        configured_internal_connection_percent > 0.0 \
+            and internal_connections_are_deterministic,
+        "internal opening density adds deterministic size-scaled loops without piercing the outer wall"
+    ) and _expect(
+        isolated_walls_are_not_clustered,
+        "extra openings do not cluster isolated wall pieces into one part of the maze"
+    ) and _expect(
+        maze_origin == Vector2i.ONE \
+            and full_map_edges_are_used \
+            and sparse_perimeter_breaks_prevent_border_bypass,
+        "ordinary edge corridors use sparse breaks instead of forming a border bypass"
+    ) and _expect(
+        int(changed_result.get("hallway_width", 0)) == 2 \
+            and player_cell == Vector3i(1, 0, 1) \
+            and vampire_cell.x == end_gate_cell.x \
+            and vampire_cell.z == configured_height - 2 \
+            and end_gate_cell.z == configured_height - 1 \
+            and vampire_cell.distance_to(end_gate_cell) == 1.0 \
+            and changed_result.get("end_gate_outward_direction") == Vector2i.DOWN,
+        "the straight bottom-row gate stays opposite the player with the vampire immediately inside"
+    ) and _expect(
+        generated_gate != null \
+            and generated_gate.get_parent() == generated_content \
+            and changed_result.get("end_gate") == generated_gate \
+            and generated_gate_uses_authored_scale,
+        "generated dungeon content only rotates the authored unscaled end gate into place"
+    ) and _expect(
+        generated_passages_use_authored_leaves and generated_gate_keeps_its_leaves,
+        "generated passages retain the reusable locked scenes and their closed leaves"
+    ) and _expect(
+        generated_maze.has_method(&"freeze_generated_level_for_editing") \
+            and freeze_generated_level_action.is_valid() \
+            and freeze_generated_level_action.get_method() \
+                == &"freeze_generated_level_for_editing" \
+            and generated_content.has_method(&"make_generated_children_editable") \
+            and generated_preview_roots_are_transient,
+        "live previews stay transient until editors freeze their generated scene roots"
+    ) and _expect(
+        generated_gate != null \
+            and bool(generated_gate.get("completes_level")) \
+            and generated_staircase != null \
+            and generated_staircase.get_parent() == generated_gate \
+            and generated_content.get_node_or_null("GeneratedExitStaircase") == null \
+            and locked_staircase_rejects_completion \
+            and unlocked_staircase_completes \
+            and staircase_is_outside_gate \
+            and generated_staircase_is_visible \
+            and staircase_is_single_procedural_mesh,
+        "the visible exterior uses one procedural staircase mesh and completes after unlocking"
+    ) and _expect(
+        staircase_has_walkable_transition,
+        "the exit relies on the floor before its continuous shallow staircase ramp"
+    ) and _expect(
+        staircase_has_guarded_victory_runoff,
+        "the exit has invisible side guards and continues safely beyond its victory trigger"
+    ) and _expect(
+        door_approaches_are_clear,
+        "generated coffins stay clear of both sides of every locked doorway"
+    ) and _expect(
+        floor.get_used_cells().size() == configured_width * configured_height \
+            and wall_item_ids.size() > 1 \
+            and gate_aperture_is_clear \
+            and gate_opening_width_tiles == 1 \
+            and gate_aperture_has_wall_shoulders \
+            and bottom_right_corner_is_enclosed \
+            and current_bake_is_reusable,
+        "the generated gate occupies one boundary tile between solid wall shoulders"
+    ) and _expect(
+        content_plan.get("treasure_budgets", {}) \
+                == content_plan.get("placed_treasure_budgets", {}) \
+            and pile_coin_counts_are_in_range \
+            and supports_large_treasure_pile_budgets \
+            and generated_treasure_pile_count == treasure_caches.size() \
+            and treasure_piles_use_distinct_cells \
+            and (first_result.get("content_plan") as Dictionary).get(
+                "treasure_caches",
+                []
+            ) == (repeat_result.get("content_plan") as Dictionary).get(
+                "treasure_caches",
+                []
+            ),
+        "generated treasure piles support large budgets and honour their count, distinct cells, and range"
+    ) and _expect(
+        treasure_is_distributed_through_safe_areas,
+        "generated treasure favours open interior regions instead of edge corridors or route breadcrumbs"
+    ) and _expect(
+        coffins_do_not_overlap_treasure \
+            and spacious_coffins_avoid_nearby_treasure,
+        "generated coffins never overlap treasure and prefer full clearance when space permits"
+    ) and _expect(
+        gems_use_only_challenging_piles,
+        "generated gems are reserved for challenging off-main-path treasure piles"
+    ) and _expect(
+        vampire_layout_landmarks.size() \
+            == treasure_caches.size() + keys.size() + coffins.size() + doors.size() + 1,
+        "generated content supplies every strategic treasure, key, coffin, door, and gate landmark"
+    ) and _expect(
+        doors.size() == int(content_configuration.get("door_count")) \
+            and keys.size() == doors.size() + 1 \
+            and _generated_plan_keys_are_reachable(content_plan, changed_result) \
+            and _generated_exit_key_requires_exploration(content_plan, changed_result),
+        "generated keys remain obtainable while the gold exit key requires exploration"
+    ) and _expect(
+        vampire_ignores_every_generated_blocker,
+        "the vampire crosses generated doors and coffins without changing player collision"
+    ) and _expect(
+        coffins.size() == expected_coffin_count \
+            and target_load_weight > 0.0,
+        "coffin count follows the configured carry load and real treasure weights"
+    ) and _expect(
+        bat_nests.size() == configured_bat_count \
+            and exploration_bat_count == expected_exploration_bat_count \
+            and bat_noise_positions.size() == 1 \
+            and bat_noise_positions[0] == player.global_position,
+        "bat difficulty controls off-path placement and take-off reports the player's location as noise"
+    )
+
+    var automatic_configuration := configuration.duplicate(true) as Resource
+    var automatic_content_configuration := content_configuration.duplicate(true) as Resource
+    automatic_configuration.set(
+        "content_configuration",
+        automatic_content_configuration
+    )
+    generated_maze.set("configuration", automatic_configuration)
+    var automatic_baseline_result := generated_maze.call(
+        "generate_from_config",
+        automatic_configuration,
+        1730,
+        player,
+        vampire
+    ) as Dictionary
+    var automatic_baseline_plan := automatic_baseline_result.get(
+        "content_plan",
+        {}
+    ) as Dictionary
+    var automatic_wall_cells_before := walls.get_used_cells()
+    automatic_wall_cells_before.sort()
+    var automatic_generation_results: Array[Dictionary] = []
+    generated_maze.connect(
+        &"maze_generated",
+        func(_seed: int, result: Dictionary) -> void:
+            automatic_generation_results.append(result)
+    )
+    generated_maze.set("_generation_queued", false)
+    automatic_content_configuration.set(
+        "treasure_pile_count",
+        int(content_configuration.get("treasure_pile_count")) + 1
+    )
+    var settings_change_queued_regeneration := bool(
+        generated_maze.get("_generation_queued")
+    )
+    generated_maze.set("_last_regeneration_request_milliseconds", 0)
+    generated_maze.call("_run_queued_regeneration")
+    var automatic_wall_cells_after := walls.get_used_cells()
+    automatic_wall_cells_after.sort()
+    var automatic_result := automatic_generation_results[-1] \
+        if not automatic_generation_results.is_empty() else {}
+    var automatic_plan := automatic_result.get("content_plan", {}) as Dictionary
+    passed = _expect(
+        settings_change_queued_regeneration \
+            and automatic_generation_results.size() == 1 \
+            and automatic_wall_cells_before == automatic_wall_cells_after \
+            and automatic_baseline_result.get("player_cell") \
+                == automatic_result.get("player_cell") \
+            and automatic_baseline_result.get("vampire_cell") \
+                == automatic_result.get("vampire_cell") \
+            and automatic_baseline_result.get("end_gate_cell") \
+                == automatic_result.get("end_gate_cell") \
+            and automatic_baseline_plan.get("doors", []) \
+                == automatic_plan.get("doors", []) \
+            and automatic_baseline_plan.get("keys", []) \
+                == automatic_plan.get("keys", []) \
+            and (automatic_result.get("errors", []) as Array).is_empty() \
+            and (automatic_plan.get("treasure_caches", []) as Array).size() \
+                == int(automatic_content_configuration.get("treasure_pile_count")),
+        "content setting changes regenerate automatically without changing the seeded maze layout"
+    ) and passed
+
+    var changed_connection_percent := float(
+        automatic_configuration.get("internal_connection_percent")
+    ) + 5.0
+    automatic_configuration.set(
+        "internal_connection_percent",
+        changed_connection_percent
+    )
+    var layout_change_queued_regeneration := bool(
+        generated_maze.get("_generation_queued")
+    )
+    generated_maze.set("_last_regeneration_request_milliseconds", 0)
+    generated_maze.call("_run_queued_regeneration")
+    var rebuilt_wall_cells := walls.get_used_cells()
+    rebuilt_wall_cells.sort()
+    var rebuilt_result := automatic_generation_results[-1] \
+        if automatic_generation_results.size() >= 2 else {}
+    passed = _expect(
+        layout_change_queued_regeneration \
+            and automatic_generation_results.size() == 2 \
+            and rebuilt_wall_cells != automatic_wall_cells_after \
+            and is_equal_approx(
+                float(rebuilt_result.get("internal_connection_percent", -1.0)),
+                changed_connection_percent
+            ) \
+            and (rebuilt_result.get("errors", []) as Array).is_empty(),
+        "maze layout setting changes rebuild immediately for editor feedback"
+    ) and passed
+
+    generated_maze.free()
+    return passed
+
+
+func _test_vampire_maze_exit_key_requires_exploration() -> bool:
+    var generated_maze := VAMPIRE_GENERATED_MAZE_SCENE.instantiate() as Node3D
+    root.add_child(generated_maze)
+    var player := TestGeneratedPlayer.new()
+    var vampire := CharacterBody3D.new()
+    generated_maze.add_child(player)
+    generated_maze.add_child(vampire)
+    var result := generated_maze.call(
+        "generate_from_config",
+        generated_maze.get("configuration") as Resource,
+        1730,
+        player,
+        vampire
+    ) as Dictionary
+    var plan := result.get("content_plan", {}) as Dictionary
+    var passed := _expect(
+        (result.get("errors", []) as Array).is_empty() \
+            and _generated_plan_keys_are_reachable(plan, result) \
+            and _generated_exit_key_requires_exploration(plan, result),
+        "the generated gold gate key is reachable only after leaving the direct exit route"
+    )
+    generated_maze.free()
+    return passed
+
+
+func _generated_plan_keys_are_reachable(content_plan: Dictionary, maze_result: Dictionary) -> bool:
+    var walkable := {}
+    for cell_value in maze_result.get("floor_cells", []):
+        walkable[cell_value as Vector2i] = true
+    var player_cell_3d := maze_result.get("player_cell") as Vector3i
+    var end_gate_cell_3d := maze_result.get("end_gate_cell") as Vector3i
+    var player_cell := Vector2i(player_cell_3d.x, player_cell_3d.z)
+    var end_gate_cell := Vector2i(end_gate_cell_3d.x, end_gate_cell_3d.z)
+    var doors := content_plan.get("doors", []) as Array
+    var keys := content_plan.get("keys", []) as Array
+
+    for door_index in doors.size():
+        var blocked := {}
+        for future_index in range(door_index, doors.size()):
+            var future_door := doors[future_index] as Dictionary
+            for blocked_cell in future_door.get("blocked_cells", []):
+                blocked[blocked_cell as Vector2i] = true
+        var reachable := _get_test_reachable_cells(player_cell, walkable, blocked)
+        var matching_key_cell := Vector2i(-1, -1)
+        for key_value in keys:
+            var key := key_value as Dictionary
+            if int(key["unlocks_door_index"]) == door_index:
+                matching_key_cell = key["cell"] as Vector2i
+                break
+        if matching_key_cell == Vector2i(-1, -1) or not reachable.has(matching_key_cell):
+            return false
+
+    var all_reachable := _get_test_reachable_cells(player_cell, walkable, {})
+    var exit_key_reachable := false
+    for key_value in keys:
+        var key := key_value as Dictionary
+        if int(key["unlocks_door_index"]) == doors.size():
+            exit_key_reachable = all_reachable.has(key["cell"] as Vector2i)
+            break
+    return exit_key_reachable and all_reachable.has(end_gate_cell)
+
+
+func _generated_exit_key_requires_exploration(
+    content_plan: Dictionary,
+    maze_result: Dictionary
+) -> bool:
+    var main_path := content_plan.get("main_path", []) as Array
+    var keys := content_plan.get("keys", []) as Array
+    var doors := content_plan.get("doors", []) as Array
+    var end_gate_cell_3d := maze_result.get("end_gate_cell") as Vector3i
+    var end_gate_cell := Vector2i(end_gate_cell_3d.x, end_gate_cell_3d.z)
+    var player_cell_3d := maze_result.get("player_cell") as Vector3i
+    var player_cell := Vector2i(player_cell_3d.x, player_cell_3d.z)
+    var walkable := {}
+    for cell_value in maze_result.get("floor_cells", []):
+        walkable[cell_value as Vector2i] = true
+
+    var exit_key_cell := Vector2i(-1, -1)
+    var exit_key_is_off_main_path := false
+    for key_value in keys:
+        var key := key_value as Dictionary
+        if int(key["unlocks_door_index"]) != doors.size():
+            continue
+        exit_key_cell = key["cell"] as Vector2i
+        exit_key_is_off_main_path = bool(key.get("off_main_path", false))
+        break
+    if exit_key_cell == Vector2i(-1, -1) \
+            or main_path.has(exit_key_cell) \
+            or not exit_key_is_off_main_path:
+        return false
+
+    var route_from_key_to_gate := _get_test_shortest_path(
+        exit_key_cell,
+        end_gate_cell,
+        walkable,
+        {}
+    )
+    var reachable_before_unlocking_gate := _get_test_reachable_cells(
+        player_cell,
+        walkable,
+        {end_gate_cell: true}
+    )
+    return reachable_before_unlocking_gate.has(exit_key_cell) \
+        and route_from_key_to_gate.size() - 1 \
+        >= VAMPIRE_GENERATED_CONTENT_PLANNER.MIN_EXIT_KEY_DISTANCE_FROM_GATE_TILES
+
+
+func _get_test_reachable_cells(
+    start: Vector2i,
+    walkable: Dictionary,
+    blocked: Dictionary
+) -> Dictionary:
+    var reachable := {start: true}
+    var pending: Array[Vector2i] = [start]
+    var read_index := 0
+    while read_index < pending.size():
+        var current := pending[read_index]
+        read_index += 1
+        for direction in [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT]:
+            var neighbour: Vector2i = current + direction
+            if not walkable.has(neighbour) or blocked.has(neighbour) or reachable.has(neighbour):
+                continue
+            reachable[neighbour] = true
+            pending.append(neighbour)
+    return reachable
+
+
+func _get_test_shortest_path(
+    start: Vector2i,
+    destination: Vector2i,
+    walkable: Dictionary,
+    blocked: Dictionary
+) -> Array[Vector2i]:
+    var previous := {start: start}
+    var pending: Array[Vector2i] = [start]
+    var read_index := 0
+    while read_index < pending.size():
+        var current := pending[read_index]
+        read_index += 1
+        if current == destination:
+            break
+        for direction in [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT]:
+            var neighbour: Vector2i = current + direction
+            if not walkable.has(neighbour) \
+                    or blocked.has(neighbour) \
+                    or previous.has(neighbour):
+                continue
+            previous[neighbour] = current
+            pending.append(neighbour)
+    if not previous.has(destination):
+        return []
+
+    var path: Array[Vector2i] = [destination]
+    var cursor := destination
+    while cursor != start:
+        cursor = previous[cursor] as Vector2i
+        path.append(cursor)
+    path.reverse()
+    return path
+
+
+func _test_vampire_maze_minimap_shows_all_shortest_routes() -> bool:
+    var source_camera := Camera3D.new()
+    source_camera.current = true
+    root.add_child(source_camera)
+
+    var level := Node3D.new()
+    var player := Node3D.new()
+    player.name = "Player"
+    var gate := Node3D.new()
+    gate.name = "LockedGate"
+    var walls := GridMap.new()
+    walls.name = "PNGGridMap"
+    var wall_library := MeshLibrary.new()
+    wall_library.create_item(0)
+    walls.mesh_library = wall_library
+    walls.set_cell_item(Vector3i(1, 0, 1), 0)
+    var floor := GridMap.new()
+    floor.name = "PNGFloorGridMap"
+    var floor_library := MeshLibrary.new()
+    floor_library.create_item(0)
+    floor.mesh_library = floor_library
+    for x_coordinate in 3:
+        for z_coordinate in 3:
+            floor.set_cell_item(Vector3i(x_coordinate, 0, z_coordinate), 0)
+    player.position = floor.map_to_local(Vector3i(0, 0, 1))
+    gate.position = floor.map_to_local(Vector3i(2, 0, 1))
+    var route_overlay := VAMPIRE_MINIMAP_ROUTE_SCENE.instantiate() as MultiMeshInstance3D
+
+    level.add_child(player)
+    level.add_child(gate)
+    level.add_child(walls)
+    level.add_child(floor)
+    level.add_child(route_overlay)
+    root.add_child(level)
+
+    var initial_cells := route_overlay.call("get_highlighted_cells") as Array[Vector3i]
+    var minimap := MINIMAP_VIEW_SCRIPT.new() as Control
+    root.add_child(minimap)
+    var minimap_cull_mask := int(minimap.call("_get_source_cull_mask"))
+    var passed := _expect(
+        initial_cells.size() == 8 \
+            and initial_cells.has(Vector3i(1, 0, 0)) \
+            and initial_cells.has(Vector3i(1, 0, 2)),
+        "Vampire Maze minimap colours every equal-shortest route to the gate"
+    ) and _expect(
+        route_overlay.multimesh.instance_count == initial_cells.size(),
+        "Vampire Maze route overlay draws one coloured tile per route cell"
+    ) and _expect(
+        (source_camera.cull_mask & TEST_MINIMAP_ROUTE_VISUAL_LAYER) == 0 \
+            and (minimap_cull_mask & TEST_MINIMAP_ROUTE_VISUAL_LAYER) != 0,
+        "Vampire Maze route tiles render on the minimap but not the gameplay camera"
+    )
+
+    player.position = floor.map_to_local(Vector3i.ZERO)
+    route_overlay.call("_process", 0.016)
+    var moved_cells := route_overlay.call("get_highlighted_cells") as Array[Vector3i]
+    passed = _expect(
+        moved_cells.size() == 4 \
+            and moved_cells.has(Vector3i.ZERO) \
+            and not moved_cells.has(Vector3i(0, 0, 2)),
+        "Vampire Maze minimap routes update when the player enters another floor cell"
+    ) and passed
+
+    minimap.free()
+    level.free()
+    source_camera.free()
     return passed
 
 

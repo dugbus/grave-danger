@@ -24,10 +24,10 @@ var run_recorder: RUN_RECORDER_SCRIPT
 
 func _ready() -> void:
 	_load_selected_level()
-	_begin_run_recording()
 	await NAVIGATION_BOOTSTRAP.prepare_level(current_level)
 	_configure_runtime_references()
 	_activate_current_level_camera()
+	_begin_run_recording()
 	_configure_kill_boundary_animation()
 	max_treasure_value = _calculate_max_treasure_value()
 	_begin_result_stats()
@@ -163,6 +163,7 @@ func _configure_runtime_references() -> void:
 
 	var player := current_level.get_node_or_null("Player")
 	var kill_boundary := _get_kill_boundary()
+	var minimap_target := _get_minimap_target(player)
 	var camera := get_node_or_null("GameRuntime/Camera3D")
 	if camera != null and camera.has_method("set_runtime_targets"):
 		camera.set_runtime_targets(player, kill_boundary)
@@ -172,7 +173,7 @@ func _configure_runtime_references() -> void:
 	if minimap != null and minimap.has_method("set_minimap_enabled"):
 		minimap.set_minimap_enabled(false)
 	if show_minimap and minimap != null and minimap.has_method("set_runtime_references"):
-		minimap.set_runtime_references(player, kill_boundary, current_level)
+		minimap.set_runtime_references(minimap_target, kill_boundary, current_level)
 	if minimap != null and minimap.has_method("set_minimap_enabled"):
 		minimap.set_minimap_enabled(show_minimap)
 	if not show_minimap and minimap != null and minimap.has_method("clear_runtime_references"):
@@ -213,6 +214,8 @@ func _configure_runtime_cameras(root: Node, target: Node, kill_boundary: Node, m
 	for node in _get_descendants(root):
 		if not node is Camera3D or not node.has_method("set_runtime_targets"):
 			continue
+		if node.has_method("is_runtime_camera_enabled") and not node.is_runtime_camera_enabled():
+			continue
 
 		node.set_runtime_targets(target, kill_boundary)
 		if make_current:
@@ -223,7 +226,8 @@ func _configure_runtime_cameras(root: Node, target: Node, kill_boundary: Node, m
 
 
 func _find_camera(root: Node) -> Camera3D:
-	if root is Camera3D:
+	if root is Camera3D \
+			and (not root.has_method("is_runtime_camera_enabled") or root.is_runtime_camera_enabled()):
 		return root as Camera3D
 
 	for child in root.get_children():
@@ -246,6 +250,15 @@ func _should_show_minimap() -> bool:
 		return false
 
 	return bool(level_settings.get("show_minimap"))
+
+
+func _get_minimap_target(default_target: Node) -> Node:
+	if current_level != null and current_level.has_method("get_minimap_target"):
+		var level_target := current_level.get_minimap_target() as Node3D
+		if level_target != null:
+			return level_target
+
+	return default_target
 
 
 func _get_level_settings() -> Node:

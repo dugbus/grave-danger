@@ -109,6 +109,8 @@ func _try_collect(body: Node3D) -> bool:
 		return false
 
 	if body.try_collect_carried_item(self):
+		if body.has_method("emit_pickup_noise"):
+			body.emit_pickup_noise()
 		_deactivate_after_collection()
 		queue_free()
 		return true

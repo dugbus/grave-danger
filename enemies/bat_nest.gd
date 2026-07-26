@@ -188,6 +188,13 @@ func _ready() -> void:
 	_rebuild_roost()
 
 
+func _exit_tree() -> void:
+	_stop_flap_audio()
+	_stop_squeak_audio()
+	flap_sound = null
+	squeak_sounds.clear()
+
+
 func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		return

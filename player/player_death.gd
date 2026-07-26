@@ -107,6 +107,11 @@ func die_from_fall() -> void:
 	_die()
 
 
+func die_from_vampire() -> void:
+	# Boss contact is lethal immediately, but otherwise follows the normal death flow.
+	_die()
+
+
 func _die() -> void:
 	# Multiple flame areas can report the body in the same frame, so death must
 	# be idempotent. Falls share this same one-way transition.

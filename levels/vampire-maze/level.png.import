@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://xr016ym2s7f6"
-path="res://.godot/imported/legacy_level_layout.png-68ab26ab64a66fc05a3503fc30c9d043.ctex"
+uid="uid://bjuogayjr35js"
+path="res://.godot/imported/level.png-990c842f350199ef2992afddfd648b9d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://levels/legacy/legacy_level_layout.png"
-dest_files=["res://.godot/imported/legacy_level_layout.png-68ab26ab64a66fc05a3503fc30c9d043.ctex"]
+source_file="res://levels/vampire-maze/level.png"
+dest_files=["res://.godot/imported/level.png-990c842f350199ef2992afddfd648b9d.ctex"]
 
 [params]
 

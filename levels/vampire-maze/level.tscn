@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://nhtxghp4k8h"]
+
+[ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://levels/vampire-maze/generated_maze/generated_maze.tscn" id="11_uaw4a"]
+[ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]
+[ext_resource type="Script" uid="uid://buom3th5dqf1b" path="res://levels/vampire-maze/vampire_maze.gd" id="101_level"]
+[ext_resource type="PackedScene" path="res://enemies/vampire/vampire.tscn" id="102_vampire"]
+[ext_resource type="Script" uid="uid://dm6wtqet8u5jt" path="res://levels/vampire-maze/vampire_development_view.gd" id="103_development_view"]
+[ext_resource type="Script" uid="uid://c0fckacr1h0x3" path="res://levels/vampire-maze/vampire_development_camera.gd" id="104_development_camera"]
+[ext_resource type="Resource" path="res://levels/vampire-maze/development_camera_profile.tres" id="105_camera_profile"]
+[ext_resource type="Script" uid="uid://bvowj5mveddhm" path="res://levels/level_settings.gd" id="106_level_settings"]
+[ext_resource type="PackedScene" path="res://levels/vampire-maze/minimap_route_overlay.tscn" id="107_route_overlay"]
+[ext_resource type="PackedScene" path="res://ui/hud/vampire_debug/vampire_debug_hud.tscn" id="111_vampire_debug_hud"]
+
+[node name="Level1" type="Node3D" unique_id=753330713]
+script = ExtResource("101_level")
+
+[node name="Player" parent="." unique_id=244343110 instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.167923, 11.877796, -13.741524)
+
+[node name="IndoorLighting" parent="." unique_id=343606488 instance=ExtResource("100_indoor")]
+
+[node name="LevelSettings" type="Node" parent="." unique_id=60616507]
+script = ExtResource("106_level_settings")
+show_minimap = true
+
+[node name="Vampire" parent="." unique_id=93193051 instance=ExtResource("102_vampire")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 0.05, 18.5)
+
+[node name="VampireDebugHUD" parent="." unique_id=1970276169 instance=ExtResource("111_vampire_debug_hud")]
+
+[node name="VampireDevelopmentView" type="Node3D" parent="." unique_id=1745668619]
+script = ExtResource("103_development_view")
+
+[node name="Camera3D" type="Camera3D" parent="VampireDevelopmentView" unique_id=1252240442]
+current = true
+fov = 42.0
+script = ExtResource("104_development_camera")
+target_path = NodePath("../../Player")
+kill_boundary_path = NodePath("")
+camera_profile = ExtResource("105_camera_profile")
+
+[node name="MinimapRouteOverlay" parent="." unique_id=207949215 instance=ExtResource("107_route_overlay")]
+end_gate_path = NodePath("")
+wall_grid_map_path = NodePath("")
+floor_grid_map_path = NodePath("")
+
+[node name="GeneratedMaze" parent="." unique_id=1250068653 instance=ExtResource("11_uaw4a")]
+maze_seed = 7
+baked_generation_version = 11
+baked_maze_seed = 7
+baked_width = 32
+baked_height = 32
+
+[editable path="IndoorLighting"]

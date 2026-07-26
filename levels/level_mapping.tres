@@ -61,10 +61,11 @@ level_entries = Array[Dictionary]([{
 "name": "Level 8"
 }, {
 "available": true,
-"folder_name": "1",
-"id": "level_09",
-"legacy_result_key": "09",
-"name": "Level 9"
+"folder_name": "vampire-maze",
+"id": "vampire_boss",
+"name": "Vampire Boss",
+"run_playback_enabled": true,
+"tutorial": false
 }, {
 "available": true,
 "folder_name": "1",

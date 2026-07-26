@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="GDGeneratedDungeonContentConfig" format=3 uid="uid://c3y0r2bcnebu8"]
+
+[ext_resource type="Script" uid="uid://b0qvi64mmqfrc" path="res://levels/vampire-maze/generated_maze/generated_content_config.gd" id="1_config"]
+
+[resource]
+script = ExtResource("1_config")
+treasure_pile_count = 20
+minimum_coins_per_pile = 6
+maximum_coins_per_pile = 12
+diamond_budget = 1
+ruby_budget = 1
+sapphire_budget = 0
+emerald_budget = 0
+amethyst_budget = 0
+gold_bar_budget = 0
+door_count = 0
+bat_nest_count = 1
+bat_off_path_percent = 57.0

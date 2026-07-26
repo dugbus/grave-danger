@@ -12,12 +12,12 @@ const PREVIEW_DWELL_SECONDS := 0.18
 const MUTED_AUDIO_BUS: StringName = &"RunPlaybackMuted"
 const FLASK_COLLECTION_DISTANCE := 0.8
 const DRIFT_POSITION_TOLERANCE := 0.05
+const RUN_PLAYBACK_SESSION_GROUP: StringName = &"run_playback_session"
 
 enum LoadState {
     Idle,
     WaitingForSave,
     ReadingRecording,
-    LoadingLevel,
     Playing,
 }
 
@@ -48,7 +48,6 @@ var playback_time := 0.0
 var request_delay_remaining := 0.0
 var drift_checkpoint_index := 0
 var drift_warned_paths: Dictionary = {}
-var pending_level_load_paths: Dictionary = {}
 
 
 func _ready() -> void:
@@ -71,6 +70,17 @@ func show_level_run(level_id: String, scene_path: String) -> void:
     set_process(true)
 
 
+## Clears replay presentation without starting any first-run file or scene loading.
+func clear_level_run() -> void:
+    request_generation += 1
+    _release_recording_save_task()
+    pending_level_id = ""
+    pending_scene_path = ""
+    request_delay_remaining = 0.0
+    _clear_preview()
+    set_process(false)
+
+
 func stop_for_scene_change() -> void:
     request_generation += 1
     _release_recording_save_task()
@@ -79,7 +89,7 @@ func stop_for_scene_change() -> void:
     request_delay_remaining = 0.0
     _clear_preview()
     set_process(false)
-    await _finish_background_loading()
+    await _finish_recording_read()
     active_scene_path = ""
 
 
@@ -87,8 +97,6 @@ func _process(delta: float) -> void:
     request_delay_remaining = maxf(request_delay_remaining - delta, 0.0)
     _poll_recording_read()
     _poll_recording_save()
-    _poll_level_load()
-    _poll_abandoned_level_loads()
     if load_state == LoadState.Idle and recording_thread == null \
             and request_delay_remaining <= 0.0 and not pending_level_id.is_empty():
         _start_recording_read()
@@ -102,7 +110,6 @@ func _exit_tree() -> void:
     if recording_thread != null and recording_thread.is_started():
         recording_thread.wait_to_finish()
     recording_thread = null
-    _finish_background_loading_blocking()
 
 
 func _start_recording_read() -> void:
@@ -176,19 +183,7 @@ func _poll_recording_read() -> void:
     if active_generation == request_generation and loaded_recording is Dictionary \
             and not loaded_recording.is_empty():
         recording = loaded_recording
-        if pending_level_load_paths.has(active_scene_path):
-            load_state = LoadState.LoadingLevel
-        else:
-            var load_error := ResourceLoader.load_threaded_request(
-                active_scene_path,
-                "PackedScene",
-                true
-            )
-            if load_error == OK:
-                pending_level_load_paths[active_scene_path] = true
-                load_state = LoadState.LoadingLevel
-            else:
-                load_state = LoadState.Idle
+        _load_active_level_scene()
     else:
         load_state = LoadState.Idle
 
@@ -196,66 +191,21 @@ func _poll_recording_read() -> void:
         _start_recording_read()
 
 
-func _poll_level_load() -> void:
-    if load_state != LoadState.LoadingLevel:
-        return
-    if active_generation != request_generation:
-        load_state = LoadState.Idle
-        if recording_thread == null and not pending_level_id.is_empty() \
-                and request_delay_remaining <= 0.0:
-            _start_recording_read()
-        return
-
-    var status := ResourceLoader.load_threaded_get_status(active_scene_path)
-    if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
-        return
-    if status != ResourceLoader.THREAD_LOAD_LOADED:
-        pending_level_load_paths.erase(active_scene_path)
-        load_state = LoadState.Idle
-        return
-
-    var level_scene := ResourceLoader.load_threaded_get(active_scene_path) as PackedScene
-    pending_level_load_paths.erase(active_scene_path)
+func _load_active_level_scene() -> bool:
+    var level_scene := load(active_scene_path) as PackedScene
     if level_scene == null:
         load_state = LoadState.Idle
-        return
+        return false
     _create_preview(level_scene)
+    return load_state == LoadState.Playing
 
 
-func _poll_abandoned_level_loads() -> void:
-    for stored_path: Variant in pending_level_load_paths.keys():
-        var scene_path := String(stored_path)
-        if load_state == LoadState.LoadingLevel and scene_path == active_scene_path:
-            continue
-        var status := ResourceLoader.load_threaded_get_status(scene_path)
-        if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
-            continue
-        if status == ResourceLoader.THREAD_LOAD_LOADED:
-            ResourceLoader.load_threaded_get(scene_path)
-        pending_level_load_paths.erase(scene_path)
-
-
-func _finish_background_loading() -> void:
+func _finish_recording_read() -> void:
     while recording_thread != null and recording_thread.is_alive():
         await get_tree().process_frame
     if recording_thread != null and recording_thread.is_started():
         recording_thread.wait_to_finish()
     recording_thread = null
-
-    while not pending_level_load_paths.is_empty():
-        _poll_abandoned_level_loads()
-        if not pending_level_load_paths.is_empty():
-            await get_tree().process_frame
-
-
-func _finish_background_loading_blocking() -> void:
-    for stored_path: Variant in pending_level_load_paths.keys():
-        var scene_path := String(stored_path)
-        var status := ResourceLoader.load_threaded_get_status(scene_path)
-        if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS \
-                or status == ResourceLoader.THREAD_LOAD_LOADED:
-            ResourceLoader.load_threaded_get(scene_path)
-    pending_level_load_paths.clear()
 
 
 func _create_preview(level_scene: PackedScene) -> void:
@@ -274,6 +224,7 @@ func _create_preview(level_scene: PackedScene) -> void:
         return
     playback_session_root = Node3D.new()
     playback_session_root.name = "PlaybackSession"
+    playback_session_root.add_to_group(RUN_PLAYBACK_SESSION_GROUP)
     playback_viewport.add_child(playback_session_root)
     _prepare_preview_tree(playback_level)
     _configure_playback_player(playback_player)
@@ -453,12 +404,12 @@ func _collect_preview_flasks() -> void:
     if playback_player.has_method("is_dead") and playback_player.is_dead():
         return
     for flask_node in get_tree().get_nodes_in_group(&"flask_pickup"):
-        var flask := flask_node as Node3D
+        var flask := flask_node as GDFlaskBase
         if flask == null or not playback_level.is_ancestor_of(flask):
             continue
         if flask.global_position.distance_to(playback_player.global_position) \
                 <= FLASK_COLLECTION_DISTANCE:
-            flask.queue_free()
+            flask._try_collect(playback_player)
 
 
 func _apply_recorded_run_settings() -> void:

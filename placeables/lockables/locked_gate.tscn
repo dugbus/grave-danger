@@ -1,100 +1,95 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene format=3 uid="uid://ba4h31e1vsl1n"]
 
-[ext_resource type="Script" path="res://placeables/lockables/lockable_hinged_passage.gd" id="1_passage"]
-[ext_resource type="Script" path="res://placeables/lockables/lockable_hinged_leaf.gd" id="2_leaf"]
-[ext_resource type="ArrayMesh" path="res://Assets/placeables/lockables/gate.res" id="3_gate"]
+[ext_resource type="Script" uid="uid://c0u8ve3fhp6sl" path="res://placeables/lockables/lockable_hinged_passage.gd" id="1_passage"]
+[ext_resource type="Script" uid="uid://d1thxl65p3fxm" path="res://placeables/lockables/lockable_hinged_leaf.gd" id="2_leaf"]
+[ext_resource type="ArrayMesh" uid="uid://btq3kypo4eob2" path="res://Assets/placeables/lockables/gate.res" id="3_gate"]
+[ext_resource type="PackedScene" path="res://placeables/stairs/procedural_staircase.tscn" id="4_staircase"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gate_leaf"]
 size = Vector3(1.6, 1.8, 0.18)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gate_push"]
-size = Vector3(1.9, 2.0, 0.55)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_gate_unlock"]
-size = Vector3(2.4, 2.2, 3.4)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_gate_complete"]
-size = Vector3(0.6, 2.2, 3.0)
+size = Vector3(1.9, 2, 0.55)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gate_frame_post"]
-size = Vector3(0.28, 2.0, 0.28)
+size = Vector3(0.28, 2, 0.28)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gate_frame_header"]
 size = Vector3(0.32, 0.28, 3.4)
 
-[node name="LockedGate" type="Node3D"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_gate_unlock"]
+size = Vector3(2.4, 2.2, 3.4)
+
+[node name="LockedGate" type="Node3D" unique_id=1053134796]
 script = ExtResource("1_passage")
 completes_level = true
+completion_area_path = NodePath("ProceduralStaircase/CompletionArea")
 
-[node name="Leaves" type="Node3D" parent="."]
+[node name="Leaves" type="Node3D" parent="." unique_id=1848942186]
 
-[node name="LeftGateLeaf" type="RigidBody3D" parent="Leaves"]
+[node name="LeftGateLeaf" type="RigidBody3D" parent="Leaves" unique_id=352817749]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 1)
 mass = 10.0
 script = ExtResource("2_leaf")
 open_limit_degrees = 115.0
 push_torque = 18.0
 
-[node name="Gate" type="MeshInstance3D" parent="Leaves/LeftGateLeaf"]
+[node name="Gate" type="MeshInstance3D" parent="Leaves/LeftGateLeaf" unique_id=1051599960]
 mesh = ExtResource("3_gate")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Leaves/LeftGateLeaf"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Leaves/LeftGateLeaf" unique_id=1253205352]
 shape = SubResource("BoxShape3D_gate_leaf")
 
-[node name="PushArea" type="Area3D" parent="Leaves/LeftGateLeaf"]
+[node name="PushArea" type="Area3D" parent="Leaves/LeftGateLeaf" unique_id=1691128501]
 collision_layer = 0
 collision_mask = 2
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Leaves/LeftGateLeaf/PushArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Leaves/LeftGateLeaf/PushArea" unique_id=1650815442]
 shape = SubResource("BoxShape3D_gate_push")
 
-[node name="RightGateLeaf" type="RigidBody3D" parent="Leaves"]
+[node name="RightGateLeaf" type="RigidBody3D" parent="Leaves" unique_id=2115046998]
 transform = Transform3D(1.3113416e-07, 0, -1, 0, 1, 0, 1, 0, 1.3113416e-07, 0, 0, -1)
 mass = 10.0
 script = ExtResource("2_leaf")
 open_limit_degrees = 115.0
 push_torque = 18.0
 
-[node name="Gate" type="MeshInstance3D" parent="Leaves/RightGateLeaf"]
+[node name="Gate" type="MeshInstance3D" parent="Leaves/RightGateLeaf" unique_id=1520018653]
 mesh = ExtResource("3_gate")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Leaves/RightGateLeaf"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Leaves/RightGateLeaf" unique_id=1821722489]
 shape = SubResource("BoxShape3D_gate_leaf")
 
-[node name="PushArea" type="Area3D" parent="Leaves/RightGateLeaf"]
+[node name="PushArea" type="Area3D" parent="Leaves/RightGateLeaf" unique_id=1230733069]
 collision_layer = 0
 collision_mask = 2
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Leaves/RightGateLeaf/PushArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Leaves/RightGateLeaf/PushArea" unique_id=423023949]
 shape = SubResource("BoxShape3D_gate_push")
 
-[node name="GateFrameBody" type="StaticBody3D" parent="."]
-collision_layer = 1
+[node name="GateFrameBody" type="StaticBody3D" parent="." unique_id=735734039]
 collision_mask = 2
 
-[node name="LeftPostCollision" type="CollisionShape3D" parent="GateFrameBody"]
+[node name="LeftPostCollision" type="CollisionShape3D" parent="GateFrameBody" unique_id=1235965418]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, -1.7)
 shape = SubResource("BoxShape3D_gate_frame_post")
 
-[node name="RightPostCollision" type="CollisionShape3D" parent="GateFrameBody"]
+[node name="RightPostCollision" type="CollisionShape3D" parent="GateFrameBody" unique_id=1795567003]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 1.7)
 shape = SubResource("BoxShape3D_gate_frame_post")
 
-[node name="HeaderCollision" type="CollisionShape3D" parent="GateFrameBody"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+[node name="HeaderCollision" type="CollisionShape3D" parent="GateFrameBody" unique_id=1281510103]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 shape = SubResource("BoxShape3D_gate_frame_header")
 
-[node name="UnlockArea" type="Area3D" parent="."]
+[node name="UnlockArea" type="Area3D" parent="." unique_id=1001574957]
 collision_layer = 0
 collision_mask = 2
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="UnlockArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="UnlockArea" unique_id=1285927770]
 shape = SubResource("BoxShape3D_gate_unlock")
 
-[node name="CompletionArea" type="Area3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0, 0)
-collision_layer = 0
-collision_mask = 2
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CompletionArea"]
-shape = SubResource("BoxShape3D_gate_complete")
+[node name="ProceduralStaircase" parent="." unique_id=955328442 instance=ExtResource("4_staircase")]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -0.16, 0, 0)
+steepness_degrees = 24.0
+step_depth = 0.4

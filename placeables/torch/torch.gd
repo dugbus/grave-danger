@@ -34,7 +34,7 @@ var activation_elapsed_ms := 0.0
 var flicker_elapsed := 0.0
 
 @onready var flame_particles := get_node_or_null("%FlameParticles") as GPUParticles3D
-@onready var ember_particles := get_node_or_null("%EmberParticles") as GPUParticles3D
+@onready var ember_particles := get_node_or_null("%EmberParticles") as CPUParticles3D
 @onready var flame_light := get_node_or_null("%FlameLight") as OmniLight3D
 @onready var outline_mesh := get_node_or_null(
 	"RaisedWallMount/Model/RootNode/Torch1"
@@ -176,9 +176,7 @@ func _set_outline_intensity(intensity: float) -> void:
 		return
 
 	var clamped_intensity := clampf(intensity, 0.0, 1.0)
-	var outline_material := outline_mesh.material_overlay as ShaderMaterial
-	if outline_material != null:
-		outline_material.set_shader_parameter(&"outline_intensity", clamped_intensity)
+	outline_mesh.set_instance_shader_parameter(&"outline_intensity", clamped_intensity)
 
 
 func _get_persistence_id() -> StringName:

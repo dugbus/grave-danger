@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://levels/vampire-maze/generated_maze/generated_bat_noise.gd" id="1_noise"]
+[ext_resource type="PackedScene" path="res://enemies/bat_nest.tscn" id="2_bat_nest"]
+
+[node name="GeneratedBatNoise" type="Node3D"]
+script = ExtResource("1_noise")
+
+[node name="BatNest" parent="." instance=ExtResource("2_bat_nest")]

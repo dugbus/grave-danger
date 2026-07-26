@@ -8,6 +8,7 @@ const MINIMAP_VIEWPORT_NAME := "MinimapViewport"
 const MINIMAP_CAMERA_NAME := "MinimapCamera"
 const CAMERA_ENVIRONMENT_PROPERTY := "environment"
 const DEFAULT_CAMERA_CULL_MASK := (1 << 20) - 1
+const MINIMAP_ROUTE_VISUAL_LAYER := 1 << 18
 const TEXT_OVERLAY_VISUAL_LAYER := 1 << 19
 const MINIMAP_HIDDEN_VISUAL_LAYERS := TEXT_OVERLAY_VISUAL_LAYER
 const MINIMAP_VISIBLE_CULL_MASK := DEFAULT_CAMERA_CULL_MASK ^ MINIMAP_HIDDEN_VISUAL_LAYERS
@@ -305,7 +306,7 @@ func _has_camera_property(property_name: String) -> bool:
 func _get_source_cull_mask() -> int:
 	var source_camera := _get_source_camera()
 	if source_camera != null:
-		return source_camera.cull_mask & MINIMAP_VISIBLE_CULL_MASK
+		return (source_camera.cull_mask | MINIMAP_ROUTE_VISUAL_LAYER) & MINIMAP_VISIBLE_CULL_MASK
 
 	return MINIMAP_VISIBLE_CULL_MASK
 

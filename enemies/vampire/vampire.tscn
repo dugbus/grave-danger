@@ -1,0 +1,161 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Assets/kenney-graveyard/character-vampire.glb" id="1_character"]
+[ext_resource type="Script" path="res://enemies/vampire/vampire.gd" id="2_vampire"]
+[ext_resource type="Resource" path="res://enemies/vampire/vampire_settings.tres" id="3_settings"]
+[ext_resource type="Script" path="res://enemies/vampire/vampire_navigation.gd" id="4_navigation"]
+[ext_resource type="Script" path="res://enemies/vampire/vampire_presentation.gd" id="5_presentation"]
+[ext_resource type="Script" path="res://enemies/vampire/vampire_contact.gd" id="6_contact"]
+[ext_resource type="Script" path="res://player/player_light.gd" id="7_light"]
+[ext_resource type="Script" path="res://player/player_shadow.gd" id="8_shadow"]
+[ext_resource type="PlaneMesh" path="res://game/contact_shadow_mesh.tres" id="9_shadow_mesh"]
+[ext_resource type="Material" path="res://game/contact_shadow_material.tres" id="10_shadow_material"]
+[ext_resource type="Script" path="res://enemies/vampire/senses/vampire_senses.gd" id="11_senses"]
+[ext_resource type="Script" path="res://enemies/vampire/behaviour/vampire_hunt.gd" id="12_hunt"]
+[ext_resource type="Script" path="res://enemies/vampire/effects/vampire_proximity_fog.gd" id="13_fog"]
+[ext_resource type="Shader" path="res://enemies/vampire/effects/vampire_proximity_fog.gdshader" id="14_fog_shader"]
+[ext_resource type="Script" path="res://enemies/vampire/knowledge/vampire_layout_knowledge.gd" id="15_knowledge"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.52
+height = 1.6
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_contact"]
+radius = 0.62
+height = 1.75
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_sight"]
+radius = 0.64
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_fast"]
+frequency = 0.8
+fractal_octaves = 4
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_fast"]
+noise = SubResource("FastNoiseLite_fast")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_slow"]
+frequency = 0.3
+fractal_octaves = 4
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_slow"]
+noise = SubResource("FastNoiseLite_slow")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_proximity_fog"]
+shader = ExtResource("14_fog_shader")
+shader_parameter/intensity = 0.0
+shader_parameter/fog_color = Color(0.46, 0.08, 0.72, 1)
+shader_parameter/drift_speed = 0.32
+shader_parameter/distortion_strength = 0.009
+
+[node name="Vampire" type="CharacterBody3D"]
+collision_layer = 8
+collision_mask = 3
+script = ExtResource("2_vampire")
+settings = ExtResource("3_settings")
+
+[node name="VampireNavigation" type="Node" parent="."]
+script = ExtResource("4_navigation")
+
+[node name="VampireHunt" type="Node" parent="."]
+script = ExtResource("12_hunt")
+
+[node name="VampireLayoutKnowledge" type="Node" parent="."]
+script = ExtResource("15_knowledge")
+
+[node name="VampireSenses" type="ShapeCast3D" parent="."]
+position = Vector3(0, 0.65, 0)
+target_position = Vector3(0, 0, 1)
+collision_mask = 3
+collide_with_areas = false
+shape = SubResource("SphereShape3D_sight")
+script = ExtResource("11_senses")
+
+[node name="VisualSightRay" type="RayCast3D" parent="VampireSenses"]
+target_position = Vector3(0, 0, 1)
+collision_mask = 3
+collide_with_areas = false
+
+[node name="VampirePresentation" type="Node" parent="."]
+script = ExtResource("5_presentation")
+
+[node name="VampireProximityFog" type="CanvasLayer" parent="."]
+layer = 2
+script = ExtResource("13_fog")
+
+[node name="FogRect" type="ColorRect" parent="VampireProximityFog"]
+material = SubResource("ShaderMaterial_proximity_fog")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Pivot" type="Node3D" parent="."]
+
+[node name="Character" parent="Pivot" instance=ExtResource("1_character")]
+scale = Vector3(2, 2, 2)
+
+[node name="VampireHeadlampLight" type="SpotLight3D" parent="Pivot"]
+transform = Transform3D(-1, 0, -8.742278e-08, -5.015858e-08, 0.81915206, 0.57357645, 7.163184e-08, 0.57357645, -0.81915206, 0, 2.1, 0.6)
+light_color = Color(0.62, 0.18, 1, 1)
+light_energy = 8.0
+light_indirect_energy = 0.0
+shadow_enabled = true
+shadow_bias = 0.03
+shadow_normal_bias = 0.6
+spot_range = 60.0
+spot_attenuation = 1.25
+spot_angle = 82.0
+spot_angle_attenuation = 0.5
+script = ExtResource("7_light")
+base_energy = 8.0
+dip_amount = 0.45
+peak_amount = 1.0
+noise_fast = SubResource("NoiseTexture3D_fast")
+noise_slow = SubResource("NoiseTexture3D_slow")
+dim_color = Color(0.28, 0.03, 0.58, 1)
+bright_color = Color(0.78, 0.38, 1, 1)
+
+[node name="VampireLight" type="OmniLight3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0.6)
+light_color = Color(0.62, 0.18, 1, 1)
+light_energy = 1.2
+light_indirect_energy = 0.0
+shadow_enabled = true
+shadow_bias = 0.03
+shadow_normal_bias = 0.6
+omni_range = 4.0
+omni_attenuation = 0.2
+script = ExtResource("7_light")
+base_energy = 1.2
+dip_amount = 0.02
+peak_amount = 0.015
+noise_fast = SubResource("NoiseTexture3D_fast")
+noise_slow = SubResource("NoiseTexture3D_slow")
+dim_color = Color(0.28, 0.03, 0.58, 1)
+bright_color = Color(0.78, 0.38, 1, 1)
+
+[node name="VampireContact" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("6_contact")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="VampireContact"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("CapsuleShape3D_contact")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="VampireShadow" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0.06)
+layers = 3
+cast_shadow = 0
+mesh = ExtResource("9_shadow_mesh")
+surface_material_override/0 = ExtResource("10_shadow_material")
+script = ExtResource("8_shadow")
+shadow_size = Vector2(2.4, 1.5)

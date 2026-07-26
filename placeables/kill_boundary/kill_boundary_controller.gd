@@ -283,6 +283,9 @@ func _apply_flame_heat(delta: float) -> void:
 		var body_3d := body as Node3D
 		if not is_instance_valid(body_3d):
 			continue
+		if body_3d.has_method("is_immune_to_kill_boundary") \
+				and bool(body_3d.call("is_immune_to_kill_boundary")):
+			continue
 
 		if not _is_inside_flame_damage_height(body_3d.global_position):
 			continue

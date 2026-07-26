@@ -16,7 +16,13 @@ enum GemCut {
     set(value):
         gem_material = value
         if is_node_ready():
-            _apply_gem_material(self)
+            _apply_gem_materials(self)
+## Shared outline overlay that keeps every jewel visible in dark spaces.
+@export var edge_glow_material: Material:
+    set(value):
+        edge_glow_material = value
+        if is_node_ready():
+            _apply_gem_materials(self)
 ## Silhouette and facet construction used by this jewel variant.
 @export var cut := GemCut.Brilliant:
     set(value):
@@ -27,7 +33,7 @@ enum GemCut {
 
 func _ready() -> void:
     _apply_cut_visibility()
-    _apply_gem_material(self)
+    _apply_gem_materials(self)
 
 
 func _apply_cut_visibility() -> void:
@@ -42,9 +48,11 @@ func _apply_cut_visibility() -> void:
             cut_nodes[index].visible = index == cut
 
 
-func _apply_gem_material(node: Node) -> void:
+func _apply_gem_materials(node: Node) -> void:
     if node is MeshInstance3D:
-        (node as MeshInstance3D).material_override = gem_material
+        var mesh_instance := node as MeshInstance3D
+        mesh_instance.material_override = gem_material
+        mesh_instance.material_overlay = edge_glow_material
 
     for child in node.get_children():
-        _apply_gem_material(child)
+        _apply_gem_materials(child)
