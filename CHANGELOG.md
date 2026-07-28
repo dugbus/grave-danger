@@ -1,9 +1,22 @@
 # Changelog
 
+## 2026-07-28
+
+### 1400
+
+- The corner minimap now keeps Vampire diagnostic text hidden, revealing it in the separate header only while the left trigger opens the full-screen map.
+  - Prompt: Show Vampire diagnostic text only in the controller-expanded map.
+
 ## 2026-07-26
 
 ### 1800
 
+- The full-screen minimap now places Vampire diagnostics in a dedicated header so they no longer cover the top of the fitted level map.
+  - Prompt: Keep the top of the expanded minimap visible.
+- The full-screen minimap now zooms out and centres the complete level instead of continuing to scroll around the tracked character.
+  - Prompt: Fit the complete level inside the expanded minimap.
+- Holding the left trigger now expands the minimap across the full screen with larger Vampire diagnostic text and markers, then restores the corner view on release.
+  - Prompt: Make the minimap fill the screen while the left trigger is held so its Vampire diagnostics are readable.
 - Gold coins and their pile previews now use the textured metallic skull model at its authored size, with matching shared convex physics and the existing treasure outline.
   - Prompt: Integrate the newly added skull-coin model.
 

@@ -12,6 +12,8 @@ const MINIMUM_UNCERTAINTY_RADIUS_PIXELS := 3.0
 
 ## Label that displays the Vampire's live perception, search, and route diagnostics.
 @export var status_label_path: NodePath = ^"StatusBackdrop/StatusLabel"
+## Panel behind the Vampire's live diagnostics.
+@export var status_backdrop_path: NodePath = ^"StatusBackdrop"
 ## Purple map marker used for the Vampire and its current facing direction.
 @export var vampire_color := Color(0.78, 0.32, 1.0, 1.0)
 ## Pink map marker used for the position where the Vampire believes the player is.
@@ -22,6 +24,7 @@ const MINIMUM_UNCERTAINTY_RADIUS_PIXELS := 3.0
 @export var target_color := Color(1.0, 0.72, 0.12, 1.0)
 
 @onready var status_label := get_node_or_null(status_label_path) as Label
+@onready var status_backdrop := get_node_or_null(status_backdrop_path) as Control
 
 var vampire: Node3D
 var minimap_camera: Camera3D
@@ -29,6 +32,7 @@ var viewport_container: SubViewportContainer
 var snapshot: Dictionary = {}
 var content_rect := Rect2()
 var marker_font: Font
+var marker_scale := 1.0
 
 
 func _ready() -> void:
@@ -71,6 +75,29 @@ func clear_runtime_references() -> void:
     set_process(false)
     if status_label != null:
         status_label.text = ""
+    queue_redraw()
+
+
+## Shows diagnostic text only in the expanded layout and scales its map markers.
+func set_expanded_layout(
+    expanded: bool,
+    settings: GDMinimapViewSettings
+) -> void:
+    if settings == null:
+        return
+
+    marker_scale = settings.expanded_marker_scale if expanded else 1.0
+
+    if status_label != null:
+        status_label.add_theme_font_size_override(
+            "font_size",
+            settings.expanded_status_font_size
+        )
+    if status_backdrop != null:
+        status_backdrop.visible = expanded
+        status_backdrop.offset_bottom = (
+            status_backdrop.offset_top + settings.expanded_status_height
+        )
     queue_redraw()
 
 
@@ -160,8 +187,8 @@ func _draw() -> void:
             vampire_screen_position,
             belief_screen_position,
             belief_color * Color(1.0, 1.0, 1.0, 0.7),
-            1.5,
-            5.0
+            1.5 * marker_scale,
+            5.0 * marker_scale
         )
         if content_rect.has_point(raw_belief_screen_position):
             _draw_uncertainty(
@@ -201,48 +228,55 @@ func _draw_vampire_marker(
         screen_direction = Vector2.UP
     var screen_right := Vector2(-screen_direction.y, screen_direction.x)
     var points := PackedVector2Array([
-        screen_position + screen_direction * VAMPIRE_MARKER_LENGTH,
-        screen_position - screen_direction * VAMPIRE_MARKER_LENGTH * 0.65 \
-            + screen_right * VAMPIRE_MARKER_WIDTH,
-        screen_position - screen_direction * VAMPIRE_MARKER_LENGTH * 0.65 \
-            - screen_right * VAMPIRE_MARKER_WIDTH,
+        screen_position + screen_direction * VAMPIRE_MARKER_LENGTH * marker_scale,
+        screen_position - screen_direction * VAMPIRE_MARKER_LENGTH * marker_scale * 0.65 \
+            + screen_right * VAMPIRE_MARKER_WIDTH * marker_scale,
+        screen_position - screen_direction * VAMPIRE_MARKER_LENGTH * marker_scale * 0.65 \
+            - screen_right * VAMPIRE_MARKER_WIDTH * marker_scale,
     ])
     draw_colored_polygon(points, vampire_color)
     var outline := points.duplicate()
     outline.append(points[0])
-    draw_polyline(outline, Color.WHITE, 1.5, true)
+    draw_polyline(outline, Color.WHITE, 1.5 * marker_scale, true)
 
 
 func _draw_belief_marker(screen_position: Vector2) -> void:
     var diamond := PackedVector2Array([
-        screen_position + Vector2.UP * BELIEF_MARKER_RADIUS,
-        screen_position + Vector2.RIGHT * BELIEF_MARKER_RADIUS,
-        screen_position + Vector2.DOWN * BELIEF_MARKER_RADIUS,
-        screen_position + Vector2.LEFT * BELIEF_MARKER_RADIUS,
-        screen_position + Vector2.UP * BELIEF_MARKER_RADIUS,
+        screen_position + Vector2.UP * BELIEF_MARKER_RADIUS * marker_scale,
+        screen_position + Vector2.RIGHT * BELIEF_MARKER_RADIUS * marker_scale,
+        screen_position + Vector2.DOWN * BELIEF_MARKER_RADIUS * marker_scale,
+        screen_position + Vector2.LEFT * BELIEF_MARKER_RADIUS * marker_scale,
+        screen_position + Vector2.UP * BELIEF_MARKER_RADIUS * marker_scale,
     ])
-    draw_polyline(diamond, belief_color, 3.0, true)
+    draw_polyline(diamond, belief_color, 3.0 * marker_scale, true)
     _draw_marker_letter("?", screen_position, belief_color)
 
 
 func _draw_player_marker(screen_position: Vector2) -> void:
-    draw_circle(screen_position, PLAYER_MARKER_RADIUS, player_color, false, 2.5, true)
+    draw_circle(
+        screen_position,
+        PLAYER_MARKER_RADIUS * marker_scale,
+        player_color,
+        false,
+        2.5 * marker_scale,
+        true
+    )
     _draw_marker_letter("P", screen_position, player_color)
 
 
 func _draw_target_marker(screen_position: Vector2) -> void:
     draw_line(
-        screen_position - Vector2.RIGHT * TARGET_MARKER_RADIUS,
-        screen_position + Vector2.RIGHT * TARGET_MARKER_RADIUS,
+        screen_position - Vector2.RIGHT * TARGET_MARKER_RADIUS * marker_scale,
+        screen_position + Vector2.RIGHT * TARGET_MARKER_RADIUS * marker_scale,
         target_color,
-        2.5,
+        2.5 * marker_scale,
         true
     )
     draw_line(
-        screen_position - Vector2.UP * TARGET_MARKER_RADIUS,
-        screen_position + Vector2.UP * TARGET_MARKER_RADIUS,
+        screen_position - Vector2.UP * TARGET_MARKER_RADIUS * marker_scale,
+        screen_position + Vector2.UP * TARGET_MARKER_RADIUS * marker_scale,
         target_color,
-        2.5,
+        2.5 * marker_scale,
         true
     )
 
@@ -253,7 +287,10 @@ func _draw_uncertainty(screen_position: Vector2, world_radius: float) -> void:
     var radius_pixels := world_radius \
         * content_rect.size.y \
         / maxf(minimap_camera.size, 0.001)
-    radius_pixels = maxf(radius_pixels, MINIMUM_UNCERTAINTY_RADIUS_PIXELS)
+    radius_pixels = maxf(
+        radius_pixels,
+        MINIMUM_UNCERTAINTY_RADIUS_PIXELS * marker_scale
+    )
     draw_arc(
         screen_position,
         radius_pixels,
@@ -261,7 +298,7 @@ func _draw_uncertainty(screen_position: Vector2, world_radius: float) -> void:
         TAU,
         48,
         belief_color * Color(1.0, 1.0, 1.0, 0.45),
-        1.5,
+        1.5 * marker_scale,
         true
     )
 
@@ -269,7 +306,7 @@ func _draw_uncertainty(screen_position: Vector2, world_radius: float) -> void:
 func _draw_marker_letter(letter: String, screen_position: Vector2, color: Color) -> void:
     if marker_font == null:
         return
-    var font_size := 12
+    var font_size := roundi(12.0 * marker_scale)
     var text_size := marker_font.get_string_size(
         letter,
         HORIZONTAL_ALIGNMENT_CENTER,
@@ -302,8 +339,9 @@ func _project_world_position(world_position: Vector3) -> Vector2:
 
 
 func _clamp_marker_to_content(screen_position: Vector2) -> Vector2:
-    var minimum := content_rect.position + Vector2.ONE * MARKER_MARGIN
-    var maximum := content_rect.end - Vector2.ONE * MARKER_MARGIN
+    var marker_margin := MARKER_MARGIN * marker_scale
+    var minimum := content_rect.position + Vector2.ONE * marker_margin
+    var maximum := content_rect.end - Vector2.ONE * marker_margin
     return Vector2(
         clampf(screen_position.x, minimum.x, maximum.x),
         clampf(screen_position.y, minimum.y, maximum.y)

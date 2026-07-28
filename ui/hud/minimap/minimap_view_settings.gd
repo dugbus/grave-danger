@@ -14,8 +14,20 @@ class_name GDMinimapViewSettings
 ## Distance between the minimap panel and the viewport edges.
 @export_range(0.0, 80.0, 1.0) var screen_margin := 20.0
 
+## Distance between the expanded minimap and the viewport edges.
+@export_range(0.0, 80.0, 1.0) var expanded_screen_margin := 0.0
+
 ## Padding between the minimap frame and rendered level view.
 @export_range(0.0, 32.0, 1.0) var content_padding := 8.0
+
+## Font size used by Vampire diagnostics while the minimap fills the screen.
+@export_range(16, 64, 1) var expanded_status_font_size := 30
+
+## Height reserved for Vampire diagnostics while the minimap fills the screen.
+@export_range(96.0, 320.0, 1.0) var expanded_status_height := 154.0
+
+## Multiplier applied to map markers while the minimap fills the screen.
+@export_range(1.0, 4.0, 0.05) var expanded_marker_scale := 2.0
 
 ## Orthographic world size used when no level or boundary bounds are available.
 @export_range(1.0, 300.0, 0.5) var fallback_orthographic_size := 18.0

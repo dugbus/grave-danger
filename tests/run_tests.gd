@@ -375,6 +375,7 @@ func _run_tests() -> void:
     failed = not await _test_ground_enemies_block_each_other() or failed
     failed = not await _test_ground_enemies_fall_before_moving() or failed
     failed = not _test_minimap_disables_processing_and_rendering() or failed
+    failed = not _test_minimap_left_trigger_expands_and_restores_layout() or failed
     failed = not _test_minimap_camera_scrolls_wide_level_without_empty_space() or failed
     failed = not _test_minimap_camera_scrolls_tall_level_without_empty_space() or failed
     failed = not _test_bat_nest_swarms_then_rises_away() or failed
@@ -8257,6 +8258,128 @@ func _test_minimap_disables_processing_and_rendering() -> bool:
         and _expect(not minimap_camera.current, "disabled minimap camera is not current")
 
     minimap.queue_free()
+    return passed
+
+
+func _test_minimap_left_trigger_expands_and_restores_layout() -> bool:
+    var minimap: Control = MINIMAP_VIEW_SCRIPT.new()
+    minimap.set("settings", MINIMAP_VIEW_SETTINGS)
+    var viewport_container := SubViewportContainer.new()
+    viewport_container.name = "ViewportContainer"
+    var minimap_viewport := SubViewport.new()
+    minimap_viewport.name = "MinimapViewport"
+    var minimap_camera := Camera3D.new()
+    minimap_camera.name = "MinimapCamera"
+    var vampire_overlay: Control = VAMPIRE_MINIMAP_OVERLAY_SCRIPT.new()
+    vampire_overlay.name = "VampireOverlay"
+    var status_backdrop := ColorRect.new()
+    status_backdrop.name = "StatusBackdrop"
+    status_backdrop.offset_top = 8.0
+    var status_label := Label.new()
+    status_label.name = "StatusLabel"
+
+    minimap.add_child(viewport_container)
+    viewport_container.add_child(minimap_viewport)
+    minimap_viewport.add_child(minimap_camera)
+    minimap.add_child(vampire_overlay)
+    vampire_overlay.add_child(status_backdrop)
+    status_backdrop.add_child(status_label)
+    root.add_child(minimap)
+
+    var level_root := Node3D.new()
+    var level_mesh := MeshInstance3D.new()
+    var level_box := BoxMesh.new()
+    level_box.size = Vector3(200.0, 2.0, 80.0)
+    level_mesh.mesh = level_box
+    level_mesh.position = Vector3(50.0, 0.0, -20.0)
+    level_root.add_child(level_mesh)
+    root.add_child(level_root)
+    var target := Node3D.new()
+    target.position = Vector3(150.0, 0.0, -20.0)
+    root.add_child(target)
+
+    minimap.call("set_runtime_references", target, null, level_root)
+    minimap.call("set_minimap_enabled", true)
+    var corner_width := minimap.offset_right - minimap.offset_left
+    var corner_text_hidden := not status_backdrop.visible
+    var has_left_trigger := false
+    for event: InputEvent in InputMap.action_get_events(&"expand_minimap"):
+        if event is InputEventJoypadMotion:
+            var joypad_motion := event as InputEventJoypadMotion
+            has_left_trigger = joypad_motion.axis == JOY_AXIS_TRIGGER_LEFT \
+                and joypad_motion.axis_value > 0.0
+            if has_left_trigger:
+                break
+
+    Input.action_press(&"expand_minimap")
+    minimap.call("_process", 0.016)
+    var visible_size := root.get_visible_rect().size
+    var expected_expanded_size := visible_size \
+        - Vector2.ONE * MINIMAP_VIEW_SETTINGS.expanded_screen_margin * 2.0
+    var expanded_size := Vector2(
+        minimap.offset_right - minimap.offset_left + visible_size.x,
+        minimap.offset_bottom - minimap.offset_top + visible_size.y
+    )
+    var expanded_world_size := Vector2(
+        _get_camera_visible_world_width(minimap_camera, minimap),
+        minimap_camera.size
+    )
+    var level_center := level_mesh.global_position
+    var passed := _expect(has_left_trigger, "minimap expansion is mapped to the left trigger") \
+        and _expect(
+            corner_text_hidden,
+            "corner minimap hides Vampire diagnostic text"
+        ) \
+        and _expect(
+            minimap.call("is_minimap_expanded") as bool,
+            "holding the minimap action enables the expanded layout"
+        ) \
+        and _expect(
+            expanded_size.is_equal_approx(expected_expanded_size),
+            "expanded minimap fills the viewport"
+        ) \
+        and _expect(
+            status_label.get_theme_font_size("font_size")
+                == MINIMAP_VIEW_SETTINGS.expanded_status_font_size,
+            "expanded minimap enlarges Vampire diagnostic text"
+        ) \
+        and _expect(
+            status_backdrop.visible,
+            "expanded minimap reveals Vampire diagnostic text"
+        ) \
+        and _expect(
+            viewport_container.offset_top >= status_backdrop.offset_bottom,
+            "expanded minimap keeps the rendered map below its diagnostic header"
+        ) \
+        and _expect(
+            expanded_world_size.x >= level_box.size.x
+                and expanded_world_size.y >= level_box.size.z,
+            "expanded minimap zooms out to contain the complete level"
+        ) \
+        and _expect(
+            is_equal_approx(minimap_camera.global_position.x, level_center.x)
+                and is_equal_approx(minimap_camera.global_position.z, level_center.z),
+            "expanded minimap centres the complete level instead of tracking an edge"
+        )
+
+    Input.action_release(&"expand_minimap")
+    minimap.call("_process", 0.016)
+    passed = _expect(
+        not (minimap.call("is_minimap_expanded") as bool),
+        "releasing the minimap action restores the corner layout"
+    ) and passed
+    passed = _expect(
+        is_equal_approx(minimap.offset_right - minimap.offset_left, corner_width),
+        "restored minimap returns to its configured corner width"
+    ) and passed
+    passed = _expect(
+        not status_backdrop.visible,
+        "restored corner minimap hides Vampire diagnostic text again"
+    ) and passed
+
+    minimap.queue_free()
+    level_root.queue_free()
+    target.queue_free()
     return passed
 
 

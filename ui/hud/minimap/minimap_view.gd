@@ -14,6 +14,12 @@ const TEXT_OVERLAY_VISUAL_LAYER := 1 << 19
 const MINIMAP_HIDDEN_VISUAL_LAYERS := TEXT_OVERLAY_VISUAL_LAYER
 const MINIMAP_VISIBLE_CULL_MASK := DEFAULT_CAMERA_CULL_MASK ^ MINIMAP_HIDDEN_VISUAL_LAYERS
 const BOUNDS_EPSILON := 0.001
+const EXPAND_MINIMAP_ACTION := &"expand_minimap"
+
+enum DisplayMode {
+	Corner,
+	Expanded,
+}
 
 ## Shared minimap tuning values for the whole game.
 @export var settings: GDMinimapViewSettings = DEFAULT_SETTINGS
@@ -25,6 +31,7 @@ var level_bounds := AABB()
 var has_level_bounds := false
 var minimap_environment: Environment
 var minimap_enabled := false
+var display_mode := DisplayMode.Corner
 
 @onready var viewport_container := get_node_or_null(VIEWPORT_CONTAINER_NAME) as SubViewportContainer
 @onready var minimap_viewport := (
@@ -47,6 +54,7 @@ func _process(_delta: float) -> void:
 	if not minimap_enabled:
 		return
 
+	_update_display_mode_from_input()
 	_configure_viewport()
 	_update_camera_transform()
 
@@ -91,11 +99,31 @@ func set_minimap_enabled(enabled: bool) -> void:
 		minimap_camera.current = enabled
 
 	if enabled:
+		_update_display_mode_from_input()
 		_configure_viewport()
 		_update_camera_transform()
 		_configure_vampire_overlay()
-	elif vampire_overlay != null:
-		vampire_overlay.call("clear_runtime_references")
+	else:
+		set_minimap_expanded(false)
+		if vampire_overlay != null:
+			vampire_overlay.call("clear_runtime_references")
+
+
+## Expands or restores the minimap without synthesising controller input.
+func set_minimap_expanded(expanded: bool) -> void:
+	var requested_mode := DisplayMode.Expanded if expanded else DisplayMode.Corner
+	if display_mode == requested_mode:
+		return
+
+	display_mode = requested_mode
+	if minimap_enabled:
+		_configure_viewport()
+		_configure_vampire_overlay_display()
+
+
+## Reports whether the minimap is currently using its full-screen layout.
+func is_minimap_expanded() -> bool:
+	return display_mode == DisplayMode.Expanded
 
 
 func _configure_viewport() -> void:
@@ -138,6 +166,7 @@ func _configure_disabled_viewport() -> void:
 func _configure_vampire_overlay() -> void:
 	if vampire_overlay == null:
 		return
+	_configure_vampire_overlay_display()
 	if not minimap_enabled:
 		vampire_overlay.call("clear_runtime_references")
 		return
@@ -147,6 +176,20 @@ func _configure_vampire_overlay() -> void:
 		minimap_camera,
 		viewport_container
 	)
+
+
+func _configure_vampire_overlay_display() -> void:
+	if vampire_overlay == null:
+		return
+	vampire_overlay.call(
+		"set_expanded_layout",
+		is_minimap_expanded(),
+		_get_settings()
+	)
+
+
+func _update_display_mode_from_input() -> void:
+	set_minimap_expanded(Input.is_action_pressed(EXPAND_MINIMAP_ACTION))
 
 
 func _update_camera_transform() -> void:
@@ -186,6 +229,11 @@ func _get_minimap_orthographic_size() -> float:
 func _get_fitted_orthographic_size(bounds_size: Vector2) -> float:
 	var viewport_aspect := _get_minimap_aspect()
 	var map_aspect := bounds_size.x / maxf(bounds_size.y, BOUNDS_EPSILON)
+
+	if is_minimap_expanded():
+		if map_aspect >= viewport_aspect:
+			return bounds_size.x / maxf(viewport_aspect, BOUNDS_EPSILON)
+		return bounds_size.y
 
 	if map_aspect >= viewport_aspect:
 		return bounds_size.y
@@ -276,9 +324,19 @@ func _get_viewport_size() -> Vector2:
 
 func _get_minimap_render_size(active_settings: GDMinimapViewSettings) -> Vector2i:
 	var visible_size := get_viewport().get_visible_rect().size
-	var panel_width := maxf(visible_size.x * active_settings.viewport_width_fraction, active_settings.minimum_panel_width)
-	var panel_height := panel_width / maxf(active_settings.panel_aspect_ratio, 0.001)
-	var content_size := Vector2(panel_width, panel_height) - Vector2.ONE * active_settings.content_padding * 2.0
+	var panel_size := Vector2.ZERO
+	if is_minimap_expanded():
+		panel_size = visible_size - Vector2.ONE * active_settings.expanded_screen_margin * 2.0
+	else:
+		var panel_width := maxf(
+			visible_size.x * active_settings.viewport_width_fraction,
+			active_settings.minimum_panel_width
+		)
+		var panel_height := panel_width / maxf(active_settings.panel_aspect_ratio, 0.001)
+		panel_size = Vector2(panel_width, panel_height)
+	var content_size := panel_size - Vector2.ONE * active_settings.content_padding * 2.0
+	if is_minimap_expanded():
+		content_size.y -= active_settings.expanded_status_height
 	return Vector2i(maxi(roundi(content_size.x), 1), maxi(roundi(content_size.y), 1))
 
 
@@ -287,18 +345,30 @@ func _configure_panel_layout() -> void:
 	var render_size := _get_minimap_render_size(active_settings)
 	var panel_size := Vector2(render_size) + Vector2.ONE * active_settings.content_padding * 2.0
 
-	anchor_left = 1.0
-	anchor_top = 1.0
-	anchor_right = 1.0
-	anchor_bottom = 1.0
-	offset_left = -active_settings.screen_margin - panel_size.x
-	offset_top = -active_settings.screen_margin - panel_size.y
-	offset_right = -active_settings.screen_margin
-	offset_bottom = -active_settings.screen_margin
+	if is_minimap_expanded():
+		anchor_left = 0.0
+		anchor_top = 0.0
+		anchor_right = 1.0
+		anchor_bottom = 1.0
+		offset_left = active_settings.expanded_screen_margin
+		offset_top = active_settings.expanded_screen_margin
+		offset_right = -active_settings.expanded_screen_margin
+		offset_bottom = -active_settings.expanded_screen_margin
+	else:
+		anchor_left = 1.0
+		anchor_top = 1.0
+		anchor_right = 1.0
+		anchor_bottom = 1.0
+		offset_left = -active_settings.screen_margin - panel_size.x
+		offset_top = -active_settings.screen_margin - panel_size.y
+		offset_right = -active_settings.screen_margin
+		offset_bottom = -active_settings.screen_margin
 
 	if viewport_container != null:
 		viewport_container.offset_left = active_settings.content_padding
 		viewport_container.offset_top = active_settings.content_padding
+		if is_minimap_expanded():
+			viewport_container.offset_top += active_settings.expanded_status_height
 		viewport_container.offset_right = -active_settings.content_padding
 		viewport_container.offset_bottom = -active_settings.content_padding
 		viewport_container.custom_minimum_size = Vector2(render_size)

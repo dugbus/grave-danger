@@ -152,6 +152,7 @@ clip_contents = true
 script = ExtResource("15_vampire_overlay")
 
 [node name="StatusBackdrop" type="ColorRect" parent="MinimapHud/MinimapView/VampireOverlay"]
+visible = false
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
