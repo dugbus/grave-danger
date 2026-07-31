@@ -1,0 +1,73 @@
+{
+  "captured_duration": 103.916666666662,
+  "captured_frame_count": 6235,
+  "created_unix_time": 1785271830.0,
+  "format_version": 2.0,
+  "level_id": "vampire_boss",
+  "level_scene_bytes": 2930.0,
+  "level_scene_file": "20260728T205030Z-vampire_boss.tscn",
+  "level_scene_sha256": "c75423965a578dcb70289646661b6a77eb1ce1fd79115423a7d538a1f2201777",
+  "level_scene_status": "ready",
+  "marker": {
+    "created_unix_time": 1785271830.0,
+    "frame": 6234.0,
+    "note": "",
+    "snapshot": {
+      "max_treasure_value": 185.0,
+      "nodes": [
+        {
+          "path": "Vampire",
+          "state": {
+            "disabled_for_testing": false,
+            "hunt": {
+              "awareness_source": "Sight",
+              "last_confirmed_player_position": [
+                15.9193878173828,
+                0.00002341205254197,
+                1.9725341796875
+              ],
+              "noise_target_active": false,
+              "player_visible": true,
+              "searching": false
+            },
+            "navigation": {
+              "has_target": false,
+              "route_index": 1.0,
+              "route_points": 1.0,
+              "route_rebuilds": 215.0,
+              "route_search_status": "AlreadyAtTarget",
+              "route_traversal_status": "Arrived",
+              "stall_recoveries": 0.0,
+              "target_position": [
+                15.9193878173828,
+                0.00002341205254197,
+                1.9725341796875
+              ],
+              "using_visible_shortcut": false
+            },
+            "position": [
+              15.4158058166504,
+              0.00100018014200032,
+              2.59554243087769
+            ],
+            "state": "ChasingPlayer",
+            "velocity": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "visible": true
+          }
+        }
+      ],
+      "showing_result": false,
+      "treasure_collected": 52.0
+    },
+    "time": 103.916666666662
+  },
+  "playback_bytes": 62225,
+  "playback_file": "20260728T205030Z-vampire_boss.gdr",
+  "playback_status": "ready",
+  "report_id": "20260728T205030Z-vampire_boss",
+  "status": "open"
+}
