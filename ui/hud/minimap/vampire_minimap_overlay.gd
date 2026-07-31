@@ -9,6 +9,7 @@ const BELIEF_MARKER_RADIUS := 7.0
 const PLAYER_MARKER_RADIUS := 6.0
 const TARGET_MARKER_RADIUS := 6.0
 const MINIMUM_UNCERTAINTY_RADIUS_PIXELS := 3.0
+const SIGHT_CONE_SEGMENTS := 24
 
 ## Label that displays the Vampire's live perception, search, and route diagnostics.
 @export var status_label_path: NodePath = ^"StatusBackdrop/StatusLabel"
@@ -147,15 +148,20 @@ func _refresh_status_text() -> void:
     var route_status := _humanize_name(
         String(snapshot.get("route_status", "Unavailable"))
     )
+    var head_yaw_degrees := float(snapshot.get("head_yaw_degrees", 0.0))
+    var look_mode := "CORRIDOR" \
+        if bool(snapshot.get("corridor_look_active", false)) else "AMBIENT"
 
     status_label.text = (
-        "%s  •  LOS %s  •  %s\n"
+        "%s  •  LOS %s  •  LOOK %s %+.0f°  •  %s\n"
         + "BELIEF %s  •  ±%.1fm  •  ERROR %s\n"
         + "SEARCH %s  •  ROUTE %d/%d  •  SPEED %.1fm/s\n"
         + "EVIDENCE %.1fs  •  CONF %s  •  DEST %s  •  %s"
     ) % [
         state_name,
         line_of_sight,
+        look_mode,
+        head_yaw_degrees,
         awareness_name,
         belief_name,
         uncertainty_radius,
@@ -178,6 +184,8 @@ func _draw() -> void:
     var vampire_position := snapshot.get("vampire_position", Vector3.ZERO) as Vector3
     var vampire_screen_position := _project_world_position(vampire_position)
     var facing_direction := snapshot.get("facing_direction", Vector3.FORWARD) as Vector3
+
+    _draw_sight_cone(vampire_screen_position, vampire_position, facing_direction)
 
     if bool(snapshot.get("has_belief", false)):
         var belief_position := snapshot.get("belief_position", Vector3.ZERO) as Vector3
@@ -210,6 +218,48 @@ func _draw() -> void:
         )
 
     _draw_vampire_marker(vampire_screen_position, vampire_position, facing_direction)
+
+
+func _draw_sight_cone(
+    screen_position: Vector2,
+    world_position: Vector3,
+    facing_direction: Vector3
+) -> void:
+    var sight_distance := maxf(float(snapshot.get("sight_distance", 0.0)), 0.0)
+    var field_of_view := clampf(
+        float(snapshot.get("sight_field_of_view_degrees", 0.0)),
+        0.0,
+        360.0
+    )
+    if sight_distance <= 0.0 or field_of_view <= 0.0:
+        return
+
+    var horizontal_facing := Vector3(facing_direction.x, 0.0, facing_direction.z)
+    if horizontal_facing.is_zero_approx():
+        horizontal_facing = Vector3.FORWARD
+    horizontal_facing = horizontal_facing.normalized()
+    var half_angle := deg_to_rad(field_of_view * 0.5)
+    var cone_points := PackedVector2Array([screen_position])
+    var outline_points := PackedVector2Array()
+    for segment_index in range(SIGHT_CONE_SEGMENTS + 1):
+        var fraction := float(segment_index) / float(SIGHT_CONE_SEGMENTS)
+        var angle := lerpf(-half_angle, half_angle, fraction)
+        var edge_direction := horizontal_facing.rotated(Vector3.UP, angle)
+        var edge_screen_position := _project_world_position(
+            world_position + edge_direction * sight_distance
+        )
+        cone_points.append(edge_screen_position)
+        outline_points.append(edge_screen_position)
+    draw_colored_polygon(
+        cone_points,
+        vampire_color * Color(1.0, 1.0, 1.0, 0.12)
+    )
+    draw_polyline(
+        outline_points,
+        vampire_color * Color(1.0, 1.0, 1.0, 0.55),
+        1.25 * marker_scale,
+        true
+    )
 
 
 func _draw_vampire_marker(

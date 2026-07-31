@@ -102,12 +102,19 @@ extends Resource
             return
         target_carry_load_percent = value
         emit_changed()
-## Minimum number of reachable coffin deposits placed along the best route.
+## Minimum number of reachable coffin deposits distributed through the maze.
 @export_range(1, 16, 1) var minimum_coffin_count := 1:
     set(value):
         if minimum_coffin_count == value:
             return
         minimum_coffin_count = value
+        emit_changed()
+## Preferred centre-to-centre spacing between generated coffin deposits.
+@export_range(1, 24, 1, "suffix: tiles") var minimum_coffin_spacing_tiles := 8:
+    set(value):
+        if minimum_coffin_spacing_tiles == value:
+            return
+        minimum_coffin_spacing_tiles = value
         emit_changed()
 ## Preferred centre-to-centre clearance between coffins and treasure piles.
 @export_range(1, 12, 1, "suffix: tiles") var preferred_coffin_treasure_clearance_tiles := 3:

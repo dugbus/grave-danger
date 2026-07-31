@@ -15,6 +15,7 @@
 [ext_resource type="Script" path="res://enemies/vampire/effects/vampire_proximity_fog.gd" id="13_fog"]
 [ext_resource type="Shader" path="res://enemies/vampire/effects/vampire_proximity_fog.gdshader" id="14_fog_shader"]
 [ext_resource type="Script" path="res://enemies/vampire/knowledge/vampire_layout_knowledge.gd" id="15_knowledge"]
+[ext_resource type="Script" path="res://enemies/vampire/vampire_look.gd" id="16_look"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.52
@@ -57,6 +58,9 @@ settings = ExtResource("3_settings")
 [node name="VampireNavigation" type="Node" parent="."]
 script = ExtResource("4_navigation")
 
+[node name="VampireLook" type="Node" parent="."]
+script = ExtResource("16_look")
+
 [node name="VampireHunt" type="Node" parent="."]
 script = ExtResource("12_hunt")
 
@@ -96,6 +100,8 @@ mouse_filter = 2
 
 [node name="Character" parent="Pivot" instance=ExtResource("1_character")]
 scale = Vector3(2, 2, 2)
+
+[node name="LookDirection" type="Node3D" parent="Pivot"]
 
 [node name="VampireHeadlampLight" type="SpotLight3D" parent="Pivot"]
 transform = Transform3D(-1, 0, -8.742278e-08, -5.015858e-08, 0.81915206, 0.57357645, 7.163184e-08, 0.57357645, -0.81915206, 0, 2.1, 0.6)

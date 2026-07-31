@@ -15,6 +15,7 @@ enum VampireState {
 }
 
 const CHARACTER_GROUP: StringName = &"character"
+const ENEMY_GROUP: StringName = &"enemy"
 const GAMEPLAY_PROCESS_GROUP: StringName = &"deterministic_gameplay_process"
 const VAMPIRE_PROCESS_PRIORITY := 50
 
@@ -26,6 +27,8 @@ const VAMPIRE_PROCESS_PRIORITY := 50
 @export var character_path: NodePath = ^"Pivot/Character"
 ## Component that builds and follows routes to last-heard noise positions.
 @export var navigation_path: NodePath = ^"VampireNavigation"
+## Component that independently aims the Vampire's head, sight, and headlamp.
+@export var look_path: NodePath = ^"VampireLook"
 ## Component that selects idle and run animations from the imported character.
 @export var presentation_path: NodePath = ^"VampirePresentation"
 ## Wall-occluded instant-kill area surrounding the doubled Vampire model.
@@ -50,6 +53,7 @@ const VAMPIRE_PROCESS_PRIORITY := 50
 @onready var pivot := get_node_or_null(pivot_path) as Node3D
 @onready var character := get_node_or_null(character_path) as Node3D
 @onready var navigation: Node = get_node_or_null(navigation_path)
+@onready var look: Node = get_node_or_null(look_path)
 @onready var presentation: Node = get_node_or_null(presentation_path)
 @onready var contact := get_node_or_null(contact_path) as GDVampireContact
 @onready var senses: Node = get_node_or_null(senses_path)
@@ -70,10 +74,15 @@ var _passthrough_obstacle_bodies: Array[PhysicsBody3D] = []
 var _passthrough_obstacle_shapes: Array[CollisionShape3D] = []
 var _pivot_rest_position := Vector3.ZERO
 var _configuration_error_reported := false
+var _corridor_look_active := false
+var _corridor_look_latched := false
+var _corridor_look_elapsed := 0.0
+var _next_corridor_look_side := 1.0
 
 
 func _ready() -> void:
 	add_to_group(CHARACTER_GROUP)
+	add_to_group(ENEMY_GROUP)
 	add_to_group(GAMEPLAY_PROCESS_GROUP)
 	process_physics_priority = VAMPIRE_PROCESS_PRIORITY
 	if pivot != null:
@@ -82,12 +91,24 @@ func _ready() -> void:
 		character.scale = Vector3.ONE * settings.model_scale
 	if navigation != null:
 		navigation.configure(self, pivot, settings)
+	if look != null:
+		look.configure()
 	if presentation != null:
 		presentation.configure(character)
 	if contact != null:
 		contact.configure(settings)
 	_cache_enabled_state()
 	_apply_testing_disabled_state()
+
+
+## Returns the point the player's close-threat awareness should follow.
+func get_player_attention_position() -> Vector3:
+	return global_position
+
+
+## Reports whether this vampire should currently hold the player's attention.
+func is_available_for_player_attention() -> bool:
+	return not disable_vampire_for_testing and is_visible_in_tree()
 
 
 func _physics_process(delta: float) -> void:
@@ -107,6 +128,7 @@ func _physics_process(delta: float) -> void:
 		horizontal_speed = navigation.update_velocity(delta)
 		if state == VampireState.Hunting and not navigation.has_target and hunt == null:
 			state = VampireState.Idle
+	_update_look(delta)
 	move_and_slide()
 	_update_passthrough_obstacle_stride(delta)
 	if contact != null:
@@ -306,14 +328,18 @@ func pursue_last_seen_player(last_seen_position: Vector3) -> bool:
 func begin_junction_scan() -> void:
 	if disable_vampire_for_testing:
 		return
-	if navigation != null:
-		navigation.stop_immediately()
 	state = VampireState.ScanningJunction
 
 
-func face_scan_direction(direction: Vector3, delta: float) -> void:
-	if navigation != null:
-		navigation.face_direction(direction, delta)
+func face_scan_direction(direction: Vector3, _delta: float) -> void:
+	if look != null:
+		look.look_in_world_direction(direction)
+
+
+## Releases a completed or interrupted corridor check back toward travel facing.
+func finish_junction_scan() -> void:
+	if look != null:
+		look.return_to_travel_direction()
 
 
 func finish_search() -> void:
@@ -334,6 +360,11 @@ func is_chasing_player() -> bool:
 ## Returns whether the editor development toggle has completely disabled this boss.
 func is_disabled_for_testing() -> bool:
 	return disable_vampire_for_testing
+
+
+## Returns whether a moving search currently aims the head into a side corridor.
+func is_corridor_look_active() -> bool:
+	return _corridor_look_active
 
 
 ## Captures focused replay evidence when a player marks a Vampire problem for Codex.
@@ -472,7 +503,10 @@ func get_minimap_debug_snapshot() -> Dictionary:
 		GDVampireNavigation.RouteTraversalStatus.keys(),
 		int(navigation.get_route_traversal_status())
 	) if navigation != null else "Unavailable"
-	var facing_direction := pivot.global_basis.z if pivot != null else Vector3.FORWARD
+	var facing_direction := look.get_look_direction() as Vector3 \
+		if look != null else (
+			pivot.global_basis.z if pivot != null else Vector3.FORWARD
+		)
 	var horizontal_velocity := Vector2(velocity.x, velocity.z)
 	var belief_error := _horizontal_distance(
 		belief_position,
@@ -487,6 +521,13 @@ func get_minimap_debug_snapshot() -> Dictionary:
 		"state": _enum_name(VampireState.keys(), state),
 		"vampire_position": global_position,
 		"facing_direction": facing_direction,
+		"head_yaw_degrees": rad_to_deg(float(look.get_current_head_yaw())) \
+			if look != null else 0.0,
+		"corridor_look_active": _corridor_look_active,
+		"sight_distance": float(settings.sight_distance) \
+			if settings != null else 0.0,
+		"sight_field_of_view_degrees": float(settings.sight_field_of_view_degrees) \
+			if settings != null else 0.0,
 		"speed": horizontal_velocity.length(),
 		"player_visible": player_visible,
 		"awareness_source": awareness_name,
@@ -507,6 +548,84 @@ func get_minimap_debug_snapshot() -> Dictionary:
 		"route_points": route.size(),
 		"route_status": route_status,
 	}
+
+
+func _update_look(delta: float) -> void:
+	if look == null:
+		return
+	var has_observed_position := hunt != null and bool(hunt.is_player_visible())
+	var observed_position := hunt.get("last_confirmed_player_position") as Vector3 \
+		if has_observed_position else Vector3.ZERO
+	_update_moving_corridor_look(delta, has_observed_position)
+	var movement_focus_ratio := clampf(
+		Vector2(velocity.x, velocity.z).length() \
+			/ maxf(float(settings.max_speed), 0.01),
+		0.0,
+		1.0
+	) if settings != null else 0.0
+	look.update_look(
+		delta,
+		observed_position,
+		has_observed_position,
+		state != VampireState.ScanningJunction,
+		movement_focus_ratio
+	)
+
+
+func _update_moving_corridor_look(
+		delta: float,
+		has_observed_position: bool
+) -> void:
+	if has_observed_position or not _is_searching_while_moving():
+		_cancel_moving_corridor_look()
+		_corridor_look_latched = false
+		return
+	var side_directions: Array[Vector3] = []
+	if senses != null and settings != null:
+		side_directions = senses.get_clear_side_corridor_directions(
+			float(settings.junction_scan_probe_distance)
+		) as Array[Vector3]
+	if side_directions.is_empty():
+		_corridor_look_latched = false
+	if _corridor_look_active:
+		_corridor_look_elapsed += maxf(delta, 0.0)
+		if _corridor_look_elapsed \
+				>= float(settings.junction_scan_seconds_per_direction):
+			_cancel_moving_corridor_look()
+		return
+	if _corridor_look_latched or side_directions.is_empty():
+		return
+	_corridor_look_latched = true
+	_corridor_look_active = true
+	_corridor_look_elapsed = 0.0
+	var selected_direction := _select_corridor_look_direction(side_directions)
+	look.look_in_world_direction(selected_direction)
+
+
+func _cancel_moving_corridor_look() -> void:
+	if _corridor_look_active and look != null:
+		look.return_to_travel_direction()
+	_corridor_look_active = false
+	_corridor_look_elapsed = 0.0
+
+
+func _select_corridor_look_direction(
+		side_directions: Array[Vector3]
+) -> Vector3:
+	var selected_direction := side_directions[0]
+	for direction in side_directions:
+		var local_direction := pivot.global_basis.inverse() * direction
+		if signf(local_direction.x) == _next_corridor_look_side:
+			selected_direction = direction
+			break
+	_next_corridor_look_side *= -1.0
+	return selected_direction
+
+
+func _is_searching_while_moving() -> bool:
+	return state == VampireState.Hunting \
+		or state == VampireState.SearchingRoute \
+		or state == VampireState.PursuingLastSeen
 
 
 func _enum_name(names: Array, value: int) -> String:

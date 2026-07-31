@@ -9,6 +9,7 @@ const FOOTSTEP_SOUND_PATHS: Array[String] = [
     "res://Assets/audio/footstep4.mp3",
 ]
 const CHARACTER_GROUP: StringName = &"character"
+const ENEMY_GROUP: StringName = &"enemy"
 const SKELETON_GROUP: StringName = &"skeleton"
 const SMART_ZOMBIE_GROUP: StringName = &"smart_zombie"
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
@@ -173,6 +174,7 @@ var spawn_floor_checked := false
 
 func _ready() -> void:
     add_to_group(CHARACTER_GROUP)
+    add_to_group(ENEMY_GROUP)
     add_to_group(SKELETON_GROUP)
     footstep_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"skeleton_audio")
     _load_footstep_sounds()
@@ -204,6 +206,17 @@ func can_be_hit_by_spike_trap() -> bool:
 
 func get_spike_trap_position() -> Vector3:
     return path_follow.global_position if path_follow != null else global_position
+
+
+## Returns the moving point the player's close-threat awareness should follow.
+func get_player_attention_position() -> Vector3:
+    return path_follow.global_position if path_follow != null else global_position
+
+
+## Reports whether this skeleton is active and visible enough to track.
+func is_available_for_player_attention() -> bool:
+    return has_dropped_in and not is_dead and drop_pivot != null \
+        and drop_pivot.is_visible_in_tree()
 
 
 func _physics_process(delta: float) -> void:

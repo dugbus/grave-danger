@@ -10,8 +10,12 @@ The Vampire may choose actions from only these evidence sources:
   a nearby authored landmark, such as a key or coffin. It reveals no inventory or
   objective state beyond the event that was actually heard.
 - **Direct sight:** `GDVampireSenses` may sample the player's collision geometry to
-  decide current visibility. Only after visibility is confirmed may hunt logic read
-  the current player position and update observed velocity.
+  decide current visibility inside the editor-authored gameplay sight cone. Only
+  after visibility is confirmed may hunt logic read the current player position and
+  update observed velocity. The cone follows `Pivot/LookDirection`, which may glance
+  independently of travel but is always limited by the shared safe head-turn angle.
+  While following a search route, the Vampire deliberately moves this narrower cone
+  into newly encountered side corridors without rotating or pausing its travel.
 
 After sight is lost, the grace period, prediction, and searches use retained confirmed
 positions and velocities. They must not read the live player position. Visibility

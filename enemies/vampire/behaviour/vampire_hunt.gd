@@ -95,10 +95,7 @@ func reset_runtime_state() -> void:
 	player_is_visible = false
 	searching = false
 	pursuing_last_seen_position = false
-	junction_scan_active = false
-	junction_scan_directions.clear()
-	junction_scan_direction_index = 0
-	junction_scan_elapsed = 0.0
+	_cancel_junction_scan()
 	search_plan_after_scan = SearchPlan.StrategicRoute
 	active_search_plan = SearchPlan.StrategicRoute
 	sight_loss_elapsed = 0.0
@@ -220,8 +217,7 @@ func notify_noise(
 	sight_loss_elapsed = 0.0
 	searching = false
 	pursuing_last_seen_position = false
-	junction_scan_active = false
-	junction_scan_directions.clear()
+	_cancel_junction_scan()
 	has_chase_target = false
 	player_location_unknown_elapsed = 0.0
 	prediction_followup_searches_remaining = 0
@@ -427,8 +423,7 @@ func recover_from_route_failure() -> bool:
 	noise_target_active = false
 	searching = false
 	pursuing_last_seen_position = false
-	junction_scan_active = false
-	junction_scan_directions.clear()
+	_cancel_junction_scan()
 	has_chase_target = false
 	if begin_search():
 		return true
@@ -441,21 +436,12 @@ func _active_route_failed() -> bool:
 		== GDVampireNavigation.RouteTraversalStatus.Failed
 
 
-func _begin_junction_scan(search_plan: SearchPlan, delta: float) -> void:
+func _begin_junction_scan(search_plan: SearchPlan, _delta: float) -> void:
 	if _try_prioritize_visible_player():
 		return
 	search_plan_after_scan = search_plan
-	junction_scan_directions = senses.get_clear_scan_directions(
-		settings.junction_scan_probe_distance
-	) as Array[Vector3]
-	junction_scan_direction_index = 0
-	junction_scan_elapsed = 0.0
-	if junction_scan_directions.is_empty():
-		_resume_search_after_scan()
-		return
-	junction_scan_active = true
-	body.begin_junction_scan()
-	body.face_scan_direction(junction_scan_directions[0], delta)
+	_cancel_junction_scan()
+	_resume_search_after_scan()
 
 
 func _update_junction_scan(delta: float) -> void:
@@ -479,8 +465,7 @@ func _update_junction_scan(delta: float) -> void:
 
 
 func _resume_search_after_scan() -> void:
-	junction_scan_active = false
-	junction_scan_directions.clear()
+	_cancel_junction_scan()
 	if search_plan_after_scan == SearchPlan.NoiseRadius:
 		begin_noise_radius_search()
 	elif search_plan_after_scan == SearchPlan.LastSeenDirection:
@@ -568,8 +553,7 @@ func _enter_visible_chase(
 	noise_elapsed_seconds = 0.0
 	searching = false
 	pursuing_last_seen_position = false
-	junction_scan_active = false
-	junction_scan_directions.clear()
+	_cancel_junction_scan()
 	sight_loss_elapsed = 0.0
 	awareness_source = AwarenessSource.Sight
 	if newly_acquired or chase_state_was_invalid:
@@ -579,6 +563,15 @@ func _enter_visible_chase(
 		confirmed_player_position
 	)
 	player_was_visible = true
+
+
+func _cancel_junction_scan() -> void:
+	junction_scan_active = false
+	junction_scan_directions.clear()
+	junction_scan_direction_index = 0
+	junction_scan_elapsed = 0.0
+	if body != null and body.has_method(&"finish_junction_scan"):
+		body.call(&"finish_junction_scan")
 
 
 func _on_player_visibility_changed(visible: bool) -> void:

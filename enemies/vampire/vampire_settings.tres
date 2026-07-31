@@ -4,3 +4,4 @@
 
 [resource]
 script = ExtResource("1_settings")
+proximity_fog_max_intensity = 0.8

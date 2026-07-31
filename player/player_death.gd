@@ -10,6 +10,8 @@ const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 
 ## Node that receives death animation playback requests.
 @export var animation_controller_path: NodePath = ^"../PlayerAnimation"
+## Node that adds the visible twitch and blood burst to the death animation.
+@export var death_effects_path: NodePath = ^"../PlayerDeathEffects"
 ## Scene loaded after the death delay and fade complete.
 @export var lose_scene := "res://ui/screens/lose_screen.tscn"
 ## Seconds to wait after death before starting the lose-screen fade.
@@ -21,6 +23,7 @@ const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 
 @onready var player := get_parent() as CharacterBody3D
 @onready var animation_controller: Node = get_node_or_null(animation_controller_path)
+@onready var death_effects: Node = get_node_or_null(death_effects_path)
 
 var is_dead := false
 var showing_lose_screen := false
@@ -132,6 +135,8 @@ func _die() -> void:
 
 	if animation_controller != null:
 		animation_controller.play_death()
+	if death_effects != null:
+		death_effects.play_death_throes()
 
 	# The camera owns the actual death close-up. This component only requests it
 	# when the current camera supports that optional method.

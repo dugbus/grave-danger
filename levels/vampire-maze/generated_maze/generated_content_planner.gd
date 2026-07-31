@@ -132,6 +132,7 @@ func build_plan(
         distance_from_main_path,
         occupied,
         treasure_cells,
+        map_size,
         total_treasure_weight,
         configuration,
         seed_value
@@ -457,6 +458,7 @@ func _plan_coffins(
     distance_from_main_path: Dictionary,
     occupied: Dictionary,
     treasure_cells: Array[Vector2i],
+    map_size: Vector2i,
     total_treasure_weight: float,
     configuration: Resource,
     seed_value: int
@@ -470,20 +472,25 @@ func _plan_coffins(
         int(configuration.get("preferred_coffin_treasure_clearance_tiles")),
         1
     )
-    var preferred_occupied := occupied.duplicate()
-    var cells := _select_spread_path_cells(
-        main_path,
-        preferred_occupied,
-        coffin_count,
-        0.18,
-        0.9,
-        treasure_cells,
-        preferred_clearance
+    var preferred_coffin_spacing := maxi(
+        int(configuration.get("minimum_coffin_spacing_tiles")),
+        1
     )
+    var preferred_occupied := occupied.duplicate()
     var route_progress_by_cell := GRAPH_SCRIPT.build_route_progress_by_cell(
         main_path,
         walkable
     ) as Dictionary
+    var cells := _select_distributed_coffin_cells(
+        walkable,
+        preferred_occupied,
+        treasure_cells,
+        coffin_count,
+        map_size,
+        seed_value,
+        preferred_clearance,
+        preferred_coffin_spacing
+    )
     if cells.size() < coffin_count:
         cells.append_array(_select_exploration_cells(
             walkable,
@@ -529,6 +536,62 @@ func _plan_coffins(
             "route_progress": float(route_progress_by_cell.get(cell, 0.0)),
         })
     return coffins
+
+
+func _select_distributed_coffin_cells(
+    walkable: Dictionary,
+    occupied: Dictionary,
+    treasure_cells: Array[Vector2i],
+    count: int,
+    map_size: Vector2i,
+    seed_value: int,
+    treasure_clearance_tiles: int,
+    coffin_spacing_tiles: int
+) -> Array[Vector2i]:
+    var selected: Array[Vector2i] = []
+    if count <= 0:
+        return selected
+    var candidates: Array[Dictionary] = []
+    for cell_value in walkable:
+        var cell := cell_value as Vector2i
+        if occupied.has(cell) or not GRAPH_SCRIPT.has_minimum_cell_separation(
+            cell,
+            treasure_cells,
+            treasure_clearance_tiles
+        ):
+            continue
+        candidates.append({
+            "cell": cell,
+            "random_score": GRAPH_SCRIPT.coordinate_score(cell, seed_value, 397),
+        })
+
+    var region_targets := _build_treasure_region_targets(
+        count,
+        map_size,
+        seed_value ^ 397
+    )
+    for target_position in region_targets:
+        var best_cell := Vector2i(-1, -1)
+        var best_score := -INF
+        for candidate in candidates:
+            var cell := candidate["cell"] as Vector2i
+            if occupied.has(cell) or not GRAPH_SCRIPT.has_minimum_cell_separation(
+                cell,
+                selected,
+                coffin_spacing_tiles
+            ):
+                continue
+            var distance_squared := Vector2(cell).distance_squared_to(target_position)
+            var score := -distance_squared * 100000.0 \
+                + float(candidate["random_score"])
+            if score > best_score:
+                best_cell = cell
+                best_score = score
+        if best_cell == Vector2i(-1, -1):
+            continue
+        selected.append(best_cell)
+        occupied[best_cell] = true
+    return selected
 
 
 func _plan_treasure_caches(

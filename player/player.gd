@@ -24,6 +24,7 @@ const FALL_DEATH_DEPTH := 4.0
 @onready var inventory: Node = $PlayerInventory
 @onready var animation_controller: Node = $PlayerAnimation
 @onready var death_controller: Node = $PlayerDeath
+@onready var attention: Node = $PlayerAttention
 
 var pickup_radius_multiplier := 1.0
 var base_pickup_radius_multiplier := 1.0
@@ -56,6 +57,7 @@ func _physics_process(delta: float) -> void:
 	inventory.update_drop_input(delta)
 
 	var input_strength: float = movement.update_walk(delta, inventory)
+	attention.update_attention(delta, input_strength)
 	animation_controller.update_movement(input_strength, inventory)
 
 	var push_velocity := velocity

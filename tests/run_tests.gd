@@ -4,6 +4,7 @@ const BAT_NEST_SCRIPT := preload("res://enemies/bat_nest.gd")
 const TREASURE_DEPOSIT_COFFIN_SCENE := preload("res://placeables/treasure_deposit/treasure_deposit_coffin.tscn")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const CODEX_SESSION_OPTIONS := preload("res://game/codex_session_options.gd")
+const CHARACTER_LOOK_SETTINGS := preload("res://game/character_look_settings.tres")
 const RUN_RECORDER_SCRIPT := preload("res://game/run_recorder.gd")
 const RUN_RECORDING_SCRIPT := preload("res://game/run_recording.gd")
 const SCREEN_FADE_SCRIPT := preload("res://ui/screens/screen_fade.gd")
@@ -40,6 +41,8 @@ const VAMPIRE_MINIMAP_OVERLAY_SCRIPT := preload(
     "res://ui/hud/minimap/vampire_minimap_overlay.gd"
 )
 const PANEL_SCENE := preload("res://ui/hud/panel.tscn")
+const BLOOD_SPLATTER_DECAL_SCRIPT := preload("res://player/blood_splatter_decal.gd")
+const PLAYER_DEATH_EFFECTS_SCRIPT := preload("res://player/player_death_effects.gd")
 const PLAYER_SCENE := preload("res://player/player.tscn")
 const RUBY_ITEM := preload("res://placeables/treasure/gems/ruby_inventory.tres")
 const RUBY_SCENE := preload("res://placeables/treasure/gems/ruby.tscn")
@@ -322,6 +325,7 @@ func _run_tests() -> void:
     failed = not await _test_feedback_dialog_uses_large_game_font() or failed
     failed = not await _test_game_settings_batch_disk_writes() or failed
     failed = not _test_player_fall_death_threshold() or failed
+    failed = not await _test_player_death_uses_face_blood_and_body_throes() or failed
     failed = not _test_torch_scene_and_persistent_activation() or failed
     failed = not _test_indoor_lighting_strengthens_occlusion() or failed
     failed = not _test_held_drop_input_accelerates() or failed
@@ -362,6 +366,8 @@ func _run_tests() -> void:
     failed = not _test_frontend_gallery_instances_navigable_screens() or failed
     failed = not await _test_result_screens_and_settings_share_frontend_design() or failed
     failed = not _test_enemies_use_fake_shadows_without_warning_light_blobs() or failed
+    failed = not _test_vampire_settings_prioritize_core_controls() or failed
+    failed = not await _test_characters_glance_and_return_with_safe_head_turns() or failed
     failed = not _test_vampire_layout_knowledge_ages_and_filters_evidence() or failed
     failed = not _test_vampire_hunt_resets_and_scans_with_frame_delta() or failed
     failed = not await _test_vampire_boss_routes_to_noise_and_kills_on_contact() or failed
@@ -1207,6 +1213,7 @@ func _test_feedback_dialog_uses_large_game_font() -> bool:
     var feedback := feedback_scene.instantiate() as GDPlayerFeedback
     root.add_child(feedback)
     await process_frame
+    var note_panel := feedback.get_node_or_null("NotePanel") as Control
     var prompt := feedback.get_node_or_null(
         "NotePanel/Center/Panel/Margin/VBox/Prompt"
     ) as Label
@@ -1228,15 +1235,55 @@ func _test_feedback_dialog_uses_large_game_font() -> bool:
             submitted_note["value"] = note
     )
     feedback.call("_show_note_field")
-    note_field.text = "The first line.\nThe second line."
-    proceed_button.pressed.emit()
-    var multiline_note_submitted := String(submitted_note["value"]) \
-        == "The first line.\nThe second line."
+    var keyboard_starts_on_controller_action := proceed_button.has_focus() \
+        and note_field.focus_mode == Control.FOCUS_CLICK
+    var first_key := InputEventKey.new()
+    first_key.keycode = KEY_A
+    first_key.unicode = "a".unicode_at(0)
+    first_key.pressed = true
+    feedback.call("_input", first_key)
+    var newline_key := InputEventKey.new()
+    newline_key.keycode = KEY_ENTER
+    newline_key.pressed = true
+    feedback.call("_input", newline_key)
+    var second_key := InputEventKey.new()
+    second_key.keycode = KEY_B
+    second_key.unicode = "b".unicode_at(0)
+    second_key.pressed = true
+    feedback.call("_input", second_key)
+    var keyboard_routes_to_note_without_activating := note_field.text == "a\nb" \
+        and note_panel.visible \
+        and proceed_button.has_focus()
+
+    var dpad_left := InputEventJoypadButton.new()
+    dpad_left.button_index = JOY_BUTTON_DPAD_LEFT
+    dpad_left.pressed = true
+    feedback.call("_input", dpad_left)
+    var dpad_selects_cancel := cancel_button.has_focus()
+    dpad_left.pressed = false
+    feedback.call("_input", dpad_left)
+    var stick_motion := InputEventJoypadMotion.new()
+    stick_motion.axis = JOY_AXIS_LEFT_X
+    stick_motion.axis_value = 1.0
+    feedback.call("_input", stick_motion)
+    var stick_selects_proceed := proceed_button.has_focus()
+    var joypad_accept := InputEventJoypadButton.new()
+    joypad_accept.button_index = JOY_BUTTON_A
+    joypad_accept.pressed = true
+    feedback.call("_input", joypad_accept)
+    var controller_submits_keyboard_note := String(submitted_note["value"]) == "a\nb" \
+        and not note_panel.visible
+    joypad_accept.pressed = false
+    feedback.call("_input", joypad_accept)
+
     feedback.call("_show_note_field")
     note_field.text = "Discard this note."
-    cancel_button.pressed.emit()
-    var cancel_discarded_note := String(submitted_note["value"]) \
-        == "The first line.\nThe second line."
+    var joypad_cancel := InputEventJoypadButton.new()
+    joypad_cancel.button_index = JOY_BUTTON_B
+    joypad_cancel.pressed = true
+    feedback.call("_input", joypad_cancel)
+    var controller_cancel_discarded_note := String(submitted_note["value"]) == "a\nb" \
+        and not note_panel.visible
     var passed := _expect(
         prompt != null \
             and prompt.get_theme_font_size("font_size") >= 64 \
@@ -1251,8 +1298,12 @@ func _test_feedback_dialog_uses_large_game_font() -> bool:
             and note_field.has_theme_font_override("font"),
         "feedback instructions and entry field more than double their original font sizes"
     ) and _expect(
-        multiline_note_submitted \
-            and cancel_discarded_note \
+        keyboard_starts_on_controller_action \
+            and keyboard_routes_to_note_without_activating \
+            and dpad_selects_cancel \
+            and stick_selects_proceed \
+            and controller_submits_keyboard_note \
+            and controller_cancel_discarded_note \
             and proceed_button != null \
             and proceed_button.focus_mode == Control.FOCUS_ALL \
             and proceed_button.has_theme_font_override("font") \
@@ -1261,7 +1312,7 @@ func _test_feedback_dialog_uses_large_game_font() -> bool:
             and cancel_button.has_theme_font_override("font") \
             and not proceed_button.focus_neighbor_left.is_empty() \
             and not cancel_button.focus_neighbor_right.is_empty(),
-        "feedback supports multiline notes and joypad-focusable Proceed and Cancel actions"
+        "feedback routes keyboard notes separately from controller navigation and actions"
     )
     feedback.queue_free()
     await process_frame
@@ -1646,6 +1697,142 @@ func _test_player_fall_death_threshold() -> bool:
 
     return _expect(survives_at_threshold, "player survives exactly four metres below the floor") \
         and _expect(dies_below_threshold, "player dies below four metres under the floor")
+
+
+func _test_player_death_uses_face_blood_and_body_throes() -> bool:
+    var floor := StaticBody3D.new()
+    floor.collision_layer = 1
+    var floor_collision := CollisionShape3D.new()
+    var floor_shape := BoxShape3D.new()
+    floor_shape.size = Vector3(4.0, 0.1, 4.0)
+    floor_collision.shape = floor_shape
+    floor.add_child(floor_collision)
+    floor.position.y = -0.05
+    root.add_child(floor)
+    var player := PLAYER_SCENE.instantiate() as GDPlayer
+    root.add_child(player)
+    player.set_physics_process(false)
+    await physics_frame
+
+    var death_controller := player.get_node("PlayerDeath") as GDPlayerDeath
+    var death_effects := player.get_node("PlayerDeathEffects") as Node3D
+    var attention := player.get_node("PlayerAttention") as GDPlayerAttention
+    var head := player.get_node(
+        "Pivot/Character/character-keeper/root/torso/head"
+    ) as Node3D
+    var visual_pivot := player.get_node("Pivot") as Node3D
+    var blood_emitters: Array[GPUParticles3D] = [
+        player.get_node("PlayerDeathEffects/MouthBlood") as GPUParticles3D,
+        player.get_node("PlayerDeathEffects/NoseBlood") as GPUParticles3D,
+        player.get_node("PlayerDeathEffects/LeftEyeBlood") as GPUParticles3D,
+        player.get_node("PlayerDeathEffects/RightEyeBlood") as GPUParticles3D,
+    ]
+    death_controller.return_delay = 60.0
+    var base_pivot_rotation := visual_pivot.rotation
+    player.die_from_flames()
+
+    var all_face_sources_keep_emitting := true
+    for emitter in blood_emitters:
+        all_face_sources_keep_emitting = all_face_sources_keep_emitting \
+            and emitter.visible \
+            and emitter.emitting \
+            and not emitter.one_shot \
+            and not emitter.local_coords \
+            and emitter.process_material is ParticleProcessMaterial
+    var head_inverse := head.global_transform.affine_inverse()
+    var face_sources_are_placed := (
+        head_inverse * blood_emitters[0].global_transform
+    ).origin.is_equal_approx(PLAYER_DEATH_EFFECTS_SCRIPT.MOUTH_FACE_OFFSET) \
+        and (
+            head_inverse * blood_emitters[1].global_transform
+        ).origin.is_equal_approx(PLAYER_DEATH_EFFECTS_SCRIPT.NOSE_FACE_OFFSET) \
+        and (
+            head_inverse * blood_emitters[2].global_transform
+        ).origin.is_equal_approx(PLAYER_DEATH_EFFECTS_SCRIPT.LEFT_EYE_FACE_OFFSET) \
+        and (
+            head_inverse * blood_emitters[3].global_transform
+        ).origin.is_equal_approx(PLAYER_DEATH_EFFECTS_SCRIPT.RIGHT_EYE_FACE_OFFSET)
+    await create_timer(0.04).timeout
+    var body_has_started_twitching := not visual_pivot.rotation.is_equal_approx(
+        base_pivot_rotation
+    )
+    await create_timer(
+        float(death_effects.get("environment_splatter_delay")) + 0.08
+    ).timeout
+    var player_splatter := death_effects.call("get_player_splatter") as Node3D
+    var environment_splatter := death_effects.call("get_environment_splatter") as Node3D
+    var player_decal := player_splatter.get_node_or_null("Decal") as Decal \
+        if player_splatter != null else null
+    var environment_decal := environment_splatter.get_node_or_null("Decal") as Decal \
+        if environment_splatter != null else null
+    var player_surface_mark := player_splatter.get_node_or_null(
+        "SurfaceMark"
+    ) as MeshInstance3D if player_splatter != null else null
+    var environment_surface_mark := environment_splatter.get_node_or_null(
+        "SurfaceMark"
+    ) as MeshInstance3D if environment_splatter != null else null
+    var player_impact := player_splatter.get_node_or_null(
+        "ImpactBlood"
+    ) as GPUParticles3D if player_splatter != null else null
+    var environment_impact := environment_splatter.get_node_or_null(
+        "ImpactBlood"
+    ) as GPUParticles3D if environment_splatter != null else null
+    var head_mesh := head as MeshInstance3D
+    var head_bounds := head_mesh.get_aabb()
+    var current_head_inverse := head.global_transform.affine_inverse()
+    var sources_are_below_hat := true
+    for emitter in blood_emitters:
+        var source_offset := (current_head_inverse * emitter.global_transform).origin
+        sources_are_below_hat = sources_are_below_hat \
+            and source_offset.y < head_bounds.position.y + head_bounds.size.y * 0.5 \
+            and source_offset.z > 0.16 \
+            and source_offset.z < 0.21
+    var player_projector_reaches_face := player_splatter != null \
+        and player_decal != null \
+        and absf(player_splatter.position.z - 0.174) < player_decal.size.y * 0.5
+    var splatters_attach_to_their_receivers := player_splatter != null \
+        and environment_splatter != null \
+        and player_splatter.get_parent() == head \
+        and environment_splatter.get_parent() == floor \
+        and player_decal != null \
+        and environment_decal != null \
+        and player_decal.cull_mask == BLOOD_SPLATTER_DECAL_SCRIPT.PLAYER_VISUAL_LAYER \
+        and environment_decal.cull_mask \
+            == BLOOD_SPLATTER_DECAL_SCRIPT.ENVIRONMENT_VISUAL_LAYER \
+        and player_decal.texture_albedo != null \
+        and environment_decal.texture_albedo == player_decal.texture_albedo \
+        and player_decal.texture_emission == player_decal.texture_albedo \
+        and environment_decal.texture_emission == environment_decal.texture_albedo \
+        and player_surface_mark != null \
+        and player_surface_mark.mesh != null \
+        and environment_surface_mark != null \
+        and environment_surface_mark.mesh != null \
+        and player_impact != null \
+        and player_impact.one_shot \
+        and player_impact.amount == 8 \
+        and environment_impact != null \
+        and environment_impact.one_shot \
+        and environment_impact.amount == 18
+
+    var passed := _expect(
+        death_controller.is_dead \
+            and bool(death_effects.get("is_playing")) \
+            and not attention.is_processing() \
+            and body_has_started_twitching,
+        "player death overlays diminishing body throes without live attention movement"
+    ) and _expect(
+        all_face_sources_keep_emitting \
+            and face_sources_are_placed \
+            and sources_are_below_hat,
+        "player death keeps spraying blood from facial features below the hat"
+    ) and _expect(
+        splatters_attach_to_their_receivers and player_projector_reaches_face,
+        "blood impacts visibly mark and overlap the corpse and contacted environment"
+    )
+    player.queue_free()
+    floor.queue_free()
+    await process_frame
+    return passed
 
 
 func _test_held_drop_input_accelerates() -> bool:
@@ -4574,6 +4761,264 @@ func _test_result_screens_and_settings_share_frontend_design() -> bool:
     return passed
 
 
+func _test_vampire_settings_prioritize_core_controls() -> bool:
+    var settings := load(
+        "res://enemies/vampire/vampire_settings.tres"
+    ) as Resource
+    var advanced_group_index := -1
+    var core_property_indices: Array[int] = []
+    var advanced_property_indices: Array[int] = []
+    var advanced_subgroups: Array[StringName] = []
+    var core_property_names: Array[StringName] = [
+        &"model_scale",
+        &"max_speed",
+        &"acceleration",
+        &"deceleration",
+        &"turn_speed",
+        &"sight_distance",
+        &"sight_field_of_view_degrees",
+        &"sight_loss_grace_seconds",
+        &"instant_kill_contact_radius",
+        &"proximity_fog_distance",
+        &"proximity_fog_max_intensity",
+    ]
+    var advanced_property_names: Array[StringName] = [
+        &"waypoint_reached_distance",
+        &"wall_stall_recovery_seconds",
+        &"sight_clearance_radius",
+        &"last_seen_prediction_seconds",
+        &"junction_scan_seconds_per_direction",
+        &"noise_retarget_distance",
+        &"layout_landmark_noise_match_distance",
+        &"proximity_fog_response_speed",
+    ]
+    var property_list := settings.get_property_list()
+    for property_index in property_list.size():
+        var property := property_list[property_index] as Dictionary
+        var property_name := property.get("name", &"") as StringName
+        var property_usage := int(property.get("usage", PROPERTY_USAGE_NONE))
+        if (property_usage & PROPERTY_USAGE_GROUP) != 0 \
+                and property_name == &"Advanced":
+            advanced_group_index = property_index
+        elif (property_usage & PROPERTY_USAGE_SUBGROUP) != 0:
+            advanced_subgroups.append(property_name)
+        elif core_property_names.has(property_name):
+            core_property_indices.append(property_index)
+        elif advanced_property_names.has(property_name):
+            advanced_property_indices.append(property_index)
+
+    var core_controls_are_before_advanced := advanced_group_index >= 0 \
+        and core_property_indices.size() == core_property_names.size()
+    for property_index in core_property_indices:
+        core_controls_are_before_advanced = core_controls_are_before_advanced \
+            and property_index < advanced_group_index
+    var complex_controls_are_inside_advanced := advanced_property_indices.size() \
+        == advanced_property_names.size()
+    for property_index in advanced_property_indices:
+        complex_controls_are_inside_advanced = complex_controls_are_inside_advanced \
+            and property_index > advanced_group_index
+    return _expect(
+        core_controls_are_before_advanced \
+            and complex_controls_are_inside_advanced \
+            and advanced_subgroups.has(&"Movement") \
+            and advanced_subgroups.has(&"Sight") \
+            and advanced_subgroups.has(&"Noise Search") \
+            and advanced_subgroups.has(&"Proximity Fog"),
+        "Vampire settings keep core controls above grouped advanced tuning"
+    )
+
+
+func _test_characters_glance_and_return_with_safe_head_turns() -> bool:
+    var holder := Node3D.new()
+    root.add_child(holder)
+
+    var player := PLAYER_SCENE.instantiate() as GDPlayer
+    var coin := GOLD_COIN_SCENE.instantiate() as GDInventoryPickup
+    holder.add_child(player)
+    holder.add_child(coin)
+    player.set_physics_process(false)
+    coin.set_physics_process(false)
+    coin.freeze = true
+    coin.position = Vector3(1.5, 0.0, 2.0)
+    await physics_frame
+
+    var player_attention: Node = player.get_node("PlayerAttention")
+    var player_pivot := player.get_node("Pivot") as Node3D
+    var player_look_direction := player.get_node("Pivot/LookDirection") as Node3D
+    var player_head := player.get_node(
+        "Pivot/Character/character-keeper/root/torso/head"
+    ) as Node3D
+    var player_torso := player_head.get_parent() as Node3D
+    var player_torso_rest_yaw := player_torso.rotation.y
+    var player_headlamp := player.get_node("Pivot/PlayerHeadlampLight") as SpotLight3D
+    var player_headlamp_offset := player_head.global_transform.affine_inverse() \
+        * player_headlamp.global_transform
+    var player_travel_yaw := player_pivot.rotation.y
+    player_attention.update_attention(0.2)
+    player_attention.call("_process", 0.0)
+    var player_glances_at_visible_coin: bool = player_attention.get_target_collectible() == coin \
+        and player_attention.get_current_head_yaw() > 0.0 \
+        and player_attention.get_current_head_yaw() \
+            <= float(player_attention.get_maximum_head_turn_radians()) \
+        and is_equal_approx(player_pivot.rotation.y, player_travel_yaw) \
+        and not is_zero_approx(player_look_direction.rotation.y)
+    var player_headlamp_follows_head := (
+        player_head.global_transform.affine_inverse() * player_headlamp.global_transform
+    ).is_equal_approx(player_headlamp_offset)
+    var player_upper_body_supports_look := not is_equal_approx(
+        player_torso.rotation.y,
+        player_torso_rest_yaw
+    )
+    coin.queue_free()
+    await process_frame
+    player_attention.update_attention(0.1)
+    player_attention.update_attention(0.8)
+    var player_returns_to_travel: bool = is_zero_approx(
+        player_attention.get_current_head_yaw()
+    ) and is_equal_approx(player_pivot.rotation.y, player_travel_yaw) \
+        and player_attention.get_target_collectible() == null
+    player_attention.update_attention(0.0, 0.0)
+    player_attention.set("next_glance_seconds", 0.0)
+    player_attention.update_attention(0.2, 0.0)
+    var player_idle_glance := absf(float(player_attention.get_current_head_yaw()))
+    var player_first_idle_direction := float(player_attention.get_current_head_yaw())
+    player_attention.update_attention(2.0, 0.0)
+    var player_second_idle_direction := float(player_attention.get_current_head_yaw())
+    var player_continuously_scans_at_rest := player_first_idle_direction \
+        * player_second_idle_direction < 0.0
+    player_attention.update_attention(0.0, 1.0)
+    player_attention.set("next_glance_seconds", 0.0)
+    player_attention.update_attention(0.2, 1.0)
+    var player_full_pace_glance := absf(float(player_attention.get_current_head_yaw()))
+
+    var vampire := VAMPIRE_SCENE.instantiate() as GDVampire
+    vampire.position = Vector3(4.3, 0.0, 1.2)
+    holder.add_child(vampire)
+    vampire.set_physics_process(false)
+    var threat_coin := GOLD_COIN_SCENE.instantiate() as GDInventoryPickup
+    threat_coin.position = Vector3(0.0, 0.0, 3.0)
+    holder.add_child(threat_coin)
+    threat_coin.set_physics_process(false)
+    threat_coin.freeze = true
+    await physics_frame
+    player_attention.update_attention(0.2, 1.0)
+    var player_tracks_close_enemy: bool = player_attention.get_target_enemy() == vampire \
+        and player_attention.get_target_collectible() == null \
+        and is_equal_approx(
+            player_attention.get_current_head_yaw(),
+            player_attention.get_maximum_head_turn_radians()
+        )
+    vampire.position = Vector3(-4.3, 0.0, 1.2)
+    player_attention.update_attention(0.4, 1.0)
+    var player_follows_moving_enemy: bool = player_attention.get_target_enemy() == vampire \
+        and player_attention.get_current_head_yaw() < 0.0
+    vampire.position = Vector3(0.0, 0.0, -2.0)
+    player_attention.update_attention(0.1, 1.0)
+    var player_rejects_enemy_behind := player_attention.get_target_enemy() == null
+    vampire.position = Vector3(0.0, 0.0, 5.1)
+    player_attention.update_attention(0.1, 1.0)
+    var player_rejects_enemy_beyond_close_range := player_attention.get_target_enemy() == null
+    var vampire_look: Node = vampire.get_node("VampireLook")
+    var vampire_pivot := vampire.get_node("Pivot") as Node3D
+    var vampire_head := vampire.get_node(
+        "Pivot/Character/character-vampire/root/torso/head"
+    ) as Node3D
+    var vampire_torso := vampire_head.get_parent() as Node3D
+    var vampire_torso_rest_yaw := vampire_torso.rotation.y
+    var vampire_headlamp := vampire.get_node("Pivot/VampireHeadlampLight") as SpotLight3D
+    var vampire_headlamp_offset := vampire_head.global_transform.affine_inverse() \
+        * vampire_headlamp.global_transform
+    var vampire_travel_yaw := vampire_pivot.rotation.y
+    vampire_look.return_to_travel_direction()
+    vampire_look.update_look(1.0, Vector3.ZERO, false, false)
+    vampire_look.update_look(0.0, Vector3.ZERO, false, true)
+    vampire_look.set("next_glance_seconds", 0.0)
+    vampire_look.update_look(0.2, Vector3.ZERO, false, true)
+    vampire_look.call("_process", 0.0)
+    var vampire_idle_glance := absf(float(vampire_look.get_current_head_yaw()))
+    var vampire_headlamp_follows_head := (
+        vampire_head.global_transform.affine_inverse() * vampire_headlamp.global_transform
+    ).is_equal_approx(vampire_headlamp_offset)
+    var vampire_upper_body_supports_look := not is_equal_approx(
+        vampire_torso.rotation.y,
+        vampire_torso_rest_yaw
+    )
+    var vampire_first_idle_direction := float(vampire_look.get_current_head_yaw())
+    vampire_look.update_look(2.0, Vector3.ZERO, false, true, 0.0)
+    var vampire_second_idle_direction := float(vampire_look.get_current_head_yaw())
+    var vampire_continuously_scans_at_rest := vampire_first_idle_direction \
+        * vampire_second_idle_direction < 0.0
+    vampire_look.update_look(0.0, Vector3.ZERO, false, true, 1.0)
+    vampire_look.set("next_glance_seconds", 0.0)
+    vampire_look.update_look(0.2, Vector3.ZERO, false, true, 1.0)
+    var vampire_full_pace_glance := absf(float(vampire_look.get_current_head_yaw()))
+    var vampire_searches_while_stationary: bool = vampire_idle_glance \
+        > vampire_full_pace_glance \
+        and is_equal_approx(vampire_pivot.rotation.y, vampire_travel_yaw)
+    vampire_look.return_to_travel_direction()
+    vampire_look.update_look(1.0, Vector3.ZERO, false, false)
+    vampire_look.look_in_world_direction(Vector3.RIGHT)
+    vampire_look.update_look(1.0)
+    var vampire_turn_is_clamped: bool = is_equal_approx(
+        vampire_look.get_current_head_yaw(),
+        float(vampire_look.get_maximum_head_turn_radians())
+    ) and is_equal_approx(vampire_pivot.rotation.y, vampire_travel_yaw)
+    vampire_look.return_to_travel_direction()
+    vampire_look.update_look(1.0, Vector3.ZERO, false, false)
+    var vampire_returns_to_travel: bool = is_zero_approx(
+        vampire_look.get_current_head_yaw()
+    ) and is_equal_approx(vampire_pivot.rotation.y, vampire_travel_yaw)
+
+    var snapshot := vampire.get_minimap_debug_snapshot()
+    var senses := vampire.get_node("VampireSenses") as GDVampireSenses
+    var minimap_and_sight_share_look_direction := (
+        senses.get("facing_node") as Node3D
+    ) == vampire.get_node("Pivot/LookDirection") \
+        and float(snapshot.get("sight_distance", 0.0)) > 0.0 \
+        and float(snapshot.get("sight_field_of_view_degrees", 0.0)) > 0.0
+    var stationary_attention_is_stronger := float(
+        CHARACTER_LOOK_SETTINGS.get_wandering_head_turn_radians(0.0)
+    ) > float(CHARACTER_LOOK_SETTINGS.get_wandering_head_turn_radians(0.5)) \
+        and float(CHARACTER_LOOK_SETTINGS.get_wandering_head_turn_radians(0.5)) \
+            > float(CHARACTER_LOOK_SETTINGS.get_wandering_head_turn_radians(1.0)) \
+        and float(CHARACTER_LOOK_SETTINGS.get_wandering_hold_seconds(0.0)) \
+            > float(CHARACTER_LOOK_SETTINGS.get_wandering_hold_seconds(1.0)) \
+        and float(CHARACTER_LOOK_SETTINGS.get_wandering_interval_max_seconds(0.0)) \
+            < float(CHARACTER_LOOK_SETTINGS.get_wandering_interval_min_seconds(1.0))
+
+    var passed := _expect(
+        player_glances_at_visible_coin \
+            and player_returns_to_travel \
+            and player_idle_glance > player_full_pace_glance \
+            and player_continuously_scans_at_rest,
+        "player continuously scans at rest and focuses toward full-pace travel"
+    ) and _expect(
+        player_tracks_close_enemy \
+            and player_follows_moving_enemy \
+            and player_rejects_enemy_behind \
+            and player_rejects_enemy_beyond_close_range,
+        "player follows close forward enemies as far as its safe head turn permits"
+    ) and _expect(
+        vampire_searches_while_stationary \
+            and vampire_turn_is_clamped \
+            and vampire_returns_to_travel \
+            and vampire_continuously_scans_at_rest,
+        "vampire continuously searches at rest without exceeding a safe head turn"
+    ) and _expect(
+        player_headlamp_follows_head \
+            and vampire_headlamp_follows_head \
+            and player_upper_body_supports_look \
+            and vampire_upper_body_supports_look,
+        "readable head turns include the upper body and keep headlamps attached"
+    ) and _expect(
+        minimap_and_sight_share_look_direction and stationary_attention_is_stronger,
+        "Vampire sight and the shared attention ramp use the live look direction"
+    )
+    holder.queue_free()
+    await process_frame
+    return passed
+
+
 func _test_vampire_layout_knowledge_ages_and_filters_evidence() -> bool:
     var navigation := TestVampireLayoutNavigation.new()
     var evidence_position := Vector3.ZERO
@@ -4799,21 +5244,48 @@ func _test_vampire_hunt_resets_and_scans_with_frame_delta() -> bool:
         and reset_rng_matches_seed
 
     var pivot := vampire.get_node("Pivot") as Node3D
+    var vampire_look: Node = vampire.get_node("VampireLook")
     pivot.rotation.y = 0.0
     var scan_delta := 1.0 / 60.0
-    var expected_first_yaw := lerp_angle(
-        0.0,
-        atan2(Vector3.FORWARD.x, Vector3.FORWARD.z),
-        float(settings.get("turn_speed")) * scan_delta
+    var travel_yaw_before_scan := pivot.rotation.y
+    vampire.set("state", GDVampire.VampireState.SearchingRoute)
+    vampire.velocity = Vector3(0.0, 0.0, 2.0)
+    navigation.set("has_target", true)
+    navigation.set("route_points", [Vector3(0.0, 0.0, 4.0)] as Array[Vector3])
+    var velocity_before_corridor_look := vampire.velocity
+    vampire.call("_update_look", scan_delta)
+    var expected_first_head_yaw := minf(
+        float(CHARACTER_LOOK_SETTINGS.head_turn_speed) * scan_delta,
+        float(vampire_look.get_maximum_head_turn_radians())
     )
-    hunt.call(
-        "_begin_junction_scan",
-        GDVampireHunt.SearchPlan.StrategicRoute,
-        scan_delta
-    )
-    var first_scan_turn_uses_frame_delta := is_equal_approx(
+    var side_corridor_directions := senses.get_clear_side_corridor_directions(
+        float(settings.get("junction_scan_probe_distance"))
+    ) as Array[Vector3]
+    var scan_right := pivot.global_basis.x.normalized()
+    var corridor_snapshot := vampire.get_minimap_debug_snapshot()
+    var moving_search_checks_side_corridors := is_equal_approx(
         pivot.rotation.y,
-        expected_first_yaw
+        travel_yaw_before_scan
+    ) and is_equal_approx(
+        float(vampire_look.get_current_head_yaw()),
+        expected_first_head_yaw
+    ) and bool(vampire.call("is_corridor_look_active")) \
+        and side_corridor_directions.has(scan_right) \
+        and side_corridor_directions.has(-scan_right) \
+        and bool(navigation.get("has_target")) \
+        and vampire.velocity.is_equal_approx(velocity_before_corridor_look) \
+        and bool(corridor_snapshot.get("corridor_look_active", false)) \
+        and absf(float(corridor_snapshot.get("head_yaw_degrees", 0.0))) > 0.0
+    vampire.call(
+        "_update_look",
+        float(settings.get("junction_scan_seconds_per_direction")) + 0.01
+    )
+    var corridor_look_returns_head_to_travel := is_zero_approx(
+        float(vampire_look.get_current_head_yaw())
+    ) and not bool(vampire.call("is_corridor_look_active"))
+    var human_scaled_gameplay_sight := is_equal_approx(
+        float(settings.get("sight_field_of_view_degrees")),
+        110.0
     )
     var complete_configuration_has_no_errors := vampire.get_configuration_errors(
         player,
@@ -4827,8 +5299,12 @@ func _test_vampire_hunt_resets_and_scans_with_frame_delta() -> bool:
     ) == PackedStringArray(["player", "wall GridMap", "end gate"])
 
     var passed := _expect(
-        first_scan_turn_uses_frame_delta,
-        "vampire junction scanning turns through one frame instead of snapping initially"
+        moving_search_checks_side_corridors \
+            and corridor_look_returns_head_to_travel,
+        "vampire checks side corridors with its head while route movement continues"
+    ) and _expect(
+        human_scaled_gameplay_sight,
+        "vampire gameplay sight uses a focused human-scale field of view"
     ) and _expect(
         stale_observations_are_cleared,
         "vampire reuse clears perception, prediction, search, movement, and RNG state"
@@ -4868,6 +5344,7 @@ func _test_vampire_boss_routes_to_noise_and_kills_on_contact() -> bool:
     player.set_physics_process(false)
     vampire.position = grid_map.map_to_local(Vector3i(1, 0, 1))
     player.position = grid_map.map_to_local(Vector3i(3, 0, 1))
+    var authored_player_entrance := player.position
     var coffin := TREASURE_DEPOSIT_COFFIN_SCENE.instantiate() as Node3D
     coffin.position = Vector3(1.0, 0.0, 3.0)
     var gate := Node3D.new()
@@ -4910,7 +5387,7 @@ func _test_vampire_boss_routes_to_noise_and_kills_on_contact() -> bool:
     await process_frame
     var hunt := vampire.get_node("VampireHunt")
     var starts_hunting_entrance: bool = selected_targets.size() == 1 \
-        and selected_targets[0] == player.global_position \
+        and selected_targets[0].is_equal_approx(authored_player_entrance) \
         and vampire.get_vampire_state() == GDVampire.VampireState.Hunting \
         and int(hunt.call("get_awareness_source")) \
             == GDVampireHunt.AwarenessSource.Entrance
@@ -5124,6 +5601,11 @@ func _test_vampire_boss_routes_to_noise_and_kills_on_contact() -> bool:
     var current_sight_direction := player.position - vampire.position
     current_sight_direction.y = 0.0
     current_sight_direction = current_sight_direction.normalized()
+    var vampire_pivot := vampire.get_node("Pivot") as Node3D
+    vampire_pivot.rotation.y = atan2(
+        current_sight_direction.x,
+        current_sight_direction.z
+    )
     var sight_edge_direction := Vector3(
         -current_sight_direction.z,
         0.0,
@@ -5183,6 +5665,10 @@ func _test_vampire_boss_routes_to_noise_and_kills_on_contact() -> bool:
     )
     senses.call("sample_player_visibility")
     var ordinary_player_position := player.global_position
+    vampire_pivot.rotation.y = atan2(
+        sight_edge_direction.x,
+        sight_edge_direction.z
+    )
     player.global_position = vampire.global_position + sight_edge_direction * 1.25
     await physics_frame
     var notices_player_passing_close := bool(senses.call("sample_player_visibility"))
@@ -5200,6 +5686,13 @@ func _test_vampire_boss_routes_to_noise_and_kills_on_contact() -> bool:
         grid_map.map_to_local(Vector3i(3, 0, 1))
     ) + Vector3(0.0, 0.0, -0.51)
     wall_pressed_player_position.y = vampire.global_position.y
+    var wall_pressed_direction := (
+        wall_pressed_player_position - vampire.global_position
+    )
+    vampire_pivot.rotation.y = atan2(
+        wall_pressed_direction.x,
+        wall_pressed_direction.z
+    )
     player.global_position = wall_pressed_player_position
     await physics_frame
     var wall_pressed_player_cell := grid_map.local_to_map(
@@ -5216,21 +5709,67 @@ func _test_vampire_boss_routes_to_noise_and_kills_on_contact() -> bool:
     grid_map.set_cell_item(wall_pressed_player_cell, GridMap.INVALID_CELL_ITEM)
     player.global_position = ordinary_player_position
     sight_wall.position = sight_wall_centre + sight_wall_clear_offset
+    vampire_pivot.rotation.y = atan2(
+        current_sight_direction.x,
+        current_sight_direction.z
+    )
     vampire.process_mode = vampire_process_mode
     await physics_frame
     senses.call("set_wall_grid_map", null)
-    var vampire_pivot := vampire.get_node("Pivot") as Node3D
+    var visual_headlamp := vampire.get_node(
+        "Pivot/VampireHeadlampLight"
+    ) as SpotLight3D
+    var vampire_look_component: Node = vampire.get_node("VampireLook")
+    vampire_look_component.look_in_world_direction(vampire_pivot.global_basis.z)
+    vampire_look_component.update_look(1.0)
+    var visibility_cone_forward := vampire_look_component.get_look_direction() as Vector3
+    visibility_cone_forward.y = 0.0
+    visibility_cone_forward = visibility_cone_forward.normalized()
+    var visibility_cone_test_direction := visibility_cone_forward.rotated(
+        Vector3.UP,
+        deg_to_rad(60.0)
+    )
+    var authored_field_of_view := float(
+        settings.get("sight_field_of_view_degrees")
+    )
+    var authored_headlamp_angle := visual_headlamp.spot_angle
+    settings.set("sight_field_of_view_degrees", 90.0)
+    visual_headlamp.spot_angle = 179.0
+    player.global_position = vampire.global_position \
+        + visibility_cone_test_direction * 1.25
+    await physics_frame
+    var narrow_gameplay_cone_excludes_player := not bool(
+        senses.call("can_see_player")
+    )
+    settings.set("sight_field_of_view_degrees", 150.0)
+    visual_headlamp.spot_angle = 1.0
+    await physics_frame
+    var wide_gameplay_cone_includes_player := bool(senses.call("can_see_player"))
     var behind_vampire_direction := -vampire_pivot.global_basis.z.normalized()
     player.global_position = vampire.global_position + behind_vampire_direction * 1.25
     await physics_frame
-    var omnidirectional_sight_remains_active := bool(senses.call("can_see_player"))
-    player.global_position = vampire.global_position + Vector3(64.0, 0.0, 0.0)
+    var visibility_cone_rejects_player_behind := not bool(
+        senses.call("can_see_player")
+    )
+    settings.set("sight_field_of_view_degrees", authored_field_of_view)
+    visual_headlamp.spot_angle = authored_headlamp_angle
+    var configured_sight_distance := float(settings.get("sight_distance"))
+    player.global_position = vampire.global_position \
+        + visibility_cone_forward * configured_sight_distance
     await physics_frame
-    var sees_player_within_64_metres := bool(senses.call("can_see_player"))
-    player.global_position = vampire.global_position + Vector3(64.5, 0.0, 0.0)
+    var sees_player_at_configured_distance := bool(senses.call("can_see_player"))
+    player.global_position = vampire.global_position \
+        + visibility_cone_forward * (configured_sight_distance + 0.5)
     await physics_frame
-    var cannot_see_player_beyond_64_metres := not bool(senses.call("can_see_player"))
+    var cannot_see_player_beyond_configured_distance := not bool(
+        senses.call("can_see_player")
+    )
+    vampire_look_component.return_to_travel_direction()
     player.global_position = ordinary_player_position
+    vampire_pivot.rotation.y = atan2(
+        current_sight_direction.x,
+        current_sight_direction.z
+    )
     senses.call("set_wall_grid_map", grid_map)
     await physics_frame
     var sight_samples_before := int(senses.call("get_visibility_sample_count"))
@@ -5311,11 +5850,9 @@ func _test_vampire_boss_routes_to_noise_and_kills_on_contact() -> bool:
             and character.scale.is_equal_approx(Vector3.ONE * 2.0),
         "vampire model is authored at double scale"
     ) and _expect(
-        is_equal_approx(
-            float(settings.get("max_speed")),
-            GDPlayerMovement.SPEED * 1.1
-        ),
-        "vampire maximum speed is 1.1 times the player's maximum speed"
+        float(settings.get("max_speed")) > 0.0 \
+            and navigation.get("settings") == settings,
+        "vampire navigation uses its positive editor-configured maximum speed"
     ) and _expect(
         noise_search_is_replay_stable and search_candidates_are_stably_ordered,
         "vampire search decisions use replay-stable seeds, candidates, and physics ordering"
@@ -5665,10 +6202,12 @@ func _test_vampire_boss_routes_to_noise_and_kills_on_contact() -> bool:
         (hunt.get("junction_scan_directions") as Array[Vector3]).size(),
         1
     )
-    hunt.update_hunt(
-        float(settings.get("junction_scan_seconds_per_direction")) \
-            * scan_direction_count + 0.001
-    )
+    var scan_duration := float(settings.get("junction_scan_seconds_per_direction")) \
+        * scan_direction_count + 0.001
+    var uncertainty_expansion_duration := float(
+        settings.get("prediction_followup_distance")
+    ) / maxf(float(settings.get("assumed_player_max_speed")), 0.001) + 0.001
+    hunt.update_hunt(maxf(scan_duration, uncertainty_expansion_duration))
     var followup_distance := float(hunt.call("get_last_seen_uncertainty_radius"))
     var followup_prediction_origin := vampire.global_position
     var expected_followup_target := navigation.predict_reachable_target(
@@ -5760,17 +6299,9 @@ func _test_vampire_boss_routes_to_noise_and_kills_on_contact() -> bool:
         vampire.position + player.position
     ) * 0.5 + Vector3.UP * 0.8
     await physics_frame
-    hunt.update_hunt(2.0)
+    hunt.update_hunt(2.5)
     navigation.set("has_target", false)
     hunt.update_hunt(0.0)
-    var noise_scan_direction_count := maxi(
-        (hunt.get("junction_scan_directions") as Array[Vector3]).size(),
-        1
-    )
-    hunt.update_hunt(
-        float(settings.get("junction_scan_seconds_per_direction")) \
-            * noise_scan_direction_count + 0.001
-    )
     var noise_search_uses_layout_without_cheating: bool = vampire.get_vampire_state() \
         == GDVampire.VampireState.SearchingRoute \
         and bool(navigation.get("has_target")) \
@@ -6004,10 +6535,9 @@ func _test_vampire_boss_routes_to_noise_and_kills_on_contact() -> bool:
         clear_empty_tile_is_verified and visible_player_tile_is_not_empty,
         "vampire sight distinguishes an empty visible tile from the observed player tile"
     ) and _expect(
-        is_equal_approx(float(settings.get("sight_distance")), 64.0) \
-            and sees_player_within_64_metres \
-            and cannot_see_player_beyond_64_metres,
-        "vampire sight reaches 64 metres but not beyond its configured range"
+        sees_player_at_configured_distance \
+            and cannot_see_player_beyond_configured_distance,
+        "vampire sight reaches but does not exceed its configured range"
     ) and _expect(
         notices_player_passing_close,
         "vampire notices a nearby player even when wide sight brushes a wall edge"
@@ -6015,8 +6545,10 @@ func _test_vampire_boss_routes_to_noise_and_kills_on_contact() -> bool:
         sees_player_pressed_into_wall_cell,
         "coarse wall-cell occupancy cannot hide a physically visible wall-side player"
     ) and _expect(
-        omnidirectional_sight_remains_active,
-        "vampire sight remains omnidirectional around its moving body"
+        narrow_gameplay_cone_excludes_player \
+            and wide_gameplay_cone_includes_player \
+            and visibility_cone_rejects_player_behind,
+        "vampire sight uses its gameplay FOV independently of the headlamp cone"
     ) and _expect(
         close_pass_is_chasing,
         "vampire immediately enters its chase state after reacquiring a nearby player"
@@ -7167,13 +7699,44 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
                 break
         treasure_pile_cells.append(cache_cell)
     var coffins_do_not_overlap_treasure := true
+    var coffin_spatial_regions := {}
+    var coffin_x_bands := {}
+    var coffin_y_bands := {}
+    var coffin_cells_for_spacing: Array[Vector2i] = []
+    var minimum_coffin_spacing := int(
+        content_configuration.get("minimum_coffin_spacing_tiles")
+    )
+    var coffins_keep_their_spacing := true
     for coffin_value in coffins:
         var planned_coffin := coffin_value as Dictionary
         var coffin_cell := planned_coffin["cell"] as Vector2i
+        var coffin_x_band := clampi(
+            floori(float(coffin_cell.x) * 2.0 / float(configured_width)),
+            0,
+            1
+        )
+        var coffin_y_band := clampi(
+            floori(float(coffin_cell.y) * 2.0 / float(configured_height)),
+            0,
+            1
+        )
+        coffin_spatial_regions[Vector2i(coffin_x_band, coffin_y_band)] = true
+        coffin_x_bands[coffin_x_band] = true
+        coffin_y_bands[coffin_y_band] = true
+        for other_coffin_cell in coffin_cells_for_spacing:
+            if coffin_cell.distance_to(other_coffin_cell) \
+                    < float(minimum_coffin_spacing):
+                coffins_keep_their_spacing = false
+                break
+        coffin_cells_for_spacing.append(coffin_cell)
         for treasure_cell in treasure_pile_cells:
             if coffin_cell == treasure_cell:
                 coffins_do_not_overlap_treasure = false
                 break
+    var coffins_use_separate_maze_regions := coffins.size() < 3 \
+        or (coffin_spatial_regions.size() >= 3 \
+            and coffin_x_bands.size() >= 2 \
+            and coffin_y_bands.size() >= 2)
 
     var challenging_configuration := content_configuration.duplicate(true) as Resource
     challenging_configuration.set("treasure_pile_count", 4)
@@ -7252,6 +7815,12 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
     ) and _expect(
         first_signature == repeat_signature and first_signature != changed_signature,
         "the same maze seed is stable and changing the seed creates a different map"
+    ) and _expect(
+        coffins_do_not_overlap_treasure \
+            and spacious_coffins_avoid_nearby_treasure \
+            and coffins_keep_their_spacing \
+            and coffins_use_separate_maze_regions,
+        "generated coffins occupy separate maze regions with useful spacing from treasure"
     ) and _expect(
         configured_internal_connection_percent > 0.0 \
             and internal_connections_are_deterministic,
@@ -7338,10 +7907,6 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
     ) and _expect(
         treasure_is_distributed_through_safe_areas,
         "generated treasure favours open interior regions instead of edge corridors or route breadcrumbs"
-    ) and _expect(
-        coffins_do_not_overlap_treasure \
-            and spacious_coffins_avoid_nearby_treasure,
-        "generated coffins never overlap treasure and prefer full clearance when space permits"
     ) and _expect(
         gems_use_only_challenging_piles,
         "generated gems are reserved for challenging off-main-path treasure piles"

@@ -26,6 +26,7 @@ const FOOTSTEP_SOUND_PATHS: Array[String] = [
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 const DEFAULT_PUNCH_HIT_SOUND_PATH := "res://Assets/audio/punch.mp3"
 const CHARACTER_GROUP: StringName = &"character"
+const ENEMY_GROUP: StringName = &"enemy"
 const NAVIGATION_BLOCKER_GROUP := &"navigation_blocker"
 const PLAYER_GROUP := &"player"
 const SMART_ZOMBIE_GROUP: StringName = &"smart_zombie"

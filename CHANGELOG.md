@@ -1,5 +1,67 @@
 # Changelog
 
+## 2026-07-31
+
+### 1900
+
+- GeneratedMaze coffin deposits now occupy separate maze regions with generous spacing between them.
+  - Prompt: Spread GeneratedMaze coffins across the level instead of clustering them together.
+- Blood now sprays from the keeper's facial features, then visibly bursts and stains both the fallen body and nearby floor.
+  - Prompt: Move death blood from the hat onto the face and make impacts and decals visible.
+- Feedback notes now accept all keyboard typing while D-pad, left stick, accept, and cancel inputs independently operate the dialog actions.
+  - Prompt: Route feedback typing to the note while the controller operates the dialog UI.
+- Player deaths now leave irregular blood splatter decals attached to both the corpse and the contacted environment surface.
+  - Prompt: Keep blood spraying during the death close-up and leave splatters on the corpse and environment.
+- Facial blood now continues spraying while the player lies still during the death-camera close-up.
+  - Prompt: Keep blood spraying during the death close-up and leave splatters on the corpse and environment.
+- Player deaths now include diminishing body spasms and blood droplets from the mouth, nose, and both eyes.
+  - Prompt: Make player deaths more visceral with twitching and facial blood.
+
+### 1800
+
+- The Vampire now glances into side corridors for three quarters of a second while continuing along its search route, with minimap diagnostics explicitly identifying each corridor look.
+  - Prompt: Make the Vampire visibly check side corridors without pausing.
+- The Vampire's gameplay field of view is now a focused 110 degrees, making deliberate head movement important for finding the player.
+  - Prompt: Narrow the Vampire's sight to a human-scale field.
+- The Vampire now pauses during junction searches and turns its head, sight, and headlamp down each clear forward or side corridor without rotating its travel direction.
+  - Prompt: Give the searching Vampire deliberate corridor head checks.
+
+### 1700
+
+- The player now begins following visible enemies from five metres away, providing a longer and more readable head-tracking window while walking past them.
+  - Prompt: Make nearby-enemy head tracking remain visible for longer.
+- The player now keeps close enemies anywhere in front under observation, turning as far toward them as safely possible instead of glancing at the opposite wall.
+  - Prompt: Correct the player's head direction when passing a nearby skeleton.
+- Player head attention now prioritises visible vampires, zombies, and skeletons within three metres, follows them while they remain in the safe forward head-turn arc, and ignores threats behind the player or beyond close range.
+  - Prompt: Improve player head awareness around nearby enemies
+
+### 1600
+
+- Stationary players and Vampires now begin scanning immediately and continue alternating off-centre looks, with a subtle upper-body turn that makes their attention readable.
+  - Prompt: Keep stationary characters actively looking around instead of staring ahead.
+- Player and Vampire headlamps now follow the complete animated head movement while keeping their authored position and cone.
+  - Prompt: Attach each character's headlamp to its moving head.
+- The player and Vampire now scan widely and often while stationary, then smoothly narrow their wandering gaze as movement approaches full pace.
+  - Prompt: Make looking around stronger at rest and focused at full pace.
+- Collecting an item while the player is looking at it no longer causes a crash on the following frame.
+  - Prompt: Fix the crash after collecting an item during a player glance.
+- The Vampire now glances from side to side while travelling, with its restricted sight cone and live look angle visible on the minimap.
+  - Prompt: Let the Vampire search with safe glances and show its sight on the minimap.
+- The player now briefly looks toward nearby unobstructed collectibles before returning attention to their travel direction.
+  - Prompt: Let the player notice nearby collectibles with safe glances.
+
+### 1500
+
+- Level editors can now tune the Vampire's gameplay field of view independently from its visual headlamp cone.
+  - Prompt: Separate the Vampire's visual headlamp effect from gameplay visibility.
+
+### 1300
+
+- Level editors now see the Vampire's essential gameplay controls first, with detailed behaviour tuning organised into Advanced subgroups.
+  - Prompt: Keep critical Vampire controls in the base settings and move complex tuning into Advanced.
+- The Vampire now sees only within its editor-authored headlamp cone instead of detecting players in every direction.
+  - Prompt: Use the Vampire's editor property to determine its visibility cone.
+
 ## 2026-07-28
 
 ### 1400

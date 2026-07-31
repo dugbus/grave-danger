@@ -9,6 +9,7 @@ var spawn_floor_checked := false
 
 func _ready() -> void:
 	add_to_group(CHARACTER_GROUP)
+	add_to_group(ENEMY_GROUP)
 	add_to_group(SMART_ZOMBIE_GROUP)
 	_seed_deterministic_rng()
 	_load_footstep_sounds()
@@ -126,6 +127,18 @@ func can_be_hit_by_spike_trap() -> bool:
 
 func get_spike_trap_position() -> Vector3:
 	return _get_body_position()
+
+
+## Returns the moving point the player's close-threat awareness should follow.
+func get_player_attention_position() -> Vector3:
+	return _get_body_position()
+
+
+## Reports whether this zombie is active and visible enough to track.
+func is_available_for_player_attention() -> bool:
+	return has_dropped_in and not is_dead and drop_pivot != null \
+		and drop_pivot.is_visible_in_tree()
+
 
 func force_state_for_test(next_state: ZombieState) -> void:
 	_change_state(next_state)

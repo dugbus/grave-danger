@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <path
+    fill="#74070d"
+    fill-opacity="0.9"
+    d="M57 113c7-31 33-51 64-50 19-18 54-6 59 20 27 8 36 38 19 59 4 28-28 47-52 32-18 20-52 14-62-10-30 2-46-31-28-51z"
+  />
+  <path
+    fill="#a20c16"
+    fill-opacity="0.72"
+    d="M78 111c14-25 44-35 70-22 22 11 31 39 18 61-13 23-44 30-66 15-19-13-29-36-22-54z"
+  />
+  <circle cx="41" cy="79" r="13" fill="#74070d" fill-opacity="0.88" />
+  <circle cx="202" cy="72" r="9" fill="#74070d" fill-opacity="0.86" />
+  <circle cx="217" cy="167" r="15" fill="#74070d" fill-opacity="0.88" />
+  <circle cx="49" cy="190" r="10" fill="#74070d" fill-opacity="0.84" />
+  <circle cx="26" cy="144" r="6" fill="#a20c16" fill-opacity="0.78" />
+  <circle cx="184" cy="207" r="6" fill="#a20c16" fill-opacity="0.78" />
+  <circle cx="231" cy="111" r="4" fill="#a20c16" fill-opacity="0.74" />
+  <circle cx="92" cy="39" r="5" fill="#a20c16" fill-opacity="0.76" />
+</svg>

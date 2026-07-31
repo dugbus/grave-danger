@@ -8,6 +8,10 @@ const GAMEPLAY_PROCESS_GROUP: StringName = &"deterministic_gameplay_process"
 
 ## Low occlusion ray used when the body-width sight sweep brushes a wall edge.
 @export var visual_sight_ray_path: NodePath = ^"VisualSightRay"
+## Node whose positive Z axis represents the Vampire's gameplay facing direction.
+@export var facing_node_path: NodePath = ^"../Pivot/LookDirection"
+## Travel pivot used to decide which corridors remain reachable by a safe head turn.
+@export var travel_facing_node_path: NodePath = ^"../Pivot"
 
 var player: Node3D
 var settings: Resource
@@ -19,6 +23,8 @@ var player_direct_path_clear := false
 var visibility_sample_count := 0
 
 @onready var visual_sight_ray := get_node_or_null(visual_sight_ray_path) as RayCast3D
+@onready var facing_node := get_node_or_null(facing_node_path) as Node3D
+@onready var travel_facing_node := get_node_or_null(travel_facing_node_path) as Node3D
 
 
 func _ready() -> void:
@@ -68,9 +74,13 @@ func set_wall_grid_map(grid_map: GridMap) -> void:
 	wall_grid_y = _get_wall_grid_y(wall_grid_map)
 
 
-## Returns cardinal passage directions clear enough for the vampire to inspect visually.
+## Returns clear forward and side passages that the vampire can inspect with its head.
 func get_clear_scan_directions(probe_distance: float) -> Array[Vector3]:
 	var clear_directions: Array[Vector3] = []
+	var horizontal_forward := travel_facing_node.global_basis.z \
+		if travel_facing_node != null else Vector3.FORWARD
+	horizontal_forward.y = 0.0
+	horizontal_forward = horizontal_forward.normalized()
 	var cardinal_directions: Array[Vector3] = [
 		Vector3.FORWARD,
 		Vector3.RIGHT,
@@ -78,10 +88,29 @@ func get_clear_scan_directions(probe_distance: float) -> Array[Vector3]:
 		Vector3.LEFT,
 	]
 	for direction in cardinal_directions:
+		# A corridor behind the body cannot be checked within the safe head-turn limit.
+		if horizontal_forward.dot(direction) < -0.01:
+			continue
 		var probe_target := global_position + direction * maxf(probe_distance, 0.1)
 		if _grid_corridor_is_clear(probe_target):
 			clear_directions.append(direction)
 	return clear_directions
+
+
+## Returns only passages perpendicular to travel for moving corridor checks.
+func get_clear_side_corridor_directions(probe_distance: float) -> Array[Vector3]:
+	var side_directions: Array[Vector3] = []
+	if travel_facing_node == null:
+		return side_directions
+	var horizontal_forward := travel_facing_node.global_basis.z
+	horizontal_forward.y = 0.0
+	if horizontal_forward.is_zero_approx():
+		return side_directions
+	horizontal_forward = horizontal_forward.normalized()
+	for direction in get_clear_scan_directions(probe_distance):
+		if absf(horizontal_forward.dot(direction)) <= 0.1:
+			side_directions.append(direction)
+	return side_directions
 
 
 ## Returns whether the floor-level body sweep or its wall-occluded visual ray sees the player.
@@ -96,7 +125,8 @@ func can_see_player() -> bool:
 		player.global_position.z
 	)
 	var sight_offset: Vector3 = sight_target - global_position
-	if sight_offset.length() > settings.sight_distance:
+	if sight_offset.length() > settings.sight_distance \
+			or not _is_inside_visibility_cone(sight_offset):
 		return false
 
 	if _grid_corridor_is_clear(sight_target):
@@ -124,6 +154,7 @@ func can_verify_position_is_empty(world_position: Vector3) -> bool:
 	var sight_offset := sight_target - global_position
 	sight_offset.y = 0.0
 	if sight_offset.length() > float(settings.sight_distance) \
+			or not _is_inside_visibility_cone(sight_offset) \
 			or not _grid_visual_line_is_clear(sight_target):
 		return false
 
@@ -159,6 +190,28 @@ func is_player_direct_path_clear() -> bool:
 ## Returns how many continuous sight samples have run for diagnostics and tests.
 func get_visibility_sample_count() -> int:
 	return visibility_sample_count
+
+
+func _is_inside_visibility_cone(sight_offset: Vector3) -> bool:
+	if facing_node == null or settings == null:
+		return false
+
+	var horizontal_offset := sight_offset
+	horizontal_offset.y = 0.0
+	if horizontal_offset.is_zero_approx():
+		return true
+
+	var horizontal_forward := facing_node.global_basis.z
+	horizontal_forward.y = 0.0
+	if horizontal_forward.is_zero_approx():
+		return false
+	var minimum_alignment := cos(deg_to_rad(clampf(
+		float(settings.sight_field_of_view_degrees) * 0.5,
+		0.0,
+		180.0
+	)))
+	return horizontal_forward.normalized().dot(horizontal_offset.normalized()) \
+		>= minimum_alignment
 
 
 func _grid_corridor_is_clear(sight_target: Vector3) -> bool:
