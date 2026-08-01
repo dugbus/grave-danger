@@ -42,9 +42,6 @@ const SILVER_KEY_ITEM_TYPE := &"silver_key"
 const MIN_PLACEMENT_DISTANCE_FROM_SPAWN := 3
 const MIN_EXIT_KEY_DISTANCE_FROM_GATE_TILES := 8
 const DOOR_APPROACH_CLEARANCE_TILES := 2
-const MIN_TREASURE_ESCAPE_OPTION_COUNT := 3
-const MIN_TREASURE_OPEN_AREA_CELL_COUNT := 6
-const MIN_TREASURE_MAP_EDGE_CLEARANCE_TILES := 4
 
 
 ## Returns route and placement data suitable for editor or runtime scene creation.
@@ -697,7 +694,7 @@ func _plan_treasure_caches(
             break
 
     # Preserve the requested count as the final priority. Occupied cells still
-    # prevent overlap; this fallback drops spacing and open-area preferences.
+    # prevent overlap; this fallback only drops the preferred spacing.
     var unplaced_count := requested_cache_count - main_cells.size() - off_cells.size()
     if unplaced_count > 0:
         var fallback_main_cells := _select_treasure_area_cells(
@@ -709,8 +706,7 @@ func _plan_treasure_caches(
             PlacementBand.MainPath,
             seed_value ^ 229,
             all_treasure_cells,
-            0,
-            true
+            0
         )
         main_cells.append_array(fallback_main_cells)
         all_treasure_cells.append_array(fallback_main_cells)
@@ -725,8 +721,7 @@ func _plan_treasure_caches(
             PlacementBand.Exploration,
             seed_value ^ 233,
             all_treasure_cells,
-            0,
-            true
+            0
         )
         off_cells.append_array(fallback_off_cells)
     if main_cells.is_empty() and off_cells.is_empty():
@@ -944,8 +939,7 @@ func _select_treasure_area_cells(
     placement_band: PlacementBand,
     random_seed: int,
     separation_cells: Array[Vector2i] = [],
-    minimum_separation_tiles: int = 0,
-    allow_narrow_areas: bool = false
+    minimum_separation_tiles: int = 0
 ) -> Array[Vector2i]:
     var selected: Array[Vector2i] = []
     if count <= 0:
@@ -957,25 +951,15 @@ func _select_treasure_area_cells(
             continue
         var distance_to_main_path := int(distance_from_main_path.get(cell, 0))
         var is_main_path_cell := distance_to_main_path == 0
-        if placement_band == PlacementBand.MainPath and not is_main_path_cell:
-            continue
-        if placement_band == PlacementBand.Exploration and is_main_path_cell:
-            continue
-        var map_edge_clearance := _get_map_edge_clearance(cell, map_size)
-        if map_edge_clearance < MIN_TREASURE_MAP_EDGE_CLEARANCE_TILES:
-            continue
-        var escape_option_count := _get_walkable_neighbour_count(cell, walkable)
-        var open_area_cell_count := _get_open_area_cell_count(cell, walkable)
-        if not allow_narrow_areas \
-                and (escape_option_count < MIN_TREASURE_ESCAPE_OPTION_COUNT \
-                    or open_area_cell_count < MIN_TREASURE_OPEN_AREA_CELL_COUNT):
-            continue
+        match placement_band:
+            PlacementBand.MainPath:
+                if not is_main_path_cell:
+                    continue
+            PlacementBand.Exploration:
+                if is_main_path_cell:
+                    continue
         candidates.append({
             "cell": cell,
-            "distance_to_main_path": distance_to_main_path,
-            "map_edge_clearance": map_edge_clearance,
-            "escape_option_count": escape_option_count,
-            "open_area_cell_count": open_area_cell_count,
             "random_score": GRAPH_SCRIPT.coordinate_score(cell, random_seed, 0),
         })
 
@@ -1016,13 +1000,9 @@ func _select_treasure_area_candidate(
         ):
             continue
         var target_distance_squared := Vector2(cell).distance_squared_to(target_position)
-        # Each pile first claims a different map region, then prefers a spacious
-        # opened junction within that region instead of sharing one corridor.
+        # Each pile claims a random point in a different map region. All cells in
+        # its placement band compete equally, including the perimeter corridors.
         var candidate_score := -target_distance_squared * 1000000.0 \
-            + float(candidate["open_area_cell_count"]) * 100000.0 \
-            + float(candidate["escape_option_count"]) * 10000.0 \
-            + float(candidate["map_edge_clearance"]) * 1000.0 \
-            + float(candidate["distance_to_main_path"]) * 100.0 \
             + float(candidate["random_score"])
         if candidate_score > best_score:
             best_candidate = candidate
@@ -1038,14 +1018,8 @@ func _build_treasure_region_targets(
     var targets: Array[Vector2] = []
     if count <= 0:
         return targets
-    var usable_width := maxi(
-        map_size.x - MIN_TREASURE_MAP_EDGE_CLEARANCE_TILES * 2,
-        1
-    )
-    var usable_height := maxi(
-        map_size.y - MIN_TREASURE_MAP_EDGE_CLEARANCE_TILES * 2,
-        1
-    )
+    var usable_width := maxi(map_size.x, 1)
+    var usable_height := maxi(map_size.y, 1)
     var aspect_ratio := float(usable_width) / float(usable_height)
     var column_count := maxi(ceili(sqrt(float(count) * aspect_ratio)), 1)
     var row_count := maxi(ceili(float(count) / float(column_count)), 1)
@@ -1059,12 +1033,8 @@ func _build_treasure_region_targets(
         var held_index := region_indices[index]
         region_indices[index] = region_indices[swap_index]
         region_indices[swap_index] = held_index
-    var minimum_coordinate := Vector2.ONE \
-        * float(MIN_TREASURE_MAP_EDGE_CLEARANCE_TILES)
-    var maximum_coordinate := Vector2(
-        map_size.x - 1 - MIN_TREASURE_MAP_EDGE_CLEARANCE_TILES,
-        map_size.y - 1 - MIN_TREASURE_MAP_EDGE_CLEARANCE_TILES
-    )
+    var minimum_coordinate := Vector2.ZERO
+    var maximum_coordinate := Vector2(map_size - Vector2i.ONE)
     for slot_index in count:
         var region_index := region_indices[slot_index]
         var column_index := region_index % column_count
@@ -1073,12 +1043,12 @@ func _build_treasure_region_targets(
             lerpf(
                 minimum_coordinate.x,
                 maximum_coordinate.x,
-                (float(column_index) + 0.5) / float(column_count)
+                (float(column_index) + random.randf()) / float(column_count)
             ),
             lerpf(
                 minimum_coordinate.y,
                 maximum_coordinate.y,
-                (float(row_index) + 0.5) / float(row_count)
+                (float(row_index) + random.randf()) / float(row_count)
             )
         ))
     return targets

@@ -1,6 +1,6 @@
 class_name GDPlayerDeathEffects
 extends Node3D
-## Adds brief body spasms and face-tracked blood droplets to the player's death.
+## Adds brief body spasms plus cause-specific fire or face-tracked blood to the player's death.
 
 
 const MOUTH_FACE_OFFSET := Vector3(0.0, 0.055, 0.19)
@@ -18,19 +18,26 @@ const BLOOD_SPLATTER_SCRIPT := preload("res://player/blood_splatter_decal.gd")
 @export var visual_pivot_path: NodePath = ^"../Pivot"
 ## Imported head mesh used to keep each blood source attached to the animated face.
 @export var head_path: NodePath = ^"../Pivot/Character/character-keeper/root/torso/head"
+## Imported character root whose visible meshes become charred after a fire death.
+@export var character_path: NodePath = ^"../Pivot/Character"
 ## Attention controller disabled at death so its live head turn cannot fight the final pose.
 @export var attention_path: NodePath = ^"../PlayerAttention"
+## Shared opaque material laid over every character mesh after a fire death.
+@export var blackened_material: Material = preload("res://player/fire_death_blackened_material.tres")
 ## Seconds before the floor mark appears beneath the settling body.
 @export_range(0.0, 2.0, 0.01, "suffix:s") var environment_splatter_delay := 0.62
 
 @onready var player := get_parent() as CharacterBody3D
 @onready var visual_pivot := get_node_or_null(visual_pivot_path) as Node3D
 @onready var head := get_node_or_null(head_path) as Node3D
+@onready var character := get_node_or_null(character_path) as Node3D
 @onready var attention := get_node_or_null(attention_path) as Node
 @onready var mouth_blood := %MouthBlood as GPUParticles3D
 @onready var nose_blood := %NoseBlood as GPUParticles3D
 @onready var left_eye_blood := %LeftEyeBlood as GPUParticles3D
 @onready var right_eye_blood := %RightEyeBlood as GPUParticles3D
+@onready var fire_particles := %FireParticles as GPUParticles3D
+@onready var fire_light := %FireLight as OmniLight3D
 
 var is_playing := false
 var base_pivot_rotation := Vector3.ZERO
@@ -38,6 +45,7 @@ var throe_tween: Tween
 var blood_emitters: Array[GPUParticles3D] = []
 var player_splatter: Node3D
 var environment_splatter: Node3D
+var uses_blood_effects := false
 
 
 func _ready() -> void:
@@ -52,11 +60,12 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-    _place_blood_emitters()
+    if uses_blood_effects:
+        _place_blood_emitters()
 
 
 ## Starts the one-way death presentation without replacing the imported death animation.
-func play_death_throes() -> void:
+func play_death_throes(death_cause: GDPlayerDeath.DeathCause) -> void:
     if is_playing:
         return
 
@@ -64,11 +73,16 @@ func play_death_throes() -> void:
     set_process(true)
     if attention != null:
         attention.set_process(false)
-    _place_blood_emitters()
-    _emit_blood()
-    _place_player_splatter()
-    _place_environment_splatter_after_settle()
-    _play_twitch_sequence()
+    uses_blood_effects = death_cause != GDPlayerDeath.DeathCause.Fire
+    if uses_blood_effects:
+        _place_blood_emitters()
+        _emit_blood()
+        _place_player_splatter()
+        _place_environment_splatter_after_settle()
+        _play_twitch_sequence()
+    else:
+        _play_fire_death()
+        _play_fire_twitch_sequence()
 
 
 ## Returns the mark attached to the player for tests and future presentation hooks.
@@ -79,6 +93,18 @@ func get_player_splatter() -> Node3D:
 ## Returns the mark attached to contacted environment geometry once the body settles.
 func get_environment_splatter() -> Node3D:
     return environment_splatter
+
+
+func _play_fire_death() -> void:
+    if character != null:
+        for descendant in character.find_children("*", "MeshInstance3D", true, false):
+            var character_mesh := descendant as MeshInstance3D
+            character_mesh.material_overlay = blackened_material
+    if fire_particles != null:
+        fire_particles.visible = true
+        fire_particles.restart()
+    if fire_light != null:
+        fire_light.visible = true
 
 
 func _place_blood_emitters() -> void:
@@ -194,12 +220,7 @@ func _play_twitch_sequence() -> void:
     if visual_pivot == null:
         return
 
-    if throe_tween != null and throe_tween.is_valid():
-        throe_tween.kill()
-    base_pivot_rotation = visual_pivot.rotation
-    throe_tween = create_tween()
-    throe_tween.set_trans(Tween.TRANS_SINE)
-    throe_tween.set_ease(Tween.EASE_IN_OUT)
+    _start_throe_tween()
     _append_twitch_pose(Vector3(6.0, -2.0, 8.0), 0.07)
     _append_twitch_pose(Vector3(-4.0, 1.0, -6.0), 0.09)
     throe_tween.tween_interval(0.09)
@@ -211,6 +232,41 @@ func _play_twitch_sequence() -> void:
     throe_tween.tween_interval(0.16)
     _append_twitch_pose(Vector3(1.0, 0.0, 0.8), 0.05)
     _append_twitch_pose(Vector3.ZERO, 0.15)
+
+
+func _play_fire_twitch_sequence() -> void:
+    if visual_pivot == null:
+        return
+
+    _start_throe_tween()
+    _append_twitch_pose(Vector3(18.0, -8.0, 22.0), 0.055)
+    _append_twitch_pose(Vector3(-15.0, 7.0, -19.0), 0.065)
+    _append_twitch_pose(Vector3(20.0, -5.0, 16.0), 0.055)
+    _append_twitch_pose(Vector3(-13.0, 4.0, -16.0), 0.07)
+    throe_tween.tween_interval(0.045)
+    _append_twitch_pose(Vector3(16.0, -6.0, 14.0), 0.06)
+    _append_twitch_pose(Vector3(-11.0, 3.0, -13.0), 0.075)
+    throe_tween.tween_interval(0.06)
+    _append_twitch_pose(Vector3(13.0, -4.0, 11.0), 0.06)
+    _append_twitch_pose(Vector3(-9.0, 2.0, -10.0), 0.075)
+    throe_tween.tween_interval(0.08)
+    _append_twitch_pose(Vector3(10.0, -3.0, 8.0), 0.06)
+    _append_twitch_pose(Vector3(-6.0, 1.0, -7.0), 0.085)
+    throe_tween.tween_interval(0.1)
+    _append_twitch_pose(Vector3(7.0, -2.0, 5.0), 0.07)
+    _append_twitch_pose(Vector3(-4.0, 1.0, -4.0), 0.09)
+    throe_tween.tween_interval(0.1)
+    _append_twitch_pose(Vector3(4.0, 0.0, 3.0), 0.07)
+    _append_twitch_pose(Vector3.ZERO, 0.18)
+
+
+func _start_throe_tween() -> void:
+    if throe_tween != null and throe_tween.is_valid():
+        throe_tween.kill()
+    base_pivot_rotation = visual_pivot.rotation
+    throe_tween = create_tween()
+    throe_tween.set_trans(Tween.TRANS_SINE)
+    throe_tween.set_ease(Tween.EASE_IN_OUT)
 
 
 func _append_twitch_pose(target_rotation_degrees: Vector3, duration: float) -> void:

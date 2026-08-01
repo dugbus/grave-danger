@@ -292,14 +292,16 @@ class TestKillBoundaryVictim:
 
     var immune_to_kill_boundary := true
     var received_damage := 0.0
+    var last_damage_was_fire := false
 
 
     func is_immune_to_kill_boundary() -> bool:
         return immune_to_kill_boundary
 
 
-    func apply_flame_damage(amount: float) -> void:
+    func apply_kill_boundary_damage(amount: float, causes_fire_death: bool) -> void:
         received_damage += amount
+        last_damage_was_fire = causes_fire_death
 
 
 func _init() -> void:
@@ -326,6 +328,7 @@ func _run_tests() -> void:
     failed = not await _test_game_settings_batch_disk_writes() or failed
     failed = not _test_player_fall_death_threshold() or failed
     failed = not await _test_player_death_uses_face_blood_and_body_throes() or failed
+    failed = not await _test_fire_boundary_death_blackens_and_burns_player() or failed
     failed = not _test_torch_scene_and_persistent_activation() or failed
     failed = not _test_indoor_lighting_strengthens_occlusion() or failed
     failed = not _test_held_drop_input_accelerates() or failed
@@ -1729,7 +1732,7 @@ func _test_player_death_uses_face_blood_and_body_throes() -> bool:
     ]
     death_controller.return_delay = 60.0
     var base_pivot_rotation := visual_pivot.rotation
-    player.die_from_flames()
+    player.die_from_fall()
 
     var all_face_sources_keep_emitting := true
     for emitter in blood_emitters:
@@ -1831,6 +1834,96 @@ func _test_player_death_uses_face_blood_and_body_throes() -> bool:
     )
     player.queue_free()
     floor.queue_free()
+    await process_frame
+    return passed
+
+
+func _test_fire_boundary_death_blackens_and_burns_player() -> bool:
+    var player := PLAYER_SCENE.instantiate() as GDPlayer
+    root.add_child(player)
+    player.set_physics_process(false)
+    var death_controller := player.get_node("PlayerDeath") as GDPlayerDeath
+    var death_effects := player.get_node("PlayerDeathEffects") as GDPlayerDeathEffects
+    var fire_particles := player.get_node(
+        "PlayerDeathEffects/FireParticles"
+    ) as GPUParticles3D
+    var fire_light := player.get_node("PlayerDeathEffects/FireLight") as OmniLight3D
+    var blood_emitters: Array[GPUParticles3D] = [
+        player.get_node("PlayerDeathEffects/MouthBlood") as GPUParticles3D,
+        player.get_node("PlayerDeathEffects/NoseBlood") as GPUParticles3D,
+        player.get_node("PlayerDeathEffects/LeftEyeBlood") as GPUParticles3D,
+        player.get_node("PlayerDeathEffects/RightEyeBlood") as GPUParticles3D,
+    ]
+    var character := player.get_node("Pivot/Character") as Node3D
+    var torso := player.get_node(
+        "Pivot/Character/character-keeper/root/torso"
+    ) as MeshInstance3D
+    var head := player.get_node(
+        "Pivot/Character/character-keeper/root/torso/head"
+    ) as MeshInstance3D
+    var visual_pivot := player.get_node("Pivot") as Node3D
+    var base_pivot_rotation := visual_pivot.rotation
+    death_controller.return_delay = 60.0
+
+    player.apply_kill_boundary_damage(death_controller.max_flame_energy, true)
+    await create_timer(0.045).timeout
+    var pronounced_fire_throe_started := visual_pivot.rotation.distance_to(
+        base_pivot_rotation
+    ) > deg_to_rad(10.0)
+    await create_timer(0.305).timeout
+
+    var character_meshes := character.find_children("*", "MeshInstance3D", true, false)
+    var every_character_mesh_is_blackened := not character_meshes.is_empty()
+    for descendant in character_meshes:
+        var character_mesh := descendant as MeshInstance3D
+        every_character_mesh_is_blackened = every_character_mesh_is_blackened \
+            and character_mesh.material_overlay == death_effects.blackened_material
+    var blood_was_suppressed := true
+    for emitter in blood_emitters:
+        blood_was_suppressed = blood_was_suppressed \
+            and not emitter.visible \
+            and not emitter.emitting
+    var fire_process_material := fire_particles.process_material as ParticleProcessMaterial
+    var head_fire_position := fire_particles.global_transform.affine_inverse() \
+        * head.global_position
+    var torso_fire_position := fire_particles.global_transform.affine_inverse() \
+        * torso.global_position
+    var fire_extents := fire_process_material.emission_box_extents
+    var upper_body_stays_inside_fire_volume := (
+        absf(head_fire_position.x) <= fire_extents.x \
+        and absf(head_fire_position.y) <= fire_extents.y \
+        and absf(head_fire_position.z) <= fire_extents.z \
+        and absf(torso_fire_position.x) <= fire_extents.x \
+        and absf(torso_fire_position.y) <= fire_extents.y \
+        and absf(torso_fire_position.z) <= fire_extents.z
+    )
+    var fire_mesh := fire_particles.draw_pass_1 as QuadMesh
+    var fire_shader_material := fire_mesh.material as ShaderMaterial
+    var fire_shader_code := fire_shader_material.shader.code
+    var particles_keep_individual_positions := fire_shader_code.contains(
+        "particle_position = MODELVIEW_MATRIX[3]"
+    ) and not fire_shader_code.contains("MODEL_MATRIX[3]")
+
+    var passed := _expect(
+        death_controller.is_dead \
+            and every_character_mesh_is_blackened \
+            and fire_particles.visible \
+            and fire_particles.emitting \
+            and fire_particles.amount >= 80 \
+            and fire_particles.process_material is ParticleProcessMaterial \
+            and fire_light.visible,
+        "fire kill-boundary death blackens the player under flames covering the body"
+    ) and _expect(
+        upper_body_stays_inside_fire_volume and particles_keep_individual_positions,
+        "fire particles remain distributed over the fallen player's torso and head"
+    ) and _expect(
+        pronounced_fire_throe_started and death_effects.throe_tween.is_running(),
+        "burning player begins pronounced sustained death throes"
+    ) and _expect(
+        blood_was_suppressed,
+        "fire kill-boundary death replaces the ordinary blood presentation"
+    )
+    player.queue_free()
     await process_frame
     return passed
 
@@ -2623,6 +2716,12 @@ func _test_stairwell_scopes_kill_boundary_immunity() -> bool:
     victim.immune_to_kill_boundary = false
     boundary.call("_apply_flame_heat", 1.0)
     var ordinary_victim_received_damage := victim.received_damage > 0.0
+    var flame_boundary_reports_fire_death := victim.last_damage_was_fire
+    victim.received_damage = 0.0
+    boundary.render_effect = boundary.EFFECT_GHOST
+    boundary.call("_apply_flame_heat", 1.0)
+    var ghost_boundary_reports_non_fire_death := victim.received_damage > 0.0 \
+        and not victim.last_damage_was_fire
 
     var passed := _expect(
         safety_area != null \
@@ -2643,8 +2742,11 @@ func _test_stairwell_scopes_kill_boundary_immunity() -> bool:
         leaving_stairs_restores_boundary and doubling_back_restores_boundary,
         "leaving or doubling back from the stairs restores boundary damage and collision"
     ) and _expect(
-        immune_victim_ignored_damage and ordinary_victim_received_damage,
-        "kill-boundary damage respects and immediately resumes after scoped immunity"
+        immune_victim_ignored_damage \
+            and ordinary_victim_received_damage \
+            and flame_boundary_reports_fire_death \
+            and ghost_boundary_reports_non_fire_death,
+        "boundary damage resumes after immunity and only active flames report a fire death"
     )
     victim.free()
     player.free()
@@ -7649,8 +7751,9 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
     var treasure_spatial_regions := {}
     var treasure_x_bands := {}
     var treasure_y_bands := {}
-    var treasure_uses_open_escape_areas := true
+    var treasure_uses_route_or_exploration_bands := true
     var main_path_pile_count := 0
+    var perimeter_treasure_count := 0
     for cache_value in treasure_caches:
         var cache := cache_value as Dictionary
         var counts := cache["counts"] as Dictionary
@@ -7672,21 +7775,23 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
         treasure_spatial_regions[Vector2i(x_band, y_band)] = true
         treasure_x_bands[x_band] = true
         treasure_y_bands[y_band] = true
-        if int(cache.get("escape_option_count", 0)) \
-                    < VAMPIRE_GENERATED_CONTENT_PLANNER.MIN_TREASURE_ESCAPE_OPTION_COUNT \
-                or int(cache.get("open_area_cell_count", 0)) \
-                    < VAMPIRE_GENERATED_CONTENT_PLANNER.MIN_TREASURE_OPEN_AREA_CELL_COUNT \
-                or int(cache.get("map_edge_clearance_tiles", 0)) \
-                    < VAMPIRE_GENERATED_CONTENT_PLANNER.MIN_TREASURE_MAP_EDGE_CLEARANCE_TILES:
-            treasure_uses_open_escape_areas = false
-        if int(cache["placement_band"]) \
-                == VAMPIRE_GENERATED_CONTENT_PLANNER.PlacementBand.MainPath:
+        var placement_band := int(cache["placement_band"])
+        var map_edge_clearance := int(cache.get("map_edge_clearance_tiles", 0))
+        if placement_band \
+                    != VAMPIRE_GENERATED_CONTENT_PLANNER.PlacementBand.MainPath \
+                and placement_band \
+                    != VAMPIRE_GENERATED_CONTENT_PLANNER.PlacementBand.Exploration:
+            treasure_uses_route_or_exploration_bands = false
+        if placement_band == VAMPIRE_GENERATED_CONTENT_PLANNER.PlacementBand.MainPath:
             main_path_pile_count += 1
-    var treasure_is_distributed_through_safe_areas := treasure_caches.size() < 4 \
-        or (treasure_uses_open_escape_areas \
+        if map_edge_clearance <= 2:
+            perimeter_treasure_count += 1
+    var treasure_is_distributed_through_available_space := treasure_caches.size() < 4 \
+        or (treasure_uses_route_or_exploration_bands \
             and treasure_spatial_regions.size() >= 8 \
             and treasure_x_bands.size() >= 3 \
             and treasure_y_bands.size() >= 3 \
+            and perimeter_treasure_count > 0 \
             and main_path_pile_count < treasure_caches.size() / 2)
     var treasure_pile_cells: Array[Vector2i] = []
     var treasure_piles_use_distinct_cells := true
@@ -7834,6 +7939,15 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
             and sparse_perimeter_breaks_prevent_border_bypass,
         "ordinary edge corridors use sparse breaks instead of forming a border bypass"
     ) and _expect(
+        treasure_is_distributed_through_available_space,
+        "generated treasure spreads through perimeter and interior walkable space"
+    ) and _expect(
+        doors.size() == int(content_configuration.get("door_count")) \
+            and keys.size() == doors.size() + 1 \
+            and _generated_plan_keys_are_reachable(content_plan, changed_result) \
+            and _generated_exit_key_requires_exploration(content_plan, changed_result),
+        "generated keys remain obtainable while the gold exit key requires exploration"
+    ) and _expect(
         int(changed_result.get("hallway_width", 0)) == 2 \
             and player_cell == Vector3i(1, 0, 1) \
             and vampire_cell.x == end_gate_cell.x \
@@ -7905,21 +8019,12 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
             ),
         "generated treasure piles support large budgets and honour their count, distinct cells, and range"
     ) and _expect(
-        treasure_is_distributed_through_safe_areas,
-        "generated treasure favours open interior regions instead of edge corridors or route breadcrumbs"
-    ) and _expect(
         gems_use_only_challenging_piles,
         "generated gems are reserved for challenging off-main-path treasure piles"
     ) and _expect(
         vampire_layout_landmarks.size() \
             == treasure_caches.size() + keys.size() + coffins.size() + doors.size() + 1,
         "generated content supplies every strategic treasure, key, coffin, door, and gate landmark"
-    ) and _expect(
-        doors.size() == int(content_configuration.get("door_count")) \
-            and keys.size() == doors.size() + 1 \
-            and _generated_plan_keys_are_reachable(content_plan, changed_result) \
-            and _generated_exit_key_requires_exploration(content_plan, changed_result),
-        "generated keys remain obtainable while the gold exit key requires exploration"
     ) and _expect(
         vampire_ignores_every_generated_blocker,
         "the vampire crosses generated doors and coffins without changing player collision"

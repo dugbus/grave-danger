@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-08-01
+
+### 0100
+
+- GeneratedMaze placeables now spread through all valid walkable space without treating perimeter corridors as a separate placement zone.
+  - Prompt: Spread GeneratedMaze placeables randomly through all valid space while preserving challenge constraints.
+- Fire deaths now drive pronounced rapid whole-body convulsions before the burning player gradually falls still.
+  - Prompt: Make the burning player convulse much more visibly during death.
+- Fire-death flames now remain spread from the player's feet through the torso and head instead of collapsing at ground level.
+  - Prompt: Extend fire-death flames from the feet over the head and torso.
+- Flame kill boundaries now leave the player visibly charred and engulfed in fire instead of showing the ordinary blood death.
+  - Prompt: Give fire kill boundaries a burning death over the player's blackened body.
+
 ## 2026-07-31
 
 ### 1900

@@ -4,13 +4,24 @@ class_name GDPlayerDeath
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 
+enum DeathCause {
+	Fire,
+	Fall,
+	Vampire,
+	Poison,
+	EnemyDamage,
+	SpikeTrap,
+	EnergyDrain,
+	NonFireBoundary,
+}
+
 
 # Death is isolated so hazards only need one public Player method while the
 # component owns the one-way transition into the death state.
 
 ## Node that receives death animation playback requests.
 @export var animation_controller_path: NodePath = ^"../PlayerAnimation"
-## Node that adds the visible twitch and blood burst to the death animation.
+## Node that adds cause-specific fire or blood effects and visible twitching to the death animation.
 @export var death_effects_path: NodePath = ^"../PlayerDeathEffects"
 ## Scene loaded after the death delay and fade complete.
 @export var lose_scene := "res://ui/screens/lose_screen.tscn"
@@ -36,19 +47,23 @@ func _ready() -> void:
 
 
 func apply_flame_damage(amount: float) -> void:
-	if is_dead:
-		return
+	# Existing enemies drain the same health pool through this legacy API.
+	_apply_damage(amount, DeathCause.EnemyDamage)
 
-	flame_energy = maxf(flame_energy - maxf(amount, 0.0), 0.0)
-	if flame_energy <= 0.0:
-		die_from_flames()
+
+func apply_kill_boundary_damage(amount: float, causes_fire_death: bool) -> void:
+	var death_cause := DeathCause.Fire if causes_fire_death else DeathCause.NonFireBoundary
+	_apply_damage(amount, death_cause)
 
 
 func apply_percent_damage(percent_of_max: float) -> void:
 	if max_flame_energy <= 0.0:
 		return
 
-	apply_flame_damage(max_flame_energy * maxf(percent_of_max, 0.0) * 0.01)
+	_apply_damage(
+		max_flame_energy * maxf(percent_of_max, 0.0) * 0.01,
+		DeathCause.SpikeTrap
+	)
 
 
 func drain_flame_energy() -> void:
@@ -56,7 +71,7 @@ func drain_flame_energy() -> void:
 		return
 
 	flame_energy = 0.0
-	die_from_flames()
+	_die(DeathCause.EnergyDrain)
 
 
 func can_receive_healing() -> bool:
@@ -94,7 +109,7 @@ func apply_temporary_damage(amount: float, restore_after_seconds: float) -> bool
 
 	flame_energy = maxf(flame_energy - damage_amount, 0.0)
 	if flame_energy <= 0.0:
-		die_from_flames()
+		_die(DeathCause.Poison)
 		return true
 
 	_restore_temporary_damage_after(damage_amount, restore_after_seconds)
@@ -102,20 +117,20 @@ func apply_temporary_damage(amount: float, restore_after_seconds: float) -> bool
 
 
 func die_from_flames() -> void:
-	_die()
+	_die(DeathCause.Fire)
 
 
 func die_from_fall() -> void:
 	# A fall is lethal immediately, but otherwise follows the normal death flow.
-	_die()
+	_die(DeathCause.Fall)
 
 
 func die_from_vampire() -> void:
 	# Boss contact is lethal immediately, but otherwise follows the normal death flow.
-	_die()
+	_die(DeathCause.Vampire)
 
 
-func _die() -> void:
+func _die(death_cause: DeathCause) -> void:
 	# Multiple flame areas can report the body in the same frame, so death must
 	# be idempotent. Falls share this same one-way transition.
 	if is_dead:
@@ -136,7 +151,7 @@ func _die() -> void:
 	if animation_controller != null:
 		animation_controller.play_death()
 	if death_effects != null:
-		death_effects.play_death_throes()
+		death_effects.play_death_throes(death_cause)
 
 	# The camera owns the actual death close-up. This component only requests it
 	# when the current camera supports that optional method.
@@ -145,6 +160,15 @@ func _die() -> void:
 		camera.focus_on_dead_player(player)
 
 	_show_lose_screen_after_death()
+
+
+func _apply_damage(amount: float, death_cause: DeathCause) -> void:
+	if is_dead:
+		return
+
+	flame_energy = maxf(flame_energy - maxf(amount, 0.0), 0.0)
+	if flame_energy <= 0.0:
+		_die(death_cause)
 
 
 func _play_death_scream() -> void:

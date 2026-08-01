@@ -1,0 +1,14 @@
+[gd_resource type="QuadMesh" load_steps=3 format=3]
+
+[ext_resource type="Shader" path="res://player/fire_death_flame.gdshader" id="1_flame"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_flame"]
+render_priority = 2
+shader = ExtResource("1_flame")
+shader_parameter/core_color = Vector3(1, 0.92, 0.28)
+shader_parameter/edge_color = Vector3(1, 0.08, 0.005)
+shader_parameter/emission_strength = 2.8
+
+[resource]
+material = SubResource("ShaderMaterial_flame")
+size = Vector2(0.24, 0.48)

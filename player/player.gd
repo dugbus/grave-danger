@@ -207,6 +207,15 @@ func apply_flame_damage(amount: float) -> void:
 		animation_controller.play_hit_reaction()
 
 
+func apply_kill_boundary_damage(amount: float, causes_fire_death: bool) -> void:
+	var was_dead := is_dead()
+	death_controller.apply_kill_boundary_damage(amount, causes_fire_death)
+	if was_dead or is_dead() or amount <= 0.0:
+		return
+	if animation_controller.has_method("play_hit_reaction"):
+		animation_controller.play_hit_reaction()
+
+
 func apply_spike_trap_damage(percent_of_max: float) -> void:
 	var was_dead := is_dead()
 	death_controller.apply_percent_damage(percent_of_max)

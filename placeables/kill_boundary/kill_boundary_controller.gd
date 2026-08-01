@@ -304,8 +304,11 @@ func _apply_flame_heat(delta: float) -> void:
 			var outside_ratio := clampf(outside_depth / maxf(outside_damage_ramp_depth, 0.001), 0.0, 1.0)
 			damage_multiplier = lerpf(1.0, maxf(max_outside_damage_multiplier, 1.0), outside_ratio)
 
-		if body_3d.has_method("apply_flame_damage"):
-			body_3d.apply_flame_damage(flame_damage_per_second * damage_multiplier * delta)
+		var damage_amount := flame_damage_per_second * damage_multiplier * delta
+		if body_3d.has_method("apply_kill_boundary_damage"):
+			body_3d.call("apply_kill_boundary_damage", damage_amount, _is_flame_effect_active())
+		elif body_3d.has_method("apply_flame_damage"):
+			body_3d.apply_flame_damage(damage_amount)
 		elif body_3d.has_method("die_from_flames"):
 			body_3d.die_from_flames()
 
