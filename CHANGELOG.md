@@ -2,6 +2,11 @@
 
 ## 2026-08-01
 
+### 0200
+
+- Level-editor feedback snapshots no longer claim the source level's scene identity, preventing duplicate UID warnings in Godot.
+  - Prompt: Remove duplicate UIDs reported for Vampire Boss feedback snapshots.
+
 ### 0100
 
 - GeneratedMaze placeables now spread through all valid walkable space without treating perimeter corridors as a separate placement zone.

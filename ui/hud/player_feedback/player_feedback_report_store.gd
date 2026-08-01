@@ -297,6 +297,7 @@ static func _save_level_scene_snapshot(
     var scene_source := FileAccess.get_file_as_string(level_scene_path)
     if scene_source.is_empty():
         return {"status": "save_failed"}
+    scene_source = _remove_root_scene_uid(scene_source)
     var file_name := "%s%s" % [report_id, LEVEL_SCENE_EXTENSION]
     var snapshot_path := report_directory.path_join(file_name)
     var snapshot_file := FileAccess.open(snapshot_path, FileAccess.WRITE)
@@ -311,6 +312,23 @@ static func _save_level_scene_snapshot(
         "bytes": _get_file_size(snapshot_path),
         "sha256": FileAccess.get_sha256(snapshot_path),
     }
+
+
+## Removes the source identity so an immutable report copy cannot collide with the live scene.
+static func _remove_root_scene_uid(scene_source: String) -> String:
+    var header_end := scene_source.find("\n")
+    if header_end < 0:
+        header_end = scene_source.length()
+    var header := scene_source.left(header_end)
+    if not header.begins_with("[gd_scene "):
+        return scene_source
+    var uid_start := header.find(" uid=\"")
+    if uid_start < 0:
+        return scene_source
+    var uid_end := header.find("\"", uid_start + 6)
+    if uid_end < 0:
+        return scene_source
+    return scene_source.left(uid_start) + scene_source.substr(uid_end + 1)
 
 
 static func _remove_level_scene_snapshot(

@@ -604,6 +604,9 @@ func _test_run_recording_preserves_compact_frame_timing_and_controls() -> bool:
     var repository_level_scene_saved := FileAccess.file_exists(
         repository_level_scene_path
     )
+    var repository_level_scene_source := FileAccess.get_file_as_string(
+        repository_level_scene_path
+    )
     var stored_settings := stored_metadata.get("settings", {}) as Dictionary
     var stored_session := stored_metadata.get("session", {}) as Dictionary
     var stored_purchases := stored_settings.get("shop_purchases", {}) as Dictionary
@@ -713,8 +716,9 @@ func _test_run_recording_preserves_compact_frame_timing_and_controls() -> bool:
                     "level_scene_status",
                     ""
                 )) == "ready" \
-                and repository_level_scene_saved,
-            "player feedback creates commit-ready playback and an immutable level snapshot"
+                and repository_level_scene_saved \
+                and not repository_level_scene_source.get_slice("\n", 0).contains(" uid="),
+            "player feedback creates a UID-free immutable level snapshot and playback"
         ) \
         and _expect(
             listed_recordings.size() == 1 and latest_recording_id == storage_level_id,

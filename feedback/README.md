@@ -2,9 +2,10 @@
 
 Press Triangle during gameplay to create a report in `feedback/reports/`. Each open report
 contains readable JSON metadata and a matching `.gdr` playback captured through the marked
-moment and its short follow-up window.
+moment and its short follow-up window. Its text-scene snapshot deliberately has no root UID,
+so Godot does not confuse the immutable copy with the editable source level.
 
-Commit both files so another developer or Codex thread can inspect the same evidence.
+Commit all three files so another developer or Codex thread can inspect the same evidence.
 Playback files use Git LFS. The game and archive command retain at most 20 reports using
 25 MiB in total, with a 5 MiB limit for one playback. Open reports are never silently
 pruned; resolved archive entries are removed oldest-first when space is needed.
