@@ -16,6 +16,7 @@ const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const GROUND_SPAWN := preload("res://enemies/ground_spawn.gd")
 const WORLD_COLLISION_LAYER := 1
 const ZOMBIE_COLLISION_LAYER := 1 << 3
+const PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER := 1 << 4
 const SKELETON_COLLISION_LAYER := 1 << 5
 const ENEMY_GEOMETRY_VISUAL_LAYER := 1 << 18
 const ALL_VISUAL_LAYERS := (1 << 20) - 1
@@ -184,6 +185,10 @@ func _ready() -> void:
     add_to_group(CHARACTER_GROUP)
     add_to_group(ENEMY_GROUP)
     add_to_group(SKELETON_GROUP)
+    map_collision_mask &= ~PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
+    enemy_collision_mask &= ~PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
+    if skeleton_body != null:
+        skeleton_body.collision_mask &= ~PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
     footstep_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"skeleton_audio")
     _load_footstep_sounds()
     landing_sound = GDAudio.load_stream(LANDING_SOUND_PATH)

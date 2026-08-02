@@ -430,6 +430,7 @@ func _run_tests() -> void:
     failed = not _test_reusable_gate_and_treasure_deposit_coffin_scenes() or failed
     failed = not _test_coffin_deposit_jumps_move_two_extra_coins() or failed
     failed = not _test_stairwell_scopes_kill_boundary_immunity() or failed
+    failed = not _test_kill_boundary_ignores_zombies_and_skeletons() or failed
     failed = not _test_key_scenes_have_authored_pickup_areas_and_landing_audio() or failed
     failed = not _test_graveyard_scene_does_not_embed_default_level() or failed
     failed = not _test_level_lookup_supports_debug_and_stable_ids() or failed
@@ -3509,6 +3510,84 @@ func _test_stairwell_scopes_kill_boundary_immunity() -> bool:
     player.free()
     boundary.free()
     staircase.free()
+    return passed
+
+
+func _test_kill_boundary_ignores_zombies_and_skeletons() -> bool:
+    var boundary := KILL_BOUNDARY_SCENE.instantiate() as GDKillBoundary3D
+    boundary.autoplay_boundary_animation = false
+    boundary.boundary_segments = 8
+    root.add_child(boundary)
+    boundary.set_physics_process(false)
+
+    var zombie := ZOMBIE_SCENE.instantiate() as GDZombiePath
+    var skeleton := SKELETON_SCENE.instantiate() as GDSkeletonPath
+    var zombie_body := zombie.get_node("ZombieBody") as CharacterBody3D
+    var skeleton_body := skeleton.get_node(
+        "PathFollow3D/DropPivot/SkeletonBody"
+    ) as AnimatableBody3D
+    var authored_enemy_bodies_ignore_boundary := (
+        zombie_body.collision_mask & TEST_BOUNDARY_BLOCKER_COLLISION_LAYER
+    ) == 0 and (
+        skeleton_body.collision_mask & TEST_BOUNDARY_BLOCKER_COLLISION_LAYER
+    ) == 0
+    zombie.ai_enabled_on_ready = false
+    root.add_child(zombie)
+    root.add_child(skeleton)
+    zombie.set_physics_process(false)
+    skeleton.set_physics_process(false)
+
+    var player := PLAYER_SCENE.instantiate() as GDPlayer
+    root.add_child(player)
+    player.set_physics_process(false)
+    var runtime_enemy_bodies_ignore_boundary := (
+        zombie_body.collision_mask & TEST_BOUNDARY_BLOCKER_COLLISION_LAYER
+    ) == 0 and (
+        skeleton_body.collision_mask & TEST_BOUNDARY_BLOCKER_COLLISION_LAYER
+    ) == 0
+    var enemy_probes_ignore_boundary := (
+        zombie.map_collision_mask & TEST_BOUNDARY_BLOCKER_COLLISION_LAYER
+    ) == 0 and (
+        zombie.vision_collision_mask & TEST_BOUNDARY_BLOCKER_COLLISION_LAYER
+    ) == 0 and (
+        skeleton.map_collision_mask & TEST_BOUNDARY_BLOCKER_COLLISION_LAYER
+    ) == 0 and (
+        skeleton.enemy_collision_mask & TEST_BOUNDARY_BLOCKER_COLLISION_LAYER
+    ) == 0
+
+    var flame_areas := boundary.get("strip_areas") as Array
+    var flame_areas_only_monitor_player := not flame_areas.is_empty()
+    for area_value in flame_areas:
+        var area := area_value as Area3D
+        flame_areas_only_monitor_player = flame_areas_only_monitor_player \
+            and area != null \
+            and area.collision_mask == 2
+    var blocker_bodies := boundary.get("blocker_bodies") as Array
+    var blockers_use_player_only_layer := not blocker_bodies.is_empty()
+    for body_value in blocker_bodies:
+        var blocker := body_value as StaticBody3D
+        blockers_use_player_only_layer = blockers_use_player_only_layer \
+            and blocker != null \
+            and blocker.collision_layer == TEST_BOUNDARY_BLOCKER_COLLISION_LAYER
+
+    var passed := _expect(
+        authored_enemy_bodies_ignore_boundary \
+            and runtime_enemy_bodies_ignore_boundary \
+            and enemy_probes_ignore_boundary,
+        "zombies and skeletons ignore the moving player-only boundary blockers"
+    ) and _expect(
+        flame_areas_only_monitor_player,
+        "kill-boundary damage areas monitor the player layer without monitoring enemies"
+    ) and _expect(
+        blockers_use_player_only_layer \
+            and (player.collision_mask & TEST_BOUNDARY_BLOCKER_COLLISION_LAYER) != 0,
+        "kill-boundary blocker collision remains active for the player"
+    )
+
+    player.free()
+    skeleton.free()
+    zombie.free()
+    boundary.free()
     return passed
 
 

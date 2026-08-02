@@ -2,6 +2,11 @@
 
 ## 2026-08-02
 
+### 1300
+
+- Kill-boundary flames and moving blocker walls now affect the player without moving, blocking, or damaging zombies and skeletons.
+  - Prompt: Prevent the moving kill boundary from affecting zombies or skeletons.
+
 ### 0200
 
 - Each jump near a deposit coffin now transfers exactly two extra carried coins without accelerating later unloading.
