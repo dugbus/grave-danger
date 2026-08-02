@@ -1,0 +1,14 @@
+{
+	"[gdscript]": {
+		"editor.defaultFormatter": "geequlim.godot-tools",
+		"editor.detectIndentation": false,
+		"editor.insertSpaces": false,
+		"editor.tabSize": 4
+	},
+	"godotTools.editorPath.godot4": "godot",
+	"godotTools.lsp.autoReconnect.enabled": true,
+	"godotTools.lsp.headless": true,
+	"godotTools.lsp.serverHost": "127.0.0.1",
+	"godotTools.lsp.serverPort": 6008,
+	"godotTools.scenePreview.previewRelatedScenes": "sameFolder"
+}

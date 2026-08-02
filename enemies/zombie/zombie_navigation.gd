@@ -602,7 +602,7 @@ func _update_drop_in(delta: float) -> bool:
         return true
 
     elapsed_time += delta
-    if not is_dropping_in and elapsed_time < drop_in_time:
+    if not is_dropping_in and elapsed_time < spawn_time:
         return false
 
     if not is_dropping_in:
@@ -630,6 +630,7 @@ func _start_drop_in() -> void:
     _set_kill_area_enabled(false)
 
 func _finish_drop_in() -> void:
+    var completed_visible_drop := is_dropping_in
     has_dropped_in = true
     is_dropping_in = false
     if drop_pivot != null:
@@ -638,3 +639,5 @@ func _finish_drop_in() -> void:
     _set_active_visible(true)
     _set_kill_area_enabled(false)
     _update_animation(0.0)
+    if completed_visible_drop:
+        _play_landing_sound()

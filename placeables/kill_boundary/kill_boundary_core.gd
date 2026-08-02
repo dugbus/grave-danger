@@ -19,16 +19,19 @@ func _ready() -> void:
 		_sync_editor_preview_animation()
 		_sync_boundary()
 		set_process(true)
+		super._ready()
 		return
 
 	_sync_movement_to_animation()
 	if not _runtime_effects_enabled():
 		_set_runtime_effects_enabled(false)
+		super._ready()
 		return
 
 	_create_strips()
 	_create_near_flame_audio()
 	_sync_boundary()
+	super._ready()
 
 
 func _notification(what: int) -> void:
@@ -327,4 +330,3 @@ func _get_center_node() -> Node3D:
 		return center
 
 	return self
-

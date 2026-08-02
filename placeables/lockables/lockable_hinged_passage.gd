@@ -1,4 +1,4 @@
-extends Node3D
+extends "res://placeables/placeable.gd"
 class_name GDLockableHingedPassage
 
 
@@ -37,6 +37,7 @@ func _ready() -> void:
 	_configure_area(unlock_area)
 	_configure_area(completion_area)
 	_connect_areas()
+	super._ready()
 
 
 func is_locked() -> bool:

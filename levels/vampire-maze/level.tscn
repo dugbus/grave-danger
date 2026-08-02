@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://levels/vampire-maze/generated_maze/generated_maze.tscn" id="11_uaw4a"]
+[ext_resource type="Material" uid="uid://8jqemqaj1dhu" path="res://Assets/environment/floors/flagstones_floor.material" id="12_ubeqf"]
 [ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]
 [ext_resource type="Script" uid="uid://buom3th5dqf1b" path="res://levels/vampire-maze/vampire_maze.gd" id="101_level"]
 [ext_resource type="PackedScene" path="res://enemies/vampire/vampire.tscn" id="102_vampire"]
@@ -25,7 +26,7 @@ script = ExtResource("106_level_settings")
 show_minimap = true
 
 [node name="Vampire" parent="." unique_id=93193051 instance=ExtResource("102_vampire")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0.05, 15.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0.05, 14.5)
 
 [node name="VampireDebugHUD" parent="." unique_id=1970276169 instance=ExtResource("111_vampire_debug_hud")]
 
@@ -47,6 +48,8 @@ floor_grid_map_path = NodePath("")
 
 [node name="GeneratedMaze" parent="." unique_id=1250068653 instance=ExtResource("11_uaw4a")]
 maze_seed = 7
+floor_material = ExtResource("12_ubeqf")
+floor_texture_tiles = Vector2i(2, 2)
 baked_generation_version = 11
 baked_maze_seed = 7
 baked_width = 34

@@ -47,12 +47,34 @@
 - Prefer current Godot 4.x APIs. Do not use Godot 3.x APIs.
 
 ## GDScript style
-- Follow the Godot 4.6 GDScript style guide.
-- Use spaces, not tabs.
-- Use snake_case for files, functions, variables, and signals.
-- Use PascalCase for class_name and node names.
-- Prefer `:=` when the type is clear from the right side; write explicit types when inference is ambiguous, especially `get_node()` results.
-- Order scripts as: @tool/@icon, class_name, extends, doc comment, signals, enums, constants, exports, vars, @onready vars, lifecycle callbacks, public methods, private methods.
+- Godot 4.7 only.
+- Use statically typed GDScript.
+- Use tabs for GDScript indentation, displayed at four columns.
+- Prefer composition over deep inheritance.
+- Keep scripts below 500 lines where practical.
+- Keep functions small and single-purpose.
+- Avoid string-based method and signal names.
+- Use Resources for shared configuration.
+- Do not duplicate tunable defaults across scene instances.
+- Avoid autoloads unless state genuinely needs global lifetime.
+- Do not use get_node() repeatedly inside process loops.
+- Cache required node references with @onready.
+- Avoid allocations in _process() and _physics_process().
+- Use signals for loose communication, direct calls for ownership relationships.
+- Make enemy state transitions explicit and testable.
+- Keep gameplay logic deterministic where replays depend upon it.
+- Never silently modify imported assets or generated scenes.
+- Preserve editor usability for non-programmers.
+- Explain any architecture change before applying it across the repository.
+
+## GODOT Best Practices
+
+Godot guidance is stored in docs/godot-best-practices.
+
+Consult it only when relevant to the current task. Read the smallest number of
+topic files needed. Treat the documentation as general guidance rather than
+project-specific requirements. Prefer existing project conventions when they
+deliberately differ.
 
 ## Code generation rules
 - Preserve existing scene/resource paths.

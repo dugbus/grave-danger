@@ -1,5 +1,5 @@
 class_name GDTorch
-extends Node3D
+extends "res://placeables/placeable.gd"
 ## A wall-mounted torch that permanently lights after the player faces it.
 
 signal lit
@@ -48,6 +48,7 @@ func _ready() -> void:
 	if level_selection != null and level_selection.has_method("is_torch_lit"):
 		if level_selection.is_torch_lit(_get_persistence_id()):
 			_set_lit(false)
+	super._ready()
 
 
 func _physics_process(delta: float) -> void:

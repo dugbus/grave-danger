@@ -25,6 +25,7 @@ item/0/navigation_layers = 1
 [node name="GeneratedMaze" type="Node3D"]
 script = ExtResource("1_generator")
 configuration = ExtResource("2_config")
+floor_material = ExtResource("4_floor_material")
 
 [node name="PNGGridMap" type="GridMap" parent="."]
 mesh_library = ExtResource("3_walls")

@@ -19,6 +19,16 @@ class_name GDPlayerJumpSettings
 @export_range(0.1, 4.0, 0.01) var jump_pitch_min := 0.96
 ## Highest random pitch scale used for each jump sound.
 @export_range(0.1, 4.0, 0.01) var jump_pitch_max := 1.04
+## Audio sample played when the player lands after a meaningful fall.
+@export_file("*.mp3") var landing_sound_path := "res://Assets/audio/player-landing.mp3"
+## Landing sound volume in decibels.
+@export_range(-80.0, 24.0, 0.1, "suffix:dB") var landing_volume_db := 0.0
+## Lowest random pitch scale used for each landing sound.
+@export_range(0.1, 4.0, 0.01) var landing_pitch_min := 0.97
+## Highest random pitch scale used for each landing sound.
+@export_range(0.1, 4.0, 0.01) var landing_pitch_max := 1.03
+## Minimum downward speed required to play a landing instead of treating it as a small step.
+@export_range(0.0, 20.0, 0.05, "suffix:m/s") var landing_minimum_speed := 1.25
 
 
 func get_jump_height() -> float:

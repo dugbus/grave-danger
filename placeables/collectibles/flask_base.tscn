@@ -7,9 +7,63 @@
 [sub_resource type="SphereShape3D" id="SphereShape3D_flask_pickup"]
 radius = 0.55
 
-[node name="Flask" type="Node3D" unique_id=686868909]
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_flask"]
+friction = 0.45
+bounce = 0.12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_flask_base"]
+radius = 0.061
+height = 0.016
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_flask_body"]
+radius = 0.11
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_flask_neck"]
+radius = 0.042
+height = 0.07
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_flask_rim"]
+radius = 0.053
+height = 0.045
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_flask_stopper"]
+radius = 0.027
+height = 0.014
+
+[node name="Flask" type="RigidBody3D" unique_id=686868909]
+collision_layer = 4
+collision_mask = 5
+mass = 0.35
+physics_material_override = SubResource("PhysicsMaterial_flask")
+linear_damp = 0.25
+angular_damp = 0.9
+freeze = true
+continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 8
 script = ExtResource("1_flask_base")
+spawn_spin_speed = 9.0
 global_flask_properties = ExtResource("2_4vqv1")
+
+[node name="BaseCollisionShape" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.008, 0)
+shape = SubResource("CylinderShape3D_flask_base")
+
+[node name="BodyCollisionShape" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.11, 0)
+shape = SubResource("SphereShape3D_flask_body")
+
+[node name="NeckCollisionShape" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.225, 0)
+shape = SubResource("CylinderShape3D_flask_neck")
+
+[node name="RimCollisionShape" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.2745, 0)
+shape = SubResource("CylinderShape3D_flask_rim")
+
+[node name="StopperCollisionShape" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.301, 0)
+shape = SubResource("CylinderShape3D_flask_stopper")
 
 [node name="Visual" type="Node3D" parent="." unique_id=1693092501]
 

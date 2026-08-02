@@ -14,6 +14,7 @@ func _ready() -> void:
 	_seed_deterministic_rng()
 	_load_footstep_sounds()
 	_load_punch_hit_sound()
+	_load_landing_sound()
 	_randomize_next_footstep_distance()
 	_configure_nodes()
 	_apply_start_progress()
@@ -31,10 +32,19 @@ func _ready() -> void:
 	navigation_ready = ai_enabled_on_ready
 	state = ZombieState.Patrol if navigation_ready else ZombieState.LevelStart
 
-	if drop_in_time > 0.0:
+	if spawn_time > 0.0:
 		_set_active_visible(false)
 	else:
 		_finish_drop_in()
+	super._ready()
+
+
+func _uses_custom_placeable_spawn() -> bool:
+	return true
+
+
+func is_placeable_spawned() -> bool:
+	return has_dropped_in
 
 func _physics_process(delta: float) -> void:
 	if zombie_body == null:

@@ -5,7 +5,7 @@
 #
 # This class provides the shared functionality used by every flask type,
 # including:
-#   - Floating and spinning idle animation.
+#   - Floating idle animation for pre-placed flasks and shared visual rotation.
 #   - Player detection and pickup handling.
 #   - Pickup sound playback and collection animation.
 #   - Liquid material colour/emission customization.
@@ -33,11 +33,18 @@
 # directly.
 ##
 @tool
-extends Node3D
+extends "res://placeables/physics_placeable.gd"
 class_name GDFlaskBase
 
 
 const DRINKING_SOUND := preload("res://Assets/audio/drinking-liquid.mp3")
+const FLASK_IMPACT_SOUND_PATH := "res://Assets/audio/flask-hits-ground.mp3"
+const IMPACT_AUDIO_NAME := "FlaskImpactAudio"
+const IMPACT_AUDIO_MAX_DISTANCE := 64.0
+const IMPACT_AUDIO_UNIT_SIZE := 16.0
+const IMPACT_AUDIO_VOLUME_DB := 6.0
+const IMPACT_COOLDOWN_SECONDS := 0.12
+const MINIMUM_IMPACT_SPEED := 1.0
 const LIQUID_MATERIAL_NAME := "FlaskLiquidMaterial"
 const FLASK_PROPERTIES := preload("res://placeables/collectibles/global_flask_properties.tres")
 
@@ -68,10 +75,10 @@ const FLASK_PROPERTIES := preload("res://placeables/collectibles/global_flask_pr
 # Rotation speed of the floating flask.
 @export var spin_speed := 0.9
 
-# Vertical bobbing distance.
+# Vertical bobbing distance for flasks that are present from level start.
 @export var bob_height := 0.045
 
-# Bobbing animation speed.
+# Bobbing animation speed for flasks that are present from level start.
 @export var bob_speed := 2.8
 
 # Time taken for the pickup shrink animation.
@@ -108,6 +115,15 @@ var visual_base_y := 0.0
 # Bodies currently inside the pickup area.
 var candidate_bodies: Array[Node3D] = []
 
+# Shared audio sample loaded through the central audio support.
+var impact_sound: AudioStream
+
+# Remaining delay before another substantial collision may play an impact.
+var impact_cooldown_remaining := 0.0
+
+# Velocity sampled before the next physics contact signal is received.
+var previous_linear_velocity := Vector3.ZERO
+
 
 func _ready() -> void:
 	# In the editor only update visuals.
@@ -115,16 +131,21 @@ func _ready() -> void:
 		_apply_liquid_color()
 		set_process(false)
 		set_physics_process(false)
+		super._ready()
 		return
 
 	add_to_group("flask_pickup")
 
 	visual_base_y = visual.position.y
+	impact_sound = GDAudio.load_stream(FLASK_IMPACT_SOUND_PATH)
+	previous_linear_velocity = linear_velocity
 
 	pickup_area.body_entered.connect(_on_pickup_area_body_entered)
 	pickup_area.body_exited.connect(_on_pickup_area_body_exited)
+	body_entered.connect(_on_physics_body_entered)
 
 	_apply_liquid_color()
+	super._ready()
 
 
 func _process(delta: float) -> void:
@@ -132,12 +153,19 @@ func _process(delta: float) -> void:
 	elapsed += delta
 
 	visual.rotation.y += spin_speed * delta
+	if spawn_time > 0.0:
+		# A dropped flask's visual must remain aligned with its physical bottle shape.
+		visual.position.y = visual_base_y
+		return
 
 	var bob_offset := (sin(elapsed * bob_speed) + 1.0) * 0.5 * bob_height
 	visual.position.y = visual_base_y + bob_offset
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	impact_cooldown_remaining = maxf(impact_cooldown_remaining - delta, 0.0)
+	previous_linear_velocity = linear_velocity
+
 	# Do not process further once collection has begun.
 	if is_being_collected:
 		return
@@ -195,6 +223,31 @@ func _on_pickup_area_body_entered(body: Node3D) -> void:
 # Remove bodies that leave the pickup area.
 func _on_pickup_area_body_exited(body: Node3D) -> void:
 	candidate_bodies.erase(body)
+
+
+# Plays one spatial glass impact for a substantial collision with another body.
+func _on_physics_body_entered(body: Node) -> void:
+	if impact_sound == null or impact_cooldown_remaining > 0.0:
+		return
+
+	var other_velocity := Vector3.ZERO
+	if body is RigidBody3D:
+		other_velocity = (body as RigidBody3D).linear_velocity
+	var previous_impact_speed := (previous_linear_velocity - other_velocity).length()
+	var current_impact_speed := (linear_velocity - other_velocity).length()
+	if maxf(previous_impact_speed, current_impact_speed) < MINIMUM_IMPACT_SPEED:
+		return
+
+	impact_cooldown_remaining = IMPACT_COOLDOWN_SECONDS
+	GDAudio.play_one_shot_3d(
+		self,
+		impact_sound,
+		IMPACT_AUDIO_NAME,
+		IMPACT_AUDIO_VOLUME_DB,
+		1.0,
+		IMPACT_AUDIO_MAX_DISTANCE,
+		IMPACT_AUDIO_UNIT_SIZE
+	)
 
 
 ##

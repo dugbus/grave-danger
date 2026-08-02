@@ -1,6 +1,6 @@
 @tool
 @abstract
-extends Path3D
+extends "res://placeables/path_placeable.gd"
 
 
 const EDITOR_PREVIEW_CONTAINER_NAME := "EditorPreview"

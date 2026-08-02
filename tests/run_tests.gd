@@ -1,6 +1,7 @@
 extends SceneTree
 
 const BAT_NEST_SCRIPT := preload("res://enemies/bat_nest.gd")
+const PLACEABLE_SCRIPT := preload("res://placeables/placeable.gd")
 const TREASURE_DEPOSIT_COFFIN_SCENE := preload("res://placeables/treasure_deposit/treasure_deposit_coffin.tscn")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const CODEX_SESSION_OPTIONS := preload("res://game/codex_session_options.gd")
@@ -31,6 +32,7 @@ const LEVEL_SETTINGS_SCRIPT := preload("res://levels/level_settings.gd")
 const LEVEL_SELECT_SCENE := preload("res://ui/screens/level_select_screen.tscn")
 const LOW_HEALTH_VIGNETTE_SCRIPT := preload("res://ui/hud/low_health_vignette.gd")
 const LOCKED_GATE_SCENE := preload("res://placeables/lockables/locked_gate.tscn")
+const HEALTH_FLASK_SCENE := preload("res://placeables/collectibles/health_flask.tscn")
 const NO_BOUNDARY_FLASK_SCENE := preload(
     "res://placeables/collectibles/flask_no_boundary.tscn"
 )
@@ -88,6 +90,64 @@ const VAMPIRE_DEBUG_HUD_SCENE := preload(
 const VAMPIRE_SCENE := preload("res://enemies/vampire/vampire.tscn")
 const ZOMBIE_SCENE := preload("res://enemies/zombie.tscn")
 const TEST_MINIMAP_ROUTE_VISUAL_LAYER := 1 << 18
+
+const MAP_PLACEABLE_SCENE_PATHS: Array[String] = [
+    "res://placeables/collectibles/flask_base.tscn",
+    "res://placeables/collectibles/flask_bigger_sack.tscn",
+    "res://placeables/collectibles/flask_breathing_space.tscn",
+    "res://placeables/collectibles/flask_no_boundary.tscn",
+    "res://placeables/collectibles/flask_pause_boundary.tscn",
+    "res://placeables/collectibles/flask_pickup_radius.tscn",
+    "res://placeables/collectibles/flask_poison.tscn",
+    "res://placeables/collectibles/health_flask.tscn",
+    "res://placeables/kill_boundary/kill_boundary.tscn",
+    "res://placeables/lockables/locked_door.tscn",
+    "res://placeables/lockables/locked_gate.tscn",
+    "res://placeables/pushables/hay_bale_pushable.tscn",
+    "res://placeables/pushables/rolling_rock_pushable.tscn",
+    "res://placeables/spike_trap/spike_trap.tscn",
+    "res://placeables/stairs/procedural_staircase.tscn",
+    "res://placeables/text_trigger/text_trigger.tscn",
+    "res://placeables/torch/torch.tscn",
+    "res://placeables/treasure_deposit/treasure_deposit_coffin.tscn",
+    "res://placeables/treasure/gems/amethyst.tscn",
+    "res://placeables/treasure/gems/diamond.tscn",
+    "res://placeables/treasure/gems/emerald.tscn",
+    "res://placeables/treasure/gems/ruby.tscn",
+    "res://placeables/treasure/gems/sapphire.tscn",
+    "res://placeables/treasure/gold_bar.tscn",
+    "res://placeables/treasure/gold_coin.tscn",
+    "res://placeables/treasure/gold_coin_pile.tscn",
+    "res://placeables/treasure/treasure_pile.tscn",
+    "res://enemies/bat_nest.tscn",
+    "res://enemies/skeleton.tscn",
+    "res://enemies/vampire/vampire.tscn",
+    "res://enemies/zombie.tscn",
+    "res://inventory/key.tscn",
+    "res://inventory/silver_key.tscn",
+]
+
+const PHYSICS_DROP_PLACEABLE_SCENE_PATHS: Array[String] = [
+    "res://placeables/collectibles/flask_base.tscn",
+    "res://placeables/collectibles/flask_bigger_sack.tscn",
+    "res://placeables/collectibles/flask_breathing_space.tscn",
+    "res://placeables/collectibles/flask_no_boundary.tscn",
+    "res://placeables/collectibles/flask_pause_boundary.tscn",
+    "res://placeables/collectibles/flask_pickup_radius.tscn",
+    "res://placeables/collectibles/flask_poison.tscn",
+    "res://placeables/collectibles/health_flask.tscn",
+    "res://placeables/pushables/rolling_rock_pushable.tscn",
+    "res://placeables/treasure_deposit/treasure_deposit_coffin.tscn",
+    "res://placeables/treasure/gems/amethyst.tscn",
+    "res://placeables/treasure/gems/diamond.tscn",
+    "res://placeables/treasure/gems/emerald.tscn",
+    "res://placeables/treasure/gems/ruby.tscn",
+    "res://placeables/treasure/gems/sapphire.tscn",
+    "res://placeables/treasure/gold_bar.tscn",
+    "res://placeables/treasure/gold_coin.tscn",
+    "res://inventory/key.tscn",
+    "res://inventory/silver_key.tscn",
+]
 
 enum TestAutotileItem {
     Base = 1,
@@ -247,6 +307,25 @@ class TestVampireVictim:
         killed = true
 
 
+class TestSkeletonVictim:
+    extends Node3D
+
+    var killed_by_enemy := false
+    var killed_by_fire := false
+
+
+    func is_dead() -> bool:
+        return killed_by_enemy or killed_by_fire
+
+
+    func die_from_enemy() -> void:
+        killed_by_enemy = true
+
+
+    func die_from_flames() -> void:
+        killed_by_fire = true
+
+
 class TestGeneratedPlayer:
     extends CharacterBody3D
 
@@ -311,8 +390,14 @@ func _init() -> void:
 func _run_tests() -> void:
     var failed := false
     failed = not _test_deterministic_seed_helper_is_stable() or failed
+    failed = not _test_map_placeables_share_spawn_time_and_physics_capabilities() or failed
+    failed = not _test_debug_level_sequences_spawn_reviews_once_per_second() or failed
+    failed = not _test_debug_level_enemy_patrols_ping_pong() or failed
+    failed = not await _test_placeable_spawn_time_delays_and_drops_items() or failed
+    failed = not await _test_static_placeable_spawn_presentations() or failed
     failed = not _test_codex_session_options_require_explicit_directed_test_data() or failed
     failed = not _test_run_recording_preserves_compact_frame_timing_and_controls() or failed
+    failed = not _test_run_recorder_skips_freed_drift_nodes() or failed
     failed = not await _test_quick_exit_flushes_run_recording_tasks() or failed
     failed = not _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() or failed
     failed = not _test_treasure_pile_discovers_compatible_scenes_and_spawns_mixed_counts() \
@@ -322,10 +407,12 @@ func _run_tests() -> void:
     failed = not _test_gem_variants_use_icon_cuts_and_scale_values() or failed
     failed = not _test_audio_fallback_is_deterministic() or failed
     failed = not _test_frontend_audio_uses_shared_support() or failed
+    failed = not _test_letterbox_background_is_black() or failed
     failed = not await _test_screen_fade_finishes_while_paused() or failed
     failed = not await _test_feedback_pause_restores_prior_pause_state() or failed
     failed = not await _test_feedback_dialog_uses_large_game_font() or failed
     failed = not await _test_game_settings_batch_disk_writes() or failed
+    failed = not _test_player_landing_uses_new_sample_after_a_meaningful_fall() or failed
     failed = not _test_player_fall_death_threshold() or failed
     failed = not await _test_player_death_uses_face_blood_and_body_throes() or failed
     failed = not await _test_fire_boundary_death_blackens_and_burns_player() or failed
@@ -335,13 +422,15 @@ func _run_tests() -> void:
     failed = not _test_drop_direction_variation_is_deterministic_and_compact() or failed
     failed = not _test_all_treasure_uses_indoor_lighting_and_coin_outline() or failed
     failed = not await _test_gold_bar_uses_inventory_capacity_and_physics_drop() or failed
+    failed = not await _test_dense_coin_pile_collection_is_bounded() or failed
     failed = not _test_result_percentage_uses_mixed_treasure_value() or failed
     failed = not _test_typed_treasure_wallet_and_shop_purchases() or failed
     failed = not _test_treasure_absorption_does_not_complete_level() or failed
     failed = not _test_gate_completion_completes_level() or failed
     failed = not _test_reusable_gate_and_treasure_deposit_coffin_scenes() or failed
+    failed = not _test_coffin_deposit_jumps_move_two_extra_coins() or failed
     failed = not _test_stairwell_scopes_kill_boundary_immunity() or failed
-    failed = not _test_key_scenes_have_authored_pickup_areas() or failed
+    failed = not _test_key_scenes_have_authored_pickup_areas_and_landing_audio() or failed
     failed = not _test_graveyard_scene_does_not_embed_default_level() or failed
     failed = not _test_level_lookup_supports_debug_and_stable_ids() or failed
     failed = not _test_level_selection_tracks_outcomes_and_highlight() or failed
@@ -377,10 +466,14 @@ func _run_tests() -> void:
     failed = not _test_vampire_navigation_reports_scaled_search_contract() or failed
     failed = not _test_vampire_maze_owns_its_development_view() or failed
     failed = not _test_vampire_minimap_reports_live_belief_and_route_state() or failed
+    failed = not _test_generated_maze_floor_settings() or failed
     failed = not _test_vampire_maze_generates_seeded_grid_maps() or failed
     failed = not _test_vampire_maze_exit_key_requires_exploration() or failed
     failed = not _test_vampire_maze_minimap_shows_all_shortest_routes() or failed
+    failed = not _test_skeleton_contact_uses_non_fire_death() or failed
     failed = not _test_skeleton_facing_is_driven_by_movement() or failed
+    failed = not _test_skeleton_uses_dedicated_movement_audio() or failed
+    failed = not _test_zombie_spawn_uses_existing_enemy_landing_audio() or failed
     failed = not await _test_ground_enemies_block_each_other() or failed
     failed = not await _test_ground_enemies_fall_before_moving() or failed
     failed = not _test_minimap_disables_processing_and_rendering() or failed
@@ -397,6 +490,475 @@ func _run_tests() -> void:
     failed = not _test_png_gridmap_import_disables_y_cell_centering() or failed
     await process_frame
     quit(1 if failed else 0)
+
+
+func _test_map_placeables_share_spawn_time_and_physics_capabilities() -> bool:
+    var passed := true
+    for scene_path in MAP_PLACEABLE_SCENE_PATHS:
+        var packed_scene := load(scene_path) as PackedScene
+        var placeable: Node3D
+        if packed_scene != null:
+            placeable = packed_scene.instantiate() as Node3D
+        passed = _expect(
+            placeable != null and _object_has_property(placeable, &"spawn_time"),
+            "%s exposes Spawn Time on its placeable root" % scene_path
+        ) and passed
+        if PHYSICS_DROP_PLACEABLE_SCENE_PATHS.has(scene_path):
+            passed = _expect(
+                placeable is RigidBody3D and _object_has_property(placeable, &"spawn_drop_height"),
+                "%s is marked as a gravity drop-capable placeable" % scene_path
+            ) and passed
+        if placeable != null:
+            placeable.free()
+
+    var pile := TREASURE_PILE_SCENE.instantiate()
+    pile.set(&"trigger_time", 2.5)
+    passed = _expect(
+        is_equal_approx(float(pile.get(&"spawn_time")), 2.5),
+        "legacy treasure-pile trigger time mirrors the shared Spawn Time field"
+    ) and passed
+    pile.free()
+
+    var skeleton := SKELETON_SCENE.instantiate()
+    skeleton.set(&"drop_in_time", 3.5)
+    passed = _expect(
+        is_equal_approx(float(skeleton.get(&"spawn_time")), 3.5),
+        "legacy enemy drop-in time mirrors the shared Spawn Time field"
+    ) and passed
+    skeleton.free()
+    return passed
+
+
+func _test_debug_level_sequences_spawn_reviews_once_per_second() -> bool:
+    var debug_level_scene := load("res://levels/debug-level/level.tscn") as PackedScene
+    var debug_level := debug_level_scene.instantiate() as Node3D
+    var spawn_review_paths: Array[NodePath] = [
+        ^"GDFlaskNoBoundary2",
+        ^"GDFlaskBiggerSack2",
+        ^"Zombie/GDFlaskBreathingSpace",
+        ^"Zombie/GDFlaskPauseBoundary",
+        ^"Zombie/GDFlaskPickupRadius",
+        ^"Zombie/GDFlaskPoison",
+        ^"Zombie/GDHealthFlask",
+        ^"Zombie/LockedDoor",
+        ^"Zombie/SilverKey",
+        ^"Zombie/LockedGate",
+        ^"Zombie/Key",
+        ^"Zombie/HayBalePushable",
+        ^"Zombie/RollingRockPushable",
+        ^"Zombie/SpikeTrap",
+        ^"Zombie/GDTextTrigger",
+        ^"Zombie/Torch",
+        ^"Zombie/TreasureDepositCoffin",
+        ^"Zombie/Amethyst",
+        ^"Zombie/Diamond",
+        ^"Zombie/Emerald",
+        ^"Zombie/Ruby",
+        ^"Zombie/Sapphire",
+        ^"Zombie/GoldBar",
+        ^"Zombie/GoldCoinPile",
+        ^"Zombie/TreasurePile",
+        ^"Zombie/BatNest",
+        ^"Zombie/Skeleton",
+        ^"Zombie/Zombie",
+    ]
+    var sequence_is_complete := debug_level != null
+    for spawn_index in spawn_review_paths.size():
+        var placeable: Node = null
+        if debug_level != null:
+            placeable = debug_level.get_node_or_null(spawn_review_paths[spawn_index])
+        if placeable == null \
+                or not _object_has_property(placeable, &"spawn_time") \
+                or not is_equal_approx(float(placeable.get(&"spawn_time")), spawn_index + 1.0):
+            sequence_is_complete = false
+            break
+
+    if debug_level != null:
+        debug_level.free()
+    return _expect(
+        sequence_is_complete,
+        "the debug-level spawn-review row runs once per second from 1 through 28"
+    )
+
+
+func _test_debug_level_enemy_patrols_ping_pong() -> bool:
+    var debug_level_scene := load("res://levels/debug-level/level.tscn") as PackedScene
+    var debug_level := debug_level_scene.instantiate() as Node3D
+    var enemy_paths: Array[NodePath] = [
+        ^"Skeleton",
+        ^"Zombie",
+        ^"Zombie/Skeleton",
+        ^"Zombie/Zombie",
+    ]
+    var patrols_ping_pong := debug_level != null
+    for enemy_path in enemy_paths:
+        var enemy: Node = null
+        var path_follow: PathFollow3D = null
+        var patrol_curve: Curve3D = null
+        if debug_level != null:
+            enemy = debug_level.get_node_or_null(enemy_path)
+        if enemy != null:
+            path_follow = enemy.get_node_or_null("PathFollow3D") as PathFollow3D
+            patrol_curve = enemy.get("curve") as Curve3D
+        if enemy == null \
+                or bool(enemy.get("loop_patrol")) \
+                or not bool(enemy.get("reverse_at_path_ends")) \
+                or patrol_curve == null \
+                or patrol_curve.closed \
+                or path_follow == null \
+                or path_follow.loop:
+            patrols_ping_pong = false
+            break
+
+    if debug_level != null:
+        debug_level.free()
+    return _expect(
+        patrols_ping_pong,
+        "the debug level's original and timed enemy patrols reverse instead of wrapping"
+    )
+
+
+func _test_placeable_spawn_time_delays_and_drops_items() -> bool:
+    var existing_key := KEY_SCENE.instantiate() as RigidBody3D
+    root.add_child(existing_key)
+    var passed := _expect(
+        existing_key.visible \
+            and not existing_key.freeze \
+            and existing_key.get(&"placeable_spawn_controller") == null,
+        "Spawn Time zero leaves an already-present physics item untouched"
+    )
+    existing_key.queue_free()
+
+    var existing_flask := HEALTH_FLASK_SCENE.instantiate() as RigidBody3D
+    root.add_child(existing_flask)
+    passed = _expect(
+        existing_flask.freeze \
+            and existing_flask.get(&"placeable_spawn_controller") == null \
+            and is_zero_approx(existing_flask.angular_velocity.length()),
+        "Spawn Time zero keeps an authored flask fixed in place"
+    ) and passed
+    var flask_physics_material := existing_flask.physics_material_override
+    var base_collision := existing_flask.get_node_or_null("BaseCollisionShape") \
+        as CollisionShape3D
+    var body_collision := existing_flask.get_node_or_null("BodyCollisionShape") \
+        as CollisionShape3D
+    var neck_collision := existing_flask.get_node_or_null("NeckCollisionShape") \
+        as CollisionShape3D
+    var rim_collision := existing_flask.get_node_or_null("RimCollisionShape") \
+        as CollisionShape3D
+    var stopper_collision := existing_flask.get_node_or_null("StopperCollisionShape") \
+        as CollisionShape3D
+    var base_shape: CylinderShape3D
+    var body_shape: SphereShape3D
+    var neck_shape: CylinderShape3D
+    var rim_shape: CylinderShape3D
+    var stopper_shape: CylinderShape3D
+    if base_collision != null:
+        base_shape = base_collision.shape as CylinderShape3D
+    if body_collision != null:
+        body_shape = body_collision.shape as SphereShape3D
+    if neck_collision != null:
+        neck_shape = neck_collision.shape as CylinderShape3D
+    if rim_collision != null:
+        rim_shape = rim_collision.shape as CylinderShape3D
+    if stopper_collision != null:
+        stopper_shape = stopper_collision.shape as CylinderShape3D
+    passed = _expect(
+        flask_physics_material != null \
+            and is_equal_approx(flask_physics_material.bounce, 0.12) \
+            and is_equal_approx(flask_physics_material.friction, 0.45) \
+            and is_equal_approx(existing_flask.linear_damp, 0.25) \
+            and is_equal_approx(existing_flask.angular_damp, 0.9) \
+            and existing_flask.contact_monitor \
+            and existing_flask.max_contacts_reported == 8 \
+            and base_collision != null \
+            and base_shape != null \
+            and body_collision != null \
+            and body_shape != null \
+            and neck_collision != null \
+            and neck_shape != null \
+            and rim_collision != null \
+            and rim_shape != null \
+            and stopper_collision != null \
+            and stopper_shape != null \
+            and is_equal_approx(base_shape.radius, 0.061) \
+            and is_equal_approx(body_shape.radius, 0.11) \
+            and is_equal_approx(neck_shape.radius, 0.042) \
+            and is_equal_approx(rim_shape.radius, 0.053) \
+            and is_equal_approx(stopper_shape.radius, 0.027),
+        "flasks use a measured, lightly bouncing bottle collider that settles after rolling"
+    ) and passed
+    existing_flask.set(&"previous_linear_velocity", Vector3.DOWN * 4.0)
+    var impact_body := StaticBody3D.new()
+    existing_flask.call("_on_physics_body_entered", impact_body)
+    var impact_audio := existing_flask.get_node_or_null("FlaskImpactAudio") \
+        as AudioStreamPlayer3D
+    passed = _expect(
+        impact_audio != null \
+            and impact_audio.stream != null \
+            and impact_audio.bus == &"SFX" \
+            and is_equal_approx(impact_audio.volume_db, 6.0) \
+            and is_equal_approx(impact_audio.max_distance, 64.0) \
+            and is_equal_approx(impact_audio.unit_size, 16.0),
+        "a substantial flask collision plays its shared sample through spatial SFX audio"
+    ) and passed
+    impact_body.free()
+    existing_flask.queue_free()
+
+    var static_placeable := PLACEABLE_SCRIPT.new() as Node3D
+    var trigger_area := Area3D.new()
+    trigger_area.collision_layer = 1
+    trigger_area.collision_mask = 2
+    static_placeable.add_child(trigger_area)
+    static_placeable.set(&"spawn_time", 0.04)
+    root.add_child(static_placeable)
+    await physics_frame
+    passed = _expect(
+        not static_placeable.visible \
+            and trigger_area.collision_layer == 0 \
+            and trigger_area.collision_mask == 0,
+        "a positive Spawn Time suspends a non-physics placeable while it waits"
+    )
+    await physics_frame
+    await physics_frame
+    await physics_frame
+    passed = _expect(
+        static_placeable.visible \
+            and static_placeable.is_in_group(&"map_placeable") \
+            and trigger_area.collision_layer == 1 \
+            and trigger_area.collision_mask == 2,
+        "a non-physics placeable and its collisions activate at Spawn Time"
+    ) and passed
+    static_placeable.queue_free()
+
+    var delayed_keys: Array[RigidBody3D] = [
+        KEY_SCENE.instantiate() as RigidBody3D,
+        SILVER_KEY_SCENE.instantiate() as RigidBody3D,
+    ]
+    var authored_key_positions: Array[Vector3] = []
+    var authored_key_bases: Array[Basis] = []
+    for key_index in delayed_keys.size():
+        var delayed_key := delayed_keys[key_index]
+        delayed_key.set(&"spawn_time", 0.04)
+        delayed_key.set(&"spawn_drop_height", 1.5)
+        delayed_key.position.x = float(key_index) * 2.0
+        authored_key_positions.append(delayed_key.position)
+        authored_key_bases.append(delayed_key.basis)
+        root.add_child(delayed_key)
+    await physics_frame
+    var keys_waiting := true
+    for delayed_key in delayed_keys:
+        keys_waiting = keys_waiting and not delayed_key.visible and delayed_key.freeze
+    passed = _expect(
+        keys_waiting,
+        "delayed gold and silver keys stay hidden and frozen before spawning"
+    ) and passed
+    await physics_frame
+    await physics_frame
+    await physics_frame
+    var keys_released_with_physics := true
+    for key_index in delayed_keys.size():
+        var delayed_key := delayed_keys[key_index]
+        keys_released_with_physics = keys_released_with_physics \
+            and delayed_key.visible \
+            and delayed_key.global_position.y > authored_key_positions[key_index].y + 1.0 \
+            and not delayed_key.freeze \
+            and not delayed_key.basis.is_equal_approx(authored_key_bases[key_index]) \
+            and delayed_key.angular_velocity.length() > 0.0
+    passed = _expect(
+        keys_released_with_physics,
+        "timed gold and silver keys tumble into the level under rigid-body physics"
+    ) and passed
+    for delayed_key in delayed_keys:
+        delayed_key.queue_free()
+
+    var existing_coffin := TREASURE_DEPOSIT_COFFIN_SCENE.instantiate() as RigidBody3D
+    root.add_child(existing_coffin)
+    var coffin_collision := existing_coffin.get_node_or_null("CollisionShape3D") \
+        as CollisionShape3D
+    var coffin_shape: BoxShape3D
+    if coffin_collision != null:
+        coffin_shape = coffin_collision.shape as BoxShape3D
+    var imported_coffin_body := existing_coffin.get_node_or_null(
+        "CoffinVisual/coffin/StaticBody3D"
+    ) as StaticBody3D
+    passed = _expect(
+        existing_coffin.freeze \
+            and existing_coffin.get(&"placeable_spawn_controller") == null \
+            and coffin_collision != null \
+            and coffin_shape != null \
+            and coffin_shape.size.is_equal_approx(Vector3(0.573807, 0.325, 0.837824)) \
+            and imported_coffin_body != null \
+            and imported_coffin_body.collision_layer == 0 \
+            and imported_coffin_body.collision_mask == 0,
+        "an already-present deposit coffin stays fixed with one measured physics collider"
+    ) and passed
+    existing_coffin.queue_free()
+
+    var delayed_coffin := TREASURE_DEPOSIT_COFFIN_SCENE.instantiate() as RigidBody3D
+    delayed_coffin.set(&"spawn_time", 0.04)
+    delayed_coffin.set(&"spawn_drop_height", 1.5)
+    delayed_coffin.position.x = 4.0
+    var authored_coffin_position := delayed_coffin.position
+    var authored_coffin_basis := delayed_coffin.basis
+    root.add_child(delayed_coffin)
+    await physics_frame
+    passed = _expect(
+        not delayed_coffin.visible and delayed_coffin.freeze,
+        "a timed deposit coffin stays hidden and frozen before spawning"
+    ) and passed
+    await physics_frame
+    await physics_frame
+    await physics_frame
+    passed = _expect(
+        delayed_coffin.visible \
+            and delayed_coffin.global_position.y > authored_coffin_position.y + 1.0 \
+            and not delayed_coffin.freeze \
+            and not delayed_coffin.basis.is_equal_approx(authored_coffin_basis) \
+            and delayed_coffin.angular_velocity.length() > 2.5,
+        "a positive Spawn Time drops and tumbles the deposit coffin under rigid-body physics"
+    ) and passed
+    delayed_coffin.set(&"previous_linear_velocity", Vector3.DOWN * 4.0)
+    var coffin_impact_body := StaticBody3D.new()
+    coffin_impact_body.collision_layer = 1
+    delayed_coffin.call("_on_landing_body_entered", coffin_impact_body)
+    var coffin_landing_audio := delayed_coffin.get_node_or_null("CoffinLandingAudio") \
+        as AudioStreamPlayer3D
+    passed = _expect(
+        coffin_landing_audio != null \
+            and coffin_landing_audio.stream != null \
+            and coffin_landing_audio.stream.resource_path \
+                == "res://Assets/audio/coffin-landing.mp3" \
+            and coffin_landing_audio.bus == &"SFX" \
+            and is_equal_approx(coffin_landing_audio.volume_db, 4.0),
+        "the deposit coffin plays its supplied spatial impact sample on landing"
+    ) and passed
+    coffin_impact_body.free()
+    delayed_coffin.queue_free()
+
+    var flask := HEALTH_FLASK_SCENE.instantiate() as RigidBody3D
+    flask.set(&"spawn_time", 0.04)
+    flask.set(&"spawn_drop_height", 1.5)
+    var authored_flask_position := flask.position
+    var authored_flask_basis := flask.basis
+    root.add_child(flask)
+    var second_flask := HEALTH_FLASK_SCENE.instantiate() as RigidBody3D
+    second_flask.set(&"spawn_time", 0.04)
+    second_flask.set(&"spawn_drop_height", 1.5)
+    second_flask.position.x = 2.0
+    root.add_child(second_flask)
+    await physics_frame
+    passed = _expect(
+        not flask.visible \
+            and flask.freeze \
+            and not second_flask.visible \
+            and second_flask.freeze,
+        "a delayed flask remains hidden and frozen before spawning"
+    ) and passed
+    await physics_frame
+    await physics_frame
+    await physics_frame
+    var flask_visual := flask.get_node("Visual") as Node3D
+    passed = _expect(
+        flask.visible \
+            and flask.global_position.y > authored_flask_position.y + 1.0 \
+            and not flask.freeze \
+            and not flask.basis.is_equal_approx(authored_flask_basis) \
+            and is_zero_approx(flask_visual.position.y) \
+            and flask.angular_velocity.length() > 8.0 \
+            and second_flask.angular_velocity.length() > 8.0 \
+            and not flask.angular_velocity.normalized().is_equal_approx(
+                second_flask.angular_velocity.normalized()
+            ) \
+            and not flask.basis.is_equal_approx(second_flask.basis),
+        "delayed flasks tumble on distinct axes while staying collider-aligned"
+    ) and passed
+    flask.queue_free()
+    second_flask.queue_free()
+    await process_frame
+    return passed
+
+
+func _test_static_placeable_spawn_presentations() -> bool:
+    var spike_trap_scene := load(
+        "res://placeables/spike_trap/spike_trap.tscn"
+    ) as PackedScene
+    var spike_trap := spike_trap_scene.instantiate() as GDSpikeTrap
+    spike_trap.spawn_time = 0.04
+    spike_trap.spawn_buried_depth = 0.4
+    spike_trap.spawn_rise_seconds = 0.05
+    spike_trap.position = Vector3(1.0, 0.6, 2.0)
+    root.add_child(spike_trap)
+    var spike_authored_position := spike_trap.global_position
+    await physics_frame
+
+    var trigger_area := spike_trap.get_node("TriggerArea") as Area3D
+    var strike_area := spike_trap.get_node("StrikeArea") as Area3D
+    var passed := _expect(
+        not spike_trap.visible \
+            and trigger_area.collision_mask == 0 \
+            and strike_area.collision_mask == 0,
+        "a delayed spike trap waits invisibly without triggering"
+    )
+
+    for _frame_index in range(3):
+        await physics_frame
+    var reset_audio := spike_trap.get_node_or_null("SpikeTrapResetAudio") \
+        as AudioStreamPlayer3D
+    passed = _expect(
+        spike_trap.visible \
+            and spike_trap.global_position.y < spike_authored_position.y \
+            and reset_audio != null \
+            and reset_audio.stream == spike_trap.reset_sound,
+        "a delayed spike trap winds upward from below using its recharge sound"
+    ) and passed
+
+    for _frame_index in range(5):
+        await physics_frame
+    passed = _expect(
+        spike_trap.is_placeable_spawned() \
+            and spike_trap.global_position.is_equal_approx(spike_authored_position) \
+            and trigger_area.collision_mask == spike_trap.target_collision_mask \
+            and strike_area.collision_mask == spike_trap.target_collision_mask,
+        "a spawned spike trap becomes active only at its authored position"
+    ) and passed
+    spike_trap.queue_free()
+
+    var bat_nest_scene := load("res://enemies/bat_nest.tscn") as PackedScene
+    var bat_nest := bat_nest_scene.instantiate() as GDBatNest
+    bat_nest.spawn_time = 0.04
+    bat_nest.position = Vector3(3.0, 0.5, 4.0)
+    root.add_child(bat_nest)
+    var bat_nest_authored_position := bat_nest.global_position
+    await physics_frame
+    var bats_hidden_while_waiting := not bat_nest.visible
+
+    for _frame_index in range(3):
+        await physics_frame
+    var roosting_bats_remain_hidden := true
+    for bat_state in bat_nest.bats:
+        if bat_state.node == null or bat_state.node.visible:
+            roosting_bats_remain_hidden = false
+            break
+    passed = _expect(
+        bats_hidden_while_waiting \
+            and bat_nest.visible \
+            and bat_nest.is_placeable_spawned() \
+            and bat_nest.global_position.is_equal_approx(bat_nest_authored_position) \
+            and roosting_bats_remain_hidden,
+        "a delayed bat nest activates in place without prematurely revealing its swarm"
+    ) and passed
+    bat_nest.queue_free()
+    await process_frame
+    return passed
+
+
+func _object_has_property(object: Object, property_name: StringName) -> bool:
+    for property in object.get_property_list():
+        var found_name := property.get(&"name") as StringName
+        if found_name == property_name:
+            return true
+    return false
 
 
 func _test_deterministic_seed_helper_is_stable() -> bool:
@@ -774,6 +1336,25 @@ func _test_quick_exit_flushes_run_recording_tasks() -> bool:
     return passed
 
 
+func _test_run_recorder_skips_freed_drift_nodes() -> bool:
+    var recorder := RUN_RECORDER_SCRIPT.new() as RUN_RECORDER_SCRIPT
+    var removed_boundary_center := Node3D.new()
+    var stored_path := "KillBoundary/BoundaryCenter"
+    recorder.drift_nodes[stored_path] = removed_boundary_center
+    recorder.drift_node_paths.append(stored_path)
+    removed_boundary_center.free()
+
+    recorder._capture_drift_checkpoint(60, 1.0)
+    var checkpoint := recorder.drift_checkpoints[0] as Dictionary
+    var states := checkpoint.get("states", []) as Array
+    var passed := _expect(
+        states.is_empty(),
+        "run recorder skips a kill boundary removed during an active recording"
+    )
+    recorder.free()
+    return passed
+
+
 func _test_coin_pile_derives_stable_seed_and_disables_camera_gate_by_default() -> bool:
     var parent := Node3D.new()
     parent.name = "DeterministicSeedParent"
@@ -986,7 +1567,7 @@ func _test_debug_level_total_includes_authored_loose_treasure() -> bool:
     debug_level.add_child(runtime_pickup)
     var total_with_runtime_pickup := graveyard._calculate_max_treasure_value()
     var passed := _expect(
-        authored_total == 590 + loose_treasure_value and authored_total == 667,
+        authored_total == 867 + loose_treasure_value and authored_total == 944,
         "debug level total includes every authored loose treasure pickup (got %d)" \
             % authored_total
     ) and _expect(
@@ -1169,6 +1750,17 @@ func _test_frontend_audio_uses_shared_support() -> bool:
         select_player.stop()
         select_player.queue_free()
     return passed
+
+
+func _test_letterbox_background_is_black() -> bool:
+    var clear_color: Color = ProjectSettings.get_setting(
+        "rendering/environment/defaults/default_clear_color",
+        Color(0.3, 0.3, 0.3, 1.0)
+    )
+    return _expect(
+        clear_color.is_equal_approx(Color.BLACK),
+        "unused screen space renders as black letterboxing on non-16:9 displays"
+    )
 
 
 func _test_screen_fade_finishes_while_paused() -> bool:
@@ -1684,6 +2276,46 @@ func _grid_map_has_dedicated_shadow_caster(grid_map: GridMap) -> bool:
         and caster_mesh.size.z < wall_mesh.get_aabb().size.z \
         and caster_material != null \
         and caster_material.cull_mode == BaseMaterial3D.CULL_DISABLED
+
+
+func _test_player_landing_uses_new_sample_after_a_meaningful_fall() -> bool:
+    var player := PLAYER_SCENE.instantiate() as GDPlayer
+    if not _expect(player != null, "player scene instantiates for landing audio test"):
+        return false
+
+    root.add_child(player)
+    player.set_physics_process(false)
+    var movement := player.get_node("PlayerMovement") as GDPlayerMovement
+    movement.call("_process_landing_state", true, 0.0)
+    var suppresses_initial_floor_contact := player.get_node_or_null("LandingAudio") == null
+
+    movement.call("_process_landing_state", false, 0.5)
+    movement.call("_process_landing_state", true, 0.0)
+    var suppresses_small_floor_step := player.get_node_or_null("LandingAudio") == null
+
+    movement.call("_process_landing_state", false, 3.0)
+    movement.call("_process_landing_state", true, 0.0)
+    var landing_audio := player.get_node_or_null("LandingAudio") as AudioStreamPlayer3D
+    var loaded_landing_sound := movement.get("landing_sound") as AudioStream
+    var settings := GDPlayerMovement.JUMP_SETTINGS as GDPlayerJumpSettings
+    var uses_new_landing_sample := landing_audio != null \
+        and landing_audio.stream == loaded_landing_sound \
+        and settings.landing_sound_path == "res://Assets/audio/player-landing.mp3" \
+        and is_equal_approx(landing_audio.volume_db, settings.landing_volume_db) \
+        and landing_audio.pitch_scale >= settings.landing_pitch_min \
+        and landing_audio.pitch_scale <= settings.landing_pitch_max
+    player.free()
+
+    return _expect(
+        suppresses_initial_floor_contact,
+        "player landing audio does not play merely because the scene starts on the floor"
+    ) and _expect(
+        suppresses_small_floor_step,
+        "player landing audio ignores tiny floor steps"
+    ) and _expect(
+        uses_new_landing_sample,
+        "a meaningful player fall plays the configured new landing sample"
+    )
 
 
 func _test_player_fall_death_threshold() -> bool:
@@ -2236,6 +2868,72 @@ func _test_gold_bar_uses_inventory_capacity_and_physics_drop() -> bool:
     return passed
 
 
+func _test_dense_coin_pile_collection_is_bounded() -> bool:
+    var player := PLAYER_SCENE.instantiate() as GDPlayer
+    root.add_child(player)
+    var inventory := player.get_node("PlayerInventory") as GDPlayerInventory
+    var coins: Array[GDGoldCoin] = []
+    var attempted_coin_count := GDPlayerInventory.MAX_PICKUPS_PER_PHYSICS_FRAME + 4
+    var collected_count := 0
+    var pickup_noise_events: Array[Vector3] = []
+    player.pickup_noise_emitted.connect(
+        func(noise_position: Vector3) -> void:
+            pickup_noise_events.append(noise_position)
+    )
+    for _coin_index in attempted_coin_count:
+        var coin := GOLD_COIN_SCENE.instantiate() as GDGoldCoin
+        coin.position = player.position
+        root.add_child(coin)
+        coin.can_be_collected = true
+        coins.append(coin)
+        if coin._try_collect(player):
+            collected_count += 1
+
+    var pickup_audio_count := 0
+    for child in player.get_children():
+        if child is AudioStreamPlayer \
+                and String(child.name).begins_with("PickupItemAudio"):
+            pickup_audio_count += 1
+    var passed := _expect(
+        collected_count == GDPlayerInventory.MAX_PICKUPS_PER_PHYSICS_FRAME \
+            and inventory.get_item_count(&"gold_coin") == collected_count,
+        "dense coin overlaps collect through a bounded per-physics-frame budget " \
+            + "(collected %d, carried %d)" % [
+                collected_count,
+                inventory.get_item_count(&"gold_coin"),
+            ]
+    ) and _expect(
+        pickup_audio_count == 1,
+        "a dense coin pickup batch reuses one inventory audio voice"
+    ) and _expect(
+        pickup_noise_events.size() == 1,
+        "a dense coin pickup batch emits one shared enemy-alert event"
+    ) and _expect(
+        not coins[0].continuous_cd and not coins[0].contact_monitor,
+        "dense coin piles avoid unused continuous collision and contact monitoring"
+    )
+
+    while inventory.get_item_count(&"gold_coin") < GOLD_COIN_ITEM.max_count:
+        inventory._add_item(GOLD_COIN_ITEM)
+    await process_frame
+    var remaining_original_coins := 0
+    for coin in coins:
+        if is_instance_valid(coin):
+            remaining_original_coins += 1
+    var live_gold_coins := get_nodes_in_group("gold_coin").size()
+    passed = _expect(
+        remaining_original_coins == attempted_coin_count - collected_count \
+            and live_gold_coins == remaining_original_coins,
+        "a full sack leaves overflow coins in place without spawning replacements"
+    ) and passed
+
+    for coin in coins:
+        if is_instance_valid(coin):
+            coin.free()
+    player.free()
+    return passed
+
+
 func _test_treasure_absorption_does_not_complete_level() -> bool:
     var graveyard := TestGraveyard.new()
     graveyard.max_treasure_value = 3
@@ -2677,6 +3375,61 @@ func _test_reusable_gate_and_treasure_deposit_coffin_scenes() -> bool:
     return passed
 
 
+func _test_coffin_deposit_jumps_move_two_extra_coins() -> bool:
+    var prior_coin_instance_ids: Array[int] = []
+    for coin_node in get_nodes_in_group(&"gold_coin"):
+        prior_coin_instance_ids.append(coin_node.get_instance_id())
+    var coffin := TREASURE_DEPOSIT_COFFIN_SCENE.instantiate() as Node3D
+    var player := PLAYER_SCENE.instantiate() as GDPlayer
+    root.add_child(coffin)
+    root.add_child(player)
+    var deposit := coffin.get_node("TreasureDeposit") as GDTreasureDeposit
+    var inventory := player.get_node("PlayerInventory") as GDPlayerInventory
+    for _coin_index in 5:
+        inventory._add_item(GOLD_COIN_ITEM)
+    inventory._add_item(GOLD_BAR_ITEM)
+    deposit._on_body_entered(player)
+
+    deposit.deposit_cooldown = deposit.deposit_interval
+    player.notify_jump_started()
+    var coins_after_first_jump := inventory.get_item_count(&"gold_coin")
+    var gold_bars_after_first_jump := inventory.get_item_count(&"gold_bar")
+    var cooldown_after_first_jump := deposit.deposit_cooldown
+    player.notify_jump_started()
+    var coins_after_second_jump := inventory.get_item_count(&"gold_coin")
+    player.notify_jump_started()
+    var coins_after_third_jump := inventory.get_item_count(&"gold_coin")
+    deposit._on_body_exited(player)
+    inventory._add_item(GOLD_COIN_ITEM)
+    inventory._add_item(GOLD_COIN_ITEM)
+    player.notify_jump_started()
+    var coins_after_out_of_range_jump := inventory.get_item_count(&"gold_coin")
+
+    var passed := _expect(
+        coins_after_first_jump == 3 \
+            and coins_after_second_jump == 1 \
+            and coins_after_third_jump == 0,
+        "each nearby jump moves exactly two extra carried coins when available"
+    ) and _expect(
+        gold_bars_after_first_jump == 1,
+        "jump bonus transfers leave non-coin treasure to the ordinary coffin flow"
+    ) and _expect(
+        is_equal_approx(cooldown_after_first_jump, deposit.deposit_interval),
+        "jump bonus coins do not alter the coffin's ordinary timed deposit cadence"
+    ) and _expect(
+        coins_after_out_of_range_jump == 2,
+        "jumping outside coffin range does not transfer bonus coins"
+    )
+
+    for coin_node in get_nodes_in_group(&"gold_coin"):
+        var coin := coin_node as Node
+        if coin != null and not prior_coin_instance_ids.has(coin.get_instance_id()):
+            coin.free()
+    player.free()
+    coffin.free()
+    return passed
+
+
 func _test_stairwell_scopes_kill_boundary_immunity() -> bool:
     var staircase := PROCEDURAL_STAIRCASE_SCENE.instantiate() as Node3D
     var player := PLAYER_SCENE.instantiate() as GDPlayer
@@ -2759,13 +3512,43 @@ func _test_stairwell_scopes_kill_boundary_immunity() -> bool:
     return passed
 
 
-func _test_key_scenes_have_authored_pickup_areas() -> bool:
+func _test_key_scenes_have_authored_pickup_areas_and_landing_audio() -> bool:
     var gold_key := KEY_SCENE.instantiate() as GDKey
     var silver_key := SILVER_KEY_SCENE.instantiate() as GDKey
-    var passed := _expect(_key_has_valid_pickup_area(gold_key), "gold key scene has a valid pickup area") \
-        and _expect(_key_has_valid_pickup_area(silver_key), "silver key scene has a valid pickup area")
-    gold_key.free()
-    silver_key.free()
+    var keys: Array[GDKey] = [gold_key, silver_key]
+    var world_body := StaticBody3D.new()
+    world_body.collision_layer = 1
+    root.add_child(world_body)
+    var passed := true
+    for key in keys:
+        root.add_child(key)
+        var item := key.carried_item as GDCarriedItem
+        key.previous_linear_velocity = Vector3.DOWN * 0.5
+        key.call("_on_body_entered", world_body)
+        var tiny_contact_is_silent := key.get_node_or_null("KeyLandingAudio") == null
+        key.previous_linear_velocity = Vector3.DOWN * 4.0
+        key.call("_on_body_entered", world_body)
+        var landing_audio := key.get_node_or_null("KeyLandingAudio") as AudioStreamPlayer3D
+        passed = _expect(
+            _key_has_valid_pickup_area(key),
+            "%s scene has a valid pickup area" % key.name
+        ) and _expect(
+            key.contact_monitor \
+                and key.max_contacts_reported > 0 \
+                and item != null \
+                and item.landing_sound != null \
+                and item.landing_sound.resource_path == "res://Assets/audio/key-landing.mp3" \
+                and tiny_contact_is_silent \
+                and landing_audio != null \
+                and landing_audio.stream == item.landing_sound \
+                and landing_audio.bus == &"SFX",
+            "%s ignores tiny contacts and plays the shared spatial landing sample after a fall" \
+                % key.name
+        ) and passed
+
+    world_body.free()
+    for key in keys:
+        key.free()
     return passed
 
 
@@ -5498,6 +6281,10 @@ func _test_vampire_boss_routes_to_noise_and_kills_on_contact() -> bool:
         and int(hunt.call("get_awareness_source")) \
             == GDVampireHunt.AwarenessSource.Entrance
     var placed_coffin_bodies: Array[PhysicsBody3D] = []
+    var coffin_root_body := coffin as PhysicsBody3D
+    if coffin_root_body != null \
+            and (player.collision_mask & coffin_root_body.collision_layer) != 0:
+        placed_coffin_bodies.append(coffin_root_body)
     for coffin_body_node in coffin.find_children("*", "PhysicsBody3D", true, false):
         var coffin_body := coffin_body_node as PhysicsBody3D
         if coffin_body != null \
@@ -7180,6 +7967,51 @@ func _test_vampire_minimap_reports_live_belief_and_route_state() -> bool:
     return passed
 
 
+func _test_generated_maze_floor_settings() -> bool:
+    var generated_maze := VAMPIRE_GENERATED_MAZE_SCENE.instantiate() as Node3D
+    var custom_floor_material := StandardMaterial3D.new()
+    custom_floor_material.albedo_color = Color(0.18, 0.42, 0.73, 1.0)
+    generated_maze.set("floor_material", custom_floor_material)
+    generated_maze.set("floor_texture_tiles", Vector2i(2, 3))
+    root.add_child(generated_maze)
+
+    var floor_grid_map := generated_maze.get_node("PNGFloorGridMap") as GridMap
+    var floor_library := floor_grid_map.mesh_library
+    var first_floor_mesh := floor_library.get_item_mesh(0) as PlaneMesh
+    var x_phase_floor_mesh := floor_library.get_item_mesh(1) as PlaneMesh
+    var y_phase_floor_mesh := floor_library.get_item_mesh(2) as PlaneMesh
+    var first_material := first_floor_mesh.material as BaseMaterial3D
+    var x_phase_material := x_phase_floor_mesh.material as BaseMaterial3D
+    var y_phase_material := y_phase_floor_mesh.material as BaseMaterial3D
+    var passed := _expect(
+        generated_maze.get("floor_material") == custom_floor_material \
+            and generated_maze.get("floor_texture_tiles") == Vector2i(2, 3),
+        "GeneratedMaze exposes floor material and tiles-per-texture settings directly"
+    ) and _expect(
+        floor_library.get_item_list().size() == 6 \
+            and first_material != null \
+            and first_material != custom_floor_material \
+            and first_material.albedo_color.is_equal_approx(
+                custom_floor_material.albedo_color
+            ) \
+            and first_material.uv1_scale.is_equal_approx(
+                Vector3(0.5, 1.0 / 3.0, 1.0)
+            ) \
+            and first_material.uv1_offset.is_equal_approx(Vector3.ZERO) \
+            and x_phase_material.uv1_offset.is_equal_approx(Vector3(0.5, 0.0, 0.0)) \
+            and y_phase_material.uv1_offset.is_equal_approx(
+                Vector3(0.0, 1.0 / 3.0, 0.0)
+            ) \
+            and floor_grid_map.get_cell_item(Vector3i.ZERO) == 0 \
+            and floor_grid_map.get_cell_item(Vector3i(1, 0, 0)) == 1 \
+            and floor_grid_map.get_cell_item(Vector3i(0, 0, 1)) == 2,
+        "one complete generated-floor texture spans the configured X/Y cell count"
+    )
+
+    generated_maze.free()
+    return passed
+
+
 func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
     var generated_maze := VAMPIRE_GENERATED_MAZE_SCENE.instantiate() as Node3D
     root.add_child(generated_maze)
@@ -7504,6 +8336,14 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
     var coffins := content_plan.get("coffins", []) as Array
     var treasure_caches := content_plan.get("treasure_caches", []) as Array
     var bat_nests := content_plan.get("bat_nests", []) as Array
+    var vampire_gate_clearance_cell := Vector2i(end_gate_cell.x, end_gate_cell.z - 1)
+    var vampire_gate_clearance_is_empty := true
+    for placements in [doors, keys, coffins, treasure_caches, bat_nests]:
+        for placement_value in placements:
+            var placement := placement_value as Dictionary
+            if placement.get("cell") == vampire_gate_clearance_cell \
+                    or placement.get("paired_cell") == vampire_gate_clearance_cell:
+                vampire_gate_clearance_is_empty = false
     var exploration_bat_count := 0
     for bat_value in bat_nests:
         var bat := bat_value as Dictionary
@@ -7955,11 +8795,12 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
         int(changed_result.get("hallway_width", 0)) == 2 \
             and player_cell == Vector3i(1, 0, 1) \
             and vampire_cell.x == end_gate_cell.x \
-            and vampire_cell.z == configured_height - 2 \
+            and vampire_cell.z == configured_height - 3 \
             and end_gate_cell.z == configured_height - 1 \
-            and vampire_cell.distance_to(end_gate_cell) == 1.0 \
+            and vampire_cell.distance_to(end_gate_cell) == 2.0 \
+            and vampire_gate_clearance_is_empty \
             and changed_result.get("end_gate_outward_direction") == Vector2i.DOWN,
-        "the straight bottom-row gate stays opposite the player with the vampire immediately inside"
+        "the straight bottom-row gate keeps a clear two-cell buffer before the vampire"
     ) and _expect(
         generated_gate != null \
             and generated_gate.get_parent() == generated_content \
@@ -8367,6 +9208,19 @@ func _test_vampire_maze_minimap_shows_all_shortest_routes() -> bool:
     return passed
 
 
+func _test_skeleton_contact_uses_non_fire_death() -> bool:
+    var skeleton := SKELETON_SCENE.instantiate()
+    var victim := TestSkeletonVictim.new()
+    skeleton.call("_kill_body_if_player", victim)
+    var passed := _expect(
+        victim.killed_by_enemy and not victim.killed_by_fire,
+        "skeleton contact selects an ordinary enemy death instead of a fire death"
+    )
+    skeleton.free()
+    victim.free()
+    return passed
+
+
 func _test_skeleton_facing_is_driven_by_movement() -> bool:
     var skeleton := SKELETON_SCENE.instantiate()
     root.add_child(skeleton)
@@ -8386,6 +9240,82 @@ func _test_skeleton_facing_is_driven_by_movement() -> bool:
         and _expect(is_equal_approx(pivot.rotation.y, PI / 2.0), "skeleton visual faces rightward patrol movement")
 
     skeleton.queue_free()
+    return passed
+
+
+func _test_skeleton_uses_dedicated_movement_audio() -> bool:
+    var skeleton := SKELETON_SCENE.instantiate()
+    skeleton.set_physics_process(false)
+    skeleton.set("spawn_time", 10.0)
+    root.add_child(skeleton)
+
+    var footstep_sounds := skeleton.get("footstep_sounds") as Array[AudioStream]
+    skeleton.call("_play_footstep", float(skeleton.get("shuffle_speed")))
+    var path_follow := skeleton.get_node("PathFollow3D") as PathFollow3D
+    var footstep_audio := path_follow.get_node_or_null("FootstepAudio") as AudioStreamPlayer3D
+
+    skeleton.call("_start_drop_in")
+    var drop_pivot := skeleton.get_node("PathFollow3D/DropPivot") as Node3D
+    var drop_interval := float(skeleton.get("drop_duration")) * 0.25
+    var drop_distances: Array[float] = []
+    for interval_index in range(4):
+        var prior_height := drop_pivot.position.y
+        skeleton.call("_update_drop_in", drop_interval)
+        drop_distances.append(prior_height - drop_pivot.position.y)
+    var landing_audio := (
+        path_follow.get_node_or_null("SkeletonLandingAudio") as AudioStreamPlayer3D
+    )
+    var passed := _expect(
+        footstep_sounds.size() == 1 \
+            and footstep_sounds[0] is AudioStreamMP3 \
+            and footstep_audio != null \
+            and footstep_audio.stream == footstep_sounds[0] \
+            and footstep_audio.bus == GDAudio.SFX_BUS,
+        "skeleton patrol steps use the dedicated spatial footstep sample"
+    ) and _expect(
+        drop_distances[0] < drop_distances[1] \
+            and drop_distances[1] < drop_distances[2] \
+            and drop_distances[2] < drop_distances[3],
+        "a skeleton's visible spawn drop accelerates continuously into the floor"
+    ) and _expect(
+        landing_audio != null \
+            and landing_audio.stream == skeleton.get("landing_sound") \
+            and landing_audio.bus == GDAudio.SFX_BUS \
+            and is_equal_approx(landing_audio.volume_db, 4.0) \
+            and is_equal_approx(landing_audio.max_distance, 48.0) \
+            and is_equal_approx(landing_audio.unit_size, 16.0),
+        "a skeleton's visible spawn landing uses an audible spatial impact sample"
+    )
+
+    skeleton.queue_free()
+    return passed
+
+
+func _test_zombie_spawn_uses_existing_enemy_landing_audio() -> bool:
+    var zombie := ZOMBIE_SCENE.instantiate()
+    zombie.set("spawn_time", 10.0)
+    root.add_child(zombie)
+    zombie.set_physics_process(false)
+    var zombie_body := zombie.get_node("ZombieBody") as CharacterBody3D
+    var no_audio_before_drop := zombie_body.get_node_or_null("ZombieLandingAudio") == null
+
+    zombie.call("_start_drop_in")
+    zombie.call("_finish_drop_in")
+    var landing_audio := zombie_body.get_node_or_null("ZombieLandingAudio") \
+        as AudioStreamPlayer3D
+    var passed := _expect(
+        no_audio_before_drop,
+        "an authored zombie does not play landing audio before its visible spawn drop"
+    ) and _expect(
+        landing_audio != null \
+            and landing_audio.stream == zombie.get("landing_sound") \
+            and landing_audio.bus == GDAudio.SFX_BUS \
+            and is_equal_approx(landing_audio.volume_db, 4.0) \
+            and is_equal_approx(landing_audio.max_distance, 48.0) \
+            and is_equal_approx(landing_audio.unit_size, 16.0),
+        "a zombie spawn drop plays the existing generic enemy landing sample"
+    )
+    zombie.queue_free()
     return passed
 
 
@@ -8494,8 +9424,13 @@ func _test_ground_enemies_fall_before_moving() -> bool:
         and is_equal_approx(zombie_body.global_position.x, zombie_start_x)
     )
 
+    var falling_skeleton_played_landing_audio := false
     for frame_index in range(80):
         await physics_frame
+        falling_skeleton_played_landing_audio = (
+            falling_skeleton_played_landing_audio
+            or skeleton.get_node_or_null("PathFollow3D/SkeletonLandingAudio") != null
+        )
 
     var passed := _expect(
         airborne_enemies_remained_above_floor,
@@ -8512,6 +9447,12 @@ func _test_ground_enemies_fall_before_moving() -> bool:
     ) and _expect(
         bool(skeleton.get("has_landed")) and absf(skeleton.global_position.y) <= 0.01,
         "a skeleton placed in mid-air falls to the floor before patrolling"
+    ) and _expect(
+        falling_skeleton_played_landing_audio,
+        "a skeleton falling from mid-air plays its landing sound on floor impact"
+    ) and _expect(
+        low_skeleton.get_node_or_null("PathFollow3D/SkeletonLandingAudio") == null,
+        "a skeleton's tiny initial floor correction does not play a landing sound"
     ) and _expect(
         zombie_body.is_on_floor() and absf(zombie_body.global_position.y) <= 0.02,
         "a zombie placed in mid-air falls to the floor even while its AI is waiting"

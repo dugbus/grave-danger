@@ -1,6 +1,6 @@
 @tool
 class_name GDBatNest
-extends Node3D
+extends "res://placeables/placeable.gd"
 ## Spawns a clustered bat roost that swarms around the player before scattering upward.
 
 
@@ -186,6 +186,7 @@ func _ready() -> void:
 	_randomize_next_flap_sound()
 	_randomize_next_squeak_sound()
 	_rebuild_roost()
+	super._ready()
 
 
 func _exit_tree() -> void:

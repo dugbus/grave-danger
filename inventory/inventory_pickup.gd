@@ -1,4 +1,4 @@
-extends RigidBody3D
+extends "res://placeables/physics_placeable.gd"
 class_name GDInventoryPickup
 
 
@@ -25,6 +25,7 @@ func _ready() -> void:
 	add_to_group("inventory_pickup")
 	_bind_or_create_pickup_area()
 	_block_pickup_for(pickup_delay)
+	super._ready()
 
 
 func _physics_process(_delta: float) -> void:

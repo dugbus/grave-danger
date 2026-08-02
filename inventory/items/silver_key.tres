@@ -1,7 +1,8 @@
-[gd_resource type="Resource" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="GDCarriedItem" format=3 uid="uid://d0y2v21gee1xh"]
 
-[ext_resource type="Script" path="res://inventory/carried_item.gd" id="1_item"]
-[ext_resource type="AudioStream" path="res://Assets/audio/key-pickup.mp3" id="2_sound"]
+[ext_resource type="Script" uid="uid://dnfptyeoq66i6" path="res://inventory/carried_item.gd" id="1_item"]
+[ext_resource type="AudioStream" uid="uid://diiii6rcy2uft" path="res://Assets/audio/key-pickup.mp3" id="2_sound"]
+[ext_resource type="AudioStream" uid="uid://je5ict766fx4" path="res://Assets/audio/key-landing.mp3" id="3_landing_sound"]
 
 [resource]
 script = ExtResource("1_item")
@@ -12,3 +13,4 @@ weight = 5.0
 drop_order = 10
 world_scene_path = "res://inventory/silver_key.tscn"
 pickup_sound = ExtResource("2_sound")
+landing_sound = ExtResource("3_landing_sound")

@@ -64,16 +64,21 @@ const FOOTSTEP_SOUND_PATHS: Array[String] = [
 
 var footstep_sounds: Array[AudioStream] = []
 var jump_sound: AudioStream
+var landing_sound: AudioStream
 var footstep_distance_accumulator := 0.0
 var next_footstep_distance := 1.0
 var current_horizontal_speed := 0.0
 var audio_rng := RandomNumberGenerator.new()
+var has_observed_floor_state := false
+var was_on_floor := false
+var maximum_fall_speed := 0.0
 
 
 func _ready() -> void:
 	audio_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"player_movement_audio")
 	_load_footstep_sounds()
 	_load_jump_sound()
+	_load_landing_sound()
 	_randomize_next_footstep_distance()
 
 
@@ -93,6 +98,18 @@ func apply_gravity_and_jump(delta: float, inventory: Node) -> void:
 		var jump_velocity := settings.get_jump_velocity(gravity_magnitude)
 		player.velocity.y = jump_velocity * inventory.weight_multiplier(1.0, settings.min_weight_jump_multiplier)
 		_play_jump_sound(settings)
+		if player.has_method(&"notify_jump_started"):
+			player.call(&"notify_jump_started")
+
+
+func update_landing(pre_move_vertical_velocity: float) -> void:
+	if player == null:
+		return
+
+	_process_landing_state(
+		player.is_on_floor(),
+		maxf(-pre_move_vertical_velocity, 0.0)
+	)
 
 
 func update_walk(delta: float, inventory: Node) -> float:
@@ -166,6 +183,34 @@ func _load_jump_sound() -> void:
 	jump_sound = GDAudio.load_stream(settings.jump_sound_path)
 
 
+func _load_landing_sound() -> void:
+	var settings := JUMP_SETTINGS as GDPlayerJumpSettings
+	landing_sound = GDAudio.load_stream(settings.landing_sound_path)
+
+
+func _process_landing_state(is_grounded: bool, downward_speed: float) -> void:
+	# The first sample establishes the initial state without making a player
+	# authored on the floor sound as though they have just landed.
+	if not has_observed_floor_state:
+		has_observed_floor_state = true
+		was_on_floor = is_grounded
+		maximum_fall_speed = downward_speed if not is_grounded else 0.0
+		return
+
+	if not is_grounded:
+		maximum_fall_speed = maxf(maximum_fall_speed, downward_speed)
+	elif not was_on_floor:
+		maximum_fall_speed = maxf(maximum_fall_speed, downward_speed)
+		var settings := JUMP_SETTINGS as GDPlayerJumpSettings
+		if maximum_fall_speed >= settings.landing_minimum_speed:
+			_play_landing_sound(settings)
+		maximum_fall_speed = 0.0
+	else:
+		maximum_fall_speed = 0.0
+
+	was_on_floor = is_grounded
+
+
 func _update_footsteps(delta: float, horizontal_speed: float) -> void:
 	if footstep_sounds.is_empty():
 		return
@@ -212,6 +257,22 @@ func _play_jump_sound(settings: GDPlayerJumpSettings) -> void:
 		"JumpAudio",
 		settings.jump_volume_db,
 		audio_rng.randf_range(settings.jump_pitch_min, settings.jump_pitch_max)
+	)
+	if player != null and player.has_method("emit_noise"):
+		player.emit_noise()
+
+
+func _play_landing_sound(settings: GDPlayerJumpSettings) -> void:
+	if landing_sound == null:
+		return
+
+	var audio_parent: Node = player as Node if player != null else self as Node
+	GDAudio.play_one_shot_3d(
+		audio_parent,
+		landing_sound,
+		"LandingAudio",
+		settings.landing_volume_db,
+		audio_rng.randf_range(settings.landing_pitch_min, settings.landing_pitch_max)
 	)
 	if player != null and player.has_method("emit_noise"):
 		player.emit_noise()

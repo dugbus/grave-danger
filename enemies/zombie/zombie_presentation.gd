@@ -145,6 +145,9 @@ func _load_footstep_sounds() -> void:
 func _load_punch_hit_sound() -> void:
     punch_hit_sound = GDAudio.load_stream(punch_hit_sound_path)
 
+func _load_landing_sound() -> void:
+    landing_sound = GDAudio.load_stream(LANDING_SOUND_PATH)
+
 func _update_footsteps(_delta: float, horizontal_speed: float) -> void:
     if footstep_sounds.is_empty():
         return
@@ -202,6 +205,21 @@ func _play_footstep(horizontal_speed: float) -> void:
         footstep_rng,
         footstep_volume_variance_db,
         GDAudio.FootstepSoundProfile.Enemy
+    )
+
+func _play_landing_sound() -> void:
+    if landing_sound == null:
+        return
+
+    var audio_parent: Node = zombie_body as Node if zombie_body != null else self as Node
+    GDAudio.play_one_shot_3d(
+        audio_parent,
+        landing_sound,
+        LANDING_AUDIO_NAME,
+        LANDING_AUDIO_VOLUME_DB,
+        1.0,
+        LANDING_AUDIO_MAX_DISTANCE,
+        LANDING_AUDIO_UNIT_SIZE
     )
 
 func _play_punch_hit_sound() -> void:

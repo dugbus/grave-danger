@@ -120,6 +120,11 @@ func die_from_flames() -> void:
 	_die(DeathCause.Fire)
 
 
+func die_from_enemy() -> void:
+	# Lethal ordinary-enemy contact uses blood effects, never the fire presentation.
+	_die(DeathCause.EnemyDamage)
+
+
 func die_from_fall() -> void:
 	# A fall is lethal immediately, but otherwise follows the normal death flow.
 	_die(DeathCause.Fall)

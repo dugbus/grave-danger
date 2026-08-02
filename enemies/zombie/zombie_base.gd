@@ -1,4 +1,4 @@
-extends Path3D
+extends "res://placeables/path_placeable.gd"
 
 
 @warning_ignore("unused_signal")
@@ -25,6 +25,11 @@ const FOOTSTEP_SOUND_PATHS: Array[String] = [
 ]
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 const DEFAULT_PUNCH_HIT_SOUND_PATH := "res://Assets/audio/punch.mp3"
+const LANDING_SOUND_PATH := "res://Assets/audio/enemy-landing.mp3"
+const LANDING_AUDIO_NAME := "ZombieLandingAudio"
+const LANDING_AUDIO_VOLUME_DB := 4.0
+const LANDING_AUDIO_MAX_DISTANCE := 48.0
+const LANDING_AUDIO_UNIT_SIZE := 16.0
 const CHARACTER_GROUP: StringName = &"character"
 const ENEMY_GROUP: StringName = &"enemy"
 const NAVIGATION_BLOCKER_GROUP := &"navigation_blocker"
@@ -72,8 +77,12 @@ const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 @export var navigation_ready := false
 ## Seconds a player must remain inside the contact area before death triggers.
 @export var kill_confirmation_time := 0.08
-## Seconds after scene start before this zombie drops in.
-@export var drop_in_time := 0.0
+## Legacy serialized enemy delay; new level editing uses the shared Spawn Time field.
+@export_storage var drop_in_time: float:
+    get:
+        return spawn_time
+    set(value):
+        spawn_time = maxf(value, 0.0)
 ## Height above the patrol path used at the start of the drop-in.
 @export var drop_height := 3.2
 ## Seconds taken to fall from drop_height to the path.
@@ -244,6 +253,7 @@ var facing_direction := Vector3.BACK
 var current_movement_velocity := Vector3.ZERO
 var footstep_sounds: Array[AudioStream] = []
 var punch_hit_sound: AudioStream
+var landing_sound: AudioStream
 var footstep_distance_accumulator := 0.0
 var next_footstep_distance := 1.0
 var footstep_rng := RandomNumberGenerator.new()
@@ -341,7 +351,7 @@ func _is_live_player_body(body: Node) -> bool:
     if body.has_method("is_dead") and body.is_dead():
         return false
 
-    return body.has_method("die_from_flames")
+    return body.has_method("apply_flame_damage") or body.has_method("die_from_enemy")
 
 
 func has_reserved_attack_position() -> bool:

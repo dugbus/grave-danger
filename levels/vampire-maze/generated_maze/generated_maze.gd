@@ -3,7 +3,7 @@ class_name GDSeededGridMaze
 extends Node3D
 
 ## Builds a deterministic, two-tile-wide maze into child GridMaps, with the
-## locked exit opposite the player and the vampire waiting immediately inside it.
+## locked exit opposite the player and the vampire waiting safely inside it.
 
 signal maze_generated(seed: int, generation_result: Dictionary)
 
@@ -20,12 +20,7 @@ enum MazeConnectionAxis {
 const REPAIRER_SCRIPT := preload("res://addons/png_to_gridmap/png_to_gridmap_repairer.gd")
 const MESH_CATALOG_SCRIPT := preload("res://addons/png_to_gridmap/png_to_gridmap_mesh_catalog.gd")
 const DEFAULT_CONFIG := preload("res://levels/vampire-maze/generated_maze/generated_maze_config.tres")
-const CARDINAL_DIRECTIONS: Array[Vector2i] = [
-    Vector2i.UP,
-    Vector2i.RIGHT,
-    Vector2i.DOWN,
-    Vector2i.LEFT,
-]
+const CARDINAL_DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT]
 const BASE_WALL_ITEM_REF := "Wall"
 const EDITOR_REGENERATION_DEBOUNCE_MILLISECONDS := 300
 const PERIMETER_CONNECTIONS_PER_BREAK := 12
@@ -45,13 +40,25 @@ const CURRENT_GENERATION_VERSION := 11
         configuration = value
         _connect_configuration_changes()
         _queue_regeneration()
+@export_group("Generated Floor")
+## Material applied to every generated floor tile.
+@export var floor_material: BaseMaterial3D:
+    set(value):
+        floor_material = value
+        _queue_regeneration()
+## Generated floor cells covered by one texture along the local X and Z/texture-Y axes.
+@export var floor_texture_tiles := Vector2i.ONE:
+    set(value):
+        floor_texture_tiles = Vector2i(maxi(value.x, 1), maxi(value.y, 1))
+        _queue_regeneration()
+@export_group("")
 ## Child GridMap that receives generated and repaired wall cells.
 @export var wall_grid_map_path: NodePath = ^"PNGGridMap"
 ## Child GridMap that receives a complete floor below the maze.
 @export var floor_grid_map_path: NodePath = ^"PNGFloorGridMap"
 ## Player placed in the generated entrance corner.
 @export var player_path: NodePath = ^"../Player"
-## Vampire placed immediately inside the locked gate opposite the player.
+## Vampire placed two cells inside the locked gate opposite the player.
 @export var vampire_path: NodePath = ^"../Vampire"
 ## Child responsible for planning and instancing generated dungeon content.
 @export var generated_content_path: NodePath = ^"GeneratedContent"
@@ -166,6 +173,11 @@ func _generate_from_config(
         _is_generating = false
         return {"errors": errors}
 
+    GDGeneratedFloorSettings.apply(
+        floor_grid_map,
+        floor_material,
+        floor_texture_tiles
+    )
     var width := maxi(int(runtime_configuration.get("width")), 7)
     var height := maxi(int(runtime_configuration.get("height")), 7)
     var hallway_width := maxi(int(runtime_configuration.get("hallway_width")), 1)
@@ -859,7 +871,7 @@ func _get_end_gate_layout(
     return {
         "passage_origin_x": passage_origin_x,
         "end_gate_cell": Vector3i(route_lane_x, 0, height - 1),
-        "vampire_cell": Vector3i(route_lane_x, 0, height - 2),
+        "vampire_cell": Vector3i(route_lane_x, 0, height - 3),
     }
 
 
@@ -902,7 +914,6 @@ func _populate_grid_maps(
         errors.append("GeneratedMaze wall MeshLibrary has no '%s' item." % BASE_WALL_ITEM_REF)
         return errors
     var wall_item_id := int(wall_refs[BASE_WALL_ITEM_REF])
-    var floor_item_id := int(floor_grid_map.mesh_library.get_item_list()[0])
     var map_offset := Vector3(-float(width) * 0.5, 0.0, -float(height) * 0.5)
 
     wall_grid_map.clear()
@@ -917,6 +928,11 @@ func _populate_grid_maps(
     for z_coordinate in height:
         for x_coordinate in width:
             var cell := Vector3i(x_coordinate, 0, z_coordinate)
+            var floor_item_id := GDGeneratedFloorSettings.item_id_for_cell(
+                floor_grid_map,
+                Vector2i(x_coordinate, z_coordinate),
+                floor_texture_tiles
+            )
             floor_grid_map.set_cell_item(cell, floor_item_id)
             if not floor_cells.has(Vector2i(x_coordinate, z_coordinate)):
                 wall_grid_map.set_cell_item(cell, wall_item_id)

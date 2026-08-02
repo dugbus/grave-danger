@@ -1,6 +1,6 @@
 @tool
 class_name GDProceduralStaircase
-extends Node3D
+extends "res://placeables/placeable.gd"
 
 ## Builds one watertight staircase mesh from three construction settings.
 
@@ -62,14 +62,17 @@ var _protected_players: Array[Node3D] = []
 func _ready() -> void:
     rebuild()
     if Engine.is_editor_hint():
+        super._ready()
         return
 
     var safety_area := get_node_or_null(^"StairwellSafetyArea") as Area3D
     if safety_area == null:
+        super._ready()
         return
     safety_area.body_entered.connect(_on_safety_area_body_entered)
     safety_area.body_exited.connect(_on_safety_area_body_exited)
     _protect_initial_safety_area_bodies.call_deferred()
+    super._ready()
 
 
 func _exit_tree() -> void:

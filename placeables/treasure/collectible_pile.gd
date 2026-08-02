@@ -1,6 +1,6 @@
 @tool
 class_name GDCollectiblePile
-extends Node3D
+extends "res://placeables/placeable.gd"
 
 
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
@@ -19,8 +19,12 @@ const EDITOR_SELECTION_MINIMUM_HEIGHT := 0.25
 ## Height above this node where spawned items initially appear.
 @export_range(0.0, 10.0, 0.05) var spawn_height := 1.0
 
-## Seconds after scene start before this pile begins spawning items.
-@export_range(0.0, 300.0, 0.05) var trigger_time := 0.0
+## Legacy serialized pile delay; new level editing uses the shared Spawn Time field.
+@export_storage var trigger_time: float:
+    get:
+        return spawn_time
+    set(value):
+        spawn_time = maxf(value, 0.0)
 
 ## Seconds between individual item spawns; zero queues the whole pile at once.
 @export_range(0.0, 1.0, 0.005) var spawn_interval := 0.01
@@ -77,12 +81,14 @@ func _ready() -> void:
     if Engine.is_editor_hint():
         _configure_editor_selection_placeholder()
         _refresh_editor_preview()
+        super._ready()
         return
 
     _hide_editor_selection_placeholder()
     runtime_seed = DETERMINISTIC_SEED.from_node(self, random_seed, _get_seed_salt())
     rng.seed = runtime_seed
-    spawn_started = trigger_time <= 0.0
+    spawn_started = spawn_time <= 0.0
+    super._ready()
 
 
 func get_max_item_count() -> int:
@@ -114,7 +120,7 @@ func _advance_spawn_schedule() -> void:
 
     if not spawn_started:
         trigger_elapsed_usec += _get_physics_tick_usec()
-        if trigger_elapsed_usec < _seconds_to_usec(trigger_time):
+        if trigger_elapsed_usec < _seconds_to_usec(spawn_time):
             return
 
         spawn_started = true
@@ -128,6 +134,14 @@ func _advance_spawn_schedule() -> void:
     while spawn_elapsed_usec >= spawn_interval_usec and scheduled_items < item_count:
         spawn_elapsed_usec -= spawn_interval_usec
         scheduled_items += 1
+
+
+func _uses_custom_placeable_spawn() -> bool:
+    return true
+
+
+func is_placeable_spawned() -> bool:
+    return spawn_started
 
 
 func _spawn_scheduled_items() -> void:

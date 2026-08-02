@@ -1,6 +1,102 @@
 # Changelog
 
+## 2026-08-02
+
+### 0200
+
+- Each jump near a deposit coffin now transfers exactly two extra carried coins without accelerating later unloading.
+  - Prompt: Replace the coffin jump speed boost with two extra coins per jump.
+
+### 0100
+
+- Five nearby jumps now double coffin unloading speed, sustained hopping can reach 2.5 times speed, and the boost fades after jumping stops.
+  - Prompt: Rebalance the coffin jump boost after reviewing the Debug Level playback.
+
 ## 2026-08-01
+
+### 2100
+
+- Repeated jumps near a deposit coffin now accelerate unloading up to three times normal speed, then reset when the player leaves.
+  - Prompt: Make repeated jumps accelerate treasure unloading at coffins by more than half.
+- Large dense coin piles now collect smoothly in paced batches, and overflow coins remain in place when the sack is full.
+  - Prompt: Stop large dense coin piles from chugging during collection.
+- Deposit coffins now play the supplied spatial impact sound when they land.
+  - Prompt: Use the supplied coffin impact sample during the physics spawn.
+- Timed treasure-deposit coffins now fall and tumble into the level while coffins present from the start remain fixed.
+  - Prompt: Make deposit coffins use physics when Spawn Time is positive.
+- The Debug Level's original and timed skeleton and zombie patrols now turn around at each endpoint instead of jumping back to the start.
+  - Prompt: Make Debug Level enemy patrols ping-pong instead of wrapping.
+
+### 2000
+
+- Gold and silver keys now play the shared spatial key impact sound after a meaningful landing while tiny placement corrections remain silent.
+  - Prompt: Play the supplied landing sound for both key types.
+- Timed gold and silver keys now tumble visibly into the level under rigid-body physics.
+  - Prompt: Make timed keys use a physics drop-in.
+
+### 1900
+
+- The Debug Level's 28 duplicated review objects now spawn in walking order at one-second intervals.
+  - Prompt: Complete one-second Spawn Time sequencing for the debug-level review row.
+- Delayed spike traps now wind upward from below the floor using their recharge sound before activating, while bat nests activate at their authored position without moving or revealing the swarm early.
+  - Prompt: Give spike traps and bat nests suitable non-drop spawn presentations.
+- Level developers can now use Godot Tools for headless GDScript completion, scene previews, formatting, and F5 debugging of the project or current scene.
+  - Prompt: Configure the installed VS Code Godot extensions for this project.
+- Level developers now get consistent four-column tab indentation for GDScript in VS Code and other EditorConfig-aware editors.
+  - Prompt: Align VS Code with the repository's preferred GDScript indentation.
+
+### 1800
+
+- Generated mazes now place the Vampire two cells inside the exit and keep the intervening gate approach clear.
+  - Prompt: Move the generated Vampire further away from the exit gate.
+- Players now play the new spatial landing sample after meaningful falls while initial floor contact and tiny steps stay silent; delayed zombie drops now use the existing enemy landing sample.
+  - Prompt: Implement player landing with the new sample and identify missing spawn-impact sounds.
+
+### 1700
+
+- Level editors can now set the floor material and X/Y cells-per-texture directly on GeneratedMaze, with each texture continuing seamlessly across those cells.
+  - Prompt: Show generated floor controls on the maze node and define tiling as cells covered by one texture.
+
+### 1600
+
+- Skeleton spawn drops now accelerate into the floor, with a stronger landing impact that carries clearly across the play area.
+  - Prompt: Make skeleton spawn drops feel heavy and make their landing impact easier to hear.
+- Skeletons now use their dedicated spatial footstep sound and play their landing impact after a visible drop or fall to the floor.
+  - Prompt: Use the new skeleton footstep and landing sounds during movement and spawn impacts.
+- Collecting the No Boundary flask no longer interrupts play when the removed kill boundary reaches the next recording checkpoint.
+  - Prompt: Prevent the no-boundary flask from crashing an active run recording.
+- Unused screen space on displays with a different aspect ratio now renders as solid black instead of Godot's gray fallback.
+  - Prompt: Make the gray bars on non-16:9 Windows laptop displays black.
+- Spawned flasks now tumble around varied axes throughout their fall instead of descending with a fixed pose.
+  - Prompt: Make spawned flasks spin so their drop no longer looks unnaturally linear.
+
+### 1500
+
+- Flask impacts now remain audible from normal and zoomed-out gameplay cameras, with safe gain added for the quiet source sample.
+  - Prompt: Make the flask floor-impact sample clearly audible after it could not be heard in gameplay.
+- Flasks now play the new spatial glass-impact sound on substantial floor, wall, and object collisions without repeating it for tiny settling contacts.
+  - Prompt: Play the new flask impact sample through the shared audio support when a flask hits another body.
+- Spawned flasks now rest against the floor with collision shaped to the visible base, body, neck, rim, and stopper, without the visual bobbing away from the landed bottle.
+  - Prompt: Align the spawned flask physics body with the visible bottle so it no longer appears to float above the floor.
+
+### 1400
+
+- Spawned flasks now rebound subtly, roll and wobble on a bottle-shaped collider, then settle naturally in their landed pose.
+  - Prompt: Give spawned flasks a believable small bounce, roll, and settled bottle motion.
+- Delayed physics items, including every flask variant, now begin rounded-body drops at deterministic varied angles, while zero-time editor placements remain fixed exactly as authored.
+  - Prompt: Randomize spawned physics-item rotations and make health flasks physically drop while preserving zero-time placements.
+
+### 0400
+
+- Skeleton contact now causes the ordinary blood death presentation instead of incorrectly setting the player on fire.
+  - Prompt: Use the correct death type when a skeleton kills the player.
+
+### 0300
+
+- Delayed keys, loose treasure, gems, gold bars, coins, and rolling rocks now drop in under physics, while non-physics placeables remain hidden and inactive until their spawn time.
+  - Prompt: Give every map placeable and enemy a shared spawn time, preserving existing timers and identifying physics drops.
+- Level editors can now set one Spawn Time on every reusable map item and enemy, with zero keeping the item present from level start and existing pile and enemy timings preserved.
+  - Prompt: Give every map placeable and enemy a shared spawn time, preserving existing timers and identifying physics drops.
 
 ### 0200
 

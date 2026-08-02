@@ -3,6 +3,8 @@ class_name GDPlayer
 
 
 signal flask_effect_started(effect_id: StringName, liquid_color: Color, duration: float)
+## Emitted when a grounded jump starts so nearby gameplay objects can react to it.
+signal jump_started
 ## Emitted for any player-owned gameplay sound that can attract listening enemies.
 signal noise_emitted(noise_position: Vector3)
 ## Emitted after a pickup succeeds so level-specific listeners can react at the player's location.
@@ -16,6 +18,7 @@ const PUSH_FLOOR_MIN_NORMAL_Y := 0.65
 const PUSH_FLOOR_IGNORE_SECONDS := 0.25
 const FLOOR_LEVEL_Y := 0.0
 const FALL_DEATH_DEPTH := 4.0
+const PICKUP_NOISE_COOLDOWN_PHYSICS_FRAMES := 6
 
 # Player stays as the public API for other gameplay objects.
 # Treasure pickups and kill-boundary areas still talk to this CharacterBody3D, while the actual
@@ -31,6 +34,7 @@ var base_pickup_radius_multiplier := 1.0
 var active_pickup_radius_multipliers: Array[float] = []
 var floor_push_ignore_timers: Dictionary = {}
 var kill_boundary_immunity_sources: Array[Node] = []
+var last_pickup_noise_physics_frame := -PICKUP_NOISE_COOLDOWN_PHYSICS_FRAMES
 
 
 func _ready() -> void:
@@ -62,6 +66,7 @@ func _physics_process(delta: float) -> void:
 
 	var push_velocity := velocity
 	move_and_slide()
+	movement.update_landing(push_velocity.y)
 	_die_if_fallen_below_floor()
 	_push_slide_colliders(push_velocity, delta)
 
@@ -74,8 +79,17 @@ func try_collect_carried_item(pickup: Node3D) -> bool:
 
 
 func emit_pickup_noise() -> void:
+	var physics_frame := Engine.get_physics_frames()
+	if physics_frame - last_pickup_noise_physics_frame \
+			< PICKUP_NOISE_COOLDOWN_PHYSICS_FRAMES:
+		return
+	last_pickup_noise_physics_frame = physics_frame
 	pickup_noise_emitted.emit(global_position)
 	emit_noise()
+
+
+func notify_jump_started() -> void:
+	jump_started.emit()
 
 
 func emit_noise() -> void:
@@ -182,6 +196,11 @@ func is_immune_to_kill_boundary() -> bool:
 func die_from_flames() -> void:
 	# KillBoundary calls this on any body that exposes the method.
 	death_controller.die_from_flames()
+
+
+func die_from_enemy() -> void:
+	# Ordinary enemy contact is immediately lethal without selecting fire effects.
+	death_controller.die_from_enemy()
 
 
 func die_from_fall() -> void:

@@ -22,7 +22,10 @@ collision_layer = 4
 collision_mask = 5
 mass = 0.1
 continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 8
 script = ExtResource("1_key_script")
+spawn_spin_speed = 9.0
 key_material = SubResource("StandardMaterial3D_key")
 
 [node name="KeyModel" parent="." instance=ExtResource("1_key")]

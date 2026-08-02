@@ -1,6 +1,6 @@
 @tool
 class_name GDTextTrigger
-extends Area3D
+extends "res://placeables/area_placeable.gd"
 
 
 const TEXT_SHADER := preload("res://ui/hud/flask_effect_text.gdshader")
@@ -119,6 +119,7 @@ var has_completed_text := false
 func _ready() -> void:
 	_apply_trigger_size()
 	if Engine.is_editor_hint():
+		super._ready()
 		return
 
 	collision_layer = 0
@@ -131,6 +132,7 @@ func _ready() -> void:
 	_configure_pause_layer()
 	_hide_text()
 	_detect_initial_overlaps.call_deferred()
+	super._ready()
 
 
 func _process(delta: float) -> void:

@@ -1,0 +1,74 @@
+[
+  {
+    "file": "01_introduction.md",
+    "title": "Introduction",
+    "source": "https://docs.godotengine.org/en/stable/tutorials/best_practices/introduction_best_practices.html",
+    "bytes": 1245
+  },
+  {
+    "file": "02_applying_object_oriented_principles_in_godot.md",
+    "title": "Applying object-oriented principles in Godot",
+    "source": "https://docs.godotengine.org/en/stable/tutorials/best_practices/what_are_godot_classes.html",
+    "bytes": 2947
+  },
+  {
+    "file": "03_scene_organization.md",
+    "title": "Scene organization",
+    "source": "https://docs.godotengine.org/en/stable/tutorials/best_practices/scene_organization.html",
+    "bytes": 12797
+  },
+  {
+    "file": "04_when_to_use_scenes_versus_scripts.md",
+    "title": "When to use scenes versus scripts",
+    "source": "https://docs.godotengine.org/en/stable/tutorials/best_practices/scenes_versus_scripts.html",
+    "bytes": 6249
+  },
+  {
+    "file": "05_autoloads_versus_regular_nodes.md",
+    "title": "Autoloads versus regular nodes",
+    "source": "https://docs.godotengine.org/en/stable/tutorials/best_practices/autoloads_versus_regular_nodes.html",
+    "bytes": 4552
+  },
+  {
+    "file": "06_when_and_how_to_avoid_using_nodes_for_everything.md",
+    "title": "When and how to avoid using nodes for everything",
+    "source": "https://docs.godotengine.org/en/stable/tutorials/best_practices/node_alternatives.html",
+    "bytes": 2939
+  },
+  {
+    "file": "07_godot_interfaces.md",
+    "title": "Godot interfaces",
+    "source": "https://docs.godotengine.org/en/stable/tutorials/best_practices/godot_interfaces.html",
+    "bytes": 9993
+  },
+  {
+    "file": "08_godot_notifications.md",
+    "title": "Godot notifications",
+    "source": "https://docs.godotengine.org/en/stable/tutorials/best_practices/godot_notifications.html",
+    "bytes": 7291
+  },
+  {
+    "file": "09_data_preferences.md",
+    "title": "Data preferences",
+    "source": "https://docs.godotengine.org/en/stable/tutorials/best_practices/data_preferences.html",
+    "bytes": 14224
+  },
+  {
+    "file": "10_logic_preferences.md",
+    "title": "Logic preferences",
+    "source": "https://docs.godotengine.org/en/stable/tutorials/best_practices/logic_preferences.html",
+    "bytes": 7323
+  },
+  {
+    "file": "11_project_organization.md",
+    "title": "Project organization",
+    "source": "https://docs.godotengine.org/en/stable/tutorials/best_practices/project_organization.html",
+    "bytes": 4984
+  },
+  {
+    "file": "12_version_control_systems.md",
+    "title": "Version control systems",
+    "source": "https://docs.godotengine.org/en/stable/tutorials/best_practices/version_control_systems.html",
+    "bytes": 6679
+  }
+]

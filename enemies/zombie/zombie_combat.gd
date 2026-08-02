@@ -24,7 +24,8 @@ func _find_player(node: Node) -> Node3D:
     if node == null:
         return null
 
-    if node is Node3D and node.has_method("die_from_flames"):
+    if node is Node3D \
+            and (node.has_method("apply_flame_damage") or node.has_method("die_from_enemy")):
         return node as Node3D
 
     for child in node.get_children():
@@ -83,8 +84,8 @@ func _apply_attack_damage() -> bool:
         if target.has_method("apply_flame_damage"):
             target.apply_flame_damage(attack_damage)
             hit_landed = true
-        elif target.has_method("die_from_flames"):
-            target.die_from_flames()
+        elif target.has_method("die_from_enemy"):
+            target.die_from_enemy()
             hit_landed = true
 
     if hit_landed:

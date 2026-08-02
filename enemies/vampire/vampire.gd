@@ -1,4 +1,4 @@
-extends CharacterBody3D
+extends "res://placeables/character_placeable.gd"
 class_name GDVampire
 
 
@@ -99,6 +99,7 @@ func _ready() -> void:
 		contact.configure(settings)
 	_cache_enabled_state()
 	_apply_testing_disabled_state()
+	super._ready()
 
 
 ## Returns the point the player's close-threat awareness should follow.

@@ -1,5 +1,5 @@
 class_name GDSpherePushable
-extends RigidBody3D
+extends "res://placeables/physics_placeable.gd"
 
 
 const PLAYER_COLLISION_LAYER := 2
@@ -84,6 +84,7 @@ func _ready() -> void:
 	continuous_cd = true
 	contact_monitor = true
 	max_contacts_reported = max(max_contacts_reported, 12)
+	super._ready()
 
 
 func push(impulse: Vector3) -> void:

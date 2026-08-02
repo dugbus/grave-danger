@@ -1,5 +1,5 @@
 class_name GDBoxPushable
-extends CharacterBody3D
+extends "res://placeables/character_placeable.gd"
 
 
 const PLAYER_COLLISION_LAYER := 2
@@ -45,6 +45,7 @@ func _ready() -> void:
 
 	if collide_with_player:
 		collision_mask |= PLAYER_COLLISION_LAYER
+	super._ready()
 
 
 func _physics_process(delta: float) -> void:

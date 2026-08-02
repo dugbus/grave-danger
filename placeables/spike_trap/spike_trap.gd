@@ -1,4 +1,4 @@
-extends Node3D
+extends "res://placeables/placeable.gd"
 class_name GDSpikeTrap
 
 
@@ -8,6 +8,12 @@ enum SpikeTrapState {
     Rising,
     Active,
     Resetting,
+}
+
+enum SpawnPresentationState {
+    Present,
+    Waiting,
+    Rising,
 }
 
 const PLAYER_COLLISION_LAYER := 2
@@ -48,6 +54,12 @@ const DEFAULT_RESET_SOUND_PATH := "res://Assets/audio/spike-going-back-down.mp3"
 @export var rise_bounce_height := 0.13
 @export var reset_tension_lift := 0.08
 
+@export_group("Spawn Presentation")
+## Distance below the authored position where a delayed trap begins appearing.
+@export_range(0.0, 2.0, 0.01, "suffix:m") var spawn_buried_depth := 0.35
+## Seconds the trap takes to wind upward into its authored position.
+@export_range(0.01, 4.0, 0.01, "suffix:s") var spawn_rise_seconds := 0.75
+
 @export_group("Audio")
 @export_file("*.mp3", "*.wav", "*.ogg") var trigger_sound_path := DEFAULT_TRIGGER_SOUND_PATH
 @export_file("*.mp3", "*.wav", "*.ogg") var hit_sound_path := DEFAULT_HIT_SOUND_PATH
@@ -65,6 +77,10 @@ var motion_tween: Tween
 var trigger_sound: AudioStream
 var hit_sound: AudioStream
 var reset_sound: AudioStream
+var spawn_presentation_state := SpawnPresentationState.Present
+var spawn_elapsed_seconds := 0.0
+var authored_spawn_global_position := Vector3.ZERO
+var spawn_motion_tween: Tween
 
 
 func _ready() -> void:
@@ -79,8 +95,23 @@ func _ready() -> void:
     if spikes_pivot != null:
         spikes_pivot.position.y = hidden_position_y
 
+    authored_spawn_global_position = global_position
+    if not Engine.is_editor_hint() and spawn_time > 0.0:
+        spawn_presentation_state = SpawnPresentationState.Waiting
+        visible = false
+        _set_trigger_areas_enabled(false)
+    super._ready()
 
-func _physics_process(_delta: float) -> void:
+
+func _physics_process(delta: float) -> void:
+    if spawn_presentation_state == SpawnPresentationState.Waiting:
+        spawn_elapsed_seconds += maxf(delta, 0.0)
+        if spawn_elapsed_seconds >= spawn_time:
+            _begin_spawn_presentation()
+        return
+    if spawn_presentation_state == SpawnPresentationState.Rising:
+        return
+
     if state != SpikeTrapState.Ready:
         return
 
@@ -102,6 +133,43 @@ func get_spike_trap_state() -> SpikeTrapState:
 
 func is_ready() -> bool:
     return state == SpikeTrapState.Ready
+
+
+func _uses_custom_placeable_spawn() -> bool:
+    return true
+
+
+func is_placeable_spawned() -> bool:
+    return spawn_presentation_state == SpawnPresentationState.Present
+
+
+func _begin_spawn_presentation() -> void:
+    if spawn_presentation_state != SpawnPresentationState.Waiting:
+        return
+
+    spawn_presentation_state = SpawnPresentationState.Rising
+    global_position = authored_spawn_global_position - Vector3.UP * maxf(spawn_buried_depth, 0.0)
+    visible = true
+    _play_sound(reset_sound, "SpikeTrapResetAudio", reset_volume_db)
+
+    spawn_motion_tween = create_tween()
+    spawn_motion_tween.set_trans(Tween.TRANS_SINE)
+    spawn_motion_tween.set_ease(Tween.EASE_OUT)
+    spawn_motion_tween.tween_property(
+        self,
+        "global_position:y",
+        authored_spawn_global_position.y,
+        maxf(spawn_rise_seconds, 0.01)
+    )
+    spawn_motion_tween.finished.connect(_finish_spawn_presentation)
+
+
+func _finish_spawn_presentation() -> void:
+    global_position = authored_spawn_global_position
+    spawn_motion_tween = null
+    spawn_presentation_state = SpawnPresentationState.Present
+    _set_trigger_areas_enabled(true)
+    placeable_spawned.emit()
 
 
 func _run_cycle() -> void:
@@ -160,8 +228,8 @@ func _damage_target(target: Node) -> bool:
         target.call("die_from_spike_trap")
         return true
 
-    if target.has_method("die_from_flames"):
-        target.call("die_from_flames")
+    if target.has_method("die_from_enemy"):
+        target.call("die_from_enemy")
         return true
 
     return false
@@ -216,7 +284,7 @@ func _can_damage_node(node: Node) -> bool:
     return (
         node.has_method("apply_spike_trap_damage")
         or node.has_method("die_from_spike_trap")
-        or node.has_method("die_from_flames")
+        or node.has_method("die_from_enemy")
     )
 
 
@@ -321,6 +389,15 @@ func _configure_area(area: Area3D) -> void:
     area.collision_mask = target_collision_mask
     area.monitoring = true
     area.monitorable = false
+
+
+func _set_trigger_areas_enabled(enabled: bool) -> void:
+    var areas: Array[Area3D] = [trigger_area, strike_area]
+    for area in areas:
+        if area == null:
+            continue
+        area.collision_mask = target_collision_mask if enabled else 0
+        area.set_deferred(&"monitoring", enabled)
 
 
 func _load_sounds() -> void:

@@ -77,6 +77,7 @@ func build_plan(
         vampire_cell: true,
         end_gate_cell: true,
     }
+    _occupy_straight_passage_between(occupied, vampire_cell, end_gate_cell)
     var door_result := _plan_doors_and_keys(
         main_path,
         walkable,
@@ -165,6 +166,25 @@ func build_plan(
         "main_path_treasure_percent": float(configuration.get("main_path_treasure_percent")),
         "solvable": errors.is_empty(),
     }
+
+
+func _occupy_straight_passage_between(
+    occupied: Dictionary,
+    first_cell: Vector2i,
+    second_cell: Vector2i
+) -> void:
+    if first_cell.x == second_cell.x:
+        for y_coordinate in range(
+            mini(first_cell.y, second_cell.y) + 1,
+            maxi(first_cell.y, second_cell.y)
+        ):
+            occupied[Vector2i(first_cell.x, y_coordinate)] = true
+    elif first_cell.y == second_cell.y:
+        for x_coordinate in range(
+            mini(first_cell.x, second_cell.x) + 1,
+            maxi(first_cell.x, second_cell.x)
+        ):
+            occupied[Vector2i(x_coordinate, first_cell.y)] = true
 
 
 func _plan_doors_and_keys(

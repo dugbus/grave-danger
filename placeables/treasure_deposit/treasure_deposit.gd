@@ -1,5 +1,5 @@
 class_name GDTreasureDeposit
-extends Node3D
+extends "res://placeables/placeable.gd"
 
 const DEFAULT_ABSORB_SOUND := preload("res://Assets/audio/coin-pickup.mp3")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
@@ -8,6 +8,7 @@ const ABSORB_SOUND_PITCH_MIN := 0.82
 const ABSORB_SOUND_PITCH_MAX := 0.98
 const ABSORB_SOUND_VOLUME_MIN_DB := -3.0
 const ABSORB_SOUND_VOLUME_MAX_DB := 1.0
+const GOLD_COIN_ITEM_TYPE := &"gold_coin"
 
 ## Treasure value added to the level score when an item reaches the deposit.
 signal treasure_absorbed(value: int)
@@ -18,6 +19,8 @@ signal treasure_item_absorbed(item_type: StringName, value: int)
 @export var detection_radius := 1.4
 ## Minimum seconds between treasure items being pulled from a player.
 @export var deposit_interval := 0.12
+## Extra carried gold coins pulled into the coffin whenever the nearby player jumps.
+@export_range(0, 10, 1) var jump_bonus_coin_count := 2
 ## Extra vertical height added to the arcing deposit animation.
 @export var launch_height := 1.25
 ## Seconds a visual treasure item takes to fly from the player to the deposit.
@@ -41,6 +44,7 @@ var wobble_rest_rotation := Vector3.ZERO
 var wobble_tween: Tween
 var deposit_area: Area3D
 var pickup_radius_multiplier := 1.0
+var jump_callbacks_by_body: Dictionary = {}
 
 
 func _ready() -> void:
@@ -53,6 +57,17 @@ func _ready() -> void:
 	wobble_rest_rotation = wobble_node.rotation
 	set_pickup_radius_multiplier(_get_runtime_pickup_radius_multiplier())
 	_create_detection_area()
+	super._ready()
+
+
+func _get_placeable_spawn_root() -> Node3D:
+	var parent := get_parent() as Node3D
+	if parent == null:
+		return self
+	var parent_name := String(parent.name).to_lower()
+	if parent_name.contains("coffin"):
+		return parent
+	return self
 
 
 func _physics_process(delta: float) -> void:
@@ -99,10 +114,50 @@ func set_pickup_radius_multiplier(multiplier: float) -> void:
 func _on_body_entered(body: Node3D) -> void:
 	if not candidate_bodies.has(body):
 		candidate_bodies.append(body)
+	_bind_jump_bonus(body)
 
 
 func _on_body_exited(body: Node3D) -> void:
 	candidate_bodies.erase(body)
+	_unbind_jump_bonus(body)
+
+
+func _bind_jump_bonus(body: Node3D) -> void:
+	if body == null or jump_callbacks_by_body.has(body) or not body.has_signal(&"jump_started"):
+		return
+
+	var callback := _on_candidate_jump_started.bind(body)
+	jump_callbacks_by_body[body] = callback
+	body.connect(&"jump_started", callback)
+
+
+func _unbind_jump_bonus(body: Node3D) -> void:
+	var callback := jump_callbacks_by_body.get(body, Callable()) as Callable
+	if body != null \
+			and not callback.is_null() \
+			and body.is_connected(&"jump_started", callback):
+		body.disconnect(&"jump_started", callback)
+	jump_callbacks_by_body.erase(body)
+
+
+func _on_candidate_jump_started(body: Node3D) -> void:
+	if body == null or not candidate_bodies.has(body):
+		return
+	for _coin_index in jump_bonus_coin_count:
+		var coin := _take_carried_gold_coin(body)
+		if coin == null:
+			return
+		_launch_deposit_treasure(body, coin)
+
+
+func _take_carried_gold_coin(player_body: Node3D) -> Resource:
+	if player_body.has_method("take_carried_item_of_type"):
+		return player_body.call(
+			"take_carried_item_of_type",
+			GOLD_COIN_ITEM_TYPE
+		) as Resource
+
+	return null
 
 
 func _take_treasure_item(player_body: Node3D) -> Resource:

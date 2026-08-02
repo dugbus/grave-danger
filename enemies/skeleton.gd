@@ -1,13 +1,12 @@
-extends Path3D
+extends "res://placeables/path_placeable.gd"
 class_name GDSkeletonPath
 
 
 const FOOTSTEP_SOUND_PATHS: Array[String] = [
-    "res://Assets/audio/footstep1.mp3",
-    "res://Assets/audio/footstep2.mp3",
-    "res://Assets/audio/footstep3.mp3",
-    "res://Assets/audio/footstep4.mp3",
+    "res://Assets/audio/skeleton-footstep.mp3",
 ]
+const LANDING_SOUND_PATH := "res://Assets/audio/skeleton-landing.mp3"
+const LANDING_AUDIO_NAME := "SkeletonLandingAudio"
 const CHARACTER_GROUP: StringName = &"character"
 const ENEMY_GROUP: StringName = &"enemy"
 const SKELETON_GROUP: StringName = &"skeleton"
@@ -27,6 +26,10 @@ const ENEMY_LIGHT_SHADOW_CASTER_MASK := (
 const MODEL_FORWARD_YAW_OFFSET := 0.0
 const FLOOR_PROBE_MARGIN := 0.05
 const FLOOR_SNAP_DISTANCE := 0.1
+const MINIMUM_AUDIBLE_LANDING_SPEED := 1.0
+const LANDING_AUDIO_VOLUME_DB := 4.0
+const LANDING_AUDIO_MAX_DISTANCE := 48.0
+const LANDING_AUDIO_UNIT_SIZE := 16.0
 
 ## PathFollow3D that carries the skeleton visual and contact area.
 @export var path_follow_path: NodePath = ^"PathFollow3D"
@@ -46,8 +49,12 @@ const FLOOR_SNAP_DISTANCE := 0.1
 @export var skeleton_light_path: NodePath = ^"PathFollow3D/DropPivot/Pivot/SkeletonLight"
 ## Seconds a player must remain inside the contact area before death triggers.
 @export var kill_confirmation_time := 0.08
-## Seconds after scene start before this skeleton drops in.
-@export var drop_in_time := 0.0
+## Legacy serialized enemy delay; new level editing uses the shared Spawn Time field.
+@export_storage var drop_in_time: float:
+    get:
+        return spawn_time
+    set(value):
+        spawn_time = maxf(value, 0.0)
 ## Height above the patrol path used at the start of the drop-in.
 @export var drop_height := 3.2
 ## Seconds taken to fall from drop_height to the path.
@@ -152,6 +159,7 @@ const FLOOR_SNAP_DISTANCE := 0.1
 
 var patrol_direction := 1.0
 var footstep_sounds: Array[AudioStream] = []
+var landing_sound: AudioStream
 var footstep_rng := RandomNumberGenerator.new()
 var footstep_distance_accumulator := 0.0
 var next_footstep_distance := 1.0
@@ -178,6 +186,7 @@ func _ready() -> void:
     add_to_group(SKELETON_GROUP)
     footstep_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"skeleton_audio")
     _load_footstep_sounds()
+    landing_sound = GDAudio.load_stream(LANDING_SOUND_PATH)
     _randomize_next_footstep_distance()
     _apply_start_progress()
     _configure_shadow_casting()
@@ -190,10 +199,11 @@ func _ready() -> void:
         animation_player = _find_animation_player(character)
         _resolve_animation_names()
 
-    if drop_in_time > 0.0:
+    if spawn_time > 0.0:
         _set_active_visible(false)
     else:
         _finish_drop_in()
+    super._ready()
 
 
 func die_from_spike_trap() -> void:
@@ -285,9 +295,12 @@ func _update_fall(delta: float) -> bool:
     var hit := world.direct_space_state.intersect_ray(query)
     if not hit.is_empty():
         var floor_position := hit.get("position", current_floor_position) as Vector3
+        var landing_speed := -fall_velocity
         global_position.y += floor_position.y - current_floor_position.y
         fall_velocity = 0.0
         has_landed = true
+        if has_dropped_in and landing_speed >= MINIMUM_AUDIBLE_LANDING_SPEED:
+            _play_landing_sound()
         return false
 
     global_position.y += fall_velocity * delta
@@ -310,7 +323,7 @@ func _update_drop_in(delta: float) -> bool:
         return true
 
     elapsed_time += delta
-    if not is_dropping_in and elapsed_time < drop_in_time:
+    if not is_dropping_in and elapsed_time < spawn_time:
         return false
 
     if not is_dropping_in:
@@ -319,9 +332,9 @@ func _update_drop_in(delta: float) -> bool:
     drop_elapsed += delta
     var duration := maxf(drop_duration, 0.001)
     var ratio := clampf(drop_elapsed / duration, 0.0, 1.0)
-    var eased_ratio := 1.0 - pow(1.0 - ratio, 3.0)
+    var fall_ratio := ratio * ratio
     if drop_pivot != null:
-        drop_pivot.position.y = lerpf(maxf(drop_height, 0.0), 0.0, eased_ratio)
+        drop_pivot.position.y = lerpf(maxf(drop_height, 0.0), 0.0, fall_ratio)
 
     if ratio >= 1.0:
         _finish_drop_in()
@@ -339,7 +352,16 @@ func _start_drop_in() -> void:
     _set_kill_area_enabled(false)
 
 
+func _uses_custom_placeable_spawn() -> bool:
+    return true
+
+
+func is_placeable_spawned() -> bool:
+    return has_dropped_in
+
+
 func _finish_drop_in() -> void:
+    var completed_visible_drop := is_dropping_in
     has_dropped_in = true
     is_dropping_in = false
     if drop_pivot != null:
@@ -348,6 +370,8 @@ func _finish_drop_in() -> void:
     _set_active_visible(true)
     _set_kill_area_enabled(true)
     _update_animation(shuffle_speed)
+    if completed_visible_drop:
+        _play_landing_sound()
 
 
 func _set_active_visible(active: bool) -> void:
@@ -733,6 +757,19 @@ func _play_footstep(horizontal_speed: float) -> void:
     )
 
 
+func _play_landing_sound() -> void:
+    var audio_parent: Node = path_follow as Node if path_follow != null else self as Node
+    GDAudio.play_one_shot_3d(
+        audio_parent,
+        landing_sound,
+        LANDING_AUDIO_NAME,
+        LANDING_AUDIO_VOLUME_DB,
+        1.0,
+        LANDING_AUDIO_MAX_DISTANCE,
+        LANDING_AUDIO_UNIT_SIZE
+    )
+
+
 func _update_rolling_ball_death() -> void:
     if not rolling_ball_death_enabled or is_dead or kill_area == null:
         return
@@ -911,7 +948,7 @@ func _kill_body_if_player(body: Node) -> void:
     if not _is_live_player_body(body):
         return
 
-    body.die_from_flames()
+    body.die_from_enemy()
 
 
 func _is_live_player_body(body: Node) -> bool:
@@ -921,7 +958,7 @@ func _is_live_player_body(body: Node) -> bool:
     if body.has_method("is_dead") and body.is_dead():
         return false
 
-    return body.has_method("die_from_flames")
+    return body.has_method("die_from_enemy")
 
 
 func _find_collision_shape(node: Node) -> CollisionShape3D:

@@ -30,6 +30,7 @@ const DROP_DIRECTION_VARIANCE_RADIANS := PI / 15.0
 const DROP_CLEAR_RADIUS = 0.18
 const DROP_NUDGE_RADIUS = 0.35
 const DROP_NUDGE_IMPULSE = 0.025
+const MAX_PICKUPS_PER_PHYSICS_FRAME := 6
 const COIN_SOUND_VOLUME_OFFSET_DB := -2.5
 const COIN_SOUND_PITCH_MIN := 0.86
 const COIN_SOUND_PITCH_MAX := 1.0
@@ -55,6 +56,8 @@ var drop_hold_time := 0.0
 var bonus_inventory_space := 0
 var audio_rng := RandomNumberGenerator.new()
 var drop_position_rng := RandomNumberGenerator.new()
+var pickup_budget_physics_frame := -1
+var pickups_collected_this_frame := 0
 
 
 func _ready() -> void:
@@ -93,11 +96,14 @@ func try_collect_item_pickup(pickup: Node3D) -> bool:
 	if _item_requires_facing_for_pickup(item) and not _is_facing(pickup.global_position):
 		return false
 	if get_item_count(item_type) >= _get_effective_item_max_count(item):
-		return _drop_unstored_pickup(item)
+		return false
+	if not _has_pickup_budget():
+		return false
 	if not _make_room_for_item(item):
-		return _drop_unstored_pickup(item)
+		return false
 
 	_add_item(item)
+	pickups_collected_this_frame += 1
 	_play_item_sound(item, _item_pickup_sound(item), "PickupItemAudio")
 	return true
 
@@ -310,18 +316,6 @@ func _make_room_for_item(item: Resource) -> bool:
 	return true
 
 
-func _drop_unstored_pickup(item: Resource) -> bool:
-	if _item_type(item) != GOLD_COIN_ITEM_TYPE:
-		return false
-	if not _spawn_dropped_item(item):
-		return false
-
-	_play_item_sound(item, _item_drop_sound(item), "DropItemAudio")
-	if player != null and player.has_method("emit_noise"):
-		player.emit_noise()
-	return true
-
-
 func _get_next_auto_shed_item(incoming_item: Resource) -> Resource:
 	var best_item: Resource = null
 	var incoming_drop_order := _item_drop_order(incoming_item)
@@ -479,7 +473,22 @@ func _play_item_sound(item: Resource, sound: AudioStream, player_name: String) -
 
 	var audio_parent: Node = player as Node if player != null else self as Node
 	var sound_name := player_name if not player_name.is_empty() else "InventoryItemAudio"
+	var existing_sound := audio_parent.get_node_or_null(sound_name) as AudioStreamPlayer
+	if existing_sound != null and not existing_sound.is_queued_for_deletion():
+		existing_sound.stream = sound
+		existing_sound.volume_db = volume_db
+		existing_sound.pitch_scale = pitch_scale
+		existing_sound.play()
+		return
 	GDAudio.play_one_shot(audio_parent, sound, sound_name, volume_db, pitch_scale)
+
+
+func _has_pickup_budget() -> bool:
+	var physics_frame := Engine.get_physics_frames()
+	if physics_frame != pickup_budget_physics_frame:
+		pickup_budget_physics_frame = physics_frame
+		pickups_collected_this_frame = 0
+	return pickups_collected_this_frame < MAX_PICKUPS_PER_PHYSICS_FRAME
 
 
 func _uses_coin_sound_profile(item: Resource) -> bool:
