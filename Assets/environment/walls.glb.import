@@ -133,14 +133,6 @@ _subresources={
 }
 },
 "nodes": {
-"PATH:Fence": {
-"generate/physics": true,
-"physics/shape_type": 3
-},
-"PATH:Tombstone": {
-"generate/physics": true,
-"physics/shape_type": 3
-},
 "PATH:Wall": {
 "generate/physics": true
 },
