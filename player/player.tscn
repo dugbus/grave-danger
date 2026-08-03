@@ -12,10 +12,34 @@
 [ext_resource type="Script" uid="uid://cs73qa7c0pcul" path="res://player/player_shadow.gd" id="10_shadow"]
 [ext_resource type="PlaneMesh" path="res://game/contact_shadow_mesh.tres" id="11_shadow_mesh"]
 [ext_resource type="Material" path="res://game/contact_shadow_material.tres" id="12_shadow_material"]
-[ext_resource type="Script" path="res://player/player_attention.gd" id="13_attention"]
-[ext_resource type="Script" path="res://player/player_death_effects.gd" id="14_death_effects"]
-[ext_resource type="ParticleProcessMaterial" path="res://player/fire_death_particles_process_material.tres" id="15_fire_process"]
-[ext_resource type="QuadMesh" path="res://player/fire_death_particle_mesh.tres" id="16_fire_mesh"]
+[ext_resource type="Script" uid="uid://dh2iebdnpb21j" path="res://player/player_attention.gd" id="13_attention"]
+[ext_resource type="Script" uid="uid://bvit8b7mdc5mh" path="res://player/player_death_effects.gd" id="14_death_effects"]
+[ext_resource type="Material" path="res://player/fire_death_particles_process_material.tres" id="15_fire_process"]
+[ext_resource type="QuadMesh" uid="uid://c7btpfw36kdfj" path="res://player/fire_death_particle_mesh.tres" id="16_fire_mesh"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_blood"]
+emission_shape = 1
+emission_sphere_radius = 0.008
+direction = Vector3(0, 0, 1)
+spread = 38.0
+initial_velocity_min = 0.3
+initial_velocity_max = 0.9
+gravity = Vector3(0, -3.8, 0)
+damping_min = 0.1
+damping_max = 0.35
+scale_min = 0.55
+scale_max = 1.4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_blood"]
+shading_mode = 0
+albedo_color = Color(0.32, 0.006, 0.012, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_blood"]
+material = SubResource("StandardMaterial3D_blood")
+radius = 0.012
+height = 0.026
+radial_segments = 5
+rings = 3
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_fast"]
 frequency = 0.8
@@ -48,34 +72,6 @@ depth = 0.08
 radius = 0.28
 height = 0.8
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_blood"]
-shading_mode = 0
-albedo_color = Color(0.32, 0.006, 0.012, 1)
-emission_enabled = true
-emission = Color(0.12, 0.001, 0.002, 1)
-emission_energy_multiplier = 0.35
-roughness = 0.72
-
-[sub_resource type="SphereMesh" id="SphereMesh_blood"]
-material = SubResource("StandardMaterial3D_blood")
-radius = 0.012
-height = 0.026
-radial_segments = 5
-rings = 3
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_blood"]
-emission_shape = 1
-emission_sphere_radius = 0.008
-direction = Vector3(0, 0, 1)
-spread = 38.0
-gravity = Vector3(0, -3.8, 0)
-initial_velocity_min = 0.3
-initial_velocity_max = 0.9
-damping_min = 0.1
-damping_max = 0.35
-scale_min = 0.55
-scale_max = 1.4
-
 [node name="Player" type="CharacterBody3D" unique_id=244343110]
 collision_layer = 2
 collision_mask = 9
@@ -93,10 +89,10 @@ script = ExtResource("5_8mhfk")
 [node name="PlayerDeath" type="Node" parent="." unique_id=360054101]
 script = ExtResource("6_7xubc")
 
-[node name="PlayerDeathEffects" type="Node3D" parent="."]
+[node name="PlayerDeathEffects" type="Node3D" parent="." unique_id=1974269072]
 script = ExtResource("14_death_effects")
 
-[node name="MouthBlood" type="GPUParticles3D" parent="PlayerDeathEffects"]
+[node name="MouthBlood" type="GPUParticles3D" parent="PlayerDeathEffects" unique_id=1100199439]
 unique_name_in_owner = true
 top_level = true
 visible = false
@@ -104,15 +100,13 @@ cast_shadow = 0
 emitting = false
 amount = 14
 lifetime = 0.9
-one_shot = false
 explosiveness = 0.72
 randomness = 0.65
 visibility_aabb = AABB(-0.8, -1.8, -0.8, 1.6, 2.2, 1.6)
-local_coords = false
 process_material = SubResource("ParticleProcessMaterial_blood")
 draw_pass_1 = SubResource("SphereMesh_blood")
 
-[node name="NoseBlood" type="GPUParticles3D" parent="PlayerDeathEffects"]
+[node name="NoseBlood" type="GPUParticles3D" parent="PlayerDeathEffects" unique_id=319754717]
 unique_name_in_owner = true
 top_level = true
 visible = false
@@ -120,15 +114,13 @@ cast_shadow = 0
 emitting = false
 amount = 10
 lifetime = 0.9
-one_shot = false
 explosiveness = 0.72
 randomness = 0.65
 visibility_aabb = AABB(-0.8, -1.8, -0.8, 1.6, 2.2, 1.6)
-local_coords = false
 process_material = SubResource("ParticleProcessMaterial_blood")
 draw_pass_1 = SubResource("SphereMesh_blood")
 
-[node name="LeftEyeBlood" type="GPUParticles3D" parent="PlayerDeathEffects"]
+[node name="LeftEyeBlood" type="GPUParticles3D" parent="PlayerDeathEffects" unique_id=1799252258]
 unique_name_in_owner = true
 top_level = true
 visible = false
@@ -136,15 +128,13 @@ cast_shadow = 0
 emitting = false
 amount = 7
 lifetime = 0.9
-one_shot = false
 explosiveness = 0.72
 randomness = 0.65
 visibility_aabb = AABB(-0.8, -1.8, -0.8, 1.6, 2.2, 1.6)
-local_coords = false
 process_material = SubResource("ParticleProcessMaterial_blood")
 draw_pass_1 = SubResource("SphereMesh_blood")
 
-[node name="RightEyeBlood" type="GPUParticles3D" parent="PlayerDeathEffects"]
+[node name="RightEyeBlood" type="GPUParticles3D" parent="PlayerDeathEffects" unique_id=26486283]
 unique_name_in_owner = true
 top_level = true
 visible = false
@@ -152,17 +142,15 @@ cast_shadow = 0
 emitting = false
 amount = 7
 lifetime = 0.9
-one_shot = false
 explosiveness = 0.72
 randomness = 0.65
 visibility_aabb = AABB(-0.8, -1.8, -0.8, 1.6, 2.2, 1.6)
-local_coords = false
 process_material = SubResource("ParticleProcessMaterial_blood")
 draw_pass_1 = SubResource("SphereMesh_blood")
 
-[node name="FireParticles" type="GPUParticles3D" parent="PlayerDeathEffects"]
+[node name="FireParticles" type="GPUParticles3D" parent="PlayerDeathEffects" unique_id=391659146]
 unique_name_in_owner = true
-position = Vector3(0, 0.52, -0.18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.52, -0.18)
 visible = false
 cast_shadow = 0
 emitting = false
@@ -170,13 +158,12 @@ amount = 84
 lifetime = 0.82
 randomness = 0.84
 visibility_aabb = AABB(-0.7, -0.7, -0.7, 1.4, 2.4, 1.4)
-local_coords = false
 process_material = ExtResource("15_fire_process")
 draw_pass_1 = ExtResource("16_fire_mesh")
 
-[node name="FireLight" type="OmniLight3D" parent="PlayerDeathEffects"]
+[node name="FireLight" type="OmniLight3D" parent="PlayerDeathEffects" unique_id=1182295354]
 unique_name_in_owner = true
-position = Vector3(0, 0.62, -0.18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.62, -0.18)
 visible = false
 light_color = Color(1, 0.22, 0.015, 1)
 light_energy = 4.0
@@ -184,20 +171,19 @@ light_indirect_energy = 0.0
 omni_range = 3.2
 omni_attenuation = 1.15
 
-[node name="PlayerAttention" type="Node3D" parent="."]
-position = Vector3(0, 0.85, 0)
+[node name="PlayerAttention" type="Node3D" parent="." unique_id=975484854]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
 script = ExtResource("13_attention")
 
-[node name="CollectibleSightRay" type="RayCast3D" parent="PlayerAttention"]
+[node name="CollectibleSightRay" type="RayCast3D" parent="PlayerAttention" unique_id=141583491]
 target_position = Vector3(0, 0, 1)
 collision_mask = 5
-collide_with_areas = false
 
 [node name="Pivot" type="Node3D" parent="." unique_id=2026899053]
 
 [node name="Character" parent="Pivot" unique_id=2053546351 instance=ExtResource("1_4flbx")]
 
-[node name="LookDirection" type="Node3D" parent="Pivot"]
+[node name="LookDirection" type="Node3D" parent="Pivot" unique_id=774174708]
 
 [node name="PlayerHeadlampLight" type="SpotLight3D" parent="Pivot" unique_id=1854365692]
 transform = Transform3D(-1, 0, -8.742278e-08, -5.015858e-08, 0.81915206, 0.57357645, 7.163184e-08, 0.57357645, -0.81915206, 0, 1.05, 0.3)
@@ -205,7 +191,6 @@ light_color = Color(0.8842759, 0.4890548, 0.27783498, 1)
 light_energy = 8.0
 light_indirect_energy = 0.0
 shadow_enabled = true
-shadow_bias = 0.03
 shadow_normal_bias = 0.6
 spot_range = 60.0
 spot_attenuation = 1.25
@@ -223,7 +208,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0.3)
 light_color = Color(0.8842759, 0.4890548, 0.27783498, 1)
 light_energy = 1.2
 light_indirect_energy = 0.0
-shadow_enabled = true
 shadow_bias = 0.03
 shadow_normal_bias = 0.6
 omni_range = 4.0
