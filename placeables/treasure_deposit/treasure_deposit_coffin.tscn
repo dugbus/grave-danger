@@ -1,43 +1,44 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene format=3 uid="uid://caviokpl1nr78"]
 
-[ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/kenney-graveyard/coffin.glb" id="1_coffin"]
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://placeables/treasure_deposit/treasure_deposit.gd" id="2_deposit"]
-[ext_resource type="Script" path="res://placeables/treasure_deposit/treasure_deposit_coffin.gd" id="3_placeable"]
+[ext_resource type="ArrayMesh" uid="uid://bxuv65f14d1l1" path="res://Assets/environment/coffin-base.res" id="3_6ggli"]
+[ext_resource type="Script" uid="uid://ceni1koq8ksxl" path="res://placeables/treasure_deposit/treasure_deposit_coffin.gd" id="3_placeable"]
+[ext_resource type="ArrayMesh" uid="uid://byk6usmirmsu7" path="res://Assets/environment/coffin-lid.res" id="4_2cvc0"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_coffin"]
 friction = 0.65
 bounce = 0.05
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_coffin"]
-size = Vector3(0.573807, 0.325, 0.837824)
+size = Vector3(0.573807, 0.36512452, 1.2013993)
 
-[node name="TreasureDepositCoffin" type="RigidBody3D"]
-collision_layer = 1
+[node name="TreasureDepositCoffin" type="RigidBody3D" unique_id=537362474]
 collision_mask = 3
 mass = 35.0
 physics_material_override = SubResource("PhysicsMaterial_coffin")
-linear_damp = 0.35
-angular_damp = 1.2
 freeze = true
 continuous_cd = true
 contact_monitor = true
 max_contacts_reported = 8
+linear_damp = 0.35
+angular_damp = 1.2
 script = ExtResource("3_placeable")
 spawn_spin_speed = 3.0
 
-[node name="CoffinVisual" parent="." instance=ExtResource("1_coffin")]
+[node name="CoffinVisual" type="Node3D" parent="." unique_id=1845621590]
 
-[node name="StaticBody3D" parent="CoffinVisual/coffin" index="1"]
-collision_layer = 0
-collision_mask = 0
+[node name="CoffinBase" type="MeshInstance3D" parent="CoffinVisual" unique_id=78158309]
+mesh = ExtResource("3_6ggli")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-position = Vector3(0, 0.1625, 0)
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CoffinVisual" unique_id=1308781363]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.34316587, -0.01593399)
+mesh = ExtResource("4_2cvc0")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=832851464]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18256226, 0.004280746)
 shape = SubResource("BoxShape3D_coffin")
 
-[node name="TreasureDeposit" type="Node3D" parent="."]
+[node name="TreasureDeposit" type="Node3D" parent="." unique_id=1938689940]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("2_deposit")
 metadata/_edit_lock_ = true
-
-[editable path="CoffinVisual"]
