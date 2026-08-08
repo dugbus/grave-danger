@@ -1,6 +1,86 @@
 # Changelog
 
+## 2026-08-07
+
+### 1800
+
+- Pickup radius flasks now expand only loose-item collection range and leave coffin drop-off distance unchanged.
+  - Prompt: Keep pickup radius boosts from changing treasure drop-off range.
+
+### 1700
+
+- Pickup radius flasks now grant independently timed, stackable radius boosts for 15 seconds each.
+  - Prompt: Make pickup radius flasks last fifteen seconds and stack their radius boosts.
+
+### 1400
+
+- The level duplication workflow now supports the typed level definitions used by the current level mapping.
+  - Prompt: Generate a level named Flask Kill Expand from the existing level PNG in folder 5.
+- Level editors can select Flask Kill Expand as a generated 32-by-32 level built around the existing folder 5 layout image.
+  - Prompt: Generate a level named Flask Kill Expand from the existing level PNG in folder 5.
+
+## 2026-08-04
+
+### 2000
+
+- Level editors no longer see stale optional-node path errors from lockable passages, the generated Vampire Maze, or the Graveyard camera.
+  - Prompt: Remove the reported invalid scene paths and related editor errors.
+
+### 1900
+
+- Gold and silver keys no longer consume sack capacity, so a cleared coffin leaves the sack counter at zero while keys remain available for locks.
+  - Prompt: Clarify why five sack units remained at the debug-level coffin.
+
+### 1800
+
+- Graveyard levels now load the rebuilt MeshLibrary by its stable path without stale UID warnings, and disabled text triggers no longer probe physics overlaps.
+  - Prompt: Clear the stale MeshLibrary UID warnings and related text-trigger editor error.
+- Paused text Continue now responds directly to the controller's primary face button as well as Enter and Space.
+  - Prompt: Make the paused text Continue action respond to the controller's primary button.
+- Paused text now uses the primary action and a large, polished Continue button positioned above the HUD panel.
+  - Prompt: Improve the paused text Continue control's input, size, and placement.
+- The Debug Level potion showcase now extends to separate popup and game-pausing text triggers.
+  - Prompt: Add popup and pausing text-trigger examples after the Debug Level potions.
+
+### 0100
+
+- Graveyard GridMaps now retain Road item IDs and use the pulled artist-authored collision shapes for Fence and Tombstone.
+  - Prompt: Rebuild the Graveyard MeshLibrary after pulling the latest models.
+
+## 2026-08-03
+
+### 2100
+
+- Level editors can place reusable Fence and Tombstone scenes that retain the collision bounds authored in Blender.
+  - Prompt: Make artist-placed Fence and Tombstone models collide outside GridMaps.
+
+### 1200
+
+- Existing Vampire Maze feedback snapshots no longer duplicate the live level scene UID when Godot scans the project.
+  - Prompt: Check and resolve the editor errors from the supplied Godot log.
+
+### 1100
+
+- Level 1 now automatically selects its wall GridMap and repairs connected wall pieces, while switching levels no longer reuses an invalid GridMap target.
+  - Prompt: Make automatic GridMap repair work in Level 1 as it does in Level 7.
+- The PNG-to-GridMap editor addon now loads correctly after adding manual colour mappings and mapping-aware repairs.
+  - Prompt: Restore the disabled PNG-to-GridMap addon after the mapping update.
+- Level editors can add colour-to-piece mappings without a PNG and remove or restore existing mappings from the wall configuration.
+  - Prompt: Correct updated wall autotiling and manage mappings without a PNG.
+- PNG-to-GridMap now aligns repaired wall ends, corners, and T-junctions with the updated Graveyard meshes, including after mapping edits.
+  - Prompt: Correct updated wall autotiling and manage mappings without a PNG.
+
 ## 2026-08-02
+
+### 1600
+
+- Level editors can now inspect typed level definitions and edit reusable prompt, flask-preview, and PNG-to-GridMap scene structure while existing gameplay and replay behaviour remain unchanged.
+  - Prompt: Resolve every marked Godot TODO without changing runtime behaviour.
+
+### 1500
+
+- Developers and level editors can now find focused TODO guidance for Godot architecture, data, scene, and frame-loop concerns without gameplay changes.
+  - Prompt: Review the code against Godot best practices and mark issues without fixing them.
 
 ### 1300
 

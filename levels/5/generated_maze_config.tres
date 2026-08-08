@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="GDGeneratedMazeConfig" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://levels/vampire-maze/generated_maze/generated_maze_config.gd" id="1_config"]
+[ext_resource type="Resource" path="res://levels/vampire-maze/generated_maze/generated_maze_wall_repair_settings.tres" id="2_repair"]
+[ext_resource type="Resource" path="res://levels/vampire-maze/generated_maze/generated_content_config.tres" id="3_content"]
+
+[resource]
+script = ExtResource("1_config")
+width = 32
+height = 32
+internal_connection_percent = 15.0
+wall_repair_settings = ExtResource("2_repair")
+content_configuration = ExtResource("3_content")

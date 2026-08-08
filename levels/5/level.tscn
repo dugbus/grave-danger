@@ -1,0 +1,785 @@
+[gd_scene format=3 uid="uid://cp45xrxwtcqui"]
+
+[ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="2_lighting"]
+[ext_resource type="Script" uid="uid://bvowj5mveddhm" path="res://levels/level_settings.gd" id="3_level_settings"]
+[ext_resource type="MeshLibrary" uid="uid://cunnj75ip2b7a" path="res://Assets/environment/graveyard.res" id="4_fqt7p"]
+[ext_resource type="Material" uid="uid://yu0cqmik8u3x" path="res://Assets/environment/floors/dirt_floor.material" id="5_juicj"]
+[ext_resource type="Script" uid="uid://c6wa53llemsd" path="res://placeables/kill_boundary/kill_boundary.gd" id="6_johbs"]
+[ext_resource type="PackedScene" uid="uid://cujenbxxb5lj5" path="res://placeables/collectibles/flask_breathing_space.tscn" id="7_juicj"]
+[ext_resource type="PackedScene" path="res://placeables/treasure_deposit/treasure_deposit_coffin.tscn" id="8_johbs"]
+[ext_resource type="PackedScene" uid="uid://cw45377f21i2v" path="res://placeables/treasure/gold_coin_pile.tscn" id="9_f0mfd"]
+[ext_resource type="PackedScene" path="res://inventory/key.tscn" id="10_dtmyq"]
+[ext_resource type="PackedScene" path="res://placeables/treasure/gems/emerald.tscn" id="11_3ocjo"]
+[ext_resource type="PackedScene" uid="uid://4d4svvau65je" path="res://placeables/collectibles/flask_pickup_radius.tscn" id="12_s35cj"]
+[ext_resource type="PackedScene" uid="uid://ba4h31e1vsl1n" path="res://placeables/lockables/locked_gate.tscn" id="13_r4djm"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_f0mfd"]
+material = ExtResource("5_juicj")
+size = Vector2(1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dtmyq"]
+size = Vector3(1, 0.5, 1)
+
+[sub_resource type="MeshLibrary" id="MeshLibrary_3ocjo"]
+item/0/name = "PNG Floor Tile"
+item/0/mesh = SubResource("PlaneMesh_f0mfd")
+item/0/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/0/mesh_cast_shadow = 1
+item/0/shapes = [SubResource("BoxShape3D_dtmyq"), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)]
+item/0/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/0/navigation_layers = 1
+
+[sub_resource type="Curve3D" id="Curve3D_s35cj"]
+
+[sub_resource type="Animation" id="Animation_r4djm"]
+resource_name = "kill_boundary"
+length = 0.8333333
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:movement_speed")
+tracks/0/interp = 1
+tracks/0/loop_wrap = false
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:boundary_size_x")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [8.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:boundary_size_y")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [8.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".:boundary_rotation_z_radians")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath(".:shape_morph")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_q4iva"]
+_data = {
+&"kill_boundary": SubResource("Animation_r4djm")
+}
+
+[node name="FlaskKillExpand" type="Node3D" unique_id=2091951036]
+
+[node name="Player" parent="." unique_id=2013812172 instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8608017, 0.05, 0.7066722)
+
+[node name="IndoorLighting" parent="." unique_id=596794574 instance=ExtResource("2_lighting")]
+
+[node name="LevelSettings" type="Node" parent="." unique_id=1961559413]
+script = ExtResource("3_level_settings")
+
+[node name="PNGGridMap" type="GridMap" parent="." unique_id=448687946]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 0, -15.5)
+mesh_library = ExtResource("4_fqt7p")
+cell_size = Vector3(1, 1, 1)
+cell_center_y = false
+data = {
+"cells": PackedInt32Array(31, 31, 1441792, 30, 31, 655365, 29, 31, 655365, 28, 31, 655365, 27, 31, 655365, 26, 31, 655365, 25, 31, 655365, 24, 31, 655365, 23, 31, 655365, 22, 31, 655365, 21, 31, 655365, 20, 31, 655365, 19, 31, 655365, 18, 31, 655362, 15, 31, 2, 14, 31, 655365, 13, 31, 655365, 12, 31, 655365, 11, 31, 655365, 10, 31, 655365, 9, 31, 655365, 8, 31, 655365, 7, 31, 655365, 6, 31, 655365, 5, 31, 655365, 4, 31, 655365, 3, 31, 655365, 2, 31, 655365, 1, 31, 655365, 0, 31, 655360, 31, 30, 1048581, 0, 30, 1048581, 31, 29, 1048581, 0, 29, 1048581, 31, 28, 1048581, 0, 28, 1048581, 31, 27, 1048581, 24, 27, 2, 23, 27, 655365, 22, 27, 655365, 21, 27, 655365, 20, 27, 655365, 19, 27, 655365, 18, 27, 655365, 17, 27, 655365, 16, 27, 655365, 15, 27, 655365, 14, 27, 655365, 13, 27, 655365, 12, 27, 655365, 11, 27, 655365, 10, 27, 655365, 9, 27, 655365, 8, 27, 655362, 0, 27, 1048581, 31, 26, 1048581, 0, 26, 1048581, 31, 25, 1048581, 0, 25, 1048581, 31, 24, 1048581, 27, 24, 1441794, 24, 24, 1441792, 23, 24, 655365, 22, 24, 655365, 21, 24, 655365, 20, 24, 655365, 19, 24, 655365, 18, 24, 655365, 17, 24, 655362, 15, 24, 2, 14, 24, 655365, 13, 24, 655365, 12, 24, 655365, 11, 24, 655365, 10, 24, 655365, 9, 24, 655365, 8, 24, 655360, 5, 24, 1441794, 0, 24, 1048581, 31, 23, 1048581, 27, 23, 1048581, 24, 23, 1048581, 8, 23, 1048581, 5, 23, 1048581, 0, 23, 1048581, 31, 22, 1048581, 27, 22, 1048581, 24, 22, 1048581, 8, 22, 1048581, 5, 22, 1048581, 0, 22, 1048581, 31, 21, 1048581, 27, 21, 1048581, 24, 21, 1048581, 21, 21, 1441792, 20, 21, 655365, 19, 21, 655365, 18, 21, 655365, 17, 21, 655362, 15, 21, 2, 14, 21, 655365, 13, 21, 655365, 12, 21, 655365, 11, 21, 655360, 8, 21, 1048581, 5, 21, 1048581, 0, 21, 1048581, 31, 20, 1048581, 27, 20, 1048581, 24, 20, 1048581, 21, 20, 1048581, 11, 20, 1048581, 8, 20, 1048581, 5, 20, 1048581, 0, 20, 1048581, 31, 19, 1048581, 27, 19, 1048581, 24, 19, 1048581, 21, 19, 1048581, 19, 19, 1441792, 18, 19, 655365, 17, 19, 655362, 15, 19, 2, 14, 19, 655365, 13, 19, 655360, 11, 19, 1048581, 8, 19, 1048581, 5, 19, 1048581, 0, 19, 1048581, 31, 18, 1048581, 27, 18, 1048581, 24, 18, 1048581, 21, 18, 1048581, 19, 18, 1048581, 13, 18, 1048581, 11, 18, 1048581, 8, 18, 1048581, 5, 18, 1048581, 0, 18, 1048581, 31, 17, 1048581, 27, 17, 1048581, 24, 17, 1048578, 21, 17, 1048578, 19, 17, 1048578, 17, 17, 655366, 15, 17, 655366, 13, 17, 1048578, 11, 17, 1048578, 8, 17, 1048578, 5, 17, 1048581, 0, 17, 1048581, 31, 16, 1048581, 27, 16, 1048581, 5, 16, 1048581, 0, 16, 1048581, 31, 15, 1048581, 27, 15, 1048581, 24, 15, 1441794, 21, 15, 1441794, 19, 15, 1441794, 17, 15, 655366, 15, 15, 655366, 13, 15, 1441794, 11, 15, 1441794, 8, 15, 1441794, 5, 15, 1048581, 0, 15, 1048581, 31, 14, 1048581, 27, 14, 1048581, 24, 14, 1048581, 21, 14, 1048581, 19, 14, 1048581, 13, 14, 1048581, 11, 14, 1048581, 8, 14, 1048581, 5, 14, 1048581, 0, 14, 1048581, 31, 13, 1048581, 27, 13, 1048581, 24, 13, 1048581, 21, 13, 1048581, 19, 13, 0, 18, 13, 655365, 17, 13, 655362, 15, 13, 2, 14, 13, 655365, 13, 13, 1048576, 11, 13, 1048581, 8, 13, 1048581, 5, 13, 1048581, 0, 13, 1048581, 31, 12, 1048581, 27, 12, 1048581, 24, 12, 1048581, 21, 12, 1048581, 11, 12, 1048581, 8, 12, 1048581, 5, 12, 1048581, 0, 12, 1048581, 31, 11, 1048581, 27, 11, 1048581, 24, 11, 1048581, 21, 11, 0, 20, 11, 655365, 19, 11, 655365, 18, 11, 655365, 17, 11, 655362, 15, 11, 2, 14, 11, 655365, 13, 11, 655365, 12, 11, 655365, 11, 11, 1048576, 8, 11, 1048581, 5, 11, 1048581, 0, 11, 1048581, 31, 10, 1048581, 27, 10, 1048581, 24, 10, 1048581, 8, 10, 1048581, 5, 10, 1048581, 0, 10, 1048581, 31, 9, 1048581, 27, 9, 1048581, 24, 9, 1048581, 8, 9, 1048581, 5, 9, 1048581, 0, 9, 1048581, 31, 8, 1048581, 27, 8, 1048578, 24, 8, 0, 23, 8, 655365, 22, 8, 655365, 21, 8, 655365, 20, 8, 655365, 19, 8, 655365, 18, 8, 655365, 17, 8, 655362, 15, 8, 2, 14, 8, 655365, 13, 8, 655365, 12, 8, 655365, 11, 8, 655365, 10, 8, 655365, 9, 8, 655365, 8, 8, 1048576, 5, 8, 1048578, 0, 8, 1048581, 31, 7, 1048581, 0, 7, 1048581, 31, 6, 1048581, 0, 6, 1048581, 31, 5, 1048581, 24, 5, 2, 23, 5, 655365, 22, 5, 655365, 21, 5, 655365, 20, 5, 655365, 19, 5, 655365, 18, 5, 655365, 17, 5, 655365, 16, 5, 655365, 15, 5, 655365, 14, 5, 655365, 13, 5, 655365, 12, 5, 655365, 11, 5, 655365, 10, 5, 655365, 9, 5, 655365, 8, 5, 655362, 0, 5, 1048581, 31, 4, 1048581, 0, 4, 1048581, 31, 3, 1048581, 0, 3, 1048581, 31, 2, 1048581, 0, 2, 1048581, 31, 1, 1048581, 0, 1, 1048581, 31, 0, 0, 30, 0, 655365, 29, 0, 655365, 28, 0, 655365, 27, 0, 655365, 26, 0, 655365, 25, 0, 655365, 24, 0, 655365, 23, 0, 655365, 22, 0, 655365, 21, 0, 655365, 20, 0, 655365, 19, 0, 655365, 18, 0, 655365, 17, 0, 655365, 16, 0, 655365, 15, 0, 655365, 14, 0, 655365, 13, 0, 655365, 12, 0, 655365, 11, 0, 655365, 10, 0, 655365, 9, 0, 655365, 8, 0, 655365, 7, 0, 655365, 6, 0, 655365, 5, 0, 655365, 4, 0, 655365, 3, 0, 655365, 2, 0, 655365, 1, 0, 655365, 0, 0, 1048576)
+}
+
+[node name="PNGFloorGridMap" type="GridMap" parent="." unique_id=2020046310]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 0, -15.5)
+mesh_library = SubResource("MeshLibrary_3ocjo")
+cell_size = Vector3(1, 1, 1)
+cell_octant_size = 16
+cell_center_y = false
+collision_mask = 0
+data = {
+"cells": PackedInt32Array(31, 31, 0, 30, 31, 0, 29, 31, 0, 28, 31, 0, 27, 31, 0, 26, 31, 0, 25, 31, 0, 24, 31, 0, 23, 31, 0, 22, 31, 0, 21, 31, 0, 20, 31, 0, 19, 31, 0, 18, 31, 0, 17, 31, 0, 16, 31, 0, 15, 31, 0, 14, 31, 0, 13, 31, 0, 12, 31, 0, 11, 31, 0, 10, 31, 0, 9, 31, 0, 8, 31, 0, 7, 31, 0, 6, 31, 0, 5, 31, 0, 4, 31, 0, 3, 31, 0, 2, 31, 0, 1, 31, 0, 0, 31, 0, 31, 30, 0, 30, 30, 0, 29, 30, 0, 28, 30, 0, 27, 30, 0, 26, 30, 0, 25, 30, 0, 24, 30, 0, 23, 30, 0, 22, 30, 0, 21, 30, 0, 20, 30, 0, 19, 30, 0, 18, 30, 0, 17, 30, 0, 16, 30, 0, 15, 30, 0, 14, 30, 0, 13, 30, 0, 12, 30, 0, 11, 30, 0, 10, 30, 0, 9, 30, 0, 8, 30, 0, 7, 30, 0, 6, 30, 0, 5, 30, 0, 4, 30, 0, 3, 30, 0, 2, 30, 0, 1, 30, 0, 0, 30, 0, 31, 29, 0, 30, 29, 0, 29, 29, 0, 28, 29, 0, 27, 29, 0, 26, 29, 0, 25, 29, 0, 24, 29, 0, 23, 29, 0, 22, 29, 0, 21, 29, 0, 20, 29, 0, 19, 29, 0, 18, 29, 0, 17, 29, 0, 16, 29, 0, 15, 29, 0, 14, 29, 0, 13, 29, 0, 12, 29, 0, 11, 29, 0, 10, 29, 0, 9, 29, 0, 8, 29, 0, 7, 29, 0, 6, 29, 0, 5, 29, 0, 4, 29, 0, 3, 29, 0, 2, 29, 0, 1, 29, 0, 0, 29, 0, 31, 28, 0, 30, 28, 0, 29, 28, 0, 28, 28, 0, 27, 28, 0, 26, 28, 0, 25, 28, 0, 24, 28, 0, 23, 28, 0, 22, 28, 0, 21, 28, 0, 20, 28, 0, 19, 28, 0, 18, 28, 0, 17, 28, 0, 16, 28, 0, 15, 28, 0, 14, 28, 0, 13, 28, 0, 12, 28, 0, 11, 28, 0, 10, 28, 0, 9, 28, 0, 8, 28, 0, 7, 28, 0, 6, 28, 0, 5, 28, 0, 4, 28, 0, 3, 28, 0, 2, 28, 0, 1, 28, 0, 0, 28, 0, 31, 27, 0, 30, 27, 0, 29, 27, 0, 28, 27, 0, 27, 27, 0, 26, 27, 0, 25, 27, 0, 24, 27, 0, 23, 27, 0, 22, 27, 0, 21, 27, 0, 20, 27, 0, 19, 27, 0, 18, 27, 0, 17, 27, 0, 16, 27, 0, 15, 27, 0, 14, 27, 0, 13, 27, 0, 12, 27, 0, 11, 27, 0, 10, 27, 0, 9, 27, 0, 8, 27, 0, 7, 27, 0, 6, 27, 0, 5, 27, 0, 4, 27, 0, 3, 27, 0, 2, 27, 0, 1, 27, 0, 0, 27, 0, 31, 26, 0, 30, 26, 0, 29, 26, 0, 28, 26, 0, 27, 26, 0, 26, 26, 0, 25, 26, 0, 24, 26, 0, 23, 26, 0, 22, 26, 0, 21, 26, 0, 20, 26, 0, 19, 26, 0, 18, 26, 0, 17, 26, 0, 16, 26, 0, 15, 26, 0, 14, 26, 0, 13, 26, 0, 12, 26, 0, 11, 26, 0, 10, 26, 0, 9, 26, 0, 8, 26, 0, 7, 26, 0, 6, 26, 0, 5, 26, 0, 4, 26, 0, 3, 26, 0, 2, 26, 0, 1, 26, 0, 0, 26, 0, 31, 25, 0, 30, 25, 0, 29, 25, 0, 28, 25, 0, 27, 25, 0, 26, 25, 0, 25, 25, 0, 24, 25, 0, 23, 25, 0, 22, 25, 0, 21, 25, 0, 20, 25, 0, 19, 25, 0, 18, 25, 0, 17, 25, 0, 16, 25, 0, 15, 25, 0, 14, 25, 0, 13, 25, 0, 12, 25, 0, 11, 25, 0, 10, 25, 0, 9, 25, 0, 8, 25, 0, 7, 25, 0, 6, 25, 0, 5, 25, 0, 4, 25, 0, 3, 25, 0, 2, 25, 0, 1, 25, 0, 0, 25, 0, 31, 24, 0, 30, 24, 0, 29, 24, 0, 28, 24, 0, 27, 24, 0, 26, 24, 0, 25, 24, 0, 24, 24, 0, 23, 24, 0, 22, 24, 0, 21, 24, 0, 20, 24, 0, 19, 24, 0, 18, 24, 0, 17, 24, 0, 16, 24, 0, 15, 24, 0, 14, 24, 0, 13, 24, 0, 12, 24, 0, 11, 24, 0, 10, 24, 0, 9, 24, 0, 8, 24, 0, 7, 24, 0, 6, 24, 0, 5, 24, 0, 4, 24, 0, 3, 24, 0, 2, 24, 0, 1, 24, 0, 0, 24, 0, 31, 23, 0, 30, 23, 0, 29, 23, 0, 28, 23, 0, 27, 23, 0, 26, 23, 0, 25, 23, 0, 24, 23, 0, 23, 23, 0, 22, 23, 0, 21, 23, 0, 20, 23, 0, 19, 23, 0, 18, 23, 0, 17, 23, 0, 16, 23, 0, 15, 23, 0, 14, 23, 0, 13, 23, 0, 12, 23, 0, 11, 23, 0, 10, 23, 0, 9, 23, 0, 8, 23, 0, 7, 23, 0, 6, 23, 0, 5, 23, 0, 4, 23, 0, 3, 23, 0, 2, 23, 0, 1, 23, 0, 0, 23, 0, 31, 22, 0, 30, 22, 0, 29, 22, 0, 28, 22, 0, 27, 22, 0, 26, 22, 0, 25, 22, 0, 24, 22, 0, 23, 22, 0, 22, 22, 0, 21, 22, 0, 20, 22, 0, 19, 22, 0, 18, 22, 0, 17, 22, 0, 16, 22, 0, 15, 22, 0, 14, 22, 0, 13, 22, 0, 12, 22, 0, 11, 22, 0, 10, 22, 0, 9, 22, 0, 8, 22, 0, 7, 22, 0, 6, 22, 0, 5, 22, 0, 4, 22, 0, 3, 22, 0, 2, 22, 0, 1, 22, 0, 0, 22, 0, 31, 21, 0, 30, 21, 0, 29, 21, 0, 28, 21, 0, 27, 21, 0, 26, 21, 0, 25, 21, 0, 24, 21, 0, 23, 21, 0, 22, 21, 0, 21, 21, 0, 20, 21, 0, 19, 21, 0, 18, 21, 0, 17, 21, 0, 16, 21, 0, 15, 21, 0, 14, 21, 0, 13, 21, 0, 12, 21, 0, 11, 21, 0, 10, 21, 0, 9, 21, 0, 8, 21, 0, 7, 21, 0, 6, 21, 0, 5, 21, 0, 4, 21, 0, 3, 21, 0, 2, 21, 0, 1, 21, 0, 0, 21, 0, 31, 20, 0, 30, 20, 0, 29, 20, 0, 28, 20, 0, 27, 20, 0, 26, 20, 0, 25, 20, 0, 24, 20, 0, 23, 20, 0, 22, 20, 0, 21, 20, 0, 20, 20, 0, 19, 20, 0, 18, 20, 0, 17, 20, 0, 16, 20, 0, 15, 20, 0, 14, 20, 0, 13, 20, 0, 12, 20, 0, 11, 20, 0, 10, 20, 0, 9, 20, 0, 8, 20, 0, 7, 20, 0, 6, 20, 0, 5, 20, 0, 4, 20, 0, 3, 20, 0, 2, 20, 0, 1, 20, 0, 0, 20, 0, 31, 19, 0, 30, 19, 0, 29, 19, 0, 28, 19, 0, 27, 19, 0, 26, 19, 0, 25, 19, 0, 24, 19, 0, 23, 19, 0, 22, 19, 0, 21, 19, 0, 20, 19, 0, 19, 19, 0, 18, 19, 0, 17, 19, 0, 16, 19, 0, 15, 19, 0, 14, 19, 0, 13, 19, 0, 12, 19, 0, 11, 19, 0, 10, 19, 0, 9, 19, 0, 8, 19, 0, 7, 19, 0, 6, 19, 0, 5, 19, 0, 4, 19, 0, 3, 19, 0, 2, 19, 0, 1, 19, 0, 0, 19, 0, 31, 18, 0, 30, 18, 0, 29, 18, 0, 28, 18, 0, 27, 18, 0, 26, 18, 0, 25, 18, 0, 24, 18, 0, 23, 18, 0, 22, 18, 0, 21, 18, 0, 20, 18, 0, 19, 18, 0, 18, 18, 0, 17, 18, 0, 16, 18, 0, 15, 18, 0, 14, 18, 0, 13, 18, 0, 12, 18, 0, 11, 18, 0, 10, 18, 0, 9, 18, 0, 8, 18, 0, 7, 18, 0, 6, 18, 0, 5, 18, 0, 4, 18, 0, 3, 18, 0, 2, 18, 0, 1, 18, 0, 0, 18, 0, 31, 17, 0, 30, 17, 0, 29, 17, 0, 28, 17, 0, 27, 17, 0, 26, 17, 0, 25, 17, 0, 24, 17, 0, 23, 17, 0, 22, 17, 0, 21, 17, 0, 20, 17, 0, 19, 17, 0, 18, 17, 0, 17, 17, 0, 16, 17, 0, 15, 17, 0, 14, 17, 0, 13, 17, 0, 12, 17, 0, 11, 17, 0, 10, 17, 0, 9, 17, 0, 8, 17, 0, 7, 17, 0, 6, 17, 0, 5, 17, 0, 4, 17, 0, 3, 17, 0, 2, 17, 0, 1, 17, 0, 0, 17, 0, 31, 16, 0, 30, 16, 0, 29, 16, 0, 28, 16, 0, 27, 16, 0, 26, 16, 0, 25, 16, 0, 24, 16, 0, 23, 16, 0, 22, 16, 0, 21, 16, 0, 20, 16, 0, 19, 16, 0, 18, 16, 0, 17, 16, 0, 16, 16, 0, 15, 16, 0, 14, 16, 0, 13, 16, 0, 12, 16, 0, 11, 16, 0, 10, 16, 0, 9, 16, 0, 8, 16, 0, 7, 16, 0, 6, 16, 0, 5, 16, 0, 4, 16, 0, 3, 16, 0, 2, 16, 0, 1, 16, 0, 0, 16, 0, 31, 15, 0, 30, 15, 0, 29, 15, 0, 28, 15, 0, 27, 15, 0, 26, 15, 0, 25, 15, 0, 24, 15, 0, 23, 15, 0, 22, 15, 0, 21, 15, 0, 20, 15, 0, 19, 15, 0, 18, 15, 0, 17, 15, 0, 16, 15, 0, 15, 15, 0, 14, 15, 0, 13, 15, 0, 12, 15, 0, 11, 15, 0, 10, 15, 0, 9, 15, 0, 8, 15, 0, 7, 15, 0, 6, 15, 0, 5, 15, 0, 4, 15, 0, 3, 15, 0, 2, 15, 0, 1, 15, 0, 0, 15, 0, 31, 14, 0, 30, 14, 0, 29, 14, 0, 28, 14, 0, 27, 14, 0, 26, 14, 0, 25, 14, 0, 24, 14, 0, 23, 14, 0, 22, 14, 0, 21, 14, 0, 20, 14, 0, 19, 14, 0, 18, 14, 0, 17, 14, 0, 16, 14, 0, 15, 14, 0, 14, 14, 0, 13, 14, 0, 12, 14, 0, 11, 14, 0, 10, 14, 0, 9, 14, 0, 8, 14, 0, 7, 14, 0, 6, 14, 0, 5, 14, 0, 4, 14, 0, 3, 14, 0, 2, 14, 0, 1, 14, 0, 0, 14, 0, 31, 13, 0, 30, 13, 0, 29, 13, 0, 28, 13, 0, 27, 13, 0, 26, 13, 0, 25, 13, 0, 24, 13, 0, 23, 13, 0, 22, 13, 0, 21, 13, 0, 20, 13, 0, 19, 13, 0, 18, 13, 0, 17, 13, 0, 16, 13, 0, 15, 13, 0, 14, 13, 0, 13, 13, 0, 12, 13, 0, 11, 13, 0, 10, 13, 0, 9, 13, 0, 8, 13, 0, 7, 13, 0, 6, 13, 0, 5, 13, 0, 4, 13, 0, 3, 13, 0, 2, 13, 0, 1, 13, 0, 0, 13, 0, 31, 12, 0, 30, 12, 0, 29, 12, 0, 28, 12, 0, 27, 12, 0, 26, 12, 0, 25, 12, 0, 24, 12, 0, 23, 12, 0, 22, 12, 0, 21, 12, 0, 20, 12, 0, 19, 12, 0, 18, 12, 0, 17, 12, 0, 16, 12, 0, 15, 12, 0, 14, 12, 0, 13, 12, 0, 12, 12, 0, 11, 12, 0, 10, 12, 0, 9, 12, 0, 8, 12, 0, 7, 12, 0, 6, 12, 0, 5, 12, 0, 4, 12, 0, 3, 12, 0, 2, 12, 0, 1, 12, 0, 0, 12, 0, 31, 11, 0, 30, 11, 0, 29, 11, 0, 28, 11, 0, 27, 11, 0, 26, 11, 0, 25, 11, 0, 24, 11, 0, 23, 11, 0, 22, 11, 0, 21, 11, 0, 20, 11, 0, 19, 11, 0, 18, 11, 0, 17, 11, 0, 16, 11, 0, 15, 11, 0, 14, 11, 0, 13, 11, 0, 12, 11, 0, 11, 11, 0, 10, 11, 0, 9, 11, 0, 8, 11, 0, 7, 11, 0, 6, 11, 0, 5, 11, 0, 4, 11, 0, 3, 11, 0, 2, 11, 0, 1, 11, 0, 0, 11, 0, 31, 10, 0, 30, 10, 0, 29, 10, 0, 28, 10, 0, 27, 10, 0, 26, 10, 0, 25, 10, 0, 24, 10, 0, 23, 10, 0, 22, 10, 0, 21, 10, 0, 20, 10, 0, 19, 10, 0, 18, 10, 0, 17, 10, 0, 16, 10, 0, 15, 10, 0, 14, 10, 0, 13, 10, 0, 12, 10, 0, 11, 10, 0, 10, 10, 0, 9, 10, 0, 8, 10, 0, 7, 10, 0, 6, 10, 0, 5, 10, 0, 4, 10, 0, 3, 10, 0, 2, 10, 0, 1, 10, 0, 0, 10, 0, 31, 9, 0, 30, 9, 0, 29, 9, 0, 28, 9, 0, 27, 9, 0, 26, 9, 0, 25, 9, 0, 24, 9, 0, 23, 9, 0, 22, 9, 0, 21, 9, 0, 20, 9, 0, 19, 9, 0, 18, 9, 0, 17, 9, 0, 16, 9, 0, 15, 9, 0, 14, 9, 0, 13, 9, 0, 12, 9, 0, 11, 9, 0, 10, 9, 0, 9, 9, 0, 8, 9, 0, 7, 9, 0, 6, 9, 0, 5, 9, 0, 4, 9, 0, 3, 9, 0, 2, 9, 0, 1, 9, 0, 0, 9, 0, 31, 8, 0, 30, 8, 0, 29, 8, 0, 28, 8, 0, 27, 8, 0, 26, 8, 0, 25, 8, 0, 24, 8, 0, 23, 8, 0, 22, 8, 0, 21, 8, 0, 20, 8, 0, 19, 8, 0, 18, 8, 0, 17, 8, 0, 16, 8, 0, 15, 8, 0, 14, 8, 0, 13, 8, 0, 12, 8, 0, 11, 8, 0, 10, 8, 0, 9, 8, 0, 8, 8, 0, 7, 8, 0, 6, 8, 0, 5, 8, 0, 4, 8, 0, 3, 8, 0, 2, 8, 0, 1, 8, 0, 0, 8, 0, 31, 7, 0, 30, 7, 0, 29, 7, 0, 28, 7, 0, 27, 7, 0, 26, 7, 0, 25, 7, 0, 24, 7, 0, 23, 7, 0, 22, 7, 0, 21, 7, 0, 20, 7, 0, 19, 7, 0, 18, 7, 0, 17, 7, 0, 16, 7, 0, 15, 7, 0, 14, 7, 0, 13, 7, 0, 12, 7, 0, 11, 7, 0, 10, 7, 0, 9, 7, 0, 8, 7, 0, 7, 7, 0, 6, 7, 0, 4, 7, 0, 3, 7, 0, 2, 7, 0, 1, 7, 0, 0, 7, 0, 31, 6, 0, 30, 6, 0, 29, 6, 0, 28, 6, 0, 27, 6, 0, 26, 6, 0, 25, 6, 0, 24, 6, 0, 23, 6, 0, 22, 6, 0, 21, 6, 0, 20, 6, 0, 19, 6, 0, 18, 6, 0, 17, 6, 0, 16, 6, 0, 15, 6, 0, 14, 6, 0, 13, 6, 0, 12, 6, 0, 11, 6, 0, 10, 6, 0, 9, 6, 0, 8, 6, 0, 7, 6, 0, 6, 6, 0, 5, 6, 0, 4, 6, 0, 3, 6, 0, 2, 6, 0, 1, 6, 0, 0, 6, 0, 31, 5, 0, 30, 5, 0, 29, 5, 0, 28, 5, 0, 27, 5, 0, 26, 5, 0, 25, 5, 0, 24, 5, 0, 23, 5, 0, 22, 5, 0, 21, 5, 0, 20, 5, 0, 19, 5, 0, 18, 5, 0, 17, 5, 0, 16, 5, 0, 15, 5, 0, 14, 5, 0, 13, 5, 0, 12, 5, 0, 11, 5, 0, 10, 5, 0, 9, 5, 0, 8, 5, 0, 7, 5, 0, 6, 5, 0, 5, 5, 0, 4, 5, 0, 3, 5, 0, 2, 5, 0, 1, 5, 0, 0, 5, 0, 31, 4, 0, 30, 4, 0, 29, 4, 0, 28, 4, 0, 27, 4, 0, 26, 4, 0, 25, 4, 0, 24, 4, 0, 23, 4, 0, 22, 4, 0, 21, 4, 0, 20, 4, 0, 19, 4, 0, 18, 4, 0, 17, 4, 0, 16, 4, 0, 15, 4, 0, 14, 4, 0, 13, 4, 0, 12, 4, 0, 11, 4, 0, 10, 4, 0, 9, 4, 0, 8, 4, 0, 7, 4, 0, 6, 4, 0, 5, 4, 0, 4, 4, 0, 3, 4, 0, 2, 4, 0, 1, 4, 0, 0, 4, 0, 31, 3, 0, 30, 3, 0, 29, 3, 0, 28, 3, 0, 27, 3, 0, 26, 3, 0, 25, 3, 0, 24, 3, 0, 23, 3, 0, 22, 3, 0, 21, 3, 0, 20, 3, 0, 19, 3, 0, 18, 3, 0, 17, 3, 0, 16, 3, 0, 15, 3, 0, 14, 3, 0, 13, 3, 0, 12, 3, 0, 11, 3, 0, 10, 3, 0, 9, 3, 0, 8, 3, 0, 7, 3, 0, 6, 3, 0, 5, 3, 0, 4, 3, 0, 3, 3, 0, 2, 3, 0, 1, 3, 0, 0, 3, 0, 31, 2, 0, 30, 2, 0, 29, 2, 0, 28, 2, 0, 27, 2, 0, 26, 2, 0, 25, 2, 0, 24, 2, 0, 23, 2, 0, 22, 2, 0, 21, 2, 0, 20, 2, 0, 19, 2, 0, 18, 2, 0, 17, 2, 0, 16, 2, 0, 15, 2, 0, 14, 2, 0, 13, 2, 0, 12, 2, 0, 11, 2, 0, 10, 2, 0, 9, 2, 0, 8, 2, 0, 7, 2, 0, 6, 2, 0, 5, 2, 0, 4, 2, 0, 3, 2, 0, 2, 2, 0, 1, 2, 0, 0, 2, 0, 31, 1, 0, 30, 1, 0, 29, 1, 0, 28, 1, 0, 27, 1, 0, 26, 1, 0, 25, 1, 0, 24, 1, 0, 23, 1, 0, 22, 1, 0, 21, 1, 0, 20, 1, 0, 19, 1, 0, 18, 1, 0, 17, 1, 0, 16, 1, 0, 15, 1, 0, 14, 1, 0, 13, 1, 0, 12, 1, 0, 11, 1, 0, 10, 1, 0, 9, 1, 0, 8, 1, 0, 7, 1, 0, 6, 1, 0, 5, 1, 0, 4, 1, 0, 3, 1, 0, 2, 1, 0, 1, 1, 0, 0, 1, 0, 31, 0, 0, 30, 0, 0, 29, 0, 0, 28, 0, 0, 27, 0, 0, 26, 0, 0, 25, 0, 0, 24, 0, 0, 23, 0, 0, 22, 0, 0, 21, 0, 0, 20, 0, 0, 19, 0, 0, 18, 0, 0, 17, 0, 0, 16, 0, 0, 15, 0, 0, 14, 0, 0, 13, 0, 0, 12, 0, 0, 11, 0, 0, 10, 0, 0, 9, 0, 0, 8, 0, 0, 7, 0, 0, 6, 0, 0, 5, 0, 0, 4, 0, 0, 3, 0, 0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 5, 7, 0)
+}
+
+[node name="GDKillBoundary3D" type="Path3D" parent="." unique_id=83580773]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.99122953, 0, 1.029213)
+curve = SubResource("Curve3D_s35cj")
+script = ExtResource("6_johbs")
+boundary_animation = SubResource("Animation_r4djm")
+boundary_size_x = 16.0
+boundary_size_y = 16.0
+bounds_size = Vector2(16, 16)
+render_effect = 1
+metadata/_custom_type_script = "uid://c6wa53llemsd"
+
+[node name="BoundaryCenter" type="PathFollow3D" parent="GDKillBoundary3D" unique_id=935055241]
+rotation_mode = 0
+
+[node name="BoundaryAnimationPlayer" type="AnimationPlayer" parent="GDKillBoundary3D" unique_id=9761737]
+libraries/ = SubResource("AnimationLibrary_q4iva")
+
+[node name="GDFlaskBreathingSpace" parent="." unique_id=264903540 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9499011, -9.536743e-07, -0.9372126)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace17" parent="." unique_id=275419817 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9499011, -9.536743e-07, -5.1971908)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace18" parent="." unique_id=1681545521 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9499011, -9.536743e-07, -8.201199)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace19" parent="." unique_id=1548886162 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.949901, -9.536743e-07, -8.201199)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace20" parent="." unique_id=2038513294 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.3278456, -9.536743e-07, -8.201199)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace21" parent="." unique_id=666246995 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.663693, -9.536743e-07, -8.201199)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace22" parent="." unique_id=980138277 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7228613, -9.536743e-07, -8.201199)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace23" parent="." unique_id=1236184939 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.130413, -9.536743e-07, -8.201199)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace24" parent="." unique_id=1379635250 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.9244943, -9.536743e-07, -8.201199)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace25" parent="." unique_id=44162488 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.597418, -9.536743e-07, -7.0909)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace26" parent="." unique_id=59941518 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.15977, -9.536743e-07, -12.276416)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace27" parent="." unique_id=2010896252 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.37654, -9.536743e-07, -3.025504)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace28" parent="." unique_id=1116376237 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.603074, -9.536743e-07, -12.226717)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace29" parent="." unique_id=605758945 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.653506, -1.9073486e-06, 0.9696233)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace30" parent="." unique_id=1094156189 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.45472, -9.536743e-07, 3.947486)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace31" parent="." unique_id=1491559550 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.580294, -9.536743e-07, 7.4674582)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace79" parent="." unique_id=1639547780 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.365824, -9.536743e-07, 12.131161)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace80" parent="." unique_id=1164445870 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.836307, -9.536743e-07, 14.294847)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace81" parent="." unique_id=1579696662 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.097304, -9.536743e-07, 12.654037)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace82" parent="." unique_id=1970407709 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.33126, -9.536743e-07, 11.849951)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace83" parent="." unique_id=881203246 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.478559, -9.536743e-07, 14.870783)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace84" parent="." unique_id=998377353 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.478559, -9.536743e-07, 14.870783)
+spawn_time = 1.0
+
+[node name="GDFlaskBreathingSpace2" parent="." unique_id=597135052 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8616195, 0, -0.70752203)
+spawn_time = 2.0
+
+[node name="GDFlaskBreathingSpace3" parent="." unique_id=1402503536 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.025135, 0, -0.73025894)
+spawn_time = 8.0
+
+[node name="GDFlaskBreathingSpace4" parent="." unique_id=1969610724 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.1445374, 0, 1.1542286)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace9" parent="." unique_id=1398113368 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.278873, 0, 1.1542286)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace74" parent="." unique_id=2111571426 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.541613, -9.536743e-07, -5.2039185)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace75" parent="." unique_id=561601637 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.732182, -1.9073486e-06, -5.305647)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace97" parent="." unique_id=1292089617 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8639693, -9.536743e-07, -5.304836)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace98" parent="." unique_id=7040670 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8448725, 0, -5.276331)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace99" parent="." unique_id=1441544490 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.878806, 9.536743e-07, -5.250892)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace100" parent="." unique_id=1021391438 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.170698, 1.9073486e-06, -5.1656823)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace101" parent="." unique_id=1451237959 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6877, 1.9073486e-06, -1.8854244)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace102" parent="." unique_id=443682465 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.3975854, 1.9073486e-06, 4.460141)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace103" parent="." unique_id=615601143 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.567596, 1.9073486e-06, 7.674662)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace104" parent="." unique_id=2019214551 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.427835, 1.9073486e-06, 10.778999)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace76" parent="." unique_id=1477155173 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5331655, -1.9073486e-06, 1.2267408)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace77" parent="." unique_id=1544505081 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.382682, -9.536743e-07, -1.3532214)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace78" parent="." unique_id=1545164023 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.410676, -9.536743e-07, 6.7122345)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace10" parent="." unique_id=190117038 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.308107, 0, 1.1542286)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace11" parent="." unique_id=579281287 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.308107, 0, -2.7197237)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace50" parent="." unique_id=1643472786 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.881894, -0.0014061928, -5.6654882)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace51" parent="." unique_id=1430357421 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.003186, -0.0014061928, -0.77780294)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace52" parent="." unique_id=386439969 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.14333, -0.0014061928, 3.4050813)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace53" parent="." unique_id=1082175054 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.501377, -0.0014061928, 5.494555)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace54" parent="." unique_id=1697135161 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.132143, -0.0014061928, 7.2771926)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace55" parent="." unique_id=1006088060 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.201465, -0.0014061928, 9.541584)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace68" parent="." unique_id=1891795191 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.028061, -0.0014061928, 10.962799)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace69" parent="." unique_id=1571099908 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.255496, -0.0014061928, 13.103371)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace70" parent="." unique_id=393517309 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.833031, -0.0014061928, 13.803493)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace71" parent="." unique_id=193715219 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.395921, -0.0014061928, 12.818976)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace72" parent="." unique_id=394981208 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.214349, -0.0014061928, 15.294647)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace73" parent="." unique_id=1718958623 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.708434, -0.0014061928, 15.459875)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace56" parent="." unique_id=1409363626 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.565118, 0.012631893, 7.441326)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace57" parent="." unique_id=273918534 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5617733, -0.0014061928, 7.52787)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace58" parent="." unique_id=243962775 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08084297, -0.0014061928, 9.778694)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace59" parent="." unique_id=410905157 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.59976673, -0.0014061928, 9.31095)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace60" parent="." unique_id=286662966 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5107678, -0.0014061928, 13.55189)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace61" parent="." unique_id=123853844 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8620776, -0.0014061928, 14.109167)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace62" parent="." unique_id=1561489574 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.9604754, -0.0014061928, 13.469428)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace63" parent="." unique_id=560788410 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2709017, -0.0014061928, 14.700562)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace64" parent="." unique_id=920945287 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.539701, -0.0014061928, 13.345326)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace65" parent="." unique_id=1342478061 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1943688, -0.0014061928, 13.951853)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace66" parent="." unique_id=989385580 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9782417, -0.0014061928, 13.340936)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace67" parent="." unique_id=1497813815 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.258683, -0.0014061928, 14.360782)
+spawn_time = 7.0
+
+[node name="GDFlaskBreathingSpace5" parent="." unique_id=487405905 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.06492, 0, 1.1774397)
+spawn_time = 3.0
+
+[node name="GDFlaskBreathingSpace6" parent="." unique_id=1429379239 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0668229, 0, 3.201775)
+spawn_time = 4.0
+
+[node name="GDFlaskBreathingSpace7" parent="." unique_id=610460453 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.95170987, 0, 3.2867012)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace12" parent="." unique_id=1949508187 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6421905, 0, 7.7402687)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace85" parent="." unique_id=1951978474 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2928255, 0, 7.313079)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace86" parent="." unique_id=787709848 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8038013, 0, 8.300979)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace87" parent="." unique_id=1894664952 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2795925, 0, 7.4167223)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace88" parent="." unique_id=773059726 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.953642, 0, 5.0911036)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace89" parent="." unique_id=192754893 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.953642, 0, 3.0911036)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace90" parent="." unique_id=2123411163 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.0250363, 0, -1.7174506)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace13" parent="." unique_id=1110025322 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4755135, -0.07856178, 10.465672)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace14" parent="." unique_id=1000555498 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.458117, 0, 13.208378)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace15" parent="." unique_id=1696904229 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.182224, 0, 13.208378)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace16" parent="." unique_id=1985426359 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.300967, 0, 6.6824627)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace32" parent="." unique_id=1942473927 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.300967, 0, 3.3243651)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace33" parent="." unique_id=319579011 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.300967, 0, -1.0706811)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace34" parent="." unique_id=1693381215 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.300967, 0, -4.9930377)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace35" parent="." unique_id=1794662926 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.300967, 0, -8.993038)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace36" parent="." unique_id=1989378271 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.300967, 0, -8.993038)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace112" parent="." unique_id=305941407 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.340795, 0, -7.12558)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace113" parent="." unique_id=869649747 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.412745, 0, -3.0363903)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace114" parent="." unique_id=1120630269 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.992898, 0, 1.2186103)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace115" parent="." unique_id=1153962325 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.992898, 0.18112373, 5.219719)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace116" parent="." unique_id=663529100 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.817569, 0.18112564, 8.5181465)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace37" parent="." unique_id=438745873 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.605582, 0, -12.9341345)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace38" parent="." unique_id=76112865 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.885333, 0, -11.113175)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace39" parent="." unique_id=1172777048 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4369125, 1.9073486e-06, -12.222634)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace40" parent="." unique_id=518017621 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.7152567, 1.9073486e-06, -12.169799)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace41" parent="." unique_id=1645059451 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9867907, 1.9073486e-06, -12.100177)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace93" parent="." unique_id=788737568 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.30899, 1.9073486e-06, -11.986517)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace94" parent="." unique_id=1188702081 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.572598, 1.9073486e-06, -11.973657)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace95" parent="." unique_id=1766493533 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2577386, 1.9073486e-06, -12.165781)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace96" parent="." unique_id=1872526223 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.547462, 1.9073486e-06, -8.930994)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace42" parent="." unique_id=984597658 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.9459515, 2.861023e-06, -12.028018)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace105" parent="." unique_id=1918075546 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.559725, 2.861023e-06, -11.848246)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace106" parent="." unique_id=1624957341 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0859003, 2.861023e-06, -11.947771)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace107" parent="." unique_id=1357361927 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.711395, 2.861023e-06, -12.000296)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace108" parent="." unique_id=998555535 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6240408, 2.861023e-06, -11.891295)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace109" parent="." unique_id=1341378182 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9465544, 2.861023e-06, -12.079586)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace110" parent="." unique_id=825157641 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3500385, 2.861023e-06, -11.995947)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace111" parent="." unique_id=1766419650 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.6078005, 2.861023e-06, -12.0015955)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace43" parent="." unique_id=743886622 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.698244, 1.9073486e-06, -5.7820373)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace44" parent="." unique_id=1022783389 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.706636, 2.861023e-06, -2.7310896)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace45" parent="." unique_id=783491622 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.774016, 2.861023e-06, 0.7300315)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace46" parent="." unique_id=40365656 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.431727, 3.8146973e-06, 4.707792)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace91" parent="." unique_id=354837771 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.587646, 3.8146973e-06, 6.71128)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace92" parent="." unique_id=1402331242 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.571847, 3.8146973e-06, 2.8143587)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace47" parent="." unique_id=1693622833 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.687998, 3.8146973e-06, 8.328611)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace48" parent="." unique_id=1408330574 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.670931, 0.08087635, 11.328611)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace49" parent="." unique_id=1534458616 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.586726, 0.08087635, 10.792109)
+spawn_time = 5.0
+
+[node name="GDFlaskBreathingSpace8" parent="." unique_id=1318427656 instance=ExtResource("7_juicj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.102066, 0, 3.2614684)
+spawn_time = 6.0
+
+[node name="TreasureDepositCoffin" parent="." unique_id=1470238225 instance=ExtResource("8_johbs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.84793735, 0, 1.3178483)
+
+[node name="GoldCoinPile" parent="." unique_id=492205804 instance=ExtResource("9_f0mfd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0571828, 0.125, 5.179848)
+coin_count = 15
+
+[node name="GoldCoinPile2" parent="." unique_id=97367867 instance=ExtResource("9_f0mfd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7239888, 0.125, 5.179848)
+coin_count = 15
+
+[node name="GoldCoinPile3" parent="." unique_id=731635573 instance=ExtResource("9_f0mfd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.954173, 0.125, 5.179848)
+coin_count = 15
+
+[node name="GoldCoinPile4" parent="." unique_id=1848738772 instance=ExtResource("9_f0mfd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.954173, 0.125, 1.270226)
+coin_count = 15
+
+[node name="GoldCoinPile5" parent="." unique_id=315746705 instance=ExtResource("9_f0mfd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.954173, 0.125, -2.9596133)
+coin_count = 15
+
+[node name="GoldCoinPile6" parent="." unique_id=473838386 instance=ExtResource("9_f0mfd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0194926, 0.125, -2.9596133)
+coin_count = 15
+
+[node name="GoldCoinPile7" parent="." unique_id=911814630 instance=ExtResource("9_f0mfd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.9155831, 0.125, -2.9596133)
+coin_count = 15
+
+[node name="GoldCoinPile8" parent="." unique_id=1357303726 instance=ExtResource("9_f0mfd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.9155831, 0.125, 1.4208751)
+coin_count = 15
+
+[node name="GoldCoinPile9" parent="." unique_id=1217067332 instance=ExtResource("9_f0mfd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.751364, 0.125, 12.6898575)
+coin_count = 40
+pile_radius = 3.0
+
+[node name="GoldCoinPile10" parent="." unique_id=1551044360 instance=ExtResource("9_f0mfd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.705442, 0.125, 12.6898575)
+coin_count = 40
+pile_radius = 3.0
+
+[node name="GoldCoinPile11" parent="." unique_id=753593683 instance=ExtResource("9_f0mfd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.708605, 0.125, -11.631992)
+coin_count = 40
+pile_radius = 3.0
+
+[node name="GoldCoinPile12" parent="." unique_id=776104500 instance=ExtResource("9_f0mfd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.9196205, 0.125, -11.631992)
+coin_count = 40
+pile_radius = 3.0
+
+[node name="Key" parent="." unique_id=600930150 instance=ExtResource("10_dtmyq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0975525, 0.024999488, 12.810473)
+
+[node name="TreasureDepositCoffin2" parent="." unique_id=727481822 instance=ExtResource("8_johbs")]
+transform = Transform3D(0.0043364475, -0.0015922091, 0.9999894, 3.899863e-05, 0.9999988, 0.0015920547, -0.99999064, 3.209459e-05, 0.004336502, 0.64369076, 0, 10.696374)
+
+[node name="TreasureDepositCoffin3" parent="." unique_id=1404171304 instance=ExtResource("8_johbs")]
+transform = Transform3D(0.010364331, -0.0015923734, 0.999945, 3.8998627e-05, 0.9999988, 0.0015920547, -0.99994624, 2.2496137e-05, 0.010364377, 0.64369076, 0.36133707, 11.12701)
+
+[node name="TreasureDepositCoffin4" parent="." unique_id=281734 instance=ExtResource("8_johbs")]
+transform = Transform3D(0.017168138, -0.0015924897, 0.9998513, 3.8998627e-05, 0.9999988, 0.0015920547, -0.99985254, 1.1660448e-05, 0.017168175, 0.64369076, 0.65337837, 11.543389)
+
+[node name="Emerald" parent="." unique_id=1279185427 instance=ExtResource("11_3ocjo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.045124, 1.012902, 11.992241)
+
+[node name="GDFlaskPickupRadius" parent="." unique_id=899228970 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5405283, 4.7683716e-07, -1.0404739)
+
+[node name="GDFlaskPickupRadius2" parent="." unique_id=425455658 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0228823, 4.7683716e-07, -2.609569)
+
+[node name="GDFlaskPickupRadius3" parent="." unique_id=289289610 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.236058, 5.722046e-06, -2.7250788)
+
+[node name="GDFlaskPickupRadius16" parent="." unique_id=1880276979 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.932506, 5.722046e-06, -11.528644)
+
+[node name="GDFlaskPickupRadius17" parent="." unique_id=160514762 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.628184, 5.722046e-06, -12.532221)
+
+[node name="GDFlaskPickupRadius18" parent="." unique_id=1498106949 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.16516, 5.722046e-06, -10.319577)
+
+[node name="GDFlaskPickupRadius19" parent="." unique_id=1928989670 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.612418, 5.722046e-06, -9.387246)
+
+[node name="GDFlaskPickupRadius20" parent="." unique_id=372718168 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.0769205, 5.722046e-06, -12.916003)
+
+[node name="GDFlaskPickupRadius21" parent="." unique_id=775968383 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.077, 0, -11.025)
+
+[node name="GDFlaskPickupRadius22" parent="." unique_id=1067910393 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.72, 0, -9.65)
+
+[node name="GDFlaskPickupRadius23" parent="." unique_id=1409128502 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.521, 0, -10.666)
+
+[node name="GDFlaskPickupRadius24" parent="." unique_id=1213344998 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.521, 0, -10.666)
+
+[node name="GDFlaskPickupRadius4" parent="." unique_id=821302950 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.579107, 4.7683716e-07, -0.9914684)
+
+[node name="GDFlaskPickupRadius5" parent="." unique_id=1594288912 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.579107, 4.7683716e-07, 3.2674131)
+
+[node name="GDFlaskPickupRadius12" parent="." unique_id=325525493 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.331018, 4.7683716e-07, 11.902348)
+
+[node name="GDFlaskPickupRadius13" parent="." unique_id=608702405 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.392321, 4.7683716e-07, 13.164013)
+
+[node name="GDFlaskPickupRadius14" parent="." unique_id=809723494 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.528225, 4.7683716e-07, 14.748082)
+
+[node name="GDFlaskPickupRadius15" parent="." unique_id=183671193 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.528225, -2.2760816, 9.127544)
+
+[node name="GDFlaskPickupRadius6" parent="." unique_id=678835061 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0369797, 4.7683716e-07, 4.8403616)
+
+[node name="GDFlaskPickupRadius7" parent="." unique_id=841107010 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.232235, 0, 10.949997)
+
+[node name="GDFlaskPickupRadius8" parent="." unique_id=1818212720 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.288895, 0, 12.646668)
+
+[node name="GDFlaskPickupRadius9" parent="." unique_id=872802814 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.248549, 0, 14.466018)
+
+[node name="GDFlaskPickupRadius10" parent="." unique_id=1581903347 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.950267, 0, 13.337428)
+
+[node name="GDFlaskPickupRadius11" parent="." unique_id=641364511 instance=ExtResource("12_s35cj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.950267, 0, 13.337428)
+
+[node name="LockedGate" parent="." unique_id=1053134796 instance=ExtResource("13_r4djm")]
+transform = Transform3D(-0.0006986101, 0, 0.99999976, 0, 1, 0, -0.99999976, 0, -0.0006986101, 1.5703802, -0.046372317, 16.051003)
+
+[node name="TreasureDepositCoffin5" parent="." unique_id=1416596116 instance=ExtResource("8_johbs")]
+transform = Transform3D(-0.0040262076, 0, -0.9999919, 0, 1, 0, 0.9999919, 0, -0.0040262076, 9.904228, 0, -13.84006)
+
+[node name="TreasureDepositCoffin6" parent="." unique_id=1030140562 instance=ExtResource("8_johbs")]
+transform = Transform3D(-0.0040262076, 0, -0.9999919, 0, 1, 0, 0.9999919, 0, -0.0040262076, 8.11689, 0, -13.718608)
+
+[node name="TreasureDepositCoffin7" parent="." unique_id=1471492685 instance=ExtResource("8_johbs")]
+transform = Transform3D(-0.0040262076, 0, -0.9999919, 0, 1, 0, 0.9999919, 0, -0.0040262076, -8.152277, 0, -13.697623)
+
+[node name="TreasureDepositCoffin8" parent="." unique_id=1176390885 instance=ExtResource("8_johbs")]
+transform = Transform3D(-0.0040262076, 0, -0.9999919, 0, 1, 0, 0.9999919, 0, -0.0040262076, -6.4440923, 0, -13.694263)
+
+[node name="TreasureDepositCoffin9" parent="." unique_id=1532350833 instance=ExtResource("8_johbs")]
+transform = Transform3D(-0.0040262076, 0, -0.9999919, 0, 1, 0, 0.9999919, 0, -0.0040262076, -0.6615753, 0, -13.653841)
+
+[node name="TreasureDepositCoffin10" parent="." unique_id=371148425 instance=ExtResource("8_johbs")]
+transform = Transform3D(-0.0040262076, 0, -0.9999919, 0, 1, 0, 0.9999919, 0, -0.0040262076, 0.58920753, 0, -13.649709)
+
+[node name="TreasureDepositCoffin11" parent="." unique_id=143692503 instance=ExtResource("8_johbs")]
+transform = Transform3D(-0.0040262076, 0, -0.9999919, 0, 1, 0, 0.9999919, 0, -0.0040262076, 2.0772297, 0, -13.6157)
+
+[node name="TreasureDepositCoffin12" parent="." unique_id=1395272616 instance=ExtResource("8_johbs")]
+transform = Transform3D(-0.0040262076, 0, -0.9999919, 0, 1, 0, 0.9999919, 0, -0.0040262076, 14.90501, 0, 1.0224266)
+
+[editable path="IndoorLighting"]

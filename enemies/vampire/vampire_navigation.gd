@@ -1,11 +1,12 @@
 extends Node
 class_name GDVampireNavigation
 
-
 const INVALID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
+const RouteSearch := preload("res://enemies/vampire/vampire_route_search.gd")
+const NavigationClearance := preload(
+	"res://enemies/vampire/vampire_navigation_clearance.gd"
+)
 const FORWARD_DIRECTION_ALIGNMENT := 0.5
-const TARGET_WALL_CLEARANCE_MARGIN := 0.02
-const DIRECTION_EPSILON_CELL_FRACTION := 0.01
 const PREDICTION_FRONTIER_FRACTION := 0.7
 
 enum SearchDirectionMatch {
@@ -57,6 +58,8 @@ var wall_stall_progress_distance := 0.0
 var last_route_search_status := RouteSearchStatus.NoGridMap
 var route_traversal_status := RouteTraversalStatus.Idle
 var last_frontier_search_was_truncated := false
+var _route_search := RouteSearch.new()
+var _navigation_clearance := NavigationClearance.new()
 
 
 func configure(
@@ -67,6 +70,7 @@ func configure(
 	body = vampire_body
 	pivot = visual_pivot
 	settings = vampire_settings
+	_configure_route_search()
 	reset_runtime_state()
 
 
@@ -101,9 +105,15 @@ func set_wall_grid_map(grid_map: GridMap) -> void:
 		wall_item_ids = _get_wall_item_ids(wall_grid_map)
 		wall_grid_y = _get_wall_grid_y(wall_grid_map)
 		grid_bounds = _get_used_wall_bounds(wall_grid_map, wall_grid_y)
+	_configure_route_search()
 
 	if has_target:
 		_rebuild_route()
+
+
+func _configure_route_search() -> void:
+	_route_search.configure(settings, wall_grid_map, wall_item_ids, grid_bounds, wall_grid_y)
+	_navigation_clearance.configure(body, settings, wall_grid_map, wall_item_ids)
 
 
 func select_target(noise_position: Vector3) -> bool:
@@ -852,179 +862,41 @@ func _update_wall_stall_recovery(
 
 
 func _find_cell_route(start_cell: Vector3i, end_cell: Vector3i) -> Array[Vector3i]:
-	if settings == null:
-		last_route_search_status = RouteSearchStatus.Unreachable
-		return []
-	if start_cell == end_cell:
-		last_route_search_status = RouteSearchStatus.AlreadyAtTarget
-		return [start_cell]
-
-	var open_cells: Array[Vector3i] = [start_cell]
-	var read_index := 0
-	var came_from: Dictionary = {start_cell: start_cell}
-	var search_count := 0
-
-	while read_index < open_cells.size() and search_count < settings.maximum_route_search_cells:
-		var current := open_cells[read_index]
-		read_index += 1
-		search_count += 1
-		if current == end_cell:
-			last_route_search_status = RouteSearchStatus.Complete
-			return _reconstruct_route(came_from, current)
-
-		for neighbor in _get_neighbors(current):
-			if came_from.has(neighbor) or not _cell_is_in_bounds(neighbor) or _is_wall(neighbor):
-				continue
-			came_from[neighbor] = current
-			open_cells.append(neighbor)
-
-	last_route_search_status = RouteSearchStatus.SearchBudgetExhausted \
-		if read_index < open_cells.size() else RouteSearchStatus.Unreachable
-	return []
+	var result := _route_search.find_cell_route(start_cell, end_cell)
+	last_route_search_status = int(result["status"]) as RouteSearchStatus
+	var route: Array[Vector3i] = []
+	route.assign(result["route"] as Array)
+	return route
 
 
 func _get_cell_route_between_world_positions(
 		origin: Vector3,
 		destination: Vector3
 ) -> Array[Vector3i]:
-	var origin_cell := wall_grid_map.local_to_map(wall_grid_map.to_local(origin))
-	var destination_cell := wall_grid_map.local_to_map(wall_grid_map.to_local(destination))
-	origin_cell.y = wall_grid_y
-	destination_cell.y = wall_grid_y
-	origin_cell = _find_nearest_open_cell(origin_cell, wall_grid_map.to_local(origin))
-	destination_cell = _find_nearest_open_cell(
-		destination_cell,
-		wall_grid_map.to_local(destination)
-	)
-	if origin_cell == INVALID_CELL or destination_cell == INVALID_CELL:
-		return []
-	return _find_cell_route(origin_cell, destination_cell)
-
-
-func _reconstruct_route(came_from: Dictionary, end_cell: Vector3i) -> Array[Vector3i]:
-	var route: Array[Vector3i] = [end_cell]
-	var current := end_cell
-	while came_from.has(current) and came_from[current] != current:
-		current = came_from[current] as Vector3i
-		route.push_front(current)
+	var result := _route_search.get_cell_route_between_world_positions(origin, destination)
+	last_route_search_status = int(result["status"]) as RouteSearchStatus
+	var route: Array[Vector3i] = []
+	route.assign(result["route"] as Array)
 	return route
 
 
-func _simplify_cell_route(route: Array[Vector3i]) -> Array[Vector3i]:
-	if route.size() <= 2:
-		return route
+func _get_body_clearance_world() -> float:
+	return _navigation_clearance._get_body_clearance_world()
 
-	var simplified: Array[Vector3i] = [route[0]]
-	var previous_direction := route[1] - route[0]
-	for index in range(1, route.size() - 1):
-		var next_direction := route[index + 1] - route[index]
-		if next_direction != previous_direction:
-			simplified.append(route[index])
-		previous_direction = next_direction
-	simplified.append(route[route.size() - 1])
-	return simplified
+
+func _simplify_cell_route(route: Array[Vector3i]) -> Array[Vector3i]:
+	return _route_search.simplify_cell_route(route)
 
 
 func _find_nearest_open_cell(
 		origin: Vector3i,
 		reference_local_position: Vector3
 ) -> Vector3i:
-	if _cell_is_in_bounds(origin) and not _is_wall(origin):
-		return origin
-	if settings == null or grid_bounds.size == Vector2i.ZERO:
-		return INVALID_CELL
-
-	var search_origin := origin
-	search_origin.x = clampi(
-		search_origin.x,
-		grid_bounds.position.x,
-		grid_bounds.end.x - 1
-	)
-	search_origin.z = clampi(
-		search_origin.z,
-		grid_bounds.position.y,
-		grid_bounds.end.y - 1
-	)
-	search_origin.y = wall_grid_y
-	if not _is_wall(search_origin):
-		return search_origin
-
-	var wall_frontier: Array[Vector3i] = [search_origin]
-	var visited: Dictionary = {search_origin: true}
-	while not wall_frontier.is_empty() \
-			and visited.size() < settings.maximum_route_search_cells:
-		var next_wall_frontier: Array[Vector3i] = []
-		var open_candidates: Array[Vector3i] = []
-		for current in wall_frontier:
-			for neighbor in _get_neighbors(current):
-				if visited.has(neighbor) or not _cell_is_in_bounds(neighbor):
-					continue
-				visited[neighbor] = true
-				if _is_wall(neighbor):
-					next_wall_frontier.append(neighbor)
-				else:
-					open_candidates.append(neighbor)
-		if not open_candidates.is_empty():
-			return _get_closest_open_cell(
-				open_candidates,
-				reference_local_position
-			)
-		wall_frontier = next_wall_frontier
-	return INVALID_CELL
-
-
-func _get_closest_open_cell(
-		open_candidates: Array[Vector3i],
-		reference_local_position: Vector3
-) -> Vector3i:
-	var selected_cell := open_candidates[0]
-	var selected_distance := _get_horizontal_cell_distance_squared(
-		selected_cell,
-		reference_local_position
-	)
-	for candidate_index in range(1, open_candidates.size()):
-		var candidate := open_candidates[candidate_index]
-		var candidate_distance := _get_horizontal_cell_distance_squared(
-			candidate,
-			reference_local_position
-		)
-		var wins_distance_tie := is_equal_approx(
-			candidate_distance,
-			selected_distance
-		) and _cell_sorts_before(candidate, selected_cell)
-		if candidate_distance < selected_distance or wins_distance_tie:
-			selected_cell = candidate
-			selected_distance = candidate_distance
-	return selected_cell
-
-
-func _get_horizontal_cell_distance_squared(
-		cell: Vector3i,
-		reference_local_position: Vector3
-) -> float:
-	var cell_position := wall_grid_map.map_to_local(cell)
-	var horizontal_offset := Vector2(
-		cell_position.x - reference_local_position.x,
-		cell_position.z - reference_local_position.z
-	)
-	return horizontal_offset.length_squared()
-
-
-func _cell_sorts_before(first: Vector3i, second: Vector3i) -> bool:
-	if first.x != second.x:
-		return first.x < second.x
-	if first.z != second.z:
-		return first.z < second.z
-	return first.y < second.y
+	return _route_search.find_nearest_open_cell(origin, reference_local_position)
 
 
 func _get_neighbors(cell: Vector3i) -> Array[Vector3i]:
-	return [
-		cell + Vector3i(1, 0, 0),
-		cell + Vector3i(-1, 0, 0),
-		cell + Vector3i(0, 0, 1),
-		cell + Vector3i(0, 0, -1),
-	]
+	return _route_search.get_neighbors(cell)
 
 
 func _sort_search_point(first: Vector3, second: Vector3) -> bool:
@@ -1041,10 +913,7 @@ func _reset_stall_tracking() -> void:
 
 
 func _get_direction_epsilon() -> float:
-	return maxf(
-		_get_minimum_world_cell_edge_length() * DIRECTION_EPSILON_CELL_FRACTION,
-		0.0001
-	)
+	return _navigation_clearance.get_direction_epsilon()
 
 
 func _get_direction_epsilon_squared() -> float:
@@ -1053,122 +922,23 @@ func _get_direction_epsilon_squared() -> float:
 
 
 func _get_minimum_world_cell_edge_length() -> float:
-	return minf(
-		_get_world_cell_edge_length(Vector3i.RIGHT),
-		_get_world_cell_edge_length(Vector3i.BACK)
-	)
+	return _navigation_clearance.get_minimum_world_cell_edge_length()
 
 
 func _get_maximum_world_cell_edge_length() -> float:
-	return maxf(
-		_get_world_cell_edge_length(Vector3i.RIGHT),
-		_get_world_cell_edge_length(Vector3i.BACK)
-	)
+	return _navigation_clearance.get_maximum_world_cell_edge_length()
 
 
 func _get_world_cell_edge_length(direction: Vector3i) -> float:
-	if wall_grid_map == null:
-		return 1.0
-	var origin_point := wall_grid_map.to_global(
-		wall_grid_map.map_to_local(Vector3i.ZERO)
-	)
-	var neighbour_point := wall_grid_map.to_global(
-		wall_grid_map.map_to_local(direction)
-	)
-	return maxf(origin_point.distance_to(neighbour_point), 0.0001)
+	return _navigation_clearance.get_world_cell_edge_length(direction)
 
 
 func _get_wall_clearance_offset(cell: Vector3i) -> Vector3:
-	if wall_grid_map == null:
-		return Vector3.ZERO
-
-	var offset := Vector3.ZERO
-	var required_x_offset := maxf(
-		_get_local_body_clearance_x() - wall_grid_map.cell_size.x * 0.5,
-		0.0
-	)
-	var required_z_offset := maxf(
-		_get_local_body_clearance_z() - wall_grid_map.cell_size.z * 0.5,
-		0.0
-	)
-	if _is_wall(cell + Vector3i(1, 0, 0)):
-		offset.x -= required_x_offset
-	if _is_wall(cell + Vector3i(-1, 0, 0)):
-		offset.x += required_x_offset
-	if _is_wall(cell + Vector3i(0, 0, 1)):
-		offset.z -= required_z_offset
-	if _is_wall(cell + Vector3i(0, 0, -1)):
-		offset.z += required_z_offset
-	return offset
+	return _navigation_clearance.get_wall_clearance_offset(cell)
 
 
 func _get_body_clear_target_point(cell: Vector3i, world_target: Vector3) -> Vector3:
-	if wall_grid_map == null or settings == null:
-		return world_target
-
-	# Preserve the player's position along each open lane instead of stopping at
-	# the target cell centre. Only clamp an axis where an adjacent wall needs room
-	# for the Vampire's wider capsule.
-	var cell_centre := wall_grid_map.map_to_local(cell)
-	var local_target := wall_grid_map.to_local(world_target)
-	var half_width := wall_grid_map.cell_size.x * 0.5
-	var half_depth := wall_grid_map.cell_size.z * 0.5
-	var body_clearance_x := _get_local_body_clearance_x()
-	var body_clearance_z := _get_local_body_clearance_z()
-	var minimum_x := cell_centre.x - half_width
-	var maximum_x := cell_centre.x + half_width
-	var minimum_z := cell_centre.z - half_depth
-	var maximum_z := cell_centre.z + half_depth
-	if _is_wall(cell + Vector3i(1, 0, 0)):
-		maximum_x -= body_clearance_x
-	if _is_wall(cell + Vector3i(-1, 0, 0)):
-		minimum_x += body_clearance_x
-	if _is_wall(cell + Vector3i(0, 0, 1)):
-		maximum_z -= body_clearance_z
-	if _is_wall(cell + Vector3i(0, 0, -1)):
-		minimum_z += body_clearance_z
-	local_target.x = clampf(local_target.x, minimum_x, maximum_x) \
-		if minimum_x <= maximum_x else cell_centre.x
-	local_target.z = clampf(local_target.z, minimum_z, maximum_z) \
-		if minimum_z <= maximum_z else cell_centre.z
-	return wall_grid_map.to_global(local_target)
-
-
-func _get_local_body_clearance_x() -> float:
-	return _get_body_clearance_world() / maxf(
-		wall_grid_map.global_transform.basis.x.length(),
-		0.0001
-	)
-
-
-func _get_local_body_clearance_z() -> float:
-	return _get_body_clearance_world() / maxf(
-		wall_grid_map.global_transform.basis.z.length(),
-		0.0001
-	)
-
-
-func _get_body_clearance_world() -> float:
-	var fallback_radius := float(settings.sight_clearance_radius) \
-		if settings != null else 0.0
-	if body == null:
-		return fallback_radius + TARGET_WALL_CLEARANCE_MARGIN
-	var collision_shape := body.get_node_or_null(^"CollisionShape3D") as CollisionShape3D
-	if collision_shape == null or collision_shape.shape == null:
-		return fallback_radius + TARGET_WALL_CLEARANCE_MARGIN
-
-	var shape_radius := fallback_radius
-	if collision_shape.shape is CapsuleShape3D:
-		shape_radius = (collision_shape.shape as CapsuleShape3D).radius
-	elif collision_shape.shape is SphereShape3D:
-		shape_radius = (collision_shape.shape as SphereShape3D).radius
-	elif collision_shape.shape is CylinderShape3D:
-		shape_radius = (collision_shape.shape as CylinderShape3D).radius
-	var horizontal_scale := maxf(
-		collision_shape.global_transform.basis.x.length(),
-		collision_shape.global_transform.basis.z.length()
-	)
-	return shape_radius * horizontal_scale + TARGET_WALL_CLEARANCE_MARGIN
+	return _navigation_clearance.get_body_clear_target_point(cell, world_target)
 
 
 func _cell_is_in_bounds(cell: Vector3i) -> bool:

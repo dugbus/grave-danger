@@ -1,9 +1,28 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://placeables/text_trigger/text_trigger.gd" id="1_text_trigger"]
+[ext_resource type="Theme" path="res://ui/frontend/frontend_theme.tres" id="2_frontend_theme"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_trigger"]
 size = Vector3(1, 1, 1)
+
+[sub_resource type="TextMesh" id="TextMesh_heading"]
+resource_local_to_scene = true
+
+[sub_resource type="TextMesh" id="TextMesh_body"]
+resource_local_to_scene = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_overlay"]
+resource_local_to_scene = true
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+depth_draw_mode = 3
+albedo_color = Color(0, 0, 0, 0.5)
+
+[sub_resource type="QuadMesh" id="QuadMesh_overlay"]
+resource_local_to_scene = true
+material = SubResource("StandardMaterial3D_overlay")
 
 [node name="GDTextTrigger" type="Area3D"]
 collision_layer = 0
@@ -12,3 +31,57 @@ script = ExtResource("1_text_trigger")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_trigger")
+
+[node name="HeadingText" type="MeshInstance3D" parent="."]
+top_level = true
+visible = false
+layers = 524288
+cast_shadow = 0
+mesh = SubResource("TextMesh_heading")
+
+[node name="BodyText" type="MeshInstance3D" parent="."]
+top_level = true
+visible = false
+layers = 524288
+cast_shadow = 0
+mesh = SubResource("TextMesh_body")
+
+[node name="DimOverlay" type="MeshInstance3D" parent="."]
+top_level = true
+visible = false
+layers = 524288
+cast_shadow = 0
+mesh = SubResource("QuadMesh_overlay")
+
+[node name="TextLight" type="OmniLight3D" parent="."]
+top_level = true
+visible = false
+light_color = Color(1, 0.88, 0.68, 1)
+light_energy = 6.5
+light_cull_mask = 524288
+shadow_enabled = false
+omni_range = 5.5
+
+[node name="PauseLayer" type="CanvasLayer" parent="."]
+visible = false
+layer = 190
+process_mode = 3
+
+[node name="ContinueButton" type="Button" parent="PauseLayer"]
+custom_minimum_size = Vector2(440, 112)
+process_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -332.0
+offset_right = 220.0
+offset_bottom = -220.0
+grow_horizontal = 2
+grow_vertical = 0
+focus_mode = 2
+theme = ExtResource("2_frontend_theme")
+theme_override_font_sizes/font_size = 64
+text = "Continue"

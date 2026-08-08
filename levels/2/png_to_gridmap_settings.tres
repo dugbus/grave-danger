@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="PNGToGridMapSettings" format=3 uid="uid://4g233xrn86wv"]
+
+[ext_resource type="Script" uid="uid://bhrpqhaebhdyj" path="res://addons/png_to_gridmap/png_to_gridmap_settings.gd" id="1_h8lp6"]
+
+[resource]
+script = ExtResource("1_h8lp6")
+png_path = "res://levels/2/level.png"
+target_gridmap_path = NodePath("GridMap")

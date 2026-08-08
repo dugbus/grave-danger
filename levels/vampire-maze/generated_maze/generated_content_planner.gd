@@ -12,6 +12,15 @@ enum PlacementBand {
 const GRAPH_SCRIPT := preload(
     "res://levels/vampire-maze/generated_maze/generated_maze_graph.gd"
 )
+const ContentPlan := preload(
+    "res://levels/vampire-maze/generated_maze/generated_content_plan.gd"
+)
+const TreasureBudget := preload(
+    "res://levels/vampire-maze/generated_maze/generated_treasure_budget.gd"
+)
+const CellSelector := preload(
+    "res://levels/vampire-maze/generated_maze/generated_content_cell_selector.gd"
+)
 const TREASURE_TYPES: Array[StringName] = [
     &"gold_coin",
     &"diamond",
@@ -42,6 +51,7 @@ const SILVER_KEY_ITEM_TYPE := &"silver_key"
 const MIN_PLACEMENT_DISTANCE_FROM_SPAWN := 3
 const MIN_EXIT_KEY_DISTANCE_FROM_GATE_TILES := 8
 const DOOR_APPROACH_CLEARANCE_TILES := 2
+var _treasure_budget := TreasureBudget.new()
 
 
 ## Returns route and placement data suitable for editor or runtime scene creation.
@@ -149,23 +159,22 @@ func build_plan(
         configuration
     )
 
-    return {
-        "errors": errors,
-        "warnings": warnings,
-        "seed": seed_value,
-        "main_path": main_path,
-        "main_path_cells": GRAPH_SCRIPT.cells_to_vector3i(main_path),
-        "doors": doors,
-        "keys": keys,
-        "coffins": coffins,
-        "treasure_caches": treasure_caches,
-        "bat_nests": bat_nests,
-        "treasure_budgets": treasure_budgets,
-        "placed_treasure_budgets": placed_budgets,
-        "total_treasure_weight": total_treasure_weight,
-        "main_path_treasure_percent": float(configuration.get("main_path_treasure_percent")),
-        "solvable": errors.is_empty(),
-    }
+    var plan := ContentPlan.new()
+    plan.errors = errors
+    plan.warnings = warnings
+    plan.seed_value = seed_value
+    plan.main_path = main_path
+    plan.main_path_cells = GRAPH_SCRIPT.cells_to_vector3i(main_path)
+    plan.doors = doors
+    plan.keys = keys
+    plan.coffins = coffins
+    plan.treasure_caches = treasure_caches
+    plan.bat_nests = bat_nests
+    plan.treasure_budgets = treasure_budgets
+    plan.placed_treasure_budgets = placed_budgets
+    plan.total_treasure_weight = total_treasure_weight
+    plan.main_path_treasure_percent = float(configuration.get("main_path_treasure_percent"))
+    return plan.to_dictionary()
 
 
 func _occupy_straight_passage_between(
@@ -450,23 +459,11 @@ func _select_exit_key_cell(
 
 
 func _get_treasure_budgets(configuration: Resource) -> Dictionary:
-    return {
-        &"gold_coin": 0,
-        &"diamond": maxi(int(configuration.get("diamond_budget")), 0),
-        &"ruby": maxi(int(configuration.get("ruby_budget")), 0),
-        &"sapphire": maxi(int(configuration.get("sapphire_budget")), 0),
-        &"emerald": maxi(int(configuration.get("emerald_budget")), 0),
-        &"amethyst": maxi(int(configuration.get("amethyst_budget")), 0),
-        &"gold_bar": maxi(int(configuration.get("gold_bar_budget")), 0),
-    }
+    return _treasure_budget.from_configuration(configuration)
 
 
 func _get_total_treasure_weight(treasure_budgets: Dictionary) -> float:
-    var total_weight := 0.0
-    for item_type in TREASURE_TYPES:
-        var item := TREASURE_ITEMS[item_type] as Resource
-        total_weight += float(treasure_budgets.get(item_type, 0)) * float(item.get("weight"))
-    return total_weight
+    return _treasure_budget.get_total_weight(treasure_budgets)
 
 
 func _plan_coffins(
@@ -509,7 +506,7 @@ func _plan_coffins(
         preferred_coffin_spacing
     )
     if cells.size() < coffin_count:
-        cells.append_array(_select_exploration_cells(
+        cells.append_array(CellSelector.select_exploration_cells(
             walkable,
             distance_from_main_path,
             preferred_occupied,
@@ -532,7 +529,7 @@ func _plan_coffins(
             0.9
         ))
         if cells.size() < coffin_count:
-            cells.append_array(_select_exploration_cells(
+            cells.append_array(CellSelector.select_exploration_cells(
                 walkable,
                 distance_from_main_path,
                 fallback_occupied,
@@ -582,7 +579,7 @@ func _select_distributed_coffin_cells(
             "random_score": GRAPH_SCRIPT.coordinate_score(cell, seed_value, 397),
         })
 
-    var region_targets := _build_treasure_region_targets(
+    var region_targets := CellSelector.build_region_targets(
         count,
         map_size,
         seed_value ^ 397
@@ -624,7 +621,7 @@ func _plan_treasure_caches(
 ) -> Array[Dictionary]:
     var requested_cache_count := maxi(int(configuration.get("treasure_pile_count")), 0)
     if requested_cache_count <= 0:
-        if _has_additional_treasure_budget(budgets):
+        if CellSelector.has_additional_treasure_budget(budgets):
             errors.append("Generated gems and gold bars require at least one treasure pile.")
         return []
 
@@ -639,7 +636,7 @@ func _plan_treasure_caches(
         requested_cache_count
     )
     var off_cache_count := requested_cache_count - main_cache_count
-    if _has_gem_budget(budgets) and off_cache_count <= 0:
+    if CellSelector.has_gem_budget(budgets) and off_cache_count <= 0:
         off_cache_count = 1
         main_cache_count = requested_cache_count - off_cache_count
     var minimum_spacing := maxi(
@@ -749,7 +746,7 @@ func _plan_treasure_caches(
 
     var caches: Array[Dictionary] = []
     for cell in main_cells:
-        caches.append(_new_treasure_cache(
+        caches.append(CellSelector.new_treasure_cache(
             cell,
             PlacementBand.MainPath,
             float(main_path.find(cell)) / float(maxi(main_path.size() - 1, 1)),
@@ -757,7 +754,7 @@ func _plan_treasure_caches(
             map_size
         ))
     for cell in off_cells:
-        caches.append(_new_treasure_cache(
+        caches.append(CellSelector.new_treasure_cache(
             cell,
             PlacementBand.Exploration,
             float(route_progress_by_cell.get(cell, 0.0)),
@@ -787,7 +784,7 @@ func _plan_treasure_caches(
     for cache_index in caches.size():
         var cache := caches[cache_index]
         var counts := cache["counts"] as Dictionary
-        counts[&"gold_coin"] = _get_deterministic_pile_coin_count(
+        counts[&"gold_coin"] = CellSelector.get_deterministic_pile_coin_count(
             cache["cell"] as Vector2i,
             seed_value,
             cache_index,
@@ -807,86 +804,12 @@ func _plan_treasure_caches(
                     "Configured gems require an off-main-path treasure pile."
                 )
                 continue
-            _distribute_treasure_count(caches, off_indices, item_type, budget)
+            CellSelector.distribute_treasure_count(caches, off_indices, item_type, budget)
             continue
         var main_budget := clampi(roundi(float(budget) * main_percent / 100.0), 0, budget)
-        _distribute_treasure_count(caches, main_indices, item_type, main_budget)
-        _distribute_treasure_count(caches, off_indices, item_type, budget - main_budget)
+        CellSelector.distribute_treasure_count(caches, main_indices, item_type, main_budget)
+        CellSelector.distribute_treasure_count(caches, off_indices, item_type, budget - main_budget)
     return caches
-
-
-func _has_additional_treasure_budget(budgets: Dictionary) -> bool:
-    for item_type in TREASURE_TYPES:
-        if item_type != &"gold_coin" and int(budgets.get(item_type, 0)) > 0:
-            return true
-    return false
-
-
-func _has_gem_budget(budgets: Dictionary) -> bool:
-    for item_type in GEM_TYPES:
-        if int(budgets.get(item_type, 0)) > 0:
-            return true
-    return false
-
-
-func _get_deterministic_pile_coin_count(
-    cell: Vector2i,
-    seed_value: int,
-    pile_index: int,
-    minimum_coins: int,
-    maximum_coins: int
-) -> int:
-    var count_range := maximum_coins - minimum_coins + 1
-    if count_range <= 1:
-        return minimum_coins
-    return minimum_coins + posmod(
-        GRAPH_SCRIPT.coordinate_score(cell, seed_value, pile_index + 401),
-        count_range
-    )
-
-
-func _new_treasure_cache(
-    cell: Vector2i,
-    placement_band: PlacementBand,
-    route_progress: float,
-    walkable: Dictionary,
-    map_size: Vector2i
-) -> Dictionary:
-    var counts := {}
-    for item_type in TREASURE_TYPES:
-        counts[item_type] = 0
-    return {
-        "cell": cell,
-        "cell_3d": Vector3i(cell.x, 0, cell.y),
-        "placement_band": placement_band,
-        "route_progress": clampf(route_progress, 0.0, 1.0),
-        "escape_option_count": _get_walkable_neighbour_count(cell, walkable),
-        "open_area_cell_count": _get_open_area_cell_count(cell, walkable),
-        "map_edge_clearance_tiles": _get_map_edge_clearance(cell, map_size),
-        "counts": counts,
-    }
-
-
-func _distribute_treasure_count(
-    caches: Array[Dictionary],
-    preferred_indices: Array[int],
-    item_type: StringName,
-    count: int
-) -> void:
-    if count <= 0 or caches.is_empty():
-        return
-    var indices := preferred_indices
-    if indices.is_empty():
-        indices = []
-        for index in caches.size():
-            indices.append(index)
-    for item_index in count:
-        var cache_index := indices[item_index % indices.size()]
-        var cache := caches[cache_index]
-        var counts := cache["counts"] as Dictionary
-        counts[item_type] = int(counts[item_type]) + 1
-        cache["counts"] = counts
-        caches[cache_index] = cache
 
 
 func _plan_bat_nests(
@@ -905,7 +828,7 @@ func _plan_bat_nests(
     var main_cells := _select_spread_path_cells(main_path, occupied, main_count, 0.12, 0.88)
     for cell in main_cells:
         occupied[cell] = true
-    var off_cells := _select_exploration_cells(
+    var off_cells := CellSelector.select_exploration_cells(
         walkable,
         distance_from_main_path,
         occupied,
@@ -926,7 +849,7 @@ func _plan_bat_nests(
             0.88
         ))
     if off_cells.size() < off_count:
-        off_cells.append_array(_select_exploration_cells(
+        off_cells.append_array(CellSelector.select_exploration_cells(
             walkable,
             distance_from_main_path,
             hazard_occupied,
@@ -984,7 +907,7 @@ func _select_treasure_area_cells(
         })
 
     var all_separation_cells := separation_cells.duplicate()
-    var region_targets := _build_treasure_region_targets(count, map_size, random_seed)
+    var region_targets := CellSelector.build_region_targets(count, map_size, random_seed)
     for target_position in region_targets:
         var selected_candidate := _select_treasure_area_candidate(
             candidates,
@@ -1030,74 +953,6 @@ func _select_treasure_area_candidate(
     return best_candidate
 
 
-func _build_treasure_region_targets(
-    count: int,
-    map_size: Vector2i,
-    random_seed: int
-) -> Array[Vector2]:
-    var targets: Array[Vector2] = []
-    if count <= 0:
-        return targets
-    var usable_width := maxi(map_size.x, 1)
-    var usable_height := maxi(map_size.y, 1)
-    var aspect_ratio := float(usable_width) / float(usable_height)
-    var column_count := maxi(ceili(sqrt(float(count) * aspect_ratio)), 1)
-    var row_count := maxi(ceili(float(count) / float(column_count)), 1)
-    var region_indices: Array[int] = []
-    for region_index in column_count * row_count:
-        region_indices.append(region_index)
-    var random := RandomNumberGenerator.new()
-    random.seed = random_seed
-    for index in range(region_indices.size() - 1, 0, -1):
-        var swap_index := random.randi_range(0, index)
-        var held_index := region_indices[index]
-        region_indices[index] = region_indices[swap_index]
-        region_indices[swap_index] = held_index
-    var minimum_coordinate := Vector2.ZERO
-    var maximum_coordinate := Vector2(map_size - Vector2i.ONE)
-    for slot_index in count:
-        var region_index := region_indices[slot_index]
-        var column_index := region_index % column_count
-        var row_index := floori(float(region_index) / float(column_count))
-        targets.append(Vector2(
-            lerpf(
-                minimum_coordinate.x,
-                maximum_coordinate.x,
-                (float(column_index) + random.randf()) / float(column_count)
-            ),
-            lerpf(
-                minimum_coordinate.y,
-                maximum_coordinate.y,
-                (float(row_index) + random.randf()) / float(row_count)
-            )
-        ))
-    return targets
-
-
-func _get_walkable_neighbour_count(cell: Vector2i, walkable: Dictionary) -> int:
-    var neighbour_count := 0
-    for direction in GRAPH_SCRIPT.CARDINAL_DIRECTIONS:
-        if walkable.has(cell + direction):
-            neighbour_count += 1
-    return neighbour_count
-
-
-func _get_open_area_cell_count(cell: Vector2i, walkable: Dictionary) -> int:
-    var open_cell_count := 0
-    for y_offset in range(-1, 2):
-        for x_offset in range(-1, 2):
-            if walkable.has(cell + Vector2i(x_offset, y_offset)):
-                open_cell_count += 1
-    return open_cell_count
-
-
-func _get_map_edge_clearance(cell: Vector2i, map_size: Vector2i) -> int:
-    return mini(
-        mini(cell.x, cell.y),
-        mini(map_size.x - 1 - cell.x, map_size.y - 1 - cell.y)
-    )
-
-
 func _select_spread_path_cells(
     main_path: Array[Vector2i],
     occupied: Dictionary,
@@ -1124,7 +979,7 @@ func _select_spread_path_cells(
     for slot_index in count:
         var progress := float(slot_index + 1) / float(count + 1)
         var target_index := roundi(lerpf(float(minimum_index), float(maximum_index), progress))
-        var cell := _find_nearest_free_path_cell(
+        var cell := CellSelector.find_nearest_free_path_cell(
             main_path,
             occupied,
             target_index,
@@ -1141,143 +996,5 @@ func _select_spread_path_cells(
     return selected
 
 
-func _find_nearest_free_path_cell(
-    main_path: Array[Vector2i],
-    occupied: Dictionary,
-    target_index: int,
-    minimum_index: int,
-    maximum_index: int,
-    separation_cells: Array[Vector2i] = [],
-    minimum_separation_tiles: int = 0
-) -> Vector2i:
-    var maximum_offset := maxi(target_index - minimum_index, maximum_index - target_index)
-    for offset in range(0, maximum_offset + 1):
-        for sign_value: int in [-1, 1]:
-            if offset == 0 and sign_value > 0:
-                continue
-            var candidate_index: int = target_index + offset * sign_value
-            if candidate_index < minimum_index or candidate_index > maximum_index:
-                continue
-            var cell := main_path[candidate_index]
-            if not occupied.has(cell) and GRAPH_SCRIPT.has_minimum_cell_separation(
-                cell,
-                separation_cells,
-                minimum_separation_tiles
-            ):
-                return cell
-    return Vector2i(-1, -1)
-
-
-func _select_exploration_cells(
-    walkable: Dictionary,
-    distance_from_main_path: Dictionary,
-    occupied: Dictionary,
-    count: int,
-    seed_value: int,
-    salt: int,
-    separation_cells: Array[Vector2i] = [],
-    minimum_separation_tiles: int = 2,
-    route_progress_by_cell: Dictionary = {}
-) -> Array[Vector2i]:
-    var candidates: Array[Dictionary] = []
-    for cell_value in walkable:
-        var cell := cell_value as Vector2i
-        var path_distance := int(distance_from_main_path.get(cell, 0))
-        if occupied.has(cell) or path_distance <= 0:
-            continue
-        candidates.append({
-            "cell": cell,
-            "path_distance": path_distance,
-            "route_progress": float(route_progress_by_cell.get(cell, 0.0)),
-            "random_score": GRAPH_SCRIPT.coordinate_score(cell, seed_value, salt),
-        })
-    if route_progress_by_cell.is_empty():
-        candidates.sort_custom(GRAPH_SCRIPT.sort_exploration_candidate_depth_descending)
-    var selected: Array[Vector2i] = []
-    var all_separation_cells := separation_cells.duplicate()
-    if route_progress_by_cell.is_empty():
-        for candidate in candidates:
-            var cell := candidate["cell"] as Vector2i
-            if not GRAPH_SCRIPT.has_minimum_cell_separation(
-                cell,
-                all_separation_cells,
-                minimum_separation_tiles
-            ):
-                continue
-            selected.append(cell)
-            all_separation_cells.append(cell)
-            occupied[cell] = true
-            if selected.size() >= count:
-                break
-        return selected
-
-    var progress_band_radius := maxf(0.5 / float(maxi(count, 1)), 0.02)
-    for slot_index in count:
-        var target_progress := float(slot_index + 1) / float(count + 1)
-        var selected_candidate := _select_exploration_progress_candidate(
-            candidates,
-            occupied,
-            all_separation_cells,
-            minimum_separation_tiles,
-            target_progress,
-            progress_band_radius
-        )
-        if selected_candidate.is_empty():
-            selected_candidate = _select_exploration_progress_candidate(
-                candidates,
-                occupied,
-                all_separation_cells,
-                minimum_separation_tiles,
-                target_progress,
-                1.0
-            )
-        if selected_candidate.is_empty():
-            continue
-        var cell := selected_candidate["cell"] as Vector2i
-        selected.append(cell)
-        all_separation_cells.append(cell)
-        occupied[cell] = true
-    return selected
-
-
-func _select_exploration_progress_candidate(
-    candidates: Array[Dictionary],
-    occupied: Dictionary,
-    separation_cells: Array[Vector2i],
-    minimum_separation_tiles: int,
-    target_progress: float,
-    maximum_progress_difference: float
-) -> Dictionary:
-    var best_candidate := {}
-    var best_score := -INF
-    for candidate in candidates:
-        var cell := candidate["cell"] as Vector2i
-        if occupied.has(cell) or not GRAPH_SCRIPT.has_minimum_cell_separation(
-            cell,
-            separation_cells,
-            minimum_separation_tiles
-        ):
-            continue
-        var progress_difference := absf(
-            float(candidate["route_progress"]) - target_progress
-        )
-        if progress_difference > maximum_progress_difference:
-            continue
-        var candidate_score := float(candidate["path_distance"]) * 1000000.0 \
-            - progress_difference * 100000.0 \
-            + float(candidate["random_score"])
-        if candidate_score > best_score:
-            best_candidate = candidate
-            best_score = candidate_score
-    return best_candidate
-
-
 func _sum_cache_budgets(caches: Array[Dictionary]) -> Dictionary:
-    var totals := {}
-    for item_type in TREASURE_TYPES:
-        totals[item_type] = 0
-    for cache in caches:
-        var counts := cache["counts"] as Dictionary
-        for item_type in TREASURE_TYPES:
-            totals[item_type] = int(totals[item_type]) + int(counts.get(item_type, 0))
-    return totals
+    return _treasure_budget.sum_caches(caches)

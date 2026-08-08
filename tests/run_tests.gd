@@ -1,6 +1,7 @@
 extends SceneTree
 
 const BAT_NEST_SCRIPT := preload("res://enemies/bat_nest.gd")
+const LEVEL_DEFINITION_SCRIPT := preload("res://levels/level_definition.gd")
 const PLACEABLE_SCRIPT := preload("res://placeables/placeable.gd")
 const TREASURE_DEPOSIT_COFFIN_SCENE := preload("res://placeables/treasure_deposit/treasure_deposit_coffin.tscn")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
@@ -31,6 +32,7 @@ const KILL_BOUNDARY_SCENE := preload("res://placeables/kill_boundary/kill_bounda
 const LEVEL_SETTINGS_SCRIPT := preload("res://levels/level_settings.gd")
 const LEVEL_SELECT_SCENE := preload("res://ui/screens/level_select_screen.tscn")
 const LOW_HEALTH_VIGNETTE_SCRIPT := preload("res://ui/hud/low_health_vignette.gd")
+const LOCKED_DOOR_SCENE := preload("res://placeables/lockables/locked_door.tscn")
 const LOCKED_GATE_SCENE := preload("res://placeables/lockables/locked_gate.tscn")
 const HEALTH_FLASK_SCENE := preload("res://placeables/collectibles/health_flask.tscn")
 const NO_BOUNDARY_FLASK_SCENE := preload(
@@ -62,11 +64,21 @@ const FRONTEND_GALLERY_SCENE := preload("res://ui/frontend/frontend_gallery.tscn
 const WIN_SCREEN_SCENE := preload("res://ui/screens/win_screen.tscn")
 const LOSE_SCREEN_SCENE := preload("res://ui/screens/lose_screen.tscn")
 const PNG_TO_GRIDMAP_ALTERNATIVE := preload("res://addons/png_to_gridmap/png_to_gridmap_autotile_alternative.gd")
+const PNG_TO_GRIDMAP_AUTOTILE := preload("res://addons/png_to_gridmap/png_to_gridmap_autotile.gd")
+const PNG_TO_GRIDMAP_AUTO_REPAIR_WATCH := preload(
+    "res://addons/png_to_gridmap/png_to_gridmap_auto_repair_watch.gd"
+)
 const PNG_TO_GRIDMAP_COLOR_MAPPING := preload("res://addons/png_to_gridmap/png_to_gridmap_color_mapping.gd")
 const PNG_TO_GRIDMAP_FLOOR_BUILDER := preload("res://addons/png_to_gridmap/png_to_gridmap_floor_builder.gd")
 const PNG_TO_GRIDMAP_IMPORTER := preload("res://addons/png_to_gridmap/png_to_gridmap_importer.gd")
+const PNG_TO_GRIDMAP_MAPPING_CATALOG := preload(
+    "res://addons/png_to_gridmap/png_to_gridmap_mapping_catalog.gd"
+)
 const PNG_TO_GRIDMAP_PROFILE_STORE := preload("res://addons/png_to_gridmap/png_to_gridmap_profile_store.gd")
 const PNG_TO_GRIDMAP_REPAIRER := preload("res://addons/png_to_gridmap/png_to_gridmap_repairer.gd")
+const PNG_TO_GRIDMAP_RESOURCE_CATALOG := preload(
+    "res://addons/png_to_gridmap/png_to_gridmap_resource_catalog.gd"
+)
 const PNG_TO_GRIDMAP_SETTINGS := preload("res://addons/png_to_gridmap/png_to_gridmap_settings.gd")
 const SKELETON_SCENE := preload("res://enemies/skeleton.tscn")
 const SILVER_KEY_SCENE := preload("res://inventory/silver_key.tscn")
@@ -390,6 +402,8 @@ func _init() -> void:
 func _run_tests() -> void:
     var failed := false
     failed = not _test_deterministic_seed_helper_is_stable() or failed
+    failed = not _test_environment_objects_keep_authored_collision() or failed
+    failed = not _test_graveyard_mesh_library_references_use_stable_paths() or failed
     failed = not _test_map_placeables_share_spawn_time_and_physics_capabilities() or failed
     failed = not _test_debug_level_sequences_spawn_reviews_once_per_second() or failed
     failed = not _test_debug_level_enemy_patrols_ping_pong() or failed
@@ -414,6 +428,8 @@ func _run_tests() -> void:
     failed = not await _test_game_settings_batch_disk_writes() or failed
     failed = not _test_player_landing_uses_new_sample_after_a_meaningful_fall() or failed
     failed = not _test_player_fall_death_threshold() or failed
+    failed = not await _test_pickup_radius_flasks_stack_and_expire_independently() or failed
+    failed = not _test_pickup_radius_does_not_affect_treasure_deposit_range() or failed
     failed = not await _test_player_death_uses_face_blood_and_body_throes() or failed
     failed = not await _test_fire_boundary_death_blackens_and_burns_player() or failed
     failed = not _test_torch_scene_and_persistent_activation() or failed
@@ -427,6 +443,7 @@ func _run_tests() -> void:
     failed = not _test_typed_treasure_wallet_and_shop_purchases() or failed
     failed = not _test_treasure_absorption_does_not_complete_level() or failed
     failed = not _test_gate_completion_completes_level() or failed
+    failed = not _test_optional_scene_node_paths_are_empty_or_valid() or failed
     failed = not _test_reusable_gate_and_treasure_deposit_coffin_scenes() or failed
     failed = not _test_coffin_deposit_jumps_move_two_extra_coins() or failed
     failed = not _test_stairwell_scopes_kill_boundary_immunity() or failed
@@ -486,11 +503,92 @@ func _run_tests() -> void:
     failed = not _test_gridmap_repair_uses_configured_connection_groups() or failed
     failed = not _test_gridmap_repair_merges_equivalent_configurations() or failed
     failed = not _test_gridmap_repair_preserves_only_matching_alternatives() or failed
+    failed = not _test_gridmap_repair_matches_updated_wall_mesh_orientations() or failed
+    failed = not _test_auto_repair_watches_mapping_configuration_changes() or failed
+    failed = not _test_png_mapping_catalog_supports_manual_add_and_remove() or failed
+    failed = not _test_graveyard_wall_profile_uses_updated_mesh_offsets() or failed
     failed = not _test_png_profile_store_only_accepts_level_subfolders() or failed
+    failed = not _test_png_profile_store_resets_unsaved_level_state() or failed
+    failed = not _test_png_resource_catalog_selects_only_gridmap() or failed
+    failed = not _test_level_one_enables_gridmap_auto_repair() or failed
     failed = not _test_png_floor_gridmap_uses_non_transparent_pixels_and_safe_collision() or failed
     failed = not _test_png_gridmap_import_disables_y_cell_centering() or failed
     await process_frame
     quit(1 if failed else 0)
+
+
+func _test_environment_objects_keep_authored_collision() -> bool:
+    var expectations: Array[Dictionary] = [
+        {
+            "path": "res://placeables/environment/fence/fence.tscn",
+            "position": Vector3(-0.001435, 0.449779, -0.00287),
+            "size": Vector3(1.009926, 0.899558, 0.312569),
+        },
+        {
+            "path": "res://placeables/environment/tombstone/tombstone.tscn",
+            "position": Vector3(-0.05883, 0.582565, -0.020088),
+            "size": Vector3(0.413012, 1.156285, 1.041493),
+        },
+    ]
+    var passed := true
+    for expectation in expectations:
+        var scene_path := String(expectation["path"])
+        var packed_scene := load(scene_path) as PackedScene
+        var object: Node3D = null
+        if packed_scene != null:
+            object = packed_scene.instantiate() as Node3D
+        var mesh: MeshInstance3D = null
+        var body: StaticBody3D = null
+        var collision: CollisionShape3D = null
+        if object != null:
+            mesh = object.get_node_or_null(^"Mesh") as MeshInstance3D
+            body = object.get_node_or_null(^"StaticBody3D") as StaticBody3D
+            collision = object.get_node_or_null(^"StaticBody3D/CollisionShape3D") \
+                as CollisionShape3D
+        var box: BoxShape3D = null
+        if collision != null:
+            box = collision.shape as BoxShape3D
+        passed = _expect(
+            mesh != null and mesh.mesh != null,
+            "%s keeps its extracted Blender mesh" % scene_path
+        ) and passed
+        passed = _expect(
+            body != null and body.collision_layer == 1,
+            "%s provides world collision when placed outside a GridMap" % scene_path
+        ) and passed
+        passed = _expect(
+            collision != null \
+                and collision.position.is_equal_approx(expectation["position"] as Vector3) \
+                and box != null \
+                and box.size.is_equal_approx(expectation["size"] as Vector3),
+            "%s keeps the Blender-authored collision bounds" % scene_path
+        ) and passed
+        if object != null:
+            object.free()
+    return passed
+
+
+func _test_graveyard_mesh_library_references_use_stable_paths() -> bool:
+    var level_scene_paths: Array[String] = [
+        "res://levels/1/level.tscn",
+        "res://levels/2/level.tscn",
+        "res://levels/3/level.tscn",
+        "res://levels/4/level.tscn",
+        "res://levels/6/level.tscn",
+        "res://levels/7/level.tscn",
+        "res://levels/8/level.tscn",
+        "res://levels/debug-level/level.tscn",
+        "res://levels/graveyard/level.tscn",
+    ]
+    var passed := true
+    for scene_path: String in level_scene_paths:
+        var scene_source := FileAccess.get_file_as_string(scene_path)
+        passed = _expect(
+            scene_source.contains('path="res://Assets/environment/graveyard.res"') \
+                and not scene_source.contains('uid="uid://c26i1gkgrxvs7"'),
+            "%s references the rebuilt Graveyard MeshLibrary by its stable path" % scene_path
+        ) and passed
+    return passed
 
 
 func _test_map_placeables_share_spawn_time_and_physics_capabilities() -> bool:
@@ -574,11 +672,44 @@ func _test_debug_level_sequences_spawn_reviews_once_per_second() -> bool:
             sequence_is_complete = false
             break
 
+    var popup_trigger: GDTextTrigger = null
+    var pause_trigger: GDTextTrigger = null
+    if debug_level != null:
+        popup_trigger = debug_level.get_node_or_null(^"GDTextTriggerPopup") as GDTextTrigger
+        pause_trigger = debug_level.get_node_or_null(^"GDTextTriggerPause") as GDTextTrigger
+    var showcases_both_modes := popup_trigger != null \
+        and not popup_trigger.pause_game_with_text \
+        and pause_trigger != null \
+        and pause_trigger.pause_game_with_text
+    var continue_button: Button = null
+    if pause_trigger != null:
+        continue_button = pause_trigger.get_node_or_null(^"PauseLayer/ContinueButton") as Button
+    var uses_large_primary_action := continue_button != null \
+        and continue_button.custom_minimum_size == Vector2(440.0, 112.0) \
+        and is_equal_approx(continue_button.offset_top, -332.0) \
+        and is_equal_approx(continue_button.offset_bottom, -220.0) \
+        and continue_button.theme.resource_path == "res://ui/frontend/frontend_theme.tres" \
+        and continue_button.get_theme_font_size(&"font_size") == 64
+    var primary_action := InputEventJoypadButton.new()
+    primary_action.button_index = JOY_BUTTON_A
+    primary_action.pressed = true
+    var secondary_action := InputEventJoypadButton.new()
+    secondary_action.button_index = JOY_BUTTON_B
+    secondary_action.pressed = true
+    uses_large_primary_action = uses_large_primary_action \
+        and pause_trigger.call("_is_continue_input", primary_action) \
+        and not pause_trigger.call("_is_continue_input", secondary_action)
     if debug_level != null:
         debug_level.free()
     return _expect(
         sequence_is_complete,
         "the debug-level spawn-review row runs once per second from 1 through 28"
+    ) and _expect(
+        showcases_both_modes,
+        "the debug level extends the potion showcase with popup and pausing text triggers"
+    ) and _expect(
+        uses_large_primary_action,
+        "pausing text uses a large Continue button above the HUD and only the primary action"
     )
 
 
@@ -1997,6 +2128,51 @@ func _test_png_profile_store_only_accepts_level_subfolders() -> bool:
     )
 
 
+func _test_png_profile_store_resets_unsaved_level_state() -> bool:
+    var profile_store := PNG_TO_GRIDMAP_PROFILE_STORE.new(null, PNG_TO_GRIDMAP_SETTINGS)
+    var previous_settings: Resource = PNG_TO_GRIDMAP_SETTINGS.new()
+    previous_settings.mesh_library_path = "res://Assets/environment/graveyard.res"
+    previous_settings.target_gridmap_path = NodePath("PNGGridMap")
+    previous_settings.auto_repair = true
+    var level_settings: Resource = profile_store.load_for_scene(
+        previous_settings,
+        "res://levels/profile_without_saved_settings/level.tscn"
+    )
+    return _expect(
+        level_settings != previous_settings
+            and level_settings.mesh_library_path == previous_settings.mesh_library_path
+            and level_settings.target_gridmap_path.is_empty()
+            and not level_settings.auto_repair,
+        "profile-less levels retain shared mappings without inheriting another level's repair target"
+    )
+
+
+func _test_png_resource_catalog_selects_only_gridmap() -> bool:
+    var level_root := Node3D.new()
+    var grid_map := GridMap.new()
+    grid_map.name = "GridMap"
+    level_root.add_child(grid_map)
+    var selected_path: NodePath = PNG_TO_GRIDMAP_RESOURCE_CATALOG.preferred_grid_map_path(
+        level_root,
+        NodePath("MissingGridMap")
+    )
+    level_root.free()
+    return _expect(
+        selected_path == NodePath("GridMap"),
+        "PNG-to-GridMap selects a level's only GridMap when saved selection is missing"
+    )
+
+
+func _test_level_one_enables_gridmap_auto_repair() -> bool:
+    var settings := ResourceLoader.load("res://levels/1/png_to_gridmap_settings.tres")
+    return _expect(
+        settings != null
+            and settings.target_gridmap_path == NodePath("GridMap")
+            and settings.auto_repair,
+        "Level 1 targets its authored GridMap with automatic repair enabled"
+    )
+
+
 func _test_torch_scene_and_persistent_activation() -> bool:
     var torch_scene := TORCH_SCENE.instantiate()
     var mount := torch_scene.get_node("RaisedWallMount") as Node3D
@@ -2337,6 +2513,91 @@ func _test_player_fall_death_threshold() -> bool:
 
     return _expect(survives_at_threshold, "player survives exactly four metres below the floor") \
         and _expect(dies_below_threshold, "player dies below four metres under the floor")
+
+
+func _test_pickup_radius_flasks_stack_and_expire_independently() -> bool:
+    var properties := load(
+        "res://placeables/collectibles/global_flask_properties.tres"
+    ) as GDGlobalFlaskProperties
+    var player := PLAYER_SCENE.instantiate() as GDPlayer
+    root.add_child(player)
+    player.set_physics_process(false)
+
+    var first_stack_applied := player.increase_pickup_radius_percent_for(50.0, 0.2)
+    var one_stack_multiplier := player.get_pickup_radius_multiplier()
+    await create_timer(0.11).timeout
+    var second_stack_applied := player.increase_pickup_radius_percent_for(50.0, 0.2)
+    var two_stack_multiplier := player.get_pickup_radius_multiplier()
+    await create_timer(0.11).timeout
+    var first_stack_expired_multiplier := player.get_pickup_radius_multiplier()
+    await create_timer(0.11).timeout
+    var all_stacks_expired_multiplier := player.get_pickup_radius_multiplier()
+    player.free()
+
+    return _expect(
+        properties != null and is_equal_approx(properties.pickup_radius_seconds, 15.0),
+        "pickup radius flasks display and apply a fifteen-second timer"
+    ) and _expect(
+        first_stack_applied \
+            and second_stack_applied \
+            and is_equal_approx(one_stack_multiplier, 1.5) \
+            and is_equal_approx(two_stack_multiplier, 2.25),
+        "collecting a second pickup radius flask increases the active pickup radius again"
+    ) and _expect(
+        is_equal_approx(first_stack_expired_multiplier, 1.5) \
+            and is_equal_approx(all_stacks_expired_multiplier, 1.0),
+        "each pickup radius flask stack expires on its own timer"
+    )
+
+
+func _test_pickup_radius_does_not_affect_treasure_deposit_range() -> bool:
+    var player := PLAYER_SCENE.instantiate() as GDPlayer
+    root.add_child(player)
+    player.set_physics_process(false)
+    player.increase_pickup_radius_percent_for(50.0, 5.0)
+
+    var coin := GOLD_COIN_SCENE.instantiate() as GDGoldCoin
+    root.add_child(coin)
+    coin.set_physics_process(false)
+    var coin_pickup_shape := coin.get_node(
+        "PickupArea/CollisionShape3D"
+    ) as CollisionShape3D
+    var base_pickup_scale := coin_pickup_shape.get_meta(
+        "base_pickup_scale"
+    ) as Vector3
+    var one_stack_pickup_scale := coin_pickup_shape.scale
+
+    var coffin := TREASURE_DEPOSIT_COFFIN_SCENE.instantiate() as Node3D
+    root.add_child(coffin)
+    var deposit := coffin.get_node("TreasureDeposit") as GDTreasureDeposit
+    var deposit_shape := deposit.get_node(
+        "DepositArea/CollisionShape3D"
+    ) as CollisionShape3D
+    var initial_deposit_scale := deposit_shape.scale
+
+    player.increase_pickup_radius_percent_for(50.0, 5.0)
+    var two_stack_pickup_scale := coin_pickup_shape.scale
+    var boosted_deposit_scale := deposit_shape.scale
+    var deposit_radius := (deposit_shape.shape as SphereShape3D).radius
+    var deposit_ignores_pickup_radius := not deposit.is_in_group(
+        &"pickup_radius_scalable"
+    ) \
+        and initial_deposit_scale.is_equal_approx(Vector3.ONE) \
+        and boosted_deposit_scale.is_equal_approx(Vector3.ONE) \
+        and is_equal_approx(deposit_radius, deposit.detection_radius)
+
+    coin.free()
+    coffin.free()
+    player.free()
+    var passed := _expect(
+        deposit_ignores_pickup_radius,
+        "pickup radius flask stacks leave the coffin drop-off radius unchanged"
+    )
+    return _expect(
+        one_stack_pickup_scale.is_equal_approx(base_pickup_scale * 1.5) \
+            and two_stack_pickup_scale.is_equal_approx(base_pickup_scale * 2.25),
+        "pickup radius flask stacks continue to expand loose treasure pickup areas"
+    ) and passed
 
 
 func _test_player_death_uses_face_blood_and_body_throes() -> bool:
@@ -3086,6 +3347,45 @@ func _test_gate_completion_completes_level() -> bool:
     return passed
 
 
+func _test_optional_scene_node_paths_are_empty_or_valid() -> bool:
+    var door := LOCKED_DOOR_SCENE.instantiate() as Node3D
+    var gate := LOCKED_GATE_SCENE.instantiate() as Node3D
+    var vampire_level_scene := load("res://levels/vampire-maze/level.tscn") as PackedScene
+    var vampire_level := vampire_level_scene.instantiate() as Node3D
+    var generated_maze := vampire_level.get_node("GeneratedMaze") as Node3D
+    var graveyard_level_scene := load("res://levels/graveyard/level.tscn") as PackedScene
+    var graveyard_level := graveyard_level_scene.instantiate() as Node3D
+    var graveyard_camera := graveyard_level.get_node("Camera3D") as Camera3D
+    var path_expectations: Array[Dictionary] = [
+        {"node": door, "property": &"leaf_root_path"},
+        {"node": door, "property": &"unlock_area_path"},
+        {"node": door, "property": &"completion_area_path"},
+        {"node": door, "property": &"unlock_audio_player_path"},
+        {"node": gate, "property": &"leaf_root_path"},
+        {"node": gate, "property": &"unlock_area_path"},
+        {"node": gate, "property": &"completion_area_path"},
+        {"node": gate, "property": &"unlock_audio_player_path"},
+        {"node": generated_maze, "property": &"authored_content_path"},
+        {"node": graveyard_camera, "property": &"kill_boundary_path"},
+    ]
+    var passed := true
+    for expectation: Dictionary in path_expectations:
+        var node := expectation["node"] as Node
+        var property_name := expectation["property"] as StringName
+        var configured_path := node.get(property_name) as NodePath
+        passed = _expect(
+            String(configured_path).is_empty() or node.get_node_or_null(configured_path) != null,
+            "%s.%s is empty or resolves to an authored node" \
+                % [node.name, property_name]
+        ) and passed
+
+    door.free()
+    gate.free()
+    vampire_level.free()
+    graveyard_level.free()
+    return passed
+
+
 func _test_reusable_gate_and_treasure_deposit_coffin_scenes() -> bool:
     var gate := LOCKED_GATE_SCENE.instantiate() as GDLockableHingedPassage
     var coffin := TREASURE_DEPOSIT_COFFIN_SCENE.instantiate() as Node3D
@@ -3595,6 +3895,7 @@ func _test_key_scenes_have_authored_pickup_areas_and_landing_audio() -> bool:
     var gold_key := KEY_SCENE.instantiate() as GDKey
     var silver_key := SILVER_KEY_SCENE.instantiate() as GDKey
     var keys: Array[GDKey] = [gold_key, silver_key]
+    var key_inventory := GDPlayerInventory.new()
     var world_body := StaticBody3D.new()
     world_body.collision_layer = 1
     root.add_child(world_body)
@@ -3624,10 +3925,19 @@ func _test_key_scenes_have_authored_pickup_areas_and_landing_audio() -> bool:
             "%s ignores tiny contacts and plays the shared spatial landing sample after a fall" \
                 % key.name
         ) and passed
+        key_inventory._add_item(item)
+
+    passed = _expect(
+        key_inventory.get_used_inventory_units() == 0 \
+            and key_inventory.get_carried_treasure_value() == 0 \
+            and key_inventory.take_highest_value_carried_treasure() == null,
+        "carried keys remain available for locks without appearing as depositable sack treasure"
+    ) and passed
 
     world_body.free()
     for key in keys:
         key.free()
+    key_inventory.free()
     return passed
 
 
@@ -3694,13 +4004,13 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
     level_selection.persistence_enabled = false
     var test_mapping := GDLevelMapping.new()
     for index in range(16):
-        test_mapping.level_entries.append({
-            "available": true,
-            "folder_name": str(index + 1),
-            "id": "test_level_%02d" % (index + 1),
-            "name": "Test Level %d" % (index + 1),
-            "tutorial": index == 0,
-        })
+        test_mapping.level_entries.append(_create_level_definition(
+            "test_level_%02d" % (index + 1),
+            "Test Level %d" % (index + 1),
+            str(index + 1),
+            true,
+            index == 0
+        ))
     level_selection.level_mapping = test_mapping
     level_selection.last_highlighted_level_index = 12
     level_selection.level_results = {
@@ -4368,20 +4678,8 @@ func _test_level_progress_uses_stable_mapping_ids() -> bool:
     var level_selection := TestLevelSelection.new()
     var mapping := GDLevelMapping.new()
     mapping.level_entries = [
-        {
-            "available": true,
-            "folder_name": "alpha",
-            "id": "alpha",
-            "legacy_result_key": "01",
-            "name": "Alpha",
-        },
-        {
-            "available": true,
-            "folder_name": "bravo",
-            "id": "bravo",
-            "legacy_result_key": "02",
-            "name": "Bravo",
-        },
+        _create_level_definition("alpha", "Alpha", "alpha", true, false, "01"),
+        _create_level_definition("bravo", "Bravo", "bravo", true, false, "02"),
     ]
     level_selection.level_mapping = mapping
     level_selection.level_results = level_selection.migrate_results_for_test({
@@ -4393,12 +4691,10 @@ func _test_level_progress_uses_stable_mapping_ids() -> bool:
         },
     })
 
-    mapping.level_entries.insert(0, {
-        "available": true,
-        "folder_name": "new",
-        "id": "new_level",
-        "name": "New Level",
-    })
+    mapping.level_entries.insert(
+        0,
+        _create_level_definition("new_level", "New Level", "new")
+    )
     var moved_result := level_selection.get_level_result(2)
     var new_result := level_selection.get_level_result(0)
     var passed := _expect(
@@ -4416,6 +4712,24 @@ func _test_level_progress_uses_stable_mapping_ids() -> bool:
 
     level_selection.free()
     return passed
+
+
+func _create_level_definition(
+    level_id: String,
+    level_name: String,
+    level_folder_name: String,
+    is_available: bool = true,
+    is_tutorial: bool = false,
+    legacy_key: String = ""
+) -> Resource:
+    var definition := LEVEL_DEFINITION_SCRIPT.new()
+    definition.id = level_id
+    definition.display_name = level_name
+    definition.folder_name = level_folder_name
+    definition.available = is_available
+    definition.tutorial = is_tutorial
+    definition.legacy_result_key = legacy_key
+    return definition
 
 
 func _test_kill_boundary_loop_setting() -> bool:
@@ -9812,6 +10126,195 @@ func _test_gridmap_repair_preserves_only_matching_alternatives() -> bool:
     return passed
 
 
+func _test_gridmap_repair_matches_updated_wall_mesh_orientations() -> bool:
+    var settings: Resource = PNG_TO_GRIDMAP_SETTINGS.new()
+    var mapping: Resource = PNG_TO_GRIDMAP_COLOR_MAPPING.new()
+    mapping.autotile_enabled = true
+    mapping.base_item_ref = "wall-base"
+    mapping.solo_item_ref = "wall-solo"
+    mapping.end_item_ref = "wall-end"
+    mapping.corner_item_ref = "wall-corner"
+    mapping.corner_rotation_offset = 1
+    mapping.tee_item_ref = "wall-tee"
+    mapping.cross_item_ref = "wall-cross"
+    settings.color_mappings = [mapping] as Array[Resource]
+
+    var library := MeshLibrary.new()
+    _add_test_mesh_library_item(library, TestAutotileItem.Base, "wall-base")
+    _add_test_mesh_library_item(library, TestAutotileItem.Solo, "wall-solo")
+    _add_test_mesh_library_item(library, TestAutotileItem.End, "wall-end")
+    _add_test_mesh_library_item(library, TestAutotileItem.Corner, "wall-corner")
+    _add_test_mesh_library_item(library, TestAutotileItem.Tee, "wall-tee")
+    _add_test_mesh_library_item(library, TestAutotileItem.Cross, "wall-cross")
+    var grid_map := GridMap.new()
+    grid_map.mesh_library = library
+    var repairer: RefCounted = PNG_TO_GRIDMAP_REPAIRER.new()
+    var passed := true
+    var shape_specs: Array[Dictionary] = [
+        {
+            "item_id": TestAutotileItem.Corner,
+            "source_mask": PNG_TO_GRIDMAP_AUTOTILE.WEST | PNG_TO_GRIDMAP_AUTOTILE.SOUTH,
+            "world_masks": [
+                PNG_TO_GRIDMAP_AUTOTILE.NORTH | PNG_TO_GRIDMAP_AUTOTILE.EAST,
+                PNG_TO_GRIDMAP_AUTOTILE.EAST | PNG_TO_GRIDMAP_AUTOTILE.SOUTH,
+                PNG_TO_GRIDMAP_AUTOTILE.SOUTH | PNG_TO_GRIDMAP_AUTOTILE.WEST,
+                PNG_TO_GRIDMAP_AUTOTILE.WEST | PNG_TO_GRIDMAP_AUTOTILE.NORTH,
+            ],
+        },
+        {
+            "item_id": TestAutotileItem.Tee,
+            "source_mask": (
+                PNG_TO_GRIDMAP_AUTOTILE.EAST
+                | PNG_TO_GRIDMAP_AUTOTILE.SOUTH
+                | PNG_TO_GRIDMAP_AUTOTILE.WEST
+            ),
+            "world_masks": [
+                PNG_TO_GRIDMAP_AUTOTILE.NORTH | PNG_TO_GRIDMAP_AUTOTILE.EAST | PNG_TO_GRIDMAP_AUTOTILE.SOUTH,
+                PNG_TO_GRIDMAP_AUTOTILE.EAST | PNG_TO_GRIDMAP_AUTOTILE.SOUTH | PNG_TO_GRIDMAP_AUTOTILE.WEST,
+                PNG_TO_GRIDMAP_AUTOTILE.SOUTH | PNG_TO_GRIDMAP_AUTOTILE.WEST | PNG_TO_GRIDMAP_AUTOTILE.NORTH,
+                PNG_TO_GRIDMAP_AUTOTILE.WEST | PNG_TO_GRIDMAP_AUTOTILE.NORTH | PNG_TO_GRIDMAP_AUTOTILE.EAST,
+            ],
+        },
+    ]
+    for shape_spec: Dictionary in shape_specs:
+        for world_mask: int in shape_spec["world_masks"]:
+            grid_map.clear()
+            grid_map.set_cell_item(Vector3i.ZERO, TestAutotileItem.Base)
+            _set_gridmap_neighbours_for_mask(grid_map, world_mask)
+            var plan: Dictionary = repairer.build_plan(settings, grid_map, {})
+            var change := _gridmap_repair_change_for_cell(plan["changes"], Vector3i.ZERO)
+            var orientation := int(change.get("orientation", -1))
+            var repaired_mask := _transform_cardinal_mask(
+                int(shape_spec["source_mask"]),
+                grid_map.get_basis_with_orthogonal_index(orientation)
+            )
+            passed = _expect(
+                int(change.get("item_id", GridMap.INVALID_CELL_ITEM)) == int(shape_spec["item_id"])
+                    and repaired_mask == world_mask,
+                "GridMap repair aligns updated corner and tee meshes for world mask %s" % world_mask
+            ) and passed
+    grid_map.free()
+    return passed
+
+
+func _test_auto_repair_watches_mapping_configuration_changes() -> bool:
+    var settings: Resource = PNG_TO_GRIDMAP_SETTINGS.new()
+    var mapping: Resource = PNG_TO_GRIDMAP_COLOR_MAPPING.new()
+    mapping.autotile_enabled = true
+    mapping.base_item_ref = "wall-base"
+    mapping.corner_item_ref = "wall-corner"
+    settings.color_mappings = [mapping] as Array[Resource]
+    var repairer: RefCounted = PNG_TO_GRIDMAP_REPAIRER.new()
+    var initial_configuration := int(repairer.configuration_fingerprint(settings, {}))
+    mapping.corner_rotation_offset = 1
+    var changed_configuration := int(repairer.configuration_fingerprint(settings, {}))
+    var grid_map := GridMap.new()
+    var watch: RefCounted = PNG_TO_GRIDMAP_AUTO_REPAIR_WATCH.new()
+    var observes_initial_state: bool = not watch.should_repair(grid_map, 0, initial_configuration)
+    var debounces_configuration_change: bool = not watch.should_repair(
+        grid_map,
+        200,
+        changed_configuration
+    )
+    var repairs_after_debounce: bool = watch.should_repair(grid_map, 800, changed_configuration)
+    watch.accept_repair(grid_map, changed_configuration)
+    var passed := _expect(
+        initial_configuration != changed_configuration,
+        "autotile rotation edits change the repair configuration fingerprint"
+    ) and _expect(
+        observes_initial_state and debounces_configuration_change and repairs_after_debounce,
+        "auto repair runs after mapping changes settle without requiring a GridMap paint edit"
+    )
+    grid_map.free()
+    return passed
+
+
+func _test_png_mapping_catalog_supports_manual_add_and_remove() -> bool:
+    var settings: Resource = PNG_TO_GRIDMAP_SETTINGS.new()
+    var colour := Color(0.25, 0.5, 0.75, 1.0)
+    var key := PNGToGridMapImageGrid.colour_key(colour)
+    var mapping: Resource = PNG_TO_GRIDMAP_MAPPING_CATALOG.add_mapping(settings, colour)
+    var manual_keys: Array[String] = PNG_TO_GRIDMAP_MAPPING_CATALOG.ordered_keys(settings, [])
+    PNG_TO_GRIDMAP_MAPPING_CATALOG.remove_mapping(settings, mapping)
+    var ignored_detection: Resource = PNG_TO_GRIDMAP_MAPPING_CATALOG.ensure_detected_mapping(
+        settings,
+        key,
+        colour
+    )
+    var detected_keys: Array[String] = PNG_TO_GRIDMAP_MAPPING_CATALOG.ordered_keys(
+        settings,
+        [key]
+    )
+    var stayed_unconfigured: bool = ignored_detection == null \
+        and settings.color_mappings.is_empty() \
+        and detected_keys == [key]
+    var restored: Resource = PNG_TO_GRIDMAP_MAPPING_CATALOG.add_mapping(settings, colour)
+    return _expect(
+        manual_keys == [key],
+        "manual colour mappings remain editable when no PNG is loaded"
+    ) and _expect(
+        stayed_unconfigured,
+        "removed mappings stay unconfigured while their PNG colour remains visible"
+    ) and _expect(
+        restored != null and not settings.ignored_colour_keys.has(key),
+        "an editor can restore a removed mapping from the manual controls"
+    )
+
+
+func _test_graveyard_wall_profile_uses_updated_mesh_offsets() -> bool:
+    var settings := load(
+        "res://addons/png_to_gridmap/settings/png_to_gridmap_configuration_for_graveyard.tres"
+    ) as Resource
+    var configured_autotiles := 0
+    var passed := settings != null
+    if settings == null:
+        return _expect(false, "graveyard PNG-to-GridMap profile loads")
+    for mapping: Resource in settings.color_mappings:
+        if not mapping.autotile_enabled:
+            continue
+        configured_autotiles += 1
+        passed = _expect(
+            mapping.end_rotation_offset == 0
+                and mapping.corner_rotation_offset == 1
+                and mapping.tee_rotation_offset == 0,
+            "graveyard wall mapping matches the updated end, corner, and tee mesh orientations"
+        ) and passed
+    return _expect(configured_autotiles == 2, "both graveyard wall colours use autotiling") and passed
+
+
+func _set_gridmap_neighbours_for_mask(grid_map: GridMap, mask: int) -> void:
+    var directions: Array[Array] = [
+        [PNG_TO_GRIDMAP_AUTOTILE.NORTH, Vector3i(0, 0, -1)],
+        [PNG_TO_GRIDMAP_AUTOTILE.EAST, Vector3i(1, 0, 0)],
+        [PNG_TO_GRIDMAP_AUTOTILE.SOUTH, Vector3i(0, 0, 1)],
+        [PNG_TO_GRIDMAP_AUTOTILE.WEST, Vector3i(-1, 0, 0)],
+    ]
+    for direction: Array in directions:
+        if (mask & int(direction[0])) != 0:
+            grid_map.set_cell_item(direction[1] as Vector3i, TestAutotileItem.Base)
+
+
+func _transform_cardinal_mask(mask: int, basis: Basis) -> int:
+    var result := 0
+    var directions: Array[Array] = [
+        [PNG_TO_GRIDMAP_AUTOTILE.NORTH, Vector3(0.0, 0.0, -1.0)],
+        [PNG_TO_GRIDMAP_AUTOTILE.EAST, Vector3(1.0, 0.0, 0.0)],
+        [PNG_TO_GRIDMAP_AUTOTILE.SOUTH, Vector3(0.0, 0.0, 1.0)],
+        [PNG_TO_GRIDMAP_AUTOTILE.WEST, Vector3(-1.0, 0.0, 0.0)],
+    ]
+    for direction: Array in directions:
+        if (mask & int(direction[0])) == 0:
+            continue
+        var transformed := basis * (direction[1] as Vector3)
+        if absf(transformed.x) > absf(transformed.z):
+            result |= PNG_TO_GRIDMAP_AUTOTILE.EAST \
+                if transformed.x > 0.0 else PNG_TO_GRIDMAP_AUTOTILE.WEST
+        else:
+            result |= PNG_TO_GRIDMAP_AUTOTILE.SOUTH \
+                if transformed.z > 0.0 else PNG_TO_GRIDMAP_AUTOTILE.NORTH
+    return result
+
+
 func _test_png_floor_gridmap_uses_non_transparent_pixels_and_safe_collision() -> bool:
     var image := Image.create(2, 2, false, Image.FORMAT_RGBA8)
     image.fill(Color.TRANSPARENT)
@@ -10006,6 +10509,10 @@ func _test_minimap_left_trigger_expands_and_restores_layout() -> bool:
                 break
 
     Input.action_press(&"expand_minimap")
+    var expand_event := InputEventAction.new()
+    expand_event.action = &"expand_minimap"
+    expand_event.pressed = true
+    minimap.call("_unhandled_input", expand_event)
     minimap.call("_process", 0.016)
     var visible_size := root.get_visible_rect().size
     var expected_expanded_size := visible_size \
@@ -10057,6 +10564,10 @@ func _test_minimap_left_trigger_expands_and_restores_layout() -> bool:
         )
 
     Input.action_release(&"expand_minimap")
+    var restore_event := InputEventAction.new()
+    restore_event.action = &"expand_minimap"
+    restore_event.pressed = false
+    minimap.call("_unhandled_input", restore_event)
     minimap.call("_process", 0.016)
     passed = _expect(
         not (minimap.call("is_minimap_expanded") as bool),

@@ -1,0 +1,186 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/png_to_gridmap/png_to_gridmap_dock.gd" id="1_dock"]
+
+[node name="PNGToGridMapDock" type="VBoxContainer"]
+script = ExtResource("1_dock")
+
+[node name="MainScroll" type="ScrollContainer" parent="."]
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Content" type="VBoxContainer" parent="MainScroll"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Title" type="Label" parent="MainScroll/Content"]
+theme_override_font_sizes/font_size = 18
+
+[node name="OperationSection" type="Label" parent="MainScroll/Content"]
+theme_override_font_sizes/font_size = 14
+text = "Operation"
+
+[node name="OperationOption" type="OptionButton" parent="MainScroll/Content"]
+size_flags_horizontal = 3
+
+[node name="InputsSection" type="Label" parent="MainScroll/Content"]
+theme_override_font_sizes/font_size = 14
+text = "Inputs"
+
+[node name="InputButtons" type="HFlowContainer" parent="MainScroll/Content"]
+
+[node name="LoadPNG" type="Button" parent="MainScroll/Content/InputButtons"]
+text = "Load PNG"
+
+[node name="Refresh" type="Button" parent="MainScroll/Content/InputButtons"]
+text = "Refresh"
+
+[node name="PNGPath" type="Label" parent="MainScroll/Content"]
+size_flags_horizontal = 3
+tooltip_text = "No PNG loaded"
+text = "No PNG loaded"
+clip_text = true
+
+[node name="GridMapLabel" type="Label" parent="MainScroll/Content"]
+text = "GridMap"
+
+[node name="TargetGridMapOption" type="OptionButton" parent="MainScroll/Content"]
+size_flags_horizontal = 3
+
+[node name="GridMapNameLabel" type="Label" parent="MainScroll/Content"]
+text = "GridMap name"
+
+[node name="GridMapNameEdit" type="LineEdit" parent="MainScroll/Content"]
+
+[node name="MeshLibraryLabel" type="Label" parent="MainScroll/Content"]
+text = "MeshLibrary"
+
+[node name="MeshLibraryOption" type="OptionButton" parent="MainScroll/Content"]
+size_flags_horizontal = 3
+
+[node name="LevelSettingsSection" type="Label" parent="MainScroll/Content"]
+theme_override_font_sizes/font_size = 14
+text = "Level Settings"
+
+[node name="ConfigureButton" type="Button" parent="MainScroll/Content"]
+text = "Configure Wall Tiles and Colours"
+
+[node name="AdvancedButton" type="Button" parent="MainScroll/Content"]
+toggle_mode = true
+text = "More Level Settings"
+
+[node name="AdvancedContainer" type="VBoxContainer" parent="MainScroll/Content"]
+visible = false
+
+[node name="AdvancedGrid" type="GridContainer" parent="MainScroll/Content/AdvancedContainer"]
+columns = 2
+
+[node name="CellSizeLabel" type="Label" parent="MainScroll/Content/AdvancedContainer/AdvancedGrid"]
+text = "Cell size"
+
+[node name="CellSizeSpin" type="SpinBox" parent="MainScroll/Content/AdvancedContainer/AdvancedGrid"]
+min_value = 0.01
+max_value = 1024.0
+step = 0.01
+
+[node name="AutoRepairCheck" type="CheckBox" parent="MainScroll/Content/AdvancedContainer"]
+text = "Auto repair"
+
+[node name="FloorSection" type="Label" parent="MainScroll/Content"]
+theme_override_font_sizes/font_size = 14
+text = "Floor GridMap"
+
+[node name="FloorMaterialOption" type="OptionButton" parent="MainScroll/Content"]
+size_flags_horizontal = 3
+
+[node name="OutputsSection" type="Label" parent="MainScroll/Content"]
+theme_override_font_sizes/font_size = 14
+text = "Output"
+
+[node name="OutputLabel" type="Label" parent="MainScroll/Content"]
+size_flags_horizontal = 3
+tooltip_text = "Output: choose inputs first"
+text = "Output: choose inputs first"
+clip_text = true
+
+[node name="OutputPNGButtons" type="HFlowContainer" parent="MainScroll/Content"]
+
+[node name="ChoosePNG" type="Button" parent="MainScroll/Content/OutputPNGButtons"]
+text = "Choose PNG"
+
+[node name="FooterSeparator" type="HSeparator" parent="."]
+
+[node name="ValidationLabel" type="RichTextLabel" parent="."]
+custom_minimum_size = Vector2(0, 84)
+bbcode_enabled = false
+fit_content = false
+scroll_active = true
+
+[node name="FooterButtons" type="HFlowContainer" parent="."]
+
+[node name="Run" type="Button" parent="FooterButtons"]
+text = "Run"
+
+[node name="RepairGridMap" type="Button" parent="FooterButtons"]
+text = "Repair Gridmap"
+
+[node name="CreateFloor" type="Button" parent="FooterButtons"]
+text = "Create Floor"
+
+[node name="ConfigurationPopup" type="PopupPanel" parent="."]
+title = "Wall Tile and Colour Configuration"
+
+[node name="PopupContent" type="VBoxContainer" parent="ConfigurationPopup"]
+custom_minimum_size = Vector2(520, 560)
+
+[node name="LibraryRow" type="HBoxContainer" parent="ConfigurationPopup/PopupContent"]
+
+[node name="Label" type="Label" parent="ConfigurationPopup/PopupContent/LibraryRow"]
+text = "Wall pieces file"
+
+[node name="Path" type="LineEdit" parent="ConfigurationPopup/PopupContent/LibraryRow"]
+size_flags_horizontal = 3
+
+[node name="Browse" type="Button" parent="ConfigurationPopup/PopupContent/LibraryRow"]
+text = "Browse"
+
+[node name="FolderRow" type="HBoxContainer" parent="ConfigurationPopup/PopupContent"]
+
+[node name="Label" type="Label" parent="ConfigurationPopup/PopupContent/FolderRow"]
+text = "Floor materials folder"
+
+[node name="Path" type="LineEdit" parent="ConfigurationPopup/PopupContent/FolderRow"]
+size_flags_horizontal = 3
+
+[node name="Browse" type="Button" parent="ConfigurationPopup/PopupContent/FolderRow"]
+text = "Browse"
+
+[node name="ManualMappingRow" type="HBoxContainer" parent="ConfigurationPopup/PopupContent"]
+
+[node name="Label" type="Label" parent="ConfigurationPopup/PopupContent/ManualMappingRow"]
+text = "Manual colour"
+
+[node name="Colour" type="ColorPickerButton" parent="ConfigurationPopup/PopupContent/ManualMappingRow"]
+custom_minimum_size = Vector2(56, 0)
+color = Color(1, 0, 1, 1)
+
+[node name="AddMapping" type="Button" parent="ConfigurationPopup/PopupContent/ManualMappingRow"]
+size_flags_horizontal = 3
+text = "Add Colour Mapping"
+
+[node name="MappingsScroll" type="ScrollContainer" parent="ConfigurationPopup/PopupContent"]
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Rows" type="VBoxContainer" parent="ConfigurationPopup/PopupContent/MappingsScroll"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Close" type="Button" parent="ConfigurationPopup/PopupContent"]
+text = "Close"
+
+[node name="ImportWarningDialog" type="ConfirmationDialog" parent="."]
+title = "Import with Warnings?"
+
+[node name="OverwriteWarningDialog" type="ConfirmationDialog" parent="."]
+title = "Overwrite PNG?"

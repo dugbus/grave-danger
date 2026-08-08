@@ -8,7 +8,6 @@ const TEXT_VISUAL_LAYER := 1 << 19
 const FADE_IN_DURATION := 0.2
 const MIN_TRIGGER_SIZE := 0.05
 const FLASK_EFFECT_TEXT_GROUP := &"flask_effect_text"
-const CONTINUE_ACTIONS: Array[StringName] = [&"ui_accept", &"drop_carried"]
 const DIM_OVERLAY_DISTANCE_PADDING := 0.35
 
 @export_group("Content")
@@ -88,15 +87,15 @@ const DIM_OVERLAY_DISTANCE_PADDING := 0.35
 		_apply_dim_overlay_opacity()
 
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
+@onready var heading_text_mesh_instance: MeshInstance3D = $HeadingText
+@onready var body_text_mesh_instance: MeshInstance3D = $BodyText
+@onready var dim_overlay_mesh_instance: MeshInstance3D = $DimOverlay
+@onready var text_light: OmniLight3D = $TextLight
+@onready var pause_layer: CanvasLayer = $PauseLayer
+@onready var continue_button: Button = $PauseLayer/ContinueButton
 
-var heading_text_mesh_instance: MeshInstance3D
-var body_text_mesh_instance: MeshInstance3D
-var dim_overlay_mesh_instance: MeshInstance3D
 var dim_overlay_mesh: QuadMesh
 var dim_overlay_material: StandardMaterial3D
-var text_light: OmniLight3D
-var pause_layer: CanvasLayer
-var continue_button: Button
 var heading_text_mesh: TextMesh
 var body_text_mesh: TextMesh
 var heading_text_material: ShaderMaterial
@@ -127,7 +126,6 @@ func _ready() -> void:
 	set_process_input(true)
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
-	_create_runtime_nodes()
 	_configure_text_nodes()
 	_configure_pause_layer()
 	_hide_text()
@@ -182,45 +180,6 @@ func _configure_text_nodes() -> void:
 	_configure_text_meshes()
 	_configure_materials()
 	_update_text_content()
-
-
-func _create_runtime_nodes() -> void:
-	heading_text_mesh_instance = MeshInstance3D.new()
-	heading_text_mesh_instance.name = "HeadingText"
-	add_child(heading_text_mesh_instance)
-
-	body_text_mesh_instance = MeshInstance3D.new()
-	body_text_mesh_instance.name = "BodyText"
-	add_child(body_text_mesh_instance)
-
-	dim_overlay_mesh_instance = MeshInstance3D.new()
-	dim_overlay_mesh_instance.name = "DimOverlay"
-	add_child(dim_overlay_mesh_instance)
-
-	text_light = OmniLight3D.new()
-	text_light.name = "TextLight"
-	add_child(text_light)
-
-	pause_layer = CanvasLayer.new()
-	pause_layer.name = "PauseLayer"
-	pause_layer.layer = 190
-	add_child(pause_layer)
-
-	continue_button = Button.new()
-	continue_button.name = "ContinueButton"
-	continue_button.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	continue_button.offset_left = -110.0
-	continue_button.offset_top = -112.0
-	continue_button.offset_right = 110.0
-	continue_button.offset_bottom = -56.0
-	continue_button.focus_mode = Control.FOCUS_ALL
-	continue_button.disabled = false
-	continue_button.add_theme_font_size_override("font_size", 32)
-	continue_button.add_theme_color_override("font_color", Color(1.0, 0.94, 0.78, 1.0))
-	continue_button.add_theme_color_override("font_focus_color", Color.WHITE)
-	continue_button.add_theme_color_override("font_hover_color", Color.WHITE)
-	continue_button.add_theme_stylebox_override("focus", _create_continue_focus_style())
-	pause_layer.add_child(continue_button)
 
 
 func _apply_trigger_size() -> void:
@@ -491,25 +450,19 @@ func _update_continue_button() -> void:
 	continue_button_has_focus = true
 
 
-func _create_continue_focus_style() -> StyleBoxFlat:
-	var focus_style := StyleBoxFlat.new()
-	focus_style.bg_color = Color(1.0, 0.94, 0.78, 0.18)
-	focus_style.border_color = Color(1.0, 0.94, 0.78, 0.95)
-	focus_style.set_border_width_all(2)
-	focus_style.set_corner_radius_all(4)
-	focus_style.set_expand_margin_all(4.0)
-	return focus_style
-
-
 func _is_continue_input(event: InputEvent) -> bool:
-	if event.is_echo():
-		return false
+	if InputMap.has_action(&"ui_accept") and event.is_action_pressed(&"ui_accept"):
+		return true
 
-	for action: StringName in CONTINUE_ACTIONS:
-		if event.is_action_pressed(action):
-			return true
+	var joypad_event := event as InputEventJoypadButton
+	if joypad_event != null:
+		return joypad_event.pressed and joypad_event.button_index == JOY_BUTTON_A
 
-	return false
+	var key_event := event as InputEventKey
+	return key_event != null \
+		and key_event.pressed \
+		and not key_event.echo \
+		and key_event.physical_keycode in [KEY_ENTER, KEY_SPACE]
 
 
 func _suppress_flask_effect_text() -> void:
@@ -540,6 +493,8 @@ func _on_body_entered(body: Node3D) -> void:
 
 func _detect_initial_overlaps() -> void:
 	await get_tree().physics_frame
+	if not monitoring:
+		return
 	for body in get_overlapping_bodies():
 		if body is Node3D:
 			_on_body_entered(body as Node3D)

@@ -1,0 +1,57 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://Assets/placeables/collectibles/flask.glb" id="1_flask"]
+
+[node name="ActiveFlaskEffectSlot" type="VBoxContainer"]
+custom_minimum_size = Vector2(328, 408)
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ViewportContainer" type="SubViewportContainer" parent="."]
+custom_minimum_size = Vector2(288, 288)
+mouse_filter = 2
+stretch = true
+
+[node name="Viewport" type="SubViewport" parent="ViewportContainer"]
+own_world_3d = true
+size = Vector2i(288, 288)
+transparent_bg = true
+render_target_update_mode = 4
+
+[node name="FlaskPreviewWorld" type="Node3D" parent="ViewportContainer/Viewport"]
+
+[node name="FlaskPreviewVisual" type="Node3D" parent="ViewportContainer/Viewport/FlaskPreviewWorld"]
+
+[node name="Flask" parent="ViewportContainer/Viewport/FlaskPreviewWorld/FlaskPreviewVisual" instance=ExtResource("1_flask")]
+
+[node name="PreviewLight" type="DirectionalLight3D" parent="ViewportContainer/Viewport/FlaskPreviewWorld"]
+rotation_degrees = Vector3(-45, 35, 0)
+light_energy = 2.6
+
+[node name="PreviewFillLight" type="OmniLight3D" parent="ViewportContainer/Viewport/FlaskPreviewWorld"]
+position = Vector3(-1.5, 1.2, 2)
+light_energy = 1.0
+omni_range = 4.0
+
+[node name="PreviewCamera" type="Camera3D" parent="ViewportContainer/Viewport/FlaskPreviewWorld"]
+current = true
+
+[node name="EffectName" type="Label" parent="."]
+custom_minimum_size = Vector2(328, 48)
+theme_override_colors/font_color = Color(1, 0.94, 0.78, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 36
+text_overrun_behavior = 3
+horizontal_alignment = 1
+
+[node name="Countdown" type="Label" parent="."]
+custom_minimum_size = Vector2(328, 54)
+theme_override_colors/font_color = Color(1, 0.94, 0.78, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 48
+horizontal_alignment = 1

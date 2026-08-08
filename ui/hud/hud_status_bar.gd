@@ -16,6 +16,7 @@ const SHELL_BORDER := Color(0.92, 0.83, 0.58, 0.58)
 const INNER_BORDER := Color(0.96, 0.98, 0.9, 0.36)
 const HIGHLIGHT := Color(1.0, 1.0, 0.9, 0.34)
 const WARNING := Color(1.0, 0.18, 0.08, 0.82)
+const RATIO_SETTLED_EPSILON := 0.0001
 
 var warning_at_top := false
 
@@ -45,7 +46,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_sync_viewport_rect()
 	get_viewport().size_changed.connect(_sync_viewport_rect)
-	set_process(true)
+	_refresh_processing()
 
 
 func set_ratio(value: float, is_inactive: bool = false) -> void:
@@ -53,6 +54,8 @@ func set_ratio(value: float, is_inactive: bool = false) -> void:
 
 	target_ratio = next_ratio
 	inactive = is_inactive
+	queue_redraw()
+	_refresh_processing()
 
 
 func configure_size(width: float, height: float, top: float) -> void:
@@ -75,11 +78,13 @@ func configure_label_text(text: String) -> void:
 
 
 func _process(delta: float) -> void:
-	_sync_viewport_rect()
 	elapsed += delta
 	var smooth_t := 1.0 - exp(-12.0 * delta)
 	visible_ratio = lerpf(visible_ratio, target_ratio, smooth_t)
+	if absf(visible_ratio - target_ratio) <= RATIO_SETTLED_EPSILON:
+		visible_ratio = target_ratio
 	queue_redraw()
+	_refresh_processing()
 
 
 func _sync_viewport_rect() -> void:
@@ -94,8 +99,17 @@ func _sync_viewport_rect() -> void:
 		var window_size := Vector2(DisplayServer.window_get_size())
 		target_size = Vector2(maxf(target_size.x, window_size.x), maxf(target_size.y, window_size.y))
 
-	position = Vector2.ZERO
-	size = target_size
+	if position != Vector2.ZERO or size != target_size:
+		position = Vector2.ZERO
+		size = target_size
+		queue_redraw()
+
+
+func _refresh_processing() -> void:
+	set_process(
+		absf(visible_ratio - target_ratio) > RATIO_SETTLED_EPSILON
+		or _is_warning_active()
+	)
 
 
 func _draw() -> void:
@@ -143,6 +157,7 @@ func configure_style(
 	inset_pixels = maxf(p_inset_pixels, 0.0)
 	warning_threshold = clampf(p_warning_threshold, 0.0, 1.0)
 	queue_redraw()
+	_refresh_processing()
 
 
 func _is_warning_active() -> bool:

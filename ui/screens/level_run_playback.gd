@@ -4,14 +4,15 @@ class_name GDLevelRunPlayback
 ## Loads and displays a lightweight replay behind level details.
 
 const RUN_RECORDING := preload("res://game/run_recording.gd")
-const PLAYBACK_PLAYER_SCRIPT := preload("res://ui/screens/level_run_playback_player.gd")
+const PlaybackFrame := preload("res://ui/screens/level_run_playback_frame.gd")
+const PlaybackPreview := preload("res://ui/screens/level_run_playback_preview.gd")
+const PlaybackDrift := preload("res://ui/screens/level_run_playback_drift.gd")
+const MUTED_AUDIO_BUS: StringName = PlaybackPreview.MUTED_AUDIO_BUS
 const WALK_ANIMATION_CANDIDATES: Array[String] = ["walk", "sprint", "move-forward"]
 const IDLE_ANIMATION_CANDIDATES: Array[String] = ["idle", "static"]
 const DEATH_ANIMATION_CANDIDATES: Array[String] = ["death", "die", "fall"]
 const PREVIEW_DWELL_SECONDS := 0.18
-const MUTED_AUDIO_BUS: StringName = &"RunPlaybackMuted"
 const FLASK_COLLECTION_DISTANCE := 0.8
-const DRIFT_POSITION_TOLERANCE := 0.05
 const RUN_PLAYBACK_SESSION_GROUP: StringName = &"run_playback_session"
 
 enum LoadState {
@@ -52,7 +53,7 @@ var drift_warned_paths: Dictionary = {}
 
 func _ready() -> void:
     visible = false
-    _ensure_muted_audio_bus()
+    PlaybackPreview.ensure_muted_audio_bus()
     get_tree().node_added.connect(_on_tree_node_added)
     playback_viewport.own_world_3d = true
     playback_viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
@@ -279,36 +280,14 @@ func _advance_playback(delta: float) -> void:
 
 
 func _apply_frame(frame_index: int, interpolation: float) -> void:
-    if playback_player == null or playback_camera == null:
-        return
-    var positions := recording.get("player_positions", PackedVector3Array()) \
-        as PackedVector3Array
-    var yaws := recording.get("player_yaws", PackedFloat32Array()) as PackedFloat32Array
-    var camera_positions := recording.get("camera_positions", PackedVector3Array()) \
-        as PackedVector3Array
-    var camera_rotations := recording.get("camera_rotations", PackedVector4Array()) \
-        as PackedVector4Array
-    if frame_index < 0 or frame_index >= positions.size():
-        return
-
-    var next_index := mini(frame_index + 1, positions.size() - 1)
-    playback_player.global_position = positions[frame_index].lerp(
-        positions[next_index],
+    PlaybackFrame.apply(
+        recording,
+        playback_player,
+        playback_pivot,
+        playback_camera,
+        frame_index,
         interpolation
     )
-    if playback_pivot != null:
-        playback_pivot.rotation.y = lerp_angle(
-            yaws[frame_index],
-            yaws[next_index],
-            interpolation
-        )
-    playback_camera.global_position = camera_positions[frame_index].lerp(
-        camera_positions[next_index],
-        interpolation
-    )
-    var current_rotation := _vector_to_quaternion(camera_rotations[frame_index])
-    var next_rotation := _vector_to_quaternion(camera_rotations[next_index])
-    playback_camera.global_basis = Basis(current_rotation.slerp(next_rotation, interpolation))
 
 
 func _update_animation(delta: float, frame_index: int) -> void:
@@ -332,70 +311,27 @@ func _update_animation(delta: float, frame_index: int) -> void:
 
 
 func _find_frame_index(frame_times: PackedFloat32Array, time: float) -> int:
-    var low := 0
-    var high := frame_times.size() - 1
-    while low <= high:
-        var middle := floori(float(low + high) * 0.5)
-        if frame_times[middle] <= time:
-            low = middle + 1
-        else:
-            high = middle - 1
-    return clampi(high, 0, frame_times.size() - 1)
+    return PlaybackFrame.find_frame_index(frame_times, time)
 
 
 func _prepare_preview_tree(node: Node) -> void:
-    if node is Camera3D:
-        (node as Camera3D).current = false
-    if node is AudioStreamPlayer or node is AudioStreamPlayer2D or node is AudioStreamPlayer3D:
-        _mute_audio_node(node)
-    for child in node.get_children():
-        _prepare_preview_tree(child)
+    PlaybackPreview.prepare_tree(node)
 
 
 func _configure_playback_player(player_node: Node3D) -> void:
-    if player_node.get_script() != PLAYBACK_PLAYER_SCRIPT:
-        player_node.set_script(PLAYBACK_PLAYER_SCRIPT)
-    player_node.set_process(false)
-    player_node.set_physics_process(false)
-    var collision_body := player_node as CollisionObject3D
-    if collision_body != null:
-        collision_body.collision_mask = 0
+    PlaybackPreview.configure_player(player_node)
 
 
 func _isolate_preview_state(node: Node) -> void:
-    if node is GDTorch:
-        node.set_physics_process(false)
-    if node is GDTreasureDeposit:
-        node.set_physics_process(false)
-    if node is GDTextTrigger:
-        node.process_mode = Node.PROCESS_MODE_DISABLED
-        node.set_process_input(false)
-        _disable_preview_area(node as Area3D, false)
-    if node is GDFlaskBase:
-        node.set_physics_process(false)
-        _disable_preview_area(node.get_node_or_null(^"PickupArea") as Area3D)
-    if node is GDLockableHingedPassage:
-        var completion_path: NodePath = node.get("completion_area_path") as NodePath
-        _disable_preview_area(node.get_node_or_null(completion_path) as Area3D)
-    for child in node.get_children():
-        _isolate_preview_state(child)
+    PlaybackPreview.isolate_state(node)
 
 
 func _start_preview_runtime(node: Node) -> void:
-    if node is GDKillBoundary3D:
-        (node as GDKillBoundary3D).begin_runtime_animation()
-    for child in node.get_children():
-        _start_preview_runtime(child)
+    PlaybackPreview.start_runtime(node)
 
 
 func _disable_preview_area(area: Area3D, stop_monitoring: bool = true) -> void:
-    if area == null:
-        return
-    if stop_monitoring:
-        area.set_deferred("monitoring", false)
-        area.set_deferred("monitorable", false)
-    area.collision_layer = 0
-    area.collision_mask = 0
+    PlaybackPreview.disable_area(area, stop_monitoring)
 
 
 func _collect_preview_flasks() -> void:
@@ -424,78 +360,30 @@ func _apply_recorded_run_settings() -> void:
 
 
 func _report_playback_drift() -> void:
-    if not OS.is_debug_build() or playback_level == null:
-        return
-    var run_metadata := recording.get("run_metadata", {}) as Dictionary
-    var checkpoints := run_metadata.get("drift_checkpoints", []) as Array
-    while drift_checkpoint_index < checkpoints.size():
-        var checkpoint := checkpoints[drift_checkpoint_index] as Dictionary
-        if float(checkpoint.get("time", 0.0)) > playback_time:
-            return
-        _report_checkpoint_drift(checkpoint, String(run_metadata.get("level_id", "unknown")))
-        drift_checkpoint_index += 1
-
-
-func _report_checkpoint_drift(checkpoint: Dictionary, recorded_level_id: String) -> void:
-    var checkpoint_time := float(checkpoint.get("time", 0.0))
-    var states := checkpoint.get("states", []) as Array
-    for stored_state: Variant in states:
-        var state := stored_state as Dictionary
-        var stored_path := String(state.get("path", ""))
-        if stored_path.is_empty() or drift_warned_paths.has(stored_path):
-            continue
-        var actual_node := playback_level.get_node_or_null(NodePath(stored_path)) as Node3D
-        if actual_node == null:
-            push_warning(
-                "Run playback drift in level '%s' at %.2fs: missing tracked node '%s'." \
-                % [recorded_level_id, checkpoint_time, stored_path]
-            )
-            drift_warned_paths[stored_path] = true
-            continue
-        var expected_position := _array_to_vector3(state.get("position", []))
-        var position_error := actual_node.global_position.distance_to(expected_position)
-        if position_error <= DRIFT_POSITION_TOLERANCE:
-            continue
-        var warning_text := (
-            "Run playback drift in level '%s' at %.2fs: '%s' is %.3fm from its recording "
-            + "(expected %s, actual %s)."
-        ) % [
-            recorded_level_id,
-            checkpoint_time,
-            stored_path,
-            position_error,
-            expected_position,
-            actual_node.global_position,
-        ]
-        push_warning(warning_text)
-        drift_warned_paths[stored_path] = true
-
-
-func _array_to_vector3(value: Variant) -> Vector3:
-    if not value is Array:
-        return Vector3.ZERO
-    var components := value as Array
-    if components.size() != 3:
-        return Vector3.ZERO
-    return Vector3(
-        float(components[0]),
-        float(components[1]),
-        float(components[2])
+    drift_checkpoint_index = PlaybackDrift.report_due(
+        recording,
+        playback_level,
+        playback_time,
+        drift_checkpoint_index,
+        drift_warned_paths
     )
 
 
-func _ensure_muted_audio_bus() -> void:
-    if AudioServer.get_bus_index(MUTED_AUDIO_BUS) < 0:
-        AudioServer.add_bus()
-        var bus_index := AudioServer.bus_count - 1
-        AudioServer.set_bus_name(bus_index, MUTED_AUDIO_BUS)
-    AudioServer.set_bus_mute(AudioServer.get_bus_index(MUTED_AUDIO_BUS), true)
+func _report_checkpoint_drift(checkpoint: Dictionary, recorded_level_id: String) -> void:
+    PlaybackDrift._report_checkpoint(
+        playback_level,
+        checkpoint,
+        recorded_level_id,
+        drift_warned_paths
+    )
+
+
+func _array_to_vector3(value: Variant) -> Vector3:
+    return PlaybackDrift._array_to_vector3(value)
 
 
 func _mute_audio_node(node: Node) -> void:
-    node.set("autoplay", false)
-    node.set("bus", MUTED_AUDIO_BUS)
-    node.call("stop")
+    PlaybackPreview.mute_audio_node(node)
 
 
 func _on_tree_node_added(node: Node) -> void:
@@ -506,28 +394,18 @@ func _on_tree_node_added(node: Node) -> void:
 
 
 func _find_animation_player(node: Node) -> AnimationPlayer:
-    if node is AnimationPlayer:
-        return node as AnimationPlayer
-    for child in node.get_children():
-        var found := _find_animation_player(child)
-        if found != null:
-            return found
-    return null
+    return PlaybackPreview.find_animation_player(node)
 
 
 func _find_animation(
     player_node: AnimationPlayer,
     candidates: Array[String]
 ) -> String:
-    for candidate in candidates:
-        for animation_name in player_node.get_animation_list():
-            if animation_name.to_lower() == candidate:
-                return animation_name
-    return ""
+    return PlaybackPreview.find_animation(player_node, candidates)
 
 
 func _vector_to_quaternion(value: Vector4) -> Quaternion:
-    return Quaternion(value.x, value.y, value.z, value.w).normalized()
+    return PlaybackFrame.vector_to_quaternion(value)
 
 
 func _restart_preview() -> void:

@@ -43,19 +43,16 @@ var wobble_node: Node3D
 var wobble_rest_rotation := Vector3.ZERO
 var wobble_tween: Tween
 var deposit_area: Area3D
-var pickup_radius_multiplier := 1.0
 var jump_callbacks_by_body: Dictionary = {}
 
 
 func _ready() -> void:
 	add_to_group("treasure_deposit")
-	add_to_group("pickup_radius_scalable")
 	rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"treasure_deposit")
 	wobble_node = get_node_or_null(wobble_node_path) as Node3D
 	if wobble_node == null:
 		wobble_node = self
 	wobble_rest_rotation = wobble_node.rotation
-	set_pickup_radius_multiplier(_get_runtime_pickup_radius_multiplier())
 	_create_detection_area()
 	super._ready()
 
@@ -103,12 +100,6 @@ func _create_detection_area() -> void:
 	sphere_shape.radius = detection_radius
 	collision_shape.shape = sphere_shape
 	area.add_child(collision_shape)
-	_apply_pickup_radius_multiplier()
-
-
-func set_pickup_radius_multiplier(multiplier: float) -> void:
-	pickup_radius_multiplier = maxf(multiplier, 0.01)
-	_apply_pickup_radius_multiplier()
 
 
 func _on_body_entered(body: Node3D) -> void:
@@ -334,43 +325,10 @@ func _random_landing_offset() -> Vector3:
 	)
 
 
-func _apply_pickup_radius_multiplier() -> void:
-	if deposit_area == null:
-		return
-
-	for child in deposit_area.get_children():
-		if not child is CollisionShape3D:
-			continue
-
-		var collision_shape := child as CollisionShape3D
-		if not collision_shape.has_meta("base_pickup_scale"):
-			collision_shape.set_meta("base_pickup_scale", collision_shape.scale)
-		var base_scale: Vector3 = collision_shape.get_meta("base_pickup_scale")
-		collision_shape.scale = base_scale * pickup_radius_multiplier
-
-
-func _get_runtime_pickup_radius_multiplier() -> float:
-	for body in _get_sorted_flame_vulnerable_bodies():
-		if is_instance_valid(body) and body.has_method("get_pickup_radius_multiplier"):
-			return maxf(float(body.get_pickup_radius_multiplier()), 0.01)
-
-	return 1.0
-
-
 func _get_sorted_candidate_bodies() -> Array[Node3D]:
 	var sorted_bodies := candidate_bodies.duplicate()
 	sorted_bodies.sort_custom(_sort_nodes_by_path)
 	return sorted_bodies
-
-
-func _get_sorted_flame_vulnerable_bodies() -> Array[Node]:
-	var bodies: Array[Node] = []
-	for body in get_tree().get_nodes_in_group("flame_vulnerable"):
-		if body is Node:
-			bodies.append(body as Node)
-
-	bodies.sort_custom(_sort_nodes_by_path)
-	return bodies
 
 
 func _sort_nodes_by_path(a: Node, b: Node) -> bool:

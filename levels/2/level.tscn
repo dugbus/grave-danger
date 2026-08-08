@@ -8,7 +8,7 @@
 [ext_resource type="PackedScene" path="res://inventory/silver_key.tscn" id="5_lm540"]
 [ext_resource type="PackedScene" path="res://inventory/key.tscn" id="6_1rlxb"]
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://placeables/treasure_deposit/treasure_deposit.gd" id="6_deposit"]
-[ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="6_e2jp1"]
+[ext_resource type="MeshLibrary" path="res://Assets/environment/graveyard.res" id="6_e2jp1"]
 [ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://Assets/environment/shaders/level.gdshader" id="10_3xhgt"]
 [ext_resource type="PackedScene" uid="uid://cp58o88h2j8e7" path="res://enemies/zombie.tscn" id="10_veeoo"]
 [ext_resource type="PackedScene" uid="uid://mbxax50al4bn" path="res://placeables/collectibles/health_flask.tscn" id="11_haq2d"]

@@ -2,14 +2,15 @@
 
 [ext_resource type="PackedScene" uid="uid://cngmg0c3jg3x2" path="res://Assets/kenney-graveyard/coffin.glb" id="1_coffin"]
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
-[ext_resource type="PackedScene" path="res://placeables/treasure/gold_coin_pile.tscn" id="3_coinpile"]
+[ext_resource type="PackedScene" uid="uid://cw45377f21i2v" path="res://placeables/treasure/gold_coin_pile.tscn" id="3_coinpile"]
 [ext_resource type="PackedScene" path="res://placeables/kill_boundary/kill_boundary.tscn" id="4_flame"]
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://placeables/treasure_deposit/treasure_deposit.gd" id="6_deposit"]
 [ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://Assets/environment/shaders/level.gdshader" id="8_floor_shader"]
+[ext_resource type="MeshLibrary" path="res://Assets/environment/graveyard.res" id="9_ap0g3"]
 [ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="9_floor_texture"]
 [ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]
 
-[sub_resource type="Curve3D" id="Curve3D_gm14s"]
+[sub_resource type="Curve3D" id="Curve3D_a53ve"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -21.321892, 0, -22.004309, 0, 0, 0, 0, 0, 0, -20.485313, 0, -21.962996, 0, 0, 0, 0, 0, 0, -22.778164, 0, -17.45992, 0, 0, 0, 0, 0, 0, -15.900345, 0, -22.754658, 0, 0, 0, 0, 0, 0, -8.613056, 0, -22.754658, 0, 0, 0, 0, 0, 0, -11.756594, 0, -18.496595, 0, 0, 0, 0, 0, 0, -12.213835, 0, -14.181377, 0, 0, 0, 0, 0, 0, -18.243708, 0, -14.124222, 0, 0, 0, 0, 0, 0, -20.186985, 0, -14.781507, 0, 0, 0, 0, 0, 0, -20.301296, 0, -12.038057, 0, 0, 0, 0, 0, 0, -16.271852, 0, -12.638186, 0, 0, 0, 0, 0, 0, -12.442455, 0, -12.209523, 0, 0, 0, 0, 0, 0, -9.89905, 0, -9.5518055, 0, 0, 0, 0, 0, 0, -12.185257, 0, -6.6654687, 0, 0, 0, 0, 0, 0, -15.443104, 0, -9.437495, 0, 0, 0, 0, 0, 0, -20.501339, 0, -9.294608, 0, 0, 0, 0, 0, 0, -20.501339, 0, -0.86421686, 0, 0, 0, 0, 0, 0, -21.244356, 0, -9.123142, 0, 0, 0, 0, 0, 0, -17.843622, 0, -7.179867, 0, 0, 0, 0, 0, 0, -14.271421, 0, -5.7795644, 0, 0, 0, 0, 0, 0, -16.900562, 0, -2.1216316, 0, 0, 0, 0, 0, 0, -14.299999, 0, 0.9647493, 0, 0, 0, 0, 0, 0, -14.52862, 0, 2.850872, 0, 0, 0, 0, 0, 0, -21.044312, 0, 2.9937599, 0, 0, 0, 0, 0, 0, -21.1872, 0, 8.223459, 0, 0, 0, 0, 0, 0, -20.615648, 0, 3.851087, 0, 0, 0, 0, 0, 0, -15.471682, 0, 3.6510441, 0, 0, 0, 0, 0, 0, -14.042801, 0, 8.394928, 0, 0, 0, 0, 0, 0, -20.529917, 0, 12.224326, 0, 0, 0, 0, 0, 0, -22.987589, 0, 16.56812, 0, 0, 0, 0, 0, 0, -18.358019, 0, 21.19769, 0, 0, 0, 0, 0, 0, -21.93022, 0, 21.026222, 0, 0, 0, 0, 0, 0, -14.271421, 0, 19.082949, 0, 0, 0, 0, 0, 0, -10.670645, 0, 21.283424, 0, 0, 0, 0, 0, 0, -9.584694, 0, 12.195748, 0, 0, 0, 0, 0, 0, -5.926764, 0, 17.911264, 0, 0, 0, 0, 0, 0, -2.8118043, 0, 22.312218, 0, 0, 0, 0, 0, 0, 3.0466018, 0, 21.226267, 0, 0, 0, 0, 0, 0, 6.675958, 0, 20.94049, 0, 0, 0, 0, 0, 0, 8.219149, 0, 21.997864, 0, 0, 0, 0, 0, 0, 6.3044524, 0, 22.597992, 0, 0, 0, 0, 0, 0, 11.04833, 0, 22.51226, 0, 0, 0, 0, 0, 0, 14.591955, 0, 19.711655, 0, 0, 0, 0, 0, 0, 17.306826, 0, 22.369371, 0, 0, 0, 0, 0, 0, 21.964975, 0, 22.798037, 0, 0, 0, 0, 0, 0, 20.33605, 0, 18.654285, 0, 0, 0, 0, 0, 0, 16.763853, 0, 13.538894, 0, 0, 0, 0, 0, 0, 21.507734, 0, 12.853032, 0, 0, 0, 0, 0, 0, 21.357784, 0, 6.480995, 0, 0, 0, 0, 0, 0, 21.38636, 0, -14.352075, 0, 0, 0, 0, 0, 0, 20.197063, 0, -20.079802, 0, 0, 0, 0, 0, 0, 16.91064, 0, -17.164886, 0, 0, 0, 0, 0, 0, 13.967152, 0, -21.794456, 0, 0, 0, 0, 0, 0, 9.480465, 0, -20.279846, 0, 0, 0, 0, 0, 0, 5.508179, 0, -23.709156, 0, 0, 0, 0, 0, 0, 1.5930486, 0, -23.023293, 0, 0, 0, 0, 0, 0, 3.2505498, 0, -14.8501, 0, 0, 0, 0, 0, 0, 7.822968, 0, -9.563246, 0, 0, 0, 0, 0, 0, 11.309429, 0, -7.991477, 0, 0, 0, 0, 0, 0, 13.05267, 0, -3.0475504, 0, 0, 0, 0, 0, 0, 13.173797, 0, 1.1922086, 0, 0, 0, 0, 0, 0, 11.316253, 0, 6.5362177, 0, 0, 0, 0, 0, 0, 10.344611, 0, 10.222731, 0, 0, 0, 0, 0, 0, 9.715903, 0, 14.109284, 0, 0, 0, 0, 0, 0, 2.0856848, 0, 13.79493, 0, 0, 0, 0, 0, 0, -4.3728533, 0, 13.137644, 0, 0, 0, 0, 0, 0, -5.515956, 0, 12.594669, 0, 0, 0, 0, 0, 0, -9.831172, 0, 6.3933296, 0, 0, 0, 0, 0, 0, -11.374362, 0, 1.1636297, 0, 0, 0, 0, 0, 0, -5.487378, 0, 2.4210443, 0, 0, 0, 0, 0, 0, -1.9437532, 0, 5.8217783, 0, 0, 0, 0, 0, 0, 3.600299, 0, 5.507425, 0, 0, 0, 0, 0, 0, 7.6583204, 0, 1.3922517, 0, 0, 0, 0, 0, 0, 10.058841, 0, -2.40857, 0, 0, 0, 0, 0, 0, 3.6574545, 0, -7.295339, 0, 0, 0, 0, 0, 0, 2.028533, 0, -1.6655515, 0, 0, 0, 0, 0, 0, -4.7729387, 0, -2.3799922, 0, 0, 0, 0, 0, 0, -6.887681, 0, -1.6083964, 0, 0, 0, 0, 0, 0, -4.6586275, 0, -4.580467, 0, 0, 0, 0, 0, 0, -11.917338, 0, -3.6659844, 0, 0, 0, 0, 0, 0, -2.5724611, 0, -9.581547, 0, 0, 0, 0, 0, 0, -2.6581964, 0, -23.38453, 0, 0, 0, 0, 0, 0, -5.973197, 0, -22.812977, 0, 0, 0, 0, 0, 0, -7.3735, 0, -15.554265, 0, 0, 0, 0, 0, 0, -12.488891, 0, -19.469395, 0, 0, 0, 0, 0, 0, -10.145528, 0, -22.212845, 0, 0, 0, 0, 0, 0, -15.803891, 0, -21.81276, 0, 0, 0, 0, 0, 0, -20.082123, 0, -24.155224),
@@ -17,11 +18,364 @@ _data = {
 }
 point_count = 88
 
-[sub_resource type="Animation" id="Animation_r85gb"]
+[sub_resource type="Animation" id="Animation_8kpgs"]
 resource_local_to_scene = true
 resource_name = "kill_boundary_preview"
 length = 475.27316
 loop_mode = 1
+markers = [{
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 1",
+"time": 0.0
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 2",
+"time": 0.8054922241830826
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 3",
+"time": 4.766211427669525
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 4",
+"time": 9.808200684783458
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 5",
+"time": 13.453935431609155
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 6",
+"time": 16.10029778324843
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 7",
+"time": 18.270004997935295
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 8",
+"time": 21.285062619242673
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 9",
+"time": 22.310780508151055
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 10",
+"time": 23.683692344431876
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 11",
+"time": 25.720623936457635
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 12",
+"time": 27.647301053681375
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 13",
+"time": 29.48661311430454
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 14",
+"time": 31.32765321268797
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 15",
+"time": 33.466425718617444
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 16",
+"time": 35.996556284513474
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 17",
+"time": 40.21175029456377
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 18",
+"time": 44.357879451179514
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 19",
+"time": 46.3162844748211
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 20",
+"time": 48.23471800207376
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 21",
+"time": 50.48708774437428
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 22",
+"time": 52.50503924952507
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 23",
+"time": 53.45500676186086
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 24",
+"time": 56.71363272190095
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 25",
+"time": 59.329456963613026
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 26",
+"time": 61.53423484628677
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 27",
+"time": 64.10816125443458
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 28",
+"time": 66.58537420498374
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 29",
+"time": 70.35187329561235
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 30",
+"time": 72.84732979235173
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 31",
+"time": 76.1209131939888
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 32",
+"time": 77.90909233400106
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 33",
+"time": 81.85983990975618
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 34",
+"time": 83.96980234351872
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 35",
+"time": 88.54598627453566
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 36",
+"time": 91.93894592406991
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 37",
+"time": 94.63482647251129
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 38",
+"time": 97.61393524270773
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 39",
+"time": 99.43421055948019
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 40",
+"time": 100.36956057207345
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 41",
+"time": 101.37281397009849
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 42",
+"time": 103.74512653005362
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 43",
+"time": 106.00347358329537
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 44",
+"time": 107.9030969946003
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 45",
+"time": 110.24203859584094
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 46",
+"time": 112.46823281534674
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 47",
+"time": 115.58785088539364
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 48",
+"time": 117.98446928794382
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 49",
+"time": 121.17133918820144
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 50",
+"time": 131.58789415005924
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 51",
+"time": 134.51289550841807
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 52",
+"time": 136.709373144145
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 53",
+"time": 139.45247728187087
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 54",
+"time": 141.8202572837663
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 55",
+"time": 144.44418347301007
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 56",
+"time": 146.43154021125792
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 57",
+"time": 150.60135198373558
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 58",
+"time": 154.096265861125
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 59",
+"time": 156.00849544953343
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 60",
+"time": 158.62967377545357
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 61",
+"time": 160.75040103460788
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 62",
+"time": 163.5792555051255
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 63",
+"time": 165.48545112561703
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 64",
+"time": 167.4539694194293
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 65",
+"time": 171.27230964286565
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 66",
+"time": 174.51827276882648
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 67",
+"time": 175.1509895454717
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 68",
+"time": 178.92833844695565
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 69",
+"time": 181.65461546288492
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 70",
+"time": 184.66454562788726
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 71",
+"time": 187.12028558462862
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 72",
+"time": 189.89667569560527
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 73",
+"time": 192.78635142958643
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 74",
+"time": 195.0341036283636
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 75",
+"time": 199.06091319405795
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 76",
+"time": 201.99132529360054
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 77",
+"time": 205.41071542232038
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 78",
+"time": 206.5362629024935
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 79",
+"time": 208.393790180819
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 80",
+"time": 212.05181949138165
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 81",
+"time": 217.58182360908506
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 82",
+"time": 224.48340812413932
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 83",
+"time": 226.16538376311541
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 84",
+"time": 229.86168486079458
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 85",
+"time": 233.0826056034756
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 86",
+"time": 234.886592039721
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 87",
+"time": 237.72284024557354
+}, {
+"color": Color(0.25, 0.8, 1, 1),
+"name": &"Path Point 88",
+"time": 240.161583109591
+}]
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -82,10 +436,34 @@ tracks/4/keys = {
 "update": 0,
 "values": [0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
 }
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".:boundary_size_x")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 475.27316),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [8.0, 8.0]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath(".:boundary_size_y")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 475.27316),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [8.0, 8.0]
+}
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_ap0g3"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_6brm1"]
 _data = {
-&"kill_boundary": SubResource("Animation_r85gb")
+&"kill_boundary": SubResource("Animation_8kpgs")
 }
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_floor"]
@@ -113,14 +491,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.364414, 12, -23.739996)
 
 [node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 0.18119812, 0, -0.41855812)
-curve = SubResource("Curve3D_gm14s")
-boundary_animation = SubResource("Animation_r85gb")
+curve = SubResource("Curve3D_a53ve")
+boundary_animation = SubResource("Animation_8kpgs")
+bounds_size = Vector2(8, 8)
 
 [node name="BoundaryCenter" parent="KillBoundary3D" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.321892, 0, -22.004309)
 
 [node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_ap0g3")
+libraries/ = SubResource("AnimationLibrary_6brm1")
 
 [node name="Objects" type="Node3D" parent="." unique_id=1357066609]
 
@@ -396,15 +775,24 @@ transform = Transform3D(0.4574084, 0, 0.8892567, 0, 1, 0, -0.8892567, 0, 0.45740
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
 script = ExtResource("6_deposit")
 
-[node name="Tiled Floor" type="Node3D" parent="."]
+[node name="Tiled Floor" type="Node3D" parent="." unique_id=1816457730]
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Tiled Floor"]
+[node name="StaticBody3D" type="StaticBody3D" parent="Tiled Floor" unique_id=2061089868]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiled Floor/StaticBody3D"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiled Floor/StaticBody3D" unique_id=506447209]
 mesh = SubResource("PlaneMesh_floor")
 surface_material_override/0 = SubResource("ShaderMaterial_floor")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiled Floor/StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiled Floor/StaticBody3D" unique_id=1776910271]
 shape = SubResource("BoxShape3D_floor")
+
+[node name="PNGGridMap" type="GridMap" parent="." unique_id=1109710147]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 0, -15.5)
+mesh_library = ExtResource("9_ap0g3")
+cell_size = Vector3(1, 1, 1)
+cell_center_y = false
+data = {
+"cells": PackedInt32Array(31, 31, 1441792, 30, 31, 655365, 29, 31, 655365, 28, 31, 655365, 27, 31, 655365, 26, 31, 655365, 25, 31, 655365, 24, 31, 655365, 23, 31, 655365, 22, 31, 655365, 21, 31, 655365, 20, 31, 655365, 19, 31, 655365, 18, 31, 655365, 17, 31, 655365, 16, 31, 655365, 15, 31, 655365, 14, 31, 655365, 13, 31, 655365, 12, 31, 655365, 11, 31, 655365, 10, 31, 655365, 9, 31, 655365, 8, 31, 655365, 7, 31, 655365, 6, 31, 655365, 5, 31, 655365, 4, 31, 655365, 3, 31, 655365, 2, 31, 655365, 1, 31, 655365, 0, 31, 655360, 31, 30, 1048581, 0, 30, 1048581, 31, 29, 1048581, 0, 29, 1048581, 31, 28, 1048581, 28, 28, 2, 27, 28, 655365, 26, 28, 655365, 25, 28, 655365, 24, 28, 655365, 23, 28, 655362, 0, 28, 1048581, 31, 27, 1048581, 11, 27, 1441792, 10, 27, 655360, 0, 27, 1048581, 31, 26, 1048581, 13, 26, 1441792, 12, 26, 655365, 11, 26, 4, 10, 26, 4, 9, 26, 655365, 8, 26, 655360, 0, 26, 1048581, 31, 25, 1048581, 28, 25, 1441794, 25, 25, 2, 24, 25, 655365, 23, 25, 655365, 22, 25, 655360, 20, 25, 1441792, 19, 25, 655365, 18, 25, 655365, 17, 25, 655362, 14, 25, 1441792, 13, 25, 1048576, 8, 25, 0, 7, 25, 655360, 0, 25, 1048581, 31, 24, 1048581, 28, 24, 1048581, 22, 24, 1048581, 20, 24, 1048581, 14, 24, 1048581, 7, 24, 1048581, 0, 24, 1048581, 31, 23, 1048581, 28, 23, 1048581, 22, 23, 1048581, 20, 23, 1048581, 14, 23, 1048581, 7, 23, 1441796, 6, 23, 655365, 5, 23, 655362, 0, 23, 1048581, 31, 22, 1048581, 28, 22, 1048581, 22, 22, 1048581, 20, 22, 1048581, 16, 22, 2, 15, 22, 655365, 14, 22, 1048580, 7, 22, 1048581, 0, 22, 1048581, 31, 21, 1048581, 28, 21, 1048578, 22, 21, 1048578, 20, 21, 1048578, 14, 21, 1048581, 7, 21, 1048581, 0, 21, 1048581, 31, 20, 1048581, 14, 20, 0, 13, 20, 655360, 8, 20, 1441792, 7, 20, 1048576, 0, 20, 1048581, 31, 19, 1048581, 22, 19, 1441794, 20, 19, 1441794, 13, 19, 0, 12, 19, 655365, 11, 19, 655364, 10, 19, 655364, 9, 19, 655365, 8, 19, 1048576, 0, 19, 1048581, 31, 18, 1048581, 22, 18, 1048581, 20, 18, 1048581, 11, 18, 0, 10, 18, 1048580, 0, 18, 1048581, 31, 17, 1048581, 22, 17, 1048581, 20, 17, 1048581, 10, 17, 1048581, 0, 17, 1048581, 31, 16, 1048581, 22, 16, 1048581, 20, 16, 1048581, 10, 16, 1048581, 0, 16, 1048581, 31, 15, 1048581, 25, 15, 2, 24, 15, 655365, 23, 15, 655365, 22, 15, 1048576, 20, 15, 0, 19, 15, 655365, 18, 15, 655365, 17, 15, 655362, 12, 15, 2, 11, 15, 655365, 10, 15, 655361, 9, 15, 655365, 8, 15, 655362, 0, 15, 1048581, 31, 14, 1048581, 10, 14, 1048581, 0, 14, 1048581, 31, 13, 1048581, 10, 13, 1048578, 0, 13, 1048581, 31, 12, 1048581, 28, 12, 1441792, 27, 12, 655365, 26, 12, 655360, 23, 12, 1441792, 22, 12, 655364, 21, 12, 655360, 17, 12, 1441792, 16, 12, 655360, 0, 12, 1048581, 31, 11, 1048581, 28, 11, 1048581, 26, 11, 1048581, 23, 11, 1441796, 22, 11, 655361, 21, 11, 1048580, 17, 11, 0, 16, 11, 1048576, 0, 11, 1048581, 31, 10, 1048581, 28, 10, 0, 27, 10, 655365, 26, 10, 1048576, 23, 10, 0, 22, 10, 4, 21, 10, 1048576, 0, 10, 1048581, 31, 9, 1048581, 0, 9, 1048581, 31, 8, 1048581, 0, 8, 1048581, 31, 7, 1048581, 0, 7, 1048581, 31, 6, 1048581, 0, 6, 1048581, 31, 5, 1048581, 0, 5, 1048581, 31, 4, 1048581, 0, 4, 1048581, 31, 3, 1048581, 0, 3, 1048581, 31, 2, 1048581, 0, 2, 1048581, 31, 1, 1048581, 0, 1, 1048581, 31, 0, 0, 30, 0, 655365, 29, 0, 655365, 28, 0, 655365, 27, 0, 655365, 26, 0, 655365, 25, 0, 655365, 24, 0, 655365, 23, 0, 655365, 22, 0, 655365, 21, 0, 655365, 20, 0, 655365, 19, 0, 655365, 18, 0, 655365, 17, 0, 655365, 16, 0, 655365, 15, 0, 655365, 14, 0, 655365, 13, 0, 655365, 12, 0, 655365, 11, 0, 655365, 10, 0, 655365, 9, 0, 655365, 8, 0, 655365, 7, 0, 655365, 6, 0, 655365, 5, 0, 655365, 4, 0, 655365, 3, 0, 655365, 2, 0, 655365, 1, 0, 655365, 0, 0, 1048576, 4, 26, 9, 3, 28, 9, 4, 27, 9)
+}
 
 [editable path="KillBoundary3D"]

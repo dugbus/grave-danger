@@ -24,6 +24,7 @@ size = Vector3(1.459729, 1.4456214, 0.7532959)
 [node name="LockedDoor" type="Node3D" unique_id=945615625]
 script = ExtResource("1_passage")
 key_requirement = 1
+unlock_audio_player_path = NodePath("UnlockAudioPlayer")
 
 [node name="UnlockAudioPlayer" type="AudioStreamPlayer3D" parent="."]
 bus = &"SFX"

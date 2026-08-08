@@ -52,6 +52,25 @@ level_entries = Array[Dictionary]([{
 """
 
 
+TYPED_MAPPING_TEMPLATE = """[gd_resource type="Resource" script_class="GDLevelMapping" format=3]
+
+[ext_resource type="Script" path="res://levels/level_mapping.gd" id="1_mapping"]
+[ext_resource type="Script" path="res://levels/level_definition.gd" id="2_definition"]
+
+[sub_resource type="Resource" id="Level_01"]
+script = ExtResource("2_definition")
+id = "level_01"
+display_name = "Level 1"
+folder_name = "1"
+legacy_result_key = "01"
+available = true
+
+[resource]
+script = ExtResource("1_mapping")
+level_entries = Array[ExtResource("2_definition")]([SubResource("Level_01")])
+"""
+
+
 class DuplicateLevelTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary_directory = tempfile.TemporaryDirectory()
@@ -148,6 +167,27 @@ script = ExtResource("1")
         self.assertIn("height = 48", config)
         self.assertIn("export_size = Vector2i(64, 48)", settings)
         self.assertIn("res://levels/moonlit-crypt/level.png", settings)
+
+    def test_typed_mapping_is_parsed_and_extended(self) -> None:
+        mapping_path = self.repository / "levels" / "level_mapping.tres"
+        mapping_path.write_text(TYPED_MAPPING_TEMPLATE, encoding="utf-8")
+
+        result = duplicate_level.duplicate_level(
+            self.repository,
+            "Level 1",
+            "Practice Yard",
+        )
+
+        mapping = mapping_path.read_text(encoding="utf-8")
+        options = duplicate_level.discover_level_options(self.repository)
+        self.assertTrue(result["created"])
+        self.assertIn('[sub_resource type="Resource" id="Level_practice_yard"]', mapping)
+        self.assertIn('id = "practice_yard"', mapping)
+        self.assertIn('display_name = "Practice Yard"', mapping)
+        self.assertIn('folder_name = "practice-yard"', mapping)
+        self.assertIn('SubResource("Level_practice_yard")', mapping)
+        self.assertEqual(options[0].key, "level_01")
+        self.assertEqual(options[1].key, "practice_yard")
 
     def test_dry_run_does_not_write(self) -> None:
         before_mapping = (self.repository / "levels" / "level_mapping.tres").read_text(

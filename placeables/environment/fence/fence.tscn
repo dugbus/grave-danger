@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="ArrayMesh" uid="uid://cy5u6bjs36eb8" path="res://Assets/environment/fence.res" id="1_fence"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fence"]
+size = Vector3(1.009926, 0.899558, 0.312569)
+
+[node name="Fence" type="Node3D"]
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_fence")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 10
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+position = Vector3(-0.001435, 0.449779, -0.00287)
+shape = SubResource("BoxShape3D_fence")

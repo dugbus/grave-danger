@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://mbxax50al4bn" path="res://placeables/collectibles/health_flask.tscn" id="7_viipc"]
 [ext_resource type="Shader" uid="uid://jldlipjmalnl" path="res://Assets/environment/shaders/level.gdshader" id="8_floor_shader"]
 [ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="9_floor_texture"]
-[ext_resource type="MeshLibrary" uid="uid://c26i1gkgrxvs7" path="res://Assets/environment/graveyard.res" id="9_nwn5v"]
+[ext_resource type="MeshLibrary" path="res://Assets/environment/graveyard.res" id="9_nwn5v"]
 [ext_resource type="PackedScene" path="res://placeables/lockables/locked_gate.tscn" id="11_qg1rj"]
 [ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]
 

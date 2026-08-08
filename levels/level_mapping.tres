@@ -1,111 +1,149 @@
 [gd_resource type="Resource" script_class="GDLevelMapping" format=3 uid="uid://cebfylk5f3jp2"]
 
 [ext_resource type="Script" uid="uid://b7flmxmwjrx6p" path="res://levels/level_mapping.gd" id="1_mapping"]
+[ext_resource type="Script" uid="uid://ctociwlr803jl" path="res://levels/level_definition.gd" id="2_definition"]
+
+[sub_resource type="Resource" id="Level_debug"]
+script = ExtResource("2_definition")
+id = "debug_level"
+display_name = "Debug Level"
+folder_name = "debug-level"
+available = true
+
+[sub_resource type="Resource" id="Level_01"]
+script = ExtResource("2_definition")
+id = "level_01"
+display_name = "Level 1"
+folder_name = "1"
+legacy_result_key = "01"
+available = true
+
+[sub_resource type="Resource" id="Level_02"]
+script = ExtResource("2_definition")
+id = "level_02"
+display_name = "Level 2"
+folder_name = "2"
+legacy_result_key = "02"
+available = true
+
+[sub_resource type="Resource" id="Level_03"]
+script = ExtResource("2_definition")
+id = "level_03"
+display_name = "Level 3"
+folder_name = "3"
+legacy_result_key = "03"
+available = true
+
+[sub_resource type="Resource" id="Level_04"]
+script = ExtResource("2_definition")
+id = "level_04"
+display_name = "Level 4"
+folder_name = "4"
+legacy_result_key = "04"
+available = true
+
+[sub_resource type="Resource" id="Level_graveyard"]
+script = ExtResource("2_definition")
+id = "graveyard"
+display_name = "Graveyard"
+folder_name = "graveyard"
+legacy_result_key = "05"
+available = true
+
+[sub_resource type="Resource" id="Level_06"]
+script = ExtResource("2_definition")
+id = "level_06"
+display_name = "Level 6"
+folder_name = "6"
+legacy_result_key = "06"
+available = true
+
+[sub_resource type="Resource" id="Level_07"]
+script = ExtResource("2_definition")
+id = "level_07"
+display_name = "Level 7"
+folder_name = "7"
+legacy_result_key = "07"
+available = true
+
+[sub_resource type="Resource" id="Level_08"]
+script = ExtResource("2_definition")
+id = "level_08"
+display_name = "Level 8"
+folder_name = "8"
+legacy_result_key = "08"
+available = true
+
+[sub_resource type="Resource" id="Level_vampire"]
+script = ExtResource("2_definition")
+id = "vampire_boss"
+display_name = "Vampire Boss"
+folder_name = "vampire-maze"
+available = true
+
+[sub_resource type="Resource" id="Level_10"]
+script = ExtResource("2_definition")
+id = "level_10"
+display_name = "Level 10"
+folder_name = "1"
+legacy_result_key = "10"
+available = true
+
+[sub_resource type="Resource" id="Level_11"]
+script = ExtResource("2_definition")
+id = "level_11"
+display_name = "Level 11"
+folder_name = "1"
+legacy_result_key = "11"
+available = true
+
+[sub_resource type="Resource" id="Level_12"]
+script = ExtResource("2_definition")
+id = "level_12"
+display_name = "Level 12"
+folder_name = "1"
+legacy_result_key = "12"
+available = true
+
+[sub_resource type="Resource" id="Level_13"]
+script = ExtResource("2_definition")
+id = "level_13"
+display_name = "Level 13"
+folder_name = "1"
+legacy_result_key = "13"
+available = true
+
+[sub_resource type="Resource" id="Level_14"]
+script = ExtResource("2_definition")
+id = "level_14"
+display_name = "Level 14"
+folder_name = "1"
+legacy_result_key = "14"
+available = true
+
+[sub_resource type="Resource" id="Level_15"]
+script = ExtResource("2_definition")
+id = "level_15"
+display_name = "Level 15"
+folder_name = "1"
+legacy_result_key = "15"
+available = true
+
+[sub_resource type="Resource" id="Level_16"]
+script = ExtResource("2_definition")
+id = "level_16"
+display_name = "Level 16"
+folder_name = "1"
+legacy_result_key = "16"
+available = true
+
+[sub_resource type="Resource" id="Level_flask_kill_expand"]
+script = ExtResource("2_definition")
+id = "flask_kill_expand"
+display_name = "Flask Kill Expand"
+folder_name = "5"
+available = true
 
 [resource]
 script = ExtResource("1_mapping")
-level_entries = Array[Dictionary]([{
-"available": true,
-"folder_name": "debug-level",
-"id": "debug_level",
-"name": "Debug Level",
-"tutorial": false
-}, {
-"available": true,
-"folder_name": "1",
-"id": "level_01",
-"legacy_result_key": "01",
-"name": "Level 1",
-"tutorial": false
-}, {
-"available": true,
-"folder_name": "2",
-"id": "level_02",
-"legacy_result_key": "02",
-"name": "Level 2"
-}, {
-"available": true,
-"folder_name": "3",
-"id": "level_03",
-"legacy_result_key": "03",
-"name": "Level 3"
-}, {
-"available": true,
-"folder_name": "4",
-"id": "level_04",
-"legacy_result_key": "04",
-"name": "Level 4"
-}, {
-"available": true,
-"folder_name": "graveyard",
-"id": "graveyard",
-"legacy_result_key": "05",
-"name": "Graveyard"
-}, {
-"available": true,
-"folder_name": "6",
-"id": "level_06",
-"legacy_result_key": "06",
-"name": "Level 6"
-}, {
-"available": true,
-"folder_name": "7",
-"id": "level_07",
-"legacy_result_key": "07",
-"name": "Level 7"
-}, {
-"available": true,
-"folder_name": "8",
-"id": "level_08",
-"legacy_result_key": "08",
-"name": "Level 8"
-}, {
-"available": true,
-"folder_name": "vampire-maze",
-"id": "vampire_boss",
-"name": "Vampire Boss",
-"run_playback_enabled": true,
-"tutorial": false
-}, {
-"available": true,
-"folder_name": "1",
-"id": "level_10",
-"legacy_result_key": "10",
-"name": "Level 10"
-}, {
-"available": true,
-"folder_name": "1",
-"id": "level_11",
-"legacy_result_key": "11",
-"name": "Level 11"
-}, {
-"available": true,
-"folder_name": "1",
-"id": "level_12",
-"legacy_result_key": "12",
-"name": "Level 12"
-}, {
-"available": true,
-"folder_name": "1",
-"id": "level_13",
-"legacy_result_key": "13",
-"name": "Level 13"
-}, {
-"available": true,
-"folder_name": "1",
-"id": "level_14",
-"legacy_result_key": "14",
-"name": "Level 14"
-}, {
-"available": true,
-"folder_name": "1",
-"id": "level_15",
-"legacy_result_key": "15",
-"name": "Level 15"
-}, {
-"available": true,
-"folder_name": "1",
-"id": "level_16",
-"legacy_result_key": "16",
-"name": "Level 16"
-}])
+level_entries = Array[ExtResource("2_definition")]([SubResource("Level_debug"), SubResource("Level_01"), SubResource("Level_02"), SubResource("Level_03"), SubResource("Level_04"), SubResource("Level_graveyard"), SubResource("Level_06"), SubResource("Level_07"), SubResource("Level_08"), SubResource("Level_vampire"), SubResource("Level_10"), SubResource("Level_11"), SubResource("Level_12"), SubResource("Level_13"), SubResource("Level_14"), SubResource("Level_15"), SubResource("Level_16"), SubResource("Level_flask_kill_expand")])

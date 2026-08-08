@@ -37,10 +37,10 @@ class_name GDGlobalFlaskProperties
 @export_range(0.1, 120.0, 0.1, "or_greater", "suffix:s") var pause_boundary_seconds := 5.0
 
 @export_group("Pickup Radius")
-## Percent increase applied to the player's pickup radius while the pickup radius flask effect is active.
+## Percent increase contributed by each active pickup radius flask stack.
 @export_range(0.0, 500.0, 0.5, "or_greater", "suffix:%") var pickup_radius_percent := 50.0
-## Seconds the boosted pickup radius remains active after collecting the flask.
-@export_range(0.1, 120.0, 0.1, "or_greater", "suffix:s") var pickup_radius_seconds := 5.0
+## Seconds each pickup radius flask stack remains active after it is collected.
+@export_range(0.1, 120.0, 0.1, "or_greater", "suffix:s") var pickup_radius_seconds := 15.0
 
 @export_group("Poison")
 ## Total damage dealt by a poison flask effect across poison_duration.

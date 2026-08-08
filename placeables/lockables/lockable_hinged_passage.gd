@@ -17,8 +17,10 @@ const PLAYER_COLLISION_LAYER := 2
 @export var completes_level := false
 @export var leaf_root_path: NodePath = ^"Leaves"
 @export var unlock_area_path: NodePath = ^"UnlockArea"
-@export var completion_area_path: NodePath = ^"CompletionArea"
-@export var unlock_audio_player_path: NodePath = ^"UnlockAudioPlayer"
+## Optional area that completes a level after an unlocked passage is crossed.
+@export var completion_area_path: NodePath
+## Optional authored audio player; empty paths use the shared one-shot fallback.
+@export var unlock_audio_player_path: NodePath
 @export_file("*.mp3", "*.wav") var unlock_sound_path := ""
 
 var locked := true

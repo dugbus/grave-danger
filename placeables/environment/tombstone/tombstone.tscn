@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="ArrayMesh" uid="uid://v7qq524q7xrr" path="res://Assets/environment/tombstone.res" id="1_tombstone"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tombstone"]
+size = Vector3(0.413012, 1.156285, 1.041493)
+
+[node name="Tombstone" type="Node3D"]
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_tombstone")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 10
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+position = Vector3(-0.05883, 0.582565, -0.020088)
+shape = SubResource("BoxShape3D_tombstone")

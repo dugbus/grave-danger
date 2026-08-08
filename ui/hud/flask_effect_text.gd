@@ -253,8 +253,13 @@ func _ensure_text_light() -> void:
 	if text_light == null:
 		text_light = OmniLight3D.new()
 		text_light.name = "PotionEffectTextLight"
+		_configure_text_light()
 		add_child(text_light)
+	else:
+		_configure_text_light()
 
+
+func _configure_text_light() -> void:
 	text_light.top_level = true
 	text_light.visible = false
 	text_light.light_cull_mask = TEXT_VISUAL_LAYER

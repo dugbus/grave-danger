@@ -2,8 +2,10 @@ extends Resource
 class_name GDLevelMapping
 
 const LEVEL_SCENE_FILE := "level.tscn"
+const LevelDefinition := preload("res://levels/level_definition.gd")
 
-@export var level_entries: Array[Dictionary] = []
+## Ordered, typed definitions exposed to the level-selection flow.
+@export var level_entries: Array[LevelDefinition] = []
 
 
 func get_level_count() -> int:
@@ -23,7 +25,8 @@ func get_level_entry(index: int) -> Dictionary:
 	if index < 0 or index >= level_entries.size():
 		return {}
 
-	return level_entries[index]
+	var definition: LevelDefinition = level_entries[index]
+	return definition.to_level_data() if definition != null else {}
 
 
 func get_level_scene_path(index: int) -> String:

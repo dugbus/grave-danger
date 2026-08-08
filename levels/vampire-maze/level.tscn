@@ -2,7 +2,8 @@
 
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://levels/vampire-maze/generated_maze/generated_maze.tscn" id="11_uaw4a"]
-[ext_resource type="Material" uid="uid://8jqemqaj1dhu" path="res://Assets/environment/floors/flagstones_floor.material" id="12_ubeqf"]
+[ext_resource type="Texture2D" uid="uid://cj5phhpf53e7v" path="res://Assets/environment/floor-albedo.png" id="12_3h0vp"]
+[ext_resource type="Texture2D" uid="uid://e2lt84xdo8rg" path="res://Assets/environment/floor-normal.png" id="13_wmdd7"]
 [ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]
 [ext_resource type="Script" uid="uid://buom3th5dqf1b" path="res://levels/vampire-maze/vampire_maze.gd" id="101_level"]
 [ext_resource type="PackedScene" path="res://enemies/vampire/vampire.tscn" id="102_vampire"]
@@ -13,7 +14,16 @@
 [ext_resource type="PackedScene" path="res://levels/vampire-maze/minimap_route_overlay.tscn" id="107_route_overlay"]
 [ext_resource type="PackedScene" path="res://ui/hud/vampire_debug/vampire_debug_hud.tscn" id="111_vampire_debug_hud"]
 
-[node name="Level1" type="Node3D" unique_id=753330713]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qjqmh"]
+resource_local_to_scene = true
+albedo_texture = ExtResource("12_3h0vp")
+roughness = 0.84
+normal_enabled = true
+normal_scale = 2.0
+normal_texture = ExtResource("13_wmdd7")
+uv1_scale = Vector3(40, 40, 1)
+
+[node name="VampireMazeLevel" type="Node3D" unique_id=753330713]
 script = ExtResource("101_level")
 
 [node name="Player" parent="." unique_id=244343110 instance=ExtResource("2_player")]
@@ -48,7 +58,7 @@ floor_grid_map_path = NodePath("")
 
 [node name="GeneratedMaze" parent="." unique_id=1250068653 instance=ExtResource("11_uaw4a")]
 maze_seed = 7
-floor_material = ExtResource("12_ubeqf")
+floor_material = SubResource("StandardMaterial3D_qjqmh")
 floor_texture_tiles = Vector2i(2, 2)
 baked_generation_version = 11
 baked_maze_seed = 7

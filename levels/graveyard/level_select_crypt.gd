@@ -133,6 +133,9 @@ func _configure_level_trigger() -> void:
 	if level_trigger_area == null:
 		level_trigger_area = Area3D.new()
 		level_trigger_area.name = LEVEL_TRIGGER_AREA_NAME
+		level_trigger_area.collision_layer = 0
+		level_trigger_area.collision_mask = PLAYER_COLLISION_LAYER
+		level_trigger_area.monitoring = true
 		add_child(level_trigger_area)
 	level_trigger_area.global_transform = trigger_mesh.global_transform
 	level_trigger_area.collision_layer = 0
@@ -143,6 +146,8 @@ func _configure_level_trigger() -> void:
 	if collision == null:
 		collision = CollisionShape3D.new()
 		collision.name = LEVEL_TRIGGER_COLLISION_NAME
+		collision.shape = shape
+		collision.position = level_trigger_center
 		level_trigger_area.add_child(collision)
 	collision.shape = shape
 	collision.position = level_trigger_center

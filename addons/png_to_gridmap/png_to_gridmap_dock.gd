@@ -6,6 +6,9 @@ extends VBoxContainer
 ## The dock owns interface state while leaving project and scene changes to the plugin services.
 
 const AutotileAlternativeResource := preload("res://addons/png_to_gridmap/png_to_gridmap_autotile_alternative.gd")
+const MappingCatalog := preload(
+	"res://addons/png_to_gridmap/png_to_gridmap_mapping_catalog.gd"
+)
 
 signal load_png_selected(path: String)
 signal export_png_path_selected(path: String)
@@ -47,6 +50,7 @@ var _configuration_popup: PopupPanel
 var _png_path_label: Label
 var _mesh_library_path_edit: LineEdit
 var _floor_materials_folder_edit: LineEdit
+var _manual_colour_picker: ColorPickerButton
 var _rows_container: VBoxContainer
 var _outputs_section_label: Label
 var _output_label: Label
@@ -64,15 +68,12 @@ var _floor_materials_folder_dialog: EditorFileDialog
 func setup(title_text: String, settings: Resource, ui_state: Dictionary) -> void:
 	_settings = settings
 	name = "PNG to GridMap"
-	_build_main_scroll(title_text)
-	_build_operation()
-	_build_inputs()
-	_build_advanced()
-	_build_floor_controls()
-	_build_configuration_popup()
-	_build_outputs()
-	_build_footer()
-	_build_dialogs()
+	_bind_scene_controls()
+	_create_editor_dialogs()
+	(_content_container.get_node(^"Title") as Label).text = title_text
+	_operation_option.add_item("Import PNG to GridMap", OPERATION_IMPORT)
+	_operation_option.add_item("Export GridMap to PNG", OPERATION_EXPORT)
+	_connect_scene_signals()
 	_apply_ui_state(ui_state)
 	_apply_editor_tooltips(self)
 
@@ -173,234 +174,142 @@ func _disconnect_signal_callables(signal_ref: Signal) -> void:
 		signal_ref.disconnect(connection["callable"])
 
 
-## Builds the scrollable main content area.
-func _build_main_scroll(title_text: String) -> void:
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	add_child(scroll)
-	_content_container = VBoxContainer.new()
-	_content_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_content_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.add_child(_content_container)
-	var title := Label.new()
-	title.text = title_text
-	title.add_theme_font_size_override("font_size", 18)
-	_content_container.add_child(title)
+## Resolves the stable controls authored in the dock scene.
+func _bind_scene_controls() -> void:
+	_content_container = get_node(^"MainScroll/Content") as VBoxContainer
+	_operation_option = _content_container.get_node(^"OperationOption") as OptionButton
+	_target_gridmap_option = _content_container.get_node(^"TargetGridMapOption") as OptionButton
+	_mesh_library_option = _content_container.get_node(^"MeshLibraryOption") as OptionButton
+	_gridmap_name_label = _content_container.get_node(^"GridMapNameLabel") as Label
+	_gridmap_name_edit = _content_container.get_node(^"GridMapNameEdit") as LineEdit
+	_cell_size_spin = _content_container.get_node(^"AdvancedContainer/AdvancedGrid/CellSizeSpin") as SpinBox
+	_auto_repair_check = _content_container.get_node(^"AdvancedContainer/AutoRepairCheck") as CheckBox
+	_floor_material_option = _content_container.get_node(^"FloorMaterialOption") as OptionButton
+	_advanced_button = _content_container.get_node(^"AdvancedButton") as Button
+	_advanced_container = _content_container.get_node(^"AdvancedContainer") as VBoxContainer
+	_png_path_label = _content_container.get_node(^"PNGPath") as Label
+	_outputs_section_label = _content_container.get_node(^"OutputsSection") as Label
+	_output_label = _content_container.get_node(^"OutputLabel") as Label
+	_output_png_button_row = _content_container.get_node(^"OutputPNGButtons") as HFlowContainer
+	_validation_label = get_node(^"ValidationLabel") as RichTextLabel
+	_configuration_popup = get_node(^"ConfigurationPopup") as PopupPanel
+	_mesh_library_path_edit = _configuration_popup.get_node(^"PopupContent/LibraryRow/Path") as LineEdit
+	_floor_materials_folder_edit = _configuration_popup.get_node(^"PopupContent/FolderRow/Path") as LineEdit
+	_manual_colour_picker = _configuration_popup.get_node(
+		^"PopupContent/ManualMappingRow/Colour"
+	) as ColorPickerButton
+	_rows_container = _configuration_popup.get_node(^"PopupContent/MappingsScroll/Rows") as VBoxContainer
+	_import_warning_dialog = get_node(^"ImportWarningDialog") as ConfirmationDialog
+	_overwrite_warning_dialog = get_node(^"OverwriteWarningDialog") as ConfirmationDialog
 
 
-## Builds the operation selector controls.
-func _build_operation() -> void:
-	_content_container.add_child(_section("Operation"))
-	_operation_option = OptionButton.new()
-	_operation_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_operation_option.add_item("Import PNG to GridMap", OPERATION_IMPORT)
-	_operation_option.add_item("Export GridMap to PNG", OPERATION_EXPORT)
+## Creates editor-only dialogs that cannot be instantiated by runtime scene validation.
+func _create_editor_dialogs() -> void:
+	_png_open_dialog = _file_dialog(EditorFileDialog.FILE_MODE_OPEN_FILE)
+	_png_open_dialog.name = "PNGOpenDialog"
+	add_child(_png_open_dialog)
+	_png_save_dialog = _file_dialog(EditorFileDialog.FILE_MODE_SAVE_FILE)
+	_png_save_dialog.name = "PNGSaveDialog"
+	add_child(_png_save_dialog)
+	_mesh_library_dialog = EditorFileDialog.new()
+	_mesh_library_dialog.name = "MeshLibraryDialog"
+	_mesh_library_dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
+	_mesh_library_dialog.access = EditorFileDialog.ACCESS_RESOURCES
+	_mesh_library_dialog.filters = PackedStringArray(["*.tres,*.res ; Godot resource files"])
+	add_child(_mesh_library_dialog)
+	_floor_materials_folder_dialog = EditorFileDialog.new()
+	_floor_materials_folder_dialog.name = "FloorMaterialsFolderDialog"
+	_floor_materials_folder_dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_DIR
+	_floor_materials_folder_dialog.access = EditorFileDialog.ACCESS_RESOURCES
+	add_child(_floor_materials_folder_dialog)
+
+
+## Connects stable scene controls to settings and typed dock signals.
+func _connect_scene_signals() -> void:
 	_operation_option.item_selected.connect(func(_index: int) -> void:
 		_update_output_label()
 		operation_changed.emit(_operation_option.get_selected_id(), _advanced_button.button_pressed)
 	)
-	_content_container.add_child(_operation_option)
-
-
-## Builds PNG, GridMap, and MeshLibrary input controls.
-func _build_inputs() -> void:
-	_content_container.add_child(_section("Inputs"))
-	_content_container.add_child(_button_row([
-		["Load PNG", func() -> void: _png_open_dialog.popup_file_dialog()],
-		["Refresh", func() -> void: refresh_requested.emit()],
-	]))
-	_png_path_label = _path_label("No PNG loaded")
-	_content_container.add_child(_png_path_label)
-	_content_container.add_child(_label("GridMap"))
-	_target_gridmap_option = OptionButton.new()
-	_target_gridmap_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	(_content_container.get_node(^"InputButtons/LoadPNG") as Button).pressed.connect(
+		func() -> void: _png_open_dialog.popup_file_dialog()
+	)
+	(_content_container.get_node(^"InputButtons/Refresh") as Button).pressed.connect(
+		func() -> void: refresh_requested.emit()
+	)
 	_target_gridmap_option.item_selected.connect(func(index: int) -> void:
 		var path := String(_target_gridmap_option.get_item_metadata(index))
 		_settings.target_gridmap_path = NodePath(path)
 		_update_gridmap_name_visibility()
 		gridmap_selected.emit(path)
 	)
-	_content_container.add_child(_target_gridmap_option)
-	_gridmap_name_label = _label("GridMap name")
-	_content_container.add_child(_gridmap_name_label)
-	_gridmap_name_edit = LineEdit.new()
 	_gridmap_name_edit.text_changed.connect(func(value: String) -> void:
 		_settings.gridmap_name = value
 		settings_changed.emit()
 	)
-	_content_container.add_child(_gridmap_name_edit)
-	_content_container.add_child(_label("MeshLibrary"))
-	_mesh_library_option = OptionButton.new()
-	_mesh_library_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_mesh_library_option.item_selected.connect(func(index: int) -> void:
 		var path := String(_mesh_library_option.get_item_metadata(index))
 		_settings.mesh_library_path = path
 		mesh_library_selected.emit(path)
 	)
-	_content_container.add_child(_mesh_library_option)
-
-
-## Builds advanced settings controls.
-func _build_advanced() -> void:
-	_content_container.add_child(_section("Level Settings"))
-	var configuration_button := Button.new()
-	configuration_button.text = "Configure Wall Tiles and Colours"
+	var configuration_button := _content_container.get_node(^"ConfigureButton") as Button
 	configuration_button.pressed.connect(func() -> void:
 		var popup_height := roundi(get_viewport_rect().size.y * 0.8)
 		_configuration_popup.popup_centered(Vector2i(560, popup_height))
 	)
-	_content_container.add_child(configuration_button)
-	_advanced_button = Button.new()
-	_advanced_button.text = "More Level Settings"
-	_advanced_button.toggle_mode = true
 	_advanced_button.toggled.connect(func(value: bool) -> void:
 		_advanced_container.visible = value
 		operation_changed.emit(_operation_option.get_selected_id(), value)
 	)
-	_content_container.add_child(_advanced_button)
-	_advanced_container = VBoxContainer.new()
-	_advanced_container.visible = false
-	_content_container.add_child(_advanced_container)
-	var grid := GridContainer.new()
-	grid.columns = 2
-	_advanced_container.add_child(grid)
-	grid.add_child(_label("Cell size"))
-	_cell_size_spin = SpinBox.new()
-	_cell_size_spin.min_value = 0.01
-	_cell_size_spin.max_value = 1024.0
-	_cell_size_spin.step = 0.01
 	_cell_size_spin.value_changed.connect(func(value: float) -> void:
 		_settings.cell_size = _normalize_cell_size(value)
 		settings_changed.emit()
 	)
-	grid.add_child(_cell_size_spin)
-	_auto_repair_check = CheckBox.new()
-	_auto_repair_check.text = "Auto repair"
 	_auto_repair_check.toggled.connect(func(value: bool) -> void:
 		_settings.auto_repair = value
 		settings_changed.emit()
 	)
-	_advanced_container.add_child(_auto_repair_check)
-
-
-## Builds the floor material selector populated from the configured material folder.
-func _build_floor_controls() -> void:
-	_content_container.add_child(_section("Floor GridMap"))
-	_floor_material_option = OptionButton.new()
-	_floor_material_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_floor_material_option.item_selected.connect(func(index: int) -> void:
 		floor_material_selected.emit(String(_floor_material_option.get_item_metadata(index)))
 	)
-	_content_container.add_child(_floor_material_option)
-
-
-## Builds the global wall configuration popup and its scrollable mapping list.
-func _build_configuration_popup() -> void:
-	_configuration_popup = PopupPanel.new()
-	_configuration_popup.title = "Wall Tile and Colour Configuration"
-	add_child(_configuration_popup)
-	var popup_content := VBoxContainer.new()
-	popup_content.custom_minimum_size = Vector2(520, 560)
-	_configuration_popup.add_child(popup_content)
-	var library_row := HBoxContainer.new()
-	library_row.add_child(_label("Wall pieces file"))
-	_mesh_library_path_edit = LineEdit.new()
-	_mesh_library_path_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_mesh_library_path_edit.text_submitted.connect(_set_mesh_library_path)
 	_mesh_library_path_edit.focus_exited.connect(func() -> void:
 		_set_mesh_library_path(_mesh_library_path_edit.text)
 	)
-	library_row.add_child(_mesh_library_path_edit)
-	var library_browse_button := Button.new()
-	library_browse_button.text = "Browse"
+	var library_browse_button := _configuration_popup.get_node(^"PopupContent/LibraryRow/Browse") as Button
 	library_browse_button.pressed.connect(func() -> void: _mesh_library_dialog.popup_file_dialog())
-	library_row.add_child(library_browse_button)
-	popup_content.add_child(library_row)
-	var folder_row := HBoxContainer.new()
-	folder_row.add_child(_label("Floor materials folder"))
-	_floor_materials_folder_edit = LineEdit.new()
-	_floor_materials_folder_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_floor_materials_folder_edit.text_submitted.connect(func(value: String) -> void:
 		_set_floor_materials_folder(value)
 	)
 	_floor_materials_folder_edit.focus_exited.connect(func() -> void:
 		_set_floor_materials_folder(_floor_materials_folder_edit.text)
 	)
-	folder_row.add_child(_floor_materials_folder_edit)
-	var folder_browse_button := Button.new()
-	folder_browse_button.text = "Browse"
+	var folder_browse_button := _configuration_popup.get_node(^"PopupContent/FolderRow/Browse") as Button
 	folder_browse_button.pressed.connect(func() -> void: _floor_materials_folder_dialog.popup_file_dialog())
-	folder_row.add_child(folder_browse_button)
-	popup_content.add_child(folder_row)
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	popup_content.add_child(scroll)
-	_rows_container = VBoxContainer.new()
-	_rows_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_rows_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.add_child(_rows_container)
-	var close_button := Button.new()
-	close_button.text = "Close"
+	var add_mapping_button := _configuration_popup.get_node(
+		^"PopupContent/ManualMappingRow/AddMapping"
+	) as Button
+	add_mapping_button.pressed.connect(func() -> void:
+		_add_mapping(_manual_colour_picker.color)
+	)
+	var close_button := _configuration_popup.get_node(^"PopupContent/Close") as Button
 	close_button.pressed.connect(_configuration_popup.hide)
-	popup_content.add_child(close_button)
-
-
-## Builds output path controls.
-func _build_outputs() -> void:
-	_outputs_section_label = _section("Output")
-	_content_container.add_child(_outputs_section_label)
-	_output_label = _path_label("Output: choose inputs first")
-	_content_container.add_child(_output_label)
-	_output_png_button_row = _button_row([["Choose PNG", func() -> void:
+	(_output_png_button_row.get_node(^"ChoosePNG") as Button).pressed.connect(func() -> void:
 		_png_save_dialog.current_path = _default_export_path
 		_png_save_dialog.popup_file_dialog()
-	]])
-	_content_container.add_child(_output_png_button_row)
-
-
-## Builds fixed validation and run controls.
-func _build_footer() -> void:
-	add_child(HSeparator.new())
-	_validation_label = RichTextLabel.new()
-	_validation_label.custom_minimum_size = Vector2(0, 84)
-	_validation_label.fit_content = false
-	_validation_label.scroll_active = true
-	_validation_label.bbcode_enabled = false
-	add_child(_validation_label)
-	add_child(_button_row([
-		["Run", func() -> void: run_requested.emit(_operation_option.get_selected_id())],
-		["Repair Gridmap", func() -> void: repair_gridmap_requested.emit()],
-		["Create Floor", func() -> void: create_floor_requested.emit()],
-	]))
-
-
-## Builds hidden file dialogs owned by the dock.
-func _build_dialogs() -> void:
-	_png_open_dialog = _file_dialog(EditorFileDialog.FILE_MODE_OPEN_FILE)
+	)
+	(get_node(^"FooterButtons/Run") as Button).pressed.connect(
+		func() -> void: run_requested.emit(_operation_option.get_selected_id())
+	)
+	(get_node(^"FooterButtons/RepairGridMap") as Button).pressed.connect(
+		func() -> void: repair_gridmap_requested.emit()
+	)
+	(get_node(^"FooterButtons/CreateFloor") as Button).pressed.connect(
+		func() -> void: create_floor_requested.emit()
+	)
 	_png_open_dialog.file_selected.connect(func(path: String) -> void: load_png_selected.emit(path))
-	add_child(_png_open_dialog)
-	_png_save_dialog = _file_dialog(EditorFileDialog.FILE_MODE_SAVE_FILE)
 	_png_save_dialog.file_selected.connect(func(path: String) -> void: export_png_path_selected.emit(path))
-	add_child(_png_save_dialog)
-	_import_warning_dialog = ConfirmationDialog.new()
-	_import_warning_dialog.title = "Import with Warnings?"
-	add_child(_import_warning_dialog)
-	_overwrite_warning_dialog = ConfirmationDialog.new()
-	_overwrite_warning_dialog.title = "Overwrite PNG?"
-	add_child(_overwrite_warning_dialog)
-	_mesh_library_dialog = EditorFileDialog.new()
-	_mesh_library_dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
-	_mesh_library_dialog.access = EditorFileDialog.ACCESS_RESOURCES
-	_mesh_library_dialog.filters = PackedStringArray(["*.tres,*.res ; Godot resource files"])
 	_mesh_library_dialog.file_selected.connect(_set_mesh_library_path)
-	add_child(_mesh_library_dialog)
-	_floor_materials_folder_dialog = EditorFileDialog.new()
-	_floor_materials_folder_dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_DIR
-	_floor_materials_folder_dialog.access = EditorFileDialog.ACCESS_RESOURCES
 	_floor_materials_folder_dialog.dir_selected.connect(_set_floor_materials_folder)
-	add_child(_floor_materials_folder_dialog)
 
 
 ## Applies saved operation and Advanced visibility state.
@@ -423,17 +332,18 @@ func _update_controls_from_settings() -> void:
 	_update_output_label()
 
 
-## Rebuilds all colour mapping rows from detected colours.
+## Rebuilds detected and manually configured colour mapping rows.
 func _rebuild_colour_rows() -> void:
 	for child in _rows_container.get_children():
 		child.queue_free()
-	if _colour_order.is_empty():
+	var row_keys := MappingCatalog.ordered_keys(_settings, _colour_order)
+	if row_keys.is_empty():
 		var empty := Label.new()
-		empty.text = "Load a PNG to detect colours."
+		empty.text = "Load a PNG or add a colour mapping manually."
 		_rows_container.add_child(empty)
 		_apply_editor_tooltips(empty)
 		return
-	for key in _colour_order:
+	for key in row_keys:
 		var row := _colour_row(key)
 		_rows_container.add_child(row)
 		_apply_editor_tooltips(row)
@@ -458,7 +368,7 @@ func _set_floor_materials_folder(value: String) -> void:
 	settings_changed.emit()
 
 
-## Builds a display row for one detected colour.
+## Builds a display row for one detected or manually configured colour.
 func _colour_row(key: String) -> Control:
 	var mapping := _mapping_for_key(key)
 	var panel := PanelContainer.new()
@@ -467,16 +377,26 @@ func _colour_row(key: String) -> Control:
 	var header := HBoxContainer.new()
 	content.add_child(header)
 	var swatch := ColorRect.new()
-	swatch.color = mapping.colour
+	swatch.color = _colour_for_key(key, mapping)
 	swatch.custom_minimum_size = Vector2(34, 22)
 	header.add_child(swatch)
 	var title := Label.new()
-	title.text = "%s  %s px" % [
-		mapping.display_name if mapping.display_name != "" else "#" + key,
-		_detected_colours[key]["count"],
-	]
+	var display_name := "#" + key
+	if mapping != null and mapping.display_name != "":
+		display_name = mapping.display_name
+	var source_label := "%s px" % int(_detected_colours[key]["count"]) \
+		if _detected_colours.has(key) else "Manual"
+	title.text = "%s  %s" % [display_name, source_label]
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
+	if mapping == null:
+		var restore_button := Button.new()
+		restore_button.text = "Add mapping"
+		restore_button.pressed.connect(func() -> void:
+			_add_mapping(swatch.color)
+		)
+		header.add_child(restore_button)
+		return panel
 	var autotile := CheckBox.new()
 	autotile.text = "Autotile"
 	autotile.button_pressed = mapping.autotile_enabled
@@ -488,6 +408,14 @@ func _colour_row(key: String) -> Control:
 		mapping_changed.emit()
 	)
 	header.add_child(autotile)
+	var remove_button := Button.new()
+	remove_button.text = "Remove mapping"
+	remove_button.pressed.connect(func() -> void:
+		MappingCatalog.remove_mapping(_settings, mapping)
+		_rebuild_colour_rows()
+		mapping_changed.emit()
+	)
+	header.add_child(remove_button)
 	content.add_child(_variant_row(mapping, PNGToGridMapAutotile.VARIANT_BASE, "Base"))
 	if mapping.autotile_enabled:
 		content.add_child(_autotile_connectivity_group_row(mapping))
@@ -635,10 +563,25 @@ func _variant_row(mapping: Resource, variant: String, text: String) -> Control:
 
 ## Finds a colour mapping resource by colour key.
 func _mapping_for_key(key: String) -> Resource:
-	for mapping in _settings.color_mappings:
-		if PNGToGridMapImageGrid.colour_key(mapping.colour) == key:
-			return mapping
-	return null
+	return MappingCatalog.mapping_for_key(_settings, key)
+
+
+## Adds a manual or previously removed mapping and refreshes its editable row.
+func _add_mapping(colour: Color) -> void:
+	var before_count: int = _settings.color_mappings.size()
+	MappingCatalog.add_mapping(_settings, colour)
+	_rebuild_colour_rows()
+	if _settings.color_mappings.size() != before_count:
+		mapping_changed.emit()
+
+
+## Resolves a row colour from its mapping or current PNG detection.
+func _colour_for_key(key: String, mapping: Resource) -> Color:
+	if mapping != null:
+		return mapping.colour
+	if _detected_colours.has(key):
+		return _detected_colours[key]["colour"] as Color
+	return Color.from_string("#" + key, Color.WHITE)
 
 
 ## Resolves a mapping variant ref through currently available item aliases.
@@ -667,38 +610,11 @@ func _update_output_label() -> void:
 		_output_png_button_row.visible = false
 
 
-## Creates a standard section heading label.
-func _section(text: String) -> Label:
-	var label := _label(text)
-	label.add_theme_font_size_override("font_size", 14)
-	return label
-
-
 ## Creates a standard compact label.
 func _label(text: String) -> Label:
 	var label := Label.new()
 	label.text = text
 	return label
-
-
-## Creates a path-style label with clipping and tooltip mirroring.
-func _path_label(text: String) -> Label:
-	var label := _label(text)
-	label.clip_text = true
-	label.tooltip_text = text
-	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	return label
-
-
-## Creates a wrapping row of buttons that does not impose a wide editor dock.
-func _button_row(specs: Array) -> HFlowContainer:
-	var row := HFlowContainer.new()
-	for spec in specs:
-		var button := Button.new()
-		button.text = spec[0]
-		button.pressed.connect(spec[1])
-		row.add_child(button)
-	return row
 
 
 ## Creates a PNG file dialog using the standard filter.
@@ -772,6 +688,9 @@ func _tooltip_for_control(control: Control) -> String:
 		"Wall pieces file": return "Choose the shared file containing the wall pieces used by picture colours."
 		"Floor materials folder": return "Choose the shared folder whose floor finishes appear in the floor list."
 		"Browse": return "Choose this location from the project."
+		"Add mapping": return "Configure this colour with a MeshLibrary piece."
+		"Add Colour Mapping": return "Add a colour and its MeshLibrary piece without loading a PNG."
+		"Remove mapping": return "Remove this colour mapping from the shared configuration."
 		"Close": return "Close these shared wall and colour choices."
 		"Choose PNG": return "Choose where the picture made from the GridMap will be saved."
 		"Run": return "Carry out the selected import or export."

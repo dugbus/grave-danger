@@ -13,6 +13,23 @@ const GRID_SOUTH := Vector3i(0, 0, 1)
 const GRID_WEST := Vector3i(-1, 0, 0)
 
 
+## Hashes every enabled mapping choice that can change a repair result.
+func configuration_fingerprint(settings: Resource, item_aliases: Dictionary) -> int:
+	var signatures: Array[String] = []
+	for mapping: Resource in settings.color_mappings:
+		if not mapping.autotile_enabled:
+			continue
+		var key := PNGToGridMapImageGrid.colour_key(mapping.colour)
+		var connection_group := String(mapping.autotile_connectivity_group).strip_edges()
+		signatures.append("%s:%s:%s" % [
+			key,
+			connection_group,
+			_mapping_signature(mapping, item_aliases),
+		])
+	signatures.sort()
+	return hash(signatures)
+
+
 ## Plans in-place autotile repairs without reading or changing a PNG image.
 func build_plan(settings: Resource, grid_map: GridMap, item_aliases: Dictionary) -> Dictionary:
 	if grid_map == null:
@@ -40,7 +57,10 @@ func build_plan(settings: Resource, grid_map: GridMap, item_aliases: Dictionary)
 		if bool(mapping_data["conflict"]):
 			if not reported_conflicts.has(item_id):
 				errors.append(
-					"MeshLibrary piece '%s' belongs to incompatible autotile mappings. Give those mappings distinct pieces or matching variant settings."
+					(
+						"MeshLibrary piece '%s' belongs to incompatible autotile mappings. "
+						+ "Give those mappings distinct pieces or matching variant settings."
+					)
 					% PNGToGridMapMeshCatalog.item_debug_name(grid_map.mesh_library, item_id)
 				)
 				reported_conflicts[item_id] = true

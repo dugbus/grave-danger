@@ -16,6 +16,8 @@ extends Resource
 @export var export_origin := Vector2i.ZERO
 @export var export_size := Vector2i.ZERO
 @export var color_mappings: Array[Resource] = []
+## PNG colours deliberately removed from the shared mapping list by a level editor.
+@export var ignored_colour_keys: Array[String] = []
 ## Generated floor GridMap path used to rebuild the same node on later runs.
 @export var floor_gridmap_path: NodePath
 ## Material applied to every generated floor tile for this level.

@@ -53,6 +53,13 @@ class SourceKind(str, Enum):
     TEMPLATE = "template"
 
 
+class MappingFormat(str, Enum):
+    """Supported level-mapping serialization formats."""
+
+    DICTIONARY = "dictionary"
+    LEVEL_DEFINITION = "level_definition"
+
+
 @dataclass(frozen=True)
 class MappingEntry:
     """One entry parsed from levels/level_mapping.tres."""
@@ -169,10 +176,12 @@ def parse_mapping_entries(mapping_path: Path) -> list[MappingEntry]:
     if not mapping_path.is_file():
         return []
     content = mapping_path.read_text(encoding="utf-8")
+    mapping_format = _detect_mapping_format(content, mapping_path)
+    if mapping_format is MappingFormat.LEVEL_DEFINITION:
+        return _parse_level_definition_entries(content)
+
     marker = "level_entries = Array[Dictionary](["
     marker_index = content.find(marker)
-    if marker_index < 0:
-        raise ValueError(f"Could not find level_entries in {mapping_path}")
 
     entries: list[MappingEntry] = []
     body_start = marker_index + len(marker)
@@ -189,6 +198,49 @@ def parse_mapping_entries(mapping_path: Path) -> list[MappingEntry]:
         level_id = str(values.get("id", _to_snake_case(name)))
         entries.append(MappingEntry(level_id, name, folder, values))
     return entries
+
+
+def _detect_mapping_format(content: str, mapping_path: Path) -> MappingFormat:
+    if "level_entries = Array[Dictionary]([" in content:
+        return MappingFormat.DICTIONARY
+    if re.search(r"(?m)^level_entries = Array\[ExtResource\([^\]]+\)\]\(\[", content):
+        return MappingFormat.LEVEL_DEFINITION
+    raise ValueError(f"Could not find level_entries in {mapping_path}")
+
+
+def _parse_level_definition_entries(content: str) -> list[MappingEntry]:
+    entries: list[MappingEntry] = []
+    block_pattern = re.compile(
+        r'(?ms)^\[sub_resource type="Resource" id="[^"]+"\]\n(.*?)(?=^\[|\Z)'
+    )
+    for match in block_pattern.finditer(content):
+        values = _parse_resource_properties(match.group(1))
+        folder = str(values.get("folder_name", ""))
+        if not folder:
+            continue
+        name = str(values.get("display_name", folder))
+        level_id = str(values.get("id", _to_snake_case(name)))
+        entries.append(MappingEntry(level_id, name, folder, values))
+    return entries
+
+
+def _parse_resource_properties(body: str) -> dict[str, Any]:
+    values: dict[str, Any] = {}
+    for key, raw_value in re.findall(
+        r"^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+?)$",
+        body,
+        re.MULTILINE,
+    ):
+        value = raw_value.strip()
+        if value.startswith('"') and value.endswith('"'):
+            values[key] = value[1:-1]
+        elif value == "true":
+            values[key] = True
+        elif value == "false":
+            values[key] = False
+        elif re.fullmatch(r"-?\d+", value):
+            values[key] = int(value)
+    return values
 
 
 def _parse_dictionary(body: str) -> dict[str, Any]:
@@ -601,6 +653,19 @@ def _append_mapping_entry(
     if not mapping_path.is_file():
         raise ValueError(f"Cannot update missing mapping file: {mapping_path}")
     content = mapping_path.read_text(encoding="utf-8")
+    mapping_format = _detect_mapping_format(content, mapping_path)
+    if mapping_format is MappingFormat.LEVEL_DEFINITION:
+        _append_level_definition_entry(
+            mapping_path,
+            content,
+            folder,
+            level_id,
+            name,
+            legacy_result_key,
+            source_entry,
+        )
+        return
+
     closing_index = content.rfind("}])")
     if closing_index < 0:
         raise ValueError(f"Could not find the end of level_entries in {mapping_path}")
@@ -629,6 +694,80 @@ def _append_mapping_entry(
     addition = f", {{\n{body}\n}}"
     updated = content[: closing_index + 1] + addition + content[closing_index + 1 :]
     mapping_path.write_text(updated, encoding="utf-8")
+
+
+def _append_level_definition_entry(
+    mapping_path: Path,
+    content: str,
+    folder: str,
+    level_id: str,
+    name: str,
+    legacy_result_key: str | None,
+    source_entry: MappingEntry | None,
+) -> None:
+    script_match = re.search(
+        r'^\[ext_resource type="Script"[^\]]*path="res://levels/level_definition\.gd"'
+        r'[^\]]*id="([^"]+)"\]$',
+        content,
+        re.MULTILINE,
+    )
+    if script_match is None:
+        raise ValueError(f"Could not find the level-definition script in {mapping_path}")
+
+    resource_marker = "\n[resource]\n"
+    resource_index = content.find(resource_marker)
+    if resource_index < 0:
+        raise ValueError(f"Could not find the resource section in {mapping_path}")
+
+    subresource_id = _unique_subresource_id(content, level_id)
+    properties = [
+        f'script = ExtResource("{script_match.group(1)}")',
+        f"id = {_godot_string(level_id)}",
+        f"display_name = {_godot_string(name)}",
+        f"folder_name = {_godot_string(folder)}",
+    ]
+    if legacy_result_key:
+        properties.append(f"legacy_result_key = {_godot_string(legacy_result_key)}")
+    properties.append("available = true")
+    if source_entry is not None and bool(source_entry.values.get("tutorial", False)):
+        properties.append("tutorial = true")
+    if source_entry is not None and not bool(
+        source_entry.values.get("run_playback_enabled", True)
+    ):
+        properties.append("run_playback_enabled = false")
+
+    block = (
+        f'\n[sub_resource type="Resource" id="{subresource_id}"]\n'
+        + "\n".join(properties)
+        + "\n"
+    )
+    updated = content[:resource_index] + block + content[resource_index:]
+    array_pattern = re.compile(
+        r'(?m)^(level_entries = Array\[ExtResource\([^\]]+\)\]\(\[)(.*)(\]\))$'
+    )
+    array_match = array_pattern.search(updated)
+    if array_match is None:
+        raise ValueError(f"Could not find the typed level_entries array in {mapping_path}")
+    separator = ", " if array_match.group(2).strip() else ""
+    replacement = (
+        array_match.group(1)
+        + array_match.group(2)
+        + separator
+        + f'SubResource("{subresource_id}")'
+        + array_match.group(3)
+    )
+    updated = updated[: array_match.start()] + replacement + updated[array_match.end() :]
+    mapping_path.write_text(updated, encoding="utf-8")
+
+
+def _unique_subresource_id(content: str, level_id: str) -> str:
+    base = "Level_" + re.sub(r"[^A-Za-z0-9_]", "_", level_id)
+    candidate = base
+    suffix = 2
+    while f'id="{candidate}"' in content:
+        candidate = f"{base}_{suffix}"
+        suffix += 1
+    return candidate
 
 
 def _validate_mapping_uniqueness(

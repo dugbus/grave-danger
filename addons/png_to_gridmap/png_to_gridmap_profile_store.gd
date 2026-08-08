@@ -12,7 +12,12 @@ const UI_STATE_ADVANCED_VISIBLE := "advanced_visible"
 const UI_STATE_OPERATION_ID := "operation_id"
 const LEVELS_ROOT := "res://levels"
 const LEVEL_SETTINGS_FILE := "png_to_gridmap_settings.tres"
-const GLOBAL_PROPERTIES := [&"mesh_library_path", &"color_mappings", &"floor_materials_folder"]
+const GLOBAL_PROPERTIES := [
+	&"mesh_library_path",
+	&"color_mappings",
+	&"ignored_colour_keys",
+	&"floor_materials_folder",
+]
 const LEVEL_PROPERTIES := [
 	&"png_path",
 	&"export_png_path",
@@ -89,13 +94,22 @@ func load_for_mesh_library(current_settings: Resource) -> Resource:
 ## Loads level-specific conversion state stored beside the edited scene.
 func load_for_scene(current_settings: Resource, scene_path: String) -> Resource:
 	var path := path_for_scene(scene_path)
-	if path == "" or not ResourceLoader.exists(path):
+	if path == "":
 		return current_settings
+	if not ResourceLoader.exists(path):
+		return _new_level_settings(current_settings)
 	var loaded := ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE)
 	if loaded == null or loaded.get_script() != _settings_script:
-		return current_settings
+		return _new_level_settings(current_settings)
 	_copy_properties(current_settings, loaded, GLOBAL_PROPERTIES)
 	return loaded
+
+
+## Starts an unconfigured level without carrying paths and auto-repair choices from another scene.
+func _new_level_settings(current_settings: Resource) -> Resource:
+	var level_settings := _settings_script.new() as Resource
+	_copy_properties(current_settings, level_settings, GLOBAL_PROPERTIES)
+	return level_settings
 
 
 ## Saves mapping and scene settings only while editing a scene below res://levels/.

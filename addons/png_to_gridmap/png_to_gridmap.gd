@@ -5,20 +5,26 @@ extends EditorPlugin
 ## The plugin connects the dock to scene-safe operations, profile persistence, and undo history.
 
 const SettingsResource := preload("res://addons/png_to_gridmap/png_to_gridmap_settings.gd")
-const ColorMappingResource := preload("res://addons/png_to_gridmap/png_to_gridmap_color_mapping.gd")
-const DockResource := preload("res://addons/png_to_gridmap/png_to_gridmap_dock.gd")
+const DockScene := preload("res://addons/png_to_gridmap/png_to_gridmap_dock.tscn")
 const ProfileStoreResource := preload("res://addons/png_to_gridmap/png_to_gridmap_profile_store.gd")
 const ImporterResource := preload("res://addons/png_to_gridmap/png_to_gridmap_importer.gd")
 const ExporterResource := preload("res://addons/png_to_gridmap/png_to_gridmap_exporter.gd")
 const RepairerResource := preload("res://addons/png_to_gridmap/png_to_gridmap_repairer.gd")
 const FloorBuilderResource := preload("res://addons/png_to_gridmap/png_to_gridmap_floor_builder.gd")
 const PathsResource := preload("res://addons/png_to_gridmap/png_to_gridmap_paths.gd")
+const MappingCatalog := preload(
+	"res://addons/png_to_gridmap/png_to_gridmap_mapping_catalog.gd"
+)
+const AutoRepairWatch := preload(
+	"res://addons/png_to_gridmap/png_to_gridmap_auto_repair_watch.gd"
+)
+const ResourceCatalog := preload(
+	"res://addons/png_to_gridmap/png_to_gridmap_resource_catalog.gd"
+)
 
 const PLUGIN_CONFIG_PATH := "res://addons/png_to_gridmap/plugin.cfg"
 const EMPTY_KEY := "FFFFFFFF"
 const LEVEL_PNG_FILE := "level.png"
-const AUTO_REPAIR_CHECK_INTERVAL_MSEC := 200
-const AUTO_REPAIR_DEBOUNCE_MSEC := 600
 const DIAGNOSTIC_PREFIX := "[PNGToGridMap]"
 
 var _settings: Resource = SettingsResource.new()
@@ -38,10 +44,7 @@ var _importer: PNGToGridMapImporter
 var _exporter: PNGToGridMapExporter
 var _repairer: RefCounted
 var _floor_builder: RefCounted
-var _observed_grid_map_id := 0
-var _observed_grid_map_fingerprint := 0
-var _next_auto_repair_check_msec := 0
-var _auto_repair_due_msec := 0
+var _auto_repair_watch := AutoRepairWatch.new()
 var _resource_refresh_pending := true
 var _level_settings_loaded := false
 var _editor_dock: EditorDock
@@ -66,7 +69,7 @@ func _enter_tree() -> void:
 	var ui_state := _profile_store.load_ui_state(PNGToGridMapDock.OPERATION_IMPORT)
 	_operation_id = int(ui_state["operation_id"])
 	_advanced_visible = bool(ui_state["advanced_visible"])
-	_dock = DockResource.new()
+	_dock = DockScene.instantiate() as PNGToGridMapDock
 	_dock.setup(_dock_title(), _settings, ui_state)
 	# Let Godot create and attach its compatibility EditorDock wrapper. Constructing
 	# that wrapper directly can leave its tab detached from the content after a plugin reload.
@@ -107,28 +110,18 @@ func _process(_delta: float) -> void:
 	if not _settings.auto_repair:
 		_reset_auto_repair_watch()
 		return
-	var now := Time.get_ticks_msec()
-	if now < _next_auto_repair_check_msec:
-		return
-	_next_auto_repair_check_msec = now + AUTO_REPAIR_CHECK_INTERVAL_MSEC
 	var grid_map := _selected_gridmap()
-	if grid_map == null:
-		_reset_auto_repair_watch()
-		return
-	var instance_id := int(grid_map.get_instance_id())
-	var fingerprint := _grid_map_fingerprint(grid_map)
-	if instance_id != _observed_grid_map_id:
-		_observed_grid_map_id = instance_id
-		_observed_grid_map_fingerprint = fingerprint
-		_auto_repair_due_msec = 0
-		return
-	if fingerprint != _observed_grid_map_fingerprint:
-		_observed_grid_map_fingerprint = fingerprint
-		_auto_repair_due_msec = now + AUTO_REPAIR_DEBOUNCE_MSEC
-	if _auto_repair_due_msec != 0 and now >= _auto_repair_due_msec:
-		_auto_repair_due_msec = 0
+	var configuration_fingerprint: int = _repairer.configuration_fingerprint(
+		_settings,
+		_available_item_ref_aliases
+	)
+	if _auto_repair_watch.should_repair(
+		grid_map,
+		Time.get_ticks_msec(),
+		configuration_fingerprint
+	):
 		_repair_grid_map(grid_map, true)
-		_observed_grid_map_fingerprint = _grid_map_fingerprint(grid_map)
+		_auto_repair_watch.accept_repair(grid_map, configuration_fingerprint)
 
 
 ## Builds a compact title using plugin.cfg metadata.
@@ -298,6 +291,7 @@ func _editor_filesystem_is_ready() -> bool:
 
 ## Refreshes project-driven dropdowns and reloads any saved PNG state.
 func _refresh_all() -> void:
+	_resolve_scene_grid_map_settings()
 	_trace("Refreshing MeshLibrary catalogue.")
 	_refresh_mesh_libraries()
 	_trace("Found %s MeshLibrary resource(s)." % _mesh_library_paths.size())
@@ -321,6 +315,24 @@ func _refresh_all() -> void:
 	_trace("Resource refresh completed.")
 
 
+## Selects an unambiguous scene GridMap and uses its library to load the shared tile profile.
+func _resolve_scene_grid_map_settings() -> void:
+	var root := get_editor_interface().get_edited_scene_root()
+	var target_path := ResourceCatalog.preferred_grid_map_path(
+		root,
+		_settings.target_gridmap_path
+	)
+	_settings.target_gridmap_path = target_path
+	var grid_map := _selected_gridmap()
+	if grid_map == null or grid_map.mesh_library == null:
+		return
+	var scene_mesh_library_path := grid_map.mesh_library.resource_path
+	if scene_mesh_library_path == "" or scene_mesh_library_path == _settings.mesh_library_path:
+		return
+	_settings.mesh_library_path = scene_mesh_library_path
+	_load_profile_for_current_mesh_library()
+
+
 ## Rebuilds the MeshLibrary dropdown from project resources.
 func _refresh_mesh_libraries() -> void:
 	var editor_filesystem := get_editor_interface().get_resource_filesystem()
@@ -334,48 +346,31 @@ func _refresh_mesh_libraries() -> void:
 
 ## Rebuilds the floor material choices from the globally configured folder.
 func _refresh_floor_materials() -> void:
-	_floor_material_paths.clear()
-	_collect_material_paths(_settings.floor_materials_folder, _floor_material_paths)
-	_floor_material_paths.sort()
+	_floor_material_paths = ResourceCatalog.collect_material_paths(
+		get_editor_interface().get_resource_filesystem(),
+		_settings.floor_materials_folder
+	)
 	_dock.set_floor_material_paths(_floor_material_paths)
 
 
 ## Recursively collects loadable Material resources without relying on file extensions alone.
 func _collect_material_paths(folder: String, paths: Array[String]) -> void:
-	var directory := DirAccess.open(folder)
-	if directory == null:
-		return
-	directory.list_dir_begin()
-	var entry := directory.get_next()
-	while entry != "":
-		var path := folder.path_join(entry)
-		if directory.current_is_dir():
-			if not entry.begins_with("."):
-				_collect_material_paths(path, paths)
-		elif entry.get_extension().to_lower() in ["material", "tres"]:
-			var editor_filesystem := get_editor_interface().get_resource_filesystem()
-			var resource_type := editor_filesystem.get_file_type(path)
-			if resource_type != "" and ClassDB.is_parent_class(resource_type, &"Material"):
-				paths.append(path)
-		entry = directory.get_next()
-	directory.list_dir_end()
+	paths.append_array(ResourceCatalog.collect_material_paths(
+		get_editor_interface().get_resource_filesystem(),
+		folder
+	))
 
 
 ## Rebuilds the GridMap dropdown from the currently edited scene.
 func _refresh_gridmap_paths() -> void:
-	var paths: Array[String] = []
 	var root := get_editor_interface().get_edited_scene_root()
-	if root != null:
-		_collect_gridmap_paths(root, root, paths)
-	_dock.set_gridmap_paths(paths)
+	_dock.set_gridmap_paths(ResourceCatalog.collect_grid_map_paths(root))
 
 
 ## Collects scene-relative NodePaths for GridMaps in one scene subtree.
 func _collect_gridmap_paths(root: Node, node: Node, paths: Array[String]) -> void:
-	if node is GridMap:
-		paths.append(String(root.get_path_to(node)))
-	for child in node.get_children():
-		_collect_gridmap_paths(root, child, paths)
+	if root == node:
+		paths.append_array(ResourceCatalog.collect_grid_map_paths(root))
 
 
 ## Rebuilds selectable MeshLibrary item refs for mapping rows.
@@ -562,25 +557,12 @@ func _on_settings_changed() -> void:
 
 ## Clears pending change detection when the target or setting changes.
 func _reset_auto_repair_watch() -> void:
-	_observed_grid_map_id = 0
-	_observed_grid_map_fingerprint = 0
-	_next_auto_repair_check_msec = 0
-	_auto_repair_due_msec = 0
+	_auto_repair_watch.reset()
 
 
 ## Summarises GridMap contents so painting changes can be detected without editor input hooks.
 func _grid_map_fingerprint(grid_map: GridMap) -> int:
-	var cells := grid_map.get_used_cells()
-	cells.sort()
-	var fingerprint := cells.size()
-	for cell: Vector3i in cells:
-		fingerprint = hash([
-			fingerprint,
-			cell,
-			grid_map.get_cell_item(cell),
-			grid_map.get_cell_item_orientation(cell),
-		])
-	return fingerprint
+	return _auto_repair_watch.fingerprint(grid_map)
 
 
 ## Saves mapping changes and updates validation with current assignments.
@@ -710,20 +692,11 @@ func _scan_colours() -> void:
 	_detected_colours.erase(EMPTY_KEY)
 	_colour_order.erase(EMPTY_KEY)
 	for key in _colour_order:
-		_get_or_create_mapping(key, _detected_colours[key]["colour"])
-
-
-## Finds or creates the serialized mapping for one PNG colour.
-func _get_or_create_mapping(key: String, colour: Color) -> Resource:
-	for mapping in _settings.color_mappings:
-		if PNGToGridMapImageGrid.colour_key(mapping.colour) == key:
-			return mapping
-	var mapping := ColorMappingResource.new()
-	mapping.colour = colour
-	mapping.display_name = "#" + key
-	_settings.color_mappings.append(mapping)
-	return mapping
-
+		MappingCatalog.ensure_detected_mapping(
+			_settings,
+			key,
+			_detected_colours[key]["colour"] as Color
+		)
 
 ## Loads the selected MeshLibrary and its item lookup for service calls.
 func _active_mesh_library() -> Dictionary:

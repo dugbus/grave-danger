@@ -19,6 +19,9 @@ enum MazeConnectionAxis {
 
 const REPAIRER_SCRIPT := preload("res://addons/png_to_gridmap/png_to_gridmap_repairer.gd")
 const MESH_CATALOG_SCRIPT := preload("res://addons/png_to_gridmap/png_to_gridmap_mesh_catalog.gd")
+const GridBuilder := preload(
+    "res://levels/vampire-maze/generated_maze/generated_maze_grid_builder.gd"
+)
 const DEFAULT_CONFIG := preload("res://levels/vampire-maze/generated_maze/generated_maze_config.tres")
 const CARDINAL_DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT]
 const BASE_WALL_ITEM_REF := "Wall"
@@ -63,7 +66,7 @@ const CURRENT_GENERATION_VERSION := 11
 ## Child responsible for planning and instancing generated dungeon content.
 @export var generated_content_path: NodePath = ^"GeneratedContent"
 ## Optional authored-content root disabled when generated budgets are active.
-@export var authored_content_path: NodePath = ^"../Objects"
+@export var authored_content_path: NodePath
 ## Height added above the generated floor for both character roots.
 @export_range(0.0, 4.0, 0.05) var character_spawn_height := 0.05
 ## Allows live generation while editing; disable it to preserve manual level edits.
@@ -94,6 +97,7 @@ var _is_generating := false
 var _connected_configuration: Resource
 var _connected_content_configuration: Resource
 var _last_regeneration_request_milliseconds := 0
+var _grid_builder := GridBuilder.new()
 
 
 func _ready() -> void:
@@ -901,60 +905,19 @@ func _populate_grid_maps(
     height: int,
     wall_repair_settings: Resource
 ) -> Array[String]:
-    var errors: Array[String] = []
-    if wall_grid_map.mesh_library == null:
-        errors.append("GeneratedMaze wall GridMap requires a MeshLibrary.")
-        return errors
-    if floor_grid_map.mesh_library == null or floor_grid_map.mesh_library.get_item_list().is_empty():
-        errors.append("GeneratedMaze floor GridMap requires at least one MeshLibrary item.")
-        return errors
-
-    var wall_refs: Dictionary = MESH_CATALOG_SCRIPT.ref_to_id(wall_grid_map.mesh_library)
-    if not wall_refs.has(BASE_WALL_ITEM_REF):
-        errors.append("GeneratedMaze wall MeshLibrary has no '%s' item." % BASE_WALL_ITEM_REF)
-        return errors
-    var wall_item_id := int(wall_refs[BASE_WALL_ITEM_REF])
-    var map_offset := Vector3(-float(width) * 0.5, 0.0, -float(height) * 0.5)
-
-    wall_grid_map.clear()
-    floor_grid_map.clear()
-    wall_grid_map.position = map_offset
-    floor_grid_map.position = map_offset
-    wall_grid_map.cell_size = Vector3.ONE
-    floor_grid_map.cell_size = Vector3.ONE
-    wall_grid_map.cell_center_y = false
-    floor_grid_map.cell_center_y = false
-
-    for z_coordinate in height:
-        for x_coordinate in width:
-            var cell := Vector3i(x_coordinate, 0, z_coordinate)
-            var floor_item_id := GDGeneratedFloorSettings.item_id_for_cell(
-                floor_grid_map,
-                Vector2i(x_coordinate, z_coordinate),
-                floor_texture_tiles
-            )
-            floor_grid_map.set_cell_item(cell, floor_item_id)
-            if not floor_cells.has(Vector2i(x_coordinate, z_coordinate)):
-                wall_grid_map.set_cell_item(cell, wall_item_id)
-
-    errors.append_array(_repair_wall_cells(wall_grid_map, wall_repair_settings))
-    return errors
+    return _grid_builder.populate(
+        wall_grid_map,
+        floor_grid_map,
+        floor_cells,
+        width,
+        height,
+        floor_texture_tiles,
+        wall_repair_settings
+    )
 
 
 func _repair_wall_cells(wall_grid_map: GridMap, wall_repair_settings: Resource) -> Array[String]:
-    if wall_repair_settings == null:
-        return ["GeneratedMaze requires PNG-to-GridMap wall repair settings."]
-    var repairer: RefCounted = REPAIRER_SCRIPT.new()
-    var plan: Dictionary = repairer.call(&"build_plan", wall_repair_settings, wall_grid_map, {})
-    var errors: Array[String] = []
-    for error in plan.get("errors", []):
-        errors.append(String(error))
-    if not errors.is_empty():
-        return errors
-    for change in plan.get("changes", []):
-        var cell := change["cell"] as Vector3i
-        wall_grid_map.set_cell_item(cell, int(change["item_id"]), int(change["orientation"]))
-    return errors
+    return _grid_builder.repair(wall_grid_map, wall_repair_settings)
 
 
 func _spawn_transform_for_cell(grid_map: GridMap, cell: Vector3i, height_offset: float) -> Transform3D:

@@ -1,6 +1,8 @@
 extends Node
 class_name GDPlayerDeath
 
+signal flame_energy_changed(current_energy: float, maximum_energy: float, dead: bool)
+
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 
@@ -44,6 +46,7 @@ var active_heal_tweens: Array[Tween] = []
 
 func _ready() -> void:
 	flame_energy = max_flame_energy
+	_emit_flame_energy_changed()
 
 
 func apply_flame_damage(amount: float) -> void:
@@ -71,6 +74,7 @@ func drain_flame_energy() -> void:
 		return
 
 	flame_energy = 0.0
+	_emit_flame_energy_changed()
 	_die(DeathCause.EnergyDrain)
 
 
@@ -92,6 +96,7 @@ func heal_percent_over_time(percent_of_max: float, duration: float) -> bool:
 		var delta_amount := applied_amount - float(previous_applied_amount[0])
 		previous_applied_amount[0] = applied_amount
 		flame_energy = minf(flame_energy + delta_amount, max_flame_energy)
+		_emit_flame_energy_changed()
 
 	active_heal_tweens.append(tween)
 	tween.tween_method(apply_heal, 0.0, heal_amount, maxf(duration, 0.01))
@@ -108,6 +113,7 @@ func apply_temporary_damage(amount: float, restore_after_seconds: float) -> bool
 		return false
 
 	flame_energy = maxf(flame_energy - damage_amount, 0.0)
+	_emit_flame_energy_changed()
 	if flame_energy <= 0.0:
 		_die(DeathCause.Poison)
 		return true
@@ -142,6 +148,7 @@ func _die(death_cause: DeathCause) -> void:
 		return
 
 	is_dead = true
+	_emit_flame_energy_changed()
 	for tween in active_heal_tweens:
 		if tween != null and tween.is_valid():
 			tween.kill()
@@ -172,6 +179,7 @@ func _apply_damage(amount: float, death_cause: DeathCause) -> void:
 		return
 
 	flame_energy = maxf(flame_energy - maxf(amount, 0.0), 0.0)
+	_emit_flame_energy_changed()
 	if flame_energy <= 0.0:
 		_die(death_cause)
 
@@ -203,3 +211,8 @@ func _restore_temporary_damage_after(amount: float, seconds: float) -> void:
 	await get_tree().create_timer(maxf(seconds, 0.01)).timeout
 	if not is_dead:
 		flame_energy = minf(flame_energy + amount, max_flame_energy)
+		_emit_flame_energy_changed()
+
+
+func _emit_flame_energy_changed() -> void:
+	flame_energy_changed.emit(flame_energy, max_flame_energy, is_dead)

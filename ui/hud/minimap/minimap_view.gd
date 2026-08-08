@@ -22,7 +22,14 @@ enum DisplayMode {
 }
 
 ## Shared minimap tuning values for the whole game.
-@export var settings: GDMinimapViewSettings = DEFAULT_SETTINGS
+@export var settings: GDMinimapViewSettings = DEFAULT_SETTINGS:
+	set(value):
+		_disconnect_settings_signal()
+		settings = value
+		_connect_settings_signal()
+		if is_inside_tree() and minimap_enabled:
+			_configure_viewport()
+			_configure_vampire_overlay_display()
 
 var target: Node3D
 var kill_boundary: Node
@@ -47,6 +54,8 @@ var display_mode := DisplayMode.Corner
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_connect_settings_signal()
+	get_viewport().size_changed.connect(_on_viewport_size_changed)
 	set_minimap_enabled(minimap_enabled)
 
 
@@ -54,9 +63,12 @@ func _process(_delta: float) -> void:
 	if not minimap_enabled:
 		return
 
-	_update_display_mode_from_input()
-	_configure_viewport()
 	_update_camera_transform()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if minimap_enabled and event.is_action(EXPAND_MINIMAP_ACTION):
+		set_minimap_expanded(event.is_action_pressed(EXPAND_MINIMAP_ACTION))
 
 
 func set_runtime_targets(target_node: Node, kill_boundary_node: Node) -> void:
@@ -69,6 +81,7 @@ func set_runtime_references(target_node: Node, kill_boundary_node: Node, level_r
 	level_root = level_root_node
 	_refresh_level_bounds()
 	if minimap_enabled:
+		_configure_viewport()
 		_update_camera_transform()
 	_configure_vampire_overlay()
 
@@ -99,7 +112,7 @@ func set_minimap_enabled(enabled: bool) -> void:
 		minimap_camera.current = enabled
 
 	if enabled:
-		_update_display_mode_from_input()
+		set_minimap_expanded(Input.is_action_pressed(EXPAND_MINIMAP_ACTION))
 		_configure_viewport()
 		_update_camera_transform()
 		_configure_vampire_overlay()
@@ -188,10 +201,6 @@ func _configure_vampire_overlay_display() -> void:
 	)
 
 
-func _update_display_mode_from_input() -> void:
-	set_minimap_expanded(Input.is_action_pressed(EXPAND_MINIMAP_ACTION))
-
-
 func _update_camera_transform() -> void:
 	if minimap_camera == null:
 		return
@@ -202,6 +211,31 @@ func _update_camera_transform() -> void:
 
 	minimap_camera.global_position = camera_position
 	minimap_camera.look_at(focus, Vector3.FORWARD)
+
+
+func _on_viewport_size_changed() -> void:
+	if minimap_enabled:
+		_configure_viewport()
+		_update_camera_transform()
+
+
+func _on_settings_changed() -> void:
+	if minimap_enabled:
+		_configure_viewport()
+		_configure_vampire_overlay_display()
+		_update_camera_transform()
+
+
+func _connect_settings_signal() -> void:
+	var active_settings := _get_settings()
+	if not active_settings.changed.is_connected(_on_settings_changed):
+		active_settings.changed.connect(_on_settings_changed)
+
+
+func _disconnect_settings_signal() -> void:
+	var active_settings := _get_settings()
+	if active_settings.changed.is_connected(_on_settings_changed):
+		active_settings.changed.disconnect(_on_settings_changed)
 
 
 func _get_minimap_focus() -> Vector3:

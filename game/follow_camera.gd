@@ -6,7 +6,7 @@ class_name GDFollowCamera
 @export var target_path: NodePath = ^"../Player"
 
 ## Optional kill boundary used to auto-zoom until the safe area stays visible.
-@export var kill_boundary_path: NodePath = ^"../LevelLayout/KillBoundary3D"
+@export var kill_boundary_path: NodePath
 
 ## Optional reusable set of camera tuning values for level-specific cameras.
 @export var camera_profile: Resource:

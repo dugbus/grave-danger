@@ -13,8 +13,8 @@ const HudPanelScene := preload("res://ui/hud/panel.tscn")
 ## Existing editor-placed low-health vignette. If missing, this HUD skips the screen-edge warning.
 @export var low_health_vignette_path: NodePath = ^"../LowHealthVignette"
 
-var death_controller: Node
-var player_inventory: Node
+var death_controller: GDPlayerDeath
+var player_inventory: GDPlayerInventory
 var player: Node
 var active_flask_hud: Control
 var hud_panel: Control
@@ -30,40 +30,26 @@ func _ready() -> void:
 
 	_resolve_references()
 	_connect_inventory_signal()
-	_connect_player_signal()
+	_connect_player_signals()
+	_update_health_display()
+	_update_sack_display()
+	set_process(false)
 
 
 func set_runtime_references(death_controller_node: Node, player_inventory_node: Node) -> void:
-	death_controller = death_controller_node
-	player_inventory = player_inventory_node
+	_disconnect_runtime_signals()
+	death_controller = death_controller_node as GDPlayerDeath
+	player_inventory = player_inventory_node as GDPlayerInventory
 	player = death_controller.get_parent() if death_controller != null else null
 	_connect_inventory_signal()
-	_connect_player_signal()
-	_update_health_display()
-	_update_sack_display()
-
-
-func _process(_delta: float) -> void:
-	if hud_panel == null:
-		_bind_hud_panel()
-
-	if active_flask_hud == null:
-		_bind_active_flask_hud()
-	if low_health_vignette == null:
-		_bind_low_health_vignette()
-
-	if not is_instance_valid(death_controller) or not is_instance_valid(player_inventory):
-		_resolve_references()
-		_connect_inventory_signal()
-		_connect_player_signal()
-
+	_connect_player_signals()
 	_update_health_display()
 	_update_sack_display()
 
 
 func _resolve_references() -> void:
-	death_controller = _get_node_or_null_from_path(death_controller_path)
-	player_inventory = _get_node_or_null_from_path(inventory_path)
+	death_controller = _get_node_or_null_from_path(death_controller_path) as GDPlayerDeath
+	player_inventory = _get_node_or_null_from_path(inventory_path) as GDPlayerInventory
 	player = death_controller.get_parent() if death_controller != null else null
 
 
@@ -80,13 +66,31 @@ func _connect_inventory_signal() -> void:
 		player_inventory.inventory_capacity_changed.connect(_on_inventory_capacity_changed)
 
 
-func _connect_player_signal() -> void:
-	if player == null or not player.has_signal("flask_effect_started"):
-		return
-	if player.flask_effect_started.is_connected(_on_flask_effect_started):
-		return
+func _connect_player_signals() -> void:
+	if death_controller != null \
+		and not death_controller.flame_energy_changed.is_connected(_on_flame_energy_changed):
+		death_controller.flame_energy_changed.connect(_on_flame_energy_changed)
+	if player != null and player.has_signal("flask_effect_started") \
+		and not player.flask_effect_started.is_connected(_on_flask_effect_started):
+		player.flask_effect_started.connect(_on_flask_effect_started)
 
-	player.flask_effect_started.connect(_on_flask_effect_started)
+
+func _disconnect_runtime_signals() -> void:
+	if is_instance_valid(death_controller) \
+		and death_controller.flame_energy_changed.is_connected(_on_flame_energy_changed):
+		death_controller.flame_energy_changed.disconnect(_on_flame_energy_changed)
+	if is_instance_valid(player) and player.has_signal("flask_effect_started") \
+		and player.flask_effect_started.is_connected(_on_flask_effect_started):
+		player.flask_effect_started.disconnect(_on_flask_effect_started)
+	if is_instance_valid(player_inventory):
+		if player_inventory.item_count_changed.is_connected(_on_item_count_changed):
+			player_inventory.item_count_changed.disconnect(_on_item_count_changed)
+		if player_inventory.inventory_capacity_changed.is_connected(
+			_on_inventory_capacity_changed
+		):
+			player_inventory.inventory_capacity_changed.disconnect(
+				_on_inventory_capacity_changed
+			)
 
 
 func _bind_hud_panel() -> void:
@@ -125,6 +129,14 @@ func _on_flask_effect_started(effect_id: StringName, liquid_color: Color, durati
 	_bind_active_flask_hud()
 	if active_flask_hud != null and active_flask_hud.has_method("show_flask_effect"):
 		active_flask_hud.show_flask_effect(effect_id, liquid_color, duration)
+
+
+func _on_flame_energy_changed(
+	_current_energy: float,
+	_maximum_energy: float,
+	_dead: bool
+) -> void:
+	_update_health_display()
 
 
 func _update_health_display() -> void:

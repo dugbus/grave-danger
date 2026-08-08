@@ -2,7 +2,7 @@ extends Control
 class_name GDActiveFlaskHud
 
 
-const FLASK_SCENE := preload("res://Assets/placeables/collectibles/flask.glb")
+const EFFECT_SLOT_SCENE := preload("res://ui/hud/active_flask_effect_slot.tscn")
 const LIQUID_MATERIAL_NAME := "FlaskLiquidMaterial"
 const SLOT_SIZE := Vector2(328.0, 408.0)
 const VIEWPORT_SIZE := Vector2i(288, 288)
@@ -107,81 +107,23 @@ func _apply_layout() -> void:
 
 
 func _create_effect_slot(color: Color, effect_label: String) -> Dictionary:
-	var root := VBoxContainer.new()
-	root.custom_minimum_size = SLOT_SIZE
-	root.alignment = BoxContainer.ALIGNMENT_CENTER
-	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_theme_constant_override("separation", 0)
-
-	var viewport_container := SubViewportContainer.new()
-	viewport_container.custom_minimum_size = Vector2(VIEWPORT_SIZE)
-	viewport_container.stretch = true
-	viewport_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(viewport_container)
-
-	var viewport := SubViewport.new()
-	viewport.size = VIEWPORT_SIZE
-	viewport.transparent_bg = true
+	var root := EFFECT_SLOT_SCENE.instantiate() as VBoxContainer
+	var viewport := root.get_node(^"ViewportContainer/Viewport") as SubViewport
 	viewport.world_3d = World3D.new()
-	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	viewport_container.add_child(viewport)
-
-	var world := Node3D.new()
-	world.name = "FlaskPreviewWorld"
-	viewport.add_child(world)
-
-	var visual := Node3D.new()
-	visual.name = "FlaskPreviewVisual"
-	world.add_child(visual)
-
-	var flask_model := FLASK_SCENE.instantiate() as Node3D
-	visual.add_child(flask_model)
+	var world := viewport.get_node(^"FlaskPreviewWorld") as Node3D
+	var visual := world.get_node(^"FlaskPreviewVisual") as Node3D
+	var flask_model := visual.get_node(^"Flask") as Node3D
 	_apply_liquid_color(flask_model, color)
 
-	var light := DirectionalLight3D.new()
-	light.name = "PreviewLight"
-	light.light_energy = 2.6
-	light.rotation_degrees = Vector3(-45.0, 35.0, 0.0)
-	world.add_child(light)
-
-	var fill_light := OmniLight3D.new()
-	fill_light.name = "PreviewFillLight"
-	fill_light.light_energy = 1.0
-	fill_light.omni_range = 4.0
-	fill_light.position = Vector3(-1.5, 1.2, 2.0)
-	world.add_child(fill_light)
-
-	var camera := Camera3D.new()
-	camera.name = "PreviewCamera"
+	var camera := world.get_node(^"PreviewCamera") as Camera3D
 	_frame_camera_to_model(camera, flask_model)
 	camera.current = true
-	world.add_child(camera)
 
-	var name_label := Label.new()
-	name_label.name = "EffectName"
+	var name_label := root.get_node(^"EffectName") as Label
 	name_label.text = effect_label
-	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_label.custom_minimum_size = Vector2(SLOT_SIZE.x, 48.0)
-	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	GDGameFont.apply_to_label(name_label)
-	name_label.add_theme_font_size_override("font_size", 36)
-	name_label.add_theme_color_override("font_color", Color(1.0, 0.94, 0.78))
-	name_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
-	name_label.add_theme_constant_override("shadow_offset_x", 2)
-	name_label.add_theme_constant_override("shadow_offset_y", 2)
-	root.add_child(name_label)
-
-	var label := Label.new()
-	label.name = "Countdown"
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.custom_minimum_size = Vector2(SLOT_SIZE.x, 54.0)
+	var label := root.get_node(^"Countdown") as Label
 	GDGameFont.apply_to_label(label)
-	label.add_theme_font_size_override("font_size", 48)
-	label.add_theme_color_override("font_color", Color(1.0, 0.94, 0.78))
-	label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
-	label.add_theme_constant_override("shadow_offset_x", 2)
-	label.add_theme_constant_override("shadow_offset_y", 2)
-	root.add_child(label)
 
 	return {
 		"root": root,

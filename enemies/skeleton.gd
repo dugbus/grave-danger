@@ -1,7 +1,6 @@
 extends "res://placeables/path_placeable.gd"
 class_name GDSkeletonPath
 
-
 const FOOTSTEP_SOUND_PATHS: Array[String] = [
     "res://Assets/audio/skeleton-footstep.mp3",
 ]
@@ -14,6 +13,7 @@ const SMART_ZOMBIE_GROUP: StringName = &"smart_zombie"
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const GROUND_SPAWN := preload("res://enemies/ground_spawn.gd")
+const SkeletonPresentation := preload("res://enemies/skeleton_presentation.gd")
 const WORLD_COLLISION_LAYER := 1
 const ZOMBIE_COLLISION_LAYER := 1 << 3
 const PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER := 1 << 4
@@ -680,20 +680,7 @@ func _resolve_animation_names() -> void:
 
 
 func _resolve_animation_name(animation_name: String) -> String:
-    if animation_player == null or animation_name.is_empty():
-        return ""
-
-    if animation_player.has_animation(animation_name):
-        return animation_name
-
-    var requested := animation_name.to_lower()
-    for imported_animation_name in animation_player.get_animation_list():
-        var imported := String(imported_animation_name)
-        var normalized := imported.to_lower()
-        if normalized == requested or normalized.ends_with("/" + requested):
-            return imported
-
-    return ""
+    return SkeletonPresentation.resolve_animation_name(animation_player, animation_name)
 
 
 func _load_footstep_sounds() -> void:
@@ -910,11 +897,7 @@ func _get_fade_geometry() -> Array[GeometryInstance3D]:
 
 
 func _collect_geometry(node: Node, geometry_instances: Array[GeometryInstance3D]) -> void:
-    if node is GeometryInstance3D:
-        geometry_instances.append(node as GeometryInstance3D)
-
-    for child in node.get_children():
-        _collect_geometry(child, geometry_instances)
+    geometry_instances.append_array(SkeletonPresentation.collect_geometry(node))
 
 
 func _is_rolling_ball_body(collider: Object) -> bool:
@@ -982,12 +965,4 @@ func _find_collision_shape(node: Node) -> CollisionShape3D:
 
 
 func _find_animation_player(node: Node) -> AnimationPlayer:
-    if node is AnimationPlayer:
-        return node
-
-    for child in node.get_children():
-        var result := _find_animation_player(child)
-        if result != null:
-            return result
-
-    return null
+    return SkeletonPresentation.find_animation_player(node)

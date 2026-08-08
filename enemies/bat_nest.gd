@@ -3,7 +3,6 @@ class_name GDBatNest
 extends "res://placeables/placeable.gd"
 ## Spawns a clustered bat roost that swarms around the player before scattering upward.
 
-
 enum BatNestState {
 	Roosting,
 	Swarming,
@@ -13,6 +12,7 @@ enum BatNestState {
 
 const DEFAULT_BAT_SCENE := preload("res://Assets/environment/blender/batty.blend")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
+const BatAnimation := preload("res://enemies/bat_animation.gd")
 const PLAYER_GROUP: StringName = &"player"
 const COMBINED_FLAP_ANIMATION: StringName = &"combined_flap"
 const DEFAULT_FLAP_SOUND_PATH := "res://Assets/audio/bat-flap.mp3"
@@ -861,24 +861,11 @@ func _resolve_player() -> void:
 
 
 func _find_animation_players(root_node: Node) -> Array[AnimationPlayer]:
-	var players: Array[AnimationPlayer] = []
-	if root_node is AnimationPlayer:
-		players.append(root_node as AnimationPlayer)
-
-	for child: Node in root_node.get_children():
-		players.append_array(_find_animation_players(child))
-
-	return players
+	return BatAnimation.find_players(root_node)
 
 
 func _resolve_animation_names(bat_state: BatState) -> void:
-	bat_state.animation_names.clear()
-	for animation_player in bat_state.animation_players:
-		var animation_list := animation_player.get_animation_list()
-		if animation_list.is_empty():
-			continue
-
-		bat_state.animation_names[animation_player] = _get_flap_animation_name(animation_player, animation_list)
+	bat_state.animation_names = BatAnimation.resolve_names(bat_state.animation_players)
 
 
 func _update_bat_animations() -> void:
@@ -887,48 +874,16 @@ func _update_bat_animations() -> void:
 
 
 func _play_bat_animations(bat_state: BatState) -> void:
-	for animation_player in bat_state.animation_players:
-		if not bat_state.animation_names.has(animation_player):
-			continue
-
-		var animation_name := bat_state.animation_names[animation_player] as StringName
-		animation_player.speed_scale = flap_animation_speed_scale
-		if animation_player.current_animation != animation_name or not animation_player.is_playing():
-			animation_player.play(animation_name, -1.0, flap_animation_speed_scale)
+	BatAnimation.play(
+		bat_state.animation_players,
+		bat_state.animation_names,
+		flap_animation_speed_scale
+	)
 
 
 func _get_flap_animation_name(animation_player: AnimationPlayer, animation_list: PackedStringArray) -> StringName:
-	if animation_list.size() == 1:
-		return StringName(animation_list[0])
-
-	if animation_player.has_animation(COMBINED_FLAP_ANIMATION):
-		return COMBINED_FLAP_ANIMATION
-
-	var combined_animation := Animation.new()
-	combined_animation.resource_name = String(COMBINED_FLAP_ANIMATION)
-	combined_animation.loop_mode = Animation.LOOP_LINEAR
-
-	for animation_name in animation_list:
-		var source_animation := animation_player.get_animation(animation_name)
-		if source_animation == null:
-			continue
-
-		combined_animation.length = maxf(combined_animation.length, source_animation.length)
-		for track_index in source_animation.get_track_count():
-			source_animation.copy_track(track_index, combined_animation)
-
-	if combined_animation.get_track_count() == 0:
-		return StringName(animation_list[0])
-
-	var animation_library := _get_or_create_default_animation_library(animation_player)
-	animation_library.add_animation(COMBINED_FLAP_ANIMATION, combined_animation)
-	return COMBINED_FLAP_ANIMATION
+	return BatAnimation._get_flap_animation_name(animation_player, animation_list)
 
 
 func _get_or_create_default_animation_library(animation_player: AnimationPlayer) -> AnimationLibrary:
-	if animation_player.has_animation_library(&""):
-		return animation_player.get_animation_library(&"")
-
-	var animation_library := AnimationLibrary.new()
-	animation_player.add_animation_library(&"", animation_library)
-	return animation_library
+	return BatAnimation._get_or_create_default_animation_library(animation_player)
