@@ -312,9 +312,11 @@ func _disable_pickup_area() -> void:
 
 # Plays the pickup sound effect.
 func _play_pickup_sound() -> void:
-	var audio_parent := get_tree().current_scene
+	# The flask is removed after its collection tween, so let its owning level
+	# retain the one-shot while keeping preview audio inside the isolated world.
+	var audio_parent: Node = get_parent()
 	if audio_parent == null:
-		audio_parent = get_parent()
+		audio_parent = self
 
 	GDAudio.play_one_shot(audio_parent, DRINKING_SOUND, "FlaskPickupAudio", pickup_volume_db)
 

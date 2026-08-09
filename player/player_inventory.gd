@@ -66,7 +66,11 @@ func _ready() -> void:
 
 
 func update_drop_input(delta: float) -> void:
-	if not Input.is_action_pressed("drop_carried"):
+	update_drop_state(delta, Input.is_action_pressed(&"drop_carried"))
+
+
+func update_drop_state(delta: float, drop_pressed: bool) -> void:
+	if not drop_pressed:
 		drop_cooldown = 0.0
 		drop_hold_time = 0.0
 		return

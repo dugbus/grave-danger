@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-08-09
+
+### 1600
+
+- Level-select run playbacks now keep flask drinking and death scream samples muted without entering the normal player death flow.
+  - Prompt: Mute potion and Wilhelm scream samples during level-select playback.
+
 ## 2026-08-07
 
 ### 1800

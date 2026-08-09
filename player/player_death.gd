@@ -185,12 +185,9 @@ func _apply_damage(amount: float, death_cause: DeathCause) -> void:
 
 
 func _play_death_scream() -> void:
-	var audio_parent: Node = get_tree().current_scene
-	if audio_parent == null:
-		if player != null:
-			audio_parent = player
-		else:
-			audio_parent = self
+	# Keep the one-shot inside the player hierarchy so isolated preview worlds can
+	# route it independently from frontend audio.
+	var audio_parent: Node = player as Node if player != null else self as Node
 	GDAudio.play_one_shot(audio_parent, WILHELM_SCREAM, "DeathScreamAudio", 2.0)
 
 
