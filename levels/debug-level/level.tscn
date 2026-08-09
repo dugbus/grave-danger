@@ -21,7 +21,7 @@
 [ext_resource type="PackedScene" path="res://placeables/spike_trap/spike_trap.tscn" id="19_kfalc"]
 [ext_resource type="PackedScene" path="res://placeables/text_trigger/text_trigger.tscn" id="20_nglf8"]
 [ext_resource type="PackedScene" path="res://placeables/torch/torch.tscn" id="21_2yksf"]
-[ext_resource type="PackedScene" path="res://placeables/treasure_deposit/treasure_deposit_coffin.tscn" id="22_jm4gt"]
+[ext_resource type="PackedScene" uid="uid://caviokpl1nr78" path="res://placeables/treasure_deposit/treasure_deposit_coffin.tscn" id="22_jm4gt"]
 [ext_resource type="PackedScene" path="res://placeables/treasure/gems/amethyst.tscn" id="23_0mes7"]
 [ext_resource type="PackedScene" path="res://placeables/treasure/gems/diamond.tscn" id="24_6aaqi"]
 [ext_resource type="PackedScene" path="res://placeables/treasure/gems/emerald.tscn" id="25_t4bn3"]
@@ -30,12 +30,13 @@
 [ext_resource type="PackedScene" path="res://placeables/treasure/gold_bar.tscn" id="28_7mi71"]
 [ext_resource type="PackedScene" path="res://placeables/treasure/treasure_pile.tscn" id="30_kebrp"]
 [ext_resource type="PackedScene" path="res://enemies/bat_nest.tscn" id="31_ron3j"]
-[ext_resource type="PackedScene" path="res://enemies/skeleton.tscn" id="32_dhv6f"]
+[ext_resource type="PackedScene" uid="uid://dnrl7nbrfvej3" path="res://enemies/skeleton.tscn" id="32_dhv6f"]
 [ext_resource type="PackedScene" uid="uid://cp58o88h2j8e7" path="res://enemies/zombie.tscn" id="33_ef6pm"]
 [ext_resource type="PackedScene" path="res://placeables/environment/tombstone/tombstone.tscn" id="34_0qsyw"]
+[ext_resource type="PackedScene" uid="uid://calw8uh7a73pw" path="res://Assets/environment/millstone.tscn" id="35_ei3h4"]
 [ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]
 
-[sub_resource type="Curve3D" id="Curve3D_0qsyw"]
+[sub_resource type="Curve3D" id="Curve3D_y1ybh"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -21.321892, 0, -22.004309, 0, 0, 0, 0, 0, 0, -20.485313, 0, -21.962996, 0, 0, 0, 0, 0, 0, -22.778164, 0, -17.45992, 0, 0, 0, 0, 0, 0, -15.900345, 0, -22.754658, 0, 0, 0, 0, 0, 0, -8.613056, 0, -22.754658, 0, 0, 0, 0, 0, 0, -11.756594, 0, -18.496595, 0, 0, 0, 0, 0, 0, -12.213835, 0, -14.181377, 0, 0, 0, 0, 0, 0, -18.243708, 0, -14.124222, 0, 0, 0, 0, 0, 0, -20.186985, 0, -14.781507, 0, 0, 0, 0, 0, 0, -20.301296, 0, -12.038057, 0, 0, 0, 0, 0, 0, -16.271852, 0, -12.638186, 0, 0, 0, 0, 0, 0, -12.442455, 0, -12.209523, 0, 0, 0, 0, 0, 0, -9.89905, 0, -9.5518055, 0, 0, 0, 0, 0, 0, -12.185257, 0, -6.6654687, 0, 0, 0, 0, 0, 0, -15.443104, 0, -9.437495, 0, 0, 0, 0, 0, 0, -20.501339, 0, -9.294608, 0, 0, 0, 0, 0, 0, -20.501339, 0, -0.86421686, 0, 0, 0, 0, 0, 0, -21.244356, 0, -9.123142, 0, 0, 0, 0, 0, 0, -17.843622, 0, -7.179867, 0, 0, 0, 0, 0, 0, -14.271421, 0, -5.7795644, 0, 0, 0, 0, 0, 0, -16.900562, 0, -2.1216316, 0, 0, 0, 0, 0, 0, -14.299999, 0, 0.9647493, 0, 0, 0, 0, 0, 0, -14.52862, 0, 2.850872, 0, 0, 0, 0, 0, 0, -21.044312, 0, 2.9937599, 0, 0, 0, 0, 0, 0, -21.1872, 0, 8.223459, 0, 0, 0, 0, 0, 0, -20.615648, 0, 3.851087, 0, 0, 0, 0, 0, 0, -15.471682, 0, 3.6510441, 0, 0, 0, 0, 0, 0, -14.042801, 0, 8.394928, 0, 0, 0, 0, 0, 0, -20.529917, 0, 12.224326, 0, 0, 0, 0, 0, 0, -22.987589, 0, 16.56812, 0, 0, 0, 0, 0, 0, -18.358019, 0, 21.19769, 0, 0, 0, 0, 0, 0, -21.93022, 0, 21.026222, 0, 0, 0, 0, 0, 0, -14.271421, 0, 19.082949, 0, 0, 0, 0, 0, 0, -10.670645, 0, 21.283424, 0, 0, 0, 0, 0, 0, -9.584694, 0, 12.195748, 0, 0, 0, 0, 0, 0, -5.926764, 0, 17.911264, 0, 0, 0, 0, 0, 0, -2.8118043, 0, 22.312218, 0, 0, 0, 0, 0, 0, 3.0466018, 0, 21.226267, 0, 0, 0, 0, 0, 0, 6.675958, 0, 20.94049, 0, 0, 0, 0, 0, 0, 8.219149, 0, 21.997864, 0, 0, 0, 0, 0, 0, 6.3044524, 0, 22.597992, 0, 0, 0, 0, 0, 0, 11.04833, 0, 22.51226, 0, 0, 0, 0, 0, 0, 14.591955, 0, 19.711655, 0, 0, 0, 0, 0, 0, 17.306826, 0, 22.369371, 0, 0, 0, 0, 0, 0, 21.964975, 0, 22.798037, 0, 0, 0, 0, 0, 0, 20.33605, 0, 18.654285, 0, 0, 0, 0, 0, 0, 16.763853, 0, 13.538894, 0, 0, 0, 0, 0, 0, 21.507734, 0, 12.853032, 0, 0, 0, 0, 0, 0, 21.357784, 0, 6.480995, 0, 0, 0, 0, 0, 0, 21.38636, 0, -14.352075, 0, 0, 0, 0, 0, 0, 20.197063, 0, -20.079802, 0, 0, 0, 0, 0, 0, 16.91064, 0, -17.164886, 0, 0, 0, 0, 0, 0, 13.967152, 0, -21.794456, 0, 0, 0, 0, 0, 0, 9.480465, 0, -20.279846, 0, 0, 0, 0, 0, 0, 5.508179, 0, -23.709156, 0, 0, 0, 0, 0, 0, 1.5930486, 0, -23.023293, 0, 0, 0, 0, 0, 0, 3.2505498, 0, -14.8501, 0, 0, 0, 0, 0, 0, 7.822968, 0, -9.563246, 0, 0, 0, 0, 0, 0, 11.309429, 0, -7.991477, 0, 0, 0, 0, 0, 0, 13.05267, 0, -3.0475504, 0, 0, 0, 0, 0, 0, 13.173797, 0, 1.1922086, 0, 0, 0, 0, 0, 0, 11.316253, 0, 6.5362177, 0, 0, 0, 0, 0, 0, 10.344611, 0, 10.222731, 0, 0, 0, 0, 0, 0, 9.715903, 0, 14.109284, 0, 0, 0, 0, 0, 0, 2.0856848, 0, 13.79493, 0, 0, 0, 0, 0, 0, -4.3728533, 0, 13.137644, 0, 0, 0, 0, 0, 0, -5.515956, 0, 12.594669, 0, 0, 0, 0, 0, 0, -9.831172, 0, 6.3933296, 0, 0, 0, 0, 0, 0, -11.374362, 0, 1.1636297, 0, 0, 0, 0, 0, 0, -5.487378, 0, 2.4210443, 0, 0, 0, 0, 0, 0, -1.9437532, 0, 5.8217783, 0, 0, 0, 0, 0, 0, 3.600299, 0, 5.507425, 0, 0, 0, 0, 0, 0, 7.6583204, 0, 1.3922517, 0, 0, 0, 0, 0, 0, 10.058841, 0, -2.40857, 0, 0, 0, 0, 0, 0, 3.6574545, 0, -7.295339, 0, 0, 0, 0, 0, 0, 2.028533, 0, -1.6655515, 0, 0, 0, 0, 0, 0, -4.7729387, 0, -2.3799922, 0, 0, 0, 0, 0, 0, -6.887681, 0, -1.6083964, 0, 0, 0, 0, 0, 0, -4.6586275, 0, -4.580467, 0, 0, 0, 0, 0, 0, -11.917338, 0, -3.6659844, 0, 0, 0, 0, 0, 0, -2.5724611, 0, -9.581547, 0, 0, 0, 0, 0, 0, -2.6581964, 0, -23.38453, 0, 0, 0, 0, 0, 0, -5.973197, 0, -22.812977, 0, 0, 0, 0, 0, 0, -7.3735, 0, -15.554265, 0, 0, 0, 0, 0, 0, -12.488891, 0, -19.469395, 0, 0, 0, 0, 0, 0, -10.145528, 0, -22.212845, 0, 0, 0, 0, 0, 0, -15.803891, 0, -21.81276, 0, 0, 0, 0, 0, 0, -20.082123, 0, -24.155224),
@@ -43,7 +44,7 @@ _data = {
 }
 point_count = 88
 
-[sub_resource type="Animation" id="Animation_ei3h4"]
+[sub_resource type="Animation" id="Animation_758o1"]
 resource_local_to_scene = true
 resource_name = "kill_boundary_preview"
 length = 475.27316
@@ -486,9 +487,9 @@ tracks/6/keys = {
 "values": [8.0, 8.0]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_y1ybh"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ojnxo"]
 _data = {
-&"kill_boundary": SubResource("Animation_ei3h4")
+&"kill_boundary": SubResource("Animation_758o1")
 }
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_24rnd"]
@@ -507,22 +508,6 @@ item/0/shapes = [SubResource("BoxShape3D_nwbtd"), Transform3D(1, 0, 0, 0, 1, 0, 
 item/0/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/0/navigation_layers = 1
 
-[sub_resource type="Curve3D" id="Curve3D_758o1"]
-resource_local_to_scene = true
-_data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
-"tilts": PackedFloat32Array(0, 0)
-}
-point_count = 2
-
-[sub_resource type="Curve3D" id="Curve3D_ojnxo"]
-resource_local_to_scene = true
-_data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
-"tilts": PackedFloat32Array(0, 0)
-}
-point_count = 2
-
 [sub_resource type="Curve3D" id="Curve3D_88ebk"]
 resource_local_to_scene = true
 _data = {
@@ -532,6 +517,22 @@ _data = {
 point_count = 2
 
 [sub_resource type="Curve3D" id="Curve3D_3ruqg"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[sub_resource type="Curve3D" id="Curve3D_7eiuq"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[sub_resource type="Curve3D" id="Curve3D_j7r8b"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
@@ -557,15 +558,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.929, 12, -0.62695503)
 [node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 0.18119812, 0, -0.41855812)
 visible = false
-curve = SubResource("Curve3D_0qsyw")
-boundary_animation = SubResource("Animation_ei3h4")
+curve = SubResource("Curve3D_y1ybh")
+boundary_animation = SubResource("Animation_758o1")
 bounds_size = Vector2(8, 8)
 
 [node name="BoundaryCenter" parent="KillBoundary3D" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.321892, 0, -22.004309)
 
 [node name="BoundaryAnimationPlayer" parent="KillBoundary3D" index="1"]
-libraries/ = SubResource("AnimationLibrary_y1ybh")
+libraries/ = SubResource("AnimationLibrary_ojnxo")
 
 [node name="Objects" type="Node3D" parent="." unique_id=1357066609]
 
@@ -690,12 +691,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44.445827, 0, 0.18532312)
 
 [node name="Skeleton" parent="." unique_id=955868217 instance=ExtResource("32_dhv6f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.231255, -0.01783228, 0.0104568)
-curve = SubResource("Curve3D_758o1")
+curve = SubResource("Curve3D_88ebk")
 loop_patrol = false
 
 [node name="Zombie" parent="." unique_id=734149938 instance=ExtResource("33_ef6pm")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.092558, -0.017834187, -0.024227142)
-curve = SubResource("Curve3D_ojnxo")
+curve = SubResource("Curve3D_3ruqg")
 loop_patrol = false
 
 [node name="GDFlaskBreathingSpace" parent="Zombie" unique_id=486637941 instance=ExtResource("7_y1ybh")]
@@ -805,14 +806,17 @@ spawn_time = 26.0
 
 [node name="Skeleton" parent="Zombie" unique_id=854635641 instance=ExtResource("32_dhv6f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.964327, -0.01783228, 4.9696436)
-curve = SubResource("Curve3D_88ebk")
+curve = SubResource("Curve3D_7eiuq")
 loop_patrol = false
 spawn_time = 27.0
 
 [node name="Zombie" parent="Zombie" unique_id=550416171 instance=ExtResource("33_ef6pm")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17437172, -0.017834187, 4.9349594)
-curve = SubResource("Curve3D_3ruqg")
+curve = SubResource("Curve3D_j7r8b")
 loop_patrol = false
 spawn_time = 28.0
+
+[node name="Millstone" parent="." unique_id=525699801 instance=ExtResource("35_ei3h4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.40561, 0.5, 2.5488415)
 
 [editable path="KillBoundary3D"]
