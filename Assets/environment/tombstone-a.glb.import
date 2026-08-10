@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://br2upklqswj8"
-path="res://.godot/imported/walls.glb-8d3ce409d1c96afbf04d90c2301f6f92.scn"
+uid="uid://bxj4os8i7x2rp"
+path="res://.godot/imported/tombstone-a.glb-732a73ba09a29e5f1b5c6ee915ef74ec.scn"
 
 [deps]
 
-source_file="res://Assets/environment/walls.glb"
-dest_files=["res://.godot/imported/walls.glb-8d3ce409d1c96afbf04d90c2301f6f92.scn"]
+source_file="res://Assets/environment/tombstone-a.glb"
+dest_files=["res://.godot/imported/tombstone-a.glb-732a73ba09a29e5f1b5c6ee915ef74ec.scn"]
 
 [params]
 
@@ -40,15 +40,9 @@ materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
 _subresources={
-"meshes": {
-"walls_Road": {
-"generate/lightmap_uv": 0,
-"generate/lods": 0,
-"generate/shadow_meshes": 0,
-"lods/normal_merge_angle": 20.0,
-"save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://Assets/environment/road.res",
-"save_to_file/path": "uid://da4veqx75njlj"
+"nodes": {
+"PATH:Tombstone": {
+"generate/physics": true
 }
 }
 }
