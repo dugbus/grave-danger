@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://chfhag1vvrlhh"]
+
+[ext_resource type="ArrayMesh" uid="uid://cqwpi714b6umh" path="res://Assets/environment/bricks/Brick_33.res" id="1_hpuqi"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_a5s8m"]
+size = Vector3(0.51517105, 0.31152502, 0.31269193)
+
+[node name="Brick33" type="RigidBody3D" unique_id=177944922]
+
+[node name="Brick33" type="MeshInstance3D" parent="." unique_id=1599152580]
+mesh = ExtResource("1_hpuqi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1020638895]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0009938776, -0.00067430735, 0.0006799251)
+shape = SubResource("BoxShape3D_a5s8m")

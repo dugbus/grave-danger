@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://bsukaqxfm6nb3"]
+
+[ext_resource type="PackedScene" uid="uid://car4mpam36034" path="res://placeables/wall_breakable/brick_29.tscn" id="1_ldi0h"]
+[ext_resource type="PackedScene" uid="uid://r74w1sebro56" path="res://placeables/wall_breakable/brick_30.tscn" id="2_f1tm5"]
+[ext_resource type="PackedScene" uid="uid://ccsgwloff4qaw" path="res://placeables/wall_breakable/brick_31.tscn" id="3_60vdk"]
+[ext_resource type="PackedScene" uid="uid://c4yqtdsxh3tti" path="res://placeables/wall_breakable/brick_32.tscn" id="4_3xi8x"]
+[ext_resource type="PackedScene" uid="uid://chfhag1vvrlhh" path="res://placeables/wall_breakable/brick_33.tscn" id="5_hvd7t"]
+[ext_resource type="PackedScene" uid="uid://b2svswl3kgx5" path="res://placeables/wall_breakable/brick_34.tscn" id="6_k4n17"]
+[ext_resource type="PackedScene" uid="uid://ctbjlk8qfwwvb" path="res://placeables/wall_breakable/brick_35.tscn" id="7_iap2j"]
+
+[node name="Node3D" type="Node3D" unique_id=542482281]
+
+[node name="Brick29" parent="." unique_id=180535181 instance=ExtResource("1_ldi0h")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.26274955, 0, -0.00059622526)
+
+[node name="Brick30" parent="." unique_id=1444612946 instance=ExtResource("2_f1tm5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2628411, 0, -0.00059625506)
+
+[node name="Brick31" parent="." unique_id=973745090 instance=ExtResource("3_60vdk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.006853938, 0.292725, 0.0021269917)
+
+[node name="Brick32" parent="." unique_id=941345257 instance=ExtResource("4_3xi8x")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.26547253, 0.60456526, 0.0021269917)
+
+[node name="Brick33" parent="." unique_id=177944922 instance=ExtResource("5_hvd7t")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25350255, 0.6100119, -0.00059622526)
+
+[node name="Brick34" parent="." unique_id=846583450 instance=ExtResource("6_k4n17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38266504, 0.292725, -0.00059625506)
+
+[node name="Brick35" parent="." unique_id=69715410 instance=ExtResource("7_iap2j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.38257325, 0.292725, 0.0048502386)

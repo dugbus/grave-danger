@@ -41,6 +41,69 @@ materials/extract_format=0
 materials/extract_path=""
 _subresources={
 "meshes": {
+"walls_Brick_029": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/bricks/Brick_29.res",
+"save_to_file/path": "uid://dgrbavsa1x8gd"
+},
+"walls_Brick_030": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/bricks/Brick_30.res",
+"save_to_file/path": "uid://blb64ywlkvanm"
+},
+"walls_Brick_031": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/bricks/Brick_31.res",
+"save_to_file/path": "uid://hgrjh8b6c2wg"
+},
+"walls_Brick_032": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/bricks/Brick_32.res",
+"save_to_file/path": "uid://bqsjn0av1vhn0"
+},
+"walls_Brick_033": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/bricks/Brick_33.res",
+"save_to_file/path": "uid://brrdlmpbd0ixf"
+},
+"walls_Brick_034": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/bricks/Brick_34.res",
+"save_to_file/path": "uid://b3eehteuaf141"
+},
+"walls_Brick_035": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/bricks/Brick_35.res",
+"save_to_file/path": "uid://dbvqcbwif2sr7"
+},
 "walls_BrokenWall": {
 "generate/lightmap_uv": 0,
 "generate/lods": 0,
