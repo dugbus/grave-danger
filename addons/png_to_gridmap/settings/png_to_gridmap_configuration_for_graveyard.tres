@@ -12,6 +12,10 @@ item_ref = "WallSides"
 script = ExtResource("2_wtrwk")
 item_ref = "Fence"
 
+[sub_resource type="Resource" id="Resource_mwieu"]
+script = ExtResource("2_wtrwk")
+item_ref = "WallBroken"
+
 [sub_resource type="Resource" id="Resource_kvfjf"]
 script = ExtResource("1_mwieu")
 colour = Color(0, 0, 0, 1)
@@ -24,13 +28,10 @@ corner_item_ref = "WallCorner"
 corner_rotation_offset = 1
 tee_item_ref = "WallTee"
 cross_item_ref = "WallCross"
-autotile_alternatives = Array[Resource]([SubResource("Resource_wall_sides_black"), SubResource("Resource_wtrwk")])
+autotile_alternatives = Array[Resource]([SubResource("Resource_wall_sides_black"), SubResource("Resource_wtrwk"), SubResource("Resource_mwieu")])
 
 [resource]
 script = ExtResource("3_7hnn6")
-png_path = "res://levels/1/level.png"
-target_gridmap_path = NodePath("GridMap")
 mesh_library_path = "res://Assets/environment/graveyard.res"
-auto_repair = true
 color_mappings = Array[Resource]([SubResource("Resource_kvfjf")])
 ignored_colour_keys = Array[String](["F3F3F3FF", "1E1F1FFF", "BBC8A7FF", "6BB89AFE", "6BB89AFF", "000001FF", "010000FF", "FFFEFFFF", "000100FF", "FFFFFEFF", "FEFFFFFF", "000101FF", "010001FF", "010100FF", "FEFFFEFF", "FFFEFEFF", "010101FF", "FEFEFFFF", "241A0BFF", "FFFFFFF3", "060401FF", "FEFEFEFF", "FF00FFFF"])
