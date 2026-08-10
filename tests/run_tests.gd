@@ -116,6 +116,7 @@ const MAP_PLACEABLE_SCENE_PATHS: Array[String] = [
     "res://placeables/lockables/locked_door.tscn",
     "res://placeables/lockables/locked_gate.tscn",
     "res://placeables/pushables/hay_bale_pushable.tscn",
+    "res://placeables/pushables/millstone.tscn",
     "res://placeables/pushables/rolling_rock_pushable.tscn",
     "res://placeables/spike_trap/spike_trap.tscn",
     "res://placeables/stairs/procedural_staircase.tscn",
@@ -148,6 +149,7 @@ const PHYSICS_DROP_PLACEABLE_SCENE_PATHS: Array[String] = [
     "res://placeables/collectibles/flask_pickup_radius.tscn",
     "res://placeables/collectibles/flask_poison.tscn",
     "res://placeables/collectibles/health_flask.tscn",
+    "res://placeables/pushables/millstone.tscn",
     "res://placeables/pushables/rolling_rock_pushable.tscn",
     "res://placeables/treasure_deposit/treasure_deposit_coffin.tscn",
     "res://placeables/treasure/gems/amethyst.tscn",
@@ -405,6 +407,7 @@ func _run_tests() -> void:
     failed = not _test_environment_objects_keep_authored_collision() or failed
     failed = not _test_graveyard_mesh_library_references_use_stable_paths() or failed
     failed = not _test_map_placeables_share_spawn_time_and_physics_capabilities() or failed
+    failed = not _test_millstone_rolls_on_one_axis_and_only_crushes_while_moving() or failed
     failed = not _test_debug_level_sequences_spawn_reviews_once_per_second() or failed
     failed = not _test_debug_level_enemy_patrols_ping_pong() or failed
     failed = not await _test_placeable_spawn_time_delays_and_drops_items() or failed
@@ -625,6 +628,121 @@ func _test_map_placeables_share_spawn_time_and_physics_capabilities() -> bool:
         "legacy enemy drop-in time mirrors the shared Spawn Time field"
     ) and passed
     skeleton.free()
+    return passed
+
+
+func _test_millstone_rolls_on_one_axis_and_only_crushes_while_moving() -> bool:
+    var millstone_scene := load(
+        "res://placeables/pushables/millstone.tscn"
+    ) as PackedScene
+    var millstone := millstone_scene.instantiate() as Millstone
+    var passed := _expect(
+        millstone != null and is_equal_approx(millstone.mass, 1000.0),
+        "the placeable millstone reuses the rolling rock's resistance"
+    )
+    if millstone == null:
+        return false
+
+    var millstone_level_paths: Array[String] = [
+        "res://levels/1/level.tscn",
+        "res://levels/debug-level/level.tscn",
+    ]
+    for level_path: String in millstone_level_paths:
+        var level_source := FileAccess.get_file_as_string(level_path)
+        passed = _expect(
+            level_source.contains(
+                'path="res://placeables/pushables/millstone.tscn"'
+            ),
+            "%s instances the physics millstone rather than its static art source" % level_path
+        ) and passed
+
+    var collision_shape := millstone.get_node_or_null(^"CollisionShape3D") as CollisionShape3D
+    var cylinder: CylinderShape3D = null
+    if collision_shape != null:
+        cylinder = collision_shape.shape as CylinderShape3D
+    passed = _expect(
+        cylinder != null \
+            and is_equal_approx(cylinder.radius, 0.5) \
+            and is_equal_approx(cylinder.height, 0.5),
+        "the millstone uses a cylinder physics shape matching its model"
+    ) and passed
+    passed = _expect(
+        not millstone.constrain_to_starting_height \
+            and not millstone.axis_lock_linear_y \
+            and millstone.gravity_scale > 0.0,
+        "the millstone falls when it rolls beyond supporting ground"
+    ) and passed
+    passed = _expect(
+        millstone.audio_fade_out_seconds >= 0.15 \
+            and millstone.trapped_audio_fade_seconds >= 0.1,
+        "the millstone rolling sound fades quickly instead of cutting off"
+    ) and passed
+    millstone.has_rolling_audio_ground_contact = true
+    passed = _expect(
+        is_equal_approx(millstone._get_audible_rolling_speed(2.0), 2.0),
+        "the millstone rolling sound follows movement while supported by ground"
+    ) and passed
+    millstone.has_rolling_audio_ground_contact = false
+    passed = _expect(
+        is_zero_approx(millstone._get_audible_rolling_speed(2.0)),
+        "the millstone rolling sound fades out when movement continues in the air"
+    ) and passed
+
+    millstone.push_from_character(Vector3.RIGHT, Vector3.LEFT, 0.016)
+    passed = _expect(
+        millstone.recent_push_direction.is_equal_approx(Vector3.RIGHT),
+        "the millstone accepts a push from either rolling end"
+    ) and passed
+    millstone.recent_push_direction = Vector3.ZERO
+    millstone.recent_push_timer = 0.0
+    millstone.push_from_character(Vector3.FORWARD, Vector3.BACK, 0.016)
+    passed = _expect(
+        millstone.recent_push_direction.is_zero_approx(),
+        "the millstone rejects pushes against either axle face"
+    ) and passed
+
+    var sliding_velocity := Vector3.RIGHT + Vector3.FORWARD * 2.0
+    var assisted_velocity := millstone.get_character_push_assist_velocity(
+        Vector3.RIGHT * 5.0,
+        sliding_velocity,
+        Vector3.LEFT,
+        0.1
+    )
+    passed = _expect(
+        absf(assisted_velocity.z) < absf(sliding_velocity.z) \
+            and absf(assisted_velocity.z) > 0.0,
+        "the millstone gently reduces sideways sliding without locking the player"
+    ) and passed
+    var escape_velocity := Vector3.FORWARD * 2.0
+    passed = _expect(
+        millstone.get_character_push_assist_velocity(
+            escape_velocity,
+            escape_velocity,
+            Vector3.LEFT,
+            0.1
+        ).is_equal_approx(escape_velocity),
+        "the millstone releases alignment assistance as soon as the player steers away"
+    ) and passed
+
+    var skeleton := SKELETON_SCENE.instantiate() as GDSkeletonPath
+    var zombie := ZOMBIE_SCENE.instantiate() as GDZombiePath
+    millstone.linear_velocity = Vector3.ZERO
+    passed = _expect(
+        not skeleton._is_rolling_ball_body(millstone) \
+            and not zombie._is_rolling_ball_body(millstone),
+        "a stationary millstone cannot kill skeletons or zombies"
+    ) and passed
+    var enemy_crush_speed := float(millstone.get(&"enemy_crush_speed"))
+    millstone.linear_velocity = Vector3.RIGHT * enemy_crush_speed
+    passed = _expect(
+        skeleton._is_rolling_ball_body(millstone) \
+            and zombie._is_rolling_ball_body(millstone),
+        "a rolling millstone can kill skeletons and zombies"
+    ) and passed
+
+    skeleton.free()
+    zombie.free()
+    millstone.free()
     return passed
 
 

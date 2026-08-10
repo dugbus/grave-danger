@@ -1,0 +1,48 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://Assets/environment/millstone.tscn" id="1_millstone"]
+[ext_resource type="Script" path="res://placeables/pushables/gd_millstone.gd" id="2_pushable"]
+[ext_resource type="AudioStream" path="res://Assets/audio/rolling-rock.mp3" id="3_rolling_audio"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_millstone"]
+radius = 0.5
+height = 0.5
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_millstone"]
+friction = 0.0
+bounce = 0.0
+rough = false
+
+[node name="MillstonePushable" type="RigidBody3D"]
+collision_layer = 1
+collision_mask = 3
+mass = 1000.0
+linear_damp = 0.2
+angular_damp = 0.5
+continuous_cd = true
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+axis_lock_angular_z = true
+allow_visual_roll = true
+lock_yaw_rotation = true
+roll_radius = 0.5
+physics_material_override = SubResource("PhysicsMaterial_millstone")
+script = ExtResource("2_pushable")
+visual_rock_path = NodePath("Millstone")
+audio_fade_out_seconds = 0.18
+trapped_audio_fade_seconds = 0.12
+constrain_to_starting_height = false
+
+[node name="Millstone" parent="." instance=ExtResource("1_millstone")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0)
+shape = SubResource("CylinderShape3D_millstone")
+
+[node name="RuntimeNavigationObstacle" type="NavigationObstacle3D" parent="."]
+
+[node name="RollingRockAudio" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource("3_rolling_audio")
+volume_db = -80.0
+max_distance = 50.0
+bus = &"SFX"

@@ -1,6 +1,31 @@
 # Changelog
 
+## 2026-08-10
+
+### 0300
+
+- Millstone rolling audio now fades out as soon as the stone leaves supporting ground.
+  - Prompt: Fade millstone rolling audio as soon as it loses ground contact.
+
+### 0200
+
+- Millstones now obey gravity and fall when they roll beyond supporting ground.
+  - Prompt: Smooth millstone audio, make pushing easier to control, and let it fall into holes.
+- Players receive gentle sideways alignment assistance while pushing a millstone and can immediately steer away without being trapped.
+  - Prompt: Smooth millstone audio, make pushing easier to control, and let it fall into holes.
+- Millstone rolling audio now fades out quickly instead of stopping abruptly.
+  - Prompt: Smooth millstone audio, make pushing easier to control, and let it fall into holes.
+- Millstones already placed in Level 1 and the Debug Level now use the pushable physics scene instead of the static art source.
+  - Prompt: Fix millstones that cannot be pushed.
+
 ## 2026-08-09
+
+### 1900
+
+- Rolling millstones kill skeletons and zombies on impact, while stationary millstones remain harmless.
+  - Prompt: Add a two-direction physics millstone that only kills undead while rolling.
+- Level editors can place a physics-enabled millstone that rolls only along its two opposing sides with rolling-rock resistance and audio.
+  - Prompt: Add a two-direction physics millstone that only kills undead while rolling.
 
 ### 1600
 

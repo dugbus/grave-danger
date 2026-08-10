@@ -47,6 +47,19 @@ func push_from_character(character_velocity: Vector3, collision_normal: Vector3,
 	super.push_from_character(character_velocity, collision_normal, delta)
 
 
+func can_kill_enemy_by_rolling() -> bool:
+	return true
+
+
+func get_character_push_assist_velocity(
+	_requested_velocity: Vector3,
+	_resulting_velocity: Vector3,
+	_collision_normal: Vector3,
+	_delta: float
+) -> Vector3:
+	return _resulting_velocity
+
+
 func _physics_process(delta: float) -> void:
 	var movement := global_position - previous_position
 	movement.y = 0.0

@@ -312,4 +312,12 @@ func _push_slide_colliders(push_velocity: Vector3, delta: float) -> void:
 		if floor_push_ignore_timers.has(collider.get_instance_id()):
 			continue
 
-		collider.push_from_character(push_velocity, collision.get_normal(), delta)
+		var collision_normal := collision.get_normal()
+		collider.push_from_character(push_velocity, collision_normal, delta)
+		if collider is RollingRock:
+			velocity = (collider as RollingRock).get_character_push_assist_velocity(
+				push_velocity,
+				velocity,
+				collision_normal,
+				delta
+			)

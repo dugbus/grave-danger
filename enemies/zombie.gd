@@ -578,4 +578,7 @@ func _is_rolling_ball_body(collider: Object) -> bool:
 		return false
 
 	var node := collider as Node
-	return node is RollingRock or String(node.name).contains("RollingRock")
+	if node is RollingRock:
+		return (node as RollingRock).can_kill_enemy_by_rolling()
+
+	return String(node.name).contains("RollingRock")
