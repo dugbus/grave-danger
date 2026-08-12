@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://r74w1sebro56"]
 
-[ext_resource type="ArrayMesh" uid="uid://g8hl8f42da6q" path="res://Assets/environment/bricks/Brick_30.res" id="1_2vrub"]
+[ext_resource type="ArrayMesh" path="res://Assets/environment/bricks/Brick_30.res" id="1_2vrub"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_0k82c"]
 size = Vector3(0.51517105, 0.31152502, 0.31269193)

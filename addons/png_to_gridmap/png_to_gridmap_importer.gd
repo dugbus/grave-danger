@@ -6,6 +6,9 @@ extends RefCounted
 ## Import planning validates the profile first so applying a layout is predictable and recoverable.
 
 const CELL_SIZE_PRECISION := 1000.0
+const MappingCatalog := preload(
+    "res://addons/png_to_gridmap/png_to_gridmap_mapping_catalog.gd"
+)
 
 
 ## Validates that the current PNG and mappings can be imported.
@@ -21,8 +24,21 @@ func validate(
     if image == null:
         errors.append("No PNG loaded.")
         return {"errors": errors, "warnings": warnings}
-    var colour_grid := PNGToGridMapImageGrid.grid_from_image(image, true, empty_key)
-    for key in _mapping_keys_for_image(image, true, empty_key):
+    var configured_colours := _configured_colours(settings, empty_key)
+    var colour_grid := PNGToGridMapImageGrid.grid_from_image(
+        image,
+        true,
+        empty_key,
+        configured_colours,
+        settings.colour_match_tolerance
+    )
+    for key in _mapping_keys_for_image(
+        image,
+        true,
+        empty_key,
+        configured_colours,
+        settings.colour_match_tolerance
+    ):
         var mapping := _mapping_for_key(settings, key)
         if mapping == null:
             warnings.append("No mapping for colour #%s." % key)
@@ -80,7 +96,16 @@ func run(
         import_origin = Vector2i.ZERO
         PNGToGridMapImageGrid.offset_created_gridmap_for_rect(grid_map, import_size)
     PNGToGridMapImageGrid.clear_gridmap_rect(grid_map, import_origin, import_size)
-    var placed := _place_cells(settings, image, grid_map, ref_to_id, item_aliases, empty_key, import_origin, import_size)
+    var placed := _place_cells(
+        settings,
+        image,
+        grid_map,
+        ref_to_id,
+        item_aliases,
+        empty_key,
+        import_origin,
+        import_size
+    )
     settings.export_origin = import_origin
     settings.export_size = import_size
     return {"grid_map": grid_map, "placed": placed, "created": created_gridmap, "errors": []}
@@ -97,7 +122,13 @@ func _place_cells(
     import_origin: Vector2i,
     import_size: Vector2i
 ) -> int:
-    var colour_grid := PNGToGridMapImageGrid.grid_from_image(image, true, empty_key)
+    var colour_grid := PNGToGridMapImageGrid.grid_from_image(
+        image,
+        true,
+        empty_key,
+        _configured_colours(settings, empty_key),
+        settings.colour_match_tolerance
+    )
     var placed := 0
     for y in image.get_height():
         for x in image.get_width():
@@ -108,7 +139,8 @@ func _place_cells(
             if mapping == null or mapping.base_item_ref == "":
                 continue
             var mask := PNGToGridMapImageGrid.get_same_colour_mask(colour_grid, x, y, key)
-            var variant := PNGToGridMapAutotile.variant_for_mask(mask) if mapping.autotile_enabled else PNGToGridMapAutotile.VARIANT_BASE
+            var variant := PNGToGridMapAutotile.variant_for_mask(mask) \
+                if mapping.autotile_enabled else PNGToGridMapAutotile.VARIANT_BASE
             var item_ref := _mapping_variant_ref(mapping, variant, item_aliases)
             var item_id := int(ref_to_id[item_ref])
             var basis := PNGToGridMapAutotile.basis_for_variant(mapping, variant, mask, mapping.autotile_enabled)
@@ -121,12 +153,29 @@ func _place_cells(
 
 
 ## Returns every non-empty colour key currently present in an image.
-func _mapping_keys_for_image(image: Image, ignore_fully_transparent: bool, empty_key: String) -> Array[String]:
-    var scan := PNGToGridMapImageGrid.scan_image_colours(image, ignore_fully_transparent)
+func _mapping_keys_for_image(
+    image: Image,
+    ignore_fully_transparent: bool,
+    empty_key: String,
+    configured_colours: Array[Color],
+    channel_tolerance: int
+) -> Array[String]:
+    var scan := PNGToGridMapImageGrid.scan_image_colours(
+        image,
+        ignore_fully_transparent,
+        configured_colours,
+        channel_tolerance
+    )
     var keys: Array[String] = []
     keys.assign(scan["order"])
     keys.erase(empty_key)
     return keys
+
+
+## Combines mapping colours with the semantic empty-cell colour used by PNG import.
+func _configured_colours(settings: Resource, empty_key: String) -> Array[Color]:
+    var empty_colour := Color.from_string("#" + empty_key, Color.WHITE)
+    return MappingCatalog.configured_colours(settings, [empty_colour] as Array[Color])
 
 
 ## Finds the colour mapping for one colour key.

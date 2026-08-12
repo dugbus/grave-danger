@@ -11,8 +11,47 @@ static func colour_key(colour: Color) -> String:
 	return colour.to_html(true).to_upper()
 
 
-## Scans an image and returns colour counts sorted by most common first.
-static func scan_image_colours(image: Image, ignore_fully_transparent: bool) -> Dictionary:
+## Resolves a pixel to its nearest configured colour within an 8-bit per-channel tolerance.
+static func matched_colour_key(
+	colour: Color,
+	configured_colours: Array[Color],
+	channel_tolerance: int
+) -> String:
+	var source_key := colour_key(colour)
+	var tolerance := clampi(channel_tolerance, 0, 255)
+	if tolerance == 0 or configured_colours.is_empty():
+		return source_key
+
+	var closest_key := source_key
+	var closest_distance_squared := 4 * 255 * 255 + 1
+	for configured_colour: Color in configured_colours:
+		var configured_key := colour_key(configured_colour)
+		if configured_key == source_key:
+			return source_key
+		var channel_deltas: Array[int] = [
+			absi(roundi(colour.r * 255.0) - roundi(configured_colour.r * 255.0)),
+			absi(roundi(colour.g * 255.0) - roundi(configured_colour.g * 255.0)),
+			absi(roundi(colour.b * 255.0) - roundi(configured_colour.b * 255.0)),
+			absi(roundi(colour.a * 255.0) - roundi(configured_colour.a * 255.0)),
+		]
+		if channel_deltas.max() > tolerance:
+			continue
+		var distance_squared := 0
+		for delta: int in channel_deltas:
+			distance_squared += delta * delta
+		if distance_squared < closest_distance_squared:
+			closest_distance_squared = distance_squared
+			closest_key = configured_key
+	return closest_key
+
+
+## Scans an image and returns normalized colour counts sorted by most common first.
+static func scan_image_colours(
+	image: Image,
+	ignore_fully_transparent: bool,
+	configured_colours: Array[Color] = [],
+	channel_tolerance: int = 0
+) -> Dictionary:
 	var detected_colours := {}
 	var colour_order: Array[String] = []
 	if image == null or image.is_empty():
@@ -22,9 +61,12 @@ static func scan_image_colours(image: Image, ignore_fully_transparent: bool) -> 
 			var colour := image.get_pixel(x, y)
 			if ignore_fully_transparent and is_zero_approx(colour.a):
 				continue
-			var key := colour_key(colour)
+			var key := matched_colour_key(colour, configured_colours, channel_tolerance)
 			if not detected_colours.has(key):
-				detected_colours[key] = {"colour": colour, "count": 0}
+				detected_colours[key] = {
+					"colour": Color.from_string("#" + key, colour),
+					"count": 0,
+				}
 			detected_colours[key]["count"] = int(detected_colours[key]["count"]) + 1
 	colour_order.assign(detected_colours.keys())
 	colour_order.sort_custom(func(a: String, b: String) -> bool:
@@ -35,8 +77,14 @@ static func scan_image_colours(image: Image, ignore_fully_transparent: bool) -> 
 	return {"data": detected_colours, "order": colour_order}
 
 
-## Builds a 2D colour-key grid from a source image.
-static func grid_from_image(image: Image, ignore_fully_transparent: bool, empty_key: String) -> Array:
+## Builds a normalized 2D colour-key grid from a source image.
+static func grid_from_image(
+	image: Image,
+	ignore_fully_transparent: bool,
+	empty_key: String,
+	configured_colours: Array[Color] = [],
+	channel_tolerance: int = 0
+) -> Array:
 	var grid := []
 	if image == null:
 		return grid
@@ -47,7 +95,7 @@ static func grid_from_image(image: Image, ignore_fully_transparent: bool, empty_
 			if ignore_fully_transparent and is_zero_approx(colour.a):
 				row.append("")
 			else:
-				var key := colour_key(colour)
+				var key := matched_colour_key(colour, configured_colours, channel_tolerance)
 				row.append("" if key == empty_key else key)
 		grid.append(row)
 	return grid

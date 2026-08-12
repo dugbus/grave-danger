@@ -42,6 +42,7 @@ var _mesh_library_option: OptionButton
 var _gridmap_name_label: Label
 var _gridmap_name_edit: LineEdit
 var _cell_size_spin: SpinBox
+var _colour_match_tolerance_spin: SpinBox
 var _auto_repair_check: CheckBox
 var _floor_material_option: OptionButton
 var _advanced_button: Button
@@ -183,6 +184,9 @@ func _bind_scene_controls() -> void:
 	_gridmap_name_label = _content_container.get_node(^"GridMapNameLabel") as Label
 	_gridmap_name_edit = _content_container.get_node(^"GridMapNameEdit") as LineEdit
 	_cell_size_spin = _content_container.get_node(^"AdvancedContainer/AdvancedGrid/CellSizeSpin") as SpinBox
+	_colour_match_tolerance_spin = _content_container.get_node(
+		^"AdvancedContainer/AdvancedGrid/ColourMatchToleranceSpin"
+	) as SpinBox
 	_auto_repair_check = _content_container.get_node(^"AdvancedContainer/AutoRepairCheck") as CheckBox
 	_floor_material_option = _content_container.get_node(^"FloorMaterialOption") as OptionButton
 	_advanced_button = _content_container.get_node(^"AdvancedButton") as Button
@@ -264,6 +268,10 @@ func _connect_scene_signals() -> void:
 		_settings.cell_size = _normalize_cell_size(value)
 		settings_changed.emit()
 	)
+	_colour_match_tolerance_spin.value_changed.connect(func(value: float) -> void:
+		_settings.colour_match_tolerance = roundi(value)
+		settings_changed.emit()
+	)
 	_auto_repair_check.toggled.connect(func(value: bool) -> void:
 		_settings.auto_repair = value
 		settings_changed.emit()
@@ -324,6 +332,7 @@ func _apply_ui_state(ui_state: Dictionary) -> void:
 func _update_controls_from_settings() -> void:
 	_gridmap_name_edit.text = _settings.gridmap_name
 	_cell_size_spin.value = _normalize_cell_size(_settings.cell_size)
+	_colour_match_tolerance_spin.value = _settings.colour_match_tolerance
 	_auto_repair_check.button_pressed = _settings.auto_repair
 	_select_option_by_metadata(_floor_material_option, String(_settings.floor_material_path))
 	_mesh_library_path_edit.text = _settings.mesh_library_path

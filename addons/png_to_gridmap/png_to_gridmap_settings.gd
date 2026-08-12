@@ -11,6 +11,8 @@ extends Resource
 @export var mesh_library_path := ""
 @export var gridmap_name := "PNGGridMap"
 @export var cell_size := 1.0
+## Maximum per-channel 8-bit difference used to match PNG pixels to configured colours.
+@export_range(0, 32, 1) var colour_match_tolerance := 2
 ## Repairs connected wall pieces shortly after painting stops in the selected GridMap.
 @export var auto_repair := false
 @export var export_origin := Vector2i.ZERO

@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://caviokpl1nr78"]
 
 [ext_resource type="Script" uid="uid://dc2737kbeal34" path="res://placeables/treasure_deposit/treasure_deposit.gd" id="2_deposit"]
-[ext_resource type="ArrayMesh" uid="uid://bxuv65f14d1l1" path="res://Assets/environment/coffin-base.res" id="3_6ggli"]
+[ext_resource type="ArrayMesh" path="res://Assets/environment/coffin-base.res" id="3_6ggli"]
 [ext_resource type="Script" uid="uid://ceni1koq8ksxl" path="res://placeables/treasure_deposit/treasure_deposit_coffin.gd" id="3_placeable"]
-[ext_resource type="ArrayMesh" uid="uid://byk6usmirmsu7" path="res://Assets/environment/coffin-lid.res" id="4_2cvc0"]
+[ext_resource type="ArrayMesh" path="res://Assets/environment/coffin-lid.res" id="4_2cvc0"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_coffin"]
 friction = 0.65

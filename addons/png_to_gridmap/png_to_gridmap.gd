@@ -685,7 +685,17 @@ func _run_export(path: String) -> void:
 
 ## Scans the current image and creates missing colour mappings.
 func _scan_colours() -> void:
-	var scan := PNGToGridMapImageGrid.scan_image_colours(_image, true)
+	var empty_colour := Color.from_string("#" + EMPTY_KEY, Color.WHITE)
+	var configured_colours := MappingCatalog.configured_colours(
+		_settings,
+		[empty_colour] as Array[Color]
+	)
+	var scan := PNGToGridMapImageGrid.scan_image_colours(
+		_image,
+		true,
+		configured_colours,
+		_settings.colour_match_tolerance
+	)
 	_detected_colours = scan["data"]
 	_colour_order.clear()
 	_colour_order.assign(scan["order"])

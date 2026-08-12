@@ -60,6 +60,7 @@
 - Do not use get_node() repeatedly inside process loops.
 - Cache required node references with @onready.
 - Avoid allocations in _process() and _physics_process().
+- In tool scripts and property setters, guard `global_position` and `global_transform` access with `is_inside_tree()`; use local transforms while a node is off-tree.
 - Use signals for loose communication, direct calls for ownership relationships.
 - Make enemy state transitions explicit and testable.
 - Keep gameplay logic deterministic where replays depend upon it.
@@ -79,6 +80,8 @@ deliberately differ.
 ## Code generation rules
 - Preserve existing scene/resource paths.
 - Do not hand-edit `.tscn`, `.tres`, `.import`, or `project.godot` unless the task requires it.
+- When copying a text scene or resource to a new path, remove its root `uid` so the copy cannot share the source identity.
+- Never invent or copy an `ext_resource` UID. Keep the stable `res://` path and omit a stale UID when the referenced resource has been regenerated.
 - Prefer small, composable scenes and scripts over large inheritance trees.
 - Use signals or typed dependencies for decoupling; avoid global singletons unless already established.
 - Do not invent nodes, autoloads, input actions, groups, or resources without checking existing files first.
@@ -90,6 +93,12 @@ deliberately differ.
 ## Unit testing
 
 - Whereever possible add long lived tests to protect existing functionality and prevent regressions.
+- Place each production script's tests in a sibling `<script_name>_test.gd` file.
+- Co-located tests must extend `res://tests/test_case.gd`, implement `run()`, and avoid `class_name`.
+- Never reference, preload, or load `_test.gd` files from production scripts, scenes, resources, or autoloads.
+- Keep shared test infrastructure in `tests/`; keep feature-specific test doubles in the owning sibling test.
+- Every first-party production script requires a sibling test; the pairing check does not allow exemptions.
+- Run one co-located suite with `godot --headless --path . --script res://tests/test_runner.gd --log-file scene_scan.log -- --test-file=<res://path_to_test.gd>`.
 
 ## Validation
 Run the relevant checks after code changes:
@@ -97,3 +106,7 @@ Run the relevant checks after code changes:
 ```bash
 ./check.sh
 ```
+
+The scene scan rejects duplicate root UIDs and stale `ext_resource` UIDs. Resolve those
+failures in the text scene or resource that declares them; do not re-save or modify a
+binary asset merely to make its old UID valid again.

@@ -83,6 +83,16 @@ min_value = 0.01
 max_value = 1024.0
 step = 0.01
 
+[node name="ColourMatchToleranceLabel" type="Label" parent="MainScroll/Content/AdvancedContainer/AdvancedGrid"]
+tooltip_text = "Maximum difference allowed in each red, green, blue, and alpha channel."
+text = "Colour match tolerance"
+
+[node name="ColourMatchToleranceSpin" type="SpinBox" parent="MainScroll/Content/AdvancedContainer/AdvancedGrid"]
+tooltip_text = "Maximum difference allowed in each red, green, blue, and alpha channel."
+max_value = 32.0
+value = 2.0
+suffix = " / 255"
+
 [node name="AutoRepairCheck" type="CheckBox" parent="MainScroll/Content/AdvancedContainer"]
 text = "Auto repair"
 

@@ -1,6 +1,6 @@
 class_name GDTorch
 extends "res://placeables/placeable.gd"
-## A wall-mounted torch that permanently lights after the player faces it.
+## A wall-mounted torch that permanently lights when the player stands still beside it.
 
 signal lit
 
@@ -16,12 +16,10 @@ const FLICKER_AMOUNT := 0.12
 
 ## Optional persistent identity; leave empty to use this placed node's stable scene path.
 @export var torch_id: StringName
-## Milliseconds the player must continuously face this torch before it lights.
-@export_range(100.0, 10000.0, 50.0, "suffix:ms") var torch_activation_time := 1500.0
+## Seconds the player must remain still beside this torch before it lights.
+@export_range(0.1, 10.0, 0.05, "suffix:s") var activation_duration_seconds := 0.5
 ## Furthest distance from which the player can light this torch.
 @export_range(0.5, 10.0, 0.1, "suffix:m") var activation_distance := 3.0
-## Full horizontal facing cone within which activation time accumulates.
-@export_range(5.0, 180.0, 1.0, "suffix:°") var activation_facing_angle := 55.0
 ## Maximum residual movement speed still considered stationary for activation.
 @export_range(0.0, 0.5, 0.01, "suffix:m/s") var activation_still_speed := 0.05
 ## Distance at which an unlit torch's subtle guidance outline begins to appear.
@@ -30,7 +28,7 @@ const FLICKER_AMOUNT := 0.12
 @export_range(0.1, 10.0, 0.1, "suffix:m") var outline_full_intensity_distance := 1.5
 
 var is_lit := false
-var activation_elapsed_ms := 0.0
+var activation_elapsed_seconds := 0.0
 var flicker_elapsed := 0.0
 
 @onready var flame_particles := get_node_or_null("%FlameParticles") as GPUParticles3D
@@ -72,17 +70,17 @@ func _process(delta: float) -> void:
 	)
 
 
-## Advances activation for a player, allowing the facing rule to be tested independently.
+## Advances activation while the player remains still within the configured distance.
 func update_activation_for_player(player: Node3D, delta: float) -> void:
 	if is_lit:
 		return
 
-	if not _is_player_still(player) or not _is_player_facing_torch(player):
-		activation_elapsed_ms = 0.0
+	if not _is_player_still(player) or not _is_player_within_activation_distance(player):
+		activation_elapsed_seconds = 0.0
 		return
 
-	activation_elapsed_ms += maxf(delta, 0.0) * 1000.0
-	if activation_elapsed_ms >= torch_activation_time:
+	activation_elapsed_seconds += maxf(delta, 0.0)
+	if activation_elapsed_seconds >= activation_duration_seconds:
 		_set_lit(true)
 
 
@@ -102,27 +100,13 @@ func update_outline_for_player(player: Node3D) -> void:
 	_set_outline_intensity(intensity)
 
 
-func _is_player_facing_torch(player: Node3D) -> bool:
+func _is_player_within_activation_distance(player: Node3D) -> bool:
 	if player == null:
 		return false
 
 	var to_torch := global_position - player.global_position
 	to_torch.y = 0.0
-	if to_torch.length_squared() > activation_distance * activation_distance:
-		return false
-	if to_torch.is_zero_approx():
-		return true
-
-	var facing_source := player.get_node_or_null("Pivot") as Node3D
-	if facing_source == null:
-		facing_source = player
-	var player_forward := facing_source.global_transform.basis.z
-	player_forward.y = 0.0
-	if player_forward.is_zero_approx():
-		return false
-
-	var minimum_facing_dot := cos(deg_to_rad(activation_facing_angle * 0.5))
-	return player_forward.normalized().dot(to_torch.normalized()) >= minimum_facing_dot
+	return to_torch.length_squared() <= activation_distance * activation_distance
 
 
 func _is_player_still(player: Node3D) -> bool:
@@ -140,7 +124,7 @@ func _set_lit(should_persist: bool) -> void:
 		return
 
 	is_lit = true
-	activation_elapsed_ms = torch_activation_time
+	activation_elapsed_seconds = activation_duration_seconds
 	_set_outline_intensity(0.0)
 	_apply_lit_visuals(true)
 	if should_persist:

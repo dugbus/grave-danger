@@ -60,11 +60,10 @@ const TREASURE_PILE_SCENE_PATH := "res://placeables/treasure/treasure_pile.tscn"
 ## Persisted counts for compatible treasure types discovered after the built-in types.
 @export_storage var treasure_counts: Dictionary = {}
 
-static var cached_catalog: Array[Dictionary] = []
-static var is_catalog_cached := false
-
 var treasure_catalog: Array[Dictionary] = []
 var spawn_plan: Array[PackedScene] = []
+var cached_catalog: Array[Dictionary] = []
+var is_catalog_cached := false
 
 
 func _ready() -> void:
@@ -259,7 +258,14 @@ func _load_treasure_catalog(force_scan := false) -> void:
 
     treasure_catalog.clear()
     for entry in cached_catalog:
-        treasure_catalog.append(entry.duplicate())
+        # Keep cached discovery metadata independent of loaded resources. Each
+        # pile owns the PackedScenes used by its spawn plan and preview.
+        var collectible_scene := load(entry["scene_path"] as String) as PackedScene
+        if collectible_scene == null:
+            continue
+        var instance_entry := entry.duplicate()
+        instance_entry["scene"] = collectible_scene
+        treasure_catalog.append(instance_entry)
     _rebuild_spawn_plan()
 
 
@@ -313,7 +319,6 @@ func _scan_compatible_treasure_scenes() -> Array[Dictionary]:
         catalog.append({
             "display_name": display_name,
             "item_type": item_type,
-            "scene": scene,
             "scene_path": scene_path,
             "treasure_value": int(carried_item.get("treasure_value")),
         })

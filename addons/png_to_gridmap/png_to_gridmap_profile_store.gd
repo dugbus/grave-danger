@@ -24,6 +24,7 @@ const LEVEL_PROPERTIES := [
 	&"target_gridmap_path",
 	&"gridmap_name",
 	&"cell_size",
+	&"colour_match_tolerance",
 	&"auto_repair",
 	&"export_origin",
 	&"export_size",

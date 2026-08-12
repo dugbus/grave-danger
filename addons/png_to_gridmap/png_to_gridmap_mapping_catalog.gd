@@ -7,6 +7,21 @@ extends RefCounted
 const ColorMappingResource := preload("res://addons/png_to_gridmap/png_to_gridmap_color_mapping.gd")
 
 
+## Lists unique configured mapping colours followed by additional semantic colours.
+static func configured_colours(
+	settings: Resource,
+	additional_colours: Array[Color] = []
+) -> Array[Color]:
+	var colours: Array[Color] = []
+	for mapping: Resource in settings.color_mappings:
+		if not colours.has(mapping.colour):
+			colours.append(mapping.colour)
+	for colour: Color in additional_colours:
+		if not colours.has(colour):
+			colours.append(colour)
+	return colours
+
+
 ## Finds the configured mapping for one normalized HTML colour key.
 static func mapping_for_key(settings: Resource, key: String) -> Resource:
 	for mapping: Resource in settings.color_mappings:

@@ -30,7 +30,7 @@
 [ext_resource type="PackedScene" path="res://placeables/treasure/gold_bar.tscn" id="28_7mi71"]
 [ext_resource type="PackedScene" path="res://placeables/treasure/treasure_pile.tscn" id="30_kebrp"]
 [ext_resource type="PackedScene" path="res://enemies/bat_nest.tscn" id="31_ron3j"]
-[ext_resource type="PackedScene" uid="uid://dnrl7nbrfvej3" path="res://enemies/skeleton.tscn" id="32_dhv6f"]
+[ext_resource type="PackedScene" path="res://enemies/skeleton.tscn" id="32_dhv6f"]
 [ext_resource type="PackedScene" uid="uid://cp58o88h2j8e7" path="res://enemies/zombie.tscn" id="33_ef6pm"]
 [ext_resource type="PackedScene" path="res://placeables/environment/tombstone/tombstone.tscn" id="34_0qsyw"]
 [ext_resource type="PackedScene" path="res://placeables/pushables/millstone.tscn" id="35_ei3h4"]

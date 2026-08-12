@@ -472,7 +472,7 @@ func _update_flap_audio(delta: float) -> void:
 	add_child(flap_audio_player)
 	flap_audio_player.global_position = center
 	active_flap_audio_players.append(flap_audio_player)
-	flap_audio_player.play()
+	_start_audio_playback(flap_audio_player)
 	_randomize_next_flap_sound()
 
 
@@ -518,8 +518,12 @@ func _update_squeak_audio(delta: float) -> void:
 	add_child(squeak_audio_player)
 	squeak_audio_player.global_position = _get_flock_center()
 	active_squeak_audio_players.append(squeak_audio_player)
-	squeak_audio_player.play()
+	_start_audio_playback(squeak_audio_player)
 	_randomize_next_squeak_sound()
+
+
+func _start_audio_playback(audio_player: AudioStreamPlayer3D) -> void:
+	audio_player.play()
 
 
 func _randomize_next_flap_sound() -> void:
@@ -570,22 +574,26 @@ func _is_fly_off_audio_faded_out() -> bool:
 
 func _stop_flap_audio() -> void:
 	for flap_audio_player in active_flap_audio_players.duplicate():
-		if flap_audio_player == null:
+		if flap_audio_player == null or not is_instance_valid(flap_audio_player):
 			continue
 
 		flap_audio_player.stop()
-		flap_audio_player.queue_free()
+		# Release the decoder immediately. queue_free() can otherwise leave the
+		# playback and its stream alive when the owning nest exits on the last frame.
+		flap_audio_player.stream = null
+		flap_audio_player.free()
 
 	active_flap_audio_players.clear()
 
 
 func _stop_squeak_audio() -> void:
 	for squeak_audio_player in active_squeak_audio_players.duplicate():
-		if squeak_audio_player == null:
+		if squeak_audio_player == null or not is_instance_valid(squeak_audio_player):
 			continue
 
 		squeak_audio_player.stop()
-		squeak_audio_player.queue_free()
+		squeak_audio_player.stream = null
+		squeak_audio_player.free()
 
 	active_squeak_audio_players.clear()
 

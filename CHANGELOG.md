@@ -1,6 +1,41 @@
 # Changelog
 
+## 2026-08-12
+
+### 1700
+
+- Repository validation now finishes without false-positive teardown noise and rejects new scene, resource, audio, or rendering leaks.
+  - Prompt: Fix the reported Godot teardown errors and prevent them from recurring.
+
+### 0100
+
+- Level editors now get automatic construction and property validation for every first-party script before changes reach gameplay.
+  - Prompt: Give nearly every current production script its own co-located test coverage.
+- Level editors now receive up-to-date validation for authored scene changes while test-only scripts remain outside normal gameplay exports.
+  - Prompt: Adopt co-located tests and resolve the currently failing assertions.
+- Legacy Vampire feedback snapshots no longer conflict with each other or the editable level scene.
+  - Prompt: Remove the recurring duplicate UID errors from legacy Vampire feedback snapshots.
+
+## 2026-08-11
+
+### 1700
+
+- Repository checks now reject copied root UIDs and obsolete external-resource UIDs before they reach the editor.
+  - Prompt: Fix the reported Godot errors and warnings and prevent them from recurring.
+- Level editors can open scenes without duplicate scene identities or stale resource-UID warnings.
+  - Prompt: Fix the reported Godot errors and warnings and prevent them from recurring.
+
 ## 2026-08-10
+
+### 1600
+
+- PNG-to-GridMap now folds slight authored colour variations into the nearest configured colour using an adjustable per-level tolerance.
+  - Prompt: Fuzzy-match slight PNG colour variations to existing configured colours when loading authored layouts.
+
+### 1500
+
+- Torches now light after the player stands still nearby for half a second without needing to face them.
+  - Prompt: Make torches light after standing still beside them for a configurable half-second.
 
 ### 0300
 

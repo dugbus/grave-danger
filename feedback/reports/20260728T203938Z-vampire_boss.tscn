@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://nhtxghp4k8h"]
+[gd_scene format=3]
 
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://levels/vampire-maze/generated_maze/generated_maze.tscn" id="11_uaw4a"]
