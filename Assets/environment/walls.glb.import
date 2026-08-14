@@ -41,68 +41,14 @@ materials/extract_format=0
 materials/extract_path=""
 _subresources={
 "meshes": {
-"walls_Brick_029": {
+"walls_Brick_050": {
 "generate/lightmap_uv": 0,
 "generate/lods": 0,
 "generate/shadow_meshes": 0,
 "lods/normal_merge_angle": 20.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://Assets/environment/bricks/Brick_29.res",
-"save_to_file/path": "uid://dgrbavsa1x8gd"
-},
-"walls_Brick_030": {
-"generate/lightmap_uv": 0,
-"generate/lods": 0,
-"generate/shadow_meshes": 0,
-"lods/normal_merge_angle": 20.0,
-"save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://Assets/environment/bricks/Brick_30.res",
-"save_to_file/path": "uid://blb64ywlkvanm"
-},
-"walls_Brick_031": {
-"generate/lightmap_uv": 0,
-"generate/lods": 0,
-"generate/shadow_meshes": 0,
-"lods/normal_merge_angle": 20.0,
-"save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://Assets/environment/bricks/Brick_31.res",
-"save_to_file/path": "uid://hgrjh8b6c2wg"
-},
-"walls_Brick_032": {
-"generate/lightmap_uv": 0,
-"generate/lods": 0,
-"generate/shadow_meshes": 0,
-"lods/normal_merge_angle": 20.0,
-"save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://Assets/environment/bricks/Brick_32.res",
-"save_to_file/path": "uid://bqsjn0av1vhn0"
-},
-"walls_Brick_033": {
-"generate/lightmap_uv": 0,
-"generate/lods": 0,
-"generate/shadow_meshes": 0,
-"lods/normal_merge_angle": 20.0,
-"save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://Assets/environment/bricks/Brick_33.res",
-"save_to_file/path": "uid://brrdlmpbd0ixf"
-},
-"walls_Brick_034": {
-"generate/lightmap_uv": 0,
-"generate/lods": 0,
-"generate/shadow_meshes": 0,
-"lods/normal_merge_angle": 20.0,
-"save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://Assets/environment/bricks/Brick_34.res",
-"save_to_file/path": "uid://b3eehteuaf141"
-},
-"walls_Brick_035": {
-"generate/lightmap_uv": 0,
-"generate/lods": 0,
-"generate/shadow_meshes": 0,
-"lods/normal_merge_angle": 20.0,
-"save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://Assets/environment/bricks/Brick_35.res",
-"save_to_file/path": "uid://dbvqcbwif2sr7"
+"save_to_file/fallback_path": "res://Assets/environment/steps.res",
+"save_to_file/path": "uid://bcq2dack6fcg3"
 },
 "walls_BrokenWall": {
 "generate/lightmap_uv": 0,
@@ -113,6 +59,24 @@ _subresources={
 "save_to_file/fallback_path": "res://Assets/environment/wall-broken.res",
 "save_to_file/path": "uid://dv4j4utj0apdn"
 },
+"walls_Cylinder": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/gravestone.res",
+"save_to_file/path": "uid://bgk8f82a3ufw1"
+},
+"walls_Fence": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/fence.res",
+"save_to_file/path": "uid://cy5u6bjs36eb8"
+},
 "walls_Road": {
 "generate/lightmap_uv": 0,
 "generate/lods": 0,
@@ -121,6 +85,87 @@ _subresources={
 "save_to_file/enabled": true,
 "save_to_file/fallback_path": "res://Assets/environment/road.res",
 "save_to_file/path": "uid://da4veqx75njlj"
+},
+"walls_Tombstone": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/tombstone.res",
+"save_to_file/path": "uid://v7qq524q7xrr"
+},
+"walls_Wall": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/wall.res",
+"save_to_file/path": "uid://n8r4wn41qcee"
+},
+"walls_Wall-corner": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/wall-corner.res",
+"save_to_file/path": "uid://dc2wlryr1wwdm"
+},
+"walls_Wall-cross": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/wall-cross.res",
+"save_to_file/path": "uid://dbrjeueh0vry0"
+},
+"walls_Wall-end": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/wall-end.res",
+"save_to_file/path": "uid://cubtks6fopkej"
+},
+"walls_Wall-sides": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/wall-sides.res",
+"save_to_file/path": "uid://ciadqterbw5b5"
+},
+"walls_Wall-solo": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/wall-solo.res",
+"save_to_file/path": "uid://c424cj73i6but"
+},
+"walls_Wall-tee": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/wall-tee.res",
+"save_to_file/path": "uid://1mymou2vljs"
+},
+"walls_Wall_001": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/wall-rat.res",
+"save_to_file/path": "uid://b8sm8xf0exuk6"
 }
 }
 }

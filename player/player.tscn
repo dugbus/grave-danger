@@ -191,8 +191,8 @@ light_color = Color(0.8842759, 0.4890548, 0.27783498, 1)
 light_energy = 8.0
 light_indirect_energy = 0.0
 shadow_enabled = true
-shadow_caster_mask = 524287
 shadow_normal_bias = 0.6
+shadow_caster_mask = 524287
 spot_range = 60.0
 spot_attenuation = 1.25
 spot_angle = 82.0
@@ -206,12 +206,13 @@ noise_slow = SubResource("NoiseTexture3D_slow")
 
 [node name="PlayerLight" type="OmniLight3D" parent="Pivot" unique_id=994237452]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0.3)
-light_color = Color(0.8842759, 0.4890548, 0.27783498, 1)
+light_color = Color(0.8, 0.592, 0.48000002, 1)
 light_energy = 1.2
 light_indirect_energy = 0.0
+shadow_enabled = true
 shadow_bias = 0.03
-shadow_caster_mask = 524287
 shadow_normal_bias = 0.6
+shadow_caster_mask = 524287
 omni_range = 4.0
 omni_attenuation = 0.2
 script = ExtResource("7_boad6")
@@ -220,6 +221,8 @@ dip_amount = 0.02
 peak_amount = 0.015
 noise_fast = SubResource("NoiseTexture3D_fast")
 noise_slow = SubResource("NoiseTexture3D_slow")
+dim_color = Color(1, 0.69166666, 0.5, 1)
+bright_color = Color(1, 0.81666666, 0.5, 1)
 
 [node name="PlayerShadow" type="MeshInstance3D" parent="." unique_id=2006376189]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0.06)
