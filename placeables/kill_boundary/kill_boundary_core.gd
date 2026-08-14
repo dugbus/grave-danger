@@ -158,7 +158,12 @@ func expand_runtime_bounds_percent(percent: float) -> bool:
 	return true
 
 
-func expand_runtime_bounds_percent_for(percent: float, active_seconds: float, transition_seconds: float) -> bool:
+func expand_runtime_bounds_percent_for(
+	percent: float,
+	active_seconds: float,
+	expansion_transition_seconds: float,
+	contraction_transition_seconds := -1.0
+) -> bool:
 	if boundary_removed_for_level or not _runtime_effects_enabled():
 		return false
 
@@ -167,8 +172,17 @@ func expand_runtime_bounds_percent_for(percent: float, active_seconds: float, tr
 		return false
 
 	active_runtime_bounds_multipliers.append(multiplier)
-	_animate_runtime_bounds_multiplier(_get_target_runtime_bounds_multiplier(), transition_seconds)
-	_restore_runtime_bounds_after(multiplier, active_seconds, transition_seconds)
+	_animate_runtime_bounds_multiplier(
+		_get_target_runtime_bounds_multiplier(),
+		expansion_transition_seconds
+	)
+	var resolved_contraction_seconds := contraction_transition_seconds \
+		if contraction_transition_seconds >= 0.0 else expansion_transition_seconds
+	_restore_runtime_bounds_after(
+		multiplier,
+		active_seconds,
+		resolved_contraction_seconds
+	)
 	return true
 
 

@@ -4,3 +4,5 @@
 
 [resource]
 script = ExtResource("1_properties")
+breathing_space_expansion_transition_seconds = 1.0
+breathing_space_contraction_transition_seconds = 4.0

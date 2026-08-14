@@ -21,8 +21,10 @@ class_name GDGlobalFlaskProperties
 @export_range(0.0, 500.0, 0.5, "or_greater", "suffix:%") var breathing_space_expansion_percent := 25.0
 ## Seconds the expanded boundary is held before it returns to its normal pressure.
 @export_range(0.1, 120.0, 0.1, "or_greater", "suffix:s") var breathing_space_seconds := 8.0
-## Seconds used to ease the boundary into and out of the expanded breathing space size.
-@export_range(0.05, 10.0, 0.05, "or_greater", "suffix:s") var breathing_space_transition_seconds := 1.0
+## Seconds used to ease the boundary into its expanded breathing-space size.
+@export_range(0.05, 10.0, 0.05, "or_greater", "suffix:s") var breathing_space_expansion_transition_seconds := 1.0
+## Seconds used to ease the boundary back after the breathing-space effect expires.
+@export_range(0.05, 40.0, 0.05, "or_greater", "suffix:s") var breathing_space_contraction_transition_seconds := 4.0
 
 @export_group("No Boundary")
 ## Seconds the boundary takes to sink out of view when the no boundary flask starts.

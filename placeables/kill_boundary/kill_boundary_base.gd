@@ -388,7 +388,7 @@ var is_syncing_boundary := false
 @abstract func _restore_runtime_bounds_after(
     multiplier: float,
     active_seconds: float,
-    transition_seconds: float,
+    contraction_transition_seconds: float,
 ) -> void
 @abstract func _resume_runtime_motion_after(token: int, seconds: float) -> void
 @abstract func _ripple_retime_tracks_after_speed_change(old_animation: Animation, new_animation: Animation) -> bool

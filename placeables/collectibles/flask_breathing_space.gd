@@ -17,7 +17,8 @@ func _apply_effect(_body: Node3D) -> bool:
 	return kill_boundary.expand_runtime_bounds_percent_for(
 		FLASK_PROPERTIES.breathing_space_expansion_percent,
 		FLASK_PROPERTIES.breathing_space_seconds,
-		FLASK_PROPERTIES.breathing_space_transition_seconds
+		FLASK_PROPERTIES.breathing_space_expansion_transition_seconds,
+		FLASK_PROPERTIES.breathing_space_contraction_transition_seconds
 	)
 
 

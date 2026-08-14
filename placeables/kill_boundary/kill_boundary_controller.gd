@@ -392,11 +392,18 @@ func _animate_runtime_bounds_multiplier(target_multiplier: float, seconds: float
 	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
-func _restore_runtime_bounds_after(multiplier: float, active_seconds: float, transition_seconds: float) -> void:
+func _restore_runtime_bounds_after(
+	multiplier: float,
+	active_seconds: float,
+	contraction_transition_seconds: float
+) -> void:
 	await get_tree().create_timer(maxf(active_seconds, 0.01)).timeout
 	if is_inside_tree() and not boundary_removed_for_level:
 		active_runtime_bounds_multipliers.erase(multiplier)
-		_animate_runtime_bounds_multiplier(_get_target_runtime_bounds_multiplier(), transition_seconds)
+		_animate_runtime_bounds_multiplier(
+			_get_target_runtime_bounds_multiplier(),
+			contraction_transition_seconds
+		)
 
 
 func _get_target_runtime_bounds_multiplier() -> float:
