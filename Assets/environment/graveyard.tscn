@@ -11,8 +11,9 @@
 [ext_resource type="ArrayMesh" uid="uid://da4veqx75njlj" path="res://Assets/environment/road.res" id="8_road"]
 [ext_resource type="ArrayMesh" uid="uid://v7qq524q7xrr" path="res://Assets/environment/tombstone.res" id="9_ovlxj"]
 [ext_resource type="ArrayMesh" uid="uid://dv4j4utj0apdn" path="res://Assets/environment/wall-broken.res" id="11_f1ohu"]
-[ext_resource type="ArrayMesh" uid="uid://chw03hxdq4gea" path="res://Assets/environment/steps.res" id="12_ng422"]
-[ext_resource type="ArrayMesh" uid="uid://dosygas1m86hx" path="res://Assets/environment/gravestone.res" id="13_06x58"]
+[ext_resource type="ArrayMesh" uid="uid://bcq2dack6fcg3" path="res://Assets/environment/steps.res" id="12_ng422"]
+[ext_resource type="ArrayMesh" uid="uid://bgk8f82a3ufw1" path="res://Assets/environment/gravestone.res" id="13_06x58"]
+[ext_resource type="ArrayMesh" uid="uid://cvexvowkncd8w" path="res://Assets/environment/wall-empty.res" id="14_06x58"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_f1ohu"]
 points = PackedVector3Array(-0.371659, 0.0031548825, -0.011626571, -0.031969592, 0.8356568, 0.52600634, 0.122177035, 0.85252243, 0.51228154, -0.12382014, 0.9728017, -0.2394665, 0.26397675, 0.0019443962, -0.1361675, 0.1081406, 0.03435728, 0.5145693, -0.5082444, 0.8506098, 0.14352304, 0.26232582, 0.94682294, -0.11952506, -0.17225802, 0.0346165, 0.49562687, -0.47735557, 0.053019796, -0.14894097, 0.1376221, 0.021669544, -0.27243796, 0.27287892, 0.04091088, 0.14278732, -0.49150375, 0.8661909, -0.13270293, -0.5066191, 0.10066108, 0.11236826, -0.13900386, 0.9846071, 0.21869798, -0.13928024, 0.022194207, -0.27199787, 0.1381758, 0.8995769, -0.2733105, 0.26063618, 0.9448227, 0.12764049, -0.1562016, 0.8345706, 0.5116723, -0.15409914, 0.89276767, -0.26650086, 0.092271715, 0.004125997, 0.4830312, 0.21495612, 0.9917086, 0.12764049, -0.23126733, 0.9894621, -0.102355585, 0.15194704, 0.8358001, 0.48014283, 0.27566323, 0.89823425, -0.13357566, 0.123725705, 0.9942427, -0.21306734, -0.50764817, 0.038265776, 0.06631242, 0.27276206, 0.89527637, 0.14278278, 0.13495481, 0.041942455, 0.49305782, -0.5060862, 0.37635168, -0.101597026, -0.13938387, 0.0045733145, 0.4673061, 0.27648765, 0.036665965, -0.13412514)
@@ -163,3 +164,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4329538, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Gravestone/StaticBody3D" unique_id=660987900]
 shape = SubResource("BoxShape3D_bgk35")
+
+[node name="WallEmpty" type="MeshInstance3D" parent="." unique_id=1866256423]
+mesh = ExtResource("14_06x58")

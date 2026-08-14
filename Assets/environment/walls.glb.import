@@ -77,6 +77,15 @@ _subresources={
 "save_to_file/fallback_path": "res://Assets/environment/fence.res",
 "save_to_file/path": "uid://cy5u6bjs36eb8"
 },
+"walls_Plane": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://Assets/environment/wall-empty.res",
+"save_to_file/path": "uid://c3foihb13tpp3"
+},
 "walls_Road": {
 "generate/lightmap_uv": 0,
 "generate/lods": 0,

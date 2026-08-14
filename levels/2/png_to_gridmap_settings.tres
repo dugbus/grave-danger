@@ -6,3 +6,4 @@
 script = ExtResource("1_h8lp6")
 png_path = "res://levels/2/level.png"
 target_gridmap_path = NodePath("GridMap")
+auto_repair = true

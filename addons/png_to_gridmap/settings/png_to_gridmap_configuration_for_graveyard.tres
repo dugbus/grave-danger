@@ -16,6 +16,10 @@ item_ref = "Fence"
 script = ExtResource("2_wtrwk")
 item_ref = "WallBroken"
 
+[sub_resource type="Resource" id="Resource_7hnn6"]
+script = ExtResource("2_wtrwk")
+item_ref = "walls#WallEmpty"
+
 [sub_resource type="Resource" id="Resource_kvfjf"]
 script = ExtResource("1_mwieu")
 colour = Color(0, 0, 0, 1)
@@ -28,7 +32,7 @@ corner_item_ref = "WallCorner"
 corner_rotation_offset = 1
 tee_item_ref = "WallTee"
 cross_item_ref = "WallCross"
-autotile_alternatives = Array[Resource]([SubResource("Resource_wall_sides_black"), SubResource("Resource_wtrwk"), SubResource("Resource_mwieu")])
+autotile_alternatives = Array[Resource]([SubResource("Resource_wall_sides_black"), SubResource("Resource_wtrwk"), SubResource("Resource_mwieu"), SubResource("Resource_7hnn6")])
 
 [resource]
 script = ExtResource("3_7hnn6")
