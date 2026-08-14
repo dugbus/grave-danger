@@ -3,6 +3,7 @@ extends Node3D
 
 const GRID_MAP_SHADOW_CASTERS_NAME := "GridMapShadowCasters"
 const SHADOW_VOLUME_INSET := 0.01
+const WALL_SHADOW_PROXY_LAYER := 1 << 19
 const AUTHORED_SHADOW_SETTINGS_GROUP: StringName = &"authored_shadow_settings"
 
 ## Fully opaque indoor shadows prevent lit geometry from showing through occluders.
@@ -92,9 +93,17 @@ func _create_grid_map_shadow_casters() -> void:
             var caster_material := StandardMaterial3D.new()
             caster_material.cull_mode = BaseMaterial3D.CULL_DISABLED
             caster.material_override = caster_material
-            caster.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+            configure_wall_shadow_proxy(caster)
             caster.multimesh = multimesh
             shadow_casters.add_child(caster)
+
+
+## Restricts an invisible wall-leak caster to the room-light proxy layer.
+static func configure_wall_shadow_proxy(caster: GeometryInstance3D) -> void:
+    if caster == null:
+        return
+    caster.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+    caster.layers = WALL_SHADOW_PROXY_LAYER
 
 
 func _get_item_occluder_bounds(mesh_library: MeshLibrary, item_id: int) -> AABB:
