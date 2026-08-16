@@ -460,7 +460,7 @@ generated_transforms = Array[Transform3D]([Transform3D(1.0273527, 0, 0.39874348,
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.41994, 0, -0.050732374)
 
 [node name="SilverKey" parent="Layout" unique_id=1155606448 instance=ExtResource("12_u1l8k")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2181926, 0.024999011, -1.2948333)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3319516, 0.024999011, -1.2948333)
 
 [node name="Player" parent="." unique_id=2096732963 instance=ExtResource("1_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0.05, -11)
