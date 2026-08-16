@@ -1,41 +1,10 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://levels/vampire-maze/generated_maze/generated_maze.gd" id="1_generator"]
 [ext_resource type="Resource" path="res://levels/vampire-maze/generated_maze/generated_maze_config.tres" id="2_config"]
-[ext_resource type="MeshLibrary" path="res://Assets/environment/graveyard.res" id="3_walls"]
 [ext_resource type="Material" path="res://Assets/environment/floors/dirt_floor.material" id="4_floor_material"]
-[ext_resource type="Script" path="res://levels/vampire-maze/generated_maze/generated_content.gd" id="5_content"]
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_generated_floor"]
-material = ExtResource("4_floor_material")
-size = Vector2(1, 1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_generated_floor"]
-size = Vector3(1, 0.5, 1)
-
-[sub_resource type="MeshLibrary" id="MeshLibrary_generated_floor"]
-item/0/name = "Generated Maze Floor"
-item/0/mesh = SubResource("PlaneMesh_generated_floor")
-item/0/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-item/0/mesh_cast_shadow = 1
-item/0/shapes = [SubResource("BoxShape3D_generated_floor"), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)]
-item/0/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-item/0/navigation_layers = 1
 
 [node name="GeneratedMaze" type="Node3D"]
 script = ExtResource("1_generator")
 configuration = ExtResource("2_config")
 floor_material = ExtResource("4_floor_material")
-
-[node name="PNGGridMap" type="GridMap" parent="."]
-mesh_library = ExtResource("3_walls")
-cell_size = Vector3(1, 1, 1)
-cell_center_y = false
-
-[node name="PNGFloorGridMap" type="GridMap" parent="."]
-mesh_library = SubResource("MeshLibrary_generated_floor")
-cell_size = Vector3(1, 1, 1)
-cell_center_y = false
-
-[node name="GeneratedContent" type="Node3D" parent="."]
-script = ExtResource("5_content")

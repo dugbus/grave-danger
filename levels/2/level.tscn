@@ -16,7 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://ba4h31e1vsl1n" path="res://placeables/lockables/locked_gate.tscn" id="16_mx8o4"]
 [ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="16_yyw7i"]
 [ext_resource type="PackedScene" uid="uid://bsukaqxfm6nb3" path="res://placeables/wall_breakable/wall_breakable.tscn" id="18_mx8o4"]
-[ext_resource type="PackedScene" uid="uid://dnrl7nbrfvej3" path="res://enemies/skeleton.tscn" id="19_haq2d"]
+[ext_resource type="PackedScene" path="res://enemies/skeleton.tscn" id="19_haq2d"]
 [ext_resource type="PackedScene" path="res://placeables/pushables/millstone.tscn" id="19_yyw7i"]
 [ext_resource type="PackedScene" path="res://placeables/spike_trap/spike_trap.tscn" id="20_yyw7i"]
 [ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]

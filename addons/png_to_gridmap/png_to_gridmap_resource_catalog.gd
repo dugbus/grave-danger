@@ -20,6 +20,17 @@ static func collect_grid_map_paths(root: Node) -> Array[String]:
 	return paths
 
 
+## Matches one project path in an editor resource notification batch.
+static func resources_include_path(resources: PackedStringArray, target_path: String) -> bool:
+	if target_path == "":
+		return false
+	var normalized_target := target_path.replace("\\", "/").simplify_path()
+	for resource_path in resources:
+		if resource_path.replace("\\", "/").simplify_path() == normalized_target:
+			return true
+	return false
+
+
 ## Keeps a valid configured GridMap, or selects the scene's only GridMap when unambiguous.
 static func preferred_grid_map_path(root: Node, configured_path: NodePath) -> NodePath:
 	if root == null:

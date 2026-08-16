@@ -70,6 +70,8 @@ func _has_gizmo(for_node_3d: Node3D) -> bool:
 
 func _redraw(gizmo: EditorNode3DGizmo) -> void:
 	gizmo.clear()
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		return
 
 	var path := gizmo.get_node_3d() as Path3D
 	if path == null or path.curve == null:

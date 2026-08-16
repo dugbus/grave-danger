@@ -2491,7 +2491,13 @@ func _player_scene_owns_light_tuning() -> bool:
         and is_equal_approx(headlamp.shadow_bias, 0.03) \
         and is_equal_approx(headlamp.shadow_normal_bias, 0.6) \
         and is_equal_approx(fill_light.shadow_bias, 0.03) \
-        and is_equal_approx(fill_light.shadow_normal_bias, 0.6)
+        and is_equal_approx(fill_light.shadow_normal_bias, 0.6) \
+        and headlamp.shadow_caster_mask \
+            & GDIndoorLighting.WALL_SHADOW_PROXY_LAYER == 0 \
+        and fill_light.shadow_caster_mask \
+            & GDIndoorLighting.WALL_SHADOW_PROXY_LAYER == 0 \
+        and headlamp.shadow_caster_mask & 1 != 0 \
+        and fill_light.shadow_caster_mask & 1 != 0
     player.free()
     return passed
 
@@ -2509,6 +2515,7 @@ func _grid_map_has_dedicated_shadow_caster(grid_map: GridMap) -> bool:
     var caster_mesh := caster.multimesh.mesh as BoxMesh
     var caster_material := caster.material_override as BaseMaterial3D
     return caster.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY \
+        and caster.layers == GDIndoorLighting.WALL_SHADOW_PROXY_LAYER \
         and caster.multimesh.instance_count == 1 \
         and caster_mesh != null \
         and caster_mesh.size.x < wall_mesh.get_aabb().size.x \
@@ -8193,8 +8200,12 @@ func _test_vampire_maze_owns_its_development_view() -> bool:
     var camera := level.get_node_or_null("VampireDevelopmentView/Camera3D") as Camera3D
     var route_overlay := level.get_node_or_null("MinimapRouteOverlay") as MultiMeshInstance3D
     var generated_maze := level.get_node_or_null("GeneratedMaze") as Node3D
-    var wall_grid_map := level.get_node_or_null("GeneratedMaze/PNGGridMap") as GridMap
-    var floor_grid_map := level.get_node_or_null("GeneratedMaze/PNGFloorGridMap") as GridMap
+    var wall_grid_map := level.get_node_or_null(
+        "GeneratedMaze/Layout/PNGGridMap"
+    ) as GridMap
+    var floor_grid_map := level.get_node_or_null(
+        "GeneratedMaze/Layout/PNGFloorGridMap"
+    ) as GridMap
     var camera_profile := camera.get("camera_profile") as Resource if camera != null else null
     var maze_configuration := generated_maze.get("configuration") as Resource \
         if generated_maze != null else null
@@ -8202,10 +8213,10 @@ func _test_vampire_maze_owns_its_development_view() -> bool:
         if maze_configuration != null else 0
     var configured_height := int(maze_configuration.get("height")) \
         if maze_configuration != null else 0
-    var serialized_floor_cells := floor_grid_map.get_used_cells() \
-        if floor_grid_map != null else []
-    var serialized_wall_cells := wall_grid_map.get_used_cells() \
-        if wall_grid_map != null else []
+    var serialized_floor_cells: Array[Vector3i] = floor_grid_map.get_used_cells() \
+        if floor_grid_map != null else ([] as Array[Vector3i])
+    var serialized_wall_cells: Array[Vector3i] = wall_grid_map.get_used_cells() \
+        if wall_grid_map != null else ([] as Array[Vector3i])
     var has_no_baked_cells := serialized_floor_cells.is_empty() \
         and serialized_wall_cells.is_empty()
     var has_current_baked_cells := serialized_floor_cells.size() \
@@ -8217,6 +8228,12 @@ func _test_vampire_maze_owns_its_development_view() -> bool:
             has_current_baked_cells = false
             break
     root.add_child(level)
+    wall_grid_map = level.get_node_or_null(
+        "GeneratedMaze/Layout/PNGGridMap"
+    ) as GridMap
+    floor_grid_map = level.get_node_or_null(
+        "GeneratedMaze/Layout/PNGFloorGridMap"
+    ) as GridMap
     var authored_player := level.get_node_or_null("Player") as Node3D
     var stale_character_position := Vector3(512.0, 32.0, 512.0)
     if authored_player != null:
@@ -8225,6 +8242,12 @@ func _test_vampire_maze_owns_its_development_view() -> bool:
         vampire.global_position = stale_character_position
     var regeneration_result := generated_maze.call("regenerate_maze") as Dictionary \
         if generated_maze != null else {}
+    wall_grid_map = level.get_node_or_null(
+        "GeneratedMaze/Layout/PNGGridMap"
+    ) as GridMap
+    floor_grid_map = level.get_node_or_null(
+        "GeneratedMaze/Layout/PNGFloorGridMap"
+    ) as GridMap
     var regenerated_player_spawn := regeneration_result.get(
         "player_spawn",
         Transform3D.IDENTITY
@@ -8409,7 +8432,7 @@ func _test_generated_maze_floor_settings() -> bool:
     generated_maze.set("floor_texture_tiles", Vector2i(2, 3))
     root.add_child(generated_maze)
 
-    var floor_grid_map := generated_maze.get_node("PNGFloorGridMap") as GridMap
+    var floor_grid_map := generated_maze.get_node("Layout/PNGFloorGridMap") as GridMap
     var floor_library := floor_grid_map.mesh_library
     var first_floor_mesh := floor_library.get_item_mesh(0) as PlaneMesh
     var x_phase_floor_mesh := floor_library.get_item_mesh(1) as PlaneMesh
@@ -8449,8 +8472,8 @@ func _test_generated_maze_floor_settings() -> bool:
 func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
     var generated_maze := VAMPIRE_GENERATED_MAZE_SCENE.instantiate() as Node3D
     root.add_child(generated_maze)
-    var walls := generated_maze.get_node("PNGGridMap") as GridMap
-    var floor := generated_maze.get_node("PNGFloorGridMap") as GridMap
+    var walls := generated_maze.get_node("Layout/PNGGridMap") as GridMap
+    var floor := generated_maze.get_node("Layout/PNGFloorGridMap") as GridMap
     var configuration := generated_maze.get("configuration") as Resource
     var configured_width := int(configuration.get("width"))
     var configured_height := int(configuration.get("height"))
@@ -8560,6 +8583,8 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
         player,
         vampire
     ) as Dictionary
+    walls = generated_maze.get_node("Layout/PNGGridMap") as GridMap
+    floor = generated_maze.get_node("Layout/PNGFloorGridMap") as GridMap
     var first_wall_cells := walls.get_used_cells()
     first_wall_cells.sort()
     var first_signature := str(first_wall_cells)
@@ -8570,6 +8595,8 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
         player,
         vampire
     ) as Dictionary
+    walls = generated_maze.get_node("Layout/PNGGridMap") as GridMap
+    floor = generated_maze.get_node("Layout/PNGFloorGridMap") as GridMap
     var repeat_wall_cells := walls.get_used_cells()
     repeat_wall_cells.sort()
     var repeat_signature := str(repeat_wall_cells)
@@ -8580,6 +8607,8 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
         player,
         vampire
     ) as Dictionary
+    walls = generated_maze.get_node("Layout/PNGGridMap") as GridMap
+    floor = generated_maze.get_node("Layout/PNGFloorGridMap") as GridMap
     var changed_wall_cells := walls.get_used_cells()
     changed_wall_cells.sort()
     var changed_signature := str(changed_wall_cells)
@@ -8794,7 +8823,7 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
         0,
         configured_bat_count
     )
-    var generated_content := generated_maze.get_node("GeneratedContent")
+    var generated_content := generated_maze.get_node("Layout/GeneratedContent")
     var generated_treasure_pile_count := 0
     var generated_preview_roots_are_transient := true
     for child in generated_content.get_children():
@@ -9073,11 +9102,16 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
             main_path_pile_count += 1
         if map_edge_clearance <= 2:
             perimeter_treasure_count += 1
+    var expected_treasure_region_count := mini(
+        maxi(treasure_caches.size() - 1, 1),
+        8
+    )
+    var expected_treasure_axis_band_count := mini(treasure_caches.size(), 3)
     var treasure_is_distributed_through_available_space := treasure_caches.size() < 4 \
         or (treasure_uses_route_or_exploration_bands \
-            and treasure_spatial_regions.size() >= 8 \
-            and treasure_x_bands.size() >= 3 \
-            and treasure_y_bands.size() >= 3 \
+            and treasure_spatial_regions.size() >= expected_treasure_region_count \
+            and treasure_x_bands.size() >= expected_treasure_axis_band_count \
+            and treasure_y_bands.size() >= expected_treasure_axis_band_count \
             and perimeter_treasure_count > 0 \
             and main_path_pile_count < treasure_caches.size() / 2)
     var treasure_pile_cells: Array[Vector2i] = []
@@ -9346,6 +9380,7 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
         "content_plan",
         {}
     ) as Dictionary
+    walls = generated_maze.get_node("Layout/PNGGridMap") as GridMap
     var automatic_wall_cells_before := walls.get_used_cells()
     automatic_wall_cells_before.sort()
     var automatic_generation_results: Array[Dictionary] = []
@@ -9364,6 +9399,7 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
     )
     generated_maze.set("_last_regeneration_request_milliseconds", 0)
     generated_maze.call("_run_queued_regeneration")
+    walls = generated_maze.get_node("Layout/PNGGridMap") as GridMap
     var automatic_wall_cells_after := walls.get_used_cells()
     automatic_wall_cells_after.sort()
     var automatic_result := automatic_generation_results[-1] \
@@ -9401,6 +9437,7 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
     )
     generated_maze.set("_last_regeneration_request_milliseconds", 0)
     generated_maze.call("_run_queued_regeneration")
+    walls = generated_maze.get_node("Layout/PNGGridMap") as GridMap
     var rebuilt_wall_cells := walls.get_used_cells()
     rebuilt_wall_cells.sort()
     var rebuilt_result := automatic_generation_results[-1] \

@@ -1,0 +1,22 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://player/player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="2_lighting"]
+[ext_resource type="Script" path="res://levels/level_settings.gd" id="3_level_settings"]
+[ext_resource type="PackedScene" path="res://levels/vampire-maze/generated_maze/generated_maze.tscn" id="4_generated_maze"]
+[ext_resource type="Resource" path="res://levels/tutorial-4/generated_maze_config.tres" id="5_config"]
+
+[node name="Tutorial4" type="Node3D"]
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+
+[node name="IndoorLighting" parent="." instance=ExtResource("2_lighting")]
+
+[node name="LevelSettings" type="Node" parent="."]
+script = ExtResource("3_level_settings")
+
+[node name="GeneratedMaze" parent="." instance=ExtResource("4_generated_maze")]
+configuration = ExtResource("5_config")
+maze_seed = 4
+
+[editable path="IndoorLighting"]

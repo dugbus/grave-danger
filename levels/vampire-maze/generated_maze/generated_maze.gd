@@ -19,16 +19,16 @@ enum MazeConnectionAxis {
 
 const REPAIRER_SCRIPT := preload("res://addons/png_to_gridmap/png_to_gridmap_repairer.gd")
 const MESH_CATALOG_SCRIPT := preload("res://addons/png_to_gridmap/png_to_gridmap_mesh_catalog.gd")
-const GridBuilder := preload(
-    "res://levels/vampire-maze/generated_maze/generated_maze_grid_builder.gd"
-)
+const GridBuilder := preload("res://levels/vampire-maze/generated_maze/generated_maze_grid_builder.gd")
+const FloorRoute := preload("res://levels/vampire-maze/generated_maze/generated_floor_route.gd")
+const LayoutBuilder := preload("res://levels/vampire-maze/generated_maze/generated_maze_layout_builder.gd")
 const DEFAULT_CONFIG := preload("res://levels/vampire-maze/generated_maze/generated_maze_config.tres")
 const CARDINAL_DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT]
 const BASE_WALL_ITEM_REF := "Wall"
 const EDITOR_REGENERATION_DEBOUNCE_MILLISECONDS := 300
 const PERIMETER_CONNECTIONS_PER_BREAK := 12
 const INTERNAL_CONNECTION_RANDOM_SALT := 1597463007
-const CURRENT_GENERATION_VERSION := 11
+const CURRENT_GENERATION_VERSION := 20
 
 ## Seed used for deterministic scene and runtime maze generation.
 @export var maze_seed := 1:
@@ -55,16 +55,33 @@ const CURRENT_GENERATION_VERSION := 11
         floor_texture_tiles = Vector2i(maxi(value.x, 1), maxi(value.y, 1))
         _queue_regeneration()
 @export_group("")
+@export_group("Routed Floor")
+## Objective followed by the generated Road-tile corridor.
+@export_enum("Gate", "Gate Key") var floor_tile_route_destination: int = FloorRoute.Destination.GateKey:
+    set(value):
+        if floor_tile_route_destination == value:
+            return
+        floor_tile_route_destination = value
+        _queue_regeneration()
+## Independent chance that each walkable cell across the objective corridor receives a Road tile.
+@export_range(0.0, 100.0, 1.0, "suffix:%") var floor_tile_route_percent := 30.0:
+    set(value):
+        var clamped_value := clampf(value, 0.0, 100.0)
+        if is_equal_approx(floor_tile_route_percent, clamped_value):
+            return
+        floor_tile_route_percent = clamped_value
+        _queue_regeneration()
+@export_group("")
 ## Child GridMap that receives generated and repaired wall cells.
-@export var wall_grid_map_path: NodePath = ^"PNGGridMap"
+@export var wall_grid_map_path: NodePath = ^"Layout/PNGGridMap"
 ## Child GridMap that receives a complete floor below the maze.
-@export var floor_grid_map_path: NodePath = ^"PNGFloorGridMap"
+@export var floor_grid_map_path: NodePath = ^"Layout/PNGFloorGridMap"
 ## Player placed in the generated entrance corner.
 @export var player_path: NodePath = ^"../Player"
 ## Vampire placed two cells inside the locked gate opposite the player.
 @export var vampire_path: NodePath = ^"../Vampire"
 ## Child responsible for planning and instancing generated dungeon content.
-@export var generated_content_path: NodePath = ^"GeneratedContent"
+@export var generated_content_path: NodePath = ^"Layout/GeneratedContent"
 ## Optional authored-content root disabled when generated budgets are active.
 @export var authored_content_path: NodePath
 ## Height added above the generated floor for both character roots.
@@ -115,13 +132,11 @@ func _ready() -> void:
 func _exit_tree() -> void:
     _disconnect_configuration_changes()
 
-
 ## Regenerates this node's GridMaps and configured characters using the current seed.
 func regenerate_maze() -> Dictionary:
     var player := get_node_or_null(player_path) as Node3D
     var vampire := get_node_or_null(vampire_path) as Node3D
     return generate_from_config(configuration, maze_seed, player, vampire)
-
 
 ## Stops editor regeneration and preserves the current generated nodes for manual editing.
 func freeze_generated_level_for_editing() -> void:
@@ -151,7 +166,6 @@ func generate_from_config(
         true
     )
 
-
 func _generate_from_config(
     runtime_configuration: Resource,
     seed_value: int,
@@ -165,10 +179,12 @@ func _generate_from_config(
     maze_seed = seed_value
 
     var errors: Array[String] = []
-    var wall_grid_map := get_node_or_null(wall_grid_map_path) as GridMap
-    var floor_grid_map := get_node_or_null(floor_grid_map_path) as GridMap
     if runtime_configuration == null:
         errors.append("GeneratedMaze requires a configuration resource.")
+    elif populate_grid_maps and LayoutBuilder.replace(self) == null:
+        errors.append("GeneratedMaze could not create its Layout node.")
+    var wall_grid_map := get_node_or_null(wall_grid_map_path) as GridMap
+    var floor_grid_map := get_node_or_null(floor_grid_map_path) as GridMap
     if wall_grid_map == null:
         errors.append("GeneratedMaze could not find its wall GridMap.")
     if floor_grid_map == null:
@@ -289,9 +305,10 @@ func _generate_from_config(
     }
     var generated_content := get_node_or_null(generated_content_path)
     var content_configuration := runtime_configuration.get("content_configuration") as Resource
+    var content_plan := {}
     if generated_content != null and generated_content.has_method("regenerate_content") \
             and content_configuration != null:
-        var content_plan := generated_content.call(
+        content_plan = generated_content.call(
             &"regenerate_content",
             floor_cells,
             result,
@@ -308,6 +325,22 @@ func _generate_from_config(
             errors.append(String(content_error))
         for content_warning in content_plan.get("warnings", []):
             push_warning(String(content_warning))
+    var floor_route := FloorRoute.new()
+    var floor_route_result := floor_route.populate(
+        wall_grid_map,
+        floor_cells,
+        player_cell,
+        end_gate_cell,
+        content_plan,
+        floor_tile_route_destination as FloorRoute.Destination,
+        seed_value,
+        floor_tile_route_percent
+    ) as Dictionary
+    for floor_route_error in floor_route_result.get("errors", []):
+        errors.append(String(floor_route_error))
+    result["floor_tile_route"] = floor_route_result.get("route", [])
+    result["floor_tile_route_band"] = floor_route_result.get("route_band", [])
+    result["routed_floor_cells"] = floor_route_result.get("cells", [])
     _is_generating = false
     maze_generated.emit(seed_value, result)
     return result

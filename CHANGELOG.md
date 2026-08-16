@@ -1,6 +1,117 @@
 # Changelog
 
+## 2026-08-16
+
+### 1400
+
+- Amethysts, diamonds, emeralds, rubies, and sapphires are now twice as large with proportionally matched physical collision and pickup reach.
+  - Prompt: Make every gem twice as large and account for pickup behavior.
+- Tutorial 2's expanding kill boundary now follows its closing path segment all the way from the final point back to the start.
+  - Prompt: Make Tutorial 2's kill boundary move back to its starting point while it expands.
+
+### 1200
+
+- Looping kill boundaries now travel from their final path point back to the start instead of jumping across an open path.
+  - Prompt: Make the kill boundary loop back to its starting point.
+
+## 2026-08-15
+
+### 1900
+
+- The selected Path3D overlay no longer intercepts point clicks, seeks animations during native point selection, polls forced gizmo redraws, or samples curves while dragging, preventing its editor visualization from re-entering Godot's path gizmo.
+  - Prompt: Determine whether path3d_selected_gizmo causes the kill-boundary point-click crash and fix it.
+
+### 1700
+
+- Kill-boundary editor previews now pause while a path point is being dragged and ignore paths with fewer than two usable points.
+  - Prompt: Fix the Godot editor crash when dragging the only kill-boundary path point.
+- Skeletons and zombies now stay upright and face their movement direction even when their patrol paths are rotated.
+  - Prompt: Make skeleton and zombie orientation independent from rotated patrol paths.
+
+### 1600
+
+- Tutorial 2's placed skeleton and zombie now sit on the generated floor in the editor while retaining their runtime spawn behavior.
+  - Prompt: Show the placed skeleton and zombie at ground level in the Godot editor.
+- PNG-to-GridMap controls now keep unavailable configured resources visibly marked as missing instead of silently showing an unrelated fallback.
+  - Prompt: Keep every PNG-to-GridMap editor control synchronized with current scene and resource changes.
+- PNG-to-GridMap dropdowns, wall-piece mappings, image palettes, settings, output details, and validation now refresh as their scene and project sources change.
+  - Prompt: Keep every PNG-to-GridMap editor control synchronized with current scene and resource changes.
+
+### 1300
+
+- Generated gold keys no longer display the oversized GATE KEY locator in the level editor.
+  - Prompt: Remove the oversized GATE KEY text from generated-level editor views.
+
+## 2026-08-14
+
+### 1400
+
+- Breathing-space flasks now expand the kill boundary over one second and ease it back over four seconds after the effect expires.
+  - Prompt: Keep breathing-space expansion speed unchanged and make its contraction four times slower.
+
+### 1200
+
+- Player lights now ignore only invisible indoor wall-leak proxies while real walls, props, and enemies continue casting shadows.
+  - Prompt: Prevent indoor wall-leak shadow proxies from blocking the player's lights without disabling shadows.
+
+## 2026-08-13
+
+### 1800
+
+- Generated grass now restores its saved blade transforms after the editor attaches a rebuilt Layout, keeping the patches visible in the 3D viewport.
+  - Prompt: Make generated grass blades visible in the editor viewport.
+- Generated grass uses Level 1's 3D grass mesh with denser plasma-shaped clumps.
+  - Prompt: Keep generated grass visible in the editor and make its patches much denser.
+- Generated maze grass now stays visible and inspectable in the editor after regeneration.
+  - Prompt: Keep generated grass visible in the editor and make its patches much denser.
+- Generated maze grass now forms visible plasma-shaped floor patches whose blade density rises toward each patch's centre.
+  - Prompt: Generate visible grass only on floor cells, with plasma-controlled patches and density.
+
+### 1700
+
+- Generated grass patches now store visible instance transforms that remain inspectable in the editor.
+  - Prompt: Match generated roads and grass to Level 1's editor-visible placement.
+- Generated maze Road tiles now share the wall GridMap and sit at the same authored height as Level 1.
+  - Prompt: Match generated roads and grass to Level 1's editor-visible placement.
+- Generated gold gate keys now use their original authored size while retaining the bright material and editor locator that make them easy to identify.
+  - Prompt: Restore the generated gate key's original size while retaining its visibility treatment.
+- Tutorial 1 through Tutorial 5 are now selectable procedural levels at the top of the level list, each with its own scene, seed, configuration, and PNG-to-GridMap profile.
+  - Prompt: Create Tutorial 1 through Tutorial 5 and list them first.
+
+### 1600
+
+- Generated mazes now grow deterministic noise-clustered grass patches using Level 1's mesh and shader while keeping the main gate route and gameplay objects clear.
+  - Prompt: Generate natural grass patches in the maze using Level 1's grass style.
+- GeneratedMaze now rebuilds one inspectable Layout containing its wall, floor, routed-floor GridMaps and all generated gameplay objects whenever generation settings change.
+  - Prompt: Group every generated maze element under one replaceable editor node.
+- Generated gold gate keys now display a billboarded GATE KEY locator above the real objective in editor previews while keeping the locator hidden during gameplay.
+  - Prompt: Make the generated gate key easy to find in the editor.
+- GeneratedMaze now exposes Gate or Gate Key routing and Road density directly in the Inspector, defaults the Vampire Maze to 30%, and gives its generated gold key a larger visible model.
+  - Prompt: Expose the route target in the editor, reduce Road density, and make the gate key visible.
+
+### 1500
+
+- GeneratedMaze now scatters Road tiles across the full walkable corridor, always marks the selected destination, and shows the gold key's bright material in editor previews.
+  - Prompt: Scatter route tiles across the corridor and make the destination key visible.
+
+### 0100
+
+- GeneratedMaze now aligns directional Graveyard wall pieces with their neighbouring walls and raises its routed Road tiles fully above the dirt floor.
+  - Prompt: Correct GeneratedMaze wall rotations and make its Road route tiles visible.
+- GeneratedMaze breadcrumb routes now place the authored Road tiles from the Graveyard MeshLibrary so the route is visible in the level and editor preview.
+  - Prompt: Place the existing floor tiles from the MeshLibrary into GeneratedMaze.
+
 ## 2026-08-12
+
+### 2100
+
+- GeneratedMaze editor previews now rebuild immediately after changing the seed, including their routed floor tiles.
+  - Prompt: Make GeneratedMaze rebuild when its seed changes.
+
+### 1900
+
+- Generated mazes now place deterministic half-coverage flagstone breadcrumbs toward either the exit gate or its gold key, selectable in the shared maze settings.
+  - Prompt: Add sparse floor tiles to GeneratedMaze that can lead to the gate or its key.
 
 ### 1700
 

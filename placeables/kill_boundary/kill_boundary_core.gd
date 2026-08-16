@@ -46,6 +46,9 @@ func _notification(what: int) -> void:
 
 func _process(delta: float) -> void:
 	if Engine.is_editor_hint():
+		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			editor_path_marker_stable_time = 0.0
+			return
 		_update_speed_change_ripple_retime(delta)
 		_update_path_point_animation_markers(delta)
 		_sync_editor_preview_animation()
@@ -330,6 +333,9 @@ func _create_default_curve() -> Curve3D:
 
 
 func _configure_path_follow() -> void:
+	if curve != null:
+		curve.closed = loop_boundary_path
+
 	var path_follow := get_node_or_null(BOUNDARY_CENTER_NAME) as PathFollow3D
 	if path_follow == null:
 		return

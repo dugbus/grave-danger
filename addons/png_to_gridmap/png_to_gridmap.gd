@@ -15,12 +15,8 @@ const PathsResource := preload("res://addons/png_to_gridmap/png_to_gridmap_paths
 const MappingCatalog := preload(
 	"res://addons/png_to_gridmap/png_to_gridmap_mapping_catalog.gd"
 )
-const AutoRepairWatch := preload(
-	"res://addons/png_to_gridmap/png_to_gridmap_auto_repair_watch.gd"
-)
-const ResourceCatalog := preload(
-	"res://addons/png_to_gridmap/png_to_gridmap_resource_catalog.gd"
-)
+const AutoRepairWatch := preload("res://addons/png_to_gridmap/png_to_gridmap_auto_repair_watch.gd")
+const ResourceCatalog := preload("res://addons/png_to_gridmap/png_to_gridmap_resource_catalog.gd")
 
 const PLUGIN_CONFIG_PATH := "res://addons/png_to_gridmap/plugin.cfg"
 const EMPTY_KEY := "FFFFFFFF"
@@ -46,10 +42,14 @@ var _repairer: RefCounted
 var _floor_builder: RefCounted
 var _auto_repair_watch := AutoRepairWatch.new()
 var _resource_refresh_pending := true
+var _live_scene_refresh_pending := false
+var _reload_settings_pending := false
 var _level_settings_loaded := false
 var _editor_dock: EditorDock
 var _dock_is_open := false
 var _dock_visibility_initialized := false
+var _watched_mesh_library: MeshLibrary
+var _watched_settings: Resource
 
 
 ## Creates the dock and service objects when the editor enables the addon.
@@ -97,7 +97,9 @@ func _exit_tree() -> void:
 	_trace("Disabling plugin.")
 	set_process(false)
 	_disconnect_editor_signals()
+	_disconnect_live_resource_signals()
 	_resource_refresh_pending = false
+	_live_scene_refresh_pending = false
 	if is_instance_valid(_dock):
 		remove_control_from_docks(_dock)
 		_dock.queue_free()
@@ -155,6 +157,16 @@ func _connect_dock_signals() -> void:
 	editor_filesystem.filesystem_changed.connect(_on_editor_filesystem_activity_finished)
 	editor_filesystem.resources_reimporting.connect(_on_editor_resources_reimporting)
 	editor_filesystem.resources_reimported.connect(_on_editor_resources_reimported)
+	editor_filesystem.resources_reload.connect(_on_editor_resources_reload)
+	var undo_redo := get_undo_redo()
+	undo_redo.history_changed.connect(_on_editor_history_changed)
+	undo_redo.version_changed.connect(_on_editor_history_changed)
+	var inspector := get_editor_interface().get_inspector()
+	inspector.property_edited.connect(_on_editor_property_edited)
+	var editor_tree := get_tree()
+	editor_tree.node_added.connect(_on_editor_node_added)
+	editor_tree.node_removed.connect(_on_editor_node_removed)
+	editor_tree.node_renamed.connect(_on_editor_node_renamed)
 	_dock.load_png_selected.connect(_on_load_png_selected)
 	_dock.export_png_path_selected.connect(_on_export_png_path_selected)
 	_dock.run_requested.connect(_on_run_requested)
@@ -180,6 +192,23 @@ func _disconnect_editor_signals() -> void:
 		editor_filesystem.resources_reimporting.disconnect(_on_editor_resources_reimporting)
 	if editor_filesystem.resources_reimported.is_connected(_on_editor_resources_reimported):
 		editor_filesystem.resources_reimported.disconnect(_on_editor_resources_reimported)
+	if editor_filesystem.resources_reload.is_connected(_on_editor_resources_reload):
+		editor_filesystem.resources_reload.disconnect(_on_editor_resources_reload)
+	var undo_redo := get_undo_redo()
+	if undo_redo.history_changed.is_connected(_on_editor_history_changed):
+		undo_redo.history_changed.disconnect(_on_editor_history_changed)
+	if undo_redo.version_changed.is_connected(_on_editor_history_changed):
+		undo_redo.version_changed.disconnect(_on_editor_history_changed)
+	var inspector := get_editor_interface().get_inspector()
+	if inspector.property_edited.is_connected(_on_editor_property_edited):
+		inspector.property_edited.disconnect(_on_editor_property_edited)
+	var editor_tree := get_tree()
+	if editor_tree.node_added.is_connected(_on_editor_node_added):
+		editor_tree.node_added.disconnect(_on_editor_node_added)
+	if editor_tree.node_removed.is_connected(_on_editor_node_removed):
+		editor_tree.node_removed.disconnect(_on_editor_node_removed)
+	if editor_tree.node_renamed.is_connected(_on_editor_node_renamed):
+		editor_tree.node_renamed.disconnect(_on_editor_node_renamed)
 
 
 ## Shows the dock and schedules discovery only for scenes below res://levels/.
@@ -222,9 +251,9 @@ func _scene_supports_dock(scene_root: Node) -> bool:
 
 ## Retries queued discovery after the editor finishes a filesystem update.
 func _on_editor_filesystem_activity_finished() -> void:
-	_trace("Editor filesystem activity finished; refresh pending: %s." % _resource_refresh_pending)
-	if _resource_refresh_pending:
-		call_deferred(&"_try_complete_resource_refresh")
+	_trace("Editor filesystem activity finished; refreshing project-backed choices.")
+	_resource_refresh_pending = true
+	call_deferred(&"_try_complete_resource_refresh")
 
 
 ## Suspends discovery when Godot begins replacing imported resource data.
@@ -239,14 +268,89 @@ func _on_editor_resources_reimporting(resources: PackedStringArray) -> void:
 ## Retries queued discovery after imported resource data becomes available.
 func _on_editor_resources_reimported(resources: PackedStringArray) -> void:
 	_trace("Resource reimport finished for %s file(s)." % resources.size())
-	if _resource_refresh_pending:
-		call_deferred(&"_try_complete_resource_refresh")
+	if ResourceCatalog.resources_include_path(resources, _settings.png_path):
+		_image = null
+	_resource_refresh_pending = true
+	call_deferred(&"_try_complete_resource_refresh")
+
+
+## Reloads persisted settings and image state when Godot replaces their cached resources.
+func _on_editor_resources_reload(resources: PackedStringArray) -> void:
+	if ResourceCatalog.resources_include_path(resources, _settings.png_path):
+		_image = null
+	if _resources_include_current_settings(resources):
+		_reload_settings_pending = true
+	_resource_refresh_pending = true
+	call_deferred(&"_try_complete_resource_refresh")
+
+
+## Queues a scene-derived UI refresh after any committed editor property change.
+func _on_editor_history_changed() -> void:
+	_queue_live_scene_refresh()
+
+
+## Queues immediately after Inspector edits, including edits to external MeshLibraries.
+func _on_editor_property_edited(_property: String) -> void:
+	_queue_live_scene_refresh()
+
+
+## Refreshes when a GridMap enters the edited scene.
+func _on_editor_node_added(node: Node) -> void:
+	if node is GridMap and _node_belongs_to_edited_scene(node):
+		_queue_live_scene_refresh()
+
+
+## Refreshes when a GridMap leaves any edited scene hierarchy.
+func _on_editor_node_removed(node: Node) -> void:
+	if node is GridMap:
+		_queue_live_scene_refresh()
+
+
+## Refreshes scene-relative GridMap paths when a GridMap or one of its parents is renamed.
+func _on_editor_node_renamed(node: Node) -> void:
+	if _node_belongs_to_edited_scene(node):
+		_queue_live_scene_refresh()
+
+
+## Coalesces noisy editor callbacks into one current-scene refresh on the next idle turn.
+func _queue_live_scene_refresh() -> void:
+	if _live_scene_refresh_pending or _resource_refresh_pending:
+		return
+	var root := get_editor_interface().get_edited_scene_root()
+	if not _scene_supports_dock(root):
+		return
+	_live_scene_refresh_pending = true
+	call_deferred(&"_refresh_live_scene_state")
+
+
+## Rebuilds every control derived from unsaved scene or resource state.
+func _refresh_live_scene_state() -> void:
+	_live_scene_refresh_pending = false
+	if _resource_refresh_pending or not is_instance_valid(_dock):
+		return
+	var root := get_editor_interface().get_edited_scene_root()
+	if not _scene_supports_dock(root):
+		return
+	_resolve_scene_grid_map_settings()
+	_refresh_gridmap_paths()
+	_dock.set_mesh_library_paths(_mesh_library_paths)
+	_dock.set_floor_material_paths(_floor_material_paths)
+	_refresh_available_items()
+	_watch_live_resources()
+	_update_dock_state()
+
+
+## Reports whether a changed editor node is inside the scene represented by this dock.
+func _node_belongs_to_edited_scene(node: Node) -> bool:
+	var root := get_editor_interface().get_edited_scene_root()
+	return root != null and (node == root or root.is_ancestor_of(node))
 
 
 ## Runs discovery only when an edited scene exists and the project filesystem is idle.
 func _try_complete_resource_refresh() -> void:
 	# A refresh may already be queued when Godot disables or reloads the plugin.
-	if not is_instance_valid(_editor_dock) or not is_instance_valid(_dock):
+	if not _resource_refresh_pending \
+			or not is_instance_valid(_editor_dock) or not is_instance_valid(_dock):
 		return
 	var root := get_editor_interface().get_edited_scene_root()
 	_update_dock_visibility(root)
@@ -264,11 +368,15 @@ func _try_complete_resource_refresh() -> void:
 		return
 	_trace("Edited scene and project filesystem are ready; starting discovery.")
 	_resource_refresh_pending = false
-	if not _level_settings_loaded:
+	_live_scene_refresh_pending = false
+	if _reload_settings_pending:
+		_reload_current_settings()
+		_reload_settings_pending = false
+		_level_settings_loaded = true
+	elif not _level_settings_loaded:
 		_load_level_settings()
 		_level_settings_loaded = true
-	_load_conventional_level_png()
-	_refresh_all()
+	_refresh_all(true)
 
 
 ## Refreshes immediately when safe, or queues the request behind an active editor scan.
@@ -278,7 +386,7 @@ func _on_refresh_requested() -> void:
 		_dock.set_validation_text("Waiting for Godot to finish scanning project files...")
 		return
 	_resource_refresh_pending = false
-	_refresh_all()
+	_refresh_all(true)
 
 
 ## Reports readiness only while the editor has an indexed and idle project filesystem.
@@ -289,8 +397,8 @@ func _editor_filesystem_is_ready() -> bool:
 		and not editor_filesystem.is_importing()
 
 
-## Refreshes project-driven dropdowns and reloads any saved PNG state.
-func _refresh_all() -> void:
+## Refreshes every project-driven choice and optionally reloads image data from disk.
+func _refresh_all(reload_png: bool = false) -> void:
 	_resolve_scene_grid_map_settings()
 	_trace("Refreshing MeshLibrary catalogue.")
 	_refresh_mesh_libraries()
@@ -304,13 +412,16 @@ func _refresh_all() -> void:
 	_refresh_available_items()
 	_trace("Found %s selectable MeshLibrary item(s)." % _available_item_refs.size())
 	var conventional_png := _conventional_level_png_path()
-	if conventional_png != "" and ResourceLoader.exists(conventional_png) \
+	if reload_png:
+		_reload_png_state()
+	elif conventional_png != "" and ResourceLoader.exists(conventional_png) \
 			and _settings.png_path != conventional_png:
 		_load_png(conventional_png, false)
 	elif _settings.png_path != "" and _image == null:
 		_load_png(_settings.png_path, false)
 	else:
 		_dock.set_png_state(_settings.png_path, _detected_colours, _colour_order)
+	_watch_live_resources()
 	_update_dock_state()
 	_trace("Resource refresh completed.")
 
@@ -323,6 +434,11 @@ func _resolve_scene_grid_map_settings() -> void:
 		_settings.target_gridmap_path
 	)
 	_settings.target_gridmap_path = target_path
+	_sync_selected_grid_map_library()
+
+
+## Uses the selected scene GridMap's current external MeshLibrary and mapping profile.
+func _sync_selected_grid_map_library() -> void:
 	var grid_map := _selected_gridmap()
 	if grid_map == null or grid_map.mesh_library == null:
 		return
@@ -353,24 +469,10 @@ func _refresh_floor_materials() -> void:
 	_dock.set_floor_material_paths(_floor_material_paths)
 
 
-## Recursively collects loadable Material resources without relying on file extensions alone.
-func _collect_material_paths(folder: String, paths: Array[String]) -> void:
-	paths.append_array(ResourceCatalog.collect_material_paths(
-		get_editor_interface().get_resource_filesystem(),
-		folder
-	))
-
-
 ## Rebuilds the GridMap dropdown from the currently edited scene.
 func _refresh_gridmap_paths() -> void:
 	var root := get_editor_interface().get_edited_scene_root()
 	_dock.set_gridmap_paths(ResourceCatalog.collect_grid_map_paths(root))
-
-
-## Collects scene-relative NodePaths for GridMaps in one scene subtree.
-func _collect_gridmap_paths(root: Node, node: Node, paths: Array[String]) -> void:
-	if root == node:
-		paths.append_array(ResourceCatalog.collect_grid_map_paths(root))
 
 
 ## Rebuilds selectable MeshLibrary item refs for mapping rows.
@@ -398,6 +500,46 @@ func _load_profile_for_current_mesh_library() -> void:
 	_settings = _profile_store.load_for_mesh_library(_settings)
 	if _image != null:
 		_scan_colours()
+
+
+## Reconnects change notifications whenever profile loading replaces a watched resource.
+func _watch_live_resources() -> void:
+	if _watched_settings != _settings:
+		if _watched_settings != null \
+				and _watched_settings.changed.is_connected(_on_live_resource_changed):
+			_watched_settings.changed.disconnect(_on_live_resource_changed)
+		_watched_settings = _settings
+		if _watched_settings != null \
+				and not _watched_settings.changed.is_connected(_on_live_resource_changed):
+			_watched_settings.changed.connect(_on_live_resource_changed)
+	var active := _active_mesh_library()
+	var active_library := active.get("library") as MeshLibrary
+	if _watched_mesh_library == active_library:
+		return
+	if _watched_mesh_library != null \
+			and _watched_mesh_library.changed.is_connected(_on_live_resource_changed):
+		_watched_mesh_library.changed.disconnect(_on_live_resource_changed)
+	_watched_mesh_library = active_library
+	if _watched_mesh_library != null \
+			and not _watched_mesh_library.changed.is_connected(_on_live_resource_changed):
+		_watched_mesh_library.changed.connect(_on_live_resource_changed)
+
+
+## Stops resource callbacks before the plugin and editor-owned resources are released.
+func _disconnect_live_resource_signals() -> void:
+	if _watched_settings != null \
+			and _watched_settings.changed.is_connected(_on_live_resource_changed):
+		_watched_settings.changed.disconnect(_on_live_resource_changed)
+	if _watched_mesh_library != null \
+			and _watched_mesh_library.changed.is_connected(_on_live_resource_changed):
+		_watched_mesh_library.changed.disconnect(_on_live_resource_changed)
+	_watched_settings = null
+	_watched_mesh_library = null
+
+
+## Rebuilds resource-derived controls after a watched settings file or MeshLibrary changes.
+func _on_live_resource_changed() -> void:
+	_queue_live_scene_refresh()
 
 
 ## Loads a PNG from disk and updates colour mapping rows.
@@ -531,12 +673,17 @@ func _on_mesh_library_selected(path: String) -> void:
 		_load_png(_settings.png_path, false)
 	else:
 		_dock.set_png_state(_settings.png_path, _detected_colours, _colour_order)
+	_watch_live_resources()
 	_update_dock_state()
 
 
 ## Records the scene GridMap target chosen in the dock.
 func _on_gridmap_selected(path: String) -> void:
 	_settings.target_gridmap_path = NodePath(path)
+	_sync_selected_grid_map_library()
+	_dock.set_mesh_library_paths(_mesh_library_paths)
+	_refresh_available_items()
+	_watch_live_resources()
 	_reset_auto_repair_watch()
 	_save_profile()
 	_update_dock_state()
@@ -560,11 +707,6 @@ func _reset_auto_repair_watch() -> void:
 	_auto_repair_watch.reset()
 
 
-## Summarises GridMap contents so painting changes can be detected without editor input hooks.
-func _grid_map_fingerprint(grid_map: GridMap) -> int:
-	return _auto_repair_watch.fingerprint(grid_map)
-
-
 ## Saves mapping changes and updates validation with current assignments.
 func _on_mapping_changed() -> void:
 	_save_profile()
@@ -578,12 +720,14 @@ func _load_png(path: String, save_profile: bool) -> void:
 	var texture := ResourceLoader.load(localized_path) as Texture2D
 	if texture == null:
 		_trace("PNG load failed: the resource did not produce a Texture2D.")
+		_clear_png_state(localized_path)
 		_update_dock_state("Could not load PNG: %s." % localized_path)
 		return
 
 	var image := texture.get_image()
 	if image == null:
 		_trace("PNG load failed: the Texture2D did not provide image data.")
+		_clear_png_state(localized_path)
 		_update_dock_state("Could not read image data from PNG: %s." % localized_path)
 		return
 	_image = image
@@ -599,6 +743,27 @@ func _load_png(path: String, save_profile: bool) -> void:
 	if save_profile:
 		_save_profile()
 	_update_dock_state()
+
+
+## Reloads the current level image, preferring the conventional level.png when present.
+func _reload_png_state() -> void:
+	var conventional_png := _conventional_level_png_path()
+	if conventional_png != "" and ResourceLoader.exists(conventional_png):
+		_load_png(conventional_png, false)
+		return
+	if _settings.png_path != "" and ResourceLoader.exists(_settings.png_path):
+		_load_png(_settings.png_path, false)
+		return
+	_clear_png_state(_settings.png_path)
+
+
+## Clears cached image-derived UI while preserving the missing configured path for diagnosis.
+func _clear_png_state(path: String) -> void:
+	_image = null
+	_detected_colours.clear()
+	_colour_order.clear()
+	_settings.png_path = path
+	_dock.set_png_state(path, _detected_colours, _colour_order, path == "")
 
 
 ## Imports the current PNG after validating mappings and warnings.
@@ -758,11 +923,22 @@ func _load_level_settings() -> void:
 	_settings = _profile_store.load_for_scene(_settings, root.scene_file_path)
 
 
-## Loads level.png beside the edited level scene using the add-on's file convention.
-func _load_conventional_level_png() -> void:
-	var path := _conventional_level_png_path()
-	if path != "" and ResourceLoader.exists(path):
-		_load_png(path, false)
+## Reloads both level-specific and shared MeshLibrary settings after an external resource edit.
+func _reload_current_settings() -> void:
+	_load_level_settings()
+	_settings = _profile_store.load_for_mesh_library(_settings)
+	if _image != null:
+		_scan_colours()
+
+
+## Reports whether a reload batch contains either settings resource represented by the dock.
+func _resources_include_current_settings(resources: PackedStringArray) -> bool:
+	var root := get_editor_interface().get_edited_scene_root()
+	var scene_path := root.scene_file_path if root != null else ""
+	var level_settings_path := _profile_store.path_for_scene(scene_path)
+	var shared_settings_path := _profile_store.path_for_mesh_library(_settings.mesh_library_path)
+	return ResourceCatalog.resources_include_path(resources, level_settings_path) \
+		or ResourceCatalog.resources_include_path(resources, shared_settings_path)
 
 
 ## Returns the conventional PNG path beside the currently edited level scene.
@@ -789,9 +965,8 @@ func _trace(message: String) -> void:
 func _scene_diagnostic_name(scene_root: Node) -> String:
 	if scene_root == null:
 		return "<none>"
-	if scene_root.scene_file_path != "":
-		return scene_root.scene_file_path
-	return "%s (unsaved)" % scene_root.name
+	return scene_root.scene_file_path if scene_root.scene_file_path != "" \
+		else "%s (unsaved)" % scene_root.name
 
 
 ## Builds the current validation summary shown above Run.

@@ -228,7 +228,11 @@ func _get_path_marker_source_signature() -> String:
 	if boundary_animation == null or curve == null:
 		return ""
 
-	var source_values: Array[Variant] = [boundary_animation.length, curve.point_count]
+	var source_values: Array[Variant] = [
+		boundary_animation.length,
+		curve.point_count,
+		curve.closed,
+	]
 	for point_index in curve.point_count:
 		source_values.append(curve.get_point_position(point_index))
 
@@ -267,5 +271,4 @@ func _integrate_speed_interval(animation: Animation, speed_track: int, start_tim
 		var weight := 1.0 if sample_index == 0 or sample_index == SAMPLE_COUNT else (4.0 if sample_index % 2 == 1 else 2.0)
 		weighted_speed += speed * weight
 	return weighted_speed * step / 3.0
-
 

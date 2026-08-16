@@ -13,6 +13,7 @@ const SMART_ZOMBIE_GROUP: StringName = &"smart_zombie"
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const GROUND_SPAWN := preload("res://enemies/ground_spawn.gd")
+const GROUND_ENEMY_ORIENTATION := preload("res://enemies/ground_enemy_orientation.gd")
 const SkeletonPresentation := preload("res://enemies/skeleton_presentation.gd")
 const WORLD_COLLISION_LAYER := 1
 const ZOMBIE_COLLISION_LAYER := 1 << 3
@@ -194,6 +195,8 @@ func _ready() -> void:
     landing_sound = GDAudio.load_stream(LANDING_SOUND_PATH)
     _randomize_next_footstep_distance()
     _apply_start_progress()
+    GROUND_ENEMY_ORIENTATION.make_upright(drop_pivot)
+    GROUND_ENEMY_ORIENTATION.make_upright(shadow)
     _configure_shadow_casting()
     _configure_skeleton_light()
 

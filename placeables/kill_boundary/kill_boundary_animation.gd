@@ -98,7 +98,12 @@ func _update_removed_boundary_visuals(delta: float) -> void:
 
 
 func _sync_editor_preview_animation() -> void:
-	if not Engine.is_editor_hint() or not is_inside_tree():
+	if (
+		not Engine.is_editor_hint()
+		or not is_inside_tree()
+		or not _has_previewable_editor_path()
+		or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
+	):
 		return
 
 	var animation_player := get_node_or_null(ANIMATION_PLAYER_NAME) as AnimationPlayer
@@ -111,6 +116,22 @@ func _sync_editor_preview_animation() -> void:
 	_sync_boundary_scale_rotation_to_animation(animation, preview_time)
 	_set_center_progress(center, _calculate_travel_distance(animation, preview_time))
 	last_animation_position = preview_time
+
+
+## Path gizmo edits can temporarily leave a curve with fewer than two distinct points.
+## Avoid sampling the curve until it can define a direction.
+func _has_previewable_editor_path() -> bool:
+	if curve == null or curve.point_count < 2:
+		return false
+
+	var previous_point := curve.get_point_position(0)
+	for point_index in range(1, curve.point_count):
+		var current_point := curve.get_point_position(point_index)
+		if previous_point.distance_to(current_point) < MINIMUM_EDITOR_PREVIEW_PATH_LENGTH:
+			return false
+		previous_point = current_point
+
+	return curve.get_baked_length() >= MINIMUM_EDITOR_PREVIEW_PATH_LENGTH
 
 
 ## Moves the editor animation preview to the arrival time for the requested path point.
@@ -141,8 +162,6 @@ func preview_path_point_in_animation(point_index: int) -> float:
 
 func _set_center_progress(center: PathFollow3D, target_progress: float) -> void:
 	var sanitized_progress := maxf(target_progress, 0.0)
-	if Engine.is_editor_hint() and is_zero_approx(sanitized_progress) and is_zero_approx(center.progress):
-		center.progress = 0.001
 	center.progress = sanitized_progress
 	_apply_boundary_scale_rotation()
 

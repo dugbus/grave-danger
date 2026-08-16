@@ -5,7 +5,8 @@
 [resource]
 script = ExtResource("1_5eecn")
 png_path = "res://levels/vampire-maze/level.png"
-target_gridmap_path = NodePath("GeneratedMaze/PNGGridMap")
+target_gridmap_path = NodePath("GeneratedMaze/Layout/PNGGridMap")
+auto_repair = true
 export_size = Vector2i(128, 128)
-floor_gridmap_path = NodePath("GeneratedMaze/PNGFloorGridMap")
+floor_gridmap_path = NodePath("GeneratedMaze/Layout/PNGFloorGridMap")
 floor_material_path = "res://Assets/environment/floors/dirt_floor.material"

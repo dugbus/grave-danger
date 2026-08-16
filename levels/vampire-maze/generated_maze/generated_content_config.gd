@@ -42,6 +42,48 @@ extends Resource
         emit_changed()
 @export_group("")
 
+@export_group("Grass Patches")
+## Enables deterministic patches of Level 1-style grass across walkable maze cells.
+@export var grass_enabled := true:
+    set(value):
+        if grass_enabled == value:
+            return
+        grass_enabled = value
+        emit_changed()
+## Percentage of eligible walkable floor cells selected by the plasma field.
+@export_range(0.0, 100.0, 1.0, "suffix:%") var grass_coverage_percent := 24.0:
+    set(value):
+        var clamped_value := clampf(value, 0.0, 100.0)
+        if is_equal_approx(grass_coverage_percent, clamped_value):
+            return
+        grass_coverage_percent = clamped_value
+        emit_changed()
+## Approximate width of each coherent grass patch in maze tiles.
+@export_range(1.0, 16.0, 0.5, "suffix: tiles") var grass_patch_size_tiles := 4.5:
+    set(value):
+        var clamped_value := maxf(value, 1.0)
+        if is_equal_approx(grass_patch_size_tiles, clamped_value):
+            return
+        grass_patch_size_tiles = clamped_value
+        emit_changed()
+## Maximum grass-blade frequency at the densest point of a plasma patch.
+@export_range(1, 64, 1, "suffix: blades/cell") var grass_blades_per_cell := 32:
+    set(value):
+        var clamped_value := maxi(value, 1)
+        if grass_blades_per_cell == clamped_value:
+            return
+        grass_blades_per_cell = clamped_value
+        emit_changed()
+## Extra cell clearance around the principal gate route where grass is omitted.
+@export_range(0, 4, 1, "suffix: tiles") var grass_route_clearance_tiles := 0:
+    set(value):
+        var clamped_value := maxi(value, 0)
+        if grass_route_clearance_tiles == clamped_value:
+            return
+        grass_route_clearance_tiles = clamped_value
+        emit_changed()
+@export_group("")
+
 @export_group("Additional Treasure Budgets")
 ## Number of diamonds distributed through the generated dungeon.
 @export_range(0, 500, 1) var diamond_budget := 3:

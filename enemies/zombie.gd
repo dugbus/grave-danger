@@ -3,6 +3,7 @@ class_name GDZombiePath
 
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const GROUND_SPAWN := preload("res://enemies/ground_spawn.gd")
+const GROUND_ENEMY_ORIENTATION := preload("res://enemies/ground_enemy_orientation.gd")
 
 var spawn_floor_checked := false
 
@@ -20,6 +21,7 @@ func _ready() -> void:
 	_apply_start_progress()
 	_build_patrol_points()
 	_sync_body_to_path_start()
+	GROUND_ENEMY_ORIENTATION.make_upright(zombie_body)
 	_configure_shadow_casting()
 	_configure_zombie_light()
 	_set_attack_hitboxes_enabled(false)

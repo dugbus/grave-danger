@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PNGToGridMapSettings" format=3]
+
+[ext_resource type="Script" path="res://addons/png_to_gridmap/png_to_gridmap_settings.gd" id="1_settings"]
+
+[resource]
+script = ExtResource("1_settings")
+png_path = "res://levels/tutorial-4/level.png"
+target_gridmap_path = NodePath("GeneratedMaze/Layout/PNGGridMap")
+export_size = Vector2i(31, 31)
+floor_gridmap_path = NodePath("GeneratedMaze/Layout/PNGFloorGridMap")
+floor_material_path = "res://Assets/environment/floors/dirt_floor.material"

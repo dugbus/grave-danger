@@ -11,11 +11,9 @@ base_item_ref = "Wall"
 autotile_enabled = true
 solo_item_ref = "WallSolo"
 end_item_ref = "WallEnd"
-end_rotation_offset = 2
 corner_item_ref = "WallCorner"
-corner_rotation_offset = 3
+corner_rotation_offset = 1
 tee_item_ref = "WallTee"
-tee_rotation_offset = 2
 cross_item_ref = "WallCross"
 
 [resource]

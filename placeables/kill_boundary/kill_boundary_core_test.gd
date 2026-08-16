@@ -34,6 +34,25 @@ class TestBoundary:
 
 func run(_tree: SceneTree) -> void:
 	expect_script_contract(SUBJECT, SUBJECT_PATH)
+	var loop_boundary := GDKillBoundary3D.new()
+	loop_boundary.curve = Curve3D.new()
+	loop_boundary.curve.add_point(Vector3.ZERO)
+	loop_boundary.curve.add_point(Vector3.RIGHT)
+	loop_boundary.curve.add_point(Vector3.RIGHT + Vector3.FORWARD)
+	loop_boundary._ensure_boundary_nodes()
+	var path_follow := loop_boundary.get_node("BoundaryCenter") as PathFollow3D
+	expect(
+		loop_boundary.curve.closed and path_follow.loop,
+		"Looping closes the boundary curve so it travels from the final point back to the start."
+	)
+
+	loop_boundary.loop_boundary_path = false
+	expect(
+		not loop_boundary.curve.closed and not path_follow.loop,
+		"Disabling looping keeps the boundary path open and stops at its final point."
+	)
+	loop_boundary.free()
+
 	var boundary := TestBoundary.new()
 	var applied := boundary.expand_runtime_bounds_percent_for(
 		25.0,

@@ -21,6 +21,9 @@ const SILVER_KEY_SCENE := preload("res://inventory/silver_key.tscn")
 const BAT_NOISE_SCENE := preload(
     "res://levels/vampire-maze/generated_maze/generated_bat_noise.tscn"
 )
+const GENERATED_GRASS_SCENE := preload(
+    "res://levels/vampire-maze/generated_maze/generated_grass.tscn"
+)
 const TREASURE_TYPES: Array[StringName] = [
     &"gold_coin",
     &"diamond",
@@ -88,6 +91,17 @@ func regenerate_content(
         seed_value
     )
     _instance_bat_nests(plan.get("bat_nests", []) as Array, floor_grid_map)
+    var grass_result := _instance_grass(
+        floor_cells,
+        floor_grid_map,
+        plan,
+        seed_value,
+        configuration
+    )
+    plan["grass"] = grass_result
+    for grass_error in grass_result.get("errors", []):
+        (plan["errors"] as Array).append(String(grass_error))
+    _last_plan = plan
     vampire_layout_landmarks_changed.emit(get_vampire_layout_landmarks())
     return plan
 
@@ -276,6 +290,65 @@ func _instance_keys(placements: Array, floor_grid_map: GridMap) -> void:
         key.global_position = _world_position_for_cell(floor_grid_map, cell) + Vector3.UP * 0.08
 
 
+func _instance_grass(
+    floor_cells: Dictionary,
+    floor_grid_map: GridMap,
+    plan: Dictionary,
+    seed_value: int,
+    configuration: Resource
+) -> Dictionary:
+    if not bool(configuration.get("grass_enabled")):
+        return {"errors": [], "cells": [], "instance_count": 0}
+    var grass := GENERATED_GRASS_SCENE.instantiate() as MultiMeshInstance3D
+    if grass == null:
+        return {"errors": ["Generated content could not instantiate its grass scene."]}
+    grass.name = "GeneratedGrass"
+    # The grass scene supplies the correct Level 1 mesh, material, and behaviour,
+    # while a local root lets the generated MultiMesh buffer persist with Layout.
+    grass.scene_file_path = ""
+    _add_generated_child(grass)
+    var excluded_cells := _build_grass_excluded_cells(
+        plan,
+        int(configuration.get("grass_route_clearance_tiles"))
+    )
+    return grass.call(
+        &"populate",
+        floor_cells,
+        floor_grid_map,
+        excluded_cells,
+        seed_value,
+        float(configuration.get("grass_coverage_percent")),
+        float(configuration.get("grass_patch_size_tiles")),
+        int(configuration.get("grass_blades_per_cell"))
+    ) as Dictionary
+
+
+func _build_grass_excluded_cells(plan: Dictionary, route_clearance: int) -> Dictionary:
+    var excluded_cells := {}
+    for route_cell_value in plan.get("main_path", []):
+        var route_cell := route_cell_value as Vector2i
+        for offset_y in range(-route_clearance, route_clearance + 1):
+            var remaining_clearance := route_clearance - absi(offset_y)
+            for offset_x in range(-remaining_clearance, remaining_clearance + 1):
+                excluded_cells[route_cell + Vector2i(offset_x, offset_y)] = true
+    for collection_name in [
+        &"doors",
+        &"keys",
+        &"coffins",
+        &"treasure_caches",
+        &"bat_nests",
+    ]:
+        for placement_value in plan.get(collection_name, []):
+            var placement := placement_value as Dictionary
+            if placement.has("cell"):
+                excluded_cells[placement["cell"] as Vector2i] = true
+            if placement.has("paired_cell"):
+                excluded_cells[placement["paired_cell"] as Vector2i] = true
+            for blocked_cell_value in placement.get("blocked_cells", []):
+                excluded_cells[blocked_cell_value as Vector2i] = true
+    return excluded_cells
+
+
 func _instance_coffins(
     placements: Array,
     floor_grid_map: GridMap,
@@ -334,9 +407,12 @@ func _world_position_for_cell(floor_grid_map: GridMap, cell: Vector2i) -> Vector
 
 func _add_generated_child(node: Node) -> void:
     add_child(node)
-    # Live editor previews remain transient. Freeze Generated Level assigns
-    # scene ownership once regeneration has stopped, avoiding SceneTree order
-    # churn while old preview nodes are replaced.
+    if not _assign_editor_owner(node):
+        return
+    # Generated scene roots remain expandable while the live Layout exists.
+    # Rebuilding the Layout clears their ownership before removing them.
+    if not node.scene_file_path.is_empty():
+        get_tree().edited_scene_root.set_editable_instance(node, true)
 
 
 func _assign_editor_owner(node: Node) -> bool:

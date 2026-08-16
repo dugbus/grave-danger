@@ -35,6 +35,7 @@ const EFFECT_NONE := 2
 const EDITOR_SCRUB_TIME_EPSILON := 0.05
 const EDITOR_GHOST_PREVIEW_CYCLE_OFFSET := 0.38
 const EDITOR_PATH_MARKER_REFRESH_DELAY := 0.75
+const MINIMUM_EDITOR_PREVIEW_PATH_LENGTH := 0.001
 @export_group("Animation")
 ## Animation controlling path progress, scale, shape morph, and future properties.
 @export var boundary_animation: Animation:
@@ -51,7 +52,7 @@ const EDITOR_PATH_MARKER_REFRESH_DELAY := 0.75
 ## Starts the boundary animation automatically during gameplay.
 @export var autoplay_boundary_animation := true
 
-## Loops BoundaryCenter back to the start when movement passes the end of the path.
+## Closes the path so BoundaryCenter travels from its final point back to its starting point.
 @export var loop_boundary_path := true:
 	set(value):
 		loop_boundary_path = value

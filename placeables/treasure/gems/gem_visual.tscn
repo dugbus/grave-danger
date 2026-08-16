@@ -48,6 +48,7 @@ rings = 1
 size = Vector3(0.115, 0.012, 0.115)
 
 [node name="GemVisual" type="Node3D"]
+scale = Vector3(2, 2, 2)
 script = ExtResource("1_script")
 gem_material = ExtResource("2_material")
 edge_glow_material = ExtResource("3_outline_material")

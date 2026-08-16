@@ -34,6 +34,7 @@ var _available_item_refs: Array[String] = []
 var _available_item_display_names := {}
 var _available_item_ref_aliases := {}
 var _default_export_path := "res://gridmap_export.png"
+var _syncing_controls := false
 
 var _content_container: VBoxContainer
 var _operation_option: OptionButton
@@ -82,14 +83,26 @@ func setup(title_text: String, settings: Resource, ui_state: Dictionary) -> void
 ## Updates the settings resource that UI controls should edit.
 func set_settings(settings: Resource) -> void:
 	_settings = settings
+	_syncing_controls = true
 	_update_controls_from_settings()
+	_syncing_controls = false
 
 
-## Updates the PNG path label and detected colour rows.
-func set_png_state(path: String, detected_colours: Dictionary, colour_order: Array[String]) -> void:
+## Updates the PNG path label and detected colour rows, including missing-file state.
+func set_png_state(
+	path: String,
+	detected_colours: Dictionary,
+	colour_order: Array[String],
+	path_available: bool = true
+) -> void:
 	_detected_colours = detected_colours
 	_colour_order = colour_order
-	_png_path_label.text = path if path != "" else "No PNG loaded"
+	if path == "":
+		_png_path_label.text = "No PNG loaded"
+	elif path_available:
+		_png_path_label.text = path
+	else:
+		_png_path_label.text = "Missing PNG: %s" % path
 	_png_path_label.tooltip_text = _png_path_label.text
 	_rebuild_colour_rows()
 
@@ -116,7 +129,11 @@ func set_mesh_library_paths(paths: Array[String]) -> void:
 		_mesh_library_option.add_item(path.get_file().get_basename())
 		_mesh_library_option.set_item_metadata(_mesh_library_option.item_count - 1, path)
 		_mesh_library_option.set_item_tooltip(_mesh_library_option.item_count - 1, path)
-	_select_option_by_metadata(_mesh_library_option, String(_settings.mesh_library_path))
+	_select_option_or_append_missing(
+		_mesh_library_option,
+		String(_settings.mesh_library_path),
+		"Missing MeshLibrary"
+	)
 
 
 ## Rebuilds the floor material dropdown from the globally configured folder.
@@ -128,7 +145,11 @@ func set_floor_material_paths(paths: Array[String]) -> void:
 		_floor_material_option.add_item(path.get_file().get_basename().capitalize())
 		_floor_material_option.set_item_metadata(_floor_material_option.item_count - 1, path)
 		_floor_material_option.set_item_tooltip(_floor_material_option.item_count - 1, path)
-	_select_option_by_metadata(_floor_material_option, String(_settings.floor_material_path))
+	_select_option_or_append_missing(
+		_floor_material_option,
+		String(_settings.floor_material_path),
+		"Missing floor material"
+	)
 
 
 ## Sets MeshLibrary item refs used by colour mapping dropdowns.
@@ -241,16 +262,22 @@ func _connect_scene_signals() -> void:
 		func() -> void: refresh_requested.emit()
 	)
 	_target_gridmap_option.item_selected.connect(func(index: int) -> void:
+		if _syncing_controls:
+			return
 		var path := String(_target_gridmap_option.get_item_metadata(index))
 		_settings.target_gridmap_path = NodePath(path)
 		_update_gridmap_name_visibility()
 		gridmap_selected.emit(path)
 	)
 	_gridmap_name_edit.text_changed.connect(func(value: String) -> void:
+		if _syncing_controls:
+			return
 		_settings.gridmap_name = value
 		settings_changed.emit()
 	)
 	_mesh_library_option.item_selected.connect(func(index: int) -> void:
+		if _syncing_controls:
+			return
 		var path := String(_mesh_library_option.get_item_metadata(index))
 		_settings.mesh_library_path = path
 		mesh_library_selected.emit(path)
@@ -265,18 +292,26 @@ func _connect_scene_signals() -> void:
 		operation_changed.emit(_operation_option.get_selected_id(), value)
 	)
 	_cell_size_spin.value_changed.connect(func(value: float) -> void:
+		if _syncing_controls:
+			return
 		_settings.cell_size = _normalize_cell_size(value)
 		settings_changed.emit()
 	)
 	_colour_match_tolerance_spin.value_changed.connect(func(value: float) -> void:
+		if _syncing_controls:
+			return
 		_settings.colour_match_tolerance = roundi(value)
 		settings_changed.emit()
 	)
 	_auto_repair_check.toggled.connect(func(value: bool) -> void:
+		if _syncing_controls:
+			return
 		_settings.auto_repair = value
 		settings_changed.emit()
 	)
 	_floor_material_option.item_selected.connect(func(index: int) -> void:
+		if _syncing_controls:
+			return
 		floor_material_selected.emit(String(_floor_material_option.get_item_metadata(index)))
 	)
 	_mesh_library_path_edit.text_submitted.connect(_set_mesh_library_path)
@@ -331,10 +366,14 @@ func _apply_ui_state(ui_state: Dictionary) -> void:
 ## Copies settings values into their matching controls.
 func _update_controls_from_settings() -> void:
 	_gridmap_name_edit.text = _settings.gridmap_name
-	_cell_size_spin.value = _normalize_cell_size(_settings.cell_size)
-	_colour_match_tolerance_spin.value = _settings.colour_match_tolerance
-	_auto_repair_check.button_pressed = _settings.auto_repair
-	_select_option_by_metadata(_floor_material_option, String(_settings.floor_material_path))
+	_cell_size_spin.set_value_no_signal(_normalize_cell_size(_settings.cell_size))
+	_colour_match_tolerance_spin.set_value_no_signal(_settings.colour_match_tolerance)
+	_auto_repair_check.set_pressed_no_signal(_settings.auto_repair)
+	_select_option_or_append_missing(
+		_floor_material_option,
+		String(_settings.floor_material_path),
+		"Missing floor material"
+	)
 	_mesh_library_path_edit.text = _settings.mesh_library_path
 	_floor_materials_folder_edit.text = _settings.floor_materials_folder
 	_update_gridmap_name_visibility()
@@ -344,6 +383,7 @@ func _update_controls_from_settings() -> void:
 ## Rebuilds detected and manually configured colour mapping rows.
 func _rebuild_colour_rows() -> void:
 	for child in _rows_container.get_children():
+		_rows_container.remove_child(child)
 		child.queue_free()
 	var row_keys := MappingCatalog.ordered_keys(_settings, _colour_order)
 	if row_keys.is_empty():
@@ -489,7 +529,11 @@ func _autotile_alternative_row(mapping: Resource, alternative: Resource) -> Cont
 	for item_ref in _available_item_refs:
 		item.add_item(String(_available_item_display_names.get(item_ref, item_ref)))
 		item.set_item_metadata(item.item_count - 1, item_ref)
-	_select_option_by_metadata(item, String(_available_item_ref_aliases.get(alternative.item_ref, alternative.item_ref)))
+	_select_option_or_append_missing(
+		item,
+		String(_available_item_ref_aliases.get(alternative.item_ref, alternative.item_ref)),
+		"Missing wall piece"
+	)
 	item.item_selected.connect(func(index: int) -> void:
 		alternative.item_ref = String(item.get_item_metadata(index))
 		mapping_changed.emit()
@@ -547,7 +591,11 @@ func _variant_row(mapping: Resource, variant: String, text: String) -> Control:
 	for item_ref in _available_item_refs:
 		option.add_item(String(_available_item_display_names.get(item_ref, item_ref)))
 		option.set_item_metadata(option.item_count - 1, item_ref)
-	_select_option_by_metadata(option, _mapping_variant_ref(mapping, variant))
+	_select_option_or_append_missing(
+		option,
+		_mapping_variant_ref(mapping, variant),
+		"Missing wall piece"
+	)
 	option.item_selected.connect(func(index: int) -> void:
 		PNGToGridMapAutotile.set_variant_ref_for_mapping(mapping, variant, String(option.get_item_metadata(index)))
 		if variant == PNGToGridMapAutotile.VARIANT_BASE:
@@ -635,13 +683,30 @@ func _file_dialog(mode: EditorFileDialog.FileMode) -> EditorFileDialog:
 	return dialog
 
 
-## Selects an OptionButton item by metadata value.
-func _select_option_by_metadata(option: OptionButton, target: Variant) -> void:
+## Selects an OptionButton item by metadata value and reports whether it was found.
+func _select_option_by_metadata(option: OptionButton, target: Variant) -> bool:
 	for index in option.item_count:
 		if option.get_item_metadata(index) == target:
 			option.select(index)
-			return
-	option.select(0)
+			return true
+	if option.item_count > 0:
+		option.select(0)
+	return false
+
+
+## Keeps an unavailable configured choice visible instead of disguising it as unassigned.
+func _select_option_or_append_missing(
+	option: OptionButton,
+	target: String,
+	missing_label: String
+) -> void:
+	if _select_option_by_metadata(option, target) or target == "":
+		return
+	option.add_item("%s: %s" % [missing_label, target.get_file().get_basename()])
+	var missing_index := option.item_count - 1
+	option.set_item_metadata(missing_index, target)
+	option.set_item_tooltip(missing_index, target)
+	option.select(missing_index)
 
 
 ## Selects an OptionButton item by integer item id.

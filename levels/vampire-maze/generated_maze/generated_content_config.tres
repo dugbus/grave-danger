@@ -4,15 +4,18 @@
 
 [resource]
 script = ExtResource("1_config")
-treasure_pile_count = 20
-minimum_coins_per_pile = 6
-maximum_coins_per_pile = 12
-diamond_budget = 1
-ruby_budget = 1
+treasure_pile_count = 5
+minimum_coins_per_pile = 25
+maximum_coins_per_pile = 25
+minimum_treasure_pile_spacing_tiles = 2
+grass_route_clearance_tiles = null
+diamond_budget = 0
+ruby_budget = 0
 sapphire_budget = 0
 emerald_budget = 0
 amethyst_budget = 0
 gold_bar_budget = 0
+target_carry_load_percent = 100.0
 door_count = 0
 bat_nest_count = 1
 bat_off_path_percent = 57.0

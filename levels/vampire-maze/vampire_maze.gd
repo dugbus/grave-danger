@@ -10,11 +10,11 @@ const MAXIMUM_GENERATED_CONTENT_STARTUP_FRAMES := 120
 ## Vampire boss that receives last-heard noise targets in this level.
 @export var vampire_path: NodePath = ^"Vampire"
 ## Level-completion gate used by the vampire when it searches after losing the player.
-@export var end_gate_path: NodePath = ^"GeneratedMaze/GeneratedContent/GeneratedLockedGate"
+@export var end_gate_path: NodePath = ^"GeneratedMaze/Layout/GeneratedContent/GeneratedLockedGate"
 ## Generated dungeon content that reports bat disturbances at the player's position.
-@export var generated_content_path: NodePath = ^"GeneratedMaze/GeneratedContent"
+@export var generated_content_path: NodePath = ^"GeneratedMaze/Layout/GeneratedContent"
 ## Wall GridMap explicitly used for Vampire navigation and sight occlusion.
-@export var wall_grid_map_path: NodePath = ^"GeneratedMaze/PNGGridMap"
+@export var wall_grid_map_path: NodePath = ^"GeneratedMaze/Layout/PNGGridMap"
 
 @onready var player := get_node_or_null(player_path) as Node3D
 @onready var vampire: Node = get_node_or_null(vampire_path)
@@ -31,8 +31,7 @@ func _ready() -> void:
 		set_process(false)
 		return
 	generated_content = get_node_or_null(generated_content_path)
-	var generated_maze := generated_content.get_parent() \
-		if generated_content != null else null
+	var generated_maze := get_node_or_null(^"GeneratedMaze")
 	if generated_maze != null \
 			and generated_maze.has_signal(&"maze_generated") \
 			and not generated_maze.maze_generated.is_connected(_on_maze_generated):

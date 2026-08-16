@@ -3,6 +3,46 @@
 [ext_resource type="Script" uid="uid://b7flmxmwjrx6p" path="res://levels/level_mapping.gd" id="1_mapping"]
 [ext_resource type="Script" uid="uid://ctociwlr803jl" path="res://levels/level_definition.gd" id="2_definition"]
 
+[sub_resource type="Resource" id="Level_tutorial_1"]
+script = ExtResource("2_definition")
+id = "tutorial_1"
+display_name = "Tutorial 1"
+folder_name = "tutorial-1"
+available = true
+tutorial = true
+
+[sub_resource type="Resource" id="Level_tutorial_2"]
+script = ExtResource("2_definition")
+id = "tutorial_2"
+display_name = "Tutorial 2"
+folder_name = "tutorial-2"
+available = true
+tutorial = true
+
+[sub_resource type="Resource" id="Level_tutorial_3"]
+script = ExtResource("2_definition")
+id = "tutorial_3"
+display_name = "Tutorial 3"
+folder_name = "tutorial-3"
+available = true
+tutorial = true
+
+[sub_resource type="Resource" id="Level_tutorial_4"]
+script = ExtResource("2_definition")
+id = "tutorial_4"
+display_name = "Tutorial 4"
+folder_name = "tutorial-4"
+available = true
+tutorial = true
+
+[sub_resource type="Resource" id="Level_tutorial_5"]
+script = ExtResource("2_definition")
+id = "tutorial_5"
+display_name = "Tutorial 5"
+folder_name = "tutorial-5"
+available = true
+tutorial = true
+
 [sub_resource type="Resource" id="Level_debug"]
 script = ExtResource("2_definition")
 id = "debug_level"
@@ -146,4 +186,4 @@ available = true
 
 [resource]
 script = ExtResource("1_mapping")
-level_entries = Array[ExtResource("2_definition")]([SubResource("Level_debug"), SubResource("Level_01"), SubResource("Level_02"), SubResource("Level_03"), SubResource("Level_04"), SubResource("Level_graveyard"), SubResource("Level_06"), SubResource("Level_07"), SubResource("Level_08"), SubResource("Level_vampire"), SubResource("Level_10"), SubResource("Level_11"), SubResource("Level_12"), SubResource("Level_13"), SubResource("Level_14"), SubResource("Level_15"), SubResource("Level_16"), SubResource("Level_flask_kill_expand")])
+level_entries = Array[ExtResource("2_definition")]([SubResource("Level_tutorial_1"), SubResource("Level_tutorial_2"), SubResource("Level_tutorial_3"), SubResource("Level_tutorial_4"), SubResource("Level_tutorial_5"), SubResource("Level_debug"), SubResource("Level_01"), SubResource("Level_02"), SubResource("Level_03"), SubResource("Level_04"), SubResource("Level_graveyard"), SubResource("Level_06"), SubResource("Level_07"), SubResource("Level_08"), SubResource("Level_vampire"), SubResource("Level_10"), SubResource("Level_11"), SubResource("Level_12"), SubResource("Level_13"), SubResource("Level_14"), SubResource("Level_15"), SubResource("Level_16"), SubResource("Level_flask_kill_expand")])
