@@ -36,8 +36,7 @@ autotile_alternatives = Array[Resource]([SubResource("Resource_wall_sides_black"
 
 [resource]
 script = ExtResource("3_7hnn6")
-png_path = "res://levels/tutorial-2/level.png"
-target_gridmap_path = NodePath("Layout/PNGGridMap")
+png_path = "res://levels/tutorial-3/level.png"
 mesh_library_path = "res://Assets/environment/graveyard.res"
 auto_repair = true
 export_size = Vector2i(31, 31)
