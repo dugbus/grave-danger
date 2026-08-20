@@ -8,5 +8,5 @@ albedo_color = Color(1, 0.72, 0.08, 0.12)
 [resource]
 resource_local_to_scene = true
 material = SubResource("StandardMaterial3D_selection")
-height = 0.25
+height = 0.258
 radial_segments = 32
