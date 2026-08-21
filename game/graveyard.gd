@@ -28,6 +28,7 @@ var codex_session_options: Dictionary = {}
 
 
 func _ready() -> void:
+	GDAudio.setup_dungeon_sfx_environment()
 	if not _configure_codex_directed_test():
 		return
 	_load_selected_level()
@@ -51,6 +52,10 @@ func _ready() -> void:
 	for completion_source in _get_level_completion_sources():
 		if completion_source.has_signal("level_completed"):
 			completion_source.level_completed.connect(_on_level_completed)
+
+
+func _exit_tree() -> void:
+	GDAudio.clear_dungeon_sfx_environment()
 
 
 ## Deposited treasure updates result stats only; gate completion owns the win condition.

@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-21
+
+### 1700
+
+- Dungeon sound effects now stay brighter and clearer while retaining a subtler sense of stone-room space.
+- Dungeon sound effects now carry a restrained stone-room reverb while music remains clear and unchanged.
+  - Prompt: Give dungeon sound effects an atmospheric effect without changing music.
+
+### 1600
+
+- Breakable walls now play a spatial rock-collapse sound once when a forceful impact genuinely dislodges their bricks, while slow nudges remain quiet.
+  - Prompt: Play collapse audio when a rock or millstone breaks through a wall at sufficient speed.
+- Gold coins that fall through level geometry now return safely above nearby floor instead of disappearing from the level total.
+  - Prompt: Detect coins that fall out of bounds and keep them recoverable.
+
 ## 2026-08-20
 
 ### 1800

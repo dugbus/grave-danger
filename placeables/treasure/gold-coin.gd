@@ -6,13 +6,27 @@ const GOLD_COIN_ITEM := preload("res://placeables/treasure/gold_coin_inventory.t
 const TREASURE_OUTLINE_MATERIAL := preload(
     "res://placeables/treasure/treasure_outline_material.tres"
 )
+const RECOVERY_FLOOR_COLLISION_MASK := 1
+const RECOVERY_RAY_START_HEIGHT := 0.5
+const RECOVERY_SURFACE_CLEARANCE := 0.1
+const RECOVERY_SEARCH_OFFSETS: Array[Vector3] = [
+	Vector3(0.0, 0.0, 0.0),
+	Vector3(0.2, 0.0, 0.0),
+	Vector3(-0.2, 0.0, 0.0),
+	Vector3(0.0, 0.0, -0.2),
+	Vector3(0.0, 0.0, 0.2),
+	Vector3(0.141421, 0.0, -0.141421),
+	Vector3(-0.141421, 0.0, -0.141421),
+	Vector3(0.141421, 0.0, 0.141421),
+	Vector3(-0.141421, 0.0, 0.141421),
+]
 
 ## Visual root whose mesh vertices define this coin's convex physics hull.
 @export var physics_mesh_root_path: NodePath = ^"CoinMesh"
 ## CollisionShape3D that receives the convex hull generated from the visual mesh.
 @export var physics_collision_shape_path: NodePath = ^"CollisionShape3D"
 
-## World Y position below which the coin is treated as fallen out of bounds.
+## World Y position below which the coin is recovered instead of being lost.
 @export var despawn_below_y := -5.0
 
 ## Distance a tipped coin may roll on its edge before being settled flat.
@@ -30,6 +44,9 @@ static var physics_shape_cache: Dictionary[String, ConvexPolygonShape3D] = {}
 # Horizontal position where the current edge-roll stretch started.
 var edge_roll_start_position := Vector2.ZERO
 var is_tracking_edge_roll := false
+var fall_recovery_origin := Vector3.ZERO
+var has_fall_recovery_origin := false
+var out_of_bounds_recovery_count := 0
 
 
 func _ready() -> void:
@@ -40,6 +57,7 @@ func _ready() -> void:
 	add_to_group("gold_coin")
 	add_to_group("pickup_radius_scalable")
 	set_pickup_radius_multiplier(_get_runtime_pickup_radius_multiplier())
+	_remember_fall_recovery_origin(global_position)
 	super._ready()
 
 
@@ -73,7 +91,7 @@ func rebuild_physics_shape_from_visual() -> bool:
 
 func _physics_process(_delta: float) -> void:
 	if global_position.y < despawn_below_y:
-		queue_free()
+		_recover_from_out_of_bounds()
 		return
 
 	_limit_edge_roll_distance()
@@ -82,7 +100,64 @@ func _physics_process(_delta: float) -> void:
 
 func throw_from(spawn_transform: Transform3D, impulse: Vector3) -> void:
 	is_tracking_edge_roll = false
+	freeze = false
 	super.throw_from(spawn_transform, impulse)
+	_remember_fall_recovery_origin(spawn_transform.origin)
+
+
+func get_out_of_bounds_recovery_count() -> int:
+	return out_of_bounds_recovery_count
+
+
+func _remember_fall_recovery_origin(origin: Vector3) -> void:
+	fall_recovery_origin = origin
+	has_fall_recovery_origin = true
+
+
+func _recover_from_out_of_bounds() -> void:
+	if not has_fall_recovery_origin:
+		_remember_fall_recovery_origin(global_position)
+
+	var recovery_position := _find_floor_recovery_position()
+	global_position = recovery_position
+	linear_velocity = Vector3.ZERO
+	angular_velocity = Vector3.ZERO
+	_settle_flat_from_edge_roll()
+	freeze = true
+	reset_physics_interpolation()
+	out_of_bounds_recovery_count += 1
+	add_to_group("recovered_gold_coin")
+
+
+func _find_floor_recovery_position() -> Vector3:
+	if not is_inside_tree():
+		return fall_recovery_origin
+
+	var world := get_world_3d()
+	if world == null:
+		return fall_recovery_origin
+
+	for offset in RECOVERY_SEARCH_OFFSETS:
+		var ray_start := fall_recovery_origin + offset + Vector3.UP * RECOVERY_RAY_START_HEIGHT
+		var ray_end := Vector3(ray_start.x, despawn_below_y, ray_start.z)
+		var query := PhysicsRayQueryParameters3D.create(
+			ray_start,
+			ray_end,
+			RECOVERY_FLOOR_COLLISION_MASK,
+			[get_rid()]
+		)
+		var hit := world.direct_space_state.intersect_ray(query)
+		if hit.is_empty():
+			continue
+
+		var surface_normal := hit.get("normal", Vector3.ZERO) as Vector3
+		if surface_normal.dot(Vector3.UP) < 0.75:
+			continue
+
+		var surface_position := hit.get("position", fall_recovery_origin) as Vector3
+		return surface_position + Vector3.UP * RECOVERY_SURFACE_CLEARANCE
+
+	return fall_recovery_origin
 
 
 func _limit_edge_roll_distance() -> void:
