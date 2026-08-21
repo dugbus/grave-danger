@@ -50,7 +50,7 @@ run_godot_check() {
 run_godot_check 0 godot --headless --check-only --quit --path . --log-file scene_scan.log
 run_godot_check 2 godot --headless --path . --script res://tools/check_all_scenes.gd --debug --log-file scene_scan.log
 run_godot_check 0 godot --headless --path . --script res://tests/check_test_pairs.gd --log-file scene_scan.log
-run_godot_check 0 godot --headless --path . --script res://tests/test_runner.gd --log-file scene_scan.log
+run_godot_check 2 godot --headless --path . --script res://tests/test_runner.gd --log-file scene_scan.log
 run_godot_check 4 godot --headless --path . --script res://tests/run_tests.gd --log-file scene_scan.log
 
 if ! lint_output="$(gdlint . 2>&1)"; then

@@ -52,6 +52,14 @@ const MINIMUM_EDITOR_PREVIEW_PATH_LENGTH := 0.001
 ## Starts the boundary animation automatically during gameplay.
 @export var autoplay_boundary_animation := true
 
+## Reverses the boundary animation at each end instead of restarting it from the beginning.
+@export var ping_pong_boundary_animation := false:
+	set(value):
+		if ping_pong_boundary_animation == value:
+			return
+		ping_pong_boundary_animation = value
+		_configure_animation_loop_mode()
+
 ## Closes the path so BoundaryCenter travels from its final point back to its starting point.
 @export var loop_boundary_path := true:
 	set(value):
@@ -354,6 +362,17 @@ var editor_speed_animation_snapshot: Animation
 var editor_speed_observed_signature := ""
 var editor_speed_stable_time := 0.0
 var is_syncing_boundary := false
+
+
+func _configure_animation_loop_mode() -> void:
+	if boundary_animation == null:
+		return
+
+	var requested_loop_mode := (
+		Animation.LOOP_PINGPONG if ping_pong_boundary_animation else Animation.LOOP_LINEAR
+	)
+	if boundary_animation.loop_mode != requested_loop_mode:
+		boundary_animation.loop_mode = requested_loop_mode
 
 
 @abstract func _animate_runtime_bounds_multiplier(target_multiplier: float, seconds: float) -> void

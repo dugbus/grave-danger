@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://placeables/spike_trap/spike_trap.gd" id="1_spike_trap"]
 [ext_resource type="ArrayMesh" uid="uid://c7ijma6epb5e7" path="res://Assets/placeables/spike_trap/spike_trap.res" id="2_trap_mesh"]
 [ext_resource type="ArrayMesh" uid="uid://bhh1i7c78vtce" path="res://Assets/placeables/spike_trap/spikes.res" id="3_spikes_mesh"]
+[ext_resource type="Script" path="res://placeables/spike_trap/spike_trap_editor_placement.gd" id="4_editor_placement"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_trigger"]
 size = Vector3(1.4, 1.2, 1.4)
@@ -20,6 +21,9 @@ mesh = ExtResource("2_trap_mesh")
 
 [node name="Spikes" type="MeshInstance3D" parent="SpikesPivot"]
 mesh = ExtResource("3_spikes_mesh")
+
+[node name="FixedHeightEditorPlacement" type="Node" parent="."]
+script = ExtResource("4_editor_placement")
 
 [node name="TriggerArea" type="Area3D" parent="."]
 collision_layer = 0

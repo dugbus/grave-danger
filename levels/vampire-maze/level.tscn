@@ -347,6 +347,7 @@ floor_grid_map_path = NodePath("")
 
 [node name="GeneratedMaze" parent="." unique_id=1250068653 instance=ExtResource("11_uaw4a")]
 maze_seed = 7
+vampire_path = NodePath("../Vampire")
 floor_texture_tiles = Vector2i(2, 2)
 baked_generation_version = 16
 baked_maze_seed = 7

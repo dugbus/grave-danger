@@ -5,11 +5,12 @@
 [ext_resource type="Script" uid="uid://cs73qa7c0pcul" path="res://player/player_shadow.gd" id="3_shadow"]
 [ext_resource type="PlaneMesh" path="res://game/contact_shadow_mesh.tres" id="4_shadow_mesh"]
 [ext_resource type="Material" path="res://game/contact_shadow_material.tres" id="5_shadow_material"]
+[ext_resource type="Script" path="res://enemies/ground_enemy_editor_placement.gd" id="6_editor_placement"]
 
 [sub_resource type="Curve3D" id="Curve3D_skeleton_patrol"]
 resource_local_to_scene = true
 _data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0),
 "tilts": PackedFloat32Array(0, 0)
 }
 point_count = 2
@@ -27,9 +28,12 @@ curve = SubResource("Curve3D_skeleton_patrol")
 script = ExtResource("2_skeleton")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="." unique_id=2104898397]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
 rotation_mode = 0
 loop = false
+
+[node name="GroundEditorPlacement" type="Node" parent="."]
+script = ExtResource("6_editor_placement")
+floor_sample_path = NodePath("../PathFollow3D")
 
 [node name="DropPivot" type="Node3D" parent="PathFollow3D" unique_id=693100089]
 

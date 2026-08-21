@@ -44,20 +44,22 @@ func run(_tree: SceneTree) -> void:
 		var tutorial_scene_text := FileAccess.get_file_as_string(
 			tutorial_scene_path
 		)
-		var scene_matches_scaffold := tutorial_scene_text.contains(
+		var live_generator_matches := tutorial_scene_text.contains(
 			"res://levels/tutorial-%d/generated_maze_config.tres" \
 				% tutorial_number
 		) and tutorial_scene_text.contains(
 			"maze_seed = %d" % tutorial_number
 		)
-		if tutorial_number == 1:
-			# Tutorial 1 is the frozen, inspectable generated-layout example
-			# created by the level duplication workflow.
-			scene_matches_scaffold = tutorial_scene_text.contains(
-				'[node name="Layout" parent="."'
-			) and FileAccess.file_exists(
-				"res://levels/tutorial-1/generated_maze_config.tres"
-			)
+		# A generated tutorial remains valid after its generator is frozen into
+		# an inspectable Layout for hand-authored level editing.
+		var frozen_layout_matches := tutorial_scene_text.contains(
+			'[node name="Layout" parent="."'
+		)
+		var scene_matches_scaffold := (
+			live_generator_matches or frozen_layout_matches
+		) and FileAccess.file_exists(
+			"res://levels/tutorial-%d/generated_maze_config.tres" % tutorial_number
+		)
 		tutorials_are_registered = tutorials_are_registered \
 			and tutorial_data.get("id") == "tutorial_%d" % tutorial_number \
 			and tutorial_data.get("name") == "Tutorial %d" % tutorial_number \

@@ -273,7 +273,7 @@ func _update_fall(delta: float) -> bool:
 
     if not spawn_floor_checked:
         spawn_floor_checked = true
-        if GROUND_SPAWN.shift_above_nearby_floor(
+        if GROUND_SPAWN.snap_to_nearby_floor(
             self,
             path_follow,
             self,

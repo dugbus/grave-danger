@@ -13,6 +13,10 @@ const FloorRoute := preload(
 func run(tree: SceneTree) -> void:
 	expect_script_contract(SUBJECT, SUBJECT_PATH)
 	var generated_maze := SUBJECT_SCENE.instantiate() as Node3D
+	expect(
+		(generated_maze.get("vampire_path") as NodePath).is_empty(),
+		"Reusable generated mazes do not point at an optional missing Vampire node."
+	)
 	tree.root.add_child(generated_maze)
 	generated_maze.set(
 		"configuration",

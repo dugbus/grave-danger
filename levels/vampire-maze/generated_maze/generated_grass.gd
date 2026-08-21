@@ -1,8 +1,8 @@
 @tool
 class_name GDGeneratedMazeGrass
-extends MultiMeshInstance3D
+extends "res://addons/simplegrasstextured/grass.gd"
 
-## Builds deterministic plasma-clustered grass patches from walkable floor cells.
+## Adds deterministic plasma-clustered generation to the editable grass addon node.
 
 const NOISE_SEED_SALT := 1327217884
 const TRANSFORM_SEED_SALT := 915488749
@@ -11,13 +11,13 @@ const MAXIMUM_BLADE_SCALE := 1.18
 const CELL_JITTER_RADIUS := 0.42
 const FLOOR_OFFSET := 0.015
 
-## Serialized blade transforms used to restore the generated editor preview.
+## Legacy transform data retained so already-authored generated levels still load.
+## The editable MultiMesh buffer is now the source of truth for hand-painted changes.
 @export_storage var generated_transforms: Array[Transform3D] = []
 
 
 func _ready() -> void:
-	if Engine.is_editor_hint() and not generated_transforms.is_empty():
-		call_deferred(&"_restore_editor_preview")
+	super._ready()
 
 
 ## Replaces the current MultiMesh transforms with one seeded patch layout.
@@ -109,12 +109,7 @@ func populate(
 
 
 func _set_transforms(transforms: Array[Transform3D]) -> void:
-	generated_transforms = transforms.duplicate()
 	_apply_transforms(transforms)
-	if Engine.is_editor_hint() and not transforms.is_empty():
-		# Layout generation can finish during the editor's scene attachment pass.
-		# Rebinding once deferred makes the completed batch visible in that viewport.
-		call_deferred(&"_restore_editor_preview")
 
 
 func _apply_transforms(transforms: Array[Transform3D]) -> void:
@@ -136,13 +131,6 @@ func _apply_transforms(transforms: Array[Transform3D]) -> void:
 	custom_aabb = _calculate_bounds(transforms, source_mesh)
 	generated_multimesh.emit_changed()
 	notify_property_list_changed()
-
-
-func _restore_editor_preview() -> void:
-	if generated_transforms.is_empty():
-		return
-	_apply_transforms(generated_transforms)
-
 
 func _create_plasma(seed_value: int, patch_size_tiles: float) -> FastNoiseLite:
 	var plasma := FastNoiseLite.new()

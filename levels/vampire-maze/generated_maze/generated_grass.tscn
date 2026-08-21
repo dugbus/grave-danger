@@ -49,3 +49,6 @@ material_override = SubResource("ShaderMaterial_grass")
 cast_shadow = 0
 multimesh = SubResource("MultiMesh_grass")
 script = ExtResource("3_grass_script")
+mesh = ExtResource("1_grass_mesh")
+texture_albedo = SubResource("GradientTexture2D_grass")
+metadata/SimpleGrassTextured = "2.0.5"

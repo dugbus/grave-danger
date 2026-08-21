@@ -56,7 +56,7 @@ func _physics_process(delta: float) -> void:
 	if is_dead:
 		return
 
-	_correct_below_floor_spawn()
+	_snap_to_ground_on_spawn()
 	has_moved_body_this_frame = false
 	_apply_gravity(delta)
 	if not zombie_body.is_on_floor():
@@ -84,15 +84,15 @@ func _physics_process(delta: float) -> void:
 	if not has_moved_body_this_frame:
 		_move_body()
 
-func _correct_below_floor_spawn() -> void:
+func _snap_to_ground_on_spawn() -> void:
 	if spawn_floor_checked or zombie_body == null:
 		return
 
 	spawn_floor_checked = true
-	GROUND_SPAWN.shift_above_nearby_floor(
+	GROUND_SPAWN.snap_to_nearby_floor(
 		self,
 		zombie_body,
-		zombie_body,
+		self,
 		map_collision_mask,
 		navigation_collision_floor_normal_y,
 		[zombie_body.get_rid()]

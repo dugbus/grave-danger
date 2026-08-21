@@ -500,7 +500,7 @@ func _run_tests() -> void:
     failed = not _test_skeleton_uses_dedicated_movement_audio() or failed
     failed = not _test_zombie_spawn_uses_existing_enemy_landing_audio() or failed
     failed = not await _test_ground_enemies_block_each_other() or failed
-    failed = not await _test_ground_enemies_fall_before_moving() or failed
+    failed = not await _test_ground_enemies_snap_before_moving() or failed
     failed = not _test_minimap_disables_processing_and_rendering() or failed
     failed = not _test_minimap_left_trigger_expands_and_restores_layout() or failed
     failed = not _test_minimap_camera_scrolls_wide_level_without_empty_space() or failed
@@ -9857,7 +9857,7 @@ func _test_ground_enemies_block_each_other() -> bool:
     return passed
 
 
-func _test_ground_enemies_fall_before_moving() -> bool:
+func _test_ground_enemies_snap_before_moving() -> bool:
     var floor_body := StaticBody3D.new()
     floor_body.collision_layer = 1
     var floor_shape := CollisionShape3D.new()
@@ -9887,34 +9887,18 @@ func _test_ground_enemies_fall_before_moving() -> bool:
     var low_zombie_body := low_zombie.get_node("ZombieBody") as CharacterBody3D
 
     await physics_frame
-    var airborne_enemies_remained_above_floor: bool = skeleton.global_position.y > 1.0 \
-        and zombie_body.global_position.y > 1.0
-    for frame_index in range(3):
-        await physics_frame
+    var airborne_enemies_started_on_floor: bool = bool(skeleton.get("has_landed")) \
+        and absf(skeleton.get_node("PathFollow3D").global_position.y) <= 0.01 \
+        and absf(zombie_body.global_position.y) <= 0.02
     var low_skeleton_shifted_up: bool = bool(low_skeleton.get("has_landed")) \
         and low_skeleton.get_node("PathFollow3D").global_position.y >= -0.001
     var low_zombie_shifted_up := low_zombie_body.global_position.y >= -0.001
-    var skeleton_start_x := float(skeleton.global_position.x)
-    var zombie_start_x := float(zombie_body.global_position.x)
-    for frame_index in range(10):
+    for frame_index in range(3):
         await physics_frame
-
-    var stayed_on_patrol_start_while_falling := (
-        is_equal_approx(skeleton.global_position.x, skeleton_start_x)
-        and is_equal_approx(zombie_body.global_position.x, zombie_start_x)
-    )
-
-    var falling_skeleton_played_landing_audio := false
-    for frame_index in range(80):
-        await physics_frame
-        falling_skeleton_played_landing_audio = (
-            falling_skeleton_played_landing_audio
-            or skeleton.get_node_or_null("PathFollow3D/SkeletonLandingAudio") != null
-        )
 
     var passed := _expect(
-        airborne_enemies_remained_above_floor,
-        "ground enemies spawned in the air are not snapped down to the floor"
+        airborne_enemies_started_on_floor,
+        "ground enemies spawned in the air are snapped down to the floor before patrolling"
     ) and _expect(
         low_skeleton_shifted_up,
         "skeletons spawned slightly below the floor are shifted up before falling"
@@ -9922,20 +9906,12 @@ func _test_ground_enemies_fall_before_moving() -> bool:
         low_zombie_shifted_up,
         "zombies spawned slightly below the floor are shifted up before falling"
     ) and _expect(
-        stayed_on_patrol_start_while_falling,
-        "ground enemies do not follow their patrol while falling"
-    ) and _expect(
-        bool(skeleton.get("has_landed")) and absf(skeleton.global_position.y) <= 0.01,
-        "a skeleton placed in mid-air falls to the floor before patrolling"
-    ) and _expect(
-        falling_skeleton_played_landing_audio,
-        "a skeleton falling from mid-air plays its landing sound on floor impact"
-    ) and _expect(
-        low_skeleton.get_node_or_null("PathFollow3D/SkeletonLandingAudio") == null,
-        "a skeleton's tiny initial floor correction does not play a landing sound"
+        skeleton.get_node_or_null("PathFollow3D/SkeletonLandingAudio") == null \
+            and low_skeleton.get_node_or_null("PathFollow3D/SkeletonLandingAudio") == null,
+        "a skeleton's initial floor snap does not play a landing sound"
     ) and _expect(
         zombie_body.is_on_floor() and absf(zombie_body.global_position.y) <= 0.02,
-        "a zombie placed in mid-air falls to the floor even while its AI is waiting"
+        "a zombie placed in mid-air starts on the floor even while its AI is waiting"
     )
 
     skeleton.queue_free()

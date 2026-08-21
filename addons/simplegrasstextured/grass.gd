@@ -189,7 +189,7 @@ func _ready():
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_TRANSFORM_CHANGED:
+	if what == NOTIFICATION_TRANSFORM_CHANGED and is_inside_tree():
 		if disable_node_rotation and global_rotation != Vector3.ZERO:
 			var prev_scale := scale
 			global_rotation = Vector3.ZERO
@@ -870,7 +870,10 @@ func _on_set_disable_node_rotation(value : bool) -> void:
 	disable_node_rotation = value
 	if disable_node_rotation:
 		var prev_scale := scale
-		global_rotation = Vector3.ZERO
+		if is_inside_tree():
+			global_rotation = Vector3.ZERO
+		else:
+			rotation = Vector3.ZERO
 		scale = prev_scale
 		set_notify_transform(true)
 

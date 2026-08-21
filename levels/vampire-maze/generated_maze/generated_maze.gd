@@ -78,8 +78,8 @@ const CURRENT_GENERATION_VERSION := 20
 @export var floor_grid_map_path: NodePath = ^"Layout/PNGFloorGridMap"
 ## Player placed in the generated entrance corner.
 @export var player_path: NodePath = ^"../Player"
-## Vampire placed two cells inside the locked gate opposite the player.
-@export var vampire_path: NodePath = ^"../Vampire"
+## Optional vampire placed two cells inside the locked gate opposite the player.
+@export var vampire_path: NodePath
 ## Child responsible for planning and instancing generated dungeon content.
 @export var generated_content_path: NodePath = ^"Layout/GeneratedContent"
 ## Optional authored-content root disabled when generated budgets are active.

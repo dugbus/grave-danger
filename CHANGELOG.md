@@ -1,6 +1,55 @@
 # Changelog
 
+## 2026-08-20
+
+### 1800
+
+- Level editors now move skeletons and zombies from an origin shared by the character and first patrol point.
+  - Prompt: Place skeleton and zombie editor origins on the character and first path point.
+
+### 1700
+
+- Spike traps now stay at a fixed 0.05-metre editor height when level editors add or move them, leaving their socket tops visible and their retracted spikes underground.
+  - Prompt: Automatically translate spike traps to a fixed editor height.
+- Rolling rocks now cross tiled floor seams without catching or stopping dead. Feedback report 20260820T155353Z-tutorial_3 marked at 132.82s in tutorial_3 is archived with feedback/archive/2026-08-20/20260820T155353Z-tutorial_3.gdr.
+  - Prompt: Resolve feedback report 20260820T155353Z-tutorial_3: I just was rolling the rock and it just stopped as if there was something in the way.
+
+## 2026-08-19
+
+### 0100
+
+- Fixed generated-level editor stability: optional Vampire references no longer target missing nodes, kill-boundary animation updates preserve authored libraries, grass rotation locking is safe outside the scene tree, and copied tutorial scenes no longer share a root UID.
+  - Prompt: Fix Generated Maze editor errors involving optional Vampire paths, kill-boundary animation reloads, grass transforms, and duplicate tutorial scene identities.
+
+## 2026-08-18
+
+### 1700
+
+- Generated-maze treasure piles now keep every coin safely on the floor so players can collect the full level total and earn 100% completion.
+  - Prompt: Fix generated treasure piles being one coin short and preventing 100% completion.
+
 ## 2026-08-16
+
+### 2000
+
+- Tutorial 3's moving flame boundary now stays grounded so its flames damage the player and its perimeter blocks movement again.
+  - Prompt: Restore flame damage and the non-walkable boundary area.
+
+### 1900
+
+- Level editors can make a kill boundary animation reverse at each end with the Ping Pong Boundary Animation setting.
+  - Prompt: Add an editor parameter for ping-pong kill boundary animation.
+
+### 1800
+
+- Zombie and Skeleton instances now snap their patrol start onto nearby walkable ground while they are dragged or moved in the level editor.
+  - Prompt: Dragging zombie.tscn into the scene left it floating in mid air
+- Zombie scenes now show the body on the first patrol point in the editor, while zombies and skeletons placed above or slightly below nearby walkable ground snap their whole patrol setup onto the floor before moving.
+  - Prompt: zombie.tscn has a bad starting point where the zombie is not on the first point in the path. This is what I would expect. Also can you check for it being in the air and start it on the ground. (If skeleton has the same issue, please fix that.)
+- Clicking native Skeleton and other Path3D points no longer clears the selected-path overlay during Godot's active handle interaction.
+  - Prompt: Fix the editor crash when clicking a skeleton path point.
+- GeneratedMaze and Tutorials 1 and 2 now use SimpleGrassTextured-compatible grass that level editors can paint and erase by hand without saved edits being overwritten.
+  - Prompt: Use editable SimpleGrassTextured grass for GeneratedMaze and Tutorials 1 and 2.
 
 ### 1400
 

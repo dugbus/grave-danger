@@ -4,6 +4,7 @@ extends "res://placeables/kill_boundary/kill_boundary_core.gd"
 
 
 func _sync_animation_player() -> void:
+	_configure_animation_loop_mode()
 	if not is_inside_tree():
 		return
 
@@ -16,11 +17,20 @@ func _sync_animation_player() -> void:
 	if animation_player == null:
 		return
 
+	var library: AnimationLibrary
 	if animation_player.has_animation_library(""):
-		animation_player.remove_animation_library("")
-	var library := AnimationLibrary.new()
-	library.add_animation(DEFAULT_ANIMATION_NAME, boundary_animation)
-	animation_player.add_animation_library("", library)
+		library = animation_player.get_animation_library("")
+	else:
+		library = AnimationLibrary.new()
+		animation_player.add_animation_library("", library)
+
+	var installed_animation := library.get_animation(DEFAULT_ANIMATION_NAME) \
+		if library.has_animation(DEFAULT_ANIMATION_NAME) else null
+	if installed_animation != boundary_animation:
+		if installed_animation != null:
+			animation_player.stop()
+			library.remove_animation(DEFAULT_ANIMATION_NAME)
+		library.add_animation(DEFAULT_ANIMATION_NAME, boundary_animation)
 	animation_player.assigned_animation = DEFAULT_ANIMATION_NAME
 
 
@@ -29,7 +39,9 @@ func _create_default_animation() -> Animation:
 	animation.resource_name = String(DEFAULT_ANIMATION_NAME)
 	var animation_duration := _get_default_animation_duration()
 	animation.length = animation_duration
-	animation.loop_mode = Animation.LOOP_LINEAR
+	animation.loop_mode = (
+		Animation.LOOP_PINGPONG if ping_pong_boundary_animation else Animation.LOOP_LINEAR
+	)
 
 	var movement_speed_track := animation.add_track(Animation.TYPE_VALUE)
 	animation.track_set_path(movement_speed_track, MOVEMENT_SPEED_TRACK_PATH)
@@ -77,16 +89,26 @@ func _sync_movement_to_animation() -> void:
 	if animation_player.current_animation.is_empty():
 		return
 	var animation_position := animation_player.current_animation_position
-	if (
-		not Engine.is_editor_hint()
-		and animation_player.is_playing()
-		and animation_position + 0.001 < last_animation_position
-	):
-		movement_cycle_distance += _calculate_travel_distance(animation, animation.length)
+	_update_movement_cycle_distance(animation, animation_position, animation_player.is_playing())
 
 	_sync_boundary_scale_rotation_to_animation(animation, animation_position)
 	_set_center_progress(center, movement_cycle_distance + _calculate_travel_distance(animation, animation_position))
 	last_animation_position = animation_position
+
+
+func _update_movement_cycle_distance(
+	animation: Animation,
+	animation_position: float,
+	animation_is_playing: bool,
+) -> void:
+	if animation.loop_mode == Animation.LOOP_PINGPONG:
+		movement_cycle_distance = 0.0
+	elif (
+		not Engine.is_editor_hint()
+		and animation_is_playing
+		and animation_position + 0.001 < last_animation_position
+	):
+		movement_cycle_distance += _calculate_travel_distance(animation, animation.length)
 
 
 func _update_removed_boundary_visuals(delta: float) -> void:
