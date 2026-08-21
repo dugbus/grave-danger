@@ -372,6 +372,8 @@ albedo_color = Color(1, 0.72, 0.08, 0.12)
 [sub_resource type="CylinderMesh" id="CylinderMesh_eet0d"]
 resource_local_to_scene = true
 material = SubResource("StandardMaterial3D_selection")
+top_radius = 0.35
+bottom_radius = 0.35
 height = 0.4
 radial_segments = 32
 
@@ -547,7 +549,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, 5.5)
 gold_coin_count = 25
 diamond_count = 0
 gold_bar_count = 0
-pile_radius = 0.5
 random_seed = 3
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache01" index="0"]
