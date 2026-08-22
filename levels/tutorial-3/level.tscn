@@ -7,7 +7,6 @@
 [ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="8_arvmr"]
 [ext_resource type="PackedScene" uid="uid://ba4h31e1vsl1n" path="res://placeables/lockables/locked_gate.tscn" id="10_cg4j0"]
 [ext_resource type="Script" uid="uid://2juaclm8gc1n" path="res://addons/simplegrasstextured/grass.gd" id="14_bwxx6"]
-[ext_resource type="PackedScene" uid="uid://dymr7xr0g3qjo" path="res://Assets/environment/candlestick.glb" id="14_ny458"]
 [ext_resource type="PackedScene" path="res://inventory/key.tscn" id="15_86gkw"]
 [ext_resource type="PackedScene" path="res://placeables/pushables/rolling_rock_pushable.tscn" id="15_bwxx6"]
 [ext_resource type="PackedScene" uid="uid://bsukaqxfm6nb3" path="res://placeables/wall_breakable/wall_breakable.tscn" id="16_caxdg"]
@@ -15,6 +14,7 @@
 [ext_resource type="PackedScene" path="res://placeables/torch/torch.tscn" id="17_eet0d"]
 [ext_resource type="PackedScene" uid="uid://d2wv161iga1us" path="res://Assets/environment/coffin_lid.tscn" id="18_2nrfl"]
 [ext_resource type="PackedScene" uid="uid://bqw0vuwkr2use" path="res://Assets/environment/empty_coffin.tscn" id="19_ddm6g"]
+[ext_resource type="PackedScene" uid="uid://ccgg3jsmlm61v" path="res://Assets/environment/candlestick.tscn" id="20_4pltx"]
 [ext_resource type="Texture2D" uid="uid://dph1m5l027osi" path="res://Assets/particles/mote.png" id="20_ddm6g"]
 [ext_resource type="PackedScene" path="res://placeables/treasure/treasure_pile.tscn" id="22_75ryq"]
 [ext_resource type="PackedScene" path="res://levels/vampire-maze/generated_maze/generated_bat_noise.tscn" id="24_bs16d"]
@@ -370,18 +370,6 @@ transparency = 1
 shading_mode = 0
 albedo_color = Color(1, 0.72, 0.08, 0.12)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_ddm6g"]
-resource_local_to_scene = true
-material = SubResource("StandardMaterial3D_selection")
-height = 0.4
-radial_segments = 32
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_4pltx"]
-resource_local_to_scene = true
-material = SubResource("StandardMaterial3D_selection")
-height = 0.4
-radial_segments = 32
-
 [sub_resource type="CylinderMesh" id="CylinderMesh_dbv8d"]
 resource_local_to_scene = true
 material = SubResource("StandardMaterial3D_selection")
@@ -418,6 +406,18 @@ material = SubResource("StandardMaterial3D_selection")
 height = 0.4
 radial_segments = 32
 
+[sub_resource type="CylinderMesh" id="CylinderMesh_xlcfd"]
+resource_local_to_scene = true
+material = SubResource("StandardMaterial3D_selection")
+height = 0.4
+radial_segments = 32
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_kdg3u"]
+resource_local_to_scene = true
+material = SubResource("StandardMaterial3D_selection")
+height = 0.4
+radial_segments = 32
+
 [sub_resource type="Gradient" id="Gradient_wjj06"]
 colors = PackedColorArray(0.24637166, 0.13708663, 0.09699503, 1, 0.83, 0.71712005, 0.2656, 1)
 
@@ -426,7 +426,7 @@ gradient = SubResource("Gradient_wjj06")
 fill_from = Vector2(0, 1)
 fill_to = Vector2(0, 0.01994302)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_xlcfd"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vrnv4"]
 render_priority = 0
 shader = ExtResource("27_370kx")
 shader_parameter/albedo = Color(1, 1, 1, 1)
@@ -580,7 +580,7 @@ random_seed = 3
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache01" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_ddm6g")
+mesh = SubResource("CylinderMesh_dbv8d")
 
 [node name="GeneratedTreasureCache02" parent="Layout/GeneratedContent" index="5" unique_id=1096016980 instance=ExtResource("22_75ryq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 8)
@@ -592,7 +592,7 @@ random_seed = 980
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache02" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_4pltx")
+mesh = SubResource("CylinderMesh_2gq0d")
 
 [node name="GeneratedTreasureCache03" parent="Layout/GeneratedContent" index="6" unique_id=948172586 instance=ExtResource("22_75ryq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.5, 0, 7.5)
@@ -604,7 +604,7 @@ random_seed = 1957
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache03" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_dbv8d")
+mesh = SubResource("CylinderMesh_ttkr6")
 
 [node name="GeneratedTreasureCache04" parent="Layout/GeneratedContent" index="7" unique_id=1938101622 instance=ExtResource("22_75ryq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -10.5)
@@ -616,7 +616,7 @@ random_seed = 2934
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache04" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_2gq0d")
+mesh = SubResource("CylinderMesh_mn2y1")
 
 [node name="GeneratedTreasureCache05" parent="Layout/GeneratedContent" index="8" unique_id=1368134495 instance=ExtResource("22_75ryq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, -4.5)
@@ -628,7 +628,7 @@ random_seed = 3911
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache05" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_ttkr6")
+mesh = SubResource("CylinderMesh_0lrtl")
 
 [node name="GeneratedTreasureCache06" parent="Layout/GeneratedContent" index="9" unique_id=1870239082 instance=ExtResource("22_75ryq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0, -7.5)
@@ -640,7 +640,7 @@ random_seed = 3
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache06" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_mn2y1")
+mesh = SubResource("CylinderMesh_w5oxn")
 
 [node name="GeneratedTreasureCache07" parent="Layout/GeneratedContent" index="10" unique_id=1522925338 instance=ExtResource("22_75ryq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 0, -4.5)
@@ -652,7 +652,7 @@ random_seed = 3
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache07" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_0lrtl")
+mesh = SubResource("CylinderMesh_xlcfd")
 
 [node name="GeneratedTreasureCache08" parent="Layout/GeneratedContent" index="11" unique_id=596614822 instance=ExtResource("22_75ryq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 13.5)
@@ -664,16 +664,13 @@ random_seed = 3
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache08" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_w5oxn")
+mesh = SubResource("CylinderMesh_kdg3u")
 
 [node name="GeneratedBatNoise01" parent="Layout/GeneratedContent" index="12" unique_id=1944221100 instance=ExtResource("24_bs16d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 1.6, 10)
 
-[node name="candlestick2" parent="Layout/GeneratedContent" index="13" unique_id=992679381 instance=ExtResource("14_ny458")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.570736, 0.01, -1.3921556)
-
 [node name="SimpleGrassTextured" type="MultiMeshInstance3D" parent="Layout" unique_id=211199895]
-material_override = SubResource("ShaderMaterial_xlcfd")
+material_override = SubResource("ShaderMaterial_vrnv4")
 cast_shadow = 0
 multimesh = SubResource("MultiMesh_eet0d")
 script = ExtResource("14_bwxx6")
@@ -729,6 +726,9 @@ speed_scale = 0.5
 visibility_aabb = AABB(-15, -4, -15, 30, 4, 30)
 process_material = SubResource("ParticleProcessMaterial_8e3ph")
 draw_pass_1 = SubResource("QuadMesh_v11xe")
+
+[node name="Candlestick" parent="." unique_id=1016574851 instance=ExtResource("20_4pltx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0, -1.5)
 
 [editable path="IndoorLighting"]
 [editable path="Layout"]

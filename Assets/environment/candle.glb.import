@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dymr7xr0g3qjo"
-path="res://.godot/imported/candlestick.glb-1a06dd7ece6a15b16d7dfc3a13c15db3.scn"
+uid="uid://d2lawbp73whtp"
+path="res://.godot/imported/candle.glb-5543524390403f98f7aa835886154b67.scn"
 
 [deps]
 
-source_file="res://Assets/environment/candlestick.glb"
-dest_files=["res://.godot/imported/candlestick.glb-1a06dd7ece6a15b16d7dfc3a13c15db3.scn"]
+source_file="res://Assets/environment/candle.glb"
+dest_files=["res://.godot/imported/candle.glb-5543524390403f98f7aa835886154b67.scn"]
 
 [params]
 
@@ -41,7 +41,7 @@ materials/extract_format=0
 materials/extract_path=""
 _subresources={
 "nodes": {
-"PATH:candlestick": {
+"PATH:candle": {
 "generate/physics": true
 }
 }

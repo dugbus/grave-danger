@@ -1,0 +1,104 @@
+[gd_scene format=3 uid="uid://ccgg3jsmlm61v"]
+
+[ext_resource type="PackedScene" uid="uid://dymr7xr0g3qjo" path="res://Assets/environment/candlestick.glb" id="1_lxv4u"]
+[ext_resource type="PackedScene" uid="uid://d2lawbp73whtp" path="res://Assets/environment/candle.glb" id="2_886oy"]
+[ext_resource type="Shader" uid="uid://drx1opsej87c3" path="res://placeables/torch/torch_flame.gdshader" id="3_k1kca"]
+
+[sub_resource type="Curve" id="Curve_3ixf8"]
+_data = [Vector2(0, 0.45), 0.0, 1.8, 0, 0, Vector2(0.22, 1), 1.8, 0.0, 0, 0, Vector2(1, 0), -1.15, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_flame_scale"]
+curve = SubResource("Curve_3ixf8")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_j1w7v"]
+emission_shape = 1
+emission_sphere_radius = 0.035
+direction = Vector3(0, 1, 0)
+spread = 16.0
+initial_velocity_min = 0.22
+initial_velocity_max = 0.42
+gravity = Vector3(0, 0.35, 0)
+scale_min = 0.75
+scale_max = 1.2
+scale_curve = SubResource("CurveTexture_flame_scale")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_flame"]
+render_priority = 1
+shader = ExtResource("3_k1kca")
+shader_parameter/core_color = Color(1, 0.92, 0.52, 1)
+shader_parameter/body_color = Color(1, 0.28, 0.015, 1)
+shader_parameter/tip_color = Color(0.72, 0.025, 0.002, 1)
+shader_parameter/emission_strength = 3.5
+shader_parameter/movement_speed = 5.5
+
+[sub_resource type="QuadMesh" id="QuadMesh_4lh3b"]
+material = SubResource("ShaderMaterial_flame")
+size = Vector2(0.13, 0.22)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ember"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.55, 0.04, 0.9)
+
+[sub_resource type="SphereMesh" id="SphereMesh_vdote"]
+material = SubResource("StandardMaterial3D_ember")
+radius = 0.006
+height = 0.012
+radial_segments = 4
+rings = 2
+
+[node name="Candlestick" type="Node3D" unique_id=1016574851]
+
+[node name="candlestick2" parent="." unique_id=1078245944 instance=ExtResource("1_lxv4u")]
+
+[node name="candle2" parent="." unique_id=1721193675 instance=ExtResource("2_886oy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9991733, 0)
+
+[node name="FabricFlameAttachment" type="Node3D" parent="." unique_id=2125363988]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3741041, 0)
+
+[node name="FlameParticles" type="GPUParticles3D" parent="FabricFlameAttachment" unique_id=587376637]
+unique_name_in_owner = true
+visible = false
+cast_shadow = 0
+amount = 28
+lifetime = 0.42
+randomness = 0.55
+visibility_aabb = AABB(-0.2, -0.08, -0.2, 0.4, 0.55, 0.4)
+process_material = SubResource("ParticleProcessMaterial_j1w7v")
+draw_pass_1 = SubResource("QuadMesh_4lh3b")
+
+[node name="EmberParticles" type="CPUParticles3D" parent="FabricFlameAttachment" unique_id=981600047]
+unique_name_in_owner = true
+visible = false
+cast_shadow = 0
+amount = 10
+lifetime = 0.75
+randomness = 0.8
+visibility_aabb = AABB(-0.18, -0.04, -0.18, 0.36, 0.65, 0.36)
+mesh = SubResource("SphereMesh_vdote")
+emission_shape = 1
+emission_sphere_radius = 0.025
+direction = Vector3(0, 1, 0)
+spread = 24.0
+gravity = Vector3(0, 0.18, 0)
+initial_velocity_min = 0.28
+initial_velocity_max = 0.55
+damping_min = 0.08
+damping_max = 0.2
+scale_amount_min = 0.5
+scale_amount_max = 1.35
+
+[node name="FlameLight" type="OmniLight3D" parent="FabricFlameAttachment" unique_id=1236913164 groups=["authored_shadow_settings"]]
+unique_name_in_owner = true
+visible = false
+light_color = Color(1, 0.423529, 0.145098, 1)
+light_energy = 5.0
+light_indirect_energy = 0.0
+shadow_enabled = true
+shadow_bias = 0.03
+shadow_normal_bias = 0.6
+shadow_caster_mask = 4294836223
+omni_range = 0.1
+omni_attenuation = 1.15
