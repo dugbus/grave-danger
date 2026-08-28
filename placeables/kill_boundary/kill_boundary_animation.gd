@@ -39,9 +39,7 @@ func _create_default_animation() -> Animation:
 	animation.resource_name = String(DEFAULT_ANIMATION_NAME)
 	var animation_duration := _get_default_animation_duration()
 	animation.length = animation_duration
-	animation.loop_mode = (
-		Animation.LOOP_PINGPONG if ping_pong_boundary_animation else Animation.LOOP_LINEAR
-	)
+	animation.loop_mode = _get_requested_animation_loop_mode()
 
 	var movement_speed_track := animation.add_track(Animation.TYPE_VALUE)
 	animation.track_set_path(movement_speed_track, MOVEMENT_SPEED_TRACK_PATH)
@@ -89,7 +87,11 @@ func _sync_movement_to_animation() -> void:
 	if animation_player.current_animation.is_empty():
 		return
 	var animation_position := animation_player.current_animation_position
-	_update_movement_cycle_distance(animation, animation_position, animation_player.is_playing())
+	var animation_is_playing_forward := (
+		animation_player.is_playing()
+		and animation_player.get_playing_speed() > 0.0
+	)
+	_update_movement_cycle_distance(animation, animation_position, animation_is_playing_forward)
 
 	_sync_boundary_scale_rotation_to_animation(animation, animation_position)
 	_set_center_progress(center, movement_cycle_distance + _calculate_travel_distance(animation, animation_position))
@@ -99,13 +101,12 @@ func _sync_movement_to_animation() -> void:
 func _update_movement_cycle_distance(
 	animation: Animation,
 	animation_position: float,
-	animation_is_playing: bool,
+	animation_is_playing_forward: bool,
 ) -> void:
-	if animation.loop_mode == Animation.LOOP_PINGPONG:
+	if animation.loop_mode != Animation.LOOP_LINEAR:
 		movement_cycle_distance = 0.0
 	elif (
-		not Engine.is_editor_hint()
-		and animation_is_playing
+		animation_is_playing_forward
 		and animation_position + 0.001 < last_animation_position
 	):
 		movement_cycle_distance += _calculate_travel_distance(animation, animation.length)
@@ -124,7 +125,6 @@ func _sync_editor_preview_animation() -> void:
 		not Engine.is_editor_hint()
 		or not is_inside_tree()
 		or not _has_previewable_editor_path()
-		or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
 	):
 		return
 
@@ -134,9 +134,32 @@ func _sync_editor_preview_animation() -> void:
 		return
 
 	var animation := animation_player.get_animation(DEFAULT_ANIMATION_NAME)
+	if ping_pong_boundary_animation and derived_ping_pong_end_time > 0.0:
+		var section_needs_update := (
+			not animation_player.has_section()
+			or not is_zero_approx(animation_player.get_section_start_time())
+			or not is_equal_approx(
+				animation_player.get_section_end_time(),
+				derived_ping_pong_end_time
+			)
+		)
+		if section_needs_update:
+			animation_player.set_section(0.0, derived_ping_pong_end_time)
+	elif animation_player.has_section():
+		animation_player.reset_section()
 	var preview_time := _get_editor_preview_time(animation_player, animation)
+	var preview_is_playing_forward := (
+		animation_player.is_playing()
+		and animation_player.get_playing_speed() > 0.0
+	)
+	if not preview_is_playing_forward:
+		movement_cycle_distance = 0.0
+	_update_movement_cycle_distance(animation, preview_time, preview_is_playing_forward)
 	_sync_boundary_scale_rotation_to_animation(animation, preview_time)
-	_set_center_progress(center, _calculate_travel_distance(animation, preview_time))
+	_set_center_progress(
+		center,
+		movement_cycle_distance + _calculate_travel_distance(animation, preview_time)
+	)
 	last_animation_position = preview_time
 
 
@@ -246,7 +269,18 @@ func _upgrade_boundary_animation_tracks(animation: Animation) -> void:
 		_upgrade_boundary_scale_rotation_tracks_from_source(animation, legacy_scale_track, false)
 		animation.remove_track(legacy_scale_track)
 
+	_ensure_movement_speed_track(animation)
 	_ensure_boundary_size_tracks(animation)
+
+
+func _ensure_movement_speed_track(animation: Animation) -> void:
+	if animation.find_track(MOVEMENT_SPEED_TRACK_PATH, Animation.TYPE_VALUE) >= 0:
+		return
+
+	var track := animation.add_track(Animation.TYPE_VALUE)
+	animation.track_set_path(track, MOVEMENT_SPEED_TRACK_PATH)
+	animation.track_set_interpolation_loop_wrap(track, false)
+	animation.track_insert_key(track, 0.0, movement_speed)
 
 
 func _ensure_boundary_size_tracks(animation: Animation) -> void:
@@ -317,7 +351,7 @@ func _get_editor_preview_time(animation_player: AnimationPlayer, animation: Anim
 		editor_preview_initialized = true
 
 	if (
-		animation_player.current_animation == DEFAULT_ANIMATION_NAME
+		animation_player.assigned_animation == DEFAULT_ANIMATION_NAME
 		and (
 			animation_player.is_playing()
 			or absf(animation_player.current_animation_position - editor_preview_time) >= EDITOR_SCRUB_TIME_EPSILON
@@ -375,7 +409,11 @@ func _sync_path_point_animation_markers() -> void:
 	if boundary_animation == null or curve == null:
 		return
 
-	_ensure_animation_reaches_path_end(boundary_animation)
+	if ping_pong_boundary_animation:
+		_sync_ping_pong_playback_end(boundary_animation)
+	else:
+		derived_ping_pong_end_time = -1.0
+		_ensure_animation_reaches_path_end(boundary_animation)
 	var desired_markers: Dictionary[StringName, float] = {}
 	for point_index in curve.point_count:
 		var point_position := curve.get_point_position(point_index)
@@ -403,6 +441,22 @@ func _sync_path_point_animation_markers() -> void:
 			boundary_animation.remove_marker(marker_name)
 		boundary_animation.add_marker(marker_name, marker_time)
 		boundary_animation.set_marker_color(marker_name, PATH_POINT_MARKER_COLOR)
+
+
+## Finds the first time when integrated keyed speed reaches the open path endpoint.
+## Playback uses this as a non-destructive section so later authored keys remain intact.
+func _sync_ping_pong_playback_end(animation: Animation) -> bool:
+	var original_end_time := derived_ping_pong_end_time
+	var path_length := curve.get_baked_length()
+	_ensure_animation_reaches_path_end(animation)
+
+	var path_end_time := _find_time_for_travel_distance(animation, path_length)
+	if path_end_time < 0.0:
+		derived_ping_pong_end_time = -1.0
+		return not is_equal_approx(derived_ping_pong_end_time, original_end_time)
+
+	derived_ping_pong_end_time = maxf(path_end_time, 0.1)
+	return not is_equal_approx(derived_ping_pong_end_time, original_end_time)
 
 
 func _ensure_animation_reaches_path_end(animation: Animation) -> bool:

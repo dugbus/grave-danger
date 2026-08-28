@@ -45,6 +45,12 @@ func run(_tree: SceneTree) -> void:
 		loop_boundary.curve.closed and path_follow.loop,
 		"Looping closes the boundary curve so it travels from the final point back to the start."
 	)
+	loop_boundary.ping_pong_boundary_animation = true
+	expect(
+		not loop_boundary.curve.closed and not path_follow.loop,
+		"Ping-pong playback keeps the path open so it reverses at the final authored point."
+	)
+	loop_boundary.ping_pong_boundary_animation = false
 
 	loop_boundary.loop_boundary_path = false
 	expect(

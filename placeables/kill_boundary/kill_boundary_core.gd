@@ -48,9 +48,11 @@ func _process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 			editor_path_marker_stable_time = 0.0
-			return
-		_update_speed_change_ripple_retime(delta)
-		_update_path_point_animation_markers(delta)
+		else:
+			_update_speed_change_ripple_retime(delta)
+			_update_path_point_animation_markers(delta)
+		# Timeline scrubbing also holds the left mouse button. Keep movement and visuals
+		# responsive while deferring only animation authoring work until the drag ends.
 		_sync_editor_preview_animation()
 		_sync_boundary()
 
@@ -134,6 +136,8 @@ func get_boundary_animation_duration() -> float:
 		return 0.0
 
 	var animation := animation_player.get_animation(DEFAULT_ANIMATION_NAME)
+	if ping_pong_boundary_animation and derived_ping_pong_end_time > 0.0:
+		return derived_ping_pong_end_time
 	return animation.length if animation != null else 0.0
 
 
@@ -251,7 +255,7 @@ func _set_runtime_effects_enabled(enabled: bool, keep_visuals := false) -> void:
 			and animation_player.has_animation(DEFAULT_ANIMATION_NAME)
 			and not animation_player.is_playing()
 		):
-			animation_player.play(DEFAULT_ANIMATION_NAME)
+			_play_boundary_animation(animation_player)
 		elif not enabled and keep_visuals:
 			animation_player.speed_scale = 1.0
 			if (
@@ -259,7 +263,7 @@ func _set_runtime_effects_enabled(enabled: bool, keep_visuals := false) -> void:
 				and animation_player.has_animation(DEFAULT_ANIMATION_NAME)
 				and not animation_player.is_playing()
 			):
-				animation_player.play(DEFAULT_ANIMATION_NAME)
+				_play_boundary_animation(animation_player)
 		elif not enabled and animation_player.is_playing():
 			animation_player.stop(true)
 
@@ -272,6 +276,20 @@ func _set_runtime_effects_enabled(enabled: bool, keep_visuals := false) -> void:
 func begin_runtime_animation() -> void:
 	_sync_boundary()
 	play_runtime_animation()
+
+
+func _play_boundary_animation(animation_player: AnimationPlayer) -> void:
+	if ping_pong_boundary_animation and derived_ping_pong_end_time > 0.0:
+		animation_player.play_section(
+			DEFAULT_ANIMATION_NAME,
+			0.0,
+			derived_ping_pong_end_time
+		)
+		return
+
+	if animation_player.has_section():
+		animation_player.reset_section()
+	animation_player.play(DEFAULT_ANIMATION_NAME)
 
 
 func play_runtime_animation() -> void:
@@ -287,7 +305,7 @@ func play_runtime_animation() -> void:
 			var animation := animation_player.get_animation(DEFAULT_ANIMATION_NAME)
 			_sync_boundary_scale_rotation_to_animation(animation, 0.0)
 			_set_center_progress(center, 0.0)
-		animation_player.play(DEFAULT_ANIMATION_NAME)
+		_play_boundary_animation(animation_player)
 
 
 func _ensure_boundary_nodes() -> void:
@@ -333,15 +351,14 @@ func _create_default_curve() -> Curve3D:
 
 
 func _configure_path_follow() -> void:
+	var should_loop_path := loop_boundary_path and not ping_pong_boundary_animation
 	if curve != null:
-		curve.closed = loop_boundary_path
+		curve.closed = should_loop_path
 
 	var path_follow := get_node_or_null(BOUNDARY_CENTER_NAME) as PathFollow3D
-	if path_follow == null:
-		return
-
-	path_follow.rotation_mode = PathFollow3D.ROTATION_NONE
-	path_follow.loop = loop_boundary_path
+	if path_follow != null:
+		path_follow.rotation_mode = PathFollow3D.ROTATION_NONE
+		path_follow.loop = should_loop_path
 
 
 func _get_center_node() -> Node3D:

@@ -363,7 +363,7 @@ func _set_runtime_motion_paused(paused: bool) -> void:
 
 	animation_player.speed_scale = 0.0 if paused else 1.0
 	if not paused and autoplay_boundary_animation and _runtime_effects_enabled() and not animation_player.is_playing():
-		animation_player.play(DEFAULT_ANIMATION_NAME)
+		_play_boundary_animation(animation_player)
 
 
 func _resume_runtime_motion_after(token: int, seconds: float) -> void:

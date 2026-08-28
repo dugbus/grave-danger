@@ -14,7 +14,7 @@
 [ext_resource type="PackedScene" path="res://placeables/torch/torch.tscn" id="17_eet0d"]
 [ext_resource type="PackedScene" uid="uid://d2wv161iga1us" path="res://Assets/environment/coffin_lid.tscn" id="18_2nrfl"]
 [ext_resource type="PackedScene" uid="uid://bqw0vuwkr2use" path="res://Assets/environment/empty_coffin.tscn" id="19_ddm6g"]
-[ext_resource type="PackedScene" uid="uid://ccgg3jsmlm61v" path="res://Assets/environment/candlestick.tscn" id="20_4pltx"]
+[ext_resource type="PackedScene" path="res://Assets/environment/candlestick.tscn" id="20_4pltx"]
 [ext_resource type="Texture2D" uid="uid://dph1m5l027osi" path="res://Assets/particles/mote.png" id="20_ddm6g"]
 [ext_resource type="PackedScene" path="res://placeables/treasure/treasure_pile.tscn" id="22_75ryq"]
 [ext_resource type="PackedScene" path="res://levels/vampire-maze/generated_maze/generated_bat_noise.tscn" id="24_bs16d"]

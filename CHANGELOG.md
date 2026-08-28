@@ -1,5 +1,42 @@
 # Changelog
 
+## 2026-08-25
+
+### 1500
+
+- Kill boundaries now follow the Animation panel playhead continuously while level editors drag or seek the timeline.
+  - Prompt: Move the kill boundary while dragging the Animation panel playhead.
+- Flame-boundary path movement is now driven directly by its speed animation track, keeping Play-from-start previews synchronized even when editor process ordering changes.
+  - Prompt: Make Animation panel playback move a non-looping flame boundary instead of leaving it at the path end until paused.
+
+### 1400
+
+- Non-looping flame-boundary previews now clear stale loop travel during playback, so playing and pausing show the same path position.
+  - Prompt: Keep one-shot boundary playback aligned while the editor animation controls are playing.
+- Non-looping flame-boundary previews now play once from the path start to its end instead of remaining clamped at the endpoint.
+  - Prompt: Make non-looping, non-ping-pong flame boundaries preview from start to end in the editor.
+
+### 1300
+
+- Looped kill-boundary editor previews now continue from their true travelled path position when a linear animation timeline wraps instead of snapping elsewhere.
+  - Prompt: Keep non-ping-pong looped boundary previews continuous at timeline wrap.
+
+### 1200
+
+- Kill-boundary editor previews now resume forward linear playback immediately when Ping Pong Boundary Animation is unticked.
+  - Prompt: Stop editor preview ping-pong immediately when the option is disabled.
+- Level editors can author ping-pong kill-boundary paths and speed keys without calculating animation length; turnaround timing is derived automatically while all authored keys are preserved.
+  - Prompt: Make ping-pong boundary timing derive automatically from its path and all animated speed changes.
+- Tutorial 4's moving kill boundary now reverses cleanly at each authored endpoint without doubling back along an implicit closing path.
+  - Prompt: Fix the delayed double-back in the ping-pong kill boundary.
+
+## 2026-08-22
+
+### 1800
+
+- Candlesticks now display an always-lit flame with glowing embers and working local illumination.
+  - Prompt: Fix the new candlestick's candle flame.
+
 ## 2026-08-21
 
 ### 1700

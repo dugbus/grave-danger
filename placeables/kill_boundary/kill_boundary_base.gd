@@ -52,22 +52,35 @@ const MINIMUM_EDITOR_PREVIEW_PATH_LENGTH := 0.001
 ## Starts the boundary animation automatically during gameplay.
 @export var autoplay_boundary_animation := true
 
-## Reverses the boundary animation at each end instead of restarting it from the beginning.
+## Reverses the boundary animation at each end of its open path instead of restarting it.
 @export var ping_pong_boundary_animation := false:
 	set(value):
 		if ping_pong_boundary_animation == value:
 			return
 		ping_pong_boundary_animation = value
+		_configure_path_follow()
 		_configure_animation_loop_mode()
 
-## Closes the path so BoundaryCenter travels from its final point back to its starting point.
+## Loops non-ping-pong movement from the path end back to its start.
 @export var loop_boundary_path := true:
 	set(value):
+		if loop_boundary_path == value:
+			return
 		loop_boundary_path = value
 		_configure_path_follow()
+		_configure_animation_loop_mode()
 
 ## Distance travelled along the path per second. Key this to create pressure changes.
-@export_range(0.0, 20.0, 0.001, "or_greater", "suffix:mps") var movement_speed := 1.0
+## Track evaluation also drives path progress so editor playback stays on the animation timeline.
+@export_range(0.0, 20.0, 0.001, "or_greater", "suffix:mps") var movement_speed := 1.0:
+	set(value):
+		movement_speed = maxf(value, 0.0)
+		if not is_inside_tree():
+			return
+		if Engine.is_editor_hint():
+			_sync_editor_preview_animation()
+		else:
+			_sync_movement_to_animation()
 
 ## Keeps other animation keys attached to their path positions after a single speed key value is edited.
 @export var ripple_retime_after_speed_key_edit := true
@@ -362,17 +375,63 @@ var editor_speed_animation_snapshot: Animation
 var editor_speed_observed_signature := ""
 var editor_speed_stable_time := 0.0
 var is_syncing_boundary := false
+## Derived playback endpoint where integrated keyed speed reaches the open ping-pong path end.
+var derived_ping_pong_end_time := -1.0
 
 
 func _configure_animation_loop_mode() -> void:
 	if boundary_animation == null:
 		return
 
-	var requested_loop_mode := (
-		Animation.LOOP_PINGPONG if ping_pong_boundary_animation else Animation.LOOP_LINEAR
+	var animation_player := get_node_or_null(ANIMATION_PLAYER_NAME) as AnimationPlayer
+	var playback_is_configured := (
+		animation_player != null
+		and animation_player.has_animation(DEFAULT_ANIMATION_NAME)
+		and not animation_player.current_animation.is_empty()
 	)
+	var playback_was_active := playback_is_configured and animation_player.is_playing()
+	var playback_position := animation_player.current_animation_position \
+		if playback_is_configured else 0.0
+	var requested_loop_mode := _get_requested_animation_loop_mode()
 	if boundary_animation.loop_mode != requested_loop_mode:
 		boundary_animation.loop_mode = requested_loop_mode
+		movement_cycle_distance = 0.0
+		last_animation_position = playback_position
+	if ping_pong_boundary_animation:
+		_sync_path_point_animation_markers()
+		if playback_is_configured and derived_ping_pong_end_time > 0.0:
+			animation_player.set_section(0.0, derived_ping_pong_end_time)
+			if playback_was_active:
+				animation_player.play_section(
+					DEFAULT_ANIMATION_NAME,
+					0.0,
+					derived_ping_pong_end_time
+				)
+				animation_player.seek(
+					clampf(playback_position, 0.0, derived_ping_pong_end_time),
+					true
+				)
+		return
+
+	derived_ping_pong_end_time = -1.0
+	if not playback_is_configured:
+		return
+	if animation_player.has_section():
+		animation_player.reset_section()
+	if playback_was_active:
+		animation_player.play(DEFAULT_ANIMATION_NAME)
+		animation_player.seek(
+			clampf(playback_position, 0.0, boundary_animation.length),
+			true
+		)
+
+
+func _get_requested_animation_loop_mode() -> Animation.LoopMode:
+	if ping_pong_boundary_animation:
+		return Animation.LOOP_PINGPONG
+	if loop_boundary_path:
+		return Animation.LOOP_LINEAR
+	return Animation.LOOP_NONE
 
 
 @abstract func _animate_runtime_bounds_multiplier(target_multiplier: float, seconds: float) -> void
@@ -410,6 +469,7 @@ func _configure_animation_loop_mode() -> void:
     active_seconds: float,
     contraction_transition_seconds: float,
 ) -> void
+@abstract func _sync_path_point_animation_markers() -> void
 @abstract func _resume_runtime_motion_after(token: int, seconds: float) -> void
 @abstract func _ripple_retime_tracks_after_speed_change(old_animation: Animation, new_animation: Animation) -> bool
 @abstract func _sanitize_positive_range(value: Vector2, minimum: float) -> Vector2
