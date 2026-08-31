@@ -37,8 +37,10 @@ func run(_tree: SceneTree) -> void:
 	)
 	var duplicate_index := sequence.duplicate_pose(1)
 	expect(
-		duplicate_index == 2 and sequence.get_pose(3).time_seconds == 4.0,
-		"Duplicating inserts at one second and shifts later times."
+		duplicate_index == 2
+		and is_equal_approx(sequence.get_pose(duplicate_index).time_seconds, 5.01)
+		and is_equal_approx(sequence.get_pose(3).time_seconds, 8.0),
+		"Duplicating inserts five seconds later and shifts every later pose by five seconds."
 	)
 	sequence.delete_pose(0)
 	expect(

@@ -133,7 +133,7 @@ func _build_interface() -> void:
 		navigation,
 		"Duplicate",
 		_on_duplicate_pressed,
-		"Copy this pose one second later. Later poses move forward to keep their timing gaps."
+		"Copy this pose five seconds later. Later poses move forward to keep their timing gaps."
 	)
 	_delete_button = _add_button(
 		navigation,

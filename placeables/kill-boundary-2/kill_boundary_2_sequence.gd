@@ -13,7 +13,8 @@ enum RetimingMode {
 }
 
 const MINIMUM_INTERVAL_SECONDS := 0.01
-const DEFAULT_NEW_POSE_SECONDS := 1.0
+const DEFAULT_ADD_POSE_SECONDS := 1.0
+const DEFAULT_DUPLICATE_POSE_SECONDS := 5.0
 
 var _is_sanitizing := false
 
@@ -70,7 +71,7 @@ func add_default_pose() -> int:
 	var poses := get_poses()
 	var pose := GDKillBoundary2Pose.new()
 	_is_sanitizing = true
-	pose.time_seconds = poses.back().time_seconds + DEFAULT_NEW_POSE_SECONDS
+	pose.time_seconds = poses.back().time_seconds + DEFAULT_ADD_POSE_SECONDS
 	_add_pose_node(pose)
 	_is_sanitizing = false
 	_notify_sequence_changed(get_pose_count() - 1)
@@ -84,10 +85,10 @@ func duplicate_pose(index: int) -> int:
 		return -1
 	_is_sanitizing = true
 	for later_index in range(index + 1, poses.size()):
-		poses[later_index].time_seconds += DEFAULT_NEW_POSE_SECONDS
+		poses[later_index].time_seconds += DEFAULT_DUPLICATE_POSE_SECONDS
 	var copy := GDKillBoundary2Pose.new()
 	copy.copy_values_from(poses[index])
-	copy.time_seconds += DEFAULT_NEW_POSE_SECONDS
+	copy.time_seconds += DEFAULT_DUPLICATE_POSE_SECONDS
 	_add_pose_node(copy, index + 1)
 	_is_sanitizing = false
 	_notify_sequence_changed(index + 1)

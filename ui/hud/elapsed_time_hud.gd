@@ -102,10 +102,4 @@ func _is_boundary_animation_active() -> bool:
 
 
 func _format_elapsed_seconds(seconds: float) -> String:
-	var clamped_seconds := maxf(seconds, 0.0)
-	var minutes := int(floorf(clamped_seconds / 60.0))
-	var remaining_seconds := clamped_seconds - float(minutes * 60)
-	if minutes <= 0:
-		return "%.1fs" % remaining_seconds
-
-	return "%d:%04.1f" % [minutes, remaining_seconds]
+	return "%.1fs" % maxf(seconds, 0.0)

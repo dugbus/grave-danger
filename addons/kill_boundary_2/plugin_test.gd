@@ -19,8 +19,8 @@ func run(_tree: SceneTree) -> void:
 		"The registration shim lets pose navigation update the Inspector."
 	)
 	expect(
-		source.contains("node is GDKillBoundary2Pose") and source.contains("get_pose_index(pose)"),
-		"Selecting an authored pose keeps the boundary panel and preview synchronized."
+		source.contains("_bottom_panel_button.visible = boundary != null"),
+		"The bottom-panel tab is hidden when no Kill Boundary 2 selection can use it."
 	)
 	expect(
 		source.contains("_gizmo_plugin.bind_boundary(boundary)"),
@@ -31,3 +31,32 @@ func run(_tree: SceneTree) -> void:
 		and not source.contains("get_editor_interface().edit_node(pose)"),
 		"Selecting the boundary root leaves it selected so level editors can inspect or delete it."
 	)
+
+	var boundary := GDKillBoundary2.new()
+	var implementation_child := Node3D.new()
+	implementation_child.name = "BoundarySpace"
+	boundary.add_child(implementation_child)
+	expect_equal(
+		SUBJECT._resolve_selected_boundary(implementation_child),
+		boundary,
+		"Selecting an implementation child keeps its owning boundary panel active."
+	)
+
+	var second_pose_index := boundary.sequence.add_default_pose()
+	var second_pose := boundary.sequence.get_pose(second_pose_index)
+	var pose_child := Node.new()
+	second_pose.add_child(pose_child)
+	boundary.set_editor_active_pose(0)
+	expect(
+		SUBJECT._resolve_selected_boundary(pose_child) == boundary
+		and boundary.editor_active_pose_index == second_pose_index,
+		"Selecting a pose descendant activates that pose and keeps its boundary bound."
+	)
+
+	var unrelated := Node.new()
+	expect(
+		SUBJECT._resolve_selected_boundary(unrelated) == null,
+		"Nodes outside Kill Boundary 2 do not activate its editor panel."
+	)
+	unrelated.free()
+	boundary.free()

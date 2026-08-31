@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-08-31
+
+### 1600
+
+- Onscreen elapsed and boundary timers now stay in seconds at every duration so they match authored Pose times.
+  - Prompt: Show the onscreen Kill Boundary timer entirely in seconds.
+
+### 1500
+
+- Duplicating a Kill Boundary 2 pose now places its copy five seconds later and shifts following poses by the same amount.
+  - Prompt: Default duplicated Kill Boundary 2 poses to a five-second gap.
+- Kill Boundary 2 authoring now stays active when level editors select any of its child nodes, while its unusable editor tab stays hidden for unrelated selections.
+  - Prompt: Keep the Kill Boundary 2 editor responsive when its implementation children are selected.
+
 ## 2026-08-30
 
 ### 2200

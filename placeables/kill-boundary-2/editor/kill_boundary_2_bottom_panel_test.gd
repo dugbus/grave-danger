@@ -27,6 +27,10 @@ func run(_tree: SceneTree) -> void:
 		and (SUBJECT as Script).get_source_code().contains("_on_pose_selected"),
 		"The panel provides a synchronized pose-number and absolute-time dropdown."
 	)
+	expect(
+		(SUBJECT as Script).get_source_code().contains("Copy this pose five seconds later"),
+		"The Duplicate control explains its five-second timing offset."
+	)
 	var panel := GDKillBoundary2BottomPanel.new()
 	var boundary := GDKillBoundary2.new()
 	boundary.sequence.add_default_pose()
