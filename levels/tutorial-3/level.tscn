@@ -14,10 +14,14 @@
 [ext_resource type="PackedScene" path="res://placeables/torch/torch.tscn" id="17_eet0d"]
 [ext_resource type="PackedScene" uid="uid://d2wv161iga1us" path="res://Assets/environment/coffin_lid.tscn" id="18_2nrfl"]
 [ext_resource type="PackedScene" uid="uid://bqw0vuwkr2use" path="res://Assets/environment/empty_coffin.tscn" id="19_ddm6g"]
-[ext_resource type="PackedScene" path="res://Assets/environment/candlestick.tscn" id="20_4pltx"]
+[ext_resource type="PackedScene" uid="uid://ccgg3jsmlm61v" path="res://Assets/environment/candlestick.tscn" id="20_4pltx"]
 [ext_resource type="Texture2D" uid="uid://dph1m5l027osi" path="res://Assets/particles/mote.png" id="20_ddm6g"]
+[ext_resource type="PackedScene" path="res://placeables/kill-boundary-2/kill_boundary_2.tscn" id="21_2gq0d"]
 [ext_resource type="PackedScene" path="res://placeables/treasure/treasure_pile.tscn" id="22_75ryq"]
+[ext_resource type="Script" uid="uid://cdbrd8l1xcpmj" path="res://placeables/kill-boundary-2/kill_boundary_2_sequence.gd" id="22_ttkr6"]
+[ext_resource type="Script" uid="uid://dgcwdfr8rpucx" path="res://placeables/kill-boundary-2/kill_boundary_2_pose.gd" id="23_mn2y1"]
 [ext_resource type="PackedScene" path="res://levels/vampire-maze/generated_maze/generated_bat_noise.tscn" id="24_bs16d"]
+[ext_resource type="PackedScene" uid="uid://mbxax50al4bn" path="res://placeables/collectibles/health_flask.tscn" id="24_ttkr6"]
 [ext_resource type="Shader" uid="uid://bi3o8elbtqoni" path="res://addons/simplegrasstextured/shaders/grass.gdshader" id="27_370kx"]
 [ext_resource type="ArrayMesh" uid="uid://bnp6ud7heja8" path="res://Assets/environment/grass-small.res" id="28_1vs5v"]
 
@@ -370,30 +374,6 @@ transparency = 1
 shading_mode = 0
 albedo_color = Color(1, 0.72, 0.08, 0.12)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_dbv8d"]
-resource_local_to_scene = true
-material = SubResource("StandardMaterial3D_selection")
-height = 0.4
-radial_segments = 32
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_2gq0d"]
-resource_local_to_scene = true
-material = SubResource("StandardMaterial3D_selection")
-height = 0.4
-radial_segments = 32
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_ttkr6"]
-resource_local_to_scene = true
-material = SubResource("StandardMaterial3D_selection")
-height = 0.4
-radial_segments = 32
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_mn2y1"]
-resource_local_to_scene = true
-material = SubResource("StandardMaterial3D_selection")
-height = 0.4
-radial_segments = 32
-
 [sub_resource type="CylinderMesh" id="CylinderMesh_0lrtl"]
 resource_local_to_scene = true
 material = SubResource("StandardMaterial3D_selection")
@@ -418,6 +398,30 @@ material = SubResource("StandardMaterial3D_selection")
 height = 0.4
 radial_segments = 32
 
+[sub_resource type="CylinderMesh" id="CylinderMesh_vrnv4"]
+resource_local_to_scene = true
+material = SubResource("StandardMaterial3D_selection")
+height = 0.4
+radial_segments = 32
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_arvmr"]
+resource_local_to_scene = true
+material = SubResource("StandardMaterial3D_selection")
+height = 0.4
+radial_segments = 32
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_lo6oo"]
+resource_local_to_scene = true
+material = SubResource("StandardMaterial3D_selection")
+height = 0.4
+radial_segments = 32
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_cg4j0"]
+resource_local_to_scene = true
+material = SubResource("StandardMaterial3D_selection")
+height = 0.4
+radial_segments = 32
+
 [sub_resource type="Gradient" id="Gradient_wjj06"]
 colors = PackedColorArray(0.24637166, 0.13708663, 0.09699503, 1, 0.83, 0.71712005, 0.2656, 1)
 
@@ -426,7 +430,7 @@ gradient = SubResource("Gradient_wjj06")
 fill_from = Vector2(0, 1)
 fill_to = Vector2(0, 0.01994302)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_vrnv4"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_al22f"]
 render_priority = 0
 shader = ExtResource("27_370kx")
 shader_parameter/albedo = Color(1, 1, 1, 1)
@@ -563,14 +567,21 @@ physics_material_override = SubResource("PhysicsMaterial_coffin")
 [node name="CollisionShape3D" parent="Layout/GeneratedContent/GeneratedTreasureCoffin01" index="1" unique_id=832851464]
 shape = SubResource("BoxShape3D_coffin")
 
-[node name="GeneratedTreasureCoffin02" parent="Layout/GeneratedContent" index="3" unique_id=649804199 instance=ExtResource("17_bemc8")]
+[node name="GeneratedTreasureCoffin03" parent="Layout/GeneratedContent" index="3" unique_id=2119967100 instance=ExtResource("17_bemc8")]
+transform = Transform3D(-0.43957135, 0, 0.89820766, 0, 1, 0, -0.89820766, 0, -0.43957135, 13.628923, 0, 13.56999)
+physics_material_override = SubResource("PhysicsMaterial_coffin")
+
+[node name="CollisionShape3D" parent="Layout/GeneratedContent/GeneratedTreasureCoffin03" index="1" unique_id=832851464]
+shape = SubResource("BoxShape3D_coffin")
+
+[node name="GeneratedTreasureCoffin02" parent="Layout/GeneratedContent" index="4" unique_id=649804199 instance=ExtResource("17_bemc8")]
 transform = Transform3D(0.70710677, 0, -0.70710677, 0, 1, 0, 0.70710677, 0, 0.70710677, 13.5, 0, -13.5)
 physics_material_override = SubResource("PhysicsMaterial_coffin")
 
 [node name="CollisionShape3D" parent="Layout/GeneratedContent/GeneratedTreasureCoffin02" index="1" unique_id=832851464]
 shape = SubResource("BoxShape3D_coffin")
 
-[node name="GeneratedTreasureCache01" parent="Layout/GeneratedContent" index="4" unique_id=103174636 instance=ExtResource("22_75ryq")]
+[node name="GeneratedTreasureCache01" parent="Layout/GeneratedContent" index="5" unique_id=103174636 instance=ExtResource("22_75ryq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, 5.5)
 gold_coin_count = 25
 diamond_count = 0
@@ -580,9 +591,9 @@ random_seed = 3
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache01" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_dbv8d")
+mesh = SubResource("CylinderMesh_0lrtl")
 
-[node name="GeneratedTreasureCache02" parent="Layout/GeneratedContent" index="5" unique_id=1096016980 instance=ExtResource("22_75ryq")]
+[node name="GeneratedTreasureCache02" parent="Layout/GeneratedContent" index="6" unique_id=1096016980 instance=ExtResource("22_75ryq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 8)
 gold_coin_count = 25
 diamond_count = 0
@@ -592,9 +603,9 @@ random_seed = 980
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache02" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_2gq0d")
+mesh = SubResource("CylinderMesh_w5oxn")
 
-[node name="GeneratedTreasureCache03" parent="Layout/GeneratedContent" index="6" unique_id=948172586 instance=ExtResource("22_75ryq")]
+[node name="GeneratedTreasureCache03" parent="Layout/GeneratedContent" index="7" unique_id=948172586 instance=ExtResource("22_75ryq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.5, 0, 7.5)
 gold_coin_count = 25
 diamond_count = 0
@@ -604,9 +615,9 @@ random_seed = 1957
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache03" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_ttkr6")
+mesh = SubResource("CylinderMesh_xlcfd")
 
-[node name="GeneratedTreasureCache04" parent="Layout/GeneratedContent" index="7" unique_id=1938101622 instance=ExtResource("22_75ryq")]
+[node name="GeneratedTreasureCache04" parent="Layout/GeneratedContent" index="8" unique_id=1938101622 instance=ExtResource("22_75ryq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -10.5)
 gold_coin_count = 25
 diamond_count = 0
@@ -616,9 +627,9 @@ random_seed = 2934
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache04" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_mn2y1")
+mesh = SubResource("CylinderMesh_kdg3u")
 
-[node name="GeneratedTreasureCache05" parent="Layout/GeneratedContent" index="8" unique_id=1368134495 instance=ExtResource("22_75ryq")]
+[node name="GeneratedTreasureCache05" parent="Layout/GeneratedContent" index="9" unique_id=1368134495 instance=ExtResource("22_75ryq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, -4.5)
 gold_coin_count = 25
 diamond_count = 0
@@ -628,9 +639,9 @@ random_seed = 3911
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache05" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_0lrtl")
+mesh = SubResource("CylinderMesh_vrnv4")
 
-[node name="GeneratedTreasureCache06" parent="Layout/GeneratedContent" index="9" unique_id=1870239082 instance=ExtResource("22_75ryq")]
+[node name="GeneratedTreasureCache06" parent="Layout/GeneratedContent" index="10" unique_id=1870239082 instance=ExtResource("22_75ryq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0, -7.5)
 gold_coin_count = 25
 diamond_count = 0
@@ -640,9 +651,9 @@ random_seed = 3
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache06" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_w5oxn")
+mesh = SubResource("CylinderMesh_arvmr")
 
-[node name="GeneratedTreasureCache07" parent="Layout/GeneratedContent" index="10" unique_id=1522925338 instance=ExtResource("22_75ryq")]
+[node name="GeneratedTreasureCache07" parent="Layout/GeneratedContent" index="11" unique_id=1522925338 instance=ExtResource("22_75ryq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 0, -4.5)
 gold_coin_count = 25
 diamond_count = 0
@@ -652,9 +663,9 @@ random_seed = 3
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache07" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_xlcfd")
+mesh = SubResource("CylinderMesh_lo6oo")
 
-[node name="GeneratedTreasureCache08" parent="Layout/GeneratedContent" index="11" unique_id=596614822 instance=ExtResource("22_75ryq")]
+[node name="GeneratedTreasureCache08" parent="Layout/GeneratedContent" index="12" unique_id=596614822 instance=ExtResource("22_75ryq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 13.5)
 gold_coin_count = 25
 diamond_count = 0
@@ -664,13 +675,13 @@ random_seed = 3
 
 [node name="EditorSelectionPlaceholder" parent="Layout/GeneratedContent/GeneratedTreasureCache08" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("CylinderMesh_kdg3u")
+mesh = SubResource("CylinderMesh_cg4j0")
 
-[node name="GeneratedBatNoise01" parent="Layout/GeneratedContent" index="12" unique_id=1944221100 instance=ExtResource("24_bs16d")]
+[node name="GeneratedBatNoise01" parent="Layout/GeneratedContent" index="13" unique_id=1944221100 instance=ExtResource("24_bs16d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 1.6, 10)
 
 [node name="SimpleGrassTextured" type="MultiMeshInstance3D" parent="Layout" unique_id=211199895]
-material_override = SubResource("ShaderMaterial_vrnv4")
+material_override = SubResource("ShaderMaterial_al22f")
 cast_shadow = 0
 multimesh = SubResource("MultiMesh_eet0d")
 script = ExtResource("14_bwxx6")
@@ -716,6 +727,9 @@ transform = Transform3D(0.036571637, 0, -0.999331, 0, 1, 0, 0.999331, 0, 0.03657
 [node name="EmptyCoffin" parent="Layout" unique_id=27773371 instance=ExtResource("19_ddm6g")]
 transform = Transform3D(0.6427876, 0, -0.7660445, 0, 1, 0, 0.7660445, 0, 0.6427876, -4.563671, 0, 0.89944327)
 
+[node name="GDHealthFlask" parent="Layout" unique_id=1387496220 instance=ExtResource("24_ttkr6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, -1)
+
 [node name="MoteParticles" type="GPUParticles3D" parent="." unique_id=522287535]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
 cast_shadow = 0
@@ -730,12 +744,170 @@ draw_pass_1 = SubResource("QuadMesh_v11xe")
 [node name="Candlestick" parent="." unique_id=1016574851 instance=ExtResource("20_4pltx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0, -1.5)
 
+[node name="KillBoundary2" parent="." unique_id=1743241866 instance=ExtResource("21_2gq0d")]
+retiming_mode = 1
+
+[node name="Poses" type="Node" parent="KillBoundary2" unique_id=1685645537]
+script = ExtResource("22_ttkr6")
+
+[node name="Pose 1" type="Node3D" parent="KillBoundary2/Poses" unique_id=32349540]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.122866, 0, -12.747309)
+script = ExtResource("23_mn2y1")
+size = Vector2(6.7542686, 6.5053816)
+
+[node name="Pose 2" type="Node3D" parent="KillBoundary2/Poses" unique_id=609015097]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.122866, 0, -12.747309)
+script = ExtResource("23_mn2y1")
+size = Vector2(6.7542686, 6.5053816)
+time_seconds = 1.0
+
+[node name="Pose 3" type="Node3D" parent="KillBoundary2/Poses" unique_id=1159558742]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.022984, 0, -7.0374775)
+script = ExtResource("23_mn2y1")
+size = Vector2(6.954036, 7.08572)
+time_seconds = 5.0
+outgoing_easing = 1
+
+[node name="Pose 4" type="Node3D" parent="KillBoundary2/Poses" unique_id=509177218]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.522984, 0, -10.351996)
+script = ExtResource("23_mn2y1")
+size = Vector2(6.954036, 8.456682)
+time_seconds = 9.0
+outgoing_easing = 1
+
+[node name="Pose 5" type="Node3D" parent="KillBoundary2/Poses" unique_id=737008415]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.877134, 0, -10.381866)
+script = ExtResource("23_mn2y1")
+size = Vector2(6.7542686, 8.774496)
+time_seconds = 26.0
+
+[node name="Pose 6" type="Node3D" parent="KillBoundary2/Poses" unique_id=448400353]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.877134, 0, -10.381866)
+script = ExtResource("23_mn2y1")
+size = Vector2(6.7542686, 8.774496)
+time_seconds = 29.0
+
+[node name="Pose 7" type="Node3D" parent="KillBoundary2/Poses" unique_id=204404643]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.877134, 0, 10.118134)
+script = ExtResource("23_mn2y1")
+size = Vector2(6.7542686, 8.774496)
+time_seconds = 38.0
+
+[node name="Pose 8" type="Node3D" parent="KillBoundary2/Poses" unique_id=1471922438]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3771343, 0, 3.174146)
+script = ExtResource("23_mn2y1")
+size = Vector2(6.7542686, 5.886521)
+time_seconds = 47.0
+
+[node name="Pose 9" type="Node3D" parent="KillBoundary2/Poses" unique_id=1752348957]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.3771343, 0, -2.825854)
+script = ExtResource("23_mn2y1")
+size = Vector2(6.7542686, 5.886521)
+time_seconds = 53.0
+
+[node name="Pose 10" type="Node3D" parent="KillBoundary2/Poses" unique_id=1643290970]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8771343, 0, -2.825854)
+script = ExtResource("23_mn2y1")
+size = Vector2(6.7542686, 5.886521)
+time_seconds = 56.0
+
+[node name="Pose 11" type="Node3D" parent="KillBoundary2/Poses" unique_id=1880323608]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.165809, 0, -10.53492)
+script = ExtResource("23_mn2y1")
+size = Vector2(9.331618, 8.46839)
+time_seconds = 62.0
+
+[node name="Pose 12" type="Node3D" parent="KillBoundary2/Poses" unique_id=808999545]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6658092, 0, 4.4650803)
+script = ExtResource("23_mn2y1")
+size = Vector2(9.331618, 8.46839)
+time_seconds = 72.0
+
+[node name="Pose 13" type="Node3D" parent="KillBoundary2/Poses" unique_id=548765618]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4578328, 0, 4.3251038)
+script = ExtResource("23_mn2y1")
+size = Vector2(3.0843344, 4.108683)
+time_seconds = 84.0
+
+[node name="Pose 14" type="Node3D" parent="KillBoundary2/Poses" unique_id=1325086252]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.036406994, 0, -1.2676609)
+script = ExtResource("23_mn2y1")
+size = Vector2(5.927186, 8.923154)
+time_seconds = 90.0
+
+[node name="Pose 15" type="Node3D" parent="KillBoundary2/Poses" unique_id=792241297]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.036407, 0, -1.2676609)
+script = ExtResource("23_mn2y1")
+size = Vector2(5.927186, 8.923154)
+time_seconds = 98.0
+
+[node name="Pose 16" type="Node3D" parent="KillBoundary2/Poses" unique_id=788175867]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.036407, 0, 6.003396)
+script = ExtResource("23_mn2y1")
+size = Vector2(5.927186, 6.381039)
+time_seconds = 106.0
+
+[node name="Pose 17" type="Node3D" parent="KillBoundary2/Poses" unique_id=857813725]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9635925, 0, 9.092722)
+script = ExtResource("23_mn2y1")
+size = Vector2(5.927186, 6.2023883)
+time_seconds = 120.0
+
+[node name="Pose 18" type="Node3D" parent="KillBoundary2/Poses" unique_id=226079522]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.0364075, 0, 11.592722)
+script = ExtResource("23_mn2y1")
+size = Vector2(5.927186, 6.2023883)
+time_seconds = 126.0
+
+[node name="Pose 19" type="Node3D" parent="KillBoundary2/Poses" unique_id=2004038259]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.2228017, 0, 13.233696)
+script = ExtResource("23_mn2y1")
+size = Vector2(12.246037, 2.9204454)
+time_seconds = 130.0
+
+[node name="Pose 20" type="Node3D" parent="KillBoundary2/Poses" unique_id=1118110378]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.2228017, 0, 13.233696)
+script = ExtResource("23_mn2y1")
+size = Vector2(12.246037, 2.9204454)
+time_seconds = 136.0
+
+[node name="Pose 21" type="Node3D" parent="KillBoundary2/Poses" unique_id=1673524211]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.203489, 0, 11.959061)
+script = ExtResource("23_mn2y1")
+size = Vector2(6.284661, 6.7219234)
+time_seconds = 142.0
+
+[node name="Pose 22" type="Node3D" parent="KillBoundary2/Poses" unique_id=30675584]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.203489, 0, 11.959061)
+script = ExtResource("23_mn2y1")
+size = Vector2(6.284661, 6.7219234)
+time_seconds = 145.0
+
+[node name="Pose 23" type="Node3D" parent="KillBoundary2/Poses" unique_id=1021507200]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.796511, 0, 13.4327965)
+script = ExtResource("23_mn2y1")
+size = Vector2(6.284661, 3.7744484)
+time_seconds = 155.0
+
+[node name="Pose 24" type="Node3D" parent="KillBoundary2/Poses" unique_id=1590847448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.796511, 0, 13.4327965)
+script = ExtResource("23_mn2y1")
+size = Vector2(6.284661, 3.7744484)
+time_seconds = 165.0
+
+[node name="Pose 25" type="Node3D" parent="KillBoundary2/Poses" unique_id=2072446740]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.796511, 0, 17.932796)
+script = ExtResource("23_mn2y1")
+size = Vector2(6.284661, 3.7744484)
+time_seconds = 170.0
+
 [editable path="IndoorLighting"]
 [editable path="Layout"]
 [editable path="Layout/GeneratedContent/GeneratedLockedGate"]
 [editable path="Layout/GeneratedContent/GeneratedGoldKey01"]
 [editable path="Layout/GeneratedContent/GeneratedGoldKey01/KeyModel"]
 [editable path="Layout/GeneratedContent/GeneratedTreasureCoffin01"]
+[editable path="Layout/GeneratedContent/GeneratedTreasureCoffin03"]
 [editable path="Layout/GeneratedContent/GeneratedTreasureCoffin02"]
 [editable path="Layout/GeneratedContent/GeneratedTreasureCache01"]
 [editable path="Layout/GeneratedContent/GeneratedTreasureCache02"]
