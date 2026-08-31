@@ -1,0 +1,36 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://placeables/kill-boundary-2/kill_boundary_2.gd" id="1_root"]
+[ext_resource type="Resource" path="res://placeables/kill-boundary-2/kill_boundary_2_settings.tres" id="4_settings"]
+[ext_resource type="Script" path="res://placeables/kill-boundary-2/kill_boundary_2_animator.gd" id="5_animator"]
+[ext_resource type="Script" path="res://placeables/kill-boundary-2/kill_boundary_2_geometry.gd" id="6_geometry"]
+[ext_resource type="Script" path="res://placeables/kill-boundary-2/kill_boundary_2_presentation.gd" id="7_presentation"]
+[ext_resource type="Script" path="res://placeables/kill-boundary-2/kill_boundary_2_damage.gd" id="8_damage"]
+[ext_resource type="Script" path="res://placeables/kill-boundary-2/kill_boundary_2_blockers.gd" id="9_blockers"]
+[ext_resource type="Script" path="res://placeables/kill-boundary-2/kill_boundary_2_audio.gd" id="10_audio"]
+
+[node name="KillBoundary2" type="Node" groups=["kill_boundary"]]
+script = ExtResource("1_root")
+settings = ExtResource("4_settings")
+
+[node name="Animator" type="Node" parent="."]
+script = ExtResource("5_animator")
+
+[node name="Geometry" type="Node" parent="."]
+script = ExtResource("6_geometry")
+
+[node name="BoundarySpace" type="Node3D" parent="."]
+
+[node name="StateRoot" type="Node3D" parent="BoundarySpace"]
+
+[node name="Presentation" type="Node3D" parent="BoundarySpace/StateRoot"]
+script = ExtResource("7_presentation")
+
+[node name="Damage" type="Node3D" parent="BoundarySpace/StateRoot"]
+script = ExtResource("8_damage")
+
+[node name="Blockers" type="Node3D" parent="BoundarySpace/StateRoot"]
+script = ExtResource("9_blockers")
+
+[node name="ProximityAudio" type="AudioStreamPlayer" parent="."]
+script = ExtResource("10_audio")

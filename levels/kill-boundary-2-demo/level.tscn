@@ -1,0 +1,172 @@
+[gd_scene format=3 uid="uid://cwxcrvf1fhu1m"]
+
+[ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://lighting/gd_outdoor_lighting.tscn" id="2_lighting"]
+[ext_resource type="Script" uid="uid://bvowj5mveddhm" path="res://levels/level_settings.gd" id="3_settings"]
+[ext_resource type="PackedScene" path="res://placeables/kill-boundary-2/kill_boundary_2.tscn" id="4_boundary"]
+[ext_resource type="Script" uid="uid://dgcwdfr8rpucx" path="res://placeables/kill-boundary-2/kill_boundary_2_pose.gd" id="5_pose"]
+[ext_resource type="Script" uid="uid://cdbrd8l1xcpmj" path="res://placeables/kill-boundary-2/kill_boundary_2_sequence.gd" id="6_sequence"]
+[ext_resource type="PackedScene" uid="uid://5ele5gk0flc" path="res://placeables/collectibles/flask_pause_boundary.tscn" id="7_pause"]
+[ext_resource type="PackedScene" uid="uid://cujenbxxb5lj5" path="res://placeables/collectibles/flask_breathing_space.tscn" id="8_space"]
+[ext_resource type="PackedScene" uid="uid://bilrp2by5t4q1" path="res://placeables/collectibles/flask_no_boundary.tscn" id="9_remove"]
+[ext_resource type="Script" uid="uid://ceyo0fmieerd8" path="res://levels/kill-boundary-2-demo/kill_boundary_2_demo_controls.gd" id="10_controls"]
+
+[sub_resource type="StandardMaterial3D" id="FloorMaterial"]
+albedo_color = Color(0.15, 0.18, 0.22, 1)
+roughness = 0.86
+
+[sub_resource type="BoxMesh" id="FloorMesh"]
+material = SubResource("FloorMaterial")
+size = Vector3(32, 0.2, 32)
+
+[sub_resource type="BoxShape3D" id="FloorCollision"]
+size = Vector3(32, 0.2, 32)
+
+[node name="KillBoundary2Demo" type="Node3D" unique_id=76900735]
+
+[node name="Player" parent="." unique_id=992154292 instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+
+[node name="OutdoorLighting" parent="." unique_id=1813867606 instance=ExtResource("2_lighting")]
+
+[node name="LevelSettings" type="Node" parent="." unique_id=52057596]
+script = ExtResource("3_settings")
+show_minimap = true
+
+[node name="Floor" type="StaticBody3D" parent="." unique_id=1904808095]
+
+[node name="Mesh" type="MeshInstance3D" parent="Floor" unique_id=1780783682]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+mesh = SubResource("FloorMesh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=849958061]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+shape = SubResource("FloorCollision")
+
+[node name="KillBoundary2" parent="." unique_id=1885470510 instance=ExtResource("4_boundary")]
+playback_mode = 1
+loop_return_seconds = 3.0
+
+[node name="Poses" type="Node" parent="KillBoundary2"]
+script = ExtResource("6_sequence")
+
+[node name="Pose 1" type="Node3D" parent="KillBoundary2/Poses"]
+position = Vector3(-2, 0, -1)
+script = ExtResource("5_pose")
+size = Vector2(18, 12)
+
+[node name="Pose 2" type="Node3D" parent="KillBoundary2/Poses"]
+position = Vector3(1, 0, -1)
+rotation = Vector3(0, 0.35, 0)
+script = ExtResource("5_pose")
+size = Vector2(16, 10)
+rounding = 0.35
+time_seconds = 3.0
+outgoing_easing = 1
+
+[node name="Pose 3" type="Node3D" parent="KillBoundary2/Poses"]
+position = Vector3(2, 0, 2)
+rotation = Vector3(0, 1.2, 0)
+script = ExtResource("5_pose")
+size = Vector2(12, 18)
+rounding = 1.0
+time_seconds = 6.0
+outgoing_easing = 2
+
+[node name="Pose 4" type="Node3D" parent="KillBoundary2/Poses"]
+position = Vector3(-1, 0, 2)
+rotation = Vector3(0, 2.6, 0)
+script = ExtResource("5_pose")
+size = Vector2(14, 14)
+rounding = 1.0
+time_seconds = 9.0
+outgoing_easing = 3
+
+[node name="Pose 5" type="Node3D" parent="KillBoundary2/Poses"]
+rotation = Vector3(0, 3.4, 0)
+script = ExtResource("5_pose")
+size = Vector2(20, 9)
+rounding = 0.6
+time_seconds = 11.82
+outgoing_easing = 1
+
+[node name="PauseBoundaryFlask" parent="." unique_id=386078868 instance=ExtResource("7_pause")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+
+[node name="BreathingSpaceFlask" parent="." unique_id=1118265294 instance=ExtResource("8_space")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+
+[node name="NoBoundaryFlask" parent="." unique_id=1007491869 instance=ExtResource("9_remove")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+
+[node name="DemoHUD" type="CanvasLayer" parent="." unique_id=917479746]
+
+[node name="Controls" type="MarginContainer" parent="DemoHUD" unique_id=623567751]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 520.0
+offset_bottom = 216.0
+script = ExtResource("10_controls")
+boundary_path = NodePath("../../KillBoundary2")
+
+[node name="Panel" type="PanelContainer" parent="DemoHUD/Controls" unique_id=1737365309]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="DemoHUD/Controls/Panel" unique_id=547289841]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="DemoHUD/Controls/Panel/VBox" unique_id=1195596811]
+layout_mode = 2
+text = "Kill Boundary 2 Runtime Validation"
+
+[node name="EffectRow" type="HBoxContainer" parent="DemoHUD/Controls/Panel/VBox" unique_id=707038103]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DemoHUD/Controls/Panel/VBox/EffectRow" unique_id=600950517]
+layout_mode = 2
+text = "Effect"
+
+[node name="Effect" type="OptionButton" parent="DemoHUD/Controls/Panel/VBox/EffectRow" unique_id=1918796658]
+layout_mode = 2
+
+[node name="ModeRow" type="HBoxContainer" parent="DemoHUD/Controls/Panel/VBox" unique_id=93172915]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DemoHUD/Controls/Panel/VBox/ModeRow" unique_id=1929074664]
+layout_mode = 2
+text = "Playback"
+
+[node name="Mode" type="OptionButton" parent="DemoHUD/Controls/Panel/VBox/ModeRow" unique_id=1155287215]
+layout_mode = 2
+
+[node name="SpeedRow" type="HBoxContainer" parent="DemoHUD/Controls/Panel/VBox" unique_id=991206817]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DemoHUD/Controls/Panel/VBox/SpeedRow" unique_id=1197003934]
+layout_mode = 2
+text = "Speed"
+
+[node name="Speed" type="OptionButton" parent="DemoHUD/Controls/Panel/VBox/SpeedRow" unique_id=1841933380]
+layout_mode = 2
+
+[node name="TransportRow" type="HBoxContainer" parent="DemoHUD/Controls/Panel/VBox" unique_id=285630937]
+layout_mode = 2
+
+[node name="Restart" type="Button" parent="DemoHUD/Controls/Panel/VBox/TransportRow" unique_id=888566361]
+layout_mode = 2
+text = "Restart"
+
+[node name="PauseResume" type="Button" parent="DemoHUD/Controls/Panel/VBox/TransportRow" unique_id=1911369679]
+layout_mode = 2
+text = "Pause"
+
+[node name="BoundaryRow" type="HBoxContainer" parent="DemoHUD/Controls/Panel/VBox" unique_id=131111507]
+layout_mode = 2
+
+[node name="Remove" type="Button" parent="DemoHUD/Controls/Panel/VBox/BoundaryRow" unique_id=1690826205]
+layout_mode = 2
+text = "Remove boundary"
+
+[node name="Reload" type="Button" parent="DemoHUD/Controls/Panel/VBox/BoundaryRow" unique_id=1880536011]
+layout_mode = 2
+text = "Reload demo"

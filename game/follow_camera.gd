@@ -254,6 +254,23 @@ func _get_initial_bounds_distance(bounds_size: Vector2) -> float:
 
 
 func _get_boundary_fit_points(bounds_size: Vector2) -> Array[Vector3]:
+	if kill_boundary.has_method(&"get_camera_fit_world_points"):
+		var exact_points := (
+			kill_boundary.call(&"get_camera_fit_world_points") as PackedVector3Array
+		)
+		if not exact_points.is_empty():
+			var exact_result: Array[Vector3] = []
+			var exact_focus := _get_boundary_fit_focus()
+			var exact_height := maxf(kill_boundary.get_bounds_height(), 0.0) \
+				if kill_boundary.has_method(&"get_bounds_height") else 0.0
+			for world_point in exact_points:
+				var padded := exact_focus \
+					+ (world_point - exact_focus) * boundary_padding
+				exact_result.append(padded)
+				if exact_height > 0.0:
+					exact_result.append(padded + Vector3.UP * exact_height)
+			return exact_result
+
 	var bounds_transform := Transform3D(Basis.IDENTITY, kill_boundary.get_bounds_center())
 	if kill_boundary.has_method("get_camera_fit_transform"):
 		bounds_transform = kill_boundary.get_camera_fit_transform()

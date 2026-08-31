@@ -52,8 +52,8 @@ static func isolate_state(node: Node) -> void:
 
 
 static func start_runtime(node: Node) -> void:
-	if node is GDKillBoundary3D:
-		(node as GDKillBoundary3D).begin_runtime_animation()
+	if node.is_in_group(&"kill_boundary") and node.has_method(&"begin_runtime_animation"):
+		node.call(&"begin_runtime_animation")
 	for child in node.get_children():
 		start_runtime(child)
 

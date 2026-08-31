@@ -321,6 +321,23 @@ func _has_playable_bounds() -> bool:
 func _get_playable_bounds() -> AABB:
 	if _is_valid_playable_bounds(level_bounds, has_level_bounds):
 		return level_bounds
+	if kill_boundary != null \
+			and kill_boundary.has_method(&"get_boundary_world_points"):
+		var exact_points := (
+			kill_boundary.call(&"get_boundary_world_points") as PackedVector3Array
+		)
+		if not exact_points.is_empty():
+			var minimum := exact_points[0]
+			var maximum := exact_points[0]
+			for point in exact_points:
+				minimum.x = minf(minimum.x, point.x)
+				minimum.z = minf(minimum.z, point.z)
+				maximum.x = maxf(maximum.x, point.x)
+				maximum.z = maxf(maximum.z, point.z)
+			var exact_height := _get_bounds_height()
+			minimum.y -= exact_height * 0.5
+			maximum.y = minimum.y + exact_height
+			return AABB(minimum, maximum - minimum)
 
 	var boundary_size := kill_boundary.get_bounds_size() as Vector2
 	var boundary_center := kill_boundary.get_bounds_center() as Vector3

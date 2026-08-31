@@ -1,5 +1,99 @@
 # Changelog
 
+## 2026-08-30
+
+### 2200
+
+- Kill Boundary 2 now keeps every perimeter segment, flame, and ghost in a stable order while size and rounding animate, removing the flicker as rounded shapes become sharp rectangles.
+  - Prompt: Prevent Kill Boundary 2 effects shifting when an animated rounded boundary becomes rectangular.
+
+### 1800
+
+- Kill Boundary 2 Ghost previews now use stronger editor-only glow, opacity, and silhouette contrast while retaining the exact authored appearance during gameplay.
+  - Prompt: Make Ghost rendering easier to see in the Kill Boundary 2 editor preview without changing gameplay.
+
+### 1700
+
+- Dragging a Kill Boundary 2 edge or corner handle now moves that side only, automatically shifting the pose origin so the opposite side stays fixed, including for rotated poses and Undo/Redo.
+  - Prompt: Resize Kill Boundary 2 poses like bitmap scaling controls instead of expanding from the centre.
+
+### 1600
+
+- Kill Boundary 2 Pose Inspectors now contain only pose-owned shape and timing controls; playback, effects, blockers, camera, retiming, and shared settings remain on the selectable boundary root.
+  - Prompt: Keep boundary-wide settings on the selectable Kill Boundary 2 root instead of its poses.
+- Selecting a Kill Boundary 2 now keeps its root selected for inspection or deletion, while the remembered pose preview remains visible and an explicit Edit Pose button enters viewport editing.
+  - Prompt: Make Kill Boundary 2 selectable and removable without losing pose editing.
+
+### 1500
+
+- Kill Boundary 2 controls now explain in plain language when to change each pose, playback, visual, damage, blocker, and audio setting and what effect it will have.
+  - Prompt: Add non-technical hover help throughout Kill Boundary 2 authoring.
+
+### 1400
+
+- Kill Boundary 2's preview timeline now spans its own full-width editor row, giving level editors finer control when scrubbing long animations.
+  - Prompt: Give the Kill Boundary 2 preview scrubber its own full-width row.
+- Kill Boundary 2 now keeps the active pose selected when level editors commit timing or easing changes, use pose gizmos, or duplicate a pose.
+  - Prompt: Keep Kill Boundary 2 selected when committing pose edits or duplicating a pose.
+- Pose Inspectors now include non-duplicated Kill Boundary 2 controls for playback, loop timing, effects, blockers, camera fitting, retiming, autoplay, and shared settings, allowing boundary-wide authoring without leaving the active pose.
+  - Prompt: Expose owning Kill Boundary 2 settings while a pose remains selected for viewport editing.
+- Kill Boundary 2 now restores its last active pose when reselected, exposes level-owned Pose nodes in the scene tree without enabling Editable Children, and provides a synchronized pose-and-time dropdown for direct navigation.
+  - Prompt: Restore the last active pose, expose pose nodes without Editable Children, and add direct pose selection to the Kill Boundary 2 panel.
+
+### 1300
+
+- Selecting a single-pose Kill Boundary 2 now automatically selects Pose 1, immediately revealing its native transform widget, perimeter preview, and size/rounding handles without creating another pose or enabling editable children.
+  - Prompt: Make a newly placed single-pose Kill Boundary 2 immediately editable from its root selection.
+
+## 2026-08-29
+
+### 1100
+
+- Looping Kill Boundary 2 animations now tween continuously from the final pose back to Pose 1 using a configurable return duration and the final pose's outgoing easing; editor playback and scrubbing include the complete closing transition.
+  - Prompt: Make Loop playback tween back to Pose 1 with configurable timing instead of snapping.
+
+### 0000
+
+- Level editors can again see every Kill Boundary 2 pose outline, direction arrow, time label, and active size/rounding handle; each perimeter is directly clickable while the selected pose retains an unobstructed native Move and yaw-only Rotate widget.
+  - Prompt: Restore the complete viewport editing workflow while retaining node-backed Kill Boundary 2 poses.
+
+## 2026-08-28
+
+### 1900
+
+- Kill Boundary 2 now authors each keyframe as a visible Pose Node3D in the scene tree: selecting or navigating to a pose gives it the native Move/yaw-only Rotate widget, while the non-spatial boundary root cannot translate the sequence or obscure pose controls; custom pose gizmos retain only perimeter, size, and rounding controls.
+  - Prompt: Replace Kill Boundary 2 pose sub-gizmos with actual selectable pose nodes so the root has no obstructing transform widget.
+
+### 1700
+
+- Kill Boundary 2 roots now enforce an identity transform, while selection and Previous/Next automatically transfer the native transform widget to the active pose and hide its redundant centre cross.
+  - Prompt: Keep the Kill Boundary 2 root fixed at the scene origin and prevent its transform widget from covering pose controls.
+- Kill Boundary 2 roots are now editor-locked against whole-sequence transforms; compact centre crosses select individual pose sub-gizmos and stop intercepting the native Move/Rotate widget once active.
+  - Prompt: Prevent Kill Boundary 2's transform gizmo from moving every pose and make the active pose widget easy to use.
+
+### 1600
+
+- Kill Boundary 2 now preserves canonical segment identity and flame noise phase through rounding changes, so flames and ghosts morph with the boundary instead of scrolling around it.
+  - Prompt: Keep Kill Boundary 2 flames and ghosts stationary along the perimeter while rounding changes.
+- Kill Boundary 2 now preserves all four exact rectangle vertices at zero rounding, preventing perimeter resampling from replacing sharp corners with rounded or chamfered diagonals.
+  - Prompt: Make zero rounding on Kill Boundary 2 produce genuinely sharp rectangle corners.
+- Kill Boundary 2 rounding now changes only the corner profile: zero is a full-size sharp rectangle, one is a full-size ellipse, and unequal width/depth remain intact throughout the transition.
+  - Prompt: Keep Kill Boundary 2 dimensions stable while rounding transitions from a rectangle to an ellipse.
+- Previous, Next, and viewport pose selection now open the active Kill Boundary 2 pose in the Inspector and focus its rounding control, making sharp rectangles and rounded shapes directly editable.
+  - Prompt: Show the selected Kill Boundary 2 pose in the Inspector so its final shape can be authored.
+
+### 1500
+
+- Kill Boundary 2 poses now show explicit selectable centre markers and editor guidance for native Move and yaw-only Rotate controls.
+  - Prompt: Make Kill Boundary 2 pose position editing discoverable in the 3D viewport.
+- Kill Boundary 2 now initializes all composed components in the editor, displays a correctly sized perimeter, and advances its live preview from the bottom-panel Play control; generated visual, lethal, and blocker segments also keep independent dimensions.
+  - Prompt: Fix Kill Boundary 2 editor preview playback, its collapsed one-metre preview, and generated segment sizing.
+
+### 1400
+
+- Level editors can now author rounded moving kill boundaries as timed poses with viewport handles, yaw-only transforms, easing, retiming, scrubbing, and Undo/Redo; players can validate every runtime mode, effect, speed, flask interaction, camera/minimap behavior, and replay support in the selectable Kill Boundary 2 Demo level.
+  - Prompt: Implement the pose-authored Kill Boundary 2 replacement system and approval demo while preserving the original boundary and existing levels.
+
 ## 2026-08-25
 
 ### 1500

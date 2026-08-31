@@ -6,8 +6,8 @@ const LEVEL_MAPPING := preload("res://levels/level_mapping.tres")
 func run(_tree: SceneTree) -> void:
 	expect_equal(
 		LEVEL_MAPPING.get_level_count(),
-		23,
-		"The level lookup exposes the debug level and twenty-two playable slots."
+		24,
+		"The level lookup exposes the existing levels plus the Kill Boundary 2 demo."
 	)
 	expect_equal(LEVEL_MAPPING.get_level_id(0), "tutorial_1", "Tutorial 1 appears first.")
 	expect_equal(LEVEL_MAPPING.get_level_id(5), "debug_level", "The debug level has a stable ID.")
@@ -33,6 +33,18 @@ func run(_tree: SceneTree) -> void:
 		LEVEL_MAPPING.get_level_scene_path(15),
 		"res://levels/1/level.tscn",
 		"Placeholder level slots may reuse an existing level scene."
+	)
+	var demo_data := LEVEL_MAPPING.get_level_data(23)
+	expect(
+		demo_data.get("name") == "Kill Boundary 2 Demo" \
+			and bool(demo_data.get("available", false)) \
+			and bool(demo_data.get("run_playback_enabled", false)),
+		"The Kill Boundary 2 approval demo is selectable and replay-enabled."
+	)
+	expect_equal(
+		LEVEL_MAPPING.get_level_scene_path(23),
+		"res://levels/kill-boundary-2-demo/level.tscn",
+		"The demo mapping resolves to its dedicated text scene."
 	)
 	var tutorials_are_registered := true
 	for tutorial_number in range(1, 6):

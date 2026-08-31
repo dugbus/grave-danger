@@ -3,7 +3,6 @@ class_name GDGraveyard
 
 const WIN_SCENE := "res://ui/screens/win_screen.tscn"
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
-const KILL_BOUNDARY_SCRIPT := preload("res://placeables/kill_boundary/kill_boundary.gd")
 const LEVEL_SETTINGS_SCRIPT := preload("res://levels/level_settings.gd")
 const NAVIGATION_BOOTSTRAP := preload("res://game/navigation_bootstrap.gd")
 const RUN_RECORDER_SCRIPT := preload("res://game/run_recorder.gd")
@@ -406,7 +405,7 @@ func _find_camera(root: Node) -> Camera3D:
 
 func _configure_kill_boundary_animation() -> void:
 	var kill_boundary := _get_kill_boundary()
-	if kill_boundary != null:
+	if kill_boundary != null and kill_boundary.has_method(&"play_runtime_animation"):
 		kill_boundary.play_runtime_animation()
 
 
@@ -445,12 +444,19 @@ func _get_kill_boundary() -> Node:
 	if current_level == null:
 		return null
 
-	if current_level.get_script() == KILL_BOUNDARY_SCRIPT:
-		return current_level
+	var providers: Array[Node] = []
+	if current_level.is_in_group(&"kill_boundary"):
+		providers.append(current_level)
 	for node in _get_descendants(current_level):
-		if node.get_script() == KILL_BOUNDARY_SCRIPT:
-			return node
-	return null
+		if node.is_in_group(&"kill_boundary"):
+			providers.append(node)
+	if providers.size() > 1:
+		push_error(
+			"Level '%s' contains %d kill_boundary providers; exactly one is supported. " \
+			+ "Using the first provider in scene-tree order." \
+			% [current_level.name, providers.size()]
+		)
+	return providers.front() if not providers.is_empty() else null
 
 
 func _get_treasure_deposits() -> Array[Node]:

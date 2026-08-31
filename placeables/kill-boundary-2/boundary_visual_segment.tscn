@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3]
+
+[sub_resource type="BoxMesh" id="BoxMesh_segment"]
+resource_local_to_scene = true
+size = Vector3(1, 1.55, 0.7)
+
+[node name="BoundaryVisualSegment" type="MeshInstance3D"]
+mesh = SubResource("BoxMesh_segment")
+cast_shadow = 0
