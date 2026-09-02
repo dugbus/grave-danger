@@ -44,6 +44,8 @@ func take_unbanked_treasure() -> Dictionary:
 func get_completion_percentage() -> int:
 	if max_treasure_value <= 0:
 		return 0
+	if treasure_collected >= max_treasure_value:
+		return 100
 
-	var completion := roundi(float(treasure_collected) / float(max_treasure_value) * 100.0)
-	return clampi(completion, 0, 100)
+	var completion := floori(float(treasure_collected) / float(max_treasure_value) * 100.0)
+	return clampi(completion, 0, 99)
