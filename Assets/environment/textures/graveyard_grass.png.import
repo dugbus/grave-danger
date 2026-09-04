@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://gadfwxebefkl"
 path.s3tc="res://.godot/imported/graveyard_grass.png-571cb92c3df71d4e51ef7f69fa6dc3e4.s3tc.ctex"
+path.etc2="res://.godot/imported/graveyard_grass.png-571cb92c3df71d4e51ef7f69fa6dc3e4.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://Assets/environment/textures/graveyard_grass.png"
-dest_files=["res://.godot/imported/graveyard_grass.png-571cb92c3df71d4e51ef7f69fa6dc3e4.s3tc.ctex"]
+dest_files=["res://.godot/imported/graveyard_grass.png-571cb92c3df71d4e51ef7f69fa6dc3e4.s3tc.ctex", "res://.godot/imported/graveyard_grass.png-571cb92c3df71d4e51ef7f69fa6dc3e4.etc2.ctex"]
 
 [params]
 

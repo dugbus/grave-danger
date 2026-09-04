@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cvebgdvw8uac4"
 path.s3tc="res://.godot/imported/millstone_rocky.png-de338de590e407fd17afe40133e4a340.s3tc.ctex"
+path.etc2="res://.godot/imported/millstone_rocky.png-de338de590e407fd17afe40133e4a340.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://Assets/environment/millstone_rocky.png"
-dest_files=["res://.godot/imported/millstone_rocky.png-de338de590e407fd17afe40133e4a340.s3tc.ctex"]
+dest_files=["res://.godot/imported/millstone_rocky.png-de338de590e407fd17afe40133e4a340.s3tc.ctex", "res://.godot/imported/millstone_rocky.png-de338de590e407fd17afe40133e4a340.etc2.ctex"]
 
 [params]
 

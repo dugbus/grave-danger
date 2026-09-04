@@ -16,6 +16,7 @@ const PLAYER_COLLISION_LAYER := 2
 const WORLD_COLLISION_LAYER := 1
 const GAME_SCENE := "res://game/graveyard.tscn"
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
+const SCENE_LOADER_SCRIPT := preload("res://autoload/scene_loader.gd")
 
 @export_group("Door")
 @export var openable := true:
@@ -400,11 +401,27 @@ func _start_level_transition() -> void:
 	is_changing_level = true
 	if level_trigger_area != null:
 		level_trigger_area.monitoring = false
+	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
+	if scene_loader != null:
+		scene_loader.request_scene(GAME_SCENE)
+		scene_loader.request_scene(level_selection.get_selected_level_scene_path(), true)
 
 	var tween := SCREEN_FADE.fade_out(self, "LevelTriggerFade", trigger_fade_out_duration, "LevelTriggerFadeLayer")
 	await tween.finished
 	if is_inside_tree():
-		get_tree().change_scene_to_file(GAME_SCENE)
+		if scene_loader != null:
+			var selected_scene := await scene_loader.load_scene(
+				level_selection.get_selected_level_scene_path()
+			)
+			if selected_scene == null:
+				is_changing_level = false
+				push_warning("Could not prepare target level %d." % target_level_number)
+				return
+		var change_error := await scene_loader.change_scene_to_file(GAME_SCENE) \
+			if scene_loader != null else get_tree().change_scene_to_file(GAME_SCENE)
+		if change_error != OK:
+			is_changing_level = false
+			push_warning("Could not enter target level %d." % target_level_number)
 
 
 func _apply_hinge_limits(delta: float) -> void:

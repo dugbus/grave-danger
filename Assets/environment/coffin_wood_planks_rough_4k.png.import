@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cvg8ajlkxpfio"
 path.s3tc="res://.godot/imported/coffin_wood_planks_rough_4k.png-e837a5a4a390c36c20ecf62641f95c55.s3tc.ctex"
+path.etc2="res://.godot/imported/coffin_wood_planks_rough_4k.png-e837a5a4a390c36c20ecf62641f95c55.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://Assets/environment/coffin_wood_planks_rough_4k.png"
-dest_files=["res://.godot/imported/coffin_wood_planks_rough_4k.png-e837a5a4a390c36c20ecf62641f95c55.s3tc.ctex"]
+dest_files=["res://.godot/imported/coffin_wood_planks_rough_4k.png-e837a5a4a390c36c20ecf62641f95c55.s3tc.ctex", "res://.godot/imported/coffin_wood_planks_rough_4k.png-e837a5a4a390c36c20ecf62641f95c55.etc2.ctex"]
 
 [params]
 

@@ -1,5 +1,69 @@
 # Changelog
 
+## 2026-09-04
+
+### 1400
+
+- Production win and death screens now preserve their full authored layout through export and scale uniformly from the 1920x1080 canvas with letterboxing on non-16:9 displays.
+  - Prompt: Fix the win screen remaining bunched in production and use Godot's root viewport scaling.
+
+## 2026-09-03
+
+### 1600
+
+- Added a windowed UI capture command that saves deterministic screenshots for the title, level select, settings, shop, win, and loss screens in per-resolution folders, with customizable scenes and resolutions.
+  - Prompt: Add a windowed UI resolution screenshot test script for low-resolution, widescreen, Retina, and 4K layout checks.
+
+### 1500
+
+- Clicking the title screen now opens Level Select without competing against whole-game and dynamic-catalog preloads, while later scene preparation remains asynchronous.
+  - Prompt: Stop the game freezing after the player clicks the title screen.
+- Win and death screens now scale and centre their complete reference canvas from the final production viewport size, even when scene loading briefly reports a stale root size.
+  - Prompt: Keep the production win screen resolution-independent by scaling its complete layout instead of letting it bunch into the top-left corner.
+- Win and death headings now keep clear top spacing while Retry and Level Select remain anchored above the bottom border in production layouts.
+  - Prompt: Fix the production win and lose screens after the earlier resize fix left headings crowded and actions at the top.
+
+### 1400
+
+- New scene-linked assets and dynamically discovered treasure scenes are automatically included in precaching without reducing visual fidelity.
+  - Prompt: Make loading asynchronous from the title screen and keep future assets included without lowering fidelity.
+- Gameplay music now begins only after the selected level and its navigation are ready.
+  - Prompt: Make loading asynchronous from the title screen and keep future assets included without lowering fidelity.
+- Menus now prepare scene dependency graphs in the background, prioritizing the highlighted level before gameplay transitions.
+  - Prompt: Make loading asynchronous from the title screen and keep future assets included without lowering fidelity.
+- Frontend screens now remain correctly scaled and centred when fullscreen or HiDPI production windows finish resizing.
+  - Prompt: Keep the lose-screen buttons positioned correctly in production builds.
+
+### 1200
+
+- Production packaging now checks for required Godot export templates before starting, and native ARM builds include the required ETC2/ASTC texture data.
+  - Prompt: Resolve the missing-template and texture-format errors from production packaging.
+- Developers can package all configured production targets, or selected platforms, with one validated release-build command.
+  - Prompt: Add a root script that packages the configured production builds.
+
+## 2026-09-02
+
+### 1800
+
+- Build presets now provide ready-to-use Apple Silicon macOS, 64-bit Windows, and ARM64 iOS test targets with ignored local output paths.
+  - Prompt: Configure ARM Mac, Windows 64-bit, and iOS builds for testing.
+- Exported builds now strip playthrough marker groups, paths, and time labels from level scenes entirely.
+  - Prompt: Ensure playthrough marker authoring nodes never appear in exported builds.
+
+### 1600
+
+- Walked routes now use selectable Path3D nodes rendered by the prominent outlined ribbon and direction-arrow overlay, while every timed position marker remains available.
+  - Prompt: Render sampled walking routes as prominent editor paths while retaining timed markers.
+
+### 1500
+
+- Playthrough traces now use compact world-scaled time labels offset from position crosses, keeping dense runs readable over the level.
+  - Prompt: Make dense playthrough position markers usable in the level editor.
+- Playthrough position markers now continue sampling throughout live gameplay while frontend run playback is explicitly excluded from marker capture.
+  - Prompt: Fix playthrough markers so sampling continues and frontend playback is excluded.
+- Level editors now receive a replaceable group of editor-only player-position markers after each debug playthrough, labelled at two-second intervals and collapsed into time ranges while the player remains still.
+  - Prompt: Generate editor-only timed player-position markers after each playthrough for level construction.
+
 ## 2026-08-31
 
 ### 1600

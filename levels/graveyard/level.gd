@@ -14,6 +14,7 @@ const TREE_SURROUND_NAME := "TreeSurround"
 const FOLLOW_CAMERA_SCRIPT := preload("res://game/follow_camera.gd")
 const TREE_SURROUND_SCRIPT := preload("res://levels/graveyard/level_tree_surround.gd")
 const DEFAULT_HEIGHT_MAP_PATH := "res://levels/graveyard/height-map.png"
+const DEFAULT_HEIGHT_MAP_TEXTURE := preload("res://levels/graveyard/height-map.png")
 const DEFAULT_SUN_ROTATION_DEGREES := Vector3(-14.0, -58.0, 0.0)
 const DEFAULT_SUN_LIGHT_COLOR := Color(1.0, 0.9, 0.78, 1.0)
 const DEFAULT_SUN_ENERGY := 3.2
@@ -30,7 +31,8 @@ const DEFAULT_SKY_COLOR := Color(0.52, 0.46, 0.66, 1.0)
 		_height_map_load_failed = false
 		_queue_rebuild()
 
-@export var height_map_texture: Texture2D:
+## Imported height map retained as a scene dependency so threaded loading prepares it.
+@export var height_map_texture: Texture2D = DEFAULT_HEIGHT_MAP_TEXTURE:
 	set(value):
 		height_map_texture = value
 		_height_map_image = null

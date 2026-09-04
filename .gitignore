@@ -1,6 +1,9 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+/builds/*
+!/builds/.gitkeep
 .DS_Store
 *.blend?
 scene_scan.log
+screenshots/

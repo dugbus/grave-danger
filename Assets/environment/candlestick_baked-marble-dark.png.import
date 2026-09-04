@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://bwr1bogkfjssf"
 path.s3tc="res://.godot/imported/candlestick_baked-marble-dark.png-fe70a337fd97fdab3de45a841736e496.s3tc.ctex"
+path.etc2="res://.godot/imported/candlestick_baked-marble-dark.png-fe70a337fd97fdab3de45a841736e496.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://Assets/environment/candlestick_baked-marble-dark.png"
-dest_files=["res://.godot/imported/candlestick_baked-marble-dark.png-fe70a337fd97fdab3de45a841736e496.s3tc.ctex"]
+dest_files=["res://.godot/imported/candlestick_baked-marble-dark.png-fe70a337fd97fdab3de45a841736e496.s3tc.ctex", "res://.godot/imported/candlestick_baked-marble-dark.png-fe70a337fd97fdab3de45a841736e496.etc2.ctex"]
 
 [params]
 

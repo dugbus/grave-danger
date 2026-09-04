@@ -10,6 +10,7 @@ const SHOP_CATALOG_SCRIPT := preload("res://ui/frontend/shop_catalog.gd")
 const SHOP_ITEM_DEFINITION_SCRIPT := preload("res://ui/frontend/shop_item_definition.gd")
 const SHOP_STAT_MODIFIER_SCRIPT := preload("res://ui/frontend/shop_stat_modifier.gd")
 const FOCUS_SCROLL_LIST_SCRIPT := preload("res://ui/frontend/focus_scroll_list.gd")
+const SCENE_LOADER_SCRIPT := preload("res://autoload/scene_loader.gd")
 const LEVEL_SELECT_SCENE_PATH := "res://ui/screens/level_select_screen.tscn"
 const ITEM_NAME_MAX_FONT_SIZE := 58
 const ITEM_NAME_MEDIUM_FONT_SIZE := 49
@@ -72,6 +73,10 @@ func _ready() -> void:
     _sync_screen_container()
     if Engine.is_editor_hint():
         return
+
+    var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
+    if scene_loader != null:
+        scene_loader.request_scene(LEVEL_SELECT_SCENE_PATH)
 
     default_payment_icon = price_treasure_icon.texture if price_treasure_icon != null else null
     _bind_bottom_actions()
@@ -309,7 +314,9 @@ func _return_to_level_select() -> void:
         return
     _play_select_sound()
     is_transitioning = true
-    var change_error := get_tree().change_scene_to_file(LEVEL_SELECT_SCENE_PATH)
+    var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
+    var change_error := await scene_loader.change_scene_to_file(LEVEL_SELECT_SCENE_PATH) \
+        if scene_loader != null else get_tree().change_scene_to_file(LEVEL_SELECT_SCENE_PATH)
     if change_error != OK:
         is_transitioning = false
         push_error("Could not leave Shop: %s" % error_string(change_error))

@@ -5,6 +5,7 @@ class_name GDTitleScreen
 # Scene loaded when the player leaves the title screen.
 const LEVEL_SELECT_SCENE := "res://ui/screens/level_select_screen.tscn"
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
+const SCENE_LOADER_SCRIPT := preload("res://autoload/scene_loader.gd")
 
 ## Image shown full-screen behind the title screen.
 @export var title_texture: Texture2D
@@ -21,6 +22,7 @@ func _ready() -> void:
 
 	_bind_title_image()
 	_fade_in_title()
+	_precache_first_transition()
 	set_process_unhandled_input(true)
 
 
@@ -60,7 +62,24 @@ func _start_game() -> void:
 	if frontend_audio != null:
 		frontend_audio.call("play_select")
 	starting = true
-	get_tree().change_scene_to_file(LEVEL_SELECT_SCENE)
+	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
+	var change_error := await scene_loader.change_scene_to_file(LEVEL_SELECT_SCENE) \
+		if scene_loader != null else get_tree().change_scene_to_file(LEVEL_SELECT_SCENE)
+	if change_error != OK:
+		starting = false
+		push_error("Could not open Level Select: %s" % error_string(change_error))
+
+
+func _precache_first_transition() -> void:
+	# Godot's project-wide parser runs the main scene for --check-only but exits immediately.
+	if "--check-only" in OS.get_cmdline_args():
+		return
+	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
+	if scene_loader == null:
+		return
+	# Prepare only the immediate destination. Level Select owns gameplay precaching
+	# after it is visible, keeping large level dependency graphs off this transition.
+	scene_loader.request_scene(LEVEL_SELECT_SCENE)
 
 
 func _fade_in_title() -> void:

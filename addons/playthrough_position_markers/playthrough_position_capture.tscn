@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://addons/playthrough_position_markers/debugger_reporter.gd" id="1_reporter"]
+[ext_resource type="Script" path="res://addons/playthrough_position_markers/position_sampler.gd" id="2_sampler"]
+[ext_resource type="Resource" path="res://addons/playthrough_position_markers/playthrough_position_sampling_settings.tres" id="3_settings"]
+
+[node name="PlaythroughPositionCapture" type="Node"]
+script = ExtResource("1_reporter")
+
+[node name="Sampler" type="Node" parent="."]
+script = ExtResource("2_sampler")
+settings = ExtResource("3_settings")

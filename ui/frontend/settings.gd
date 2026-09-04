@@ -4,6 +4,7 @@ extends "res://ui/frontend/frontend_screen.gd"
 ## Frontend settings screen with persistent audio preferences and guarded progress reset.
 
 const LEVEL_SELECT_SCENE_PATH := "res://ui/screens/level_select_screen.tscn"
+const SCENE_LOADER_SCRIPT := preload("res://autoload/scene_loader.gd")
 
 var is_transitioning := false
 
@@ -60,6 +61,9 @@ var confirmation_frame := get_node("ScreenContainer/ResetConfirmationFrame") as 
 
 func _ready() -> void:
 	_sync_screen_container()
+	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
+	if scene_loader != null:
+		scene_loader.request_scene(LEVEL_SELECT_SCENE_PATH)
 	var game_settings := _get_game_settings()
 	music_slider.value = game_settings.music_volume_percent if game_settings != null else 80.0
 	sound_effect_slider.value = (
@@ -200,7 +204,9 @@ func _return_to_level_select() -> void:
 	if game_settings != null:
 		game_settings.flush_pending_save()
 	is_transitioning = true
-	var change_error := get_tree().change_scene_to_file(LEVEL_SELECT_SCENE_PATH)
+	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
+	var change_error := await scene_loader.change_scene_to_file(LEVEL_SELECT_SCENE_PATH) \
+		if scene_loader != null else get_tree().change_scene_to_file(LEVEL_SELECT_SCENE_PATH)
 	if change_error != OK:
 		is_transitioning = false
 		push_error(

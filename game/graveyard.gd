@@ -7,16 +7,18 @@ const LEVEL_SETTINGS_SCRIPT := preload("res://levels/level_settings.gd")
 const NAVIGATION_BOOTSTRAP := preload("res://game/navigation_bootstrap.gd")
 const RUN_RECORDER_SCRIPT := preload("res://game/run_recorder.gd")
 const CODEX_SESSION_OPTIONS := preload("res://game/codex_session_options.gd")
+const SCENE_LOADER_SCRIPT := preload("res://autoload/scene_loader.gd")
 const PLAYER_FEEDBACK_SETTINGS := preload(
 	"res://ui/hud/player_feedback/player_feedback_settings.gd"
 )
 
 const CURRENT_LEVEL_NAME := "CurrentLevel"
+const PLAYTHROUGH_POSITION_CAPTURE_PATH := ^"PlaythroughPositionCapture"
 
 ## Seconds used for the black transition before loading the win screen.
 @export var win_fade_out_duration := 0.8
-## Level scene used when nothing has been selected yet.
-@export var default_level_scene: PackedScene
+## Level scene path used when nothing has been selected yet.
+@export_file("*.tscn") var default_level_scene_path := "res://levels/1/level.tscn"
 
 var treasure_collected := 0
 var max_treasure_value := 0
@@ -27,7 +29,6 @@ var codex_session_options: Dictionary = {}
 
 
 func _ready() -> void:
-	GDAudio.setup_dungeon_sfx_environment()
 	if not _configure_codex_directed_test():
 		return
 	_load_selected_level()
@@ -51,6 +52,10 @@ func _ready() -> void:
 	for completion_source in _get_level_completion_sources():
 		if completion_source.has_signal("level_completed"):
 			completion_source.level_completed.connect(_on_level_completed)
+
+	GDAudio.setup_dungeon_sfx_environment()
+	_start_gameplay_music()
+	_precache_result_screens()
 
 
 func _exit_tree() -> void:
@@ -319,14 +324,38 @@ func _get_selected_level_scene() -> PackedScene:
 		if selected_scene is PackedScene:
 			return selected_scene
 
-	return default_level_scene
+	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
+	if scene_loader != null:
+		var cached_default := scene_loader.get_cached_scene(default_level_scene_path)
+		if cached_default != null:
+			return cached_default
+	return load(default_level_scene_path) as PackedScene
+
+
+func _start_gameplay_music() -> void:
+	var music_player := get_node_or_null("GameRuntime/MusicPlayer") as AudioStreamPlayer
+	if music_player != null and not music_player.playing:
+		music_player.play()
+
+
+func _precache_result_screens() -> void:
+	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
+	if scene_loader != null:
+		scene_loader.request_scenes([
+			WIN_SCENE,
+			"res://ui/screens/lose_screen.tscn",
+			"res://ui/screens/level_select_screen.tscn",
+		])
 
 
 func _configure_runtime_references() -> void:
 	if current_level == null:
 		return
 
-	var player := current_level.get_node_or_null("Player")
+	var player := current_level.get_node_or_null("Player") as Node3D
+	var position_capture := get_node_or_null(PLAYTHROUGH_POSITION_CAPTURE_PATH)
+	if position_capture != null and position_capture.has_method(&"capture_playthrough_positions"):
+		position_capture.call(&"capture_playthrough_positions", player, current_level as Node3D)
 	var kill_boundary := _get_kill_boundary()
 	var minimap_target := _get_minimap_target(player)
 	var camera := get_node_or_null("GameRuntime/Camera3D")
@@ -486,7 +515,14 @@ func _show_win_screen() -> void:
 		return
 
 	showing_result = true
+	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
+	if scene_loader != null:
+		scene_loader.request_scene(WIN_SCENE)
 	var tween := SCREEN_FADE.fade_out(self, "ResultFade", win_fade_out_duration, "ResultFadeLayer")
 	await tween.finished
 
-	get_tree().change_scene_to_file(WIN_SCENE)
+	var change_error := await scene_loader.change_scene_to_file(WIN_SCENE) \
+		if scene_loader != null else get_tree().change_scene_to_file(WIN_SCENE)
+	if change_error != OK:
+		showing_result = false
+		push_error("Could not open the win screen: %s" % error_string(change_error))

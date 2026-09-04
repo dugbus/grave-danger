@@ -70,6 +70,7 @@
 
 ## GODOT Best Practices
 
+Always prefer the idiomatic godot approach when solving problems.
 Godot guidance is stored in docs/godot-best-practices.
 
 Consult it only when relevant to the current task. Read the smallest number of

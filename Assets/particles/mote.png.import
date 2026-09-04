@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dph1m5l027osi"
 path.s3tc="res://.godot/imported/mote.png-aa476c4f9f7da1b5195d7700da8fc38e.s3tc.ctex"
+path.etc2="res://.godot/imported/mote.png-aa476c4f9f7da1b5195d7700da8fc38e.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://Assets/particles/mote.png"
-dest_files=["res://.godot/imported/mote.png-aa476c4f9f7da1b5195d7700da8fc38e.s3tc.ctex"]
+dest_files=["res://.godot/imported/mote.png-aa476c4f9f7da1b5195d7700da8fc38e.s3tc.ctex", "res://.godot/imported/mote.png-aa476c4f9f7da1b5195d7700da8fc38e.etc2.ctex"]
 
 [params]
 

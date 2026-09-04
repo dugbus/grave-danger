@@ -5,6 +5,7 @@ signal flame_energy_changed(current_energy: float, maximum_energy: float, dead: 
 
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
+const SCENE_LOADER_SCRIPT := preload("res://autoload/scene_loader.gd")
 
 enum DeathCause {
 	Fire,
@@ -47,6 +48,9 @@ var active_heal_tweens: Array[Tween] = []
 func _ready() -> void:
 	flame_energy = max_flame_energy
 	_emit_flame_energy_changed()
+	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
+	if scene_loader != null:
+		scene_loader.request_scene(lose_scene)
 
 
 func apply_flame_damage(amount: float) -> void:
@@ -201,7 +205,12 @@ func _show_lose_screen_after_death() -> void:
 	var tween := SCREEN_FADE.fade_out(self, "DeathFade", fade_out_duration, "DeathFadeLayer")
 	await tween.finished
 
-	get_tree().change_scene_to_file(lose_scene)
+	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
+	var change_error := await scene_loader.change_scene_to_file(lose_scene) \
+		if scene_loader != null else get_tree().change_scene_to_file(lose_scene)
+	if change_error != OK:
+		showing_lose_screen = false
+		push_error("Could not open the lose screen: %s" % error_string(change_error))
 
 
 func _restore_temporary_damage_after(amount: float, seconds: float) -> void:

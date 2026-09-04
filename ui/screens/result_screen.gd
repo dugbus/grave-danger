@@ -4,6 +4,7 @@ extends "res://ui/frontend/frontend_screen.gd"
 ## Shared win and loss presentation for a completed level attempt.
 
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
+const SCENE_LOADER_SCRIPT := preload("res://autoload/scene_loader.gd")
 const LEVEL_SELECT_SCENE_PATH := "res://ui/screens/level_select_screen.tscn"
 const GAME_SCENE_PATH := "res://game/graveyard.tscn"
 const FADE_LAYER_NAME := "ResultFadeLayer"
@@ -50,6 +51,7 @@ func _ready() -> void:
 	var displayed_treasure := _record_level_result()
 	_update_result_details(displayed_treasure)
 	_bind_actions()
+	_precache_result_actions()
 	SCREEN_FADE.fade_in(
 		self, "ResultFade", fade_duration, Color.BLACK, FADE_LAYER_NAME, FADE_LAYER_INDEX
 	)
@@ -153,11 +155,35 @@ func _change_scene(scene_path: String) -> void:
 		return
 	_play_select_sound()
 	transitioning = true
+	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
+	if scene_loader != null:
+		scene_loader.request_scene(scene_path)
 	var tween := SCREEN_FADE.fade_out(
 		self, "ResultFade", fade_duration, FADE_LAYER_NAME, FADE_LAYER_INDEX
 	)
 	await tween.finished
-	var change_error := get_tree().change_scene_to_file(scene_path)
+	if scene_loader != null and scene_path == GAME_SCENE_PATH:
+		var level_selection := get_node_or_null("/root/LevelSelection") as GDLevelSelection
+		if level_selection != null:
+			var selected_scene := await scene_loader.load_scene(
+				level_selection.get_selected_level_scene_path()
+			)
+			if selected_scene == null:
+				transitioning = false
+				push_error("Could not prepare the selected level for retry.")
+				return
+	var change_error := await scene_loader.change_scene_to_file(scene_path) \
+		if scene_loader != null else get_tree().change_scene_to_file(scene_path)
 	if change_error != OK:
 		transitioning = false
 		push_error("Could not leave result screen: %s" % error_string(change_error))
+
+
+func _precache_result_actions() -> void:
+	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
+	if scene_loader == null:
+		return
+	scene_loader.request_scenes([LEVEL_SELECT_SCENE_PATH, GAME_SCENE_PATH])
+	var level_selection := get_node_or_null("/root/LevelSelection") as GDLevelSelection
+	if level_selection != null:
+		scene_loader.request_scene(level_selection.get_selected_level_scene_path(), true)

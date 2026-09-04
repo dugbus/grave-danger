@@ -5,6 +5,7 @@ const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 const LEVEL_ROW_SCENE := preload("res://ui/screens/level_select_item_row.tscn")
 const FOCUS_SCROLL_LIST_SCRIPT := preload("res://ui/frontend/focus_scroll_list.gd")
 const LEVEL_RUN_PLAYBACK_SCRIPT := preload("res://ui/screens/level_run_playback.gd")
+const SCENE_LOADER_SCRIPT := preload("res://autoload/scene_loader.gd")
 const TITLE_SCENE_PATH := "res://ui/screens/title_screen.tscn"
 const SETTINGS_SCENE_PATH := "res://ui/frontend/settings.tscn"
 const FOCUS_SCROLL_MARGIN := 12.0
@@ -39,6 +40,7 @@ var settings_button: Button
 var back_button: Button
 var level_buttons: Array[Button] = []
 var selected_button_index := 0
+var precached_level_path := ""
 var scroll_tween: Tween:
 	get:
 		return scroll_container.scroll_tween if scroll_container != null else null
@@ -56,6 +58,7 @@ func _ready() -> void:
 		[back_button, settings_button, shop_button]
 	)
 	_focus_initial_level()
+	_precache_selected_level()
 	SCREEN_FADE.fade_in(self, "LevelSelectFade", fade_in_duration)
 	set_process_input(true)
 	set_process_unhandled_input(true)
@@ -197,6 +200,14 @@ func _on_button_focused(index: int) -> void:
 	var level_selection := _get_level_selection()
 	if level_selection != null:
 		level_selection.remember_highlighted_level(index)
+		var scene_loader := _get_scene_loader()
+		if scene_loader != null:
+			var focused_level_path := level_selection.get_level_scene_path(index)
+			if not precached_level_path.is_empty() \
+					and precached_level_path != focused_level_path:
+				scene_loader.release_scene(precached_level_path)
+			precached_level_path = focused_level_path
+			scene_loader.request_scene(focused_level_path, true)
 
 
 func _update_selected_level_details(index: int) -> void:
@@ -353,7 +364,10 @@ func _start_level(index: int) -> void:
 		return
 	_play_select_sound()
 	starting = true
-	await _change_scene_after_playback_shutdown(game_scene)
+	await _change_scene_after_playback_shutdown(
+		game_scene,
+		level_selection.get_selected_level_scene_path()
+	)
 
 
 func _return_to_title() -> void:
@@ -380,12 +394,41 @@ func _open_settings() -> void:
 	await _change_scene_after_playback_shutdown(SETTINGS_SCENE_PATH)
 
 
-func _change_scene_after_playback_shutdown(scene_path: String) -> void:
+func _change_scene_after_playback_shutdown(
+	scene_path: String,
+	required_dependency_path := ""
+) -> void:
+	var scene_loader := _get_scene_loader()
+	if scene_loader != null:
+		scene_loader.request_scene(scene_path)
+		if not required_dependency_path.is_empty():
+			scene_loader.request_scene(required_dependency_path, true)
 	if level_run_playback != null:
 		await level_run_playback.stop_for_scene_change()
 	if not is_inside_tree():
 		return
-	var change_error := get_tree().change_scene_to_file(scene_path)
+	if scene_loader != null and not required_dependency_path.is_empty():
+		var dependency_scene := await scene_loader.load_scene(required_dependency_path)
+		if dependency_scene == null:
+			starting = false
+			push_warning("Could not prepare scene dependency '%s'." % required_dependency_path)
+			return
+	var change_error := await scene_loader.change_scene_to_file(scene_path) \
+		if scene_loader != null else get_tree().change_scene_to_file(scene_path)
 	if change_error != OK:
 		starting = false
 		push_warning("Could not open scene '%s'." % scene_path)
+
+
+func _precache_selected_level() -> void:
+	var scene_loader := _get_scene_loader()
+	var level_selection := _get_level_selection()
+	if scene_loader == null or level_selection == null:
+		return
+	scene_loader.request_scene(game_scene)
+	precached_level_path = level_selection.get_level_scene_path(selected_button_index)
+	scene_loader.request_scene(precached_level_path)
+
+
+func _get_scene_loader() -> SCENE_LOADER_SCRIPT:
+	return get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT

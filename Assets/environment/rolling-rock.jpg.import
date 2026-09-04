@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://b751y16lsr0mi"
 path.s3tc="res://.godot/imported/rolling-rock.jpg-015e8995efb41ebf607f4fa43efa0597.s3tc.ctex"
+path.etc2="res://.godot/imported/rolling-rock.jpg-015e8995efb41ebf607f4fa43efa0597.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://Assets/environment/rolling-rock.jpg"
-dest_files=["res://.godot/imported/rolling-rock.jpg-015e8995efb41ebf607f4fa43efa0597.s3tc.ctex"]
+dest_files=["res://.godot/imported/rolling-rock.jpg-015e8995efb41ebf607f4fa43efa0597.s3tc.ctex", "res://.godot/imported/rolling-rock.jpg-015e8995efb41ebf607f4fa43efa0597.etc2.ctex"]
 
 [params]
 

@@ -5,10 +5,11 @@ class_name GDLevel05TreeSurround
 const RENDER_ROOT_NAME := "TreeChunks"
 const COLLISION_BODY_NAME := "TreeBlockers"
 
-@export var tree_scene_paths: Array[String] = [
-	"res://Assets/kenney-graveyard/pine.glb",
-	"res://Assets/kenney-graveyard/pine-crooked.glb",
-	"res://Assets/kenney-graveyard/pine-fall.glb",
+## Tree models retained as dependencies so enabling the surround never performs runtime disk loads.
+@export var tree_scenes: Array[PackedScene] = [
+	preload("res://Assets/kenney-graveyard/pine.glb"),
+	preload("res://Assets/kenney-graveyard/pine-crooked.glb"),
+	preload("res://Assets/kenney-graveyard/pine-fall.glb"),
 ]
 @export_range(0.5, 16.0, 0.1) var tree_spacing := 2.0
 @export_range(0.0, 8.0, 0.1) var inner_gap := 1.8
@@ -48,8 +49,7 @@ func _clear_generated() -> void:
 
 func _load_tree_meshes() -> Array[Mesh]:
 	var meshes: Array[Mesh] = []
-	for scene_path in tree_scene_paths:
-		var packed_scene := load(scene_path) as PackedScene
+	for packed_scene in tree_scenes:
 		if packed_scene == null:
 			continue
 

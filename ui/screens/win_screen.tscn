@@ -1,6 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://cjhiqmscotkmp"]
+[gd_scene load_steps=3 format=3 uid="uid://cjhiqmscotkmp"]
 
 [ext_resource type="PackedScene" path="res://ui/screens/result_screen_layout.tscn" id="1_layout"]
+[ext_resource type="Script" path="res://ui/screens/result_screen.gd" id="2_script"]
 
-[node name="WinScreen" instance=ExtResource("1_layout")]
+[node name="WinScreen" type="Control"]
+editor_description = "Successful result screen using the shared resolution-independent result layout."
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_script")
 outcome = 0
+
+[node name="ScreenContainer" parent="." instance=ExtResource("1_layout")]

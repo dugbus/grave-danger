@@ -1,64 +1,22 @@
-[gd_scene format=3 uid="uid://bvdv2d8npbqry"]
+[gd_scene load_steps=3 format=3 uid="uid://bvdv2d8npbqry"]
 
 [ext_resource type="PackedScene" path="res://ui/screens/result_screen_layout.tscn" id="1_layout"]
 [ext_resource type="Script" uid="uid://b8keqjxxl3qqh" path="res://ui/screens/lose_screen.gd" id="2_lose_script"]
 
-[node name="LoseScreen" unique_id=730798704 instance=ExtResource("1_layout")]
+[node name="LoseScreen" type="Control" unique_id=730798704]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("2_lose_script")
 outcome = 1
 
+[node name="ScreenContainer" parent="." instance=ExtResource("1_layout")]
+
 [node name="ScreenTitleLabel" parent="ScreenContainer" index="2"]
-visible = true
-layout_mode = 0
-offset_left = 220.0
-offset_top = 12.0
-offset_right = 1700.0
-offset_bottom = 88.0
 text = "YOU DIED!"
-
-[node name="TitleSeparator" parent="ScreenContainer" index="3"]
-layout_mode = 0
-offset_left = 777.0
-offset_top = 88.0
-offset_right = 1143.0
-offset_bottom = 97.0
-
-[node name="ResultFrame" parent="ScreenContainer" index="4"]
-layout_mode = 0
-offset_left = 64.0
-offset_top = 130.0
-offset_right = 1856.0
-offset_bottom = 886.0
-
-[node name="GoldCoinTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" index="0"]
-layout_mode = 2
-
-[node name="GoldBarTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" index="1"]
-layout_mode = 2
-
-[node name="DiamondTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" index="2"]
-layout_mode = 2
-
-[node name="RubyTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" index="3"]
-layout_mode = 2
-
-[node name="SapphireTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" index="4"]
-layout_mode = 2
-
-[node name="EmeraldTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" index="5"]
-layout_mode = 2
-
-[node name="AmethystTile" parent="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles" index="6"]
-layout_mode = 2
-
-[node name="BottomActions" parent="ScreenContainer" index="5"]
-layout_mode = 0
-offset_left = 84.0
-offset_top = 936.0
-offset_right = 1836.0
-offset_bottom = 1008.0
-theme_override_constants/separation = 24
-alignment = 1
 
 [editable path="ScreenContainer/ResultFrame"]
 [editable path="ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles/GoldCoinTile"]
