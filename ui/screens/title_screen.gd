@@ -7,7 +7,7 @@ const LEVEL_SELECT_SCENE := "res://ui/screens/level_select_screen.tscn"
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 const SCENE_LOADER_SCRIPT := preload("res://autoload/scene_loader.gd")
 
-## Image shown full-screen behind the title screen.
+## Optional image shown full-screen when this screen uses a static backdrop.
 @export var title_texture: Texture2D
 ## Seconds used for the black overlay to fade out when the title screen opens.
 @export var fade_in_duration := 0.8
@@ -41,6 +41,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _bind_title_image() -> void:
+	# Cinematic title scenes supply their own backdrop in the editor.
+	if title_texture == null:
+		return
 	title_image = get_node_or_null("TitleImage") as TextureRect
 	if title_image == null:
 		title_image = TextureRect.new()

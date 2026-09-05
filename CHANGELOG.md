@@ -2,8 +2,21 @@
 
 ## 2026-09-05
 
+### 1900
+
+- The churchyard cinematic uses the correct sun intensity so its textured surfaces are no longer washed out; export instructions now specify Unitless lighting.
+  - Prompt: Fix the churchyard cinematic appearing to have no textures.
+- Level editors can find the working Blender camera-animation export settings beside the churchyard glTF asset.
+  - Prompt: Document the correct churchyard glTF export settings in churchyard.gltf.md.
+
 ### 1800
 
+- The churchyard cinematic scene now lives with the title-screen feature instead of the art assets.
+  - Prompt: Relocate the unfinished churchyard scene from Assets.
+- The title cinematic now plays camera animation directly from the Blender glTF export, so level editors can update it through normal export and import without a separate camera-baking script.
+  - Prompt: Use the exported churchyard glTF camera animation and relocate the unfinished scene from Assets.
+- The title screen now plays a looping churchyard cinematic using the camera path and aim authored in Blender, with a button prompt to open level selection.
+  - Prompt: Use the Blender-authored churchyard camera animation as a new title-screen cinematic.
 - Level-design guidance now covers directly editable tiled floors, selective road and grass composition, navigation-safe dressing, and separate editor, rendering and gameplay validation.
   - Prompt: Capture floor, road, grass and other recent level-design lessons in the reusable skill.
 - Close Escape's FloorGridMap is now a native child of the main level scene, with all floor cells directly selectable and paintable without opening a nested layout.
