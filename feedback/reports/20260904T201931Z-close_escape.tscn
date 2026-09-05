@@ -1,0 +1,387 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://player/player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="2_lighting"]
+[ext_resource type="Script" path="res://levels/level_settings.gd" id="3_level_settings"]
+[ext_resource type="PackedScene" path="res://levels/close-escape/authored_layout.tscn" id="4_layout"]
+[ext_resource type="PackedScene" path="res://placeables/kill-boundary-2/kill_boundary_2.tscn" id="5_boundary"]
+[ext_resource type="Script" path="res://placeables/kill-boundary-2/kill_boundary_2_pose.gd" id="6_boundary_pose"]
+[ext_resource type="Script" path="res://placeables/kill-boundary-2/kill_boundary_2_sequence.gd" id="7_boundary_sequence"]
+[ext_resource type="PackedScene" path="res://placeables/lockables/locked_door.tscn" id="8_door"]
+[ext_resource type="PackedScene" path="res://placeables/lockables/locked_gate.tscn" id="9_gate"]
+[ext_resource type="PackedScene" path="res://inventory/silver_key.tscn" id="10_silver_key"]
+[ext_resource type="PackedScene" path="res://inventory/key.tscn" id="11_gold_key"]
+[ext_resource type="PackedScene" path="res://placeables/spike_trap/spike_trap.tscn" id="12_spike"]
+[ext_resource type="PackedScene" path="res://enemies/skeleton.tscn" id="13_skeleton"]
+[ext_resource type="PackedScene" path="res://enemies/zombie.tscn" id="14_zombie"]
+[ext_resource type="PackedScene" path="res://enemies/bat_nest.tscn" id="15_bat_nest"]
+[ext_resource type="PackedScene" path="res://placeables/treasure/gold_coin_pile.tscn" id="16_treasure"]
+[ext_resource type="PackedScene" path="res://placeables/treasure_deposit/treasure_deposit_coffin.tscn" id="17_deposit"]
+[ext_resource type="PackedScene" path="res://placeables/collectibles/health_flask.tscn" id="18_health"]
+[ext_resource type="PackedScene" path="res://placeables/collectibles/flask_bigger_sack.tscn" id="19_sack"]
+[ext_resource type="PackedScene" path="res://placeables/collectibles/flask_pause_boundary.tscn" id="20_pause"]
+[ext_resource type="PackedScene" path="res://placeables/collectibles/flask_breathing_space.tscn" id="21_breathing"]
+[ext_resource type="PackedScene" path="res://placeables/torch/torch.tscn" id="23_torch"]
+[ext_resource type="PackedScene" path="res://placeables/pushables/rolling_rock_pushable.tscn" id="24_rolling_rock"]
+[ext_resource type="PackedScene" path="res://placeables/pushables/millstone.tscn" id="25_millstone"]
+[ext_resource type="PackedScene" path="res://placeables/pushables/hay_bale_pushable.tscn" id="26_hay_bale"]
+[ext_resource type="PackedScene" path="res://placeables/wall_breakable/wall_breakable.tscn" id="27_breakable_wall"]
+
+[sub_resource type="StandardMaterial3D" id="FloorMaterial"]
+albedo_color = Color(0.105, 0.075, 0.048, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="FloorMesh"]
+material = SubResource("FloorMaterial")
+size = Vector3(35, 0.1, 29)
+
+[sub_resource type="BoxShape3D" id="FloorShape"]
+size = Vector3(35, 0.1, 29)
+
+[sub_resource type="Curve3D" id="PatrolA"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[sub_resource type="Curve3D" id="PatrolB"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[sub_resource type="Curve3D" id="PatrolC"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[sub_resource type="Curve3D" id="PatrolD"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[sub_resource type="Curve3D" id="PatrolE"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[node name="CloseEscape" type="Node3D"]
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector3(-15, 0.05, 11)
+
+[node name="IndoorLighting" parent="." instance=ExtResource("2_lighting")]
+
+[node name="LevelSettings" type="Node" parent="."]
+script = ExtResource("3_level_settings")
+show_minimap = true
+
+[node name="AuthoredLayout" parent="." instance=ExtResource("4_layout")]
+
+[node name="Floor" type="StaticBody3D" parent="."]
+position = Vector3(0, -0.05, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("FloorMesh")
+
+[node name="Collision" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("FloorShape")
+
+[node name="KillBoundary2" parent="." instance=ExtResource("5_boundary")]
+playback_mode = 0
+player_blocking_enabled = true
+camera_fit_scale_limit = 1.1
+
+[node name="Poses" type="Node" parent="KillBoundary2"]
+script = ExtResource("7_boundary_sequence")
+
+[node name="Pose 1" type="Node3D" parent="KillBoundary2/Poses"]
+position = Vector3(-11.5, 0, 0)
+script = ExtResource("6_boundary_pose")
+size = Vector2(13, 32)
+rounding = 0.82
+outgoing_easing = 1
+
+[node name="Pose 2" type="Node3D" parent="KillBoundary2/Poses"]
+position = Vector3(-9, 0, 2)
+script = ExtResource("6_boundary_pose")
+size = Vector2(9, 25)
+rounding = 0.86
+time_seconds = 22.0
+outgoing_easing = 1
+
+[node name="Pose 3" type="Node3D" parent="KillBoundary2/Poses"]
+position = Vector3(-5, 0, 1)
+script = ExtResource("6_boundary_pose")
+size = Vector2(25, 31)
+rounding = 0.78
+time_seconds = 24.0
+outgoing_easing = 1
+
+[node name="Pose 4" type="Node3D" parent="KillBoundary2/Poses"]
+position = Vector3(0, 0, -3)
+script = ExtResource("6_boundary_pose")
+size = Vector2(13, 24)
+rounding = 0.84
+time_seconds = 48.0
+outgoing_easing = 1
+
+[node name="Pose 5" type="Node3D" parent="KillBoundary2/Poses"]
+position = Vector3(5, 0, -4)
+script = ExtResource("6_boundary_pose")
+size = Vector2(24, 23)
+rounding = 0.8
+time_seconds = 50.0
+outgoing_easing = 1
+
+[node name="Pose 6" type="Node3D" parent="KillBoundary2/Poses"]
+position = Vector3(11, 0, -3)
+script = ExtResource("6_boundary_pose")
+size = Vector2(13, 17)
+rounding = 0.86
+time_seconds = 74.0
+outgoing_easing = 1
+
+[node name="Pose 7" type="Node3D" parent="KillBoundary2/Poses"]
+position = Vector3(11, 0, 0)
+script = ExtResource("6_boundary_pose")
+size = Vector2(15, 31)
+rounding = 0.8
+time_seconds = 76.0
+outgoing_easing = 1
+
+[node name="Pose 8" type="Node3D" parent="KillBoundary2/Poses"]
+position = Vector3(12, 0, 8)
+script = ExtResource("6_boundary_pose")
+size = Vector2(12, 14)
+rounding = 0.88
+time_seconds = 100.0
+outgoing_easing = 1
+
+[node name="Pose 9" type="Node3D" parent="KillBoundary2/Poses"]
+position = Vector3(11, 0, 0)
+script = ExtResource("6_boundary_pose")
+size = Vector2(15, 31)
+rounding = 0.8
+time_seconds = 102.0
+outgoing_easing = 1
+
+[node name="Pose 10" type="Node3D" parent="KillBoundary2/Poses"]
+position = Vector3(12, 0, -8)
+script = ExtResource("6_boundary_pose")
+size = Vector2(12, 15)
+rounding = 0.88
+time_seconds = 126.0
+outgoing_easing = 1
+
+[node name="Progression" type="Node3D" parent="."]
+
+[node name="SilverDoor1" parent="Progression" instance=ExtResource("8_door")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -6, 0, 7)
+metadata/grid_cell = Vector2i(11, 21)
+
+[node name="SilverDoor2" parent="Progression" instance=ExtResource("8_door")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 5, 0, -7)
+metadata/grid_cell = Vector2i(22, 7)
+
+[node name="SilverDoor3" parent="Progression" instance=ExtResource("8_door")]
+position = Vector3(12, 0, 3)
+metadata/grid_cell = Vector2i(29, 17)
+
+[node name="FinalGate" parent="Progression" instance=ExtResource("9_gate")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 12, 0, -14)
+metadata/grid_cell = Vector2i(29, 0)
+
+[node name="SilverKey1" parent="Progression" instance=ExtResource("10_silver_key")]
+position = Vector3(-14, 0.025, -10)
+metadata/grid_cell = Vector2i(3, 4)
+
+[node name="SilverKey2" parent="Progression" instance=ExtResource("10_silver_key")]
+position = Vector3(3, 0.025, 11)
+metadata/grid_cell = Vector2i(20, 25)
+
+[node name="SilverKey3" parent="Progression" instance=ExtResource("10_silver_key")]
+position = Vector3(8, 0.025, 0)
+metadata/grid_cell = Vector2i(25, 14)
+
+[node name="GoldKey" parent="Progression" instance=ExtResource("11_gold_key")]
+position = Vector3(16, 0.025, 12)
+metadata/grid_cell = Vector2i(33, 26)
+
+[node name="Hazards" type="Node3D" parent="."]
+
+[node name="VaultSpikeQuick" parent="Hazards" instance=ExtResource("12_spike")]
+position = Vector3(8, 0, 5)
+arming_delay = 0.05
+raised_hold_seconds = 0.85
+reset_seconds = 1.1
+
+[node name="VaultSpikeDelayed" parent="Hazards" instance=ExtResource("12_spike")]
+position = Vector3(9, 0, 5)
+arming_delay = 0.45
+raised_hold_seconds = 1.8
+reset_seconds = 2.4
+
+[node name="VaultSpikeLong" parent="Hazards" instance=ExtResource("12_spike")]
+position = Vector3(11, 0, 6)
+arming_delay = 0.15
+raised_hold_seconds = 2.2
+reset_seconds = 1.2
+
+[node name="VaultSpikeFeint" parent="Hazards" instance=ExtResource("12_spike")]
+position = Vector3(13, 0, 6)
+arming_delay = 0.7
+raised_hold_seconds = 1.0
+reset_seconds = 2.7
+
+[node name="GoldSpikeQuick" parent="Hazards" instance=ExtResource("12_spike")]
+position = Vector3(15, 0, 11)
+arming_delay = 0.08
+raised_hold_seconds = 1.15
+reset_seconds = 1.4
+
+[node name="GoldSpikeDelayed" parent="Hazards" instance=ExtResource("12_spike")]
+position = Vector3(16, 0, 11)
+arming_delay = 0.55
+raised_hold_seconds = 2.0
+reset_seconds = 2.1
+
+[node name="ShortcutBoulder" parent="Hazards" instance=ExtResource("24_rolling_rock")]
+position = Vector3(-13, 0.5, 0)
+
+[node name="BreakableShortcut" parent="Hazards" instance=ExtResource("27_breakable_wall")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -12, 0, 0)
+
+[node name="MiddleMillstone" parent="Hazards" instance=ExtResource("25_millstone")]
+position = Vector3(-2, 0.5, 4)
+
+[node name="CryptBoulder" parent="Hazards" instance=ExtResource("24_rolling_rock")]
+position = Vector3(9, 0.5, -4)
+
+[node name="MiddleHayBale" parent="Hazards" instance=ExtResource("26_hay_bale")]
+position = Vector3(-1, 0, 10)
+
+[node name="CryptHayBale" parent="Hazards" instance=ExtResource("26_hay_bale")]
+position = Vector3(12, 0, -4)
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="SkeletonA" parent="Enemies" instance=ExtResource("13_skeleton")]
+position = Vector3(-14, 0, -6)
+curve = SubResource("PatrolA")
+loop_patrol = false
+[node name="SkeletonB" parent="Enemies" instance=ExtResource("13_skeleton")]
+position = Vector3(-4, 0, 10)
+curve = SubResource("PatrolB")
+loop_patrol = false
+[node name="SkeletonC" parent="Enemies" instance=ExtResource("13_skeleton")]
+position = Vector3(1, 0, -11)
+curve = SubResource("PatrolC")
+loop_patrol = false
+[node name="SkeletonD" parent="Enemies" instance=ExtResource("13_skeleton")]
+position = Vector3(7, 0, -8)
+curve = SubResource("PatrolD")
+loop_patrol = false
+[node name="SkeletonE" parent="Enemies" instance=ExtResource("13_skeleton")]
+position = Vector3(7, 0, 7)
+curve = SubResource("PatrolE")
+loop_patrol = false
+
+[node name="ZombieA" parent="Enemies" instance=ExtResource("14_zombie")]
+position = Vector3(-12, 0, 9)
+[node name="ZombieB" parent="Enemies" instance=ExtResource("14_zombie")]
+position = Vector3(-1, 0, 2)
+[node name="ZombieC" parent="Enemies" instance=ExtResource("14_zombie")]
+position = Vector3(13, 0, 8)
+
+[node name="BatNestA" parent="Enemies" instance=ExtResource("15_bat_nest")]
+position = Vector3(-11, 0, -2)
+[node name="BatNestB" parent="Enemies" instance=ExtResource("15_bat_nest")]
+position = Vector3(-3, 0, 8)
+[node name="BatNestC" parent="Enemies" instance=ExtResource("15_bat_nest")]
+position = Vector3(10, 0, -3)
+[node name="BatNestD" parent="Enemies" instance=ExtResource("15_bat_nest")]
+position = Vector3(10, 0, 9)
+
+[node name="Treasure" type="Node3D" parent="."]
+
+[node name="CacheA1" parent="Treasure" instance=ExtResource("16_treasure")]
+position = Vector3(-15, 0, 8)
+coin_count = 25
+[node name="CacheA2" parent="Treasure" instance=ExtResource("16_treasure")]
+position = Vector3(-8, 0, 9)
+coin_count = 20
+[node name="CacheA3" parent="Treasure" instance=ExtResource("16_treasure")]
+position = Vector3(-10, 0, 0)
+coin_count = 20
+[node name="CacheB1" parent="Treasure" instance=ExtResource("16_treasure")]
+position = Vector3(-4, 0, 11)
+coin_count = 25
+[node name="CacheB2" parent="Treasure" instance=ExtResource("16_treasure")]
+position = Vector3(3, 0, 3)
+coin_count = 15
+[node name="CacheB3" parent="Treasure" instance=ExtResource("16_treasure")]
+position = Vector3(-4, 0, -11)
+coin_count = 25
+[node name="CacheC1" parent="Treasure" instance=ExtResource("16_treasure")]
+position = Vector3(7, 0, -11)
+coin_count = 20
+[node name="CacheC2" parent="Treasure" instance=ExtResource("16_treasure")]
+position = Vector3(15, 0, -2)
+coin_count = 20
+[node name="CacheC3" parent="Treasure" instance=ExtResource("16_treasure")]
+position = Vector3(7, 0, 11)
+coin_count = 30
+[node name="CacheC4" parent="Treasure" instance=ExtResource("16_treasure")]
+position = Vector3(12, 0, 8)
+coin_count = 40
+
+[node name="Deposits" type="Node3D" parent="."]
+[node name="DepositA" parent="Deposits" instance=ExtResource("17_deposit")]
+position = Vector3(-8, 0, 11)
+[node name="DepositB" parent="Deposits" instance=ExtResource("17_deposit")]
+position = Vector3(-4, 0, 3)
+[node name="DepositC" parent="Deposits" instance=ExtResource("17_deposit")]
+position = Vector3(15, 0, -10)
+[node name="VaultDeposit" parent="Deposits" instance=ExtResource("17_deposit")]
+position = Vector3(8, 0, 6)
+
+[node name="Supplies" type="Node3D" parent="."]
+[node name="StartingSackFlask" parent="Supplies" instance=ExtResource("19_sack")]
+position = Vector3(-14, 0.12, 11)
+[node name="BoundaryPauseFlask" parent="Supplies" instance=ExtResource("20_pause")]
+position = Vector3(-4, 0.12, 6)
+[node name="BoundaryBreathingSpaceFlask" parent="Supplies" instance=ExtResource("21_breathing")]
+position = Vector3(7, 0.12, -7)
+[node name="HealthFlaskA" parent="Supplies" instance=ExtResource("18_health")]
+position = Vector3(-10, 0.12, -2)
+[node name="HealthFlaskB" parent="Supplies" instance=ExtResource("18_health")]
+position = Vector3(12, 0.12, 6)
+
+[node name="Torches" type="Node3D" parent="."]
+[node name="TorchDoor1West" parent="Torches" instance=ExtResource("23_torch")]
+position = Vector3(-7, 0, 6)
+[node name="TorchDoor1East" parent="Torches" instance=ExtResource("23_torch")]
+position = Vector3(-5, 0, 8)
+[node name="TorchDoor2West" parent="Torches" instance=ExtResource("23_torch")]
+position = Vector3(4, 0, -8)
+[node name="TorchDoor2East" parent="Torches" instance=ExtResource("23_torch")]
+position = Vector3(6, 0, -6)
+[node name="TorchDoor3North" parent="Torches" instance=ExtResource("23_torch")]
+position = Vector3(11, 0, 2)
+[node name="TorchDoor3South" parent="Torches" instance=ExtResource("23_torch")]
+position = Vector3(13, 0, 4)
+[node name="TorchGateWest" parent="Torches" instance=ExtResource("23_torch")]
+position = Vector3(10, 0, -13)
+[node name="TorchGateEast" parent="Torches" instance=ExtResource("23_torch")]
+position = Vector3(14, 0, -13)
+
+[editable path="IndoorLighting"]

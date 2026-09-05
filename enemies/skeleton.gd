@@ -787,7 +787,7 @@ func _update_rolling_ball_death() -> void:
     var hits := world.direct_space_state.intersect_shape(query, 8)
     for hit: Dictionary in hits:
         var collider := hit.get("collider") as Object
-        if not _is_rolling_ball_body(collider):
+        if not _is_rolling_ball_body(collider, detection_center):
             continue
 
         var collider_3d := collider as Node3D
@@ -903,13 +903,13 @@ func _collect_geometry(node: Node, geometry_instances: Array[GeometryInstance3D]
     geometry_instances.append_array(SkeletonPresentation.collect_geometry(node))
 
 
-func _is_rolling_ball_body(collider: Object) -> bool:
+func _is_rolling_ball_body(collider: Object, target_position := Vector3.INF) -> bool:
     if collider == null or not collider is Node:
         return false
 
     var node := collider as Node
     if node is RollingRock:
-        return (node as RollingRock).can_kill_enemy_by_rolling()
+        return (node as RollingRock).can_kill_enemy_by_rolling(target_position)
 
     return String(node.name).contains("RollingRock")
 

@@ -12,7 +12,11 @@ extends RollingRock
 ## Maximum sideways player speed removed each second while actively pushing a rolling side.
 @export_range(0.0, 20.0, 0.1, "suffix:m/s²") var push_alignment_assist_acceleration := 8.0
 ## Minimum rolling speed required for this millstone to kill an enemy on contact.
-@export_range(0.0, 5.0, 0.01) var enemy_crush_speed := 0.15
+@export_range(0.0, 5.0, 0.01) var enemy_crush_speed := 0.65
+## Maximum sideways distance from the millstone's travel line that still counts as a crush.
+@export_range(0.05, 2.0, 0.01) var enemy_crush_path_half_width := 0.4
+## Minimum distance ahead of the millstone centre required so side and trailing contacts are safe.
+@export_range(0.0, 1.0, 0.01) var enemy_crush_min_forward_offset := 0.04
 ## Minimum upward contact normal treated as supporting ground for rolling audio.
 @export_range(0.0, 1.0, 0.01) var rolling_audio_ground_normal_y := 0.65
 @export_group("")
@@ -109,9 +113,22 @@ func _physics_process(delta: float) -> void:
 	previous_position = global_position
 
 
-func can_kill_enemy_by_rolling() -> bool:
+func can_kill_enemy_by_rolling(target_position := Vector3.INF) -> bool:
 	var rolling_velocity := _project_onto_roll_direction(linear_velocity)
-	return rolling_velocity.length() >= enemy_crush_speed
+	if rolling_velocity.length() < enemy_crush_speed:
+		return false
+	if not target_position.is_finite():
+		return true
+
+	var millstone_position := global_position if is_inside_tree() else position
+	var target_offset := target_position - millstone_position
+	target_offset.y = 0.0
+	var travel_direction := rolling_velocity.normalized()
+	if target_offset.dot(travel_direction) < enemy_crush_min_forward_offset:
+		return false
+
+	var lateral_direction := Vector3.UP.cross(travel_direction).normalized()
+	return absf(target_offset.dot(lateral_direction)) <= enemy_crush_path_half_width
 
 
 func _get_audible_rolling_speed(speed: float) -> float:

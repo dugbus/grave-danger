@@ -1,6 +1,65 @@
 # Changelog
 
+## 2026-09-05
+
+### 1800
+
+- Level-design guidance now covers directly editable tiled floors, selective road and grass composition, navigation-safe dressing, and separate editor, rendering and gameplay validation.
+  - Prompt: Capture floor, road, grass and other recent level-design lessons in the reusable skill.
+- Close Escape's FloorGridMap is now a native child of the main level scene, with all floor cells directly selectable and paintable without opening a nested layout.
+  - Prompt: Make the missing floor GridMap directly accessible in Close Escape's main scene tree.
+- Close Escape now exposes its floor, wall GridMaps and grass paint groups as editable children directly in the main level scene tree.
+  - Prompt: Expose Close Escape's floor as an editable GridMap in the main level editor.
+
+### 1700
+
+- Close Escape now has a fully tiled dirt floor, worn stone paths and threshold aprons, and selective grass pockets that leave rewards and spike traps readable.
+  - Prompt: Dress Close Escape with a Tutorial 1-style floor GridMap, artistic roads and Level 1-style painted grass.
+- Close Escape now has a player-reported 100% completion following the dead-zombie collision fix.
+  - Prompt: Record the successful full-treasure playthrough.
+- Zombies settling fractionally below floor height now route around walls on the correct grid layer instead of repeatedly walking into them.
+  - Prompt: Inspect zombie entrance stalls after achieving 100% and apply only a low-risk correction.
+
+### 1500
+
+- Zombies killed by spikes or rolling objects no longer leave solid invisible bodies behind, keeping the return route from Close Escape's optional spike treasure pocket open.
+  - Prompt: Find and fix the invisible obstruction that trapped the player before death in Close Escape.
+- Close Escape now keeps future rooms and the north exit approach inside the flame, while unlocking district doors smoothly brings pressure forward behind the player; the optional 30-coin spike branch remains.
+  - Prompt: Remove repeated flame waiting and preserve a challenging route to every coin in Close Escape.
+
+### 1400
+
+- Close Escape's route notes now flag the recorded 28-second wait and the fixed flame schedule's failure to accommodate faster arrivals; the 100% route remains unverified in gameplay.
+  - Prompt: Inspect saved Close Escape markers showing flame waits and an inaccessible area despite reaching the gate.
+- Level editors have a Close Escape walkthrough with collection and banking targets, plus a design lesson covering complete journeys through moving flames.
+  - Prompt: Explain the winning route and retain the design lessons.
+- Close Escape's flame now leaves time to reach the northern eastern-district door, collect all 240 coins, and return to the gold exit; an optional staggered-spike branch guards 30 coins.
+  - Prompt: Restore access to Close Escape's eastern district and make every coin reachable with optional treasure challenges.
+
 ## 2026-09-04
+
+### 2100
+
+- Level editors now have a living Grave Danger design workflow covering route integrity, staged flame pressure, encounter variety, reward rarity, physics readability, and replay-backed validation.
+  - Prompt: Capture the accumulated Grave Danger level-design learning in an updateable skill.
+- Close Escape now uses timed room contractions with rapid expansions into each next district, while millstones require clear speed and forward-lane alignment before crushing enemies.
+  - Prompt: Turn Close Escape's flame boundary into room-by-room time pressure and fix implausible millstone kills.
+
+### 2000
+
+- Close Escape skeletons now reverse smoothly instead of teleporting, its faster flame perimeter has visibly curved 64-segment corners, repeated doorway spikes have become a concentrated timed vault plus rolling and breakable obstacles, all caches contain coins only, and the opening message has been removed.
+  - Prompt: Apply the Close Escape playtest feedback for patrols, boundary shape and speed, trap variety, treasure rarity, and the opening message.
+- Close Escape now uses an authored three-district GridMap with sealed key chokepoints, spike gauntlets, skeleton patrols, zombie hunters, bat ambushes, and a visibly sweeping flame boundary; every objective remains reachable through the intended unlock sequence.
+  - Prompt: Replace Close Escape's generated, bypassable layout with an authored challenge.
+
+### 1900
+
+- The marked escape route now offers a boundary-pause flask after its first lock and a breathing-space flask after its second.
+  - Prompt: Create an original Close Escape level with a flame boundary and a route to 100% completion.
+- Players can reach and bank every treasure cache before escaping through the final gate.
+  - Prompt: Create an original Close Escape level with a flame boundary and a route to 100% completion.
+- Close Escape is now a selectable 37-by-31 graveyard maze with a tightening flame perimeter, a marked escape route, three locked stages, and a starting sack upgrade.
+  - Prompt: Create an original Close Escape level with a flame boundary and a route to 100% completion.
 
 ### 1400
 

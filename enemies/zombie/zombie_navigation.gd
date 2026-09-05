@@ -184,13 +184,24 @@ func _get_wall_slide_direction(direction: Vector3) -> Vector3:
 
     return slide_direction.normalized()
 
+func _get_navigation_cell(grid_map: GridMap, world_position: Vector3) -> Vector3i:
+    var local_position := grid_map.to_local(world_position)
+    # Physics can settle feet a few floating-point units below a floor boundary.
+    # Floor-to-cell conversion would then search the empty layer below the walls.
+    # Snap only approximate boundary equality; preserve genuine upper/lower floors
+    # and leave horizontal cell ownership unchanged.
+    var boundary_y := snappedf(local_position.y, grid_map.cell_size.y)
+    if is_equal_approx(local_position.y, boundary_y):
+        local_position.y = boundary_y
+    return grid_map.local_to_map(local_position)
+
 func _get_grid_navigation_next_position(target_position: Vector3) -> Vector3:
     var grid_map := _select_navigation_grid_map(_get_body_position(), target_position)
     if grid_map == null:
         return Vector3.INF
 
-    var start_cell := grid_map.local_to_map(grid_map.to_local(_get_body_position()))
-    var target_cell := grid_map.local_to_map(grid_map.to_local(target_position))
+    var start_cell := _get_navigation_cell(grid_map, _get_body_position())
+    var target_cell := _get_navigation_cell(grid_map, target_position)
     if _is_grid_cell_blocked(grid_map, target_cell):
         var nearest_cell := _find_nearest_unblocked_grid_cell(grid_map, target_cell)
         if nearest_cell == INVALID_GRID_CELL:
@@ -213,8 +224,8 @@ func _has_grid_navigation_path(target_position: Vector3) -> bool:
     if grid_map == null:
         return false
 
-    var start_cell := grid_map.local_to_map(grid_map.to_local(_get_body_position()))
-    var target_cell := grid_map.local_to_map(grid_map.to_local(target_position))
+    var start_cell := _get_navigation_cell(grid_map, _get_body_position())
+    var target_cell := _get_navigation_cell(grid_map, target_position)
     if _is_grid_cell_blocked(grid_map, target_cell):
         target_cell = _find_nearest_unblocked_grid_cell(grid_map, target_cell)
         if target_cell == INVALID_GRID_CELL:
@@ -231,8 +242,8 @@ func _select_navigation_grid_map(from_position: Vector3, to_position: Vector3) -
             continue
 
         var bounds := navigation_grid_bounds_by_id.get(grid_map.get_instance_id(), Rect2i()) as Rect2i
-        var from_cell := grid_map.local_to_map(grid_map.to_local(from_position))
-        var to_cell := grid_map.local_to_map(grid_map.to_local(to_position))
+        var from_cell := _get_navigation_cell(grid_map, from_position)
+        var to_cell := _get_navigation_cell(grid_map, to_position)
         if bounds.has_point(Vector2i(from_cell.x, from_cell.z)) and bounds.has_point(Vector2i(to_cell.x, to_cell.z)):
             return grid_map
 
@@ -243,8 +254,8 @@ func _has_grid_blocker_between(from_position: Vector3, to_position: Vector3) -> 
     if grid_map == null:
         return false
 
-    var from_cell := grid_map.local_to_map(grid_map.to_local(from_position))
-    var to_cell := grid_map.local_to_map(grid_map.to_local(to_position))
+    var from_cell := _get_navigation_cell(grid_map, from_position)
+    var to_cell := _get_navigation_cell(grid_map, to_position)
     var step_count := maxi(absi(to_cell.x - from_cell.x), absi(to_cell.z - from_cell.z))
     if step_count <= 1:
         return false

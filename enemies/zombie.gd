@@ -498,7 +498,7 @@ func _is_crushed(delta: float) -> bool:
 
 	var crushed := false
 	for body in crush_check_area.get_overlapping_bodies():
-		if _is_rolling_ball_body(body):
+		if _is_rolling_ball_body(body, _get_detection_center()):
 			crushed = true
 			break
 
@@ -527,7 +527,7 @@ func _update_rolling_ball_death(_delta: float) -> void:
 	var hits := world.direct_space_state.intersect_shape(query, 8)
 	for hit: Dictionary in hits:
 		var collider := hit.get("collider") as Object
-		if not _is_rolling_ball_body(collider):
+		if not _is_rolling_ball_body(collider, detection_center):
 			continue
 
 		var collider_3d := collider as Node3D
@@ -567,6 +567,11 @@ func _die_from_rolling_ball() -> void:
 	_stop_body()
 	_set_kill_area_enabled(false)
 	_set_attack_hitboxes_enabled(false)
+	# The corpse animation is visual only. Keeping the upright body solid would block
+	# narrow routes even after the mesh has sunk and faded out.
+	if zombie_body != null:
+		zombie_body.collision_layer = 0
+		zombie_body.collision_mask = 0
 	_play_death_scream()
 	_play_death_animation()
 
@@ -575,12 +580,12 @@ func _die_from_rolling_ball() -> void:
 
 	_disappear_after_death()
 
-func _is_rolling_ball_body(collider: Object) -> bool:
+func _is_rolling_ball_body(collider: Object, target_position := Vector3.INF) -> bool:
 	if collider == null or not collider is Node:
 		return false
 
 	var node := collider as Node
 	if node is RollingRock:
-		return (node as RollingRock).can_kill_enemy_by_rolling()
+		return (node as RollingRock).can_kill_enemy_by_rolling(target_position)
 
 	return String(node.name).contains("RollingRock")

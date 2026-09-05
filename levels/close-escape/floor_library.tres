@@ -1,0 +1,73 @@
+[gd_resource type="MeshLibrary" format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/environment/dirt_2.png" id="1_dirt"]
+
+[sub_resource type="BoxShape3D" id="FloorCollision"]
+size = Vector3(1, 0.5, 1)
+
+[sub_resource type="StandardMaterial3D" id="DirtPhase0"]
+albedo_texture = ExtResource("1_dirt")
+uv1_scale = Vector3(0.5, 0.5, 1)
+uv1_offset = Vector3(0, 0, 0)
+
+[sub_resource type="PlaneMesh" id="FloorTile0"]
+material = SubResource("DirtPhase0")
+size = Vector2(1, 1)
+
+[sub_resource type="StandardMaterial3D" id="DirtPhase1"]
+albedo_texture = ExtResource("1_dirt")
+uv1_scale = Vector3(0.5, 0.5, 1)
+uv1_offset = Vector3(0.5, 0, 0)
+
+[sub_resource type="PlaneMesh" id="FloorTile1"]
+material = SubResource("DirtPhase1")
+size = Vector2(1, 1)
+
+[sub_resource type="StandardMaterial3D" id="DirtPhase2"]
+albedo_texture = ExtResource("1_dirt")
+uv1_scale = Vector3(0.5, 0.5, 1)
+uv1_offset = Vector3(0, 0.5, 0)
+
+[sub_resource type="PlaneMesh" id="FloorTile2"]
+material = SubResource("DirtPhase2")
+size = Vector2(1, 1)
+
+[sub_resource type="StandardMaterial3D" id="DirtPhase3"]
+albedo_texture = ExtResource("1_dirt")
+uv1_scale = Vector3(0.5, 0.5, 1)
+uv1_offset = Vector3(0.5, 0.5, 0)
+
+[sub_resource type="PlaneMesh" id="FloorTile3"]
+material = SubResource("DirtPhase3")
+size = Vector2(1, 1)
+
+[resource]
+resource_name = "Close Escape - Tutorial 1 Dirt Tiles"
+item/0/name = "Dirt Floor 0"
+item/0/mesh = SubResource("FloorTile0")
+item/0/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/0/mesh_cast_shadow = 1
+item/0/shapes = [SubResource("FloorCollision"), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)]
+item/0/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/0/navigation_layers = 1
+item/1/name = "Dirt Floor 1"
+item/1/mesh = SubResource("FloorTile1")
+item/1/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/1/mesh_cast_shadow = 1
+item/1/shapes = [SubResource("FloorCollision"), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)]
+item/1/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/1/navigation_layers = 1
+item/2/name = "Dirt Floor 2"
+item/2/mesh = SubResource("FloorTile2")
+item/2/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/2/mesh_cast_shadow = 1
+item/2/shapes = [SubResource("FloorCollision"), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)]
+item/2/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/2/navigation_layers = 1
+item/3/name = "Dirt Floor 3"
+item/3/mesh = SubResource("FloorTile3")
+item/3/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/3/mesh_cast_shadow = 1
+item/3/shapes = [SubResource("FloorCollision"), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)]
+item/3/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/3/navigation_layers = 1

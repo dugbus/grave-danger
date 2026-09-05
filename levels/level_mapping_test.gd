@@ -6,8 +6,8 @@ const LEVEL_MAPPING := preload("res://levels/level_mapping.tres")
 func run(_tree: SceneTree) -> void:
 	expect_equal(
 		LEVEL_MAPPING.get_level_count(),
-		24,
-		"The level lookup exposes the existing levels plus the Kill Boundary 2 demo."
+		25,
+		"The level lookup exposes the existing levels, demo, and Close Escape."
 	)
 	expect_equal(LEVEL_MAPPING.get_level_id(0), "tutorial_1", "Tutorial 1 appears first.")
 	expect_equal(LEVEL_MAPPING.get_level_id(5), "debug_level", "The debug level has a stable ID.")
@@ -45,6 +45,18 @@ func run(_tree: SceneTree) -> void:
 		LEVEL_MAPPING.get_level_scene_path(23),
 		"res://levels/kill-boundary-2-demo/level.tscn",
 		"The demo mapping resolves to its dedicated text scene."
+	)
+	var close_escape_data := LEVEL_MAPPING.get_level_data(24)
+	expect(
+		close_escape_data.get("id") == "close_escape" \
+			and close_escape_data.get("name") == "Close Escape" \
+			and bool(close_escape_data.get("available", false)),
+		"Close Escape is selectable under its stable level identity."
+	)
+	expect_equal(
+		LEVEL_MAPPING.get_level_scene_path(24),
+		"res://levels/close-escape/level.tscn",
+		"Close Escape resolves to its original level scene."
 	)
 	var tutorials_are_registered := true
 	for tutorial_number in range(1, 6):

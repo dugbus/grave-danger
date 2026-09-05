@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="GDKillBoundary2Settings" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="GDKillBoundary2Settings" format=3 uid="uid://ta5sl2xo4c5b"]
 
-[ext_resource type="Script" path="res://placeables/kill-boundary-2/kill_boundary_2_settings.gd" id="1_settings"]
+[ext_resource type="Script" uid="uid://crptm4t6e8axb" path="res://placeables/kill-boundary-2/kill_boundary_2_settings.gd" id="1_settings"]
 
 [resource]
 script = ExtResource("1_settings")
+boundary_segments = 64

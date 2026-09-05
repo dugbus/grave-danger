@@ -1,0 +1,28 @@
+{
+  "captured_duration": 76.049999999997,
+  "captured_frame_count": 4563,
+  "created_unix_time": 1788553171.0,
+  "format_version": 2.0,
+  "level_id": "close_escape",
+  "level_scene_bytes": 15040.0,
+  "level_scene_file": "20260904T201931Z-close_escape.tscn",
+  "level_scene_sha256": "0e1b2e81fe791428a790202a6b6c1fe337a53e9eaace237b32848afaef7922c5",
+  "level_scene_status": "ready",
+  "marker": {
+    "created_unix_time": 1788553171.0,
+    "frame": 4416.0,
+    "note": "I can't get to the key",
+    "snapshot": {
+      "max_treasure_value": 240.0,
+      "nodes": [],
+      "showing_result": false,
+      "treasure_collected": 71.0
+    },
+    "time": 73.6166666666638
+  },
+  "playback_bytes": 132140,
+  "playback_file": "20260904T201931Z-close_escape.gdr",
+  "playback_status": "ready",
+  "report_id": "20260904T201931Z-close_escape",
+  "status": "open"
+}

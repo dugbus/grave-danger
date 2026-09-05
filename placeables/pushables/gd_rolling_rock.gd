@@ -47,7 +47,7 @@ func push_from_character(character_velocity: Vector3, collision_normal: Vector3,
 	super.push_from_character(character_velocity, collision_normal, delta)
 
 
-func can_kill_enemy_by_rolling() -> bool:
+func can_kill_enemy_by_rolling(_target_position := Vector3.INF) -> bool:
 	return true
 
 

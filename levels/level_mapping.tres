@@ -191,6 +191,13 @@ display_name = "Kill Boundary 2 Demo"
 folder_name = "kill-boundary-2-demo"
 available = true
 
+[sub_resource type="Resource" id="Level_close_escape"]
+script = ExtResource("2_definition")
+id = "close_escape"
+display_name = "Close Escape"
+folder_name = "close-escape"
+available = true
+
 [resource]
 script = ExtResource("1_mapping")
-level_entries = Array[ExtResource("2_definition")]([SubResource("Level_tutorial_1"), SubResource("Level_tutorial_2"), SubResource("Level_tutorial_3"), SubResource("Level_tutorial_4"), SubResource("Level_tutorial_5"), SubResource("Level_debug"), SubResource("Level_01"), SubResource("Level_02"), SubResource("Level_03"), SubResource("Level_04"), SubResource("Level_graveyard"), SubResource("Level_06"), SubResource("Level_07"), SubResource("Level_08"), SubResource("Level_vampire"), SubResource("Level_10"), SubResource("Level_11"), SubResource("Level_12"), SubResource("Level_13"), SubResource("Level_14"), SubResource("Level_15"), SubResource("Level_16"), SubResource("Level_flask_kill_expand"), SubResource("Level_kill_boundary_2_demo")])
+level_entries = Array[ExtResource("2_definition")]([SubResource("Level_tutorial_1"), SubResource("Level_tutorial_2"), SubResource("Level_tutorial_3"), SubResource("Level_tutorial_4"), SubResource("Level_tutorial_5"), SubResource("Level_debug"), SubResource("Level_01"), SubResource("Level_02"), SubResource("Level_03"), SubResource("Level_04"), SubResource("Level_graveyard"), SubResource("Level_06"), SubResource("Level_07"), SubResource("Level_08"), SubResource("Level_vampire"), SubResource("Level_10"), SubResource("Level_11"), SubResource("Level_12"), SubResource("Level_13"), SubResource("Level_14"), SubResource("Level_15"), SubResource("Level_16"), SubResource("Level_flask_kill_expand"), SubResource("Level_kill_boundary_2_demo"), SubResource("Level_close_escape")])
