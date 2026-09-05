@@ -36,7 +36,7 @@ autotile_alternatives = Array[Resource]([SubResource("Resource_wall_sides_black"
 
 [resource]
 script = ExtResource("3_7hnn6")
-png_path = "res://levels/1/level.png"
+png_path = "res://levels/3/level.png"
 target_gridmap_path = NodePath("GridMap")
 mesh_library_path = "res://Assets/environment/graveyard.res"
 auto_repair = true
