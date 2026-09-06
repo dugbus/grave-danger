@@ -25,7 +25,15 @@ func run(tree: SceneTree) -> void:
 	expect(player != null, "The playground owns its independent test player.")
 	expect(camera != null and camera.current, "The playground owns an active fixed camera.")
 	expect(surface != null, "The M2 fixture replaces its temporary pad with FloorSurface.")
-	expect_equal(surface.get_generated_cell_count(), 116, "The saved map generates 120 cells minus its four-cell hole.")
+	expect(
+		surface.floor_map.resource_local_to_scene,
+		"The M3 authoring trial persists an independent map with the playground scene."
+	)
+	expect_equal(
+		surface.get_generated_cell_count(),
+		116,
+		"The saved map preserves the accepted M3 room and central hole."
+	)
 	expect_equal(surface.validate_configuration(), [], "The saved M2 surface has no configuration warnings.")
 	expect(not surface.sample_surface(Vector3.ZERO).valid, "The central 2x2 hole has no sampled floor.")
 	expect(

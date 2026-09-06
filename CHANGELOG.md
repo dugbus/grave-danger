@@ -2,8 +2,27 @@
 
 ## 2026-09-06
 
+### 1700
+
+- The revised floor-surface painting workflow passed its human retry, including out-of-bounds painting, visible shape buttons and complete undo/redo.
+  - Prompt: Accept the revised M3 floor-surface editor workflow.
+- Floor maps now trim unused exterior storage automatically after paint and erase gestures; bounds remain part of the same undo/redo action and distant edits use compact sparse storage.
+  - Prompt: Accept the revised M3 floor-surface editor workflow.
+- Brush and Rectangle are now visible painting buttons, shared maps explain the effect of choosing an independent scene copy, and the FloorSurface transform gizmo hides while painting.
+  - Prompt: Refine M3 from the first editor painting trial.
+- Floor painting now expands automatically beyond the previous map edge while leaving untouched surrounding cells empty; undo and cancellation restore the earlier extent.
+  - Prompt: Refine M3 from the first editor painting trial.
+
 ### 1500
 
+- Shared FloorMap resources are identified clearly, with Make Unique and Save Map actions for safe independent editing and persistence.
+  - Prompt: Implement floor surface M3 viewport shape painting and reliable undo.
+- Each brush stroke or rectangle is recorded as one undoable action; Escape cancels a gesture and restores the complete map state.
+  - Prompt: Implement floor surface M3 viewport shape painting and reliable undo.
+- Floor painting now works over holes and empty cells using the authored elevation plane, while middle/right-mouse viewport navigation remains available.
+  - Prompt: Implement floor surface M3 viewport shape painting and reliable undo.
+- Added a Floor Surface editor dock with explicit viewport painting, target feedback, paint/erase modes, odd-sized brushes, rectangle fill, and colour-coded hover previews.
+  - Prompt: Implement floor surface M3 viewport shape painting and reliable undo.
 - The saved floor-map playground has passed its M2 human retry with visible grid rendering, matching hole collision, and live surface diagnostics.
   - Prompt: Confirm the corrected authoritative floor-map playground milestone is ready to keep.
 - The floor-surface playground now uses a bright unshaded checker grid that remains readable independently of scene lighting.

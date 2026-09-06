@@ -86,6 +86,14 @@ rules. Keep level-specific coordinates and transient tuning out of this file.
 
 ## Editor usability and art validation
 
+- Keep finite floor bounds as a storage and validation detail, not an authoring cage. Painting
+  beyond an edge should expand the stored rectangle while leaving untouched newly enclosed cells
+  absent; cancellation and undo must restore both occupancy and the previous extent. Compact the
+  storage automatically after each completed gesture so erasing exterior tiles cannot leave a
+  large invisible authored rectangle or require a separate cleanup action.
+- Make mutually exclusive paint shapes visible as direct controls, and describe resource-copy
+  actions by their consequence for the current scene. While a dedicated paint mode owns viewport
+  clicks, hide obstructive transform gizmos and restore normal selection when painting ends.
 - An object rendering at runtime is not proof that the level designer can find and paint it.
   Prefer a native `FloorGridMap` child of the main level scene for directly edited floor data.
   If deliberately using nested layout or grass scenes, expose their editable children and verify
@@ -129,3 +137,9 @@ rules. Keep level-specific coordinates and transient tuning out of this file.
   GridMap. The saved nested scene and rendered previews contained a floor, but the cause of the
   user's editor discrepancy was not established; direct ownership and editor-state tests were
   added rather than treating those previews as proof of editor accessibility.
+- The first FloorSurface shape-painting trial found fixed bounds restrictive, the rectangle dropdown
+  easy to overlook, the shared-resource copy language unclear, and the selected-node transform
+  gizmo obstructive. The accepted cancellation, navigation and scene persistence behaviour was
+  retained while those authoring affordances were revised. The retry accepted direct shape buttons,
+  out-of-bounds painting and complete undo/redo; automatic extent compaction was added after the
+  saved test gesture exposed redundant empty storage.

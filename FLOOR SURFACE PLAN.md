@@ -1,6 +1,6 @@
 # Floor Surface Implementation Plan
 
-Based on [FLOOR SURFACE DESIGN.md](FLOOR%20SURFACE%20DESIGN.md). This plan covers the **standalone prototype only**. M1 and M2 are accepted; later milestones remain unimplemented.
+Based on [FLOOR SURFACE DESIGN.md](FLOOR%20SURFACE%20DESIGN.md). This plan covers the **standalone prototype only**. M1, M2 and M3 are accepted; later milestones remain unimplemented.
 
 The aim is to deliver small, usable increments that a human can edit and play before the next dependent part is built. Existing Grave Danger levels and floor implementations remain outside this work. Integration requires a separate plan after prototype acceptance.
 
@@ -17,7 +17,7 @@ The aim is to deliver small, usable increments that a human can edit and play be
 
 - [x] M1 — Isolated playground and controllable test player.
 - [x] M2 — Authoritative map, flat floor generation and sampling.
-- [ ] M3 — Viewport shape painting and reliable undo.
+- [x] M3 — Viewport shape painting and reliable undo.
 - [ ] M4 — Absolute elevation, ledges and traversal tuning.
 - [ ] M5 — Styles, exposed depth and pits.
 - [ ] M6 — Explicit ramps and transition authoring.
@@ -86,13 +86,14 @@ The only anticipated shared configuration edit is registering the new editor plu
 
 **Deliverable:** Floor occupancy can be authored without editing individual cell properties.
 
-- [ ] Add a dedicated Floor Surface mode and dock, with target selection, hover preview, floor paint, erase, brush size and rectangle fill.
-- [ ] Support painting onto empty space using a grid/working-plane fallback; picking must not depend exclusively on existing floor collision.
-- [ ] Use one undo/redo action per complete stroke or rectangle, including a stroke crossing itself. Cancellation leaves the map unchanged.
-- [ ] Save authored resources reliably; make it clear whether a map is shared and provide an explicit unique-copy workflow before independent edits.
-- [ ] Automated checks: brush and rectangle footprints, bounds, stroke aggregation, cancellation, undo/redo round trips and independence of unique map copies.
-- [ ] Human trial: paint a room, erase a central hole, widen a passage, undo and redo each action, then save/reopen. Confirm one undo reverses one gesture and viewport navigation still works.
-- [ ] Review: adjust brush feedback and controls before extending the same gestures to elevation and style.
+- [x] Add a dedicated Floor Surface mode and dock, with target selection, hover preview, floor paint, erase, brush size and rectangle fill.
+- [x] Support painting onto empty space using a grid/working-plane fallback; picking must not depend exclusively on existing floor collision.
+- [x] Use one undo/redo action per complete stroke or rectangle, including a stroke crossing itself. Cancellation leaves the map unchanged.
+- [x] Save authored resources reliably; make it clear whether a map is shared and provide an explicit unique-copy workflow before independent edits.
+- [x] Automated checks: brush and rectangle footprints, automatic storage expansion/compaction, stroke aggregation, cancellation, undo/redo round trips and independence of unique map copies. M3's focused suites, editor startup, scene/UID scan, test pairing and lint pass; the full repository check still stops on the pre-existing Tutorial 3 kill-boundary test mismatch recorded below.
+- [x] Human trial: paint a room, erase a central hole, widen a passage, undo and redo each action, then save/reopen. Confirm one undo reverses one gesture and viewport navigation still works.
+- [x] Retry acceptance: paint beyond the previous edge, find the explicit Rectangle control, verify the independent-copy explanation, and confirm the transform gizmo hides during painting and returns afterward.
+- [x] Review: adjust brush feedback and controls before extending the same gestures to elevation and style.
 
 ## M4 — Absolute elevation, ledges and traversal
 
@@ -288,6 +289,45 @@ Decision: Awaiting trial
 Follow-up checklist items: Run the directed M2 trial, reopen the scene, and settle the cell-size/origin contract
 Earlier checkpoints to repeat: Confirm M1 movement and camera comfort remain intact
 Evidence or feedback report path: Not created yet
+```
+
+```text
+Milestone / trial: M3 implementation checkpoint
+Date / tester / revision: 2026-09-06 / Codex automated checks / 18b7573 + working tree
+Fixture and camera view: M2 saved-flat-map-v1 / Godot 3D editor viewport
+Settings changed (before → after): Added explicit viewport-paint toggle; paint/erase; 1, 3, 5, 7 and 9-cell square brushes; rectangle fill; green/red footprint preview
+Automated results: FloorMap, shape painter, dock, editor plugin and runtime FloorSurface focused suites pass. Headless editor startup, all-scene/UID scan, test pairing and focused lint pass. ./check.sh reaches the known unrelated Tutorial 3 failure where the legacy kill-boundary test requests GDKillBoundary3D; its aborted suite then exceeds teardown baselines.
+Human observations (expected / actual): Expected room painting, a central erased hole, a widened passage, one undo per gesture, redo, save/reopen and uninterrupted middle/right-mouse navigation / awaiting trial
+Decision: Awaiting trial
+Follow-up checklist items: Complete the M3 human trial and adjust brush feedback or controls from observed use
+Earlier checkpoints to repeat: Confirm the M2 checker remains visible after save/reopen
+Evidence or feedback report path: Not created yet
+```
+
+```text
+Milestone / trial: M3 human trial 1
+Date / tester / revision: 2026-09-06 / user / 18b7573 + working tree
+Fixture and camera view: M2 saved-flat-map-v1 / Godot 3D editor viewport
+Settings changed (before → after): Shared playground map → independently copied scene-local map; authored holes and a passage; saved and reopened the scene
+Automated results: Pre-trial M3 focused suites, editor startup, scene/UID scan, test pairing and lint passed
+Human observations (expected / actual): Escape restored the gesture, middle/right navigation worked, and scene-local saving survived closure. Fixed map bounds felt unnecessary; Rectangle existed but was not discoverable; Make Unique did not explain why it was needed; the selected FloorSurface transform gizmo obstructed painting.
+Decision: Changes requested
+Follow-up checklist items: Auto-expand bounds during paint with full undo/cancel; expose Brush and Rectangle buttons; explain shared versus independent maps in consequence-first language; hide and restore the selection gizmo with paint mode
+Earlier checkpoints to repeat: M3 undo/redo and save/reopen; M2 visual readability after the authored trial layout
+Evidence or feedback report path: User report in conversation; editor-only trial has no gameplay recording
+```
+
+```text
+Milestone / trial: M3 human retry 2
+Date / tester / revision: 2026-09-06 / user / 18b7573 + working tree
+Fixture and camera view: Saved-flat-map-v1 / Godot 3D editor viewport
+Settings changed (before → after): Fixed storage edge → automatic expansion and trimming; hidden shape selector → direct Brush/Rectangle buttons; ambiguous Make Unique wording → consequence-first independent-copy explanation; selected-node gizmo → hidden only while painting
+Automated results: Six focused M3 suites passed 141 assertions after the retry refinement; complete repository validation retains the pre-existing Tutorial 3 kill-boundary blocker recorded above
+Human observations (expected / actual): Expected out-of-bounds painting, obvious shape controls, complete undo/redo and unobstructed editing / tester reported that out-of-bounds painting and undo/redo worked and that the buttons were clear, accepting the revised workflow as great
+Decision: Accepted
+Follow-up checklist items: Begin M4 only as a separate implementation update
+Earlier checkpoints to repeat: Retain M3 gesture and persistence checks when elevation editing begins
+Evidence or feedback report path: User report in conversation; editor-only trial has no gameplay recording
 ```
 
 ## Deferred until a separate integration plan

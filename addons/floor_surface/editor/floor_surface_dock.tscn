@@ -1,0 +1,93 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://addons/floor_surface/editor/floor_surface_dock.gd" id="1_dock"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_shape"]
+
+[node name="FloorSurfaceDock" type="VBoxContainer"]
+custom_minimum_size = Vector2(280, 0)
+script = ExtResource("1_dock")
+
+[node name="Title" type="Label" parent="."]
+theme_override_font_sizes/font_size = 18
+text = "Floor Surface"
+
+[node name="TargetLabel" type="Label" parent="."]
+unique_name_in_owner = true
+text = "Target: select a FloorSurface"
+autowrap_mode = 2
+
+[node name="OwnershipLabel" type="Label" parent="."]
+unique_name_in_owner = true
+text = "No editable FloorMap selected."
+autowrap_mode = 2
+
+[node name="ResourceButtons" type="HFlowContainer" parent="."]
+
+[node name="MakeUniqueButton" type="Button" parent="ResourceButtons"]
+unique_name_in_owner = true
+disabled = true
+text = "Use Independent Copy"
+tooltip_text = "Copy the shared FloorMap into this scene so edits here cannot change another surface."
+
+[node name="SaveButton" type="Button" parent="ResourceButtons"]
+unique_name_in_owner = true
+disabled = true
+text = "Save Map"
+
+[node name="Separator" type="HSeparator" parent="."]
+
+[node name="EditToggle" type="CheckButton" parent="."]
+unique_name_in_owner = true
+disabled = true
+text = "Enable Viewport Painting"
+tooltip_text = "When enabled, left-drag paints. Middle/right mouse navigation remains available."
+
+[node name="PaintModeLabel" type="Label" parent="."]
+text = "Operation"
+
+[node name="PaintModeOption" type="OptionButton" parent="."]
+unique_name_in_owner = true
+disabled = true
+
+[node name="ShapeModeLabel" type="Label" parent="."]
+text = "Painting tool"
+
+[node name="ShapeButtons" type="HBoxContainer" parent="."]
+
+[node name="BrushButton" type="Button" parent="ShapeButtons"]
+unique_name_in_owner = true
+disabled = true
+size_flags_horizontal = 3
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_shape")
+text = "Brush"
+
+[node name="RectangleButton" type="Button" parent="ShapeButtons"]
+unique_name_in_owner = true
+disabled = true
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = SubResource("ButtonGroup_shape")
+text = "Rectangle"
+
+[node name="BrushSizeLabel" type="Label" parent="."]
+text = "Brush size"
+
+[node name="BrushSizeOption" type="OptionButton" parent="."]
+unique_name_in_owner = true
+disabled = true
+
+[node name="HoverLabel" type="Label" parent="."]
+unique_name_in_owner = true
+text = "Cell —"
+
+[node name="Instructions" type="Label" parent="."]
+text = "Left-drag: paint\nRectangle: drag corner to corner\nEsc: cancel gesture\nMiddle/right mouse: navigate"
+autowrap_mode = 2
+
+[node name="StatusLabel" type="Label" parent="."]
+unique_name_in_owner = true
+text = "Select a FloorSurface to begin."
+autowrap_mode = 2

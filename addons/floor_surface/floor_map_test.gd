@@ -7,6 +7,8 @@ const ROUND_TRIP_PATH := "res://.godot/floor_surface_map_round_trip_test.tres"
 func run(_tree: SceneTree) -> void:
 	expect_script_contract(SUBJECT, "res://addons/floor_surface/floor_map.gd")
 	_test_bounds_occupancy_and_negative_cells()
+	_test_presence_snapshots_and_unique_copy()
+	_test_bounds_expand_without_implicit_floor()
 	_test_sparse_authored_values_and_palette_validation()
 	_test_text_resource_round_trip()
 
@@ -44,6 +46,77 @@ func _test_sparse_authored_values_and_palette_validation() -> void:
 	expect_equal(floor_map.validate_palette_size(2).size(), 1, "Out-of-range style intent is reported.")
 
 
+func _test_presence_snapshots_and_unique_copy() -> void:
+	var floor_map := SUBJECT.new()
+	floor_map.minimum_cell = Vector2i(-1, -1)
+	floor_map.dimensions = Vector2i(3, 3)
+	floor_map.default_present = false
+	expect(
+		floor_map.apply_presence_snapshot([
+			Vector2i(1, 1),
+			Vector2i(-1, -1),
+			Vector2i(1, 1),
+			Vector2i(9, 9),
+		]),
+		"An occupancy snapshot can be applied."
+	)
+	expect_equal(
+		floor_map.get_presence_snapshot(),
+		[Vector2i(-1, -1), Vector2i(1, 1)],
+		"Snapshots are bounded, deduplicated and stored in stable order."
+	)
+	var snapshot := floor_map.get_presence_snapshot()
+	snapshot.clear()
+	expect(floor_map.has_floor(Vector2i(-1, -1)), "Returned snapshots do not alias map storage.")
+	var unique_map := floor_map.create_unique_copy() as SUBJECT
+	expect(unique_map != floor_map, "Make Unique returns a different resource instance.")
+	expect(unique_map.resource_local_to_scene, "A unique copy is marked scene-local.")
+	unique_map.set_floor_present(Vector2i.ZERO, true)
+	expect(
+		not floor_map.has_floor(Vector2i.ZERO),
+		"Editing the unique copy cannot change its source map."
+	)
+
+
+func _test_bounds_expand_without_implicit_floor() -> void:
+	var floor_map := SUBJECT.new()
+	floor_map.minimum_cell = Vector2i.ZERO
+	floor_map.dimensions = Vector2i(2, 2)
+	floor_map.default_present = true
+	var before := floor_map.get_shape_snapshot()
+	expect(
+		floor_map.expand_bounds_to_include([Vector2i(-2, 0), Vector2i(3, 2)]),
+		"Painting can grow storage beyond every original edge."
+	)
+	expect_equal(floor_map.minimum_cell, Vector2i(-2, 0), "Expansion moves the minimum bound.")
+	expect_equal(floor_map.dimensions, Vector2i(6, 3), "Expansion contains the complete request.")
+	expect(floor_map.has_floor(Vector2i.ZERO), "Existing default-present floor is preserved.")
+	expect(
+		not floor_map.has_floor(Vector2i(-1, 0)),
+		"Newly enclosed cells do not appear until the painter explicitly paints them."
+	)
+	expect(floor_map.apply_shape_snapshot(before), "Undo can restore bounds and occupancy together.")
+	expect_equal(floor_map.minimum_cell, Vector2i.ZERO, "Undo restores the original minimum bound.")
+	expect_equal(floor_map.dimensions, Vector2i(2, 2), "Undo restores the original dimensions.")
+	expect(floor_map.default_present, "Undo restores the original occupancy representation.")
+
+	floor_map.minimum_cell = Vector2i(-14, -60)
+	floor_map.dimensions = Vector2i(25, 67)
+	floor_map.default_present = true
+	floor_map.presence_exceptions.clear()
+	for z_coordinate in range(-60, 7):
+		for x_coordinate in range(-14, 11):
+			var cell := Vector2i(x_coordinate, z_coordinate)
+			if not _is_in_compact_fixture(cell):
+				floor_map.presence_exceptions.append(cell)
+	expect(floor_map.compact_storage(), "Unused exterior storage can be compacted.")
+	expect_equal(floor_map.minimum_cell, Vector2i(-6, -5), "Compaction finds the occupied minimum.")
+	expect_equal(floor_map.dimensions, Vector2i(12, 10), "Compaction trims empty exterior rows and columns.")
+	expect(floor_map.default_present, "Compaction chooses the smaller dense representation.")
+	expect_equal(floor_map.presence_exceptions.size(), 4, "Only the central hole needs serialization.")
+	expect_equal(floor_map.get_present_cells().size(), 116, "Compaction preserves the exact floor shape.")
+
+
 func _test_text_resource_round_trip() -> void:
 	var floor_map := SUBJECT.new()
 	floor_map.minimum_cell = Vector2i(-3, 2)
@@ -66,4 +139,15 @@ func _test_text_resource_round_trip() -> void:
 		expect(not restored.has_floor(Vector2i(-1, 3)), "A saved hole survives reload.")
 		expect_equal(restored.get_cell_elevation(Vector2i(-2, 2)), 7, "Elevation survives reload.")
 		expect_equal(restored.get_cell_style(Vector2i(-1, 3)), 1, "Absent style survives reload.")
+		var unique_map := restored.create_unique_copy() as SUBJECT
+		expect(
+			unique_map.resource_path.is_empty(),
+			"A unique copy no longer points at the shared resource file."
+		)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(ROUND_TRIP_PATH))
+
+
+func _is_in_compact_fixture(cell: Vector2i) -> bool:
+	return cell.x >= -6 and cell.x <= 5 \
+		and cell.y >= -5 and cell.y <= 4 \
+		and cell not in [Vector2i(-1, -1), Vector2i.ZERO, Vector2i(-1, 0), Vector2i(0, -1)]
