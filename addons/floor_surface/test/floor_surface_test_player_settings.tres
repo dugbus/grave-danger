@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="FloorSurfaceTestPlayerSettings" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/floor_surface/test/floor_surface_test_player_settings.gd" id="1_settings"]
+
+[resource]
+script = ExtResource("1_settings")
+movement_speed = 5.0
+acceleration = 18.0
+deceleration = 24.0
+gravity = 24.0
+jump_height = 0.8
+floor_snap_length = 0.25
+maximum_step_height = 0.25
+maximum_floor_angle_degrees = 45.0
+fall_reset_y = -3.0

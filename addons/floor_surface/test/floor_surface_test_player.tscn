@@ -1,0 +1,40 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://addons/floor_surface/test/floor_surface_test_player.gd" id="1_player"]
+[ext_resource type="Resource" path="res://addons/floor_surface/test/floor_surface_test_player_settings.tres" id="2_settings"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape_player"]
+radius = 0.32
+height = 1.25
+
+[sub_resource type="StandardMaterial3D" id="PlayerMaterial"]
+albedo_color = Color(0.93, 0.62, 0.16, 1)
+roughness = 0.72
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
+material = SubResource("PlayerMaterial")
+radius = 0.32
+height = 1.25
+
+[sub_resource type="StandardMaterial3D" id="FacingMaterial"]
+albedo_color = Color(0.12, 0.04, 0.03, 1)
+
+[sub_resource type="BoxMesh" id="FacingMesh"]
+material = SubResource("FacingMaterial")
+size = Vector3(0.16, 0.16, 0.42)
+
+[node name="FloorSurfaceTestPlayer" type="CharacterBody3D"]
+script = ExtResource("1_player")
+settings = ExtResource("2_settings")
+movement_camera_path = NodePath("../Camera3D")
+reset_marker_path = NodePath("../ResetPosition")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape_player")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_player")
+
+[node name="FacingMarker" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0, -0.34)
+mesh = SubResource("FacingMesh")

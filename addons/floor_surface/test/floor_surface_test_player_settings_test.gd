@@ -1,0 +1,22 @@
+extends "res://tests/test_case.gd"
+
+const SUBJECT := preload("res://addons/floor_surface/test/floor_surface_test_player_settings.gd")
+
+
+func run(_tree: SceneTree) -> void:
+	expect_script_contract(
+		SUBJECT,
+		"res://addons/floor_surface/test/floor_surface_test_player_settings.gd"
+	)
+	var settings := SUBJECT.new()
+	settings.gravity = 20.0
+	settings.jump_height = 0.9
+	expect(
+		is_equal_approx(settings.get_jump_velocity(), 6.0),
+		"Jump velocity is derived deterministically from gravity and height."
+	)
+	settings.maximum_floor_angle_degrees = 40.0
+	expect(
+		is_equal_approx(settings.get_maximum_floor_angle_radians(), deg_to_rad(40.0)),
+		"Floor-angle tuning is converted to the CharacterBody unit."
+	)

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="FloorSurfaceCameraSettings" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/floor_surface/test/floor_surface_camera_settings.gd" id="1_camera"]
+
+[resource]
+script = ExtResource("1_camera")
+overview_position = Vector3(8.5, 9, 10.5)
+overview_target = Vector3(0, 0, 0)
+overview_size = 14.0
+close_position = Vector3(5.5, 5.5, 6.5)
+close_target = Vector3(0, 0.5, 0)
+close_size = 9.0
+side_position = Vector3(-10, 6, 0)
+side_target = Vector3(0, 0.5, 0)
+side_size = 13.0

@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-06
+
+### 1500
+
+- The isolated floor-surface movement, reset, diagnostics, and camera harness has passed its first human playtest without requested tuning changes.
+  - Prompt: Confirm the first floor-surface playground milestone feels ready to use.
+
+### 1400
+
+- Level editors can tune the prototype controller and camera independently without changing existing levels or production gameplay.
+  - Prompt: Implement the floor-surface plan through its first human-usable, isolated checkpoint.
+- Players can now directly run an isolated floor-surface playground with movement, jumping, fall recovery, visible controls, live diagnostics, and selectable fixed camera views.
+  - Prompt: Implement the floor-surface plan through its first human-usable, isolated checkpoint.
+- Level editors now have a staged standalone floor-surface prototype plan with playable review checkpoints, feedback records, and acceptance checklists before integration.
+  - Prompt: Turn the floor surface design into a staged implementation plan with human trials and progress checklists.
+
 ## 2026-09-05
 
 ### 1900

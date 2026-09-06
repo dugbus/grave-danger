@@ -1,0 +1,159 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://addons/floor_surface/test/floor_surface_playground.gd" id="1_playground"]
+[ext_resource type="Resource" path="res://addons/floor_surface/test/floor_surface_camera_settings.tres" id="2_camera_settings"]
+[ext_resource type="PackedScene" path="res://addons/floor_surface/test/floor_surface_test_player.tscn" id="3_player"]
+
+[sub_resource type="Environment" id="Environment_playground"]
+background_mode = 1
+background_color = Color(0.025, 0.035, 0.055, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.44, 0.5, 0.62, 1)
+ambient_light_energy = 0.7
+
+[sub_resource type="StandardMaterial3D" id="PadMaterial"]
+albedo_color = Color(0.17, 0.22, 0.27, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="PadMesh"]
+material = SubResource("PadMaterial")
+size = Vector3(12, 0.2, 10)
+
+[sub_resource type="BoxShape3D" id="PadShape"]
+size = Vector3(12, 0.2, 10)
+
+[sub_resource type="StandardMaterial3D" id="ResetMaterial"]
+shading_mode = 0
+albedo_color = Color(0.2, 0.9, 0.72, 1)
+
+[sub_resource type="TorusMesh" id="ResetMesh"]
+material = SubResource("ResetMaterial")
+inner_radius = 0.42
+outer_radius = 0.5
+rings = 24
+ring_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="EdgeMaterial"]
+shading_mode = 0
+albedo_color = Color(0.28, 0.43, 0.55, 1)
+
+[sub_resource type="BoxMesh" id="LongEdgeMesh"]
+material = SubResource("EdgeMaterial")
+size = Vector3(12.1, 0.04, 0.04)
+
+[sub_resource type="BoxMesh" id="ShortEdgeMesh"]
+material = SubResource("EdgeMaterial")
+size = Vector3(0.04, 0.04, 10.1)
+
+[sub_resource type="StyleBoxFlat" id="PanelStyle"]
+bg_color = Color(0.025, 0.035, 0.055, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.9, 0.72, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="LabelSettings" id="ResetLabelSettings"]
+font_size = 22
+font_color = Color(0.2, 0.9, 0.72, 1)
+outline_size = 6
+outline_color = Color(0.01, 0.02, 0.03, 1)
+
+[node name="FloorSurfacePlayground" type="Node3D"]
+script = ExtResource("1_playground")
+camera_settings = ExtResource("2_camera_settings")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_playground")
+
+[node name="KeyLight" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-55, -35, 0)
+light_color = Color(0.88, 0.92, 1, 1)
+light_energy = 1.4
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+projection = 1
+size = 14.0
+current = true
+
+[node name="TemporaryPad" type="StaticBody3D" parent="."]
+position = Vector3(0, -0.1, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TemporaryPad"]
+mesh = SubResource("PadMesh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TemporaryPad"]
+shape = SubResource("PadShape")
+
+[node name="NorthEdge" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.025, -5)
+mesh = SubResource("LongEdgeMesh")
+
+[node name="SouthEdge" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.025, 5)
+mesh = SubResource("LongEdgeMesh")
+
+[node name="WestEdge" type="MeshInstance3D" parent="."]
+position = Vector3(-6, 0.025, 0)
+mesh = SubResource("ShortEdgeMesh")
+
+[node name="EastEdge" type="MeshInstance3D" parent="."]
+position = Vector3(6, 0.025, 0)
+mesh = SubResource("ShortEdgeMesh")
+
+[node name="ResetPosition" type="Marker3D" parent="."]
+position = Vector3(0, 0.65, 2.5)
+
+[node name="Ring" type="MeshInstance3D" parent="ResetPosition"]
+position = Vector3(0, -0.625, 0)
+mesh = SubResource("ResetMesh")
+
+[node name="Label" type="Label3D" parent="ResetPosition"]
+position = Vector3(0, 0.65, 0)
+text = "RESET"
+label_settings = SubResource("ResetLabelSettings")
+billboard = 1
+no_depth_test = true
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+position = Vector3(0, 0.65, 2.5)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="PanelContainer" parent="HUD"]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 590.0
+offset_bottom = 405.0
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="Margin" type="MarginContainer" parent="HUD/Panel"]
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 14
+
+[node name="Rows" type="VBoxContainer" parent="HUD/Panel/Margin"]
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="HUD/Panel/Margin/Rows"]
+theme_override_colors/font_color = Color(0.2, 0.9, 0.72, 1)
+theme_override_font_sizes/font_size = 28
+text = "FLOOR SURFACE PLAYGROUND"
+
+[node name="Instructions" type="Label" parent="HUD/Panel/Margin/Rows"]
+theme_override_colors/font_color = Color(0.9, 0.92, 0.96, 1)
+theme_override_font_sizes/font_size = 18
+text = "Arrow keys / stick: move    Space / A: jump\nR: reset to marker    V: change fixed camera\nWalk off any edge to exercise automatic fall/reset."
+
+[node name="Separator" type="HSeparator" parent="HUD/Panel/Margin/Rows"]
+
+[node name="Status" type="Label" parent="HUD/Panel/Margin/Rows"]
+theme_override_colors/font_color = Color(0.75, 0.8, 0.88, 1)
+theme_override_font_sizes/font_size = 16
+text = "Fixture: loading"
