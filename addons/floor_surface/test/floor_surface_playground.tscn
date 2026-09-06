@@ -3,6 +3,11 @@
 [ext_resource type="Script" path="res://addons/floor_surface/test/floor_surface_playground.gd" id="1_playground"]
 [ext_resource type="Resource" path="res://addons/floor_surface/test/floor_surface_camera_settings.tres" id="2_camera_settings"]
 [ext_resource type="PackedScene" path="res://addons/floor_surface/test/floor_surface_test_player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://addons/floor_surface/floor_surface.tscn" id="4_surface"]
+[ext_resource type="Resource" path="res://addons/floor_surface/test/floor_surface_playground_map.tres" id="5_map"]
+[ext_resource type="Resource" path="res://addons/floor_surface/default_floor_elevation_profile.tres" id="6_profile"]
+[ext_resource type="Script" path="res://addons/floor_surface/floor_style.gd" id="7_style_script"]
+[ext_resource type="Resource" path="res://addons/floor_surface/default_floor_style.tres" id="8_style"]
 
 [sub_resource type="Environment" id="Environment_playground"]
 background_mode = 1
@@ -10,17 +15,6 @@ background_color = Color(0.025, 0.035, 0.055, 1)
 ambient_light_source = 3
 ambient_light_color = Color(0.44, 0.5, 0.62, 1)
 ambient_light_energy = 0.7
-
-[sub_resource type="StandardMaterial3D" id="PadMaterial"]
-albedo_color = Color(0.17, 0.22, 0.27, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="PadMesh"]
-material = SubResource("PadMaterial")
-size = Vector3(12, 0.2, 10)
-
-[sub_resource type="BoxShape3D" id="PadShape"]
-size = Vector3(12, 0.2, 10)
 
 [sub_resource type="StandardMaterial3D" id="ResetMaterial"]
 shading_mode = 0
@@ -32,18 +26,6 @@ inner_radius = 0.42
 outer_radius = 0.5
 rings = 24
 ring_segments = 12
-
-[sub_resource type="StandardMaterial3D" id="EdgeMaterial"]
-shading_mode = 0
-albedo_color = Color(0.28, 0.43, 0.55, 1)
-
-[sub_resource type="BoxMesh" id="LongEdgeMesh"]
-material = SubResource("EdgeMaterial")
-size = Vector3(12.1, 0.04, 0.04)
-
-[sub_resource type="BoxMesh" id="ShortEdgeMesh"]
-material = SubResource("EdgeMaterial")
-size = Vector3(0.04, 0.04, 10.1)
 
 [sub_resource type="StyleBoxFlat" id="PanelStyle"]
 bg_color = Color(0.025, 0.035, 0.055, 0.9)
@@ -61,6 +43,12 @@ corner_radius_bottom_left = 6
 font_size = 22
 font_color = Color(0.2, 0.9, 0.72, 1)
 outline_size = 6
+outline_color = Color(0.01, 0.02, 0.03, 1)
+
+[sub_resource type="LabelSettings" id="HoleLabelSettings"]
+font_size = 24
+font_color = Color(1, 0.35, 0.22, 1)
+outline_size = 7
 outline_color = Color(0.01, 0.02, 0.03, 1)
 
 [node name="FloorSurfacePlayground" type="Node3D"]
@@ -81,30 +69,17 @@ projection = 1
 size = 14.0
 current = true
 
-[node name="TemporaryPad" type="StaticBody3D" parent="."]
-position = Vector3(0, -0.1, 0)
+[node name="FloorSurface" parent="." instance=ExtResource("4_surface")]
+floor_map = ExtResource("5_map")
+elevation_profile = ExtResource("6_profile")
+styles = Array[ExtResource("7_style_script")]([ExtResource("8_style")])
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="TemporaryPad"]
-mesh = SubResource("PadMesh")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="TemporaryPad"]
-shape = SubResource("PadShape")
-
-[node name="NorthEdge" type="MeshInstance3D" parent="."]
-position = Vector3(0, 0.025, -5)
-mesh = SubResource("LongEdgeMesh")
-
-[node name="SouthEdge" type="MeshInstance3D" parent="."]
-position = Vector3(0, 0.025, 5)
-mesh = SubResource("LongEdgeMesh")
-
-[node name="WestEdge" type="MeshInstance3D" parent="."]
-position = Vector3(-6, 0.025, 0)
-mesh = SubResource("ShortEdgeMesh")
-
-[node name="EastEdge" type="MeshInstance3D" parent="."]
-position = Vector3(6, 0.025, 0)
-mesh = SubResource("ShortEdgeMesh")
+[node name="HoleLabel" type="Label3D" parent="."]
+position = Vector3(0, 0.35, 0)
+text = "M2 HOLE\nNO SURFACE"
+label_settings = SubResource("HoleLabelSettings")
+billboard = 1
+no_depth_test = true
 
 [node name="ResetPosition" type="Marker3D" parent="."]
 position = Vector3(0, 0.65, 2.5)
@@ -129,7 +104,7 @@ position = Vector3(0, 0.65, 2.5)
 offset_left = 24.0
 offset_top = 24.0
 offset_right = 590.0
-offset_bottom = 405.0
+offset_bottom = 430.0
 theme_override_styles/panel = SubResource("PanelStyle")
 
 [node name="Margin" type="MarginContainer" parent="HUD/Panel"]
@@ -149,7 +124,7 @@ text = "FLOOR SURFACE PLAYGROUND"
 [node name="Instructions" type="Label" parent="HUD/Panel/Margin/Rows"]
 theme_override_colors/font_color = Color(0.9, 0.92, 0.96, 1)
 theme_override_font_sizes/font_size = 18
-text = "Arrow keys / stick: move    Space / A: jump\nR: reset to marker    V: change fixed camera\nWalk off any edge to exercise automatic fall/reset."
+text = "Arrow keys / stick: move    Space / A: jump\nR: reset to marker    V: change fixed camera\nCross the grid seams, circle the centre hole, then enter it."
 
 [node name="Separator" type="HSeparator" parent="HUD/Panel/Margin/Rows"]
 

@@ -1,6 +1,6 @@
 # Floor Surface Implementation Plan
 
-Based on [FLOOR SURFACE DESIGN.md](FLOOR%20SURFACE%20DESIGN.md). This plan covers the **standalone prototype only**. M1 is accepted; later milestones remain unimplemented.
+Based on [FLOOR SURFACE DESIGN.md](FLOOR%20SURFACE%20DESIGN.md). This plan covers the **standalone prototype only**. M1 and M2 are accepted; later milestones remain unimplemented.
 
 The aim is to deliver small, usable increments that a human can edit and play before the next dependent part is built. Existing Grave Danger levels and floor implementations remain outside this work. Integration requires a separate plan after prototype acceptance.
 
@@ -16,7 +16,7 @@ The aim is to deliver small, usable increments that a human can edit and play be
 ## Progress
 
 - [x] M1 — Isolated playground and controllable test player.
-- [ ] M2 — Authoritative map, flat floor generation and sampling.
+- [x] M2 — Authoritative map, flat floor generation and sampling.
 - [ ] M3 — Viewport shape painting and reliable undo.
 - [ ] M4 — Absolute elevation, ledges and traversal tuning.
 - [ ] M5 — Styles, exposed depth and pits.
@@ -71,15 +71,16 @@ The only anticipated shared configuration edit is registering the new editor plu
 
 **Deliverable:** A small saved floor map with a hole; visible geometry, collision and queries agree.
 
-- [ ] Implement map/profile/style resources and typed sample results. Store integer absolute elevations, never free-form per-cell heights.
-- [ ] Set the coordinate contract: grid aligned to world X/Z, configurable cell size and X/Z origin, and absolute `world_y = elevation * elevation_unit`. Initially warn on root Y offsets, rotation or scale that would violate that contract.
-- [ ] Define deterministic boundary ownership, negative-coordinate handling, out-of-bounds sampling and palette-index validation. Keep style assignment available on absent in-bounds cells for later pit appearance; outside bounds has no implicit pit bottom.
-- [ ] Generate batched flat tops and matching static collision from the map, replacing the temporary pad. Repeated rebuilds replace derived output without duplication.
-- [ ] Expose `has_floor`, `get_cell_elevation`, `get_world_height_at_cell` and `sample_surface`; document invalid-cell results and route consumers through this API.
-- [ ] Populate debug UI with cell, sampled height, absolute unit, normal and transition. Show no valid surface over holes rather than assuming Y=0.
-- [ ] Automated checks: text save/reload, absent and out-of-bounds cells, grid boundaries, negative cells, origin/cell-size changes, repeated rebuilds and flat query/collision agreement.
-- [ ] Human trial: walk across several cell seams and into the hole, reset, then reload the scene. Confirm no invisible bridge remains over the hole and the saved layout and debug samples agree.
-- [ ] Review: settle cell size and coordinate expectations before painting tools depend on them.
+- [x] Implement map/profile/style resources and typed sample results. Store integer absolute elevations, never free-form per-cell heights.
+- [x] Set the coordinate contract: grid aligned to world X/Z, configurable cell size and X/Z origin, and absolute `world_y = elevation * elevation_unit`. Initially warn on root Y offsets, rotation or scale that would violate that contract.
+- [x] Define deterministic boundary ownership, negative-coordinate handling, out-of-bounds sampling and palette-index validation. Keep style assignment available on absent in-bounds cells for later pit appearance; outside bounds has no implicit pit bottom.
+- [x] Generate batched flat tops and matching static collision from the map, replacing the temporary pad. Repeated rebuilds replace derived output without duplication.
+- [x] Expose `has_floor`, `get_cell_elevation`, `get_world_height_at_cell` and `sample_surface`; document invalid-cell results and route consumers through this API.
+- [x] Populate debug UI with cell, sampled height, absolute unit, normal and transition. Show no valid surface over holes rather than assuming Y=0.
+- [x] Automated checks: text save/reload, absent and out-of-bounds cells, grid boundaries, negative cells, origin/cell-size changes, repeated rebuilds and flat query/collision agreement. M2's focused checks pass; unrelated repository failures remain recorded below.
+- [x] Human trial: walk across several cell seams and into the hole, reset, then reload the scene. Confirm no invisible bridge remains over the hole and the saved layout and debug samples agree.
+- [x] Retry acceptance: confirm the unshaded high-contrast checker floor is clearly visible in the runtime and editor after the first trial rendered its surface black.
+- [x] Review: settle cell size and coordinate expectations before painting tools depend on them.
 
 ## M3 — Viewport shape painting and undo
 
@@ -247,6 +248,45 @@ Human observations (expected / actual): Expected movement in four directions, ju
 Decision: Accepted
 Follow-up checklist items: Begin M2 only as a separate implementation update
 Earlier checkpoints to repeat: None
+Evidence or feedback report path: Not created yet
+```
+
+```text
+Milestone / trial: M2 human trial 1
+Date / tester / revision: 2026-09-06 / user / 5484f1b + working tree
+Fixture and camera view: M2 / saved-flat-map-v1 / runtime view
+Settings changed (before → after): Initial lit dark teal checker → unshaded high-contrast teal checker for retry
+Automated results: Geometry, collision and query checks passed before the trial
+Human observations (expected / actual): Expected a readable grid and hole / floor rendered black; player and hole debug text remained visible; player fell through the hole and off outer sides as intended
+Decision: Changes requested
+Follow-up checklist items: Verify the brighter unshaded grid in both runtime and editor, then repeat the M2 trial
+Earlier checkpoints to repeat: M2 visual readability and HUD-to-surface agreement
+Evidence or feedback report path: User report in conversation; standalone replay unavailable
+```
+
+```text
+Milestone / trial: M2 human trial 2
+Date / tester / revision: 2026-09-06 / user / 5484f1b + working tree
+Fixture and camera view: M2 / saved-flat-map-v1 / independently launched runtime and refreshed editor preview
+Settings changed (before → after): Retained 1.00m cells, origin (0, 0), 0.25m elevation unit and the brighter unshaded checker
+Automated results: Focused material and assembled-playground suites passed after the visibility correction; prior M2 geometry, collision, serialization and query checks remain passing
+Human observations (expected / actual): Expected visible floor, usable hole and matching runtime behavior / tester confirmed it worked correctly after launching independently
+Decision: Accepted
+Follow-up checklist items: Begin M3 only as a separate implementation update
+Earlier checkpoints to repeat: None
+Evidence or feedback report path: User report in conversation; standalone replay unavailable
+```
+
+```text
+Milestone / trial: M2 implementation check; human trial pending
+Date / tester / revision: 2026-09-06 / Codex automated checks / 5484f1b + working tree
+Fixture and camera view: M2 / saved-flat-map-v1 / all three named camera arrangements constructed
+Settings changed (before → after): Temporary 12m × 10m pad → saved 12 × 10 map at 1.00m cells, origin (0, 0), 0.25m elevation unit, central 2 × 2 hole
+Automated results: Seven focused suites passed (110 assertions); scene/UID scan, test pairing, focused lint and diff checks passed. ./check.sh remains blocked by the existing Tutorial 3 GDKillBoundary3D expectation and its resulting unrelated teardown failure.
+Human observations (expected / actual): Expected stable movement across visible cell seams, live matching samples and a fall/reset through the hole with no invisible bridge / awaiting trial
+Decision: Awaiting trial
+Follow-up checklist items: Run the directed M2 trial, reopen the scene, and settle the cell-size/origin contract
+Earlier checkpoints to repeat: Confirm M1 movement and camera comfort remain intact
 Evidence or feedback report path: Not created yet
 ```
 

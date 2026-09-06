@@ -3,7 +3,7 @@ extends Node3D
 
 ## Runtime coordinator for the isolated human-testable floor-surface fixture.
 
-const FIXTURE_ID := "M1 / isolated-playground-v1"
+const FIXTURE_ID := "M2 / saved-flat-map-v1"
 const CAMERA_VIEW_COUNT := 3
 const HUD_REFRESH_SECONDS := 0.1
 const CAMERA_SETTINGS_SCRIPT := preload(
@@ -12,6 +12,8 @@ const CAMERA_SETTINGS_SCRIPT := preload(
 const PLAYER_SCRIPT := preload(
 	"res://addons/floor_surface/test/floor_surface_test_player.gd"
 )
+const SURFACE_SCRIPT := preload("res://addons/floor_surface/floor_surface.gd")
+const SAMPLE_SCRIPT := preload("res://addons/floor_surface/floor_surface_sample.gd")
 
 ## Independent camera arrangements used by this playground only.
 @export var camera_settings: CAMERA_SETTINGS_SCRIPT
@@ -19,11 +21,14 @@ const PLAYER_SCRIPT := preload(
 @export var camera_path: NodePath = ^"Camera3D"
 ## Standalone player whose state appears in the debug panel.
 @export var player_path: NodePath = ^"Player"
+## Isolated surface queried by the debug panel; production floors remain unrelated.
+@export var surface_path: NodePath = ^"FloorSurface"
 ## Label updated with live controller and future floor-surface information.
 @export var status_label_path: NodePath = ^"HUD/Panel/Margin/Rows/Status"
 
 @onready var evaluation_camera := get_node_or_null(camera_path) as Camera3D
 @onready var player := get_node_or_null(player_path) as PLAYER_SCRIPT
+@onready var floor_surface := get_node_or_null(surface_path) as SURFACE_SCRIPT
 @onready var status_label := get_node_or_null(status_label_path) as Label
 
 var current_camera_view := CAMERA_SETTINGS_SCRIPT.CameraView.Overview
@@ -86,11 +91,13 @@ func _update_status() -> void:
 			player.settings.maximum_step_height,
 			player.settings.maximum_floor_angle_degrees,
 		]
+	var sample: SAMPLE_SCRIPT = null
+	if floor_surface != null:
+		sample = floor_surface.sample_surface(player_position)
+	var surface_text := _format_surface_status(sample)
 	status_label.text = (
 		"Fixture: %s\nCamera: %s\nPlayer: (%.2f, %.2f, %.2f) | grounded: %s\n"
-		+ "Controller: %s\n\nFloor surface: unavailable (M2)\n"
-		+ "Cell: unavailable | sampled height: unavailable\n"
-		+ "Normal: unavailable | transition: unavailable"
+		+ "Controller: %s\n\n%s"
 	) % [
 		FIXTURE_ID,
 		get_camera_view_name(),
@@ -99,4 +106,31 @@ func _update_status() -> void:
 		player_position.z,
 		grounded_text,
 		controller_text,
+		surface_text,
+	]
+
+
+func _format_surface_status(sample: SAMPLE_SCRIPT) -> String:
+	if floor_surface == null or sample == null:
+		return "Floor surface: unavailable"
+	var elevation_unit := floor_surface.elevation_profile.elevation_unit \
+		if floor_surface.elevation_profile != null else 0.0
+	if not sample.valid:
+		return (
+			"Floor surface: NO SURFACE\nCell: (%d, %d) | sampled height: unavailable\n"
+			+ "Unit: %.2f m | normal: unavailable | transition: unavailable"
+		) % [sample.cell.x, sample.cell.y, elevation_unit]
+	return (
+		"Floor surface: valid\nCell: (%d, %d) | sampled height: %.2f m\n"
+		+ "Unit: %.2f m | normal: (%.1f, %.1f, %.1f)\nStyle: %d | transition: %s"
+	) % [
+		sample.cell.x,
+		sample.cell.y,
+		sample.world_height,
+		elevation_unit,
+		sample.surface_normal.x,
+		sample.surface_normal.y,
+		sample.surface_normal.z,
+		sample.style_index,
+		floor_surface.floor_map.get_transition_name(sample.transition),
 	]

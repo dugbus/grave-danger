@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/floor_surface/floor_surface.gd" id="1_surface"]
+
+[node name="FloorSurface" type="Node3D"]
+script = ExtResource("1_surface")
+
+[node name="Derived" type="Node3D" parent="."]
+
+[node name="TopMesh" type="MeshInstance3D" parent="Derived"]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Derived"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Derived/StaticBody3D"]

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="FloorStyle" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://addons/floor_surface/floor_style.gd" id="1_style"]
+[ext_resource type="Shader" path="res://addons/floor_surface/shaders/floor_surface_debug_grid.gdshader" id="2_grid"]
+
+[sub_resource type="ShaderMaterial" id="GridMaterial"]
+shader = ExtResource("2_grid")
+shader_parameter/tile_colour_a = Color(0.16, 0.42, 0.48, 1)
+shader_parameter/tile_colour_b = Color(0.24, 0.58, 0.5, 1)
+shader_parameter/grid_colour = Color(0.75, 1, 0.65, 1)
+shader_parameter/grid_width = 0.025
+
+[resource]
+script = ExtResource("1_style")
+top_material = SubResource("GridMaterial")
+pit_depth = 2.0

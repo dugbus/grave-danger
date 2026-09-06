@@ -4,6 +4,14 @@
 
 ### 1500
 
+- The saved floor-map playground has passed its M2 human retry with visible grid rendering, matching hole collision, and live surface diagnostics.
+  - Prompt: Confirm the corrected authoritative floor-map playground milestone is ready to keep.
+- The floor-surface playground now uses a bright unshaded checker grid that remains readable independently of scene lighting.
+  - Prompt: Make the M2 floor visible after the first playtest rendered it black.
+- Players can see their current floor cell, sampled height, elevation unit, normal, style, and transition update live while testing the isolated surface.
+  - Prompt: Implement the authoritative map, flat generation, collision, and sampling milestone for the isolated floor-surface prototype.
+- The floor-surface playground now rebuilds its visible floor and collision from a saved finite cell map, including a central hole with no hidden walkable surface.
+  - Prompt: Implement the authoritative map, flat generation, collision, and sampling milestone for the isolated floor-surface prototype.
 - The isolated floor-surface movement, reset, diagnostics, and camera harness has passed its first human playtest without requested tuning changes.
   - Prompt: Confirm the first floor-surface playground milestone feels ready to use.
 
