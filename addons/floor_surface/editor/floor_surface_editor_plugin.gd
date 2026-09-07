@@ -8,22 +8,31 @@ const FLOOR_MAP_SCRIPT := preload("res://addons/floor_surface/floor_map.gd")
 const SHAPE_PAINTER := preload(
 	"res://addons/floor_surface/editor/floor_surface_shape_painter.gd"
 )
+const ELEVATION_PAINTER := preload(
+	"res://addons/floor_surface/editor/floor_surface_elevation_painter.gd"
+)
+const EDITOR_VISUALS := preload(
+	"res://addons/floor_surface/editor/floor_surface_editor_visuals.gd"
+)
+const SURFACE_PICKER := preload(
+	"res://addons/floor_surface/editor/floor_surface_picker.gd"
+)
 const DOCK_SCRIPT := preload("res://addons/floor_surface/editor/floor_surface_dock.gd")
 const DOCK_SCENE := preload("res://addons/floor_surface/editor/floor_surface_dock.tscn")
 const APPLY_SNAPSHOT_METHOD := &"apply_shape_snapshot"
+const APPLY_ELEVATION_SNAPSHOT_METHOD := &"apply_elevation_snapshot"
 const FLOOR_MAP_PROPERTY := &"floor_map"
 
 var _dock: DOCK_SCRIPT
 var _target: FLOOR_SURFACE_SCRIPT
 var _painter := SHAPE_PAINTER.new()
+var _elevation_painter := ELEVATION_PAINTER.new()
 var _rectangle_start := Vector2i.ZERO
 var _last_brush_cell := Vector2i.ZERO
 var _pointer_cell := Vector2i.ZERO
 var _pointer_valid := false
 var _preview_cells: Array[Vector2i] = []
-var _preview_mesh: MeshInstance3D
-var _preview_box: BoxMesh
-var _preview_material: StandardMaterial3D
+var _visuals := EDITOR_VISUALS.new()
 var _selection_hidden_for_paint := false
 
 
@@ -33,7 +42,10 @@ func _enter_tree() -> void:
 	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_UL, _dock)
 	_dock.setup()
 	_dock.editing_toggled.connect(_on_editing_toggled)
+	_dock.edit_mode_changed.connect(_on_tool_setting_changed)
 	_dock.paint_mode_changed.connect(_on_tool_setting_changed)
+	_dock.elevation_operation_changed.connect(_on_tool_setting_changed)
+	_dock.absolute_elevation_changed.connect(_on_tool_setting_changed)
 	_dock.shape_mode_changed.connect(_on_tool_setting_changed)
 	_dock.brush_size_changed.connect(_on_tool_setting_changed)
 	_dock.make_unique_requested.connect(_on_make_unique_requested)
@@ -47,6 +59,7 @@ func _enter_tree() -> void:
 func _exit_tree() -> void:
 	_cancel_active_edit(false)
 	_restore_target_selection()
+	_disconnect_target_surface()
 	_remove_preview()
 	var selection := get_editor_interface().get_selection()
 	if selection.selection_changed.is_connected(_on_selection_changed):
@@ -69,14 +82,14 @@ func _forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> int:
 		return EditorPlugin.AFTER_GUI_INPUT_PASS
 	if event is InputEventKey:
 		var key_event := event as InputEventKey
-		if key_event.pressed and key_event.keycode == KEY_ESCAPE and _painter.is_active():
+		if key_event.pressed and key_event.keycode == KEY_ESCAPE and _is_gesture_active():
 			_cancel_active_edit(true)
 			return EditorPlugin.AFTER_GUI_INPUT_STOP
 		return EditorPlugin.AFTER_GUI_INPUT_PASS
 	if event is InputEventMouseMotion:
 		var motion_event := event as InputEventMouseMotion
 		_update_pointer(viewport_camera, motion_event.position)
-		if _painter.is_active() \
+		if _is_gesture_active() \
 				and _dock.get_shape_mode() == SHAPE_PAINTER.ShapeMode.Brush \
 				and (motion_event.button_mask & MOUSE_BUTTON_MASK_LEFT) != 0:
 			_apply_brush_segment()
@@ -120,11 +133,13 @@ func _set_target(surface: FLOOR_SURFACE_SCRIPT) -> void:
 		_refresh_dock_target()
 		return
 	_cancel_active_edit(false)
+	_disconnect_target_surface()
 	_remove_preview()
 	_target = surface
 	_pointer_valid = false
 	if _target != null:
 		_create_preview()
+		_connect_target_surface()
 	_refresh_dock_target()
 
 
@@ -132,6 +147,8 @@ func _refresh_dock_target() -> void:
 	if not is_instance_valid(_dock):
 		return
 	_dock.set_target(_target, _target.floor_map if _target != null else null)
+	if _target != null and _target.elevation_profile != null:
+		_dock.set_elevation_unit(_target.elevation_profile.elevation_unit)
 	if _target == null:
 		_dock.set_status("Select a FloorSurface to begin.")
 
@@ -142,10 +159,12 @@ func _on_editing_toggled(enabled: bool) -> void:
 		_pointer_valid = false
 		_preview_cells.clear()
 		_update_preview()
+		_update_elevation_overlay()
 		_restore_target_selection()
 		_dock.set_status("Viewport painting disabled; selection clicks are available.")
 		return
 	_hide_target_selection()
+	_update_elevation_overlay()
 	_dock.set_status(
 		"Viewport painting enabled; the transform gizmo is hidden. Left-drag to edit."
 	)
@@ -154,15 +173,16 @@ func _on_editing_toggled(enabled: bool) -> void:
 func _on_tool_setting_changed(_value: int) -> void:
 	_cancel_active_edit(false)
 	_update_preview_footprint()
+	_update_elevation_overlay()
 
 
 func _update_pointer(viewport_camera: Camera3D, pointer_position: Vector2) -> void:
 	var ray_origin := viewport_camera.project_ray_origin(pointer_position)
 	var ray_direction := viewport_camera.project_ray_normal(pointer_position)
-	var intersection: Variant = SHAPE_PAINTER.working_plane_intersection(
+	var intersection: Variant = SURFACE_PICKER.pick_world_position(
 		ray_origin,
 		ray_direction,
-		_working_world_height()
+		_target
 	)
 	if intersection == null:
 		_pointer_valid = false
@@ -180,37 +200,60 @@ func _update_preview_footprint() -> void:
 		_preview_cells.clear()
 		_update_preview()
 		return
+	var clip_to_bounds := _should_clip_to_bounds()
 	if _dock.get_shape_mode() == SHAPE_PAINTER.ShapeMode.Rectangle:
-		if _painter.is_active():
+		if _is_gesture_active():
 			_preview_cells = SHAPE_PAINTER.rectangle_footprint(
 				_rectangle_start,
 				_pointer_cell,
 				_target.floor_map,
-				_should_clip_to_bounds()
+				clip_to_bounds
 			)
 		else:
 			_preview_cells = SHAPE_PAINTER.brush_footprint(
 				_pointer_cell,
 				1,
 				_target.floor_map,
-				_should_clip_to_bounds()
+				clip_to_bounds
 			)
 	else:
 		_preview_cells = SHAPE_PAINTER.brush_footprint(
 			_pointer_cell,
 			_dock.get_brush_size(),
 			_target.floor_map,
-			_should_clip_to_bounds()
+			clip_to_bounds
 		)
+	if _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Elevation:
+		_preview_cells = _present_cells_only(_preview_cells)
 	if _preview_cells.is_empty():
 		_dock.clear_hover()
+	elif _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Elevation \
+			and _target.has_floor(_pointer_cell):
+		_dock.set_elevation_hover(
+			_pointer_cell,
+			_preview_cells.size(),
+			_target.get_cell_elevation(_pointer_cell)
+		)
 	else:
 		_dock.set_hover(_pointer_cell, _preview_cells.size())
 	_update_preview()
 
 
 func _begin_gesture() -> int:
-	if _preview_cells.is_empty() or not _painter.begin(
+	if _preview_cells.is_empty():
+		return EditorPlugin.AFTER_GUI_INPUT_PASS
+	if _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Elevation:
+		var operation := _dock.get_elevation_operation() as ELEVATION_PAINTER.Operation
+		if operation == ELEVATION_PAINTER.Operation.Sample:
+			_sample_elevation()
+			return EditorPlugin.AFTER_GUI_INPUT_STOP
+		if not _elevation_painter.begin(
+			_target.floor_map,
+			operation,
+			_dock.get_absolute_elevation()
+		):
+			return EditorPlugin.AFTER_GUI_INPUT_PASS
+	elif not _painter.begin(
 		_target.floor_map,
 		_dock.get_paint_mode() as SHAPE_PAINTER.PaintMode
 	):
@@ -218,7 +261,7 @@ func _begin_gesture() -> int:
 	_rectangle_start = _pointer_cell
 	_last_brush_cell = _pointer_cell
 	if _dock.get_shape_mode() == SHAPE_PAINTER.ShapeMode.Brush:
-		_painter.apply_cells(_preview_cells)
+		_apply_active_cells(_preview_cells)
 	else:
 		_update_preview_footprint()
 	return EditorPlugin.AFTER_GUI_INPUT_STOP
@@ -226,7 +269,7 @@ func _begin_gesture() -> int:
 
 func _apply_brush_segment() -> void:
 	for brush_centre in SHAPE_PAINTER.stroke_centres(_last_brush_cell, _pointer_cell):
-		_painter.apply_cells(SHAPE_PAINTER.brush_footprint(
+		_apply_active_cells(SHAPE_PAINTER.brush_footprint(
 			brush_centre,
 			_dock.get_brush_size(),
 			_target.floor_map,
@@ -236,11 +279,12 @@ func _apply_brush_segment() -> void:
 
 
 func _finish_gesture() -> int:
-	if not _painter.is_active():
+	if not _is_gesture_active():
 		return EditorPlugin.AFTER_GUI_INPUT_PASS
 	if _dock.get_shape_mode() == SHAPE_PAINTER.ShapeMode.Rectangle:
-		_painter.apply_cells(_preview_cells)
-	var edit := _painter.finish()
+		_apply_active_cells(_preview_cells)
+	var elevation_edit := _elevation_painter.is_active()
+	var edit := _elevation_painter.finish() if elevation_edit else _painter.finish()
 	var before := edit.get("before", {}) as Dictionary
 	var after := edit.get("after", {}) as Dictionary
 	var touched_count := edit.get("touched_count", 0) as int
@@ -248,8 +292,10 @@ func _finish_gesture() -> int:
 		var action_name := _gesture_action_name()
 		var undo_redo := get_undo_redo()
 		undo_redo.create_action(action_name)
-		undo_redo.add_do_method(_target.floor_map, APPLY_SNAPSHOT_METHOD, after)
-		undo_redo.add_undo_method(_target.floor_map, APPLY_SNAPSHOT_METHOD, before)
+		var apply_method := APPLY_ELEVATION_SNAPSHOT_METHOD \
+			if elevation_edit else APPLY_SNAPSHOT_METHOD
+		undo_redo.add_do_method(_target.floor_map, apply_method, after)
+		undo_redo.add_undo_method(_target.floor_map, apply_method, before)
 		# The live gesture already applied the final state; register it without executing twice.
 		undo_redo.commit_action(false)
 		_dock.set_status("%s: %d cell%s. Save Map when ready." % [
@@ -258,12 +304,22 @@ func _finish_gesture() -> int:
 			"" if touched_count == 1 else "s",
 		])
 	else:
-		_dock.set_status("Gesture made no occupancy change.")
+		_dock.set_status("Gesture made no floor change.")
 	_update_preview_footprint()
 	return EditorPlugin.AFTER_GUI_INPUT_STOP
 
 
 func _gesture_action_name() -> String:
+	if _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Elevation:
+		var operation_name := "Set Elevation %d" % _dock.get_absolute_elevation()
+		match _dock.get_elevation_operation() as ELEVATION_PAINTER.Operation:
+			ELEVATION_PAINTER.Operation.RaiseOne:
+				operation_name = "Raise Elevation"
+			ELEVATION_PAINTER.Operation.LowerOne:
+				operation_name = "Lower Elevation"
+		return "%s Rectangle" % operation_name \
+			if _dock.get_shape_mode() == SHAPE_PAINTER.ShapeMode.Rectangle \
+			else "%s Stroke" % operation_name
 	var operation := (
 		"Paint Floor"
 		if _dock.get_paint_mode() == SHAPE_PAINTER.PaintMode.Paint
@@ -275,6 +331,8 @@ func _gesture_action_name() -> String:
 
 
 func _should_clip_to_bounds() -> bool:
+	if _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Elevation:
+		return true
 	return _dock.get_paint_mode() == SHAPE_PAINTER.PaintMode.Erase
 
 
@@ -296,7 +354,9 @@ func _restore_target_selection() -> void:
 
 
 func _cancel_active_edit(show_status: bool) -> void:
-	if not _painter.cancel():
+	var cancelled := _painter.cancel()
+	cancelled = _elevation_painter.cancel() or cancelled
+	if not cancelled:
 		return
 	if show_status and is_instance_valid(_dock):
 		_dock.set_status("Gesture cancelled; the map was restored.")
@@ -339,6 +399,24 @@ func _working_world_height() -> float:
 	return _target.elevation_profile.elevation_to_world(_target.floor_map.default_elevation)
 
 
+func _preview_world_height() -> float:
+	if _target == null or _target.elevation_profile == null:
+		return 0.0
+	if _dock.get_edit_mode() != DOCK_SCRIPT.EditMode.Elevation:
+		return _working_world_height()
+	var elevation := _target.get_cell_elevation(_pointer_cell)
+	if elevation == FLOOR_MAP_SCRIPT.INVALID_ELEVATION:
+		return _working_world_height()
+	match _dock.get_elevation_operation() as ELEVATION_PAINTER.Operation:
+		ELEVATION_PAINTER.Operation.SetAbsolute:
+			elevation = _dock.get_absolute_elevation()
+		ELEVATION_PAINTER.Operation.RaiseOne:
+			elevation += 1
+		ELEVATION_PAINTER.Operation.LowerOne:
+			elevation -= 1
+	return _target.elevation_profile.elevation_to_world(elevation)
+
+
 func _can_paint() -> bool:
 	return is_instance_valid(_dock) \
 		and is_instance_valid(_target) \
@@ -347,56 +425,94 @@ func _can_paint() -> bool:
 
 
 func _create_preview() -> void:
-	_preview_mesh = MeshInstance3D.new()
-	_preview_mesh.name = "_FloorSurfacePaintPreview"
-	_preview_mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_preview_box = BoxMesh.new()
-	_preview_material = StandardMaterial3D.new()
-	_preview_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_preview_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_preview_material.no_depth_test = true
-	_preview_box.material = _preview_material
-	_preview_mesh.mesh = _preview_box
-	_preview_mesh.visible = false
-	_target.add_child(_preview_mesh)
-	_preview_mesh.owner = null
+	_visuals.attach(_target)
+	_update_elevation_overlay()
 
 
 func _remove_preview() -> void:
-	if is_instance_valid(_preview_mesh):
-		_preview_mesh.free()
-	_preview_mesh = null
-	_preview_box = null
-	_preview_material = null
+	_visuals.detach()
 
 
 func _update_preview() -> void:
-	if not is_instance_valid(_preview_mesh) or _preview_cells.is_empty() or not _can_paint():
-		if is_instance_valid(_preview_mesh):
-			_preview_mesh.visible = false
+	var colour := Color(1.0, 0.95, 0.2, 0.48)
+	if _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Elevation:
+		colour = Color(1.0, 0.95, 0.2, 0.48)
+	else:
+		colour = (
+			Color(0.2, 0.95, 0.45, 0.38)
+			if _dock.get_paint_mode() == SHAPE_PAINTER.PaintMode.Paint
+			else Color(1.0, 0.2, 0.25, 0.38)
+		)
+	_visuals.update_footprint(
+		_preview_cells,
+		_target.cell_size if _target != null else 1.0,
+		_target.world_origin_xz if _target != null else Vector2.ZERO,
+		_preview_world_height(),
+		colour,
+		_can_paint()
+	)
+
+
+func _is_gesture_active() -> bool:
+	return _painter.is_active() or _elevation_painter.is_active()
+
+
+func _apply_active_cells(cells: Array[Vector2i]) -> void:
+	if _elevation_painter.is_active():
+		_elevation_painter.apply_cells(_present_cells_only(cells))
+	else:
+		_painter.apply_cells(cells)
+
+
+func _present_cells_only(cells: Array[Vector2i]) -> Array[Vector2i]:
+	var present: Array[Vector2i] = []
+	for cell in cells:
+		if _target.has_floor(cell):
+			present.append(cell)
+	return present
+
+
+func _sample_elevation() -> void:
+	var elevation := _target.get_cell_elevation(_pointer_cell)
+	if elevation == FLOOR_MAP_SCRIPT.INVALID_ELEVATION:
+		_dock.set_status("No floor tile to sample at %s." % _pointer_cell)
 		return
-	var minimum := _preview_cells[0]
-	var maximum := _preview_cells[0]
-	for cell in _preview_cells:
-		minimum.x = mini(minimum.x, cell.x)
-		minimum.y = mini(minimum.y, cell.y)
-		maximum.x = maxi(maximum.x, cell.x)
-		maximum.y = maxi(maximum.y, cell.y)
-	var width := maximum.x - minimum.x + 1
-	var depth := maximum.y - minimum.y + 1
-	_preview_box.size = Vector3(
-		float(width) * _target.cell_size,
-		0.04,
-		float(depth) * _target.cell_size
+	_dock.set_sampled_elevation(elevation)
+	_dock.set_status("Sampled elevation %d — %.2f m." % [
+		elevation,
+		_target.elevation_profile.elevation_to_world(elevation),
+	])
+	_update_preview_footprint()
+
+
+func _connect_target_surface() -> void:
+	if _target == null:
+		return
+	if not _target.surface_rebuilt.is_connected(_on_target_surface_rebuilt):
+		_target.surface_rebuilt.connect(_on_target_surface_rebuilt)
+
+
+func _disconnect_target_surface() -> void:
+	if _target == null:
+		return
+	if _target.surface_rebuilt.is_connected(_on_target_surface_rebuilt):
+		_target.surface_rebuilt.disconnect(_on_target_surface_rebuilt)
+
+
+func _on_target_surface_rebuilt(_cell_count: int) -> void:
+	_update_elevation_overlay()
+	_update_preview_footprint()
+
+
+func _update_elevation_overlay() -> void:
+	if _target == null:
+		return
+	var should_show := _can_paint() \
+		and _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Elevation
+	_visuals.update_elevation_overlay(
+		_target.floor_map,
+		_target.elevation_profile,
+		_target.cell_size,
+		_target.world_origin_xz,
+		should_show
 	)
-	_preview_mesh.position = Vector3(
-		_target.world_origin_xz.x + (float(minimum.x) + float(width) * 0.5) * _target.cell_size,
-		_working_world_height() + 0.04,
-		_target.world_origin_xz.y + (float(minimum.y) + float(depth) * 0.5) * _target.cell_size
-	)
-	_preview_material.albedo_color = (
-		Color(0.2, 0.95, 0.45, 0.38)
-		if _dock.get_paint_mode() == SHAPE_PAINTER.PaintMode.Paint
-		else Color(1.0, 0.2, 0.25, 0.38)
-	)
-	_preview_mesh.visible = true

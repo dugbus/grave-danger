@@ -27,6 +27,18 @@ func run(_tree: SceneTree) -> void:
 		is_equal_approx(player.velocity.y, player.settings.get_jump_velocity()),
 		"A grounded jump uses the shared height-derived launch speed."
 	)
+	expect_equal(
+		player.resolve_walkable_step_height(0.0, 0.25, 0.02, true),
+		0.25,
+		"A grounded player receives the configured one-unit step lift."
+	)
+	expect_equal(
+		player.resolve_walkable_step_height(0.0, 0.5, 0.02, true),
+		0.0,
+		"A normal-jump ledge is never silently converted into a walkable step."
+	)
+	player.toggle_traversal_mode()
+	expect_equal(player.get_traversal_mode_name(), "Unencumbered", "The reserved test mode is explicit.")
 	player.velocity = Vector3(2.0, -4.0, 1.0)
 	var reset_transform := Transform3D(Basis.IDENTITY, Vector3(3.0, 2.0, -1.0))
 	player.reset_to_transform(reset_transform)

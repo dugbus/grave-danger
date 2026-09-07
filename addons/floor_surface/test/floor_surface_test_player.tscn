@@ -28,6 +28,7 @@ script = ExtResource("1_player")
 settings = ExtResource("2_settings")
 movement_camera_path = NodePath("../Camera3D")
 reset_marker_path = NodePath("../ResetPosition")
+floor_surface_path = NodePath("../FloorSurface")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape_player")

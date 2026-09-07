@@ -163,10 +163,6 @@ func compact_storage() -> bool:
 	var extent_lookup: Dictionary[Vector2i, bool] = {}
 	for cell in present_cells:
 		extent_lookup[cell] = true
-	_add_override_cells_to_lookup(extent_lookup, elevation_overrides)
-	_add_override_cells_to_lookup(extent_lookup, style_overrides)
-	_add_override_cells_to_lookup(extent_lookup, transition_overrides)
-	_add_override_cells_to_lookup(extent_lookup, low_edge_overrides)
 
 	var compact_minimum := Vector2i.ZERO
 	var compact_dimensions := Vector2i.ONE
@@ -205,6 +201,10 @@ func compact_storage() -> bool:
 	dimensions = compact_dimensions
 	default_present = compact_default
 	presence_exceptions = compact_exceptions
+	elevation_overrides = _bounded_integer_overrides(elevation_overrides)
+	style_overrides = _bounded_integer_overrides(style_overrides)
+	transition_overrides = _bounded_integer_overrides(transition_overrides)
+	low_edge_overrides = _bounded_integer_overrides(low_edge_overrides)
 	emit_changed()
 	return true
 
@@ -232,6 +232,29 @@ func set_cell_elevation(cell: Vector2i, elevation: int) -> bool:
 	else:
 		elevation_overrides[cell] = elevation
 	elevation_overrides = _sort_integer_overrides(elevation_overrides)
+	emit_changed()
+	return true
+
+
+## Returns detached, deterministically ordered elevation overrides for editor undo.
+func get_elevation_snapshot() -> Dictionary[Vector2i, int]:
+	return elevation_overrides.duplicate()
+
+
+## Restores elevation overrides while rejecting entries outside current tile storage.
+func apply_elevation_snapshot(overrides: Dictionary[Vector2i, int]) -> bool:
+	var sanitized: Dictionary[Vector2i, int] = {}
+	for cell_value in overrides.keys():
+		var cell := cell_value as Vector2i
+		if not is_in_bounds(cell):
+			continue
+		var elevation := overrides[cell] as int
+		if elevation != default_elevation:
+			sanitized[cell] = elevation
+	sanitized = _sort_integer_overrides(sanitized)
+	if sanitized == elevation_overrides:
+		return false
+	elevation_overrides = sanitized
 	emit_changed()
 	return true
 
@@ -338,12 +361,14 @@ func _cells_from_lookup(lookup: Dictionary[Vector2i, bool]) -> Array[Vector2i]:
 	return cells
 
 
-func _add_override_cells_to_lookup(
-	lookup: Dictionary[Vector2i, bool],
-	overrides: Dictionary
-) -> void:
-	for cell_value in overrides.keys():
-		lookup[cell_value as Vector2i] = true
+func _bounded_integer_overrides(
+	overrides: Dictionary[Vector2i, int]
+) -> Dictionary[Vector2i, int]:
+	var bounded: Dictionary[Vector2i, int] = {}
+	for cell in _sorted_override_cells(overrides):
+		if is_in_bounds(cell):
+			bounded[cell] = overrides[cell]
+	return bounded
 
 
 func _is_cell_before(left: Vector2i, right: Vector2i) -> bool:

@@ -9,6 +9,7 @@ func run(_tree: SceneTree) -> void:
 	_test_bounds_occupancy_and_negative_cells()
 	_test_presence_snapshots_and_unique_copy()
 	_test_bounds_expand_without_implicit_floor()
+	_test_elevation_snapshots()
 	_test_sparse_authored_values_and_palette_validation()
 	_test_text_resource_round_trip()
 
@@ -44,6 +45,31 @@ func _test_sparse_authored_values_and_palette_validation() -> void:
 	)
 	expect_equal(floor_map.validate_palette_size(3), [], "Valid absent-cell styles pass validation.")
 	expect_equal(floor_map.validate_palette_size(2).size(), 1, "Out-of-range style intent is reported.")
+
+
+func _test_elevation_snapshots() -> void:
+	var floor_map := SUBJECT.new()
+	floor_map.dimensions = Vector2i(3, 1)
+	floor_map.default_present = true
+	floor_map.set_cell_elevation(Vector2i(2, 0), 24)
+	var elevated := floor_map.get_elevation_snapshot()
+	floor_map.set_cell_elevation(Vector2i(1, 0), -2)
+	expect(floor_map.apply_elevation_snapshot(elevated), "A saved elevation state can be restored.")
+	expect_equal(floor_map.get_cell_elevation(Vector2i(2, 0)), 24, "Tall absolute elevation survives undo.")
+	expect_equal(floor_map.get_cell_elevation(Vector2i(1, 0)), 0, "Restoring removes later overrides.")
+	elevated[Vector2i(9, 9)] = 3
+	floor_map.apply_elevation_snapshot(elevated)
+	expect(
+		not floor_map.elevation_overrides.has(Vector2i(9, 9)),
+		"Elevation snapshots cannot add data outside tile storage."
+	)
+	floor_map.set_floor_present(Vector2i(2, 0), false)
+	floor_map.compact_storage()
+	expect_equal(floor_map.dimensions, Vector2i(2, 1), "Removing an edge tile trims its storage.")
+	expect(
+		not floor_map.elevation_overrides.has(Vector2i(2, 0)),
+		"Trimming a removed edge tile also discards its unreachable authored data."
+	)
 
 
 func _test_presence_snapshots_and_unique_copy() -> void:

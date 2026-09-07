@@ -47,6 +47,17 @@ func _test_queries_boundaries_and_origin() -> void:
 	expect(is_equal_approx(sample.world_height, 1.5), "Sampling converts integer elevation through the shared unit.")
 	expect_equal(sample.surface_normal, Vector3.UP, "Flat sampling reports an upward normal.")
 	expect(is_nan(surface.get_world_height_at_cell(Vector2i(9, 9))), "Outside bounds has no implicit height.")
+	floor_map.set_cell_elevation(Vector2i(-2, 0), 1)
+	expect_equal(
+		surface.classify_edge(Vector2i(-2, 0), Vector2i(-1, 0)),
+		PROFILE_SCRIPT.TraversalClass.NormalJump,
+		"Surface traversal uses the signed local elevation difference."
+	)
+	expect_equal(
+		surface.get_elevation_delta(Vector2i(-2, 0), Vector2i(-1, 0)),
+		2,
+		"The surface exposes the exact directed integer delta."
+	)
 	surface.transform.origin.y = 1.0
 	expect_equal(
 		surface.validate_configuration().size(),

@@ -1,13 +1,13 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene format=3 uid="uid://bd4l10sbwxi0"]
 
-[ext_resource type="Script" path="res://addons/floor_surface/test/floor_surface_playground.gd" id="1_playground"]
+[ext_resource type="Script" uid="uid://d2uilba44h8qo" path="res://addons/floor_surface/test/floor_surface_playground.gd" id="1_playground"]
 [ext_resource type="Resource" path="res://addons/floor_surface/test/floor_surface_camera_settings.tres" id="2_camera_settings"]
 [ext_resource type="PackedScene" path="res://addons/floor_surface/test/floor_surface_test_player.tscn" id="3_player"]
 [ext_resource type="PackedScene" path="res://addons/floor_surface/floor_surface.tscn" id="4_surface"]
-[ext_resource type="Script" path="res://addons/floor_surface/floor_map.gd" id="5_map_script"]
+[ext_resource type="Script" uid="uid://cdlus0vrv8r3u" path="res://addons/floor_surface/floor_map.gd" id="5_map_script"]
 [ext_resource type="Resource" path="res://addons/floor_surface/default_floor_elevation_profile.tres" id="6_profile"]
-[ext_resource type="Script" path="res://addons/floor_surface/floor_style.gd" id="7_style_script"]
-[ext_resource type="Resource" path="res://addons/floor_surface/default_floor_style.tres" id="8_style"]
+[ext_resource type="Script" uid="uid://q0ef7o077f24" path="res://addons/floor_surface/floor_style.gd" id="7_style_script"]
+[ext_resource type="Resource" uid="uid://c01b1gskf8cxp" path="res://addons/floor_surface/default_floor_style.tres" id="8_style"]
 
 [sub_resource type="Environment" id="Environment_playground"]
 background_mode = 1
@@ -16,13 +16,75 @@ ambient_light_source = 3
 ambient_light_color = Color(0.44, 0.5, 0.62, 1)
 ambient_light_energy = 0.7
 
-[sub_resource type="Resource" id="FloorMap_local"]
+[sub_resource type="Resource" id="Resource_kgjqf"]
 resource_local_to_scene = true
 script = ExtResource("5_map_script")
 minimum_cell = Vector2i(-6, -5)
-dimensions = Vector2i(12, 10)
+dimensions = Vector2i(12, 17)
 default_present = true
-presence_exceptions = Array[Vector2i]([Vector2i(-1, -1), Vector2i(0, -1), Vector2i(-1, 0), Vector2i(0, 0)])
+presence_exceptions = Array[Vector2i]([Vector2i(-1, -1), Vector2i(0, -1), Vector2i(-1, 0), Vector2i(0, 0), Vector2i(-6, 8), Vector2i(-5, 8), Vector2i(-4, 8), Vector2i(-3, 8), Vector2i(-2, 8), Vector2i(-1, 8), Vector2i(0, 8), Vector2i(1, 8), Vector2i(2, 8), Vector2i(3, 8), Vector2i(4, 8), Vector2i(5, 8), Vector2i(-6, 9), Vector2i(-5, 9), Vector2i(-4, 9), Vector2i(-3, 9), Vector2i(-2, 9), Vector2i(-1, 9), Vector2i(0, 9), Vector2i(1, 9), Vector2i(2, 9), Vector2i(3, 9), Vector2i(4, 9), Vector2i(5, 9)])
+elevation_overrides = Dictionary[Vector2i, int]({
+Vector2i(-6, 10): 24,
+Vector2i(-6, 11): 24,
+Vector2i(-5, 10): 24,
+Vector2i(-5, 11): 24,
+Vector2i(-4, -4): 1,
+Vector2i(-4, -3): 1,
+Vector2i(-4, 6): 1,
+Vector2i(-4, 7): 1,
+Vector2i(-4, 10): 25,
+Vector2i(-4, 11): 25,
+Vector2i(-3, -4): 2,
+Vector2i(-3, -3): 2,
+Vector2i(-3, 6): 1,
+Vector2i(-3, 7): 1,
+Vector2i(-3, 10): 25,
+Vector2i(-3, 11): 25,
+Vector2i(-2, -4): 2,
+Vector2i(-2, -3): 2,
+Vector2i(-2, 6): 3,
+Vector2i(-2, 7): 3,
+Vector2i(-2, 10): 27,
+Vector2i(-2, 11): 27,
+Vector2i(-1, -4): 2,
+Vector2i(-1, -3): 2,
+Vector2i(-1, 6): 3,
+Vector2i(-1, 7): 3,
+Vector2i(-1, 10): 27,
+Vector2i(-1, 11): 27,
+Vector2i(0, -4): 2,
+Vector2i(0, -3): 2,
+Vector2i(0, 6): 6,
+Vector2i(0, 7): 6,
+Vector2i(0, 10): 30,
+Vector2i(0, 11): 30,
+Vector2i(1, -4): 2,
+Vector2i(1, -3): 2,
+Vector2i(1, 6): 6,
+Vector2i(1, 7): 6,
+Vector2i(1, 10): 30,
+Vector2i(1, 11): 30,
+Vector2i(2, -4): 2,
+Vector2i(2, -3): 2,
+Vector2i(2, 6): 10,
+Vector2i(2, 7): 10,
+Vector2i(2, 10): 34,
+Vector2i(2, 11): 34,
+Vector2i(3, -4): 1,
+Vector2i(3, -3): 1,
+Vector2i(3, 6): 10,
+Vector2i(3, 7): 10,
+Vector2i(3, 10): 34,
+Vector2i(3, 11): 34,
+Vector2i(4, 6): 10,
+Vector2i(4, 7): 10,
+Vector2i(4, 10): 34,
+Vector2i(4, 11): 34,
+Vector2i(5, 6): 10,
+Vector2i(5, 7): 10,
+Vector2i(5, 10): 34,
+Vector2i(5, 11): 34
+})
 
 [sub_resource type="StandardMaterial3D" id="ResetMaterial"]
 shading_mode = 0
@@ -47,96 +109,122 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="LabelSettings" id="ResetLabelSettings"]
-font_size = 22
-font_color = Color(0.2, 0.9, 0.72, 1)
-outline_size = 6
-outline_color = Color(0.01, 0.02, 0.03, 1)
-
-[sub_resource type="LabelSettings" id="HoleLabelSettings"]
-font_size = 24
-font_color = Color(1, 0.35, 0.22, 1)
-outline_size = 7
-outline_color = Color(0.01, 0.02, 0.03, 1)
-
-[node name="FloorSurfacePlayground" type="Node3D"]
+[node name="FloorSurfacePlayground" type="Node3D" unique_id=852732978]
 script = ExtResource("1_playground")
 camera_settings = ExtResource("2_camera_settings")
+trial_start_paths = Array[NodePath]([NodePath("ResetPosition"), NodePath("LowLaneStart"), NodePath("HighLaneStart")])
+trial_focus_paths = Array[NodePath]([NodePath("MainFocus"), NodePath("LowLaneFocus"), NodePath("HighLaneFocus")])
+trial_names = Array[String](["Accepted room", "Low comparison lane", "High comparison lane — 24-unit base"])
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1292583225]
 environment = SubResource("Environment_playground")
 
-[node name="KeyLight" type="DirectionalLight3D" parent="."]
-rotation_degrees = Vector3(-55, -35, 0)
+[node name="KeyLight" type="DirectionalLight3D" parent="." unique_id=1698220985]
+transform = Transform3D(0.81915206, 0.46984634, -0.32898995, 0, 0.57357645, 0.81915206, 0.57357645, -0.6710101, 0.46984634, 0, 0, 0)
 light_color = Color(0.88, 0.92, 1, 1)
 light_energy = 1.4
 shadow_enabled = true
 
-[node name="Camera3D" type="Camera3D" parent="."]
+[node name="Camera3D" type="Camera3D" parent="." unique_id=123923068]
 projection = 1
-size = 14.0
 current = true
+size = 14.0
 
-[node name="FloorSurface" parent="." instance=ExtResource("4_surface")]
-floor_map = SubResource("FloorMap_local")
+[node name="FloorSurface" parent="." unique_id=1431299148 instance=ExtResource("4_surface")]
+floor_map = SubResource("Resource_kgjqf")
 elevation_profile = ExtResource("6_profile")
 styles = Array[ExtResource("7_style_script")]([ExtResource("8_style")])
 
-[node name="HoleLabel" type="Label3D" parent="."]
-position = Vector3(0, 0.35, 0)
-text = "M2 HOLE\nNO SURFACE"
-label_settings = SubResource("HoleLabelSettings")
+[node name="HoleLabel" type="Label3D" parent="." unique_id=1274125127]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
 billboard = 1
 no_depth_test = true
+text = "M2 HOLE
+NO SURFACE"
 
-[node name="ResetPosition" type="Marker3D" parent="."]
-position = Vector3(0, 0.65, 2.5)
+[node name="ResetPosition" type="Marker3D" parent="." unique_id=1185377777]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 2.5)
 
-[node name="Ring" type="MeshInstance3D" parent="ResetPosition"]
-position = Vector3(0, -0.625, 0)
+[node name="Ring" type="MeshInstance3D" parent="ResetPosition" unique_id=1452747155]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.625, 0)
 mesh = SubResource("ResetMesh")
 
-[node name="Label" type="Label3D" parent="ResetPosition"]
-position = Vector3(0, 0.65, 0)
-text = "RESET"
-label_settings = SubResource("ResetLabelSettings")
+[node name="Label" type="Label3D" parent="ResetPosition" unique_id=952953270]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
 billboard = 1
 no_depth_test = true
+text = "RESET"
 
-[node name="Player" parent="." instance=ExtResource("3_player")]
-position = Vector3(0, 0.65, 2.5)
+[node name="MainFocus" type="Marker3D" parent="." unique_id=2022276443]
 
-[node name="HUD" type="CanvasLayer" parent="."]
+[node name="LowLaneStart" type="Marker3D" parent="." unique_id=1840423287]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0.65, 6.5)
 
-[node name="Panel" type="PanelContainer" parent="HUD"]
+[node name="LowLaneFocus" type="Marker3D" parent="." unique_id=1170675982]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 6.5)
+
+[node name="HighLaneStart" type="Marker3D" parent="." unique_id=1881133586]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 6.65, 10.5)
+
+[node name="HighLaneFocus" type="Marker3D" parent="." unique_id=199112997]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 10.5)
+
+[node name="Player" parent="." unique_id=789155537 instance=ExtResource("3_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 2.5)
+
+[node name="LowLaneLabel" type="Label3D" parent="." unique_id=743546432]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 3.2, 6.5)
+billboard = 1
+no_depth_test = true
+text = "LOW LANE — 0 UNIT BASE
+WALK STEP 1  |  NORMAL JUMP 2  |  UNENCUMBERED 3  |  BLOCKED 4"
+
+[node name="HighLaneLabel" type="Label3D" parent="." unique_id=88923982]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 10.2, 10.5)
+billboard = 1
+no_depth_test = true
+text = "HIGH LANE — 24 UNITS / 6.00 M BASE
+SAME LOCAL DELTAS: 1  |  2  |  3  |  4"
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1835631595]
+
+[node name="Panel" type="PanelContainer" parent="HUD" unique_id=569430470]
 offset_left = 24.0
 offset_top = 24.0
 offset_right = 590.0
-offset_bottom = 430.0
+offset_bottom = 500.0
 theme_override_styles/panel = SubResource("PanelStyle")
 
-[node name="Margin" type="MarginContainer" parent="HUD/Panel"]
+[node name="Margin" type="MarginContainer" parent="HUD/Panel" unique_id=903379639]
+layout_mode = 2
 theme_override_constants/margin_left = 18
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 18
 theme_override_constants/margin_bottom = 14
 
-[node name="Rows" type="VBoxContainer" parent="HUD/Panel/Margin"]
+[node name="Rows" type="VBoxContainer" parent="HUD/Panel/Margin" unique_id=852273890]
+layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Title" type="Label" parent="HUD/Panel/Margin/Rows"]
+[node name="Title" type="Label" parent="HUD/Panel/Margin/Rows" unique_id=1074108571]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 0.9, 0.72, 1)
 theme_override_font_sizes/font_size = 28
 text = "FLOOR SURFACE PLAYGROUND"
 
-[node name="Instructions" type="Label" parent="HUD/Panel/Margin/Rows"]
+[node name="Instructions" type="Label" parent="HUD/Panel/Margin/Rows" unique_id=1551983259]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.92, 0.96, 1)
 theme_override_font_sizes/font_size = 18
-text = "Arrow keys / stick: move    Space / A: jump\nR: reset to marker    V: change fixed camera\nCross the grid seams, circle the centre hole, then enter it."
+text = "Arrow keys / stick: move    Space / A: jump
+R: reset trial    V: camera    T: next trial lane    U: normal/unencumbered
+Comparison lanes rise eastward: walk 1, jump 2, switch mode for 3, confirm 4 is blocked."
 
-[node name="Separator" type="HSeparator" parent="HUD/Panel/Margin/Rows"]
+[node name="Separator" type="HSeparator" parent="HUD/Panel/Margin/Rows" unique_id=586916565]
+layout_mode = 2
 
-[node name="Status" type="Label" parent="HUD/Panel/Margin/Rows"]
+[node name="Status" type="Label" parent="HUD/Panel/Margin/Rows" unique_id=669742576]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.75, 0.8, 0.88, 1)
 theme_override_font_sizes/font_size = 16
 text = "Fixture: loading"

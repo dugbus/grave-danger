@@ -1,6 +1,6 @@
 # Floor Surface Implementation Plan
 
-Based on [FLOOR SURFACE DESIGN.md](FLOOR%20SURFACE%20DESIGN.md). This plan covers the **standalone prototype only**. M1, M2 and M3 are accepted; later milestones remain unimplemented.
+Based on [FLOOR SURFACE DESIGN.md](FLOOR%20SURFACE%20DESIGN.md). This plan covers the **standalone prototype only**. M1, M2 and M3 are accepted; M4 is being revised after its first human trial, and later milestones remain unimplemented.
 
 The aim is to deliver small, usable increments that a human can edit and play before the next dependent part is built. Existing Grave Danger levels and floor implementations remain outside this work. Integration requires a separate plan after prototype acceptance.
 
@@ -99,13 +99,13 @@ The only anticipated shared configuration edit is registering the new editor plu
 
 **Deliverable:** Quickly authored raised regions with consistent local step/jump behaviour.
 
-- [ ] Add absolute elevation entry, raise/lower by one unit, cursor sampling, brush and rectangle operations. Display both units and metres, including `24 — 6.00m` with the provisional 0.25m unit.
-- [ ] Add a temporary false-colour elevation overlay and hovered-cell height labels independent of material and lighting.
-- [ ] Generate tops and exposed vertical ledges from neighbour height differences, omitting internal faces at matching heights. Define consistent edge ownership to avoid duplicates.
-- [ ] Implement profile classifications for flat, walkable step, normal jump, unencumbered-only jump and blocked ledge. Keep upward traversal and downward/drop behaviour explicit; do not classify using absolute height alone.
-- [ ] Build matching comparison lanes near Y=0 and at a higher absolute elevation. Tune physical step/jump behaviour against their local deltas; labels alone do not enforce traversal.
-- [ ] Provide a simple normal/unencumbered test mode to exercise the reserved threshold without importing inventory mechanics. Keep all initial thresholds provisional.
-- [ ] Automated checks: quantisation, negative and tall elevations, identical local classifications at different absolute heights, threshold boundaries, ledge collision and undo of elevation changes.
+- [x] Add absolute elevation entry, raise/lower by one unit, cursor sampling, brush and rectangle operations. Display both units and metres, including `24 — 6.00m` with the provisional 0.25m unit.
+- [x] Add a temporary muted elevation overlay and hovered-cell height labels independent of material and lighting. Keep the overlay low-luminance and translucent so it does not replace the authored floor detail.
+- [x] Generate tops and exposed vertical ledges from neighbour height differences, holes and outer boundaries, omitting internal faces at matching heights. Define consistent edge ownership to avoid duplicates.
+- [x] Implement profile classifications for flat, walkable step, normal jump, unencumbered-only jump and blocked ledge. Keep upward traversal and downward/drop behaviour explicit; do not classify using absolute height alone.
+- [x] Build matching comparison lanes near Y=0 and at a higher absolute elevation. Tune physical step/jump behaviour against their local deltas; labels alone do not enforce traversal.
+- [x] Provide a simple normal/unencumbered test mode to exercise the reserved threshold without importing inventory mechanics. Keep all initial thresholds provisional.
+- [x] Automated checks: quantisation, negative and tall elevations, identical local classifications at different absolute heights, threshold boundaries, ledge collision and undo of elevation changes. Fifteen focused suites pass 300 assertions, including physical traversal on both comparison bands, hole and perimeter walls, and low-glare overlay limits; editor startup, scene/UID scanning, test pairing and focused lint pass. The full repository check retains the pre-existing Tutorial 3 kill-boundary mismatch recorded below.
 - [ ] Human trial: directly set a platform to 24 units, then traverse both comparison lanes. Walk the small step, jump the normal ledge, compare the two movement modes and attempt the blocked ledge.
 - [ ] Review: record the elevation unit, thresholds and controller settings together; retest both lanes after tuning.
 
@@ -328,6 +328,45 @@ Decision: Accepted
 Follow-up checklist items: Begin M4 only as a separate implementation update
 Earlier checkpoints to repeat: Retain M3 gesture and persistence checks when elevation editing begins
 Evidence or feedback report path: User report in conversation; editor-only trial has no gameplay recording
+```
+
+```text
+Milestone / trial: M4 implementation checkpoint
+Date / tester / revision: 2026-09-06 / Codex automated checks / 4d99236 + working tree
+Fixture and camera view: M4 absolute-elevation-comparison-v1 / three focus-preserving camera arrangements
+Settings changed (before → after): Flat-only floor → integer absolute heights at 0.25m per unit; one jump tune → Normal 0.65m and Unencumbered 0.90m; added 1-unit walk, 2-unit normal jump, 3-unit unencumbered-only and 4-unit blocked thresholds
+Automated results: Fourteen focused suites passed 284 assertions, including editor gestures, elevated picking/overlay, owned ledge mesh/collision and real low/high lane traversal. Editor startup, 119-scene/UID scan, 232-script test pairing and focused lint pass. ./check.sh reaches 2,397 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D lookup abort and related teardown baseline failure.
+Human observations (expected / actual): Expected direct elevation-24 authoring, readable false colours and equivalent physical traversal in the low and high lanes / awaiting trial
+Decision: Awaiting human trial
+Follow-up checklist items: Run the directed M4 editor and traversal trial; tune provisional thresholds only from observed use
+Earlier checkpoints to repeat: Confirm M3 rectangle, undo/redo, save/reopen and viewport navigation while authoring elevation
+Evidence or feedback report path: Not created yet; standalone editor authoring is not captured by gameplay replay
+```
+
+```text
+Milestone / trial: M4 human trial 1
+Date / tester / revision: 2026-09-06 / user / 4d99236 + working tree
+Fixture and camera view: M4 absolute-elevation-comparison-v1 / Godot 3D editor viewport
+Settings changed (before → after): Flat-only floor → integer absolute elevation painting with full-tile false-colour feedback
+Automated results: Pre-trial M4 focused suites passed 284 assertions; complete repository validation retained the pre-existing Tutorial 3 kill-boundary blocker
+Human observations (expected / actual): Elevation painting was easy to use and undo/redo worked well. Hole walls, the exposed back of the raised comparison structure and outer boundary walls were missing. The full-value elevation overlay was too bright and obscured checker contrast for a tester with diabetic retinopathy.
+Decision: Changes requested
+Follow-up checklist items: Generate owned walls for every floor-to-empty boundary; reduce overlay luminance and opacity while retaining exact text labels; visually retry holes, outer edges and checker readability
+Earlier checkpoints to repeat: Retain the accepted elevation painting and undo/redo interaction
+Evidence or feedback report path: User report in conversation; editor-only trial has no gameplay recording
+```
+
+```text
+Milestone / trial: M4 human-trial revision 1
+Date / tester / revision: 2026-09-06 / Codex automated checks / 4d99236 + working tree
+Fixture and camera view: M4 absolute-elevation-comparison-v1 / Godot 3D editor viewport
+Settings changed (before → after): Floor-to-empty boundaries omitted → one owned wall to the style's provisional 2m depth; full-value overlay at 0.72 alpha → muted 0.38-value overlay at 0.26 alpha
+Automated results: Fifteen focused suites passed 300 assertions, including explicit hole, outer-boundary, raised ledge and overlay luminance/opacity cases. Scene/UID scanning, test pairing and focused lint pass. ./check.sh reaches 2,402 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D lookup abort and related teardown baseline failure.
+Human observations (expected / actual): Expected complete exposed sides and a readable checker beneath low-glare elevation feedback / awaiting visual retry
+Decision: Awaiting human retry
+Follow-up checklist items: Visually inspect the hole, outer perimeter and raised comparison structure, then confirm elevation mode is comfortable and the checker remains legible
+Earlier checkpoints to repeat: Retain the accepted elevation painting and undo/redo interaction
+Evidence or feedback report path: Not created yet; standalone editor authoring is not captured by gameplay replay
 ```
 
 ## Deferred until a separate integration plan

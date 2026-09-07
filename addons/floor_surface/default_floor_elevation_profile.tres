@@ -5,3 +5,7 @@
 [resource]
 script = ExtResource("1_profile")
 elevation_unit = 0.25
+walkable_step_units = 1
+normal_jump_units = 2
+unencumbered_jump_units = 3
+ordinary_drop_units = 3

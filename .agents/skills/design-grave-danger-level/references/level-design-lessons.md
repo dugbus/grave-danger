@@ -86,6 +86,11 @@ rules. Keep level-specific coordinates and transient tuning out of this file.
 
 ## Editor usability and art validation
 
+- Treat editor overlays as supplemental information, not a bright replacement for authored
+  materials. Keep their luminance and opacity low enough that underlying checker or texture detail
+  remains visible, and pair colour coding with exact text for editors with impaired vision. The M4
+  FloorSurface trial found a full-value false-colour overlay painfully bright and its checker hard
+  to distinguish for a tester with diabetic retinopathy.
 - Keep finite floor bounds as a storage and validation detail, not an authoring cage. Painting
   beyond an edge should expand the stored rectangle while leaving untouched newly enclosed cells
   absent; cancellation and undo must restore both occupancy and the previous extent. Compact the

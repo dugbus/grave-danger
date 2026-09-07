@@ -2,7 +2,7 @@
 class_name FloorSurface
 extends Node3D
 
-## Owns authoritative floor data and replaces its derived flat geometry deterministically.
+## Owns authoritative floor data and replaces its derived geometry deterministically.
 
 const MAP_SCRIPT := preload("res://addons/floor_surface/floor_map.gd")
 const PROFILE_SCRIPT := preload("res://addons/floor_surface/floor_elevation_profile.gd")
@@ -123,6 +123,27 @@ func get_world_height_at_cell(cell: Vector2i) -> float:
 	return elevation_profile.elevation_to_world(elevation)
 
 
+## Classifies a directed neighbour edge from its local integer elevation difference.
+func classify_edge(
+	from_cell: Vector2i,
+	to_cell: Vector2i
+) -> PROFILE_SCRIPT.TraversalClass:
+	if floor_map == null or elevation_profile == null \
+			or not floor_map.has_floor(from_cell) or not floor_map.has_floor(to_cell):
+		return PROFILE_SCRIPT.TraversalClass.BlockedLedge
+	return elevation_profile.classify_edge(
+		floor_map.get_cell_elevation(from_cell),
+		floor_map.get_cell_elevation(to_cell)
+	)
+
+
+## Returns the signed integer rise from one present cell to an adjacent present cell.
+func get_elevation_delta(from_cell: Vector2i, to_cell: Vector2i) -> int:
+	if floor_map == null or not floor_map.has_floor(from_cell) or not floor_map.has_floor(to_cell):
+		return MAP_SCRIPT.INVALID_ELEVATION
+	return floor_map.get_cell_elevation(to_cell) - floor_map.get_cell_elevation(from_cell)
+
+
 ## Applies floor-based boundary ownership; exact grid lines belong to the positive cell.
 func world_to_cell(world_position: Vector3) -> Vector2i:
 	var safe_cell_size := maxf(cell_size, 0.01)
@@ -132,7 +153,7 @@ func world_to_cell(world_position: Vector3) -> Vector2i:
 	)
 
 
-## Samples the authoritative flat top under X/Z; holes and outside return valid=false.
+## Samples the authoritative top under X/Z; holes and outside return valid=false.
 func sample_surface(world_position: Vector3) -> SAMPLE_SCRIPT:
 	var sampled_cell := world_to_cell(world_position)
 	var sample := SAMPLE_SCRIPT.new()

@@ -2,6 +2,22 @@
 
 ## 2026-09-06
 
+### 1900
+
+- Elevation painting now uses a muted low-opacity overlay that keeps the underlying checker detail visible while exact height text remains available.
+  - Prompt: Complete exposed floor sides and reduce elevation-mode glare.
+- Holes and outer floor boundaries now receive visible side walls with matching collision, including the exposed backs of raised platforms.
+  - Prompt: Complete exposed floor sides and reduce elevation-mode glare.
+
+### 1800
+
+- The standalone playground now includes low and 24-unit-high comparison lanes, quick trial resets, and Normal or Unencumbered movement modes for testing step, jump and blocked thresholds.
+  - Prompt: Implement the M4 absolute-elevation and traversal milestone.
+- Raised floor regions now generate visible vertical ledges with matching collision, while traversal labels are derived from directed local height differences rather than absolute height.
+  - Prompt: Implement the M4 absolute-elevation and traversal milestone.
+- Level editors can paint integer floor elevations with Set, Raise, Lower and Sample tools, using brushes or rectangles with metre readouts and a temporary false-colour overlay.
+  - Prompt: Implement the M4 absolute-elevation and traversal milestone.
+
 ### 1700
 
 - The revised floor-surface painting workflow passed its human retry, including out-of-bounds painting, visible shape buttons and complete undo/redo.

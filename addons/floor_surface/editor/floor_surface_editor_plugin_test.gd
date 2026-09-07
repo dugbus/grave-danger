@@ -27,3 +27,8 @@ func run(_tree: SceneTree) -> void:
 			and method_names.has(&"_restore_target_selection"),
 		"Painting can hide the selected node's obstructive transform gizmo and restore it later."
 	)
+	expect(
+		method_names.has(&"_sample_elevation") \
+			and method_names.has(&"_update_elevation_overlay"),
+		"M4 exposes cursor sampling and a temporary false-colour elevation overlay."
+	)
