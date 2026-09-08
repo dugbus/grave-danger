@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-09-08
+
+### 1400
+
+- Generated floor tops, pit bottoms, ledges, and outer walls now face the visible side with ordinary one-sided materials instead of relying on disabled culling.
+  - Prompt: Fix FloorSurface showing only back faces in the editor.
+- FloorSurface textures now remain clearly visible in the editor through transient unshaded preview materials, while gameplay keeps the authored lighting response.
+  - Prompt: Fix the nearly black FloorSurface editor preview after adding real textures.
+
+## 2026-09-07
+
+### 1500
+
+- FloorSurface now uses dirt and flagstone texture copies from its own game-art library, so new floor styles can be added without changing existing level materials.
+  - Prompt: Choose FloorSurface textures from a safe game-owned folder populated with copies.
+- FloorSurface's grid and checker are now an optional subdued editor guide that starts off, leaving the actual floor texture unobscured.
+  - Prompt: Make the grid and checker optional so the floor texture is easy to inspect.
+
+### 1100
+
+- Connected holes now generate crack-free walls and optional visible bottoms from their mixed rim heights and style depths while remaining non-collidable.
+  - Prompt: Implement M5 floor styles, exposed depth and readable pits.
+- Teal and stone checker styles now provide independently editable top, edge and pit-bottom materials with consistent world-scale projection.
+  - Prompt: Implement M5 floor styles, exposed depth and readable pits.
+- Level editors can brush, rectangle-paint and sample named floor styles on walkable tiles or bounded hole cells with one-step undo and redo.
+  - Prompt: Implement M5 floor styles, exposed depth and readable pits.
+
 ## 2026-09-06
 
 ### 1900

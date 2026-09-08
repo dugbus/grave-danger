@@ -1,6 +1,6 @@
 # Floor Surface Implementation Plan
 
-Based on [FLOOR SURFACE DESIGN.md](FLOOR%20SURFACE%20DESIGN.md). This plan covers the **standalone prototype only**. M1, M2 and M3 are accepted; M4 is being revised after its first human trial, and later milestones remain unimplemented.
+Based on [FLOOR SURFACE DESIGN.md](FLOOR%20SURFACE%20DESIGN.md). This plan covers the **standalone prototype only**. M1, M2 and M3 are accepted; the M4 visual retry and M5 implementation are awaiting a combined human trial, and later milestones remain unimplemented.
 
 The aim is to deliver small, usable increments that a human can edit and play before the next dependent part is built. Existing Grave Danger levels and floor implementations remain outside this work. Integration requires a separate plan after prototype acceptance.
 
@@ -51,7 +51,7 @@ Every new production script, including editor and playground behaviour, must hav
 
 Generated mesh and collision nodes are derived output; authoring lives in map/style resources and ordinary placement nodes. Do not create a node for every face. Keep helper scripts small, typed and composable, and document exported settings in human terms. Use named PascalCase enums rather than numeric mode values.
 
-Only text assets are planned: `.gd`, `.tscn`, `.tres`, `.gdshader` and plugin configuration. Use primitive meshes and procedural grid/checker shaders for initial samples. Read existing binary art only if useful; do not create or rewrite binary assets or bake generated geometry/textures to disk. The elevation texture is transient GPU data regenerated from the map. Any later binary asset change needs the specific authorization required by `AGENTS.md`.
+The prototype normally limits itself to text assets: `.gd`, `.tscn`, `.tres`, `.gdshader` and plugin configuration. The M5 trial specifically authorized exact copies of the existing dirt and flagstone textures in a FloorSurface-owned game-art folder; established textures and level material references remain untouched. Do not rewrite binary assets or bake generated geometry/textures to disk. The elevation texture is transient GPU data regenerated from the map. Any other binary asset change needs the specific authorization required by `AGENTS.md`.
 
 The only anticipated shared configuration edit is registering the new editor plugin, when needed. Keep the main scene, production input bindings, existing floor tools and existing levels unchanged.
 
@@ -113,13 +113,13 @@ The only anticipated shared configuration edit is registering the new editor plu
 
 **Deliverable:** Geometry can look like different surfaces, and holes have readable sides and configurable visible bottoms.
 
-- [ ] Supply at least two reusable text-material styles with independently configurable top, edge and pit-bottom appearance and depth.
-- [ ] Add style brush, rectangle and sample tools using M3's undo model. Preserve topology and collision when changing material alone.
-- [ ] Implement continuous world X/Z projection on tops and world/triplanar projection on exposed sides. Define how the supported materials receive shared projection settings without modifying source materials silently.
-- [ ] Define pit depth relative to a documented rim datum for each connected hole region, including mixed rim elevations and style depths. Agree the rule in this checkpoint; ensure generated sides meet bottoms without cracks.
-- [ ] Generate optional pit bottoms only within authored bounds. Treat them as visual-only in the prototype: surface queries remain invalid in holes and the player falls/resets. Keep this choice explicit for later review.
-- [ ] Automated checks: edge ownership at holes and lower neighbours, material grouping, depth changes, missing-style warnings, no walkable collision over holes and style undo.
-- [ ] Human trial: paint stone next to dirt, inspect a projected checker across cell boundaries, change pit depth and edge material, and walk/fall around the pit. Check texture scale on tall walls and seams at mixed-height rims.
+- [x] Supply at least two reusable styles using FloorSurface-owned copies of existing game textures, with independently configurable top, edge and pit-bottom appearance and depth.
+- [x] Add style brush, rectangle and sample tools using M3's undo model. Preserve topology and collision when changing material alone.
+- [x] Implement continuous world X/Z projection on tops and world-planar projection on axis-aligned exposed sides. Each `FloorStyle` owns one metres-per-repeat value shared by its generated top, edge and pit geometry; the builder supplies UVs and never mutates source materials.
+- [x] Define pit depth relative to a documented rim datum for each connected hole region, including mixed rim elevations and style depths. The datum is the lowest `rim world Y - rim style depth` candidate, giving the region one horizontal bottom, ensuring every wall meets it, and never making a rim shallower than requested.
+- [x] Generate optional pit bottoms only within authored bounds. Treat them as visual-only in the prototype: surface queries remain invalid in holes and the player falls/resets. Keep this choice explicit for later review.
+- [x] Automated checks: edge ownership at holes and lower neighbours, material grouping, depth changes, missing-style warnings, no walkable collision over holes and style undo. All 20 focused FloorSurface suites pass 412 assertions, including copied texture references, the default-off grid guide, non-mutating unshaded editor previews and clockwise visible-face winding; editor startup, scene/UID scanning, test pairing and focused lint pass. The full repository check reaches 2,492 passing assertions before the pre-existing Tutorial 3 kill-boundary lookup abort and related teardown failure.
+- [ ] Human trial: paint flagstones next to dirt, inspect the real texture across cell boundaries with the optional grid guide off and on, change pit depth and edge material, and walk/fall around the pit. Check texture scale on tall walls and seams at mixed-height rims.
 - [ ] Review: accept the pit datum and appearance controls; resolve visible cracks or inconsistent depth before ramps add more edge shapes.
 
 ## M6 — Explicit ramps and transition authoring
@@ -366,6 +366,97 @@ Human observations (expected / actual): Expected complete exposed sides and a re
 Decision: Awaiting human retry
 Follow-up checklist items: Visually inspect the hole, outer perimeter and raised comparison structure, then confirm elevation mode is comfortable and the checker remains legible
 Earlier checkpoints to repeat: Retain the accepted elevation painting and undo/redo interaction
+Evidence or feedback report path: Not created yet; standalone editor authoring is not captured by gameplay replay
+```
+
+```text
+Milestone / trial: M5 implementation checkpoint
+Date / tester / revision: 2026-09-07 / Codex automated checks / adf6c00 + working tree
+Fixture and camera view: M5 styled-mixed-rim-pit-v1 / accepted room plus retained low/high traversal views
+Settings changed (before → after): One teal top material and provisional 2m sides → named teal and stone styles with independent top/edge/pit materials, 1m world UV repeat, and 2m/3m rim depths; no pit datum → lowest rim-Y-minus-style-depth datum per connected bounded hole
+Automated results: Nineteen focused FloorSurface suites passed 390 assertions, covering style gestures and undo, material grouping, continuous top and side projection, mixed-rim datum changes, crack-free wall endpoints, optional visual bottoms, invalid hole samples and no pit-bottom collision. Headless editor startup, 119-scene/UID scan, 234-script pairing and lint pass. ./check.sh reaches 2,470 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D lookup abort and related teardown failure.
+Human observations (expected / actual): Expected easy teal/stone painting, continuous checker scale, distinct edges, a readable mixed-rim bottom and falling through that visual bottom / awaiting trial
+Decision: Awaiting human trial
+Follow-up checklist items: Retry M4 side/overlay readability, then paint and sample both M5 styles, inspect mixed-height seams, adjust a style depth/material and fall through the central visual bottom
+Earlier checkpoints to repeat: Retain M3 rectangle/undo/redo and M4 low-glare elevation mode plus complete hole/perimeter walls
+Evidence or feedback report path: Not created yet; standalone editor authoring is not captured by gameplay replay
+```
+
+```text
+Milestone / trial: M5 human trial 1 visual-material feedback
+Date / tester / revision: 2026-09-07 / user / adf6c00 + working tree
+Fixture and camera view: M5 styled-mixed-rim-pit-v1 / Godot 3D editor viewport
+Settings changed (before → after): M5 style and pit painting enabled with the checker shader still serving as each floor material
+Automated results: Pre-trial M5 focused suites passed 390 assertions; complete repository validation retained the pre-existing Tutorial 3 kill-boundary blocker
+Human observations (expected / actual): The permanent grid/checker made the underlying floor texture impossible to inspect. The tester requested a toggle and a game-owned floor-texture folder populated by copies so new FloorSurface art cannot break existing systems.
+Decision: Changes requested
+Follow-up checklist items: Keep the diagnostic grid as an editor-only toggle that defaults off; use independently copied dirt and flagstone textures for the current style palette; retry texture, side and pit readability
+Earlier checkpoints to repeat: Retain accepted M3 painting/undo and M4 low-glare elevation feedback while inspecting unmasked M5 materials
+Evidence or feedback report path: User report in conversation; editor-only trial has no gameplay recording
+```
+
+```text
+Milestone / trial: M5 human-trial revision 1
+Date / tester / revision: 2026-09-07 / Codex automated checks / adf6c00 + working tree
+Fixture and camera view: M5 styled-mixed-rim-pit-v1 / Godot 3D editor viewport
+Settings changed (before → after): Opaque checker FloorStyle materials → lit Dirt and Flagstones materials using exact copies in the FloorSurface game-art library; permanent checker → subdued editor-only Show Grid / Checker Guide toggle, off by default
+Automated results: Nineteen focused FloorSurface suites pass 401 assertions. Texture-copy hashes match their established sources; focused lint, headless editor/import startup, 119-scene/UID scan and 234-script pairing pass. ./check.sh reaches 2,481 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D lookup abort and related teardown baseline failure.
+Human observations (expected / actual): Expected unobscured dirt and flagstone textures by default, with a low-opacity alignment guide available only when requested / awaiting visual retry
+Decision: Awaiting human retry
+Follow-up checklist items: In the already-open editor, compare both named styles with the guide off and on, then inspect the hole walls and bottom under the real textures
+Earlier checkpoints to repeat: Retain accepted M3 painting/undo and M4 low-glare elevation feedback
+Evidence or feedback report path: Not created yet; standalone editor authoring is not captured by gameplay replay
+```
+
+```text
+Milestone / trial: M5 human retry 2 visual-material feedback
+Date / tester / revision: 2026-09-08 / user / adf6c00 + working tree
+Fixture and camera view: M5 styled-mixed-rim-pit-v1 / Godot 3D editor viewport
+Settings changed (before → after): Checker materials → lit texture materials with optional grid guide
+Automated results: Revision 1 focused checks passed before the visual retry
+Human observations (expected / actual): The generated horizontal floor preview rendered almost black while vertical flagstone faces remained readable, making the scene appear broken despite the copied textures loading.
+Decision: Changes requested
+Follow-up checklist items: Render transient unshaded copies only in the editor preview while preserving lit runtime materials; visually retry texture readability
+Earlier checkpoints to repeat: Confirm the grid guide remains optional and defaults off
+Evidence or feedback report path: User screenshot in conversation; editor-only trial has no gameplay recording
+```
+
+```text
+Milestone / trial: M5 human-retry revision 2
+Date / tester / revision: 2026-09-08 / Codex automated checks / adf6c00 + working tree
+Fixture and camera view: M5 styled-mixed-rim-pit-v1 / Godot 3D editor viewport
+Settings changed (before → after): Generated editor mesh reused lit style materials → editor mesh uses transient unshaded duplicates; runtime style resources remain per-pixel lit
+Automated results: Twenty focused FloorSurface suites pass 411 assertions, including proof that preview conversion does not mutate runtime materials. A headless editor fixture verifies all three generated playground surfaces use unshaded preview copies. Editor startup, 119-scene/UID scan, 235-script pairing and focused lint pass. ./check.sh reaches 2,491 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D lookup abort and related teardown baseline failure.
+Human observations (expected / actual): Expected clearly readable dirt and flagstone textures on horizontal and vertical generated faces in the editor / awaiting visual retry
+Decision: Awaiting human retry
+Follow-up checklist items: Reload the playground scene and inspect the texture with Show Grid / Checker Guide off, then toggle the guide briefly for comparison
+Earlier checkpoints to repeat: Confirm pit/outer walls, style painting and undo remain intact
+Evidence or feedback report path: Not created yet; standalone editor authoring is not captured by gameplay replay
+```
+
+```text
+Milestone / trial: M5 human retry 3 face-culling feedback
+Date / tester / revision: 2026-09-08 / user / adf6c00 + working tree
+Fixture and camera view: M5 styled-mixed-rim-pit-v1 / Godot 3D editor viewport
+Settings changed (before → after): Lit texture materials → readable unshaded editor-preview copies
+Automated results: Revision 2 focused checks passed before the visual retry
+Human observations (expected / actual): Only back faces were visible. The earlier checker shader had disabled culling and therefore concealed counter-clockwise generated triangles that Godot treated as back faces.
+Decision: Changes requested
+Follow-up checklist items: Reverse all generated top, pit-bottom, exposed-side and matching collision triangles to Godot's clockwise front-face order; visually retry from above and around the outer walls
+Earlier checkpoints to repeat: Confirm actual textures remain readable and the grid guide remains optional
+Evidence or feedback report path: User report in conversation; editor-only trial has no gameplay recording
+```
+
+```text
+Milestone / trial: M5 human-retry revision 3
+Date / tester / revision: 2026-09-08 / Codex automated checks / adf6c00 + working tree
+Fixture and camera view: M5 styled-mixed-rim-pit-v1 / Godot 3D editor viewport
+Settings changed (before → after): Counter-clockwise generated faces masked by cull-disabled checker → clockwise generated faces compatible with ordinary one-sided floor materials
+Automated results: The geometry suite passes 38 assertions including every generated top and side triangle's winding. Surface collision, playground and editor-preview suites pass. ./check.sh validates 193 text-resource UIDs, 119/119 scenes and 235 script/test pairs, then reaches 2,492 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D lookup abort and related teardown failure.
+Human observations (expected / actual): Expected visible top faces from above, visible outward walls and unchanged collisions / awaiting visual retry
+Decision: Awaiting human retry
+Follow-up checklist items: Reload the playground, inspect tops from above and orbit around an outer wall and the pit
+Earlier checkpoints to repeat: Confirm textures, style painting, pit walls and undo remain intact
 Evidence or feedback report path: Not created yet; standalone editor authoring is not captured by gameplay replay
 ```
 

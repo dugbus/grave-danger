@@ -32,9 +32,11 @@ func run(tree: SceneTree) -> void:
 	expect_equal(
 		surface.get_generated_cell_count(),
 		164,
-		"The M4 fixture retains the accepted room and adds two comparison lanes."
+		"The M5 fixture retains every accepted top while styling the central room and pit."
 	)
 	expect_equal(surface.validate_configuration(), [], "The saved floor surface has no configuration warnings.")
+	expect_equal(surface.styles.size(), 2, "The playground exposes two reusable text-material styles.")
+	expect_equal(surface.styles[1].display_name, "Flagstones", "The second style is named for painting.")
 	expect_equal(
 		surface.elevation_profile.validate_controller_limits(
 			player.settings.maximum_step_height,
@@ -45,6 +47,17 @@ func run(tree: SceneTree) -> void:
 		"The M4 traversal profile and physical controller thresholds agree."
 	)
 	expect(not surface.sample_surface(Vector3.ZERO).valid, "The central 2x2 hole has no sampled floor.")
+	expect_equal(surface.floor_map.get_cell_style(Vector2i.ZERO), 1, "The absent pit cell owns stone-bottom style intent.")
+	expect_equal(surface.get_cell_elevation(Vector2i(-1, -2)), 1, "The north pit rim uses a one-unit height.")
+	expect_equal(surface.get_cell_elevation(Vector2i(1, -1)), 2, "The stone east rim uses a two-unit height.")
+	var pit_query := PhysicsRayQueryParameters3D.create(
+		Vector3(0.5, 2.0, 0.5),
+		Vector3(0.5, -4.0, 0.5)
+	)
+	expect(
+		surface.get_world_3d().direct_space_state.intersect_ray(pit_query).is_empty(),
+		"The visible M5 pit bottom remains non-collidable so the player falls through."
+	)
 	expect(
 		status != null and status.text.contains("Floor surface: valid"),
 		"The debug panel shows the player's live M2 floor sample."

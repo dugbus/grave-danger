@@ -30,5 +30,14 @@ func run(_tree: SceneTree) -> void:
 	expect(
 		method_names.has(&"_sample_elevation") \
 			and method_names.has(&"_update_elevation_overlay"),
-		"M4 exposes cursor sampling and a temporary false-colour elevation overlay."
+		"M4 exposes cursor sampling and a temporary muted elevation overlay."
+	)
+	expect(
+		method_names.has(&"_sample_style") and method_names.has(&"_get_style_name"),
+		"M5 exposes named palette sampling independently from elevation editing."
+	)
+	expect(
+		method_names.has(&"_on_grid_overlay_toggled") \
+			and method_names.has(&"_update_grid_overlay"),
+		"The optional editor grid can be toggled independently of real floor materials."
 	)

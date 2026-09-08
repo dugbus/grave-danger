@@ -23,7 +23,9 @@ func run(_tree: SceneTree) -> void:
 	var arrays := mesh.surface_get_arrays(0)
 	var vertices := arrays[Mesh.ARRAY_VERTEX] as PackedVector3Array
 	var colours := arrays[Mesh.ARRAY_COLOR] as PackedColorArray
+	var uvs := arrays[Mesh.ARRAY_TEX_UV] as PackedVector2Array
 	expect_equal(vertices.size(), 12, "Two cells produce two coloured overlay quads.")
+	expect_equal(uvs.size(), vertices.size(), "Every vertex carries a grid-guide coordinate.")
 	expect(
 		vertices.has(Vector3(0.0, 6.025, 0.0)),
 		"Elevation 24 appears at six metres plus the preview offset."

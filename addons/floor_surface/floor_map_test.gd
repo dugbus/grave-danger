@@ -10,6 +10,7 @@ func run(_tree: SceneTree) -> void:
 	_test_presence_snapshots_and_unique_copy()
 	_test_bounds_expand_without_implicit_floor()
 	_test_elevation_snapshots()
+	_test_style_snapshots()
 	_test_sparse_authored_values_and_palette_validation()
 	_test_text_resource_round_trip()
 
@@ -69,6 +70,27 @@ func _test_elevation_snapshots() -> void:
 	expect(
 		not floor_map.elevation_overrides.has(Vector2i(2, 0)),
 		"Trimming a removed edge tile also discards its unreachable authored data."
+	)
+
+
+func _test_style_snapshots() -> void:
+	var floor_map := SUBJECT.new()
+	floor_map.dimensions = Vector2i(3, 1)
+	floor_map.default_present = true
+	floor_map.set_floor_present(Vector2i(1, 0), false)
+	floor_map.set_cell_style(Vector2i.ZERO, 1)
+	floor_map.set_cell_style(Vector2i(1, 0), 2)
+	var styled := floor_map.get_style_snapshot()
+	floor_map.set_cell_style(Vector2i(2, 0), 3)
+	expect(floor_map.apply_style_snapshot(styled), "A saved style state can be restored.")
+	expect_equal(floor_map.get_cell_style(Vector2i.ZERO), 1, "Present-cell style survives undo.")
+	expect_equal(floor_map.get_cell_style(Vector2i(1, 0)), 2, "Hole style intent survives undo.")
+	expect_equal(floor_map.get_cell_style(Vector2i(2, 0)), 0, "Restoring removes later style overrides.")
+	styled[Vector2i(9, 9)] = 1
+	floor_map.apply_style_snapshot(styled)
+	expect(
+		not floor_map.style_overrides.has(Vector2i(9, 9)),
+		"Style snapshots cannot add data outside tile storage."
 	)
 
 

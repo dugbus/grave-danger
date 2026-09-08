@@ -8,6 +8,7 @@
 [ext_resource type="Resource" path="res://addons/floor_surface/default_floor_elevation_profile.tres" id="6_profile"]
 [ext_resource type="Script" uid="uid://q0ef7o077f24" path="res://addons/floor_surface/floor_style.gd" id="7_style_script"]
 [ext_resource type="Resource" uid="uid://c01b1gskf8cxp" path="res://addons/floor_surface/default_floor_style.tres" id="8_style"]
+[ext_resource type="Resource" path="res://addons/floor_surface/stone_floor_style.tres" id="9_stone_style"]
 
 [sub_resource type="Environment" id="Environment_playground"]
 background_mode = 1
@@ -16,13 +17,13 @@ ambient_light_source = 3
 ambient_light_color = Color(0.44, 0.5, 0.62, 1)
 ambient_light_energy = 0.7
 
-[sub_resource type="Resource" id="Resource_kgjqf"]
+[sub_resource type="Resource" id="Resource_tednh"]
 resource_local_to_scene = true
 script = ExtResource("5_map_script")
 minimum_cell = Vector2i(-6, -5)
 dimensions = Vector2i(12, 17)
 default_present = true
-presence_exceptions = Array[Vector2i]([Vector2i(-1, -1), Vector2i(0, -1), Vector2i(-1, 0), Vector2i(0, 0), Vector2i(-6, 8), Vector2i(-5, 8), Vector2i(-4, 8), Vector2i(-3, 8), Vector2i(-2, 8), Vector2i(-1, 8), Vector2i(0, 8), Vector2i(1, 8), Vector2i(2, 8), Vector2i(3, 8), Vector2i(4, 8), Vector2i(5, 8), Vector2i(-6, 9), Vector2i(-5, 9), Vector2i(-4, 9), Vector2i(-3, 9), Vector2i(-2, 9), Vector2i(-1, 9), Vector2i(0, 9), Vector2i(1, 9), Vector2i(2, 9), Vector2i(3, 9), Vector2i(4, 9), Vector2i(5, 9)])
+presence_exceptions = Array[Vector2i]([Vector2i(-1, -1), Vector2i(0, -1), Vector2i(-1, 0), Vector2i(0, 0), Vector2i(-6, 5), Vector2i(-5, 5), Vector2i(-4, 5), Vector2i(-3, 5), Vector2i(-2, 5), Vector2i(-1, 5), Vector2i(0, 5), Vector2i(1, 5), Vector2i(2, 5), Vector2i(3, 5), Vector2i(4, 5), Vector2i(5, 5), Vector2i(-6, 8), Vector2i(-5, 8), Vector2i(-4, 8), Vector2i(-3, 8), Vector2i(-2, 8), Vector2i(-1, 8), Vector2i(0, 8), Vector2i(1, 8), Vector2i(2, 8), Vector2i(3, 8), Vector2i(4, 8), Vector2i(5, 8), Vector2i(-6, 9), Vector2i(-5, 9), Vector2i(-4, 9), Vector2i(-3, 9), Vector2i(-2, 9), Vector2i(-1, 9), Vector2i(0, 9), Vector2i(1, 9), Vector2i(2, 9), Vector2i(3, 9), Vector2i(4, 9), Vector2i(5, 9)])
 elevation_overrides = Dictionary[Vector2i, int]({
 Vector2i(-6, 10): 24,
 Vector2i(-6, 11): 24,
@@ -48,18 +49,22 @@ Vector2i(-2, 10): 27,
 Vector2i(-2, 11): 27,
 Vector2i(-1, -4): 2,
 Vector2i(-1, -3): 2,
+Vector2i(-1, -2): 1,
 Vector2i(-1, 6): 3,
 Vector2i(-1, 7): 3,
 Vector2i(-1, 10): 27,
 Vector2i(-1, 11): 27,
 Vector2i(0, -4): 2,
 Vector2i(0, -3): 2,
+Vector2i(0, -2): 1,
 Vector2i(0, 6): 6,
 Vector2i(0, 7): 6,
 Vector2i(0, 10): 30,
 Vector2i(0, 11): 30,
 Vector2i(1, -4): 2,
 Vector2i(1, -3): 2,
+Vector2i(1, -1): 2,
+Vector2i(1, 0): 2,
 Vector2i(1, 6): 6,
 Vector2i(1, 7): 6,
 Vector2i(1, 10): 30,
@@ -84,6 +89,212 @@ Vector2i(5, 6): 10,
 Vector2i(5, 7): 10,
 Vector2i(5, 10): 34,
 Vector2i(5, 11): 34
+})
+style_overrides = Dictionary[Vector2i, int]({
+Vector2i(-6, -5): 1,
+Vector2i(-6, -4): 1,
+Vector2i(-6, -3): 1,
+Vector2i(-6, -2): 1,
+Vector2i(-6, -1): 1,
+Vector2i(-6, 0): 1,
+Vector2i(-6, 1): 1,
+Vector2i(-6, 2): 1,
+Vector2i(-6, 3): 1,
+Vector2i(-6, 4): 1,
+Vector2i(-6, 5): 1,
+Vector2i(-6, 6): 1,
+Vector2i(-6, 7): 1,
+Vector2i(-6, 8): 1,
+Vector2i(-6, 9): 1,
+Vector2i(-6, 10): 1,
+Vector2i(-6, 11): 1,
+Vector2i(-5, -5): 1,
+Vector2i(-5, -4): 1,
+Vector2i(-5, -3): 1,
+Vector2i(-5, -2): 1,
+Vector2i(-5, -1): 1,
+Vector2i(-5, 0): 1,
+Vector2i(-5, 1): 1,
+Vector2i(-5, 2): 1,
+Vector2i(-5, 3): 1,
+Vector2i(-5, 4): 1,
+Vector2i(-5, 5): 1,
+Vector2i(-5, 6): 1,
+Vector2i(-5, 7): 1,
+Vector2i(-5, 8): 1,
+Vector2i(-5, 9): 1,
+Vector2i(-5, 10): 1,
+Vector2i(-5, 11): 1,
+Vector2i(-4, -5): 1,
+Vector2i(-4, -4): 1,
+Vector2i(-4, -3): 1,
+Vector2i(-4, -2): 1,
+Vector2i(-4, -1): 1,
+Vector2i(-4, 0): 1,
+Vector2i(-4, 1): 1,
+Vector2i(-4, 2): 1,
+Vector2i(-4, 3): 1,
+Vector2i(-4, 4): 1,
+Vector2i(-4, 5): 1,
+Vector2i(-4, 6): 1,
+Vector2i(-4, 7): 1,
+Vector2i(-4, 8): 1,
+Vector2i(-4, 9): 1,
+Vector2i(-4, 10): 1,
+Vector2i(-4, 11): 1,
+Vector2i(-3, -5): 1,
+Vector2i(-3, -4): 1,
+Vector2i(-3, -3): 1,
+Vector2i(-3, -2): 1,
+Vector2i(-3, -1): 1,
+Vector2i(-3, 0): 1,
+Vector2i(-3, 1): 1,
+Vector2i(-3, 2): 1,
+Vector2i(-3, 3): 1,
+Vector2i(-3, 4): 1,
+Vector2i(-3, 5): 1,
+Vector2i(-3, 6): 1,
+Vector2i(-3, 7): 1,
+Vector2i(-3, 8): 1,
+Vector2i(-3, 9): 1,
+Vector2i(-3, 10): 1,
+Vector2i(-3, 11): 1,
+Vector2i(-2, -5): 1,
+Vector2i(-2, -4): 1,
+Vector2i(-2, -3): 1,
+Vector2i(-2, -2): 1,
+Vector2i(-2, -1): 1,
+Vector2i(-2, 0): 1,
+Vector2i(-2, 1): 1,
+Vector2i(-2, 2): 1,
+Vector2i(-2, 3): 1,
+Vector2i(-2, 4): 1,
+Vector2i(-2, 5): 1,
+Vector2i(-2, 6): 1,
+Vector2i(-2, 7): 1,
+Vector2i(-2, 8): 1,
+Vector2i(-2, 9): 1,
+Vector2i(-2, 10): 1,
+Vector2i(-2, 11): 1,
+Vector2i(-1, -5): 1,
+Vector2i(-1, -4): 1,
+Vector2i(-1, -3): 1,
+Vector2i(-1, -2): 1,
+Vector2i(-1, -1): 1,
+Vector2i(-1, 0): 1,
+Vector2i(-1, 1): 1,
+Vector2i(-1, 2): 1,
+Vector2i(-1, 3): 1,
+Vector2i(-1, 4): 1,
+Vector2i(-1, 5): 1,
+Vector2i(-1, 6): 1,
+Vector2i(-1, 7): 1,
+Vector2i(-1, 8): 1,
+Vector2i(-1, 9): 1,
+Vector2i(-1, 10): 1,
+Vector2i(-1, 11): 1,
+Vector2i(0, -5): 1,
+Vector2i(0, -4): 1,
+Vector2i(0, -3): 1,
+Vector2i(0, -2): 1,
+Vector2i(0, -1): 1,
+Vector2i(0, 0): 1,
+Vector2i(0, 1): 1,
+Vector2i(0, 2): 1,
+Vector2i(0, 3): 1,
+Vector2i(0, 4): 1,
+Vector2i(0, 5): 1,
+Vector2i(0, 6): 1,
+Vector2i(0, 7): 1,
+Vector2i(0, 8): 1,
+Vector2i(0, 9): 1,
+Vector2i(0, 10): 1,
+Vector2i(0, 11): 1,
+Vector2i(1, -5): 1,
+Vector2i(1, -4): 1,
+Vector2i(1, -3): 1,
+Vector2i(1, -2): 1,
+Vector2i(1, -1): 1,
+Vector2i(1, 0): 1,
+Vector2i(1, 1): 1,
+Vector2i(1, 2): 1,
+Vector2i(1, 3): 1,
+Vector2i(1, 4): 1,
+Vector2i(1, 5): 1,
+Vector2i(1, 6): 1,
+Vector2i(1, 7): 1,
+Vector2i(1, 8): 1,
+Vector2i(1, 9): 1,
+Vector2i(1, 10): 1,
+Vector2i(1, 11): 1,
+Vector2i(2, -5): 1,
+Vector2i(2, -4): 1,
+Vector2i(2, -3): 1,
+Vector2i(2, -2): 1,
+Vector2i(2, -1): 1,
+Vector2i(2, 0): 1,
+Vector2i(2, 1): 1,
+Vector2i(2, 2): 1,
+Vector2i(2, 3): 1,
+Vector2i(2, 4): 1,
+Vector2i(2, 5): 1,
+Vector2i(2, 6): 1,
+Vector2i(2, 7): 1,
+Vector2i(2, 8): 1,
+Vector2i(2, 9): 1,
+Vector2i(2, 10): 1,
+Vector2i(2, 11): 1,
+Vector2i(3, -5): 1,
+Vector2i(3, -4): 1,
+Vector2i(3, -3): 1,
+Vector2i(3, -2): 1,
+Vector2i(3, -1): 1,
+Vector2i(3, 0): 1,
+Vector2i(3, 1): 1,
+Vector2i(3, 2): 1,
+Vector2i(3, 3): 1,
+Vector2i(3, 4): 1,
+Vector2i(3, 5): 1,
+Vector2i(3, 6): 1,
+Vector2i(3, 7): 1,
+Vector2i(3, 8): 1,
+Vector2i(3, 9): 1,
+Vector2i(3, 10): 1,
+Vector2i(3, 11): 1,
+Vector2i(4, -5): 1,
+Vector2i(4, -4): 1,
+Vector2i(4, -3): 1,
+Vector2i(4, -2): 1,
+Vector2i(4, -1): 1,
+Vector2i(4, 0): 1,
+Vector2i(4, 1): 1,
+Vector2i(4, 2): 1,
+Vector2i(4, 3): 1,
+Vector2i(4, 4): 1,
+Vector2i(4, 5): 1,
+Vector2i(4, 6): 1,
+Vector2i(4, 7): 1,
+Vector2i(4, 8): 1,
+Vector2i(4, 9): 1,
+Vector2i(4, 10): 1,
+Vector2i(4, 11): 1,
+Vector2i(5, -5): 1,
+Vector2i(5, -4): 1,
+Vector2i(5, -3): 1,
+Vector2i(5, -2): 1,
+Vector2i(5, -1): 1,
+Vector2i(5, 0): 1,
+Vector2i(5, 1): 1,
+Vector2i(5, 2): 1,
+Vector2i(5, 3): 1,
+Vector2i(5, 4): 1,
+Vector2i(5, 5): 1,
+Vector2i(5, 6): 1,
+Vector2i(5, 7): 1,
+Vector2i(5, 8): 1,
+Vector2i(5, 9): 1,
+Vector2i(5, 10): 1,
+Vector2i(5, 11): 1
 })
 
 [sub_resource type="StandardMaterial3D" id="ResetMaterial"]
@@ -114,7 +325,7 @@ script = ExtResource("1_playground")
 camera_settings = ExtResource("2_camera_settings")
 trial_start_paths = Array[NodePath]([NodePath("ResetPosition"), NodePath("LowLaneStart"), NodePath("HighLaneStart")])
 trial_focus_paths = Array[NodePath]([NodePath("MainFocus"), NodePath("LowLaneFocus"), NodePath("HighLaneFocus")])
-trial_names = Array[String](["Accepted room", "Low comparison lane", "High comparison lane — 24-unit base"])
+trial_names = Array[String](["Style and mixed-rim pit", "Low comparison lane", "High comparison lane — 24-unit base"])
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1292583225]
 environment = SubResource("Environment_playground")
@@ -131,16 +342,16 @@ current = true
 size = 14.0
 
 [node name="FloorSurface" parent="." unique_id=1431299148 instance=ExtResource("4_surface")]
-floor_map = SubResource("Resource_kgjqf")
+floor_map = SubResource("Resource_tednh")
 elevation_profile = ExtResource("6_profile")
-styles = Array[ExtResource("7_style_script")]([ExtResource("8_style")])
+styles = Array[ExtResource("7_style_script")]([ExtResource("8_style"), ExtResource("9_stone_style")])
 
 [node name="HoleLabel" type="Label3D" parent="." unique_id=1274125127]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
 billboard = 1
 no_depth_test = true
-text = "M2 HOLE
-NO SURFACE"
+text = "M5 MIXED-RIM PIT
+VISUAL BOTTOM — NO COLLISION"
 
 [node name="ResetPosition" type="Marker3D" parent="." unique_id=1185377777]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 2.5)
@@ -218,6 +429,7 @@ theme_override_colors/font_color = Color(0.9, 0.92, 0.96, 1)
 theme_override_font_sizes/font_size = 18
 text = "Arrow keys / stick: move    Space / A: jump
 R: reset trial    V: camera    T: next trial lane    U: normal/unencumbered
+Central room: compare teal/stone surfaces and fall through the visual pit bottom.
 Comparison lanes rise eastward: walk 1, jump 2, switch mode for 3, confirm 4 is blocked."
 
 [node name="Separator" type="HSeparator" parent="HUD/Panel/Margin/Rows" unique_id=586916565]

@@ -3,7 +3,7 @@ extends Node3D
 
 ## Runtime coordinator for the isolated human-testable floor-surface fixture.
 
-const FIXTURE_ID := "M4 / absolute-elevation-comparison-v1"
+const FIXTURE_ID := "M5 / styled-mixed-rim-pit-v1"
 const CAMERA_VIEW_COUNT := 3
 const TRIAL_COUNT := 3
 const HUD_REFRESH_SECONDS := 0.1
@@ -158,7 +158,7 @@ func _format_surface_status(sample: SAMPLE_SCRIPT) -> String:
 	return (
 		"Floor surface: valid\nCell: (%d, %d) | sampled height: %.2f m\n"
 		+ "Elevation: %d units | unit: %.2f m | normal: (%.1f, %.1f, %.1f)\n"
-		+ "East edge: %s | delta: %s\nStyle: %d | transition: %s"
+		+ "East edge: %s | delta: %s\nStyle: %d — %s | transition: %s"
 	) % [
 		sample.cell.x,
 		sample.cell.y,
@@ -171,8 +171,15 @@ func _format_surface_status(sample: SAMPLE_SCRIPT) -> String:
 		_get_east_traversal_name(sample.cell),
 		_get_east_delta_text(sample.cell),
 		sample.style_index,
+		_get_style_name(sample.style_index),
 		floor_surface.floor_map.get_transition_name(sample.transition),
 	]
+
+
+func _get_style_name(style_index: int) -> String:
+	if style_index < 0 or style_index >= floor_surface.styles.size():
+		return "Invalid"
+	return floor_surface.styles[style_index].display_name
 
 
 func _resolve_trial_nodes() -> void:

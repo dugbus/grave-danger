@@ -5,11 +5,15 @@ extends EditorPlugin
 
 const FLOOR_SURFACE_SCRIPT := preload("res://addons/floor_surface/floor_surface.gd")
 const FLOOR_MAP_SCRIPT := preload("res://addons/floor_surface/floor_map.gd")
+const STYLE_SCRIPT := preload("res://addons/floor_surface/floor_style.gd")
 const SHAPE_PAINTER := preload(
 	"res://addons/floor_surface/editor/floor_surface_shape_painter.gd"
 )
 const ELEVATION_PAINTER := preload(
 	"res://addons/floor_surface/editor/floor_surface_elevation_painter.gd"
+)
+const STYLE_PAINTER := preload(
+	"res://addons/floor_surface/editor/floor_surface_style_painter.gd"
 )
 const EDITOR_VISUALS := preload(
 	"res://addons/floor_surface/editor/floor_surface_editor_visuals.gd"
@@ -21,12 +25,14 @@ const DOCK_SCRIPT := preload("res://addons/floor_surface/editor/floor_surface_do
 const DOCK_SCENE := preload("res://addons/floor_surface/editor/floor_surface_dock.tscn")
 const APPLY_SNAPSHOT_METHOD := &"apply_shape_snapshot"
 const APPLY_ELEVATION_SNAPSHOT_METHOD := &"apply_elevation_snapshot"
+const APPLY_STYLE_SNAPSHOT_METHOD := &"apply_style_snapshot"
 const FLOOR_MAP_PROPERTY := &"floor_map"
 
 var _dock: DOCK_SCRIPT
 var _target: FLOOR_SURFACE_SCRIPT
 var _painter := SHAPE_PAINTER.new()
 var _elevation_painter := ELEVATION_PAINTER.new()
+var _style_painter := STYLE_PAINTER.new()
 var _rectangle_start := Vector2i.ZERO
 var _last_brush_cell := Vector2i.ZERO
 var _pointer_cell := Vector2i.ZERO
@@ -42,10 +48,13 @@ func _enter_tree() -> void:
 	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_UL, _dock)
 	_dock.setup()
 	_dock.editing_toggled.connect(_on_editing_toggled)
+	_dock.grid_overlay_toggled.connect(_on_grid_overlay_toggled)
 	_dock.edit_mode_changed.connect(_on_tool_setting_changed)
 	_dock.paint_mode_changed.connect(_on_tool_setting_changed)
 	_dock.elevation_operation_changed.connect(_on_tool_setting_changed)
 	_dock.absolute_elevation_changed.connect(_on_tool_setting_changed)
+	_dock.style_operation_changed.connect(_on_tool_setting_changed)
+	_dock.style_index_changed.connect(_on_tool_setting_changed)
 	_dock.shape_mode_changed.connect(_on_tool_setting_changed)
 	_dock.brush_size_changed.connect(_on_tool_setting_changed)
 	_dock.make_unique_requested.connect(_on_make_unique_requested)
@@ -146,11 +155,16 @@ func _set_target(surface: FLOOR_SURFACE_SCRIPT) -> void:
 func _refresh_dock_target() -> void:
 	if not is_instance_valid(_dock):
 		return
+	var available_styles: Array[STYLE_SCRIPT] = []
+	if _target != null:
+		available_styles = _target.styles
+	_dock.set_styles(available_styles)
 	_dock.set_target(_target, _target.floor_map if _target != null else null)
 	if _target != null and _target.elevation_profile != null:
 		_dock.set_elevation_unit(_target.elevation_profile.elevation_unit)
 	if _target == null:
 		_dock.set_status("Select a FloorSurface to begin.")
+	_update_grid_overlay()
 
 
 func _on_editing_toggled(enabled: bool) -> void:
@@ -174,6 +188,10 @@ func _on_tool_setting_changed(_value: int) -> void:
 	_cancel_active_edit(false)
 	_update_preview_footprint()
 	_update_elevation_overlay()
+
+
+func _on_grid_overlay_toggled(_visible: bool) -> void:
+	_update_grid_overlay()
 
 
 func _update_pointer(viewport_camera: Camera3D, pointer_position: Vector2) -> void:
@@ -234,6 +252,14 @@ func _update_preview_footprint() -> void:
 			_preview_cells.size(),
 			_target.get_cell_elevation(_pointer_cell)
 		)
+	elif _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Style \
+			and _target.floor_map.is_in_bounds(_pointer_cell):
+		var style_index := _target.floor_map.get_cell_style(_pointer_cell)
+		_dock.set_style_hover(
+			_pointer_cell,
+			_preview_cells.size(),
+			_get_style_name(style_index)
+		)
 	else:
 		_dock.set_hover(_pointer_cell, _preview_cells.size())
 	_update_preview()
@@ -252,6 +278,12 @@ func _begin_gesture() -> int:
 			operation,
 			_dock.get_absolute_elevation()
 		):
+			return EditorPlugin.AFTER_GUI_INPUT_PASS
+	elif _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Style:
+		if _dock.get_style_operation() == STYLE_PAINTER.Operation.Sample:
+			_sample_style()
+			return EditorPlugin.AFTER_GUI_INPUT_STOP
+		if not _style_painter.begin(_target.floor_map, _dock.get_style_index()):
 			return EditorPlugin.AFTER_GUI_INPUT_PASS
 	elif not _painter.begin(
 		_target.floor_map,
@@ -283,8 +315,18 @@ func _finish_gesture() -> int:
 		return EditorPlugin.AFTER_GUI_INPUT_PASS
 	if _dock.get_shape_mode() == SHAPE_PAINTER.ShapeMode.Rectangle:
 		_apply_active_cells(_preview_cells)
-	var elevation_edit := _elevation_painter.is_active()
-	var edit := _elevation_painter.finish() if elevation_edit else _painter.finish()
+	var edit_mode := _dock.get_edit_mode()
+	var edit: Dictionary
+	var apply_method := APPLY_SNAPSHOT_METHOD
+	match edit_mode:
+		DOCK_SCRIPT.EditMode.Elevation:
+			edit = _elevation_painter.finish()
+			apply_method = APPLY_ELEVATION_SNAPSHOT_METHOD
+		DOCK_SCRIPT.EditMode.Style:
+			edit = _style_painter.finish()
+			apply_method = APPLY_STYLE_SNAPSHOT_METHOD
+		_:
+			edit = _painter.finish()
 	var before := edit.get("before", {}) as Dictionary
 	var after := edit.get("after", {}) as Dictionary
 	var touched_count := edit.get("touched_count", 0) as int
@@ -292,8 +334,6 @@ func _finish_gesture() -> int:
 		var action_name := _gesture_action_name()
 		var undo_redo := get_undo_redo()
 		undo_redo.create_action(action_name)
-		var apply_method := APPLY_ELEVATION_SNAPSHOT_METHOD \
-			if elevation_edit else APPLY_SNAPSHOT_METHOD
 		undo_redo.add_do_method(_target.floor_map, apply_method, after)
 		undo_redo.add_undo_method(_target.floor_map, apply_method, before)
 		# The live gesture already applied the final state; register it without executing twice.
@@ -320,6 +360,11 @@ func _gesture_action_name() -> String:
 		return "%s Rectangle" % operation_name \
 			if _dock.get_shape_mode() == SHAPE_PAINTER.ShapeMode.Rectangle \
 			else "%s Stroke" % operation_name
+	if _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Style:
+		var style_operation := "Paint Style: %s" % _get_style_name(_dock.get_style_index())
+		return "%s Rectangle" % style_operation \
+			if _dock.get_shape_mode() == SHAPE_PAINTER.ShapeMode.Rectangle \
+			else "%s Stroke" % style_operation
 	var operation := (
 		"Paint Floor"
 		if _dock.get_paint_mode() == SHAPE_PAINTER.PaintMode.Paint
@@ -331,7 +376,7 @@ func _gesture_action_name() -> String:
 
 
 func _should_clip_to_bounds() -> bool:
-	if _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Elevation:
+	if _dock.get_edit_mode() != DOCK_SCRIPT.EditMode.FloorShape:
 		return true
 	return _dock.get_paint_mode() == SHAPE_PAINTER.PaintMode.Erase
 
@@ -356,6 +401,7 @@ func _restore_target_selection() -> void:
 func _cancel_active_edit(show_status: bool) -> void:
 	var cancelled := _painter.cancel()
 	cancelled = _elevation_painter.cancel() or cancelled
+	cancelled = _style_painter.cancel() or cancelled
 	if not cancelled:
 		return
 	if show_status and is_instance_valid(_dock):
@@ -402,11 +448,13 @@ func _working_world_height() -> float:
 func _preview_world_height() -> float:
 	if _target == null or _target.elevation_profile == null:
 		return 0.0
-	if _dock.get_edit_mode() != DOCK_SCRIPT.EditMode.Elevation:
+	if _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.FloorShape:
 		return _working_world_height()
 	var elevation := _target.get_cell_elevation(_pointer_cell)
 	if elevation == FLOOR_MAP_SCRIPT.INVALID_ELEVATION:
 		return _working_world_height()
+	if _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Style:
+		return _target.elevation_profile.elevation_to_world(elevation)
 	match _dock.get_elevation_operation() as ELEVATION_PAINTER.Operation:
 		ELEVATION_PAINTER.Operation.SetAbsolute:
 			elevation = _dock.get_absolute_elevation()
@@ -427,6 +475,7 @@ func _can_paint() -> bool:
 func _create_preview() -> void:
 	_visuals.attach(_target)
 	_update_elevation_overlay()
+	_update_grid_overlay()
 
 
 func _remove_preview() -> void:
@@ -436,7 +485,9 @@ func _remove_preview() -> void:
 func _update_preview() -> void:
 	var colour := Color(1.0, 0.95, 0.2, 0.48)
 	if _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Elevation:
-		colour = Color(1.0, 0.95, 0.2, 0.48)
+		colour = Color(0.55, 0.45, 0.18, 0.32)
+	elif _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Style:
+		colour = Color(0.3, 0.55, 0.72, 0.32)
 	else:
 		colour = (
 			Color(0.2, 0.95, 0.45, 0.38)
@@ -454,12 +505,14 @@ func _update_preview() -> void:
 
 
 func _is_gesture_active() -> bool:
-	return _painter.is_active() or _elevation_painter.is_active()
+	return _painter.is_active() or _elevation_painter.is_active() or _style_painter.is_active()
 
 
 func _apply_active_cells(cells: Array[Vector2i]) -> void:
 	if _elevation_painter.is_active():
 		_elevation_painter.apply_cells(_present_cells_only(cells))
+	elif _style_painter.is_active():
+		_style_painter.apply_cells(cells)
 	else:
 		_painter.apply_cells(cells)
 
@@ -485,6 +538,22 @@ func _sample_elevation() -> void:
 	_update_preview_footprint()
 
 
+func _sample_style() -> void:
+	if not _target.floor_map.is_in_bounds(_pointer_cell):
+		_dock.set_status("No bounded floor cell to sample at %s." % _pointer_cell)
+		return
+	var style_index := _target.floor_map.get_cell_style(_pointer_cell)
+	_dock.set_sampled_style(style_index)
+	_dock.set_status("Sampled style %s." % _get_style_name(style_index))
+	_update_preview_footprint()
+
+
+func _get_style_name(style_index: int) -> String:
+	if _target == null or style_index < 0 or style_index >= _target.styles.size():
+		return "Invalid style %d" % style_index
+	return _target.styles[style_index].display_name
+
+
 func _connect_target_surface() -> void:
 	if _target == null:
 		return
@@ -501,6 +570,7 @@ func _disconnect_target_surface() -> void:
 
 func _on_target_surface_rebuilt(_cell_count: int) -> void:
 	_update_elevation_overlay()
+	_update_grid_overlay()
 	_update_preview_footprint()
 
 
@@ -515,4 +585,16 @@ func _update_elevation_overlay() -> void:
 		_target.cell_size,
 		_target.world_origin_xz,
 		should_show
+	)
+
+
+func _update_grid_overlay() -> void:
+	if _target == null or not is_instance_valid(_dock):
+		return
+	_visuals.update_grid_overlay(
+		_target.floor_map,
+		_target.elevation_profile,
+		_target.cell_size,
+		_target.world_origin_xz,
+		_dock.is_grid_overlay_visible()
 	)

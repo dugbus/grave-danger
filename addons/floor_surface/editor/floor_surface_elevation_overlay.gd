@@ -17,7 +17,8 @@ static func build_mesh(
 	floor_map: FLOOR_MAP_SCRIPT,
 	profile: PROFILE_SCRIPT,
 	cell_size: float,
-	world_origin_xz: Vector2
+	world_origin_xz: Vector2,
+	surface_offset := SURFACE_OFFSET
 ) -> ArrayMesh:
 	var mesh := ArrayMesh.new()
 	if floor_map == null or profile == null:
@@ -25,10 +26,11 @@ static func build_mesh(
 	var vertices: Array[Vector3] = []
 	var normals: Array[Vector3] = []
 	var colours: Array[Color] = []
+	var uvs: Array[Vector2] = []
 	var safe_cell_size := maxf(cell_size, 0.01)
 	for cell in floor_map.get_present_cells():
 		var elevation := floor_map.get_cell_elevation(cell)
-		var height := profile.elevation_to_world(elevation) + SURFACE_OFFSET
+		var height := profile.elevation_to_world(elevation) + surface_offset
 		var minimum_x := world_origin_xz.x + float(cell.x) * safe_cell_size
 		var minimum_z := world_origin_xz.y + float(cell.y) * safe_cell_size
 		var maximum_x := minimum_x + safe_cell_size
@@ -43,7 +45,18 @@ static func build_mesh(
 			corners[0], corners[1], corners[2],
 			corners[0], corners[2], corners[3],
 		]
+		var minimum_uv := Vector2(minimum_x, minimum_z) / safe_cell_size
+		var maximum_uv := Vector2(maximum_x, maximum_z) / safe_cell_size
+		var triangle_uvs: Array[Vector2] = [
+			minimum_uv,
+			Vector2(minimum_uv.x, maximum_uv.y),
+			maximum_uv,
+			minimum_uv,
+			maximum_uv,
+			Vector2(maximum_uv.x, minimum_uv.y),
+		]
 		vertices.append_array(triangle_vertices)
+		uvs.append_array(triangle_uvs)
 		var colour := elevation_colour(elevation)
 		for _vertex in triangle_vertices:
 			normals.append(Vector3.UP)
@@ -55,6 +68,7 @@ static func build_mesh(
 	arrays[Mesh.ARRAY_VERTEX] = PackedVector3Array(vertices)
 	arrays[Mesh.ARRAY_NORMAL] = PackedVector3Array(normals)
 	arrays[Mesh.ARRAY_COLOR] = PackedColorArray(colours)
+	arrays[Mesh.ARRAY_TEX_UV] = PackedVector2Array(uvs)
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	return mesh
 

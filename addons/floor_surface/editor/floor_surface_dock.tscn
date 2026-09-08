@@ -8,6 +8,8 @@
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_elevation_operation"]
 
+[sub_resource type="ButtonGroup" id="ButtonGroup_style_operation"]
+
 [node name="FloorSurfaceDock" type="VBoxContainer"]
 custom_minimum_size = Vector2(280, 0)
 script = ExtResource("1_dock")
@@ -47,6 +49,12 @@ disabled = true
 text = "Enable Viewport Painting"
 tooltip_text = "When enabled, left-drag paints. Middle/right mouse navigation remains available."
 
+[node name="GridOverlayToggle" type="CheckButton" parent="."]
+unique_name_in_owner = true
+disabled = true
+text = "Show Grid / Checker Guide"
+tooltip_text = "Temporary editor-only alignment guide. Turn it off to inspect the actual floor texture."
+
 [node name="EditModeLabel" type="Label" parent="."]
 text = "Edit"
 
@@ -68,6 +76,14 @@ size_flags_horizontal = 3
 toggle_mode = true
 button_group = SubResource("ButtonGroup_edit_mode")
 text = "Elevation"
+
+[node name="StyleButton" type="Button" parent="EditModeButtons"]
+unique_name_in_owner = true
+disabled = true
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = SubResource("ButtonGroup_edit_mode")
+text = "Style"
 
 [node name="ShapeControls" type="VBoxContainer" parent="."]
 unique_name_in_owner = true
@@ -125,6 +141,42 @@ button_group = SubResource("ButtonGroup_elevation_operation")
 text = "Sample"
 tooltip_text = "Click an existing floor cell to copy its absolute elevation into the entry."
 
+[node name="StyleControls" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+
+[node name="StyleLabel" type="Label" parent="StyleControls"]
+text = "Surface style"
+
+[node name="StyleOption" type="OptionButton" parent="StyleControls"]
+unique_name_in_owner = true
+disabled = true
+
+[node name="StyleGuidance" type="Label" parent="StyleControls"]
+text = "Paint chooses a palette entry. Edit that FloorStyle resource in the Inspector to change its top, edge, pit bottom, projection scale or depth."
+autowrap_mode = 2
+
+[node name="StyleOperationButtons" type="HBoxContainer" parent="StyleControls"]
+
+[node name="PaintStyleButton" type="Button" parent="StyleControls/StyleOperationButtons"]
+unique_name_in_owner = true
+disabled = true
+size_flags_horizontal = 3
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_style_operation")
+text = "Paint Style"
+tooltip_text = "Paint the selected style onto floor tiles or bounded hole cells."
+
+[node name="SampleStyleButton" type="Button" parent="StyleControls/StyleOperationButtons"]
+unique_name_in_owner = true
+disabled = true
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = SubResource("ButtonGroup_style_operation")
+text = "Sample"
+tooltip_text = "Click a floor or bounded hole cell to copy its style into the selector."
+
 [node name="ShapeModeLabel" type="Label" parent="."]
 text = "Painting tool"
 
@@ -159,7 +211,7 @@ unique_name_in_owner = true
 text = "Cell —"
 
 [node name="Instructions" type="Label" parent="."]
-text = "Left-drag: apply active tool\nRectangle: drag corner to corner\nElevation Sample: click a tile\nEsc: cancel gesture\nMiddle/right mouse: navigate"
+text = "Left-drag: apply active tool\nRectangle: drag corner to corner\nElevation/Style Sample: click a cell\nEsc: cancel gesture\nMiddle/right mouse: navigate"
 autowrap_mode = 2
 
 [node name="StatusLabel" type="Label" parent="."]

@@ -86,6 +86,16 @@ rules. Keep level-specific coordinates and transient tuning out of this file.
 
 ## Editor usability and art validation
 
+- Make diagnostic grids and checkers optional editor overlays, disabled by default when the
+  designer is judging final floor art. Never make a diagnostic pattern the only material on a
+  textured surface: it prevents the editor from checking the texture, lighting and projection it
+  is meant to diagnose. When the editor viewport cannot provide dependable scene lighting, use
+  transient unshaded duplicates for its generated preview rather than changing the shared runtime
+  materials; a texture that exists but renders almost black is not an editable visual reference.
+- When introducing an experimental floor system, copy only the source textures it actively needs
+  into a clearly owned game-art folder and leave established material references untouched. Point
+  new styles at those copies so the prototype can grow its own floor library without migrating or
+  risking existing levels prematurely.
 - Treat editor overlays as supplemental information, not a bright replacement for authored
   materials. Keep their luminance and opacity low enough that underlying checker or texture detail
   remains visible, and pair colour coding with exact text for editors with impaired vision. The M4
@@ -148,3 +158,6 @@ rules. Keep level-specific coordinates and transient tuning out of this file.
   retained while those authoring affordances were revised. The retry accepted direct shape buttons,
   out-of-bounds painting and complete undo/redo; automatic extent compaction was added after the
   saved test gesture exposed redundant empty storage.
+- The M5 texture-library retry exposed lit horizontal FloorSurface previews rendering almost black
+  in the editor even though their vertical faces retained texture detail. Editor preview materials
+  are therefore unshaded transient copies; runtime styles keep their authored lighting response.

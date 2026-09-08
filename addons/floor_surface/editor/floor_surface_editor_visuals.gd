@@ -7,6 +7,10 @@ extends RefCounted
 const ELEVATION_OVERLAY := preload(
 	"res://addons/floor_surface/editor/floor_surface_elevation_overlay.gd"
 )
+const GRID_SHADER := preload(
+	"res://addons/floor_surface/shaders/floor_surface_debug_grid.gdshader"
+)
+const GRID_SURFACE_OFFSET := 0.035
 
 var _target: Node3D
 var _footprint_mesh: MeshInstance3D
@@ -14,6 +18,8 @@ var _footprint_box: BoxMesh
 var _footprint_material: StandardMaterial3D
 var _elevation_mesh: MeshInstance3D
 var _elevation_material: StandardMaterial3D
+var _grid_mesh: MeshInstance3D
+var _grid_material: ShaderMaterial
 
 
 ## Adds unsaved preview children to the selected FloorSurface.
@@ -47,6 +53,16 @@ func attach(target: Node3D) -> void:
 	_target.add_child(_elevation_mesh)
 	_elevation_mesh.owner = null
 
+	_grid_mesh = MeshInstance3D.new()
+	_grid_mesh.name = "_FloorSurfaceGridOverlay"
+	_grid_mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_grid_mesh.visible = false
+	_grid_material = ShaderMaterial.new()
+	_grid_material.shader = GRID_SHADER
+	_grid_material.render_priority = 2
+	_target.add_child(_grid_mesh)
+	_grid_mesh.owner = null
+
 
 ## Removes every transient child without touching authored scene nodes.
 func detach() -> void:
@@ -54,12 +70,16 @@ func detach() -> void:
 		_footprint_mesh.free()
 	if is_instance_valid(_elevation_mesh):
 		_elevation_mesh.free()
+	if is_instance_valid(_grid_mesh):
+		_grid_mesh.free()
 	_target = null
 	_footprint_mesh = null
 	_footprint_box = null
 	_footprint_material = null
 	_elevation_mesh = null
 	_elevation_material = null
+	_grid_mesh = null
+	_grid_material = null
 
 
 ## Updates the rectangular brush feedback above its intended world height.
@@ -116,3 +136,28 @@ func update_elevation_overlay(
 	if overlay_mesh.get_surface_count() > 0:
 		overlay_mesh.surface_set_material(0, _elevation_material)
 	_elevation_mesh.mesh = overlay_mesh
+
+
+## Rebuilds and toggles the optional editor-only grid over the real floor materials.
+func update_grid_overlay(
+	floor_map: Resource,
+	profile: Resource,
+	cell_size: float,
+	world_origin_xz: Vector2,
+	visible: bool
+) -> void:
+	if not is_instance_valid(_grid_mesh):
+		return
+	_grid_mesh.visible = visible
+	if not visible or floor_map == null or profile == null:
+		return
+	var overlay_mesh := ELEVATION_OVERLAY.build_mesh(
+		floor_map,
+		profile,
+		cell_size,
+		world_origin_xz,
+		GRID_SURFACE_OFFSET
+	)
+	if overlay_mesh.get_surface_count() > 0:
+		overlay_mesh.surface_set_material(0, _grid_material)
+	_grid_mesh.mesh = overlay_mesh

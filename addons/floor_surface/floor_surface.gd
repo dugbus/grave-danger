@@ -9,6 +9,9 @@ const PROFILE_SCRIPT := preload("res://addons/floor_surface/floor_elevation_prof
 const STYLE_SCRIPT := preload("res://addons/floor_surface/floor_style.gd")
 const SAMPLE_SCRIPT := preload("res://addons/floor_surface/floor_surface_sample.gd")
 const BUILDER_SCRIPT := preload("res://addons/floor_surface/floor_surface_geometry_builder.gd")
+const EDITOR_MATERIAL_PREVIEW := preload(
+	"res://addons/floor_surface/editor/floor_surface_editor_material_preview.gd"
+)
 
 signal surface_rebuilt(cell_count: int)
 
@@ -185,7 +188,7 @@ func validate_configuration() -> Array[String]:
 		if style == null:
 			errors.append("Palette entry %d is not a FloorStyle." % style_index)
 		else:
-			for style_error in style.validate_flat_top():
+			for style_error in style.validate():
 				errors.append("Palette entry %d: %s" % [style_index, style_error])
 	var surface_transform := global_transform if is_inside_tree() else transform
 	if not surface_transform.is_equal_approx(Transform3D.IDENTITY):
@@ -246,7 +249,9 @@ func _rebuild_editor_preview() -> int:
 		cell_size,
 		world_origin_xz
 	)
-	preview.mesh = result["mesh"] as ArrayMesh
+	var preview_mesh := result["mesh"] as ArrayMesh
+	EDITOR_MATERIAL_PREVIEW.apply_to_mesh(preview_mesh)
+	preview.mesh = preview_mesh
 	_generated_cell_count = result["cell_count"] as int
 	_rebuild_count += 1
 	surface_rebuilt.emit(_generated_cell_count)
@@ -291,4 +296,7 @@ func _get_observed_resources() -> Array[Resource]:
 	for style in styles:
 		if style != null:
 			resources.append(style)
+			for material in [style.top_material, style.edge_material, style.pit_bottom_material]:
+				if material != null and not resources.has(material):
+					resources.append(material)
 	return resources

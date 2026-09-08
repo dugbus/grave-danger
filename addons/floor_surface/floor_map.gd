@@ -279,6 +279,29 @@ func set_cell_style(cell: Vector2i, style_index: int) -> bool:
 	return true
 
 
+## Returns detached, deterministically ordered style overrides for editor undo.
+func get_style_snapshot() -> Dictionary[Vector2i, int]:
+	return style_overrides.duplicate()
+
+
+## Restores style intent while rejecting entries outside current tile storage.
+func apply_style_snapshot(overrides: Dictionary[Vector2i, int]) -> bool:
+	var sanitized: Dictionary[Vector2i, int] = {}
+	for cell_value in overrides.keys():
+		var cell := cell_value as Vector2i
+		if not is_in_bounds(cell):
+			continue
+		var style_index := overrides[cell] as int
+		if style_index != default_style_index:
+			sanitized[cell] = style_index
+	sanitized = _sort_integer_overrides(sanitized)
+	if sanitized == style_overrides:
+		return false
+	style_overrides = sanitized
+	emit_changed()
+	return true
+
+
 ## Returns the named transition authored for a present cell; absent cells are flat.
 func get_cell_transition(cell: Vector2i) -> Transition:
 	if not has_floor(cell):
