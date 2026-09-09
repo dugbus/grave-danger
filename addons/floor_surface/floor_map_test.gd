@@ -11,6 +11,7 @@ func run(_tree: SceneTree) -> void:
 	_test_bounds_expand_without_implicit_floor()
 	_test_elevation_snapshots()
 	_test_style_snapshots()
+	_test_transition_snapshots()
 	_test_sparse_authored_values_and_palette_validation()
 	_test_text_resource_round_trip()
 
@@ -92,6 +93,32 @@ func _test_style_snapshots() -> void:
 		not floor_map.style_overrides.has(Vector2i(9, 9)),
 		"Style snapshots cannot add data outside tile storage."
 	)
+
+
+func _test_transition_snapshots() -> void:
+	var floor_map := SUBJECT.new()
+	floor_map.dimensions = Vector2i(3, 1)
+	floor_map.default_present = true
+	var before := floor_map.get_transition_snapshot()
+	expect(
+		floor_map.set_cell_transition(
+			Vector2i(1, 0),
+			SUBJECT.Transition.Ramp,
+			SUBJECT.LowEdge.West,
+			2
+		),
+		"A ramp stores its named transition, low edge and low anchor elevation together."
+	)
+	expect_equal(
+		floor_map.get_cell_transition(Vector2i(1, 0)),
+		SUBJECT.Transition.Ramp,
+		"The authored ramp transition is queryable."
+	)
+	expect_equal(floor_map.get_cell_low_edge(Vector2i(1, 0)), SUBJECT.LowEdge.West, "Low edge is named.")
+	expect_equal(floor_map.get_cell_elevation(Vector2i(1, 0)), 2, "Ramp anchor uses the inferred low band.")
+	expect(floor_map.apply_transition_snapshot(before), "Undo restores all ramp fields together.")
+	expect_equal(floor_map.get_cell_transition(Vector2i(1, 0)), SUBJECT.Transition.Flat, "Undo removes the ramp.")
+	expect_equal(floor_map.get_cell_elevation(Vector2i(1, 0)), 0, "Undo restores the prior elevation.")
 
 
 func _test_presence_snapshots_and_unique_copy() -> void:

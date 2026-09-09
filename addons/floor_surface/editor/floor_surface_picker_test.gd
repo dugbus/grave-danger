@@ -22,6 +22,27 @@ func run(_tree: SceneTree) -> void:
 		surface
 	)
 	expect_equal(top_hit, Vector3(0.5, 6.0, 0.5), "Picking reaches a 24-unit top at six metres.")
+	var ramp_map := FLOOR_MAP_SCRIPT.new()
+	ramp_map.dimensions = Vector2i(3, 3)
+	ramp_map.default_present = true
+	ramp_map.set_cell_elevation(Vector2i(2, 1), 1)
+	ramp_map.set_cell_transition(
+		Vector2i.ONE,
+		FLOOR_MAP_SCRIPT.Transition.Ramp,
+		FLOOR_MAP_SCRIPT.LowEdge.West,
+		0
+	)
+	surface.floor_map = ramp_map
+	var ramp_hit := SUBJECT.pick_world_position(
+		Vector3(1.25, 2.0, 1.5),
+		Vector3(0.5, -2.0, 0.0).normalized(),
+		surface
+	) as Vector3
+	expect(
+		ramp_hit.distance_to(Vector3(1.70588, 0.17647, 1.5)) < 0.001,
+		"Angled editor picking converges on the interpolated ramp plane."
+	)
+	surface.floor_map = floor_map
 	floor_map.set_floor_present(Vector2i.ZERO, false)
 	var fallback_hit: Variant = SUBJECT.pick_world_position(
 		Vector3(2.5, 10.0, 3.5),

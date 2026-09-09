@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://addons/floor_surface/editor/floor_surface_dock.gd" id="1_dock"]
 
@@ -9,6 +9,8 @@
 [sub_resource type="ButtonGroup" id="ButtonGroup_elevation_operation"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_style_operation"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_transition_operation"]
 
 [node name="FloorSurfaceDock" type="VBoxContainer"]
 custom_minimum_size = Vector2(280, 0)
@@ -85,6 +87,14 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_edit_mode")
 text = "Style"
 
+[node name="TransitionButton" type="Button" parent="EditModeButtons"]
+unique_name_in_owner = true
+disabled = true
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = SubResource("ButtonGroup_edit_mode")
+text = "Ramp"
+
 [node name="ShapeControls" type="VBoxContainer" parent="."]
 unique_name_in_owner = true
 
@@ -153,7 +163,7 @@ unique_name_in_owner = true
 disabled = true
 
 [node name="StyleGuidance" type="Label" parent="StyleControls"]
-text = "Paint chooses a palette entry. Edit that FloorStyle resource in the Inspector to change its top, edge, pit bottom, projection scale or depth."
+text = "Paint chooses a palette entry. Edit that FloorStyle resource in the Inspector to set separate Top, Wall and Pit Bottom materials, floor/wall texture scales and pit depth."
 autowrap_mode = 2
 
 [node name="StyleOperationButtons" type="HBoxContainer" parent="StyleControls"]
@@ -176,6 +186,37 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_style_operation")
 text = "Sample"
 tooltip_text = "Click a floor or bounded hole cell to copy its style into the selector."
+
+[node name="TransitionControls" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+
+[node name="TransitionGuidance" type="Label" parent="TransitionControls"]
+text = "Drag between a flat high landing and a flat low landing. Tiles between them become one continuous ramp; a longer drag makes the same rise gentler."
+autowrap_mode = 2
+
+[node name="TransitionOperationButtons" type="HFlowContainer" parent="TransitionControls"]
+
+[node name="PaintRampButton" type="Button" parent="TransitionControls/TransitionOperationButtons"]
+unique_name_in_owner = true
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_transition_operation")
+text = "Paint Ramp"
+
+[node name="EraseRampButton" type="Button" parent="TransitionControls/TransitionOperationButtons"]
+unique_name_in_owner = true
+toggle_mode = true
+button_group = SubResource("ButtonGroup_transition_operation")
+text = "Make Flat"
+tooltip_text = "Remove the ramp transition while preserving this cell's current elevation."
+
+[node name="RotateRampButton" type="Button" parent="TransitionControls/TransitionOperationButtons"]
+unique_name_in_owner = true
+toggle_mode = true
+button_group = SubResource("ButtonGroup_transition_operation")
+text = "Rotate 90°"
+tooltip_text = "Correct an existing ramp by rotating its low edge clockwise."
 
 [node name="ShapeModeLabel" type="Label" parent="."]
 text = "Painting tool"
@@ -211,7 +252,7 @@ unique_name_in_owner = true
 text = "Cell —"
 
 [node name="Instructions" type="Label" parent="."]
-text = "Left-drag: apply active tool\nRectangle: drag corner to corner\nElevation/Style Sample: click a cell\nEsc: cancel gesture\nMiddle/right mouse: navigate"
+text = "Left-drag: apply active tool\nRamp Paint: drag between flat high/low landings\nRectangle: drag corner to corner\nElevation/Style Sample: click a cell\nEsc: cancel gesture\nMiddle/right mouse: navigate"
 autowrap_mode = 2
 
 [node name="StatusLabel" type="Label" parent="."]

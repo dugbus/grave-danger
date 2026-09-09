@@ -3,9 +3,9 @@ extends Node3D
 
 ## Runtime coordinator for the isolated human-testable floor-surface fixture.
 
-const FIXTURE_ID := "M5 / styled-mixed-rim-pit-v1"
+const FIXTURE_ID := "M6 / authored-ramp-route-v1"
 const CAMERA_VIEW_COUNT := 3
-const TRIAL_COUNT := 3
+const TRIAL_COUNT := 4
 const HUD_REFRESH_SECONDS := 0.1
 const CAMERA_SETTINGS_SCRIPT := preload(
 	"res://addons/floor_surface/test/floor_surface_camera_settings.gd"
@@ -27,7 +27,7 @@ const MAP_SCRIPT := preload("res://addons/floor_surface/floor_map.gd")
 @export var surface_path: NodePath = ^"FloorSurface"
 ## Label updated with live controller and future floor-surface information.
 @export var status_label_path: NodePath = ^"HUD/Panel/Margin/Rows/Status"
-## Repeatable main, low-lane and high-lane player reset points cycled with T.
+## Repeatable room, comparison-lane and ramp-route player reset points cycled with T.
 @export var trial_start_paths: Array[NodePath] = []
 ## Camera focus points paired with the repeatable trial starts.
 @export var trial_focus_paths: Array[NodePath] = []
@@ -97,7 +97,7 @@ func get_camera_view_name() -> String:
 	return camera_settings.get_view_name(current_camera_view)
 
 
-## Advances among the accepted room and the two local-delta comparison lanes.
+## Advances among the accepted room, comparison lanes and authored ramp route.
 func cycle_trial() -> void:
 	if _trial_starts.is_empty():
 		return
@@ -158,7 +158,7 @@ func _format_surface_status(sample: SAMPLE_SCRIPT) -> String:
 	return (
 		"Floor surface: valid\nCell: (%d, %d) | sampled height: %.2f m\n"
 		+ "Elevation: %d units | unit: %.2f m | normal: (%.1f, %.1f, %.1f)\n"
-		+ "East edge: %s | delta: %s\nStyle: %d — %s | transition: %s"
+		+ "East edge: %s | delta: %s\nStyle: %d — %s | transition: %s | low edge: %s"
 	) % [
 		sample.cell.x,
 		sample.cell.y,
@@ -173,6 +173,9 @@ func _format_surface_status(sample: SAMPLE_SCRIPT) -> String:
 		sample.style_index,
 		_get_style_name(sample.style_index),
 		floor_surface.floor_map.get_transition_name(sample.transition),
+		floor_surface.floor_map.get_low_edge_name(
+			floor_surface.floor_map.get_cell_low_edge(sample.cell)
+		),
 	]
 
 

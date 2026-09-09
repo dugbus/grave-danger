@@ -54,6 +54,6 @@ func _test_region_without_rim_has_no_bottom() -> void:
 func _make_style(depth: float) -> STYLE_SCRIPT:
 	var style := STYLE_SCRIPT.new()
 	style.top_material = StandardMaterial3D.new()
-	style.edge_material = StandardMaterial3D.new()
+	style.wall_material = StandardMaterial3D.new()
 	style.pit_depth = depth
 	return style

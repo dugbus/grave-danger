@@ -15,6 +15,9 @@ func run(_tree: SceneTree) -> void:
 	_test_owned_ledge_rendering_and_collision()
 	_test_pit_bottom_materials_projection_and_collision()
 	_test_material_only_style_change_preserves_collision()
+	_test_ramp_top_side_and_collision_geometry()
+	_test_ramp_sequence_has_watertight_landing_seams()
+	_test_contiguous_ramp_run_has_watertight_seams()
 
 
 func _test_flat_top_batching() -> void:
@@ -71,7 +74,7 @@ func _test_owned_ledge_rendering_and_collision() -> void:
 	profile.elevation_unit = 0.25
 	var style := STYLE_SCRIPT.new()
 	style.top_material = StandardMaterial3D.new()
-	style.edge_material = StandardMaterial3D.new()
+	style.wall_material = StandardMaterial3D.new()
 	var styles: Array[STYLE_SCRIPT] = [style]
 	var result := SUBJECT.new().build(floor_map, profile, styles, 1.0, Vector2.ZERO)
 	var mesh := result["mesh"] as ArrayMesh
@@ -104,12 +107,13 @@ func _test_pit_bottom_materials_projection_and_collision() -> void:
 	profile.elevation_unit = 0.25
 	var teal_style := STYLE_SCRIPT.new()
 	teal_style.top_material = StandardMaterial3D.new()
-	teal_style.edge_material = StandardMaterial3D.new()
+	teal_style.wall_material = StandardMaterial3D.new()
 	teal_style.pit_depth = 1.0
 	var stone_style := STYLE_SCRIPT.new()
 	stone_style.world_uv_metres = 0.5
+	stone_style.wall_uv_metres = 0.25
 	stone_style.top_material = StandardMaterial3D.new()
-	stone_style.edge_material = StandardMaterial3D.new()
+	stone_style.wall_material = StandardMaterial3D.new()
 	stone_style.pit_bottom_material = StandardMaterial3D.new()
 	stone_style.pit_depth = 3.0
 	var styles: Array[STYLE_SCRIPT] = [teal_style, stone_style]
@@ -120,7 +124,7 @@ func _test_pit_bottom_materials_projection_and_collision() -> void:
 	expect_equal(result["pit_bottom_cell_count"], 1, "Only the styled absent cell gets a visual bottom.")
 	expect_equal(mesh.get_surface_count(), 5, "Top and edge batches stay separate by style and pit material.")
 	var top_surface := _find_material_surface(mesh, stone_style.top_material)
-	var edge_surface := _find_material_surface(mesh, stone_style.edge_material)
+	var edge_surface := _find_material_surface(mesh, stone_style.wall_material)
 	var pit_surface := _find_material_surface(mesh, stone_style.pit_bottom_material)
 	expect(top_surface >= 0 and edge_surface >= 0 and pit_surface >= 0, "Every independent style material is used.")
 	var top_arrays := mesh.surface_get_arrays(top_surface)
@@ -139,8 +143,8 @@ func _test_pit_bottom_materials_projection_and_collision() -> void:
 	var edge_vertices := edge_arrays[Mesh.ARRAY_VERTEX] as PackedVector3Array
 	var edge_uvs := edge_arrays[Mesh.ARRAY_TEX_UV] as PackedVector2Array
 	expect(
-		edge_uvs.has(Vector2(28.0, 5.0)),
-		"Axis-aligned side UVs use world horizontal/Y projection at the same scale."
+		edge_uvs.has(Vector2(56.0, 10.0)),
+		"Wall UVs use their own continuous world scale instead of the floor scale."
 	)
 	expect(
 		edge_vertices.has(Vector3(14.0, -2.5, -4.0)),
@@ -164,10 +168,10 @@ func _test_material_only_style_change_preserves_collision() -> void:
 	var profile := PROFILE_SCRIPT.new()
 	var first_style := STYLE_SCRIPT.new()
 	first_style.top_material = StandardMaterial3D.new()
-	first_style.edge_material = StandardMaterial3D.new()
+	first_style.wall_material = StandardMaterial3D.new()
 	var second_style := STYLE_SCRIPT.new()
 	second_style.top_material = StandardMaterial3D.new()
-	second_style.edge_material = StandardMaterial3D.new()
+	second_style.wall_material = StandardMaterial3D.new()
 	var styles: Array[STYLE_SCRIPT] = [first_style, second_style]
 	var before := SUBJECT.new().build(floor_map, profile, styles, 1.0, Vector2.ZERO)
 	floor_map.set_cell_style(Vector2i(1, 0), 1)
@@ -182,11 +186,125 @@ func _test_material_only_style_change_preserves_collision() -> void:
 	)
 
 
+func _test_ramp_top_side_and_collision_geometry() -> void:
+	var floor_map := MAP_SCRIPT.new()
+	floor_map.dimensions = Vector2i(3, 3)
+	floor_map.default_present = true
+	floor_map.set_cell_elevation(Vector2i(2, 1), 1)
+	floor_map.set_cell_transition(
+		Vector2i.ONE,
+		MAP_SCRIPT.Transition.Ramp,
+		MAP_SCRIPT.LowEdge.West,
+		0
+	)
+	var profile := PROFILE_SCRIPT.new()
+	var style := STYLE_SCRIPT.new()
+	style.top_material = StandardMaterial3D.new()
+	style.wall_material = StandardMaterial3D.new()
+	var styles: Array[STYLE_SCRIPT] = [style]
+	var result := SUBJECT.new().build(floor_map, profile, styles, 1.0, Vector2.ZERO)
+	var mesh := result["mesh"] as ArrayMesh
+	var top_surface := _find_material_surface(mesh, style.top_material)
+	var edge_surface := _find_material_surface(mesh, style.wall_material)
+	var top_arrays := mesh.surface_get_arrays(top_surface)
+	var top_vertices := top_arrays[Mesh.ARRAY_VERTEX] as PackedVector3Array
+	var top_normals := top_arrays[Mesh.ARRAY_NORMAL] as PackedVector3Array
+	var edge_arrays := mesh.surface_get_arrays(edge_surface)
+	var edge_vertices := edge_arrays[Mesh.ARRAY_VERTEX] as PackedVector3Array
+	var collision_shape := result["collision_shape"] as ConcavePolygonShape3D
+	expect_equal(result["ramp_cell_count"], 1, "One valid transition generates one ramp cell.")
+	expect_equal(result["invalid_ramp_count"], 0, "The valid ramp needs no flat fallback warning.")
+	expect(top_vertices.has(Vector3(1.0, 0.0, 1.0)), "Ramp west corners meet the low landing.")
+	expect(top_vertices.has(Vector3(2.0, 0.25, 1.0)), "Ramp east corners meet the high landing.")
+	expect(
+		_has_sloped_normal(top_normals),
+		"Ramp top vertices carry the shared interpolated slope normal."
+	)
+	expect(
+		edge_vertices.has(Vector3(2.0, 0.25, 1.0)) \
+			and edge_vertices.has(Vector3(1.0, 0.0, 1.0)),
+		"A side neighbour at the low band produces a triangular ramp side."
+	)
+	expect(
+		collision_shape.get_faces().has(Vector3(2.0, 0.25, 1.0)),
+		"Ramp collision is generated from the same sloped corner heights."
+	)
+	expect(_all_rendered_faces_use_clockwise_winding(mesh), "Ramp faces retain visible winding.")
+
+
+func _test_ramp_sequence_has_watertight_landing_seams() -> void:
+	var floor_map := MAP_SCRIPT.new()
+	floor_map.dimensions = Vector2i(5, 1)
+	floor_map.default_present = true
+	floor_map.set_cell_elevation(Vector2i(2, 0), 1)
+	floor_map.set_cell_elevation(Vector2i(3, 0), 1)
+	floor_map.set_cell_elevation(Vector2i(4, 0), 2)
+	floor_map.set_cell_transition(
+		Vector2i(1, 0), MAP_SCRIPT.Transition.Ramp, MAP_SCRIPT.LowEdge.West, 0
+	)
+	floor_map.set_cell_transition(
+		Vector2i(3, 0), MAP_SCRIPT.Transition.Ramp, MAP_SCRIPT.LowEdge.West, 1
+	)
+	var style := STYLE_SCRIPT.new()
+	style.top_material = StandardMaterial3D.new()
+	style.wall_material = StandardMaterial3D.new()
+	var styles: Array[STYLE_SCRIPT] = [style]
+	var result := SUBJECT.new().build(
+		floor_map, PROFILE_SCRIPT.new(), styles, 1.0, Vector2.ZERO
+	)
+	expect_equal(result["ramp_cell_count"], 2, "A ramp/landing/ramp route resolves both transitions.")
+	expect_equal(result["invalid_ramp_count"], 0, "Sequenced ramp endpoints remain valid.")
+	expect_equal(
+		result["ledge_face_count"],
+		12,
+		"Matched ramp-to-landing seams do not generate internal vertical faces."
+	)
+
+
+func _test_contiguous_ramp_run_has_watertight_seams() -> void:
+	var floor_map := MAP_SCRIPT.new()
+	floor_map.dimensions = Vector2i(7, 1)
+	floor_map.default_present = true
+	floor_map.set_cell_elevation(Vector2i(6, 0), 12)
+	for x_coordinate in range(1, 6):
+		floor_map.set_cell_transition(
+			Vector2i(x_coordinate, 0),
+			MAP_SCRIPT.Transition.Ramp,
+			MAP_SCRIPT.LowEdge.West
+		)
+	var style := STYLE_SCRIPT.new()
+	style.top_material = StandardMaterial3D.new()
+	style.wall_material = StandardMaterial3D.new()
+	var styles: Array[STYLE_SCRIPT] = [style]
+	var result := SUBJECT.new().build(
+		floor_map, PROFILE_SCRIPT.new(), styles, 1.0, Vector2.ZERO
+	)
+	expect_equal(result["ramp_cell_count"], 5, "Every tile in the variable run generates a ramp top.")
+	expect_equal(result["invalid_ramp_count"], 0, "A three-metre rise over five tiles has no slope cap.")
+	expect_equal(
+		result["ledge_face_count"],
+		16,
+		"Continuous ramp seams add no internal walls while exposed sides remain complete."
+	)
+	var collision_shape := result["collision_shape"] as ConcavePolygonShape3D
+	expect(
+		collision_shape.get_faces().has(Vector3(3.0, 1.2, 0.0)),
+		"Ramp collision reaches the exact interpolated height at an internal seam."
+	)
+
+
 func _find_material_surface(mesh: ArrayMesh, material: Material) -> int:
 	for surface_index in mesh.get_surface_count():
 		if mesh.surface_get_material(surface_index) == material:
 			return surface_index
 	return -1
+
+
+func _has_sloped_normal(normals: PackedVector3Array) -> bool:
+	for normal in normals:
+		if normal.x < -0.2 and normal.y > 0.9:
+			return true
+	return false
 
 
 func _has_horizontal_triangle_at_height(faces: PackedVector3Array, height: float) -> bool:

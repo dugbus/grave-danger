@@ -9,6 +9,7 @@ const PROFILE_SCRIPT := preload("res://addons/floor_surface/floor_elevation_prof
 const STYLE_SCRIPT := preload("res://addons/floor_surface/floor_style.gd")
 const SAMPLE_SCRIPT := preload("res://addons/floor_surface/floor_surface_sample.gd")
 const BUILDER_SCRIPT := preload("res://addons/floor_surface/floor_surface_geometry_builder.gd")
+const RAMP_RESOLVER_SCRIPT := preload("res://addons/floor_surface/floor_surface_ramp_resolver.gd")
 const EDITOR_MATERIAL_PREVIEW := preload(
 	"res://addons/floor_surface/editor/floor_surface_editor_material_preview.gd"
 )
@@ -55,6 +56,7 @@ signal surface_rebuilt(cell_count: int)
 @onready var collision_shape := get_node_or_null(collision_shape_path) as CollisionShape3D
 
 var _builder := BUILDER_SCRIPT.new()
+var _ramp_resolver := RAMP_RESOLVER_SCRIPT.new()
 var _rebuild_count := 0
 var _generated_cell_count := 0
 var _rebuild_queued := false
@@ -134,6 +136,14 @@ func classify_edge(
 	if floor_map == null or elevation_profile == null \
 			or not floor_map.has_floor(from_cell) or not floor_map.has_floor(to_cell):
 		return PROFILE_SCRIPT.TraversalClass.BlockedLedge
+	if _ramp_resolver.is_continuous_connection(
+		floor_map,
+		elevation_profile,
+		from_cell,
+		to_cell,
+		cell_size
+	):
+		return PROFILE_SCRIPT.TraversalClass.Flat
 	return elevation_profile.classify_edge(
 		floor_map.get_cell_elevation(from_cell),
 		floor_map.get_cell_elevation(to_cell)
@@ -160,14 +170,37 @@ func world_to_cell(world_position: Vector3) -> Vector2i:
 func sample_surface(world_position: Vector3) -> SAMPLE_SCRIPT:
 	var sampled_cell := world_to_cell(world_position)
 	var sample := SAMPLE_SCRIPT.new()
-	if floor_map == null or not floor_map.has_floor(sampled_cell):
+	if floor_map == null or elevation_profile == null or not floor_map.has_floor(sampled_cell):
 		return sample.set_invalid(sampled_cell)
-	return sample.set_flat(
+	var description := get_cell_surface_description(sampled_cell)
+	var local_xz := Vector2(
+		(world_position.x - world_origin_xz.x) / cell_size - sampled_cell.x,
+		(world_position.z - world_origin_xz.y) / cell_size - sampled_cell.y
+	)
+	return sample.set_surface(
 		sampled_cell,
-		get_world_height_at_cell(sampled_cell),
+		_ramp_resolver.sample_height(description, local_xz),
+		description.get("normal", Vector3.UP) as Vector3,
 		floor_map.get_cell_style(sampled_cell),
 		floor_map.get_cell_transition(sampled_cell)
 	)
+
+
+## Returns the shared top description used by mesh, collision, queries and editor tools.
+func get_cell_surface_description(cell: Vector2i) -> Dictionary:
+	if floor_map == null or elevation_profile == null:
+		return {"valid": false, "error": "Floor surface resources are incomplete."}
+	return _ramp_resolver.resolve_cell(floor_map, elevation_profile, cell, cell_size)
+
+
+## Returns an actionable message for an invalid authored ramp, or an empty string.
+func get_transition_error(cell: Vector2i) -> String:
+	if floor_map == null or floor_map.get_cell_transition(cell) == MAP_SCRIPT.Transition.Flat:
+		return ""
+	var description := get_cell_surface_description(cell)
+	if description.get("valid", false) as bool:
+		return ""
+	return description.get("error", "Invalid ramp.") as String
 
 
 ## Reports invalid resources, palette references and unsupported root transforms.
@@ -183,6 +216,8 @@ func validate_configuration() -> Array[String]:
 		errors.append("FloorSurface needs a FloorElevationProfile resource.")
 	else:
 		errors.append_array(elevation_profile.validate())
+		if floor_map != null:
+			errors.append_array(_ramp_resolver.validate_map(floor_map, elevation_profile, cell_size))
 	for style_index in styles.size():
 		var style := styles[style_index] as STYLE_SCRIPT
 		if style == null:
@@ -296,7 +331,11 @@ func _get_observed_resources() -> Array[Resource]:
 	for style in styles:
 		if style != null:
 			resources.append(style)
-			for material in [style.top_material, style.edge_material, style.pit_bottom_material]:
+			for material in [
+				style.top_material,
+				style.get_wall_material(),
+				style.pit_bottom_material,
+			]:
 				if material != null and not resources.has(material):
 					resources.append(material)
 	return resources

@@ -316,6 +316,91 @@ func get_cell_low_edge(cell: Vector2i) -> LowEdge:
 	return int(low_edge_overrides.get(cell, LowEdge.None)) as LowEdge
 
 
+## Applies one transition intent and optional ramp anchor elevation as one map change.
+func set_cell_transition(
+	cell: Vector2i,
+	transition: Transition,
+	low_edge := LowEdge.None,
+	ramp_elevation := INVALID_ELEVATION
+) -> bool:
+	if not has_floor(cell):
+		return false
+	var next_transitions := transition_overrides.duplicate() as Dictionary[Vector2i, int]
+	var next_low_edges := low_edge_overrides.duplicate() as Dictionary[Vector2i, int]
+	var next_elevations := elevation_overrides.duplicate() as Dictionary[Vector2i, int]
+	if transition == Transition.Flat:
+		next_transitions.erase(cell)
+		next_low_edges.erase(cell)
+	else:
+		next_transitions[cell] = transition
+		if low_edge == LowEdge.None:
+			next_low_edges.erase(cell)
+		else:
+			next_low_edges[cell] = low_edge
+		if ramp_elevation != INVALID_ELEVATION:
+			if ramp_elevation == default_elevation:
+				next_elevations.erase(cell)
+			else:
+				next_elevations[cell] = ramp_elevation
+	var changed := next_transitions != transition_overrides \
+		or next_low_edges != low_edge_overrides \
+		or next_elevations != elevation_overrides
+	if not changed:
+		return false
+	transition_overrides = _sort_integer_overrides(next_transitions)
+	low_edge_overrides = _sort_integer_overrides(next_low_edges)
+	elevation_overrides = _sort_integer_overrides(next_elevations)
+	emit_changed()
+	return true
+
+
+## Returns detached transition, orientation and anchor-height state for editor undo.
+func get_transition_snapshot() -> Dictionary:
+	return {
+		"elevation_overrides": get_elevation_snapshot(),
+		"low_edge_overrides": low_edge_overrides.duplicate(),
+		"transition_overrides": transition_overrides.duplicate(),
+	}
+
+
+## Restores complete transition intent while discarding absent and out-of-bounds entries.
+func apply_transition_snapshot(snapshot: Dictionary) -> bool:
+	var restored_elevations := snapshot.get(
+		"elevation_overrides",
+		elevation_overrides
+	) as Dictionary[Vector2i, int]
+	var restored_transitions := snapshot.get(
+		"transition_overrides",
+		transition_overrides
+	) as Dictionary[Vector2i, int]
+	var restored_low_edges := snapshot.get(
+		"low_edge_overrides",
+		low_edge_overrides
+	) as Dictionary[Vector2i, int]
+	var sanitized_transitions: Dictionary[Vector2i, int] = {}
+	var sanitized_low_edges: Dictionary[Vector2i, int] = {}
+	for cell in _sorted_override_cells(restored_transitions):
+		if not has_floor(cell):
+			continue
+		var transition := restored_transitions[cell] as int
+		if transition != Transition.Flat:
+			sanitized_transitions[cell] = transition
+			var low_edge := restored_low_edges.get(cell, LowEdge.None) as int
+			if low_edge != LowEdge.None:
+				sanitized_low_edges[cell] = low_edge
+	var sanitized_elevations := _bounded_integer_overrides(restored_elevations)
+	var changed := sanitized_transitions != transition_overrides \
+		or sanitized_low_edges != low_edge_overrides \
+		or sanitized_elevations != elevation_overrides
+	if not changed:
+		return false
+	transition_overrides = sanitized_transitions
+	low_edge_overrides = sanitized_low_edges
+	elevation_overrides = sanitized_elevations
+	emit_changed()
+	return true
+
+
 ## Returns present cells in stable Z-major then X-major order.
 func get_present_cells() -> Array[Vector2i]:
 	var cells: Array[Vector2i] = []
@@ -357,6 +442,21 @@ func get_transition_name(transition: Transition) -> String:
 			return "Ramp"
 		_:
 			return "Flat"
+
+
+## Returns a stable display name for a ramp's low edge.
+func get_low_edge_name(low_edge: LowEdge) -> String:
+	match low_edge:
+		LowEdge.North:
+			return "North"
+		LowEdge.East:
+			return "East"
+		LowEdge.South:
+			return "South"
+		LowEdge.West:
+			return "West"
+		_:
+			return "None"
 
 
 func _sort_integer_overrides(

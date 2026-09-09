@@ -8,6 +8,7 @@ const MAP_SCRIPT := preload("res://addons/floor_surface/floor_map.gd")
 const PROFILE_SCRIPT := preload("res://addons/floor_surface/floor_elevation_profile.gd")
 const STYLE_SCRIPT := preload("res://addons/floor_surface/floor_style.gd")
 const PIT_RESOLVER_SCRIPT := preload("res://addons/floor_surface/floor_surface_pit_resolver.gd")
+const RAMP_RESOLVER_SCRIPT := preload("res://addons/floor_surface/floor_surface_ramp_resolver.gd")
 
 enum EdgeDirection {
 	North,
@@ -19,6 +20,7 @@ enum EdgeDirection {
 var _cell_size := 1.0
 var _world_origin_xz := Vector2.ZERO
 var _pit_bottom_heights: Dictionary[Vector2i, float] = {}
+var _surface_descriptions: Dictionary[Vector2i, Dictionary] = {}
 
 
 ## Rebuilds batched top/edge surfaces per style and one shared static collision shape.
@@ -36,6 +38,23 @@ func build(
 	var pit_result := PIT_RESOLVER_SCRIPT.new().resolve(floor_map, profile, styles)
 	_pit_bottom_heights = pit_result["bottom_heights"] as Dictionary[Vector2i, float]
 	var present_cells := floor_map.get_present_cells()
+	_surface_descriptions.clear()
+	var ramp_resolver := RAMP_RESOLVER_SCRIPT.new()
+	var ramp_cell_count := 0
+	var invalid_ramp_count := 0
+	for cell in present_cells:
+		var description := ramp_resolver.resolve_cell(
+			floor_map,
+			profile,
+			cell,
+			_cell_size
+		)
+		_surface_descriptions[cell] = description
+		if floor_map.get_cell_transition(cell) == MAP_SCRIPT.Transition.Ramp:
+			if description.get("valid", false) as bool:
+				ramp_cell_count += 1
+			else:
+				invalid_ramp_count += 1
 	var ledge_face_count := 0
 	var pit_bottom_cell_count := 0
 	for style_index in styles.size():
@@ -49,17 +68,18 @@ func build(
 		var pit_normals: Array[Vector3] = []
 		var pit_uvs: Array[Vector2] = []
 		var style := styles[style_index] as STYLE_SCRIPT
-		var world_uv_metres := maxf(style.world_uv_metres, 0.01)
+		var top_uv_metres := maxf(style.world_uv_metres, 0.01)
+		var wall_uv_metres := maxf(style.wall_uv_metres, 0.01)
 		for cell in present_cells:
 			if _resolve_style_index(floor_map.get_cell_style(cell), styles.size()) != style_index:
 				continue
-			_append_flat_cell(
+			_append_cell_top(
 				top_vertices,
 				top_normals,
 				top_uvs,
 				cell,
-				profile.elevation_to_world(floor_map.get_cell_elevation(cell)),
-				world_uv_metres
+				_surface_descriptions[cell],
+				top_uv_metres
 			)
 			ledge_face_count += _append_owned_ledges(
 				edge_vertices,
@@ -67,9 +87,8 @@ func build(
 				edge_uvs,
 				cell,
 				floor_map,
-				profile,
 				maxf(style.pit_depth, 0.01),
-				world_uv_metres
+				wall_uv_metres
 			)
 		if style.pit_bottom_material != null:
 			for z_coordinate in range(floor_map.minimum_cell.y, floor_map.minimum_cell.y + floor_map.dimensions.y):
@@ -85,18 +104,18 @@ func build(
 						pit_uvs,
 						hole_cell,
 						_pit_bottom_heights[hole_cell],
-						world_uv_metres
+						top_uv_metres
 					)
 					pit_bottom_cell_count += 1
 		_append_mesh_surface(mesh, top_vertices, top_normals, top_uvs, style.top_material)
-		_append_mesh_surface(mesh, edge_vertices, edge_normals, edge_uvs, style.edge_material)
+		_append_mesh_surface(mesh, edge_vertices, edge_normals, edge_uvs, style.get_wall_material())
 		_append_mesh_surface(mesh, pit_vertices, pit_normals, pit_uvs, style.pit_bottom_material)
 
 	for cell in present_cells:
-		_append_flat_cell_collision(
+		_append_cell_top_collision(
 			collision_vertices,
 			cell,
-			profile.elevation_to_world(floor_map.get_cell_elevation(cell))
+			_surface_descriptions[cell]
 		)
 		var unused_normals: Array[Vector3] = []
 		var unused_uvs: Array[Vector2] = []
@@ -108,9 +127,8 @@ func build(
 			unused_uvs,
 			cell,
 			floor_map,
-			profile,
 			maxf(style.pit_depth, 0.01),
-			maxf(style.world_uv_metres, 0.01)
+			maxf(style.wall_uv_metres, 0.01)
 		)
 	var collision_shape := ConcavePolygonShape3D.new()
 	collision_shape.backface_collision = true
@@ -122,6 +140,8 @@ func build(
 		"mesh": mesh,
 		"pit_bottom_cell_count": pit_bottom_cell_count,
 		"pit_region_count": pit_result["region_count"] as int,
+		"ramp_cell_count": ramp_cell_count,
+		"invalid_ramp_count": invalid_ramp_count,
 	}
 
 
@@ -151,7 +171,22 @@ func _append_flat_cell(
 	height: float,
 	world_uv_metres: float
 ) -> void:
-	var corners := _get_cell_corners(cell, height)
+	var description := {
+		"corner_heights": [height, height, height, height] as Array[float],
+		"normal": Vector3.UP,
+	}
+	_append_cell_top(vertices, normals, uvs, cell, description, world_uv_metres)
+
+
+func _append_cell_top(
+	vertices: Array[Vector3],
+	normals: Array[Vector3],
+	uvs: Array[Vector2],
+	cell: Vector2i,
+	description: Dictionary,
+	world_uv_metres: float
+) -> void:
+	var corners := _get_cell_corners_from_description(cell, description)
 	var triangle_vertices: Array[Vector3] = [
 		corners[0], corners[2], corners[1],
 		corners[0], corners[3], corners[2],
@@ -166,16 +201,17 @@ func _append_flat_cell(
 	]
 	vertices.append_array(triangle_vertices)
 	uvs.append_array(triangle_uvs)
+	var surface_normal := description.get("normal", Vector3.UP) as Vector3
 	for _vertex in triangle_vertices:
-		normals.append(Vector3.UP)
+		normals.append(surface_normal)
 
 
-func _append_flat_cell_collision(
+func _append_cell_top_collision(
 	vertices: Array[Vector3],
 	cell: Vector2i,
-	height: float
+	description: Dictionary
 ) -> void:
-	var corners := _get_cell_corners(cell, height)
+	var corners := _get_cell_corners_from_description(cell, description)
 	vertices.append_array([
 		corners[0], corners[2], corners[1],
 		corners[0], corners[3], corners[2],
@@ -188,26 +224,25 @@ func _append_owned_ledges(
 	uvs: Array[Vector2],
 	cell: Vector2i,
 	floor_map: MAP_SCRIPT,
-	profile: PROFILE_SCRIPT,
 	exposed_depth: float,
 	world_uv_metres: float
 ) -> int:
 	var face_count := 0
 	face_count += _append_owned_ledge(
 		vertices, normals, uvs, cell, EdgeDirection.North, floor_map,
-		profile, exposed_depth, world_uv_metres
+		exposed_depth, world_uv_metres
 	)
 	face_count += _append_owned_ledge(
 		vertices, normals, uvs, cell, EdgeDirection.East, floor_map,
-		profile, exposed_depth, world_uv_metres
+		exposed_depth, world_uv_metres
 	)
 	face_count += _append_owned_ledge(
 		vertices, normals, uvs, cell, EdgeDirection.South, floor_map,
-		profile, exposed_depth, world_uv_metres
+		exposed_depth, world_uv_metres
 	)
 	face_count += _append_owned_ledge(
 		vertices, normals, uvs, cell, EdgeDirection.West, floor_map,
-		profile, exposed_depth, world_uv_metres
+		exposed_depth, world_uv_metres
 	)
 	return face_count
 
@@ -219,41 +254,55 @@ func _append_owned_ledge(
 	cell: Vector2i,
 	direction: EdgeDirection,
 	floor_map: MAP_SCRIPT,
-	profile: PROFILE_SCRIPT,
 	exposed_depth: float,
 	world_uv_metres: float
 ) -> int:
 	var neighbour := cell + _edge_offset(direction)
-	var top_height := profile.elevation_to_world(floor_map.get_cell_elevation(cell))
-	var lower_height := top_height - exposed_depth
-	if floor_map.has_floor(neighbour):
-		lower_height = profile.elevation_to_world(floor_map.get_cell_elevation(neighbour))
-	elif floor_map.is_in_bounds(neighbour) and _pit_bottom_heights.has(neighbour):
-		lower_height = _pit_bottom_heights[neighbour]
-	if lower_height >= top_height:
-		return 0
-	var corners := _get_cell_corners(cell, top_height)
+	var description := _surface_descriptions[cell] as Dictionary
+	var corners := _get_cell_corners_from_description(cell, description)
 	var edge_indices := _edge_corner_indices(direction)
 	var top_a := corners[edge_indices.x]
 	var top_b := corners[edge_indices.y]
-	var bottom_a := Vector3(top_a.x, lower_height, top_a.z)
-	var bottom_b := Vector3(top_b.x, lower_height, top_b.z)
-	vertices.append_array([
-		top_a, bottom_b, bottom_a,
-		top_a, top_b, bottom_b,
-	])
+	var lower_a := top_a.y - exposed_depth
+	var lower_b := top_b.y - exposed_depth
+	if floor_map.has_floor(neighbour):
+		lower_a = _get_neighbour_height_at_corner(neighbour, top_a)
+		lower_b = _get_neighbour_height_at_corner(neighbour, top_b)
+	elif floor_map.is_in_bounds(neighbour) and _pit_bottom_heights.has(neighbour):
+		lower_a = _pit_bottom_heights[neighbour]
+		lower_b = lower_a
+	var gap_a := top_a.y - lower_a
+	var gap_b := top_b.y - lower_b
+	if gap_a <= 0.001 and gap_b <= 0.001:
+		return 0
+	lower_a = minf(lower_a, top_a.y)
+	lower_b = minf(lower_b, top_b.y)
+	var bottom_a := Vector3(top_a.x, lower_a, top_a.z)
+	var bottom_b := Vector3(top_b.x, lower_b, top_b.z)
 	var normal := _edge_normal(direction)
-	for _vertex_index in 6:
-		normals.append(normal)
-	uvs.append_array([
-		_edge_uv(top_a, direction, world_uv_metres),
-		_edge_uv(bottom_b, direction, world_uv_metres),
-		_edge_uv(bottom_a, direction, world_uv_metres),
-		_edge_uv(top_a, direction, world_uv_metres),
-		_edge_uv(top_b, direction, world_uv_metres),
-		_edge_uv(bottom_b, direction, world_uv_metres),
-	])
+	if gap_a > 0.001 and gap_b > 0.001:
+		_append_edge_triangle(vertices, normals, uvs, [top_a, bottom_b, bottom_a], normal, direction, world_uv_metres)
+		_append_edge_triangle(vertices, normals, uvs, [top_a, top_b, bottom_b], normal, direction, world_uv_metres)
+	elif gap_a > 0.001:
+		_append_edge_triangle(vertices, normals, uvs, [top_a, top_b, bottom_a], normal, direction, world_uv_metres)
+	else:
+		_append_edge_triangle(vertices, normals, uvs, [top_a, top_b, bottom_b], normal, direction, world_uv_metres)
 	return 1
+
+
+func _append_edge_triangle(
+	vertices: Array[Vector3],
+	normals: Array[Vector3],
+	uvs: Array[Vector2],
+	triangle: Array[Vector3],
+	normal: Vector3,
+	direction: EdgeDirection,
+	world_uv_metres: float
+) -> void:
+	vertices.append_array(triangle)
+	for vertex in triangle:
+		normals.append(normal)
+		uvs.append(_edge_uv(vertex, direction, world_uv_metres))
 
 
 func _edge_offset(direction: EdgeDirection) -> Vector2i:
@@ -306,6 +355,34 @@ func _get_cell_corners(
 		Vector3(maximum_x, height, maximum_z),
 		Vector3(maximum_x, height, minimum_z),
 	]
+
+
+func _get_cell_corners_from_description(
+	cell: Vector2i,
+	description: Dictionary
+) -> Array[Vector3]:
+	var heights := description.get("corner_heights", []) as Array[float]
+	if heights.size() != 4:
+		return _get_cell_corners(cell, 0.0)
+	var minimum_x := _world_origin_xz.x + float(cell.x) * _cell_size
+	var minimum_z := _world_origin_xz.y + float(cell.y) * _cell_size
+	var maximum_x := minimum_x + _cell_size
+	var maximum_z := minimum_z + _cell_size
+	return [
+		Vector3(minimum_x, heights[0], minimum_z),
+		Vector3(minimum_x, heights[1], maximum_z),
+		Vector3(maximum_x, heights[2], maximum_z),
+		Vector3(maximum_x, heights[3], minimum_z),
+	]
+
+
+func _get_neighbour_height_at_corner(neighbour: Vector2i, corner: Vector3) -> float:
+	var neighbour_description := _surface_descriptions.get(neighbour, {}) as Dictionary
+	for neighbour_corner in _get_cell_corners_from_description(neighbour, neighbour_description):
+		if is_equal_approx(neighbour_corner.x, corner.x) \
+				and is_equal_approx(neighbour_corner.z, corner.z):
+			return neighbour_corner.y
+	return corner.y
 
 
 func _top_uv(vertex: Vector3, world_uv_metres: float) -> Vector2:

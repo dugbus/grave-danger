@@ -3,10 +3,12 @@ render_mode unshaded, cull_disabled, depth_draw_never;
 
 // Optional editor-only guide. FloorSurface supplies continuous world-scaled UVs.
 
-uniform vec4 tile_colour_a : source_color = vec4(0.10, 0.14, 0.16, 0.04);
-uniform vec4 tile_colour_b : source_color = vec4(0.22, 0.26, 0.28, 0.09);
-uniform vec4 grid_colour : source_color = vec4(0.48, 0.54, 0.56, 0.24);
-uniform float grid_width : hint_range(0.005, 0.15, 0.005) = 0.018;
+uniform vec4 tile_colour_a : source_color = vec4(0.08, 0.12, 0.14, 0.02);
+uniform vec4 tile_colour_b : source_color = vec4(0.14, 0.18, 0.20, 0.10);
+uniform vec4 grid_colour : source_color = vec4(0.32, 0.50, 0.52, 0.58);
+uniform vec4 ramp_tile_colour : source_color = vec4(0.20, 0.40, 0.46, 0.28);
+uniform float grid_width : hint_range(0.005, 0.15, 0.005) = 0.035;
+uniform bool highlight_ramps = false;
 
 void fragment() {
 	vec2 grid_position = fract(UV);
@@ -14,6 +16,8 @@ void fragment() {
 	float grid = 1.0 - step(grid_width, min(edge_distance.x, edge_distance.y));
 	float checker = mod(floor(UV.x) + floor(UV.y), 2.0);
 	vec4 tile_colour = mix(tile_colour_a, tile_colour_b, checker);
+	float ramp_mask = highlight_ramps ? COLOR.r : 0.0;
+	tile_colour = mix(tile_colour, ramp_tile_colour, ramp_mask);
 	vec4 overlay_colour = mix(tile_colour, grid_colour, grid);
 	ALBEDO = overlay_colour.rgb;
 	ALPHA = overlay_colour.a;

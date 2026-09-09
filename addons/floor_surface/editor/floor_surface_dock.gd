@@ -13,12 +13,16 @@ const ELEVATION_PAINTER := preload(
 const STYLE_PAINTER := preload(
 	"res://addons/floor_surface/editor/floor_surface_style_painter.gd"
 )
+const TRANSITION_PAINTER := preload(
+	"res://addons/floor_surface/editor/floor_surface_transition_painter.gd"
+)
 const STYLE_SCRIPT := preload("res://addons/floor_surface/floor_style.gd")
 
 enum EditMode {
 	FloorShape,
 	Elevation,
 	Style,
+	Transition,
 }
 
 signal editing_toggled(enabled: bool)
@@ -29,6 +33,7 @@ signal elevation_operation_changed(operation: int)
 signal absolute_elevation_changed(elevation: int)
 signal style_operation_changed(operation: int)
 signal style_index_changed(style_index: int)
+signal transition_operation_changed(operation: int)
 signal shape_mode_changed(shape_mode: int)
 signal brush_size_changed(brush_size: int)
 signal make_unique_requested
@@ -41,9 +46,11 @@ signal save_requested
 @onready var floor_shape_button := %FloorShapeButton as Button
 @onready var elevation_button := %ElevationButton as Button
 @onready var style_button := %StyleButton as Button
+@onready var transition_button := %TransitionButton as Button
 @onready var shape_controls := %ShapeControls as Control
 @onready var elevation_controls := %ElevationControls as Control
 @onready var style_controls := %StyleControls as Control
+@onready var transition_controls := %TransitionControls as Control
 @onready var paint_mode_option := %PaintModeOption as OptionButton
 @onready var elevation_readout := %ElevationReadout as Label
 @onready var absolute_elevation := %AbsoluteElevation as SpinBox
@@ -54,9 +61,15 @@ signal save_requested
 @onready var style_option := %StyleOption as OptionButton
 @onready var paint_style_button := %PaintStyleButton as Button
 @onready var sample_style_button := %SampleStyleButton as Button
+@onready var paint_ramp_button := %PaintRampButton as Button
+@onready var erase_ramp_button := %EraseRampButton as Button
+@onready var rotate_ramp_button := %RotateRampButton as Button
 @onready var brush_button := %BrushButton as Button
 @onready var rectangle_button := %RectangleButton as Button
 @onready var brush_size_option := %BrushSizeOption as OptionButton
+@onready var shape_mode_label := $ShapeModeLabel as Label
+@onready var shape_buttons := $ShapeButtons as HBoxContainer
+@onready var brush_size_label := $BrushSizeLabel as Label
 @onready var hover_label := %HoverLabel as Label
 @onready var status_label := %StatusLabel as Label
 @onready var make_unique_button := %MakeUniqueButton as Button
@@ -82,6 +95,7 @@ func setup() -> void:
 	floor_shape_button.pressed.connect(_on_edit_mode_selected.bind(EditMode.FloorShape))
 	elevation_button.pressed.connect(_on_edit_mode_selected.bind(EditMode.Elevation))
 	style_button.pressed.connect(_on_edit_mode_selected.bind(EditMode.Style))
+	transition_button.pressed.connect(_on_edit_mode_selected.bind(EditMode.Transition))
 	paint_mode_option.item_selected.connect(_on_paint_mode_selected)
 	set_elevation_button.pressed.connect(
 		_on_elevation_operation_selected.bind(ELEVATION_PAINTER.Operation.SetAbsolute)
@@ -103,6 +117,15 @@ func setup() -> void:
 		_on_style_operation_selected.bind(STYLE_PAINTER.Operation.Sample)
 	)
 	style_option.item_selected.connect(_on_style_selected)
+	paint_ramp_button.pressed.connect(
+		_on_transition_operation_selected.bind(TRANSITION_PAINTER.Operation.PaintRamp)
+	)
+	erase_ramp_button.pressed.connect(
+		_on_transition_operation_selected.bind(TRANSITION_PAINTER.Operation.EraseRamp)
+	)
+	rotate_ramp_button.pressed.connect(
+		_on_transition_operation_selected.bind(TRANSITION_PAINTER.Operation.RotateRamp)
+	)
 	brush_button.pressed.connect(_on_shape_mode_selected.bind(SHAPE_PAINTER.ShapeMode.Brush))
 	rectangle_button.pressed.connect(
 		_on_shape_mode_selected.bind(SHAPE_PAINTER.ShapeMode.Rectangle)
@@ -121,6 +144,7 @@ func set_target(surface: Node, floor_map: Resource) -> void:
 	floor_shape_button.disabled = not has_target
 	elevation_button.disabled = not has_target
 	style_button.disabled = not has_target or not _has_styles
+	transition_button.disabled = not has_target
 	paint_mode_option.disabled = not has_target
 	brush_button.disabled = not has_target
 	rectangle_button.disabled = not has_target
@@ -129,6 +153,7 @@ func set_target(surface: Node, floor_map: Resource) -> void:
 	save_button.disabled = not has_target
 	_set_elevation_buttons_disabled(not has_target)
 	_set_style_controls_disabled(not has_target or not _has_styles)
+	_set_transition_controls_disabled(not has_target)
 	if not has_target:
 		edit_toggle.button_pressed = false
 		target_label.text = "Target: select a FloorSurface"
@@ -186,6 +211,19 @@ func set_style_hover(cell: Vector2i, cell_count: int, style_name: String) -> voi
 		"" if cell_count == 1 else "s",
 		style_name,
 	]
+
+
+## Displays authored ramp direction without resizing the dock for live validation details.
+func set_transition_hover(
+	cell: Vector2i,
+	transition_name: String,
+	low_edge_name: String,
+	_error: String
+) -> void:
+	if low_edge_name.is_empty() or low_edge_name == "None":
+		hover_label.text = "Cell %s — %s" % [cell, transition_name]
+	else:
+		hover_label.text = "Cell %s — %s — low edge %s" % [cell, transition_name, low_edge_name]
 
 
 ## Clears cursor feedback when the viewport ray no longer reaches the working plane.
@@ -252,11 +290,22 @@ func get_paint_mode() -> int:
 
 ## Returns whether the dock is editing occupancy or integer elevation.
 func get_edit_mode() -> EditMode:
+	if transition_button.button_pressed:
+		return EditMode.Transition
 	if elevation_button.button_pressed:
 		return EditMode.Elevation
 	if style_button.button_pressed:
 		return EditMode.Style
 	return EditMode.FloorShape
+
+
+## Returns whether a gesture paints, erases or rotates a ramp transition.
+func get_transition_operation() -> TRANSITION_PAINTER.Operation:
+	if erase_ramp_button.button_pressed:
+		return TRANSITION_PAINTER.Operation.EraseRamp
+	if rotate_ramp_button.button_pressed:
+		return TRANSITION_PAINTER.Operation.RotateRamp
+	return TRANSITION_PAINTER.Operation.PaintRamp
 
 
 ## Returns the selected elevation operation.
@@ -323,6 +372,10 @@ func _on_style_selected(index: int) -> void:
 	style_index_changed.emit(style_option.get_item_id(index))
 
 
+func _on_transition_operation_selected(operation: TRANSITION_PAINTER.Operation) -> void:
+	transition_operation_changed.emit(operation)
+
+
 func _on_shape_mode_selected(shape_mode: int) -> void:
 	brush_size_option.disabled = not _has_target or shape_mode == SHAPE_PAINTER.ShapeMode.Rectangle
 	shape_mode_changed.emit(shape_mode)
@@ -337,6 +390,12 @@ func _refresh_mode_visibility() -> void:
 	shape_controls.visible = edit_mode == EditMode.FloorShape
 	elevation_controls.visible = edit_mode == EditMode.Elevation
 	style_controls.visible = edit_mode == EditMode.Style
+	transition_controls.visible = edit_mode == EditMode.Transition
+	var uses_shapes := edit_mode != EditMode.Transition
+	shape_mode_label.visible = uses_shapes
+	shape_buttons.visible = uses_shapes
+	brush_size_label.visible = uses_shapes
+	brush_size_option.visible = uses_shapes
 
 
 func _set_elevation_buttons_disabled(disabled: bool) -> void:
@@ -351,6 +410,12 @@ func _set_style_controls_disabled(disabled: bool) -> void:
 	style_option.disabled = disabled
 	paint_style_button.disabled = disabled
 	sample_style_button.disabled = disabled
+
+
+func _set_transition_controls_disabled(disabled: bool) -> void:
+	paint_ramp_button.disabled = disabled
+	erase_ramp_button.disabled = disabled
+	rotate_ramp_button.disabled = disabled
 
 
 func _update_elevation_readout() -> void:

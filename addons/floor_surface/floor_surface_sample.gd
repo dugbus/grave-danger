@@ -20,10 +20,27 @@ func set_flat(
 	sampled_style_index: int,
 	sampled_transition: MAP_SCRIPT.Transition
 ) -> FloorSurfaceSample:
+	return set_surface(
+		sampled_cell,
+		sampled_height,
+		Vector3.UP,
+		sampled_style_index,
+		sampled_transition
+	)
+
+
+## Configures a valid flat or sloped sample from the shared generated-surface description.
+func set_surface(
+	sampled_cell: Vector2i,
+	sampled_height: float,
+	sampled_normal: Vector3,
+	sampled_style_index: int,
+	sampled_transition: MAP_SCRIPT.Transition
+) -> FloorSurfaceSample:
 	valid = true
 	cell = sampled_cell
 	world_height = sampled_height
-	surface_normal = Vector3.UP
+	surface_normal = sampled_normal
 	style_index = sampled_style_index
 	transition = sampled_transition
 	return self

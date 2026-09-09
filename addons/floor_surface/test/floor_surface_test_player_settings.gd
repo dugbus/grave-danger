@@ -29,8 +29,8 @@ enum TraversalMode {
 @export_range(0.0, 2.0, 0.01, "or_greater", "suffix:m") var maximum_step_height := 0.25
 ## Forward distance used to find a walkable ledge before the body meets its vertical face.
 @export_range(0.01, 2.0, 0.01, "or_greater", "suffix:m") var step_probe_distance := 0.4
-## Steepest provisional surface that the standalone controller treats as floor.
-@export_range(0.0, 89.0, 0.5, "suffix:°") var maximum_floor_angle_degrees := 45.0
+## Near-vertical floor limit allowing the playground to exercise unrestricted authored ramps.
+@export_range(0.0, 89.0, 0.5, "suffix:°") var maximum_floor_angle_degrees := 89.0
 ## World height below which the player returns to the labelled reset point.
 @export_range(-100.0, -0.1, 0.1, "or_less", "suffix:m") var fall_reset_y := -3.0
 

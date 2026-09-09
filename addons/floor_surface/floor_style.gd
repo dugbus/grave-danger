@@ -11,12 +11,19 @@ extends Resource
 			return
 		display_name = value
 		emit_changed()
-## World metres covered by one material UV repeat on tops, sides and pit bottoms.
+## World metres covered by one material UV repeat on floor tops and pit bottoms.
 @export_range(0.01, 100.0, 0.01, "or_greater", "suffix:m") var world_uv_metres := 1.0:
 	set(value):
 		if is_equal_approx(world_uv_metres, value):
 			return
 		world_uv_metres = value
+		emit_changed()
+## World metres covered by one material UV repeat on outer walls, ledges and hole sides.
+@export_range(0.01, 100.0, 0.01, "or_greater", "suffix:m") var wall_uv_metres := 1.0:
+	set(value):
+		if is_equal_approx(wall_uv_metres, value):
+			return
+		wall_uv_metres = value
 		emit_changed()
 ## Material rendered across walkable top surfaces.
 @export var top_material: Material:
@@ -25,13 +32,15 @@ extends Resource
 			return
 		top_material = value
 		emit_changed()
-## Material rendered on height ledges, hole walls and outer floor boundaries.
-@export var edge_material: Material:
+## Material rendered on outer walls, height ledges and the sides of holes and ramps.
+@export var wall_material: Material:
 	set(value):
-		if edge_material == value:
+		if wall_material == value:
 			return
-		edge_material = value
+		wall_material = value
 		emit_changed()
+## Legacy serialized name retained so existing FloorStyle resources keep their wall appearance.
+@export_storage var edge_material: Material
 ## Optional material rendered on bounded visual pit bottoms; null omits the bottom.
 @export var pit_bottom_material: Material:
 	set(value):
@@ -55,10 +64,17 @@ func validate() -> Array[String]:
 		errors.append("FloorStyle needs a display name for the style painter.")
 	if world_uv_metres <= 0.0:
 		errors.append("FloorStyle world UV metres must be greater than zero.")
+	if wall_uv_metres <= 0.0:
+		errors.append("FloorStyle wall UV metres must be greater than zero.")
 	if top_material == null:
 		errors.append("FloorStyle needs a top material.")
-	if edge_material == null:
-		errors.append("FloorStyle needs an edge material for ledges and pit walls.")
+	if get_wall_material() == null:
+		errors.append("FloorStyle needs a wall material for ledges and pit walls.")
 	if pit_depth <= 0.0:
 		errors.append("FloorStyle needs a positive exposed-side depth.")
 	return errors
+
+
+## Returns the explicit wall material, falling back to the former serialized property.
+func get_wall_material() -> Material:
+	return wall_material if wall_material != null else edge_material

@@ -21,12 +21,33 @@ static func pick_world_position(
 	var nearest_position: Variant = null
 	var nearest_distance := INF
 	for cell in surface.floor_map.get_present_cells():
+		var description := surface.get_cell_surface_description(cell)
+		var corner_heights := description.get("corner_heights", []) as Array[float]
+		if corner_heights.size() != 4:
+			continue
+		var candidate_height := (
+			corner_heights[0] + corner_heights[1] + corner_heights[2] + corner_heights[3]
+		) * 0.25
 		var hit: Variant = SHAPE_PAINTER.working_plane_intersection(
 			ray_origin,
 			ray_direction,
-			surface.get_world_height_at_cell(cell)
+			candidate_height
 		)
 		if hit == null or surface.world_to_cell(hit as Vector3) != cell:
+			continue
+		var refined_hit_valid := true
+		for _iteration in 3:
+			var sample := surface.sample_surface(hit as Vector3)
+			if not sample.valid:
+				refined_hit_valid = false
+				break
+			hit = SHAPE_PAINTER.working_plane_intersection(
+				ray_origin, ray_direction, sample.world_height
+			)
+			if hit == null or surface.world_to_cell(hit as Vector3) != cell:
+				refined_hit_valid = false
+				break
+		if not refined_hit_valid:
 			continue
 		var distance := ray_origin.distance_to(hit as Vector3)
 		if distance < nearest_distance:

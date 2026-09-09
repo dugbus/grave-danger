@@ -9,6 +9,10 @@ func run(_tree: SceneTree) -> void:
 		"res://addons/floor_surface/test/floor_surface_test_player_settings.gd"
 	)
 	var settings := SUBJECT.new()
+	expect(
+		settings.get_maximum_floor_angle_radians() > atan2(3.0, 1.0),
+		"The playground controller treats a three-metre rise over one tile as floor."
+	)
 	settings.gravity = 20.0
 	settings.normal_jump_height = 0.9
 	expect(

@@ -71,8 +71,13 @@ func _test_scene_controls(tree: SceneTree) -> void:
 	var target := Node.new()
 	dock.set_target(target, FLOOR_MAP_SCRIPT.new())
 	expect(not dock.grid_overlay_toggle.disabled, "A selected surface enables the grid guide toggle.")
+	var grid_toggle_events: Array[bool] = []
+	dock.grid_overlay_toggled.connect(
+		func(visible: bool) -> void: grid_toggle_events.append(visible)
+	)
 	dock.grid_overlay_toggle.button_pressed = true
 	expect(dock.is_grid_overlay_visible(), "The grid guide can be explicitly enabled.")
+	expect_equal(grid_toggle_events, [true] as Array[bool], "The checkbox refreshes the editor grid immediately.")
 	dock.style_button.button_pressed = true
 	dock._on_edit_mode_selected(SUBJECT.EditMode.Style)
 	expect(dock.style_controls.visible, "Style has a direct, visible edit mode.")
@@ -91,6 +96,34 @@ func _test_scene_controls(tree: SceneTree) -> void:
 	)
 	dock.set_sampled_style(0)
 	expect_equal(dock.get_style_index(), 0, "Cursor sampling updates the style selector.")
+	dock.transition_button.button_pressed = true
+	dock._on_edit_mode_selected(SUBJECT.EditMode.Transition)
+	expect(dock.transition_controls.visible, "Ramp authoring has a direct, visible edit mode.")
+	expect(not dock.shape_buttons.visible, "Ramp boundary drags hide unrelated brush and rectangle controls.")
+	expect(
+		dock.get_node("TransitionControls/TransitionGuidance").text.contains(
+			"flat high landing"
+		),
+		"Ramp guidance identifies both drag endpoints as retained flat landings."
+	)
+	expect_equal(
+		dock.get_transition_operation(),
+		dock.TRANSITION_PAINTER.Operation.PaintRamp,
+		"Painting an inferred ramp is the default transition operation."
+	)
+	dock.rotate_ramp_button.button_pressed = true
+	expect_equal(
+		dock.get_transition_operation(),
+		dock.TRANSITION_PAINTER.Operation.RotateRamp,
+		"An existing ramp has an explicit orientation correction control."
+	)
+	dock.set_transition_hover(Vector2i.ONE, "Ramp", "West", "")
+	expect(dock.hover_label.text.contains("low edge West"), "Ramp hover names its inferred low edge.")
+	dock.set_transition_hover(Vector2i.ONE, "Ramp", "West", "Needs a high landing.")
+	expect(
+		not dock.hover_label.text.contains("Needs a high landing"),
+		"Live validation details do not resize the dock or viewport while painting."
+	)
 	target.free()
 	dock.queue_free()
 	await tree.process_frame

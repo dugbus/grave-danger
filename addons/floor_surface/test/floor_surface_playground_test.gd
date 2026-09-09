@@ -32,7 +32,7 @@ func run(tree: SceneTree) -> void:
 	expect_equal(
 		surface.get_generated_cell_count(),
 		164,
-		"The M5 fixture retains every accepted top while styling the central room and pit."
+		"The M6 fixture retains every accepted top while adding transitions to existing cells."
 	)
 	expect_equal(surface.validate_configuration(), [], "The saved floor surface has no configuration warnings.")
 	expect_equal(surface.styles.size(), 2, "The playground exposes two reusable text-material styles.")
@@ -64,6 +64,36 @@ func run(tree: SceneTree) -> void:
 	)
 	expect_equal(surface.get_cell_elevation(Vector2i(-6, 10)), 24, "The high lane starts at 24 units / 6m.")
 	expect_equal(
+		surface.floor_map.get_cell_transition(Vector2i(-4, 3)),
+		surface.floor_map.Transition.Ramp,
+		"The first route transition is stored as explicit ramp intent."
+	)
+	expect_equal(
+		surface.floor_map.get_cell_low_edge(Vector2i(-4, 3)),
+		surface.floor_map.LowEdge.West,
+		"The route's low edge faces its lower west landing."
+	)
+	var ramp_sample := surface.sample_surface(Vector3(-3.5, 0.0, 3.5))
+	expect(
+		is_equal_approx(ramp_sample.world_height, 0.3),
+		"The first tile reaches one tenth of the route's three-metre rise at its centre."
+	)
+	expect(ramp_sample.surface_normal.x < -0.2, "The route reports a usable east-rising slope normal.")
+	var middle_ramp_sample := surface.sample_surface(Vector3(-1.5, 0.0, 3.5))
+	expect(
+		is_equal_approx(middle_ramp_sample.world_height, 1.5),
+		"The middle of five ramp tiles reaches half of the arbitrary endpoint rise."
+	)
+	for x_coordinate in range(-5, 1):
+		expect_equal(
+			surface.classify_edge(
+				Vector2i(x_coordinate, 3),
+				Vector2i(x_coordinate + 1, 3)
+			),
+			surface.elevation_profile.TraversalClass.Flat,
+			"Every landing and internal seam in the continuous run is traversal-flat."
+		)
+	expect_equal(
 		surface.classify_edge(Vector2i(-4, 6), Vector2i(-3, 6)),
 		surface.elevation_profile.TraversalClass.Flat,
 		"A comparison plateau remains flat."
@@ -83,6 +113,19 @@ func run(tree: SceneTree) -> void:
 	expect(playground.get_trial_name() != first_trial_name, "A human can cycle to a comparison lane.")
 	expect_equal(player.reset_marker, playground.get_node("LowLaneStart"), "Trial cycling updates repeatable reset.")
 	await _test_physical_traversal_lanes(tree, playground, player)
+	playground.cycle_trial()
+	expect_equal(
+		playground.get_trial_name(),
+		"Variable five-tile ramp run",
+		"A human can reset directly to the M6 ramp route."
+	)
+	expect_equal(player.reset_marker, playground.get_node("RampRouteStart"), "The ramp trial has a repeatable start.")
+	await _settle_player(tree, player, 15)
+	await _move_player_east(tree, player, 65)
+	expect(
+		player.global_position.x > -1.0 and player.global_position.y > 1.3,
+		"The physical controller walks up the continuous three-metre ramp without jumping."
+	)
 	var first_view_name := playground.get_camera_view_name()
 	playground.cycle_camera_view()
 	expect(

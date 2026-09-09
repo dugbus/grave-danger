@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://q0ef7o077f24" path="res://addons/floor_surface/floor_style.gd" id="1_style"]
 [ext_resource type="Texture2D" uid="uid://duxurgxccegv6" path="res://Assets/environment/floors/textures/dirt_2.png" id="2_dirt"]
 
-[sub_resource type="StandardMaterial3D" id="EdgeMaterial"]
+[sub_resource type="StandardMaterial3D" id="WallMaterial"]
 albedo_color = Color(0.62, 0.58, 0.52, 1)
 albedo_texture = ExtResource("2_dirt")
 roughness = 0.95
@@ -20,5 +20,5 @@ roughness = 0.9
 script = ExtResource("1_style")
 display_name = "Dirt"
 top_material = SubResource("TopMaterial")
-edge_material = SubResource("EdgeMaterial")
+wall_material = SubResource("WallMaterial")
 pit_bottom_material = SubResource("PitBottomMaterial")

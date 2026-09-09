@@ -1,6 +1,6 @@
 # Floor Surface Implementation Plan
 
-Based on [FLOOR SURFACE DESIGN.md](FLOOR%20SURFACE%20DESIGN.md). This plan covers the **standalone prototype only**. M1, M2 and M3 are accepted; the M4 visual retry and M5 implementation are awaiting a combined human trial, and later milestones remain unimplemented.
+Based on [FLOOR SURFACE DESIGN.md](FLOOR%20SURFACE%20DESIGN.md). This plan covers the **standalone prototype only**. M1, M2 and M3 are accepted; M4 and M5 retain open final human-review items after their implementation and feedback revisions; M6 is implemented and awaiting its directed human trial. Later milestones remain unimplemented.
 
 The aim is to deliver small, usable increments that a human can edit and play before the next dependent part is built. Existing Grave Danger levels and floor implementations remain outside this work. Integration requires a separate plan after prototype acceptance.
 
@@ -40,7 +40,7 @@ Every new production script, including editor and playground behaviour, must hav
 | --- | --- |
 | `FloorMap` resource | Finite X/Z bounds, cell occupancy, integer absolute elevation, stable palette index and named transition/orientation data; deterministic text serialization. |
 | `FloorElevationProfile` resource | Shared elevation unit and local delta classifications, with validation against the standalone controller's supported step, jump and slope limits. |
-| `FloorStyle` resource | Independent top, edge and pit-bottom materials and pit depth; missing resources produce actionable validation. |
+| `FloorStyle` resource | Independent top, wall and pit-bottom materials, separate floor/wall texture scales and pit depth; missing resources produce actionable validation. |
 | `FloorSurface` scene | Owns the map and palette, exposes the surface API, coordinates rebuilds and emits typed change notifications. No new autoload. |
 | Geometry builder | Derives batched top/edge/ramp/pit meshes and static collision from a shared surface description. Start with a full deterministic rebuild; introduce chunk invalidation when measured or needed. |
 | Surface sampler | Returns a typed result containing validity, world height, normal, cell, style and transition; shares ramp mathematics with generation. |
@@ -113,28 +113,29 @@ The only anticipated shared configuration edit is registering the new editor plu
 
 **Deliverable:** Geometry can look like different surfaces, and holes have readable sides and configurable visible bottoms.
 
-- [x] Supply at least two reusable styles using FloorSurface-owned copies of existing game textures, with independently configurable top, edge and pit-bottom appearance and depth.
+- [x] Supply at least two reusable styles using FloorSurface-owned copies of existing game floor textures, with independently configurable top, wall and pit-bottom appearance and depth. The supplied flagstone style uses a separate existing stone-wall texture on vertical faces.
 - [x] Add style brush, rectangle and sample tools using M3's undo model. Preserve topology and collision when changing material alone.
-- [x] Implement continuous world X/Z projection on tops and world-planar projection on axis-aligned exposed sides. Each `FloorStyle` owns one metres-per-repeat value shared by its generated top, edge and pit geometry; the builder supplies UVs and never mutates source materials.
+- [x] Implement continuous world X/Z projection on tops and world-planar projection on axis-aligned exposed sides. Each `FloorStyle` owns separate floor/pit and wall metres-per-repeat values; the builder supplies UVs and never mutates source materials.
 - [x] Define pit depth relative to a documented rim datum for each connected hole region, including mixed rim elevations and style depths. The datum is the lowest `rim world Y - rim style depth` candidate, giving the region one horizontal bottom, ensuring every wall meets it, and never making a rim shallower than requested.
 - [x] Generate optional pit bottoms only within authored bounds. Treat them as visual-only in the prototype: surface queries remain invalid in holes and the player falls/resets. Keep this choice explicit for later review.
 - [x] Automated checks: edge ownership at holes and lower neighbours, material grouping, depth changes, missing-style warnings, no walkable collision over holes and style undo. All 20 focused FloorSurface suites pass 412 assertions, including copied texture references, the default-off grid guide, non-mutating unshaded editor previews and clockwise visible-face winding; editor startup, scene/UID scanning, test pairing and focused lint pass. The full repository check reaches 2,492 passing assertions before the pre-existing Tutorial 3 kill-boundary lookup abort and related teardown failure.
-- [ ] Human trial: paint flagstones next to dirt, inspect the real texture across cell boundaries with the optional grid guide off and on, change pit depth and edge material, and walk/fall around the pit. Check texture scale on tall walls and seams at mixed-height rims.
+- [ ] Human trial: paint flagstones next to dirt, inspect the real texture across cell boundaries with the optional grid guide off and on, change pit depth, Wall Material and Wall UV Metres, and walk/fall around the pit. Check texture scale on tall walls and seams at mixed-height rims.
 - [ ] Review: accept the pit datum and appearance controls; resolve visible cracks or inconsistent depth before ramps add more edge shapes.
 
 ## M6 — Explicit ramps and transition authoring
 
-**Deliverable:** Paintable ramps connect local elevation bands, with matching rendering, collision and samples.
+**Deliverable:** Paintable ramps connect arbitrary local elevations, with matching rendering, collision and samples.
 
-- [ ] Implement named flat/ramp transition and low-edge orientation data; reserve extensibility without implementing stairs, ladders or special drops.
-- [ ] Infer low/high endpoints from neighbouring cells. Define the permitted band delta in shared settings and reject ambiguous or unsupported connections visibly rather than guessing silently.
-- [ ] Generate ramp tops, collision and triangular/trapezoidal exposed sides from one shared surface description. Sample interpolated height and normal across the full ramp.
-- [ ] Add a boundary-drag transition tool with inferred orientation, clear preview and a correction control for ambiguous intent. Ramp deletion restores the authored ledge/top behaviour through undoable edits.
-- [ ] Support a sequence of simple ramps and landings across several terraces. Automatic multi-terrace route dragging is optional; individually painting connected ramps must work.
-- [ ] Build a simple ramp and a short multi-terrace route with untouched blocked edges alongside them. Check slope limits using both rise and cell run.
-- [ ] Automated checks: all four orientations, endpoint/midpoint samples, normals, side geometry, hole neighbours, invalid endpoints, adjacent seams and physics/query agreement.
-- [ ] Human trial: paint a connection, walk up/down and across its edges, jump onto it and try neighbouring unpainted ledges. Edit a neighbour to invalidate it, inspect the warning, repair it, then undo/redo.
-- [ ] Review: tune transition gestures and slope limits; retain a reliable short ramp route for later regression trials.
+- [x] Implement named flat/ramp transition and low-edge orientation data; reserve extensibility without implementing stairs, ladders or special drops.
+- [x] Infer low/high flat endpoints for each contiguous ramp run. Accept any non-zero elevation difference and distribute it across the authored run length; reject missing, equal or ambiguous endpoints visibly rather than guessing silently.
+- [x] Generate ramp tops, collision and triangular/trapezoidal exposed sides from one shared surface description. Sample interpolated height and normal across the full ramp.
+- [x] Add a flat-landing-to-flat-landing transition tool with inferred orientation, a surface-conforming preview and a correction control for ambiguous intent. Clicking an existing valid slope begins at its high landing. Ramp deletion restores the authored ledge/top behaviour through undoable edits.
+- [x] Support variable-length contiguous ramp runs plus sequences of ramps and landings across several terraces. One drag may span any number of ramp tiles between retained flat high and low endpoints.
+- [x] When the optional grid guide is enabled in Ramp mode, mark every authored Ramp tile with a distinct muted tint; keep real floor materials unchanged and remove the tint immediately outside Ramp mode.
+- [x] Build a three-metre, five-tile continuous ramp route with untouched blocked edges alongside it. Verify the same three-metre rise over one through five tiles without imposing an authored slope limit.
+- [x] Automated checks: all four orientations, one-to-five-tile runs, endpoint/midpoint samples, normals, side geometry, hole neighbours, invalid endpoints, adjacent seams and physics/query agreement.
+- [ ] Human trial: drag between flat high and low landings, then walk up/down and across the result, jump onto it and try neighbouring unpainted ledges. Start another gesture on an existing slope to confirm it snaps to the high landing. Edit a landing to invalidate it, inspect the warning, repair it, then undo/redo.
+- [ ] Review: tune transition gestures and run feedback; retain the reliable five-tile ramp route for later regression trials.
 
 ## M7 — Early player visibility experiment
 
@@ -199,7 +200,7 @@ Tick only with recorded evidence; implementation alone does not satisfy a human 
 - [ ] Step/jump/block interpretation is consistent for equal local deltas at different heights.
 - [ ] Explicit ramps provide the continuous routes across otherwise blocked terrace boundaries.
 - [ ] All four pyramid routes work without unintended shortcuts or collision seams.
-- [ ] Top, exposed-edge and pit-bottom materials and depth are configurable.
+- [ ] Top, exposed-wall and pit-bottom materials, independent texture scales and depth are configurable.
 - [ ] World-projected textures remain continuous across cells and readable on tall sides.
 - [ ] Collision matches visible tops, ledges and ramps; holes have no walkable top.
 - [ ] Surface queries return correct flat and interpolated ramp heights/normals.
@@ -458,6 +459,175 @@ Decision: Awaiting human retry
 Follow-up checklist items: Reload the playground, inspect tops from above and orbit around an outer wall and the pit
 Earlier checkpoints to repeat: Confirm textures, style painting, pit walls and undo remain intact
 Evidence or feedback report path: Not created yet; standalone editor authoring is not captured by gameplay replay
+```
+
+```text
+Milestone / trial: M6 implementation checkpoint
+Date / tester / revision: 2026-09-08 / Codex automated checks / 0e25424 + working tree
+Fixture and camera view: M6 authored-ramp-route-v1 / existing room and comparison views plus repeatable ramp-route focus
+Settings changed (before → after): Reserved Flat/Ramp fields without behaviour → exact one-band ramps over a 1m cell run, limited to 45°, with inferred low edge, generated slope/side collision and interpolated samples
+Automated results: Focused map, profile, resolver, painter, dock, plugin, picker, overlay, geometry, surface and playground suites pass, including all orientations, endpoints, normals, invalid bands and holes, watertight ramp/landing seams and physics/query agreement. ./check.sh validates 193 text-resource UIDs, 119/119 scenes and 237 script/test pairs; all 245 co-located suites report 2,604 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D lookup abort causes the known teardown/baseline failure.
+Human observations (expected / actual): Expected paintable east/west/north/south ramps, readable orientation preview, smooth walking and jumping, safe invalidation warnings and complete undo/redo / awaiting directed human trial
+Decision: Awaiting human trial
+Follow-up checklist items: Paint one ramp, walk up/down/across and jump onto it; invalidate and repair one landing; undo/redo; cycle to the retained two-ramp route with T
+Earlier checkpoints to repeat: Confirm M3 navigation/undo, M4 ledge walls and low-glare overlay, and M5 textures with the optional grid off
+Evidence or feedback report path: Not created yet; standalone editor authoring is not captured by gameplay replay
+```
+
+```text
+Milestone / trial: M6 human trial 1 authoring feedback
+Date / tester / revision: 2026-09-08 / user / 0e25424 + working tree
+Fixture and camera view: M6 authored-ramp-route-v1 / Godot 3D editor viewport
+Settings changed (before → after): Initial M6 single-cell direction gesture and subtle optional grid → trial configuration
+Automated results: Initial focused M6 suites passed before the editor trial
+Human observations (expected / actual): Expected a visible grid and a draggable ramp line / the grid appeared to do nothing, and Ramp Paint did not expose or paint a line gesture
+Decision: Changes requested
+Follow-up checklist items: Make the enabled grid unmistakable without high glare; preview and paint a cardinal boundary row as one undo action; reject a broken landing without partial changes
+Earlier checkpoints to repeat: Preserve viewport navigation, single-ramp painting, textures with the guide off and exact one-band validation
+Evidence or feedback report path: User report in conversation; editor-only authoring has no gameplay recording
+```
+
+```text
+Milestone / trial: M6 human-trial revision 1
+Date / tester / revision: 2026-09-08 / Codex automated checks / 0e25424 + working tree
+Fixture and camera view: M6 authored-ramp-route-v1 / Godot 3D editor viewport
+Settings changed (before → after): Subtle 1.8%-width grid at 0.24 alpha → explicit 3.5%-width medium-luminance grid at 0.58 alpha; single-cell ramp direction cue → cardinal boundary-line preview and atomic row painting
+Automated results: Four focused editor suites pass 109 assertions covering grid signal propagation and readability, typed line previews, perpendicular orientation inference, four-cell painting, undo and complete rollback. ./check.sh validates 193 text-resource UIDs, 119/119 scenes and 237 script/test pairs; 245 suites report 2,626 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown failure.
+Human observations (expected / actual): Expected an obvious optional grid when enabled and a stable highlighted row that becomes ramps on release / awaiting editor retry
+Decision: Awaiting human retry
+Follow-up checklist items: Toggle the guide off/on, then drag along several raised boundary tiles and confirm the complete highlighted row becomes ramps with one undo
+Earlier checkpoints to repeat: Confirm a raised boundary tile can still be dragged toward one low neighbour for a single ramp
+Evidence or feedback report path: Not created yet; standalone editor authoring is not captured by gameplay replay
+```
+
+```text
+Milestone / trial: M6 human trial 2 slope-model clarification
+Date / tester / revision: 2026-09-08 / user / 0e25424 + working tree
+Fixture and camera view: M6 authored-ramp-route-v1 / Godot 3D editor viewport
+Settings changed (before → after): Cardinal multi-cell painting retained the original exact one-band-per-cell validation → requested arbitrary endpoint rise distributed over any dragged run length
+Automated results: Earlier M6 revision checks passed, but they encoded the wrong fixed-band assumption
+Human observations (expected / actual): Expected a ramp from 3m to 0m to work over one, two, three, four or five tiles / the fixed one-band rule rejected these intended slopes
+Decision: Changes requested
+Follow-up checklist items: Replace band validation with flat-endpoint interpolation; retain original authored elevations for Make Flat; verify geometry, collision, samples and traversal across every internal seam
+Earlier checkpoints to repeat: Grid toggle visibility, stable line dragging, undo/redo and complete rollback for an invalid landing
+Evidence or feedback report path: User report in conversation; editor-only authoring has no gameplay recording
+```
+
+```text
+Milestone / trial: M6 human-trial revision 2
+Date / tester / revision: 2026-09-08 / Codex automated checks / 0e25424 + working tree
+Fixture and camera view: M6 variable-five-tile-ramp-v2 / repeatable ramp-route focus
+Settings changed (before → after): Exact 0.25m ramp band and 45° authoring cap → any non-zero flat-landing elevation difference distributed continuously over one or more ramp tiles; standalone controller floor angle 45° → 89° for steep-ramp trials
+Automated results: Resolver tests pass 61 assertions including 3m rises over one through five tiles. Painter, geometry, surface and physical-playground suites pass 208 assertions, including retained authored heights, continuous internal seams and walking the five-tile route. Editor dock, plugin, visuals, profile and controller-settings suites pass another 102 assertions. ./check.sh validates 193 text-resource UIDs, 119/119 scenes and 237 script/test pairs; 245 suites report 2,687 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown and dummy-renderer baseline failure.
+Human observations (expected / actual): Expected a visible straight drag whose slope is derived solely from the two landing heights and selected length / awaiting editor retry
+Decision: Awaiting human retry
+Follow-up checklist items: Select Paint Ramp; drag from a 3m high boundary tile to a 0m flat landing over one through five tiles; inspect the preview, release, walk the result and test one undo/redo
+Earlier checkpoints to repeat: Toggle the grid guide, confirm texture readability with it off, and confirm an invalid/missing landing makes no partial edit
+Evidence or feedback report path: Not created yet; standalone editor authoring has no gameplay recording
+```
+
+```text
+Milestone / trial: M6 human trial 3 gesture and preview feedback
+Date / tester / revision: 2026-09-08 / user / 0e25424 + working tree
+Fixture and camera view: M6 variable-five-tile-ramp-v2 / Godot 3D editor viewport
+Settings changed (before → after): Unrestricted endpoint interpolation with a high boundary included in the run → trial configuration
+Automated results: Revision 2 focused and repository checks passed the FloorSurface coverage before the editor retry
+Human observations (expected / actual): Expected to drag down from the top of the supplied slope or another raised tile / the first ramp could not be placed, another placement worked inconsistently, the viewport moved during left-drag and the highlight floated above lower tiles
+Decision: Changes requested
+Follow-up checklist items: Consume every active-drag motion event; retain both endpoint tiles as flat landings; snap a valid existing ramp start to its high landing; conform the highlight to planned corner heights with normal scene depth
+Earlier checkpoints to repeat: Arbitrary 3m rise over one through five ramp tiles, grid toggle, undo/redo and invalid-gesture rollback
+Evidence or feedback report path: User report in conversation; editor-only authoring has no gameplay recording
+```
+
+```text
+Milestone / trial: M6 human-trial revision 3
+Date / tester / revision: 2026-09-08 / Codex automated checks / 0e25424 + working tree
+Fixture and camera view: M6 variable-five-tile-ramp-v3 / Godot 3D editor viewport and physical ramp route
+Settings changed (before → after): Start boundary became a ramp and needed hidden high support → both visible drag endpoints remain flat landings; active motion capture depended on the event button mask → every motion event is consumed until release; one-height no-depth preview box → depth-tested per-cell planned slope preview
+Automated results: Painter, visuals, plugin, dock and playground suites pass 196 focused assertions covering flat endpoints, snapping an existing slope to its high landing, one-to-five-tile interpolation, surface-conforming previews, input capture and physical traversal. ./check.sh validates 193 text-resource UIDs, 119/119 scenes and 237 script/test pairs; 245 suites report 2,704 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown and dummy-renderer baseline failure.
+Human observations (expected / actual): Expected a stable viewport, a highlight resting on the intended surface and successful painting from the top landing / awaiting editor retry
+Decision: Awaiting human retry
+Follow-up checklist items: With Paint Ramp active, drag from either flat landing to the other with at least one tile between; also begin on the supplied slope and confirm the preview starts from its flat high landing
+Earlier checkpoints to repeat: Toggle the grid guide and test one undo/redo plus one invalid drag
+Evidence or feedback report path: Not created yet; standalone editor authoring has no gameplay recording
+```
+
+```text
+Milestone / trial: M6 human trial 4 typed-preview feedback
+Date / tester / revision: 2026-09-08 / user / 0e25424 + working tree
+Fixture and camera view: M6 variable-five-tile-ramp-v3 / Godot 3D editor viewport
+Settings changed (before → after): Surface-conforming ramp preview and live drag validation text → trial configuration
+Automated results: Revision 3 focused checks passed, but its typed test data did not reproduce an editor dictionary returning an untyped corner-height array
+Human observations (expected / actual): Expected the ramp preview and placement to complete / repeated Array-to-Array[float] errors stopped the preview; live error text resized the plugin panel and caused the apparent viewport glitch
+Decision: Changes requested
+Follow-up checklist items: Convert preview height values explicitly at the dictionary boundary; add an untyped-array regression; remove live validation details and keep any release result to a fixed one-line status
+Earlier checkpoints to repeat: Paint from the supplied slope and a separate raised landing; verify the highlight follows the surface and the camera remains still
+Evidence or feedback report path: User report in conversation; editor-only authoring has no gameplay recording
+```
+
+```text
+Milestone / trial: M6 human-trial revision 4
+Date / tester / revision: 2026-09-08 / Codex automated checks / 0e25424 + working tree
+Fixture and camera view: M6 variable-five-tile-ramp-v4 / Godot 3D editor viewport
+Settings changed (before → after): Direct Array[float] cast from editor preview dictionaries → explicit per-value typed conversion; variable live error details → no hover validation text and fixed one-line rejection status
+Automated results: Painter, visuals, plugin and dock suites pass 145 focused assertions, including an untyped editor-dictionary preview regression and stable hover text. ./check.sh validates 193 text-resource UIDs, 119/119 scenes and 237 script/test pairs; 245 suites report 2,704 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown and dummy-renderer baseline failure.
+Human observations (expected / actual): Expected error-free placement with no panel-driven viewport shift / awaiting editor retry
+Decision: Awaiting human retry
+Follow-up checklist items: Reload the editor script, drag between flat landing endpoints and confirm the panel size, camera and highlight remain steady through release
+Earlier checkpoints to repeat: One-to-five-tile ramps, existing-slope high-landing snap, undo/redo, grid toggle and invalid rollback
+Evidence or feedback report path: Not created yet; standalone editor authoring has no gameplay recording
+```
+
+```text
+Milestone / trial: M6 ramp-state visibility request
+Date / tester / revision: 2026-09-09 / user / 0e25424 + working tree
+Fixture and camera view: M6 variable-five-tile-ramp-v4 / Godot 3D editor viewport
+Settings changed (before → after): Ordinary optional grid in every edit mode → requested distinct ramp-tile colour while the grid and Ramp mode are both active
+Automated results: Revision 4 checks passed before this editor-visibility request
+Human observations (expected / actual): After flattening a visible slope, it was unclear whether Ramp metadata still remained because equal-height or invalid ramps could look like ordinary flat tiles
+Decision: Changes requested
+Follow-up checklist items: Encode authored Ramp cells in the grid mesh, apply a low-glare distinct tint only in Ramp mode, and refresh immediately when the mode or transition data changes
+Earlier checkpoints to repeat: Grid off must show untouched textures; grid in other modes must retain its ordinary appearance; Make Flat must clear the ramp marker
+Evidence or feedback report path: User request in conversation; editor-only authoring has no gameplay recording
+```
+
+```text
+Milestone / trial: M6 human-trial revision 5
+Date / tester / revision: 2026-09-09 / Codex automated checks / 0e25424 + working tree
+Fixture and camera view: M6 variable-five-tile-ramp-v5 / Godot 3D editor viewport
+Settings changed (before → after): Ramp metadata indistinguishable in the optional grid → Ramp tiles receive a muted blue-green fill at 0.28 alpha while Ramp mode is active
+Automated results: Elevation-overlay, editor-visuals and plugin suites pass 56 focused assertions covering an exact six-vertex ramp mask, low-glare tint limits and immediate mode toggling. ./check.sh validates 193 text-resource UIDs, 119/119 scenes and 237 script/test pairs; 245 suites report 2,709 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown and dummy-renderer baseline failure.
+Human observations (expected / actual): Expected existing Ramp tiles to be visually distinguishable without obscuring their floor texture / awaiting editor retry
+Decision: Awaiting human retry
+Follow-up checklist items: Enable the grid in Ramp mode, verify slopes are tinted, use Make Flat and confirm the tint disappears; switch modes and confirm ordinary grid appearance
+Earlier checkpoints to repeat: Texture readability with grid off, stable ramp dragging and one undo/redo
+Evidence or feedback report path: Not created yet; standalone editor authoring has no gameplay recording
+```
+
+```text
+Milestone / trial: M5 wall-material configuration request during M6
+Date / tester / revision: 2026-09-09 / user / 0e25424 + working tree
+Fixture and camera view: M6 variable-five-tile-ramp-v5 / Godot 3D editor viewport
+Settings changed (before → after): Internally configurable Edge Material used the supplied floor textures and shared their UV scale → requested explicit wall texture configuration suitable for vertical masonry
+Automated results: Previous FloorSurface checks passed before this appearance request
+Human observations (expected / actual): Flagstones are plausible on horizontal tops but not on generated walls; those sides need their own selectable texture
+Decision: Changes requested
+Follow-up checklist items: Expose a plainly named Wall Material, separate its metres-per-repeat setting from floor/pit UV scale, retain old Edge Material resources safely, and give the supplied Flagstones style a real wall texture
+Earlier checkpoints to repeat: Outer, ledge, pit and ramp sides must all use the configured wall material; tops and pit bottoms must remain unchanged
+Evidence or feedback report path: User request in conversation; editor-only appearance review has no gameplay recording
+```
+
+```text
+Milestone / trial: M5 wall-material configuration revision
+Date / tester / revision: 2026-09-09 / Codex automated checks / 0e25424 + working tree
+Fixture and camera view: M6 variable-five-tile-ramp-v6 / Godot 3D editor viewport
+Settings changed (before → after): Edge Material plus one shared World UV Metres setting → Inspector-facing Wall Material plus independent Wall UV Metres; Flagstones wall reused floor albedo → existing stone-wall texture
+Automated results: Style, geometry, surface, pit-resolver and editor-material-preview suites pass 146 focused assertions, including independent wall UV projection, distinct flagstone wall texture and legacy Edge Material fallback. ./check.sh validates 193 text-resource UIDs, 119/119 scenes and 237 script/test pairs; 245 suites report 2,712 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown and dummy-renderer baseline failure.
+Human observations (expected / actual): Expected separate, editable wall appearance on every vertical generated face / awaiting editor retry
+Decision: Awaiting human retry
+Follow-up checklist items: Expand either FloorStyle in the styles palette, change Wall Material and Wall UV Metres, and inspect outer walls, a raised ledge, a pit wall and a ramp side
+Earlier checkpoints to repeat: Floor texture continuity, pit-bottom appearance, grid/ramp tint and undoable style painting
+Evidence or feedback report path: Not created yet; standalone editor authoring has no gameplay recording
 ```
 
 ## Deferred until a separate integration plan

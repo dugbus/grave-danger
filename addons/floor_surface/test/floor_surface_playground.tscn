@@ -57,6 +57,7 @@ Vector2i(-1, 11): 27,
 Vector2i(0, -4): 2,
 Vector2i(0, -3): 2,
 Vector2i(0, -2): 1,
+Vector2i(0, 3): 12,
 Vector2i(0, 6): 6,
 Vector2i(0, 7): 6,
 Vector2i(0, 10): 30,
@@ -65,6 +66,7 @@ Vector2i(1, -4): 2,
 Vector2i(1, -3): 2,
 Vector2i(1, -1): 2,
 Vector2i(1, 0): 2,
+Vector2i(1, 3): 12,
 Vector2i(1, 6): 6,
 Vector2i(1, 7): 6,
 Vector2i(1, 10): 30,
@@ -89,6 +91,20 @@ Vector2i(5, 6): 10,
 Vector2i(5, 7): 10,
 Vector2i(5, 10): 34,
 Vector2i(5, 11): 34
+})
+transition_overrides = Dictionary[Vector2i, int]({
+Vector2i(-4, 3): 1,
+Vector2i(-3, 3): 1,
+Vector2i(-2, 3): 1,
+Vector2i(-1, 3): 1,
+Vector2i(0, 3): 1
+})
+low_edge_overrides = Dictionary[Vector2i, int]({
+Vector2i(-4, 3): 4,
+Vector2i(-3, 3): 4,
+Vector2i(-2, 3): 4,
+Vector2i(-1, 3): 4,
+Vector2i(0, 3): 4
 })
 style_overrides = Dictionary[Vector2i, int]({
 Vector2i(-6, -5): 1,
@@ -323,9 +339,9 @@ corner_radius_bottom_left = 6
 [node name="FloorSurfacePlayground" type="Node3D" unique_id=852732978]
 script = ExtResource("1_playground")
 camera_settings = ExtResource("2_camera_settings")
-trial_start_paths = Array[NodePath]([NodePath("ResetPosition"), NodePath("LowLaneStart"), NodePath("HighLaneStart")])
-trial_focus_paths = Array[NodePath]([NodePath("MainFocus"), NodePath("LowLaneFocus"), NodePath("HighLaneFocus")])
-trial_names = Array[String](["Style and mixed-rim pit", "Low comparison lane", "High comparison lane — 24-unit base"])
+trial_start_paths = Array[NodePath]([NodePath("ResetPosition"), NodePath("LowLaneStart"), NodePath("HighLaneStart"), NodePath("RampRouteStart")])
+trial_focus_paths = Array[NodePath]([NodePath("MainFocus"), NodePath("LowLaneFocus"), NodePath("HighLaneFocus"), NodePath("RampRouteFocus")])
+trial_names = Array[String](["Style and mixed-rim pit", "Low comparison lane", "High comparison lane — 24-unit base", "Variable five-tile ramp run"])
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1292583225]
 environment = SubResource("Environment_playground")
@@ -380,6 +396,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 6.65, 10.5)
 [node name="HighLaneFocus" type="Marker3D" parent="." unique_id=199112997]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 10.5)
 
+[node name="RampRouteStart" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0.65, 3.5)
+
+[node name="RampRouteFocus" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.5, 3.5)
+
 [node name="Player" parent="." unique_id=789155537 instance=ExtResource("3_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 2.5)
 
@@ -396,6 +418,13 @@ billboard = 1
 no_depth_test = true
 text = "HIGH LANE — 24 UNITS / 6.00 M BASE
 SAME LOCAL DELTAS: 1  |  2  |  3  |  4"
+
+[node name="RampRouteLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4.2, 3.5)
+billboard = 1
+no_depth_test = true
+text = "M6 RAMP ROUTE — WALK WITHOUT JUMPING
+3.00 M RISE OVER 5 RAMP TILES — NO SLOPE CAP"
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1835631595]
 
@@ -429,7 +458,7 @@ theme_override_colors/font_color = Color(0.9, 0.92, 0.96, 1)
 theme_override_font_sizes/font_size = 18
 text = "Arrow keys / stick: move    Space / A: jump
 R: reset trial    V: camera    T: next trial lane    U: normal/unencumbered
-Central room: compare teal/stone surfaces and fall through the visual pit bottom.
+Central room: compare surfaces, fall through the pit, and walk the five-tile ramp route.
 Comparison lanes rise eastward: walk 1, jump 2, switch mode for 3, confirm 4 is blocked."
 
 [node name="Separator" type="HSeparator" parent="HUD/Panel/Margin/Rows" unique_id=586916565]

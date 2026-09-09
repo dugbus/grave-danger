@@ -1,6 +1,61 @@
 # Changelog
 
+## 2026-09-09
+
+### 1400
+
+- The supplied Flagstones floor style now uses the existing stone-wall texture on vertical faces while retaining flagstones on walkable tops.
+  - Prompt: Allow generated floor walls to use a separately configured texture instead of the floor texture.
+- Floor styles now expose separate Wall Material and Wall UV Metres settings for outer walls, ledges, pit walls and ramp sides, while older edge-material resources remain compatible.
+  - Prompt: Allow generated floor walls to use a separately configured texture instead of the floor texture.
+
+### 1300
+
+- Ramp mode now gives every authored ramp tile a muted blue-green grid tint, making hidden ramp metadata visible without changing the floor material.
+  - Prompt: Colour ramp tiles differently when the grid visualizer is enabled in Ramp mode.
+
 ## 2026-09-08
+
+### 2100
+
+- Ramp dragging no longer displays changing validation details in the dock, preventing the panel from resizing the 3D viewport mid-gesture.
+  - Prompt: Fix ramp placement errors and stop live plugin errors from shifting the editor viewport.
+- Ramp previews now accept editor-provided height arrays reliably, allowing the intended slope to be placed without repeated type errors.
+  - Prompt: Fix ramp placement errors and stop live plugin errors from shifting the editor viewport.
+- Ramp drags now keep the 3D viewport still and show a depth-tested highlight fitted to the intended slope instead of a floating flat box.
+  - Prompt: Fix glitchy ramp dragging, failed placement from raised slopes, and floating highlights.
+- Ramp painting now keeps both drag endpoints as flat landings, and beginning on an existing valid slope automatically uses its high landing.
+  - Prompt: Fix glitchy ramp dragging, failed placement from raised slopes, and floating highlights.
+
+### 2000
+
+- Continuous ramp joins now behave as ordinary floor while making a ramp flat restores each tile's original authored elevation.
+  - Prompt: Allow a ramp to connect 3m and 0m over any chosen number of tiles without a slope limit.
+- Level editors can now drag a ramp between different-height flat landings over any number of tiles, with the full rise distributed continuously across the run.
+  - Prompt: Allow a ramp to connect 3m and 0m over any chosen number of tiles without a slope limit.
+
+### 1900
+
+- The optional floor grid now uses wider, medium-luminance lines that are clearly visible when enabled while leaving the underlying texture readable when disabled.
+  - Prompt: Make the floor grid visible and ramp painting behave as a draggable line tool.
+- Ramp Paint now previews and creates a straight row of ramps when dragged along matching raised boundary tiles, with the whole row included in one undo action.
+  - Prompt: Make the floor grid visible and ramp painting behave as a draggable line tool.
+
+### 1800
+
+- Ramp and rectangle gestures now retain their original target because active left-drag input no longer also moves or selects through the 3D viewport.
+  - Prompt: Stop ramp dragging from flicking the viewport and failing to create a ramp.
+
+### 1600
+
+- Ramp painting now starts normally because its viewport hover preview uses a correctly typed cell collection.
+  - Prompt: Fix ramp painting doing nothing because its hover preview raises a typed-array error.
+- The standalone floor playground now includes a repeatable two-ramp terrace route alongside the existing pit and blocked-edge trials.
+  - Prompt: Implement M6 explicit ramps and transition authoring.
+- Ramps now render and collide as continuous slopes with complete exposed sides, while floor queries return interpolated height and normal across every orientation.
+  - Prompt: Implement M6 explicit ramps and transition authoring.
+- Level editors can paint one-band ramps by dragging from a ramp cell toward either landing, preview the inferred low edge, make ramps flat, rotate them, and undo or redo each edit.
+  - Prompt: Implement M6 explicit ramps and transition authoring.
 
 ### 1400
 

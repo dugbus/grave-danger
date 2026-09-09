@@ -11,6 +11,11 @@ const GRID_SHADER := preload(
 	"res://addons/floor_surface/shaders/floor_surface_debug_grid.gdshader"
 )
 const GRID_SURFACE_OFFSET := 0.035
+const GRID_WIDTH := 0.035
+const GRID_COLOUR := Color(0.32, 0.5, 0.52, 0.58)
+const GRID_TILE_COLOUR_A := Color(0.08, 0.12, 0.14, 0.02)
+const GRID_TILE_COLOUR_B := Color(0.14, 0.18, 0.2, 0.1)
+const GRID_RAMP_TILE_COLOUR := Color(0.2, 0.4, 0.46, 0.28)
 
 var _target: Node3D
 var _footprint_mesh: MeshInstance3D
@@ -35,7 +40,7 @@ func attach(target: Node3D) -> void:
 	_footprint_material = StandardMaterial3D.new()
 	_footprint_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_footprint_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_footprint_material.no_depth_test = true
+	_footprint_material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	_footprint_box.material = _footprint_material
 	_footprint_mesh.mesh = _footprint_box
 	_footprint_mesh.visible = false
@@ -60,6 +65,11 @@ func attach(target: Node3D) -> void:
 	_grid_material = ShaderMaterial.new()
 	_grid_material.shader = GRID_SHADER
 	_grid_material.render_priority = 2
+	_grid_material.set_shader_parameter(&"grid_width", GRID_WIDTH)
+	_grid_material.set_shader_parameter(&"grid_colour", GRID_COLOUR)
+	_grid_material.set_shader_parameter(&"tile_colour_a", GRID_TILE_COLOUR_A)
+	_grid_material.set_shader_parameter(&"tile_colour_b", GRID_TILE_COLOUR_B)
+	_grid_material.set_shader_parameter(&"ramp_tile_colour", GRID_RAMP_TILE_COLOUR)
 	_target.add_child(_grid_mesh)
 	_grid_mesh.owner = null
 
@@ -93,6 +103,8 @@ func update_footprint(
 ) -> void:
 	if not is_instance_valid(_footprint_mesh):
 		return
+	_footprint_mesh.mesh = _footprint_box
+	_footprint_mesh.position = Vector3.ZERO
 	_footprint_mesh.visible = visible and not cells.is_empty()
 	if not _footprint_mesh.visible:
 		return
@@ -111,6 +123,53 @@ func update_footprint(
 		world_height + 0.04,
 		world_origin_xz.y + (float(minimum.y) + float(depth) * 0.5) * cell_size
 	)
+	_footprint_material.albedo_color = colour
+
+
+## Draws a per-cell preview that follows flat or sloped authored top descriptions.
+func update_surface_footprint(
+	cells: Array[Vector2i],
+	cell_size: float,
+	world_origin_xz: Vector2,
+	descriptions: Dictionary,
+	colour: Color,
+	visible: bool
+) -> void:
+	if not is_instance_valid(_footprint_mesh):
+		return
+	var vertices := PackedVector3Array()
+	for cell in cells:
+		var description := descriptions.get(cell, {}) as Dictionary
+		var raw_heights := description.get("corner_heights", []) as Array
+		var heights: Array[float] = []
+		for raw_height in raw_heights:
+			heights.append(raw_height as float)
+		if heights.size() != 4:
+			continue
+		var minimum_x := world_origin_xz.x + float(cell.x) * cell_size
+		var minimum_z := world_origin_xz.y + float(cell.y) * cell_size
+		var maximum_x := minimum_x + cell_size
+		var maximum_z := minimum_z + cell_size
+		var corners := PackedVector3Array([
+			Vector3(minimum_x, heights[0] + 0.04, minimum_z),
+			Vector3(minimum_x, heights[1] + 0.04, maximum_z),
+			Vector3(maximum_x, heights[2] + 0.04, maximum_z),
+			Vector3(maximum_x, heights[3] + 0.04, minimum_z),
+		])
+		vertices.append_array(PackedVector3Array([
+			corners[0], corners[2], corners[1],
+			corners[0], corners[3], corners[2],
+		]))
+	var mesh := ArrayMesh.new()
+	if not vertices.is_empty():
+		var arrays := []
+		arrays.resize(Mesh.ARRAY_MAX)
+		arrays[Mesh.ARRAY_VERTEX] = vertices
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+		mesh.surface_set_material(0, _footprint_material)
+	_footprint_mesh.mesh = mesh
+	_footprint_mesh.position = Vector3.ZERO
+	_footprint_mesh.visible = visible and not vertices.is_empty()
 	_footprint_material.albedo_color = colour
 
 
@@ -144,7 +203,8 @@ func update_grid_overlay(
 	profile: Resource,
 	cell_size: float,
 	world_origin_xz: Vector2,
-	visible: bool
+	visible: bool,
+	highlight_ramps := false
 ) -> void:
 	if not is_instance_valid(_grid_mesh):
 		return
@@ -156,8 +216,10 @@ func update_grid_overlay(
 		profile,
 		cell_size,
 		world_origin_xz,
-		GRID_SURFACE_OFFSET
+		GRID_SURFACE_OFFSET,
+		ELEVATION_OVERLAY.ColourMode.RampMask
 	)
+	_grid_material.set_shader_parameter(&"highlight_ramps", highlight_ramps)
 	if overlay_mesh.get_surface_count() > 0:
 		overlay_mesh.surface_set_material(0, _grid_material)
 	_grid_mesh.mesh = overlay_mesh

@@ -10,7 +10,10 @@ const STYLE_SCRIPT := preload("res://addons/floor_surface/floor_style.gd")
 func run(tree: SceneTree) -> void:
 	expect_script_contract(SUBJECT, "res://addons/floor_surface/floor_surface.gd")
 	_test_queries_boundaries_and_origin()
+	_test_ramp_queries_and_validation()
+	_test_contiguous_ramp_edges_are_traversal_flat()
 	await _test_rebuild_and_collision_agreement(tree)
+	await _test_ramp_collision_agreement(tree)
 
 
 func _test_queries_boundaries_and_origin() -> void:
@@ -67,6 +70,69 @@ func _test_queries_boundaries_and_origin() -> void:
 	surface.free()
 
 
+func _test_ramp_queries_and_validation() -> void:
+	var surface := SUBJECT.new()
+	var floor_map := MAP_SCRIPT.new()
+	floor_map.dimensions = Vector2i(3, 3)
+	floor_map.default_present = true
+	floor_map.set_cell_elevation(Vector2i(2, 1), 1)
+	floor_map.set_cell_transition(
+		Vector2i.ONE,
+		MAP_SCRIPT.Transition.Ramp,
+		MAP_SCRIPT.LowEdge.West,
+		0
+	)
+	surface.floor_map = floor_map
+	surface.elevation_profile = PROFILE_SCRIPT.new()
+	var low_sample := surface.sample_surface(Vector3(1.0, 8.0, 1.5))
+	var middle_sample := surface.sample_surface(Vector3(1.5, -8.0, 1.5))
+	var high_sample := surface.sample_surface(Vector3(1.999, 0.0, 1.5))
+	expect(is_equal_approx(low_sample.world_height, 0.0), "Ramp sampling meets its low edge.")
+	expect(is_equal_approx(middle_sample.world_height, 0.125), "Ramp sampling interpolates its midpoint.")
+	expect(is_equal_approx(high_sample.world_height, 0.24975), "Ramp sampling approaches its high edge.")
+	expect(middle_sample.surface_normal.x < -0.2, "Ramp sampling reports the shared slope normal.")
+	expect_equal(middle_sample.transition, MAP_SCRIPT.Transition.Ramp, "Ramp sampling identifies the transition.")
+	expect(surface.get_transition_error(Vector2i.ONE).is_empty(), "A valid ramp has no editor error.")
+	expect_equal(
+		surface.classify_edge(Vector2i(0, 1), Vector2i.ONE),
+		PROFILE_SCRIPT.TraversalClass.Flat,
+		"A valid ramp endpoint is continuous regardless of its authored flat-cell delta."
+	)
+	floor_map.set_floor_present(Vector2i(2, 1), false)
+	expect(
+		not surface.get_transition_error(Vector2i.ONE).is_empty(),
+		"Removing a required landing produces an actionable error."
+	)
+	expect(surface.validate_configuration().size() >= 2, "Surface warnings include invalid ramp and empty palette.")
+	surface.free()
+
+
+func _test_contiguous_ramp_edges_are_traversal_flat() -> void:
+	var surface := SUBJECT.new()
+	var floor_map := MAP_SCRIPT.new()
+	floor_map.dimensions = Vector2i(7, 1)
+	floor_map.default_present = true
+	floor_map.set_cell_elevation(Vector2i(6, 0), 12)
+	for x_coordinate in range(1, 6):
+		floor_map.set_cell_transition(
+			Vector2i(x_coordinate, 0),
+			MAP_SCRIPT.Transition.Ramp,
+			MAP_SCRIPT.LowEdge.West
+		)
+	surface.floor_map = floor_map
+	surface.elevation_profile = PROFILE_SCRIPT.new()
+	for x_coordinate in range(6):
+		expect_equal(
+			surface.classify_edge(
+				Vector2i(x_coordinate, 0),
+				Vector2i(x_coordinate + 1, 0)
+			),
+			PROFILE_SCRIPT.TraversalClass.Flat,
+			"The traversal gate treats each continuous slope seam as floor."
+		)
+	surface.free()
+
+
 func _test_rebuild_and_collision_agreement(tree: SceneTree) -> void:
 	var surface := SURFACE_SCENE.instantiate() as SUBJECT
 	var floor_map := MAP_SCRIPT.new()
@@ -113,5 +179,51 @@ func _test_rebuild_and_collision_agreement(tree: SceneTree) -> void:
 	)
 	expect(not space_state.intersect_ray(floor_query).is_empty(), "Visible floor has matching static collision.")
 	expect(space_state.intersect_ray(hole_query).is_empty(), "The visible hole has no invisible collision bridge.")
+	surface.queue_free()
+	await tree.process_frame
+
+
+func _test_ramp_collision_agreement(tree: SceneTree) -> void:
+	var surface := SURFACE_SCENE.instantiate() as SUBJECT
+	var floor_map := MAP_SCRIPT.new()
+	floor_map.dimensions = Vector2i(3, 3)
+	floor_map.default_present = true
+	floor_map.set_cell_elevation(Vector2i(2, 1), 12)
+	floor_map.set_cell_transition(
+		Vector2i.ONE,
+		MAP_SCRIPT.Transition.Ramp,
+		MAP_SCRIPT.LowEdge.West,
+		0
+	)
+	var style := STYLE_SCRIPT.new()
+	style.top_material = StandardMaterial3D.new()
+	style.wall_material = StandardMaterial3D.new()
+	var styles: Array[STYLE_SCRIPT] = [style]
+	surface.floor_map = floor_map
+	surface.elevation_profile = PROFILE_SCRIPT.new()
+	surface.styles = styles
+	tree.root.add_child(surface)
+	await tree.physics_frame
+	await tree.physics_frame
+	var query_position := Vector3(1.5, 0.0, 1.5)
+	var sample := surface.sample_surface(query_position)
+	expect(is_equal_approx(sample.world_height, 1.5), "A one-tile ramp may interpolate a three-metre rise.")
+	var ray_query := PhysicsRayQueryParameters3D.create(
+		query_position + Vector3.UP * 2.0,
+		query_position + Vector3.DOWN * 2.0
+	)
+	var collision_hit := surface.get_world_3d().direct_space_state.intersect_ray(ray_query)
+	expect(not collision_hit.is_empty(), "The generated ramp has static collision.")
+	if not collision_hit.is_empty():
+		var collision_position := collision_hit["position"] as Vector3
+		var collision_normal := collision_hit["normal"] as Vector3
+		expect(
+			is_equal_approx(collision_position.y, sample.world_height),
+			"Ramp collision and authoritative sampling agree at the midpoint."
+		)
+		expect(
+			collision_normal.dot(sample.surface_normal) > 0.999,
+			"Ramp collision and authoritative sampling expose the same normal."
+		)
 	surface.queue_free()
 	await tree.process_frame
