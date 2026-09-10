@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://player/visibility/player_occlusion_silhouette.gd" id="1_silhouette"]
+
+[node name="PlayerOcclusionSilhouette" type="Node"]
+script = ExtResource("1_silhouette")
+

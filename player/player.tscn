@@ -16,6 +16,7 @@
 [ext_resource type="Script" uid="uid://bvit8b7mdc5mh" path="res://player/player_death_effects.gd" id="14_death_effects"]
 [ext_resource type="Material" path="res://player/fire_death_particles_process_material.tres" id="15_fire_process"]
 [ext_resource type="QuadMesh" uid="uid://c7btpfw36kdfj" path="res://player/fire_death_particle_mesh.tres" id="16_fire_mesh"]
+[ext_resource type="PackedScene" path="res://player/visibility/player_occlusion_silhouette.tscn" id="17_occlusion"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_blood"]
 emission_shape = 1
@@ -85,6 +86,8 @@ script = ExtResource("4_nltvg")
 
 [node name="PlayerAnimation" type="Node" parent="." unique_id=1906804184]
 script = ExtResource("5_8mhfk")
+
+[node name="PlayerOcclusionSilhouette" parent="." instance=ExtResource("17_occlusion")]
 
 [node name="PlayerDeath" type="Node" parent="." unique_id=360054101]
 script = ExtResource("6_7xubc")
@@ -186,7 +189,7 @@ collision_mask = 5
 [node name="LookDirection" type="Node3D" parent="Pivot" unique_id=774174708]
 
 [node name="PlayerHeadlampLight" type="SpotLight3D" parent="Pivot" unique_id=1854365692]
-transform = Transform3D(-1, 0, -8.742278e-08, -5.015858e-08, 0.81915206, 0.57357645, 7.163184e-08, 0.57357645, -0.81915206, 0, 1.05, 0.3)
+transform = Transform3D(-1, 0, -8.742278e-08, -5.015858e-08, 0.81915206, 0.57357645, 7.163184e-08, 0.57357645, -0.81915206, 0, 1.05, 0.18)
 light_color = Color(0.8842759, 0.4890548, 0.27783498, 1)
 light_energy = 8.0
 light_indirect_energy = 0.0
@@ -205,7 +208,7 @@ noise_fast = SubResource("NoiseTexture3D_fast")
 noise_slow = SubResource("NoiseTexture3D_slow")
 
 [node name="PlayerLight" type="OmniLight3D" parent="Pivot" unique_id=994237452]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0.3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0.18)
 light_color = Color(0.8, 0.592, 0.48000002, 1)
 light_energy = 1.2
 light_indirect_energy = 0.0

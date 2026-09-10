@@ -1,6 +1,69 @@
 # Changelog
 
+## 2026-09-10
+
+### 1700
+
+- The obstructed-player silhouette is now inherited by every gameplay level through the shared player, while individual level scenes require no visibility setup.
+  - Prompt: Apply the working obstruction silhouette automatically to every level and remove the Level 1-specific setup.
+
+### 0100
+
+- The visibility silhouette now uses the production player's authoritative animated meshes and masks their visible pixels, preventing duplicate skinning and self-occlusion from corrupting the clear character.
+  - Prompt: Stop the M7 visibility effect corrupting the player while unobstructed.
+
+### 0000
+
+- The player silhouette now appears over fully and partially hidden character pixels while remaining absent when the player is unobstructed.
+  - Prompt: Fix the M7 silhouette producing no visible result when the player is obstructed.
+- Hidden portions of the player now receive a solid dark silhouette with a bright border, while visible player pixels, scenery materials and shadows render normally.
+  - Prompt: Replace failed transparency experiments with a player silhouette that remains visible through dark or light obstructions without changing scene rendering.
+
 ## 2026-09-09
+
+### 2300
+
+- The obstructed player is now depth-resolved into a coherent silhouette before being composited at 35% opacity, while clear player rendering remains unchanged.
+  - Prompt: Render the obstructed character to a texture before reducing its opacity so body parts do not show through each other.
+
+### 2100
+
+- The obstructed player now uses a 35%-opaque x-ray material on imported character surfaces, restoring the exact authored appearance as soon as the sightline clears.
+  - Prompt: Fade the obstructed character so the M7 view assist reads as an x-ray instead of disabled depth testing.
+
+### 2000
+
+- FloorSurface shadows now remain continuously cast by an opaque shadows-only copy while the visible mesh changes material, including after floor rebuilds.
+  - Prompt: Keep FloorSurface shadows from flicking when the M7 obstruction fade activates or restores.
+- The M7 transparent floor now writes depth in its blended pass, keeping the view outside the player-relative aperture spatially intact without restoring the sharp alpha pre-pass.
+  - Prompt: Stop the player-relative M7 aperture from fading the whole screen.
+
+### 1900
+
+- The M7 visibility aperture now scales from the actual player’s projected height, blends through a continuous feather without an alpha depth pre-pass, and can never make obstructing floor less than 50% opaque.
+  - Prompt: Make the M7 aperture no more than half transparent, visibly feathered, and sized to the player through camera zoom without scaling on nearby obstruction geometry.
+- The M7 visibility assist now uses a constant 90-pixel screen aperture with a 28-pixel feather and 62% retained opacity, preventing nearby geometry from enlarging the circle.
+  - Prompt: Keep the M7 view-assist circle feathered, partially transparent, and the same apparent size at every geometry depth.
+
+### 1700
+
+- The M7 visibility assist now keeps obstructing terrain 70% opaque within a tighter 0.9m circle and 0.25m soft edge.
+  - Prompt: Make the M7 obstruction effect less transparent and reduce the circle size.
+- The player's headlamp and fill-light origins now stay inside the collision hull, preventing them from entering steep nearby terrain before the player does.
+  - Prompt: Keep unobstructed rendering intact, make the obstruction less transparent, and prevent the player light intersecting steep floor geometry.
+- Obstructing terrain now retains 50% opacity at the centre of its soft fade, preserving more of the structure around the player.
+  - Prompt: Keep unobstructed rendering intact, make the obstruction less transparent, and prevent the player light intersecting steep floor geometry.
+- Unobstructed FloorSurface terrain now keeps its original opaque render ordering, while active fades draw behind ordinary transparent scene content such as 3D labels.
+  - Prompt: Keep unobstructed rendering intact, make the obstruction less transparent, and prevent the player light intersecting steep floor geometry.
+
+### 1600
+
+- The M7 floor fade now activates only when FloorSurface collision genuinely blocks the camera-to-player sightline, leaving nearby clear scenery fully opaque.
+  - Prompt: Stop scenery fading when it is not obscuring the player.
+- The M7 obstruction circle now keeps raised floor visible at 25% opacity, while detailed diagnostics start hidden and remain available with H.
+  - Prompt: Hide the debug panel and keep obstructing floor partially visible instead of removing it.
+- Added the M7 floor-visibility playground with the real player and production follow-camera, repeatable raised-terrain trials, an elevation-guided local fade, live diagnostics, and an elevation preview.
+  - Prompt: Implement M7 and use the actual player instead of the debug player so the visual test reflects gameplay.
 
 ### 1400
 

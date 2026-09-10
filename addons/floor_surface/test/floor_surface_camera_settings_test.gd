@@ -22,5 +22,5 @@ func run(_tree: SceneTree) -> void:
 	expect(
 		settings.get_view_size(SUBJECT.CameraView.Close) \
 			< settings.get_view_size(SUBJECT.CameraView.Overview),
-		"The close arrangement shows a tighter inspection area."
+		"The close arrangement uses a shorter perspective follow distance."
 	)

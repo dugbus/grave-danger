@@ -3,12 +3,7 @@
 [ext_resource type="Script" uid="uid://q0ef7o077f24" path="res://addons/floor_surface/floor_style.gd" id="1_style"]
 [ext_resource type="Texture2D" uid="uid://pqy1y7bohghx" path="res://Assets/environment/floors/textures/floor-albedo.png" id="2_albedo"]
 [ext_resource type="Texture2D" uid="uid://b5a4j03d8o6en" path="res://Assets/environment/floors/textures/floor-normal.png" id="3_normal"]
-[ext_resource type="Texture2D" path="res://Assets/environment/walls_wall-stone.jpg" id="4_wall"]
-
-[sub_resource type="StandardMaterial3D" id="WallMaterial"]
-albedo_color = Color(0.62, 0.62, 0.66, 1)
-albedo_texture = ExtResource("4_wall")
-roughness = 0.88
+[ext_resource type="Texture2D" uid="uid://m00ogltqm2a0" path="res://Assets/environment/walls_wall-stone.jpg" id="4_wall"]
 
 [sub_resource type="StandardMaterial3D" id="PitBottomMaterial"]
 albedo_color = Color(0.4, 0.4, 0.44, 1)
@@ -22,6 +17,11 @@ albedo_texture = ExtResource("2_albedo")
 roughness = 0.82
 normal_enabled = true
 normal_texture = ExtResource("3_normal")
+
+[sub_resource type="StandardMaterial3D" id="WallMaterial"]
+albedo_color = Color(0.62, 0.62, 0.66, 1)
+albedo_texture = ExtResource("4_wall")
+roughness = 0.88
 
 [resource]
 script = ExtResource("1_style")

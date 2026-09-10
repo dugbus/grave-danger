@@ -3,7 +3,7 @@ extends Node3D
 
 ## Runtime coordinator for the isolated human-testable floor-surface fixture.
 
-const FIXTURE_ID := "M6 / authored-ramp-route-v1"
+const FIXTURE_ID := "M7 / player-visibility-v11"
 const CAMERA_VIEW_COUNT := 3
 const TRIAL_COUNT := 4
 const HUD_REFRESH_SECONDS := 0.1
@@ -11,47 +11,64 @@ const CAMERA_SETTINGS_SCRIPT := preload(
 	"res://addons/floor_surface/test/floor_surface_camera_settings.gd"
 )
 const PLAYER_SCRIPT := preload(
-	"res://addons/floor_surface/test/floor_surface_test_player.gd"
+	"res://player/player.gd"
 )
+const CAMERA_SCRIPT := preload("res://game/follow_camera.gd")
 const SURFACE_SCRIPT := preload("res://addons/floor_surface/floor_surface.gd")
 const SAMPLE_SCRIPT := preload("res://addons/floor_surface/floor_surface_sample.gd")
 const MAP_SCRIPT := preload("res://addons/floor_surface/floor_map.gd")
+const VISIBILITY_SCRIPT := preload(
+	"res://player/visibility/player_occlusion_silhouette.gd"
+)
 
 ## Independent camera arrangements used by this playground only.
 @export var camera_settings: CAMERA_SETTINGS_SCRIPT
-## Camera switched between the named evaluation arrangements.
+## Production follow camera switched between named evaluation angles.
 @export var camera_path: NodePath = ^"Camera3D"
-## Standalone player whose state appears in the debug panel.
+## Actual production player whose state appears in the diagnostics.
 @export var player_path: NodePath = ^"Player"
 ## Isolated surface queried by the debug panel; production floors remain unrelated.
 @export var surface_path: NodePath = ^"FloorSurface"
 ## Label updated with live controller and future floor-surface information.
 @export var status_label_path: NodePath = ^"HUD/Panel/Margin/Rows/Status"
+## Player-owned silhouette shared with ordinary gameplay levels.
+@export var visibility_path: NodePath = ^"Player/PlayerOcclusionSilhouette"
+## Diagnostics canvas that can be hidden during an unobstructed visual comparison.
+@export var hud_path: NodePath = ^"HUD"
+## Shows the detailed M7 diagnostics on launch; leave disabled for an unobstructed play view.
+@export var show_diagnostics_on_start := false
 ## Repeatable room, comparison-lane and ramp-route player reset points cycled with T.
 @export var trial_start_paths: Array[NodePath] = []
-## Camera focus points paired with the repeatable trial starts.
-@export var trial_focus_paths: Array[NodePath] = []
 ## Human-readable trial names shown in the runtime HUD.
 @export var trial_names: Array[String] = []
 
-@onready var evaluation_camera := get_node_or_null(camera_path) as Camera3D
+@onready var evaluation_camera := get_node_or_null(camera_path) as CAMERA_SCRIPT
 @onready var player := get_node_or_null(player_path) as PLAYER_SCRIPT
 @onready var floor_surface := get_node_or_null(surface_path) as SURFACE_SCRIPT
 @onready var status_label := get_node_or_null(status_label_path) as Label
+@onready var visibility_experiment := get_node_or_null(visibility_path) as VISIBILITY_SCRIPT
+@onready var hud := get_node_or_null(hud_path) as CanvasLayer
 
 var current_camera_view := CAMERA_SETTINGS_SCRIPT.CameraView.Overview
 var current_trial := 0
 var _hud_elapsed_seconds := HUD_REFRESH_SECONDS
 var _trial_starts: Array[Node3D] = []
-var _trial_focuses: Array[Node3D] = []
-var _camera_focus := Vector3.ZERO
 
 
 func _ready() -> void:
 	_resolve_trial_nodes()
-	_select_trial(0, false)
+	_select_trial(0, true)
 	apply_camera_view(current_camera_view)
 	_update_status()
+	if hud != null:
+		hud.visible = show_diagnostics_on_start
+
+
+func _physics_process(_delta: float) -> void:
+	# The real player's normal fall death is intentionally left intact. Reset just before its
+	# production -4m threshold so repeated visibility passes do not leave this fixture.
+	if player != null and player.global_position.y < -2.5:
+		_reset_player_to_current_trial()
 
 
 func _process(delta: float) -> void:
@@ -71,6 +88,20 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	elif event.keycode == KEY_T:
 		cycle_trial()
 		get_viewport().set_input_as_handled()
+	elif event.keycode == KEY_R:
+		_reset_player_to_current_trial()
+		get_viewport().set_input_as_handled()
+	elif event.keycode == KEY_F:
+		if visibility_experiment != null:
+			visibility_experiment.set_visibility_enabled(
+				not visibility_experiment.visibility_enabled
+			)
+		_update_status()
+		get_viewport().set_input_as_handled()
+	elif event.keycode == KEY_H:
+		if hud != null:
+			hud.visible = not hud.visible
+		get_viewport().set_input_as_handled()
 
 
 ## Advances to the next named fixed camera arrangement.
@@ -80,14 +111,21 @@ func cycle_camera_view() -> void:
 	_update_status()
 
 
-## Applies one named arrangement immediately for repeatable visual comparisons.
+## Applies one production-camera angle immediately for repeatable visual comparisons.
 func apply_camera_view(view: CAMERA_SETTINGS_SCRIPT.CameraView) -> void:
 	current_camera_view = view
-	if evaluation_camera == null or camera_settings == null:
+	if evaluation_camera == null or camera_settings == null or player == null:
 		return
-	evaluation_camera.global_position = camera_settings.get_view_position(view) + _camera_focus
-	evaluation_camera.look_at(camera_settings.get_view_target(view) + _camera_focus, Vector3.UP)
-	evaluation_camera.size = camera_settings.get_view_size(view)
+	var authored_offset := (
+		camera_settings.get_view_position(view) - camera_settings.get_view_target(view)
+	)
+	var horizontal_distance := Vector2(authored_offset.x, authored_offset.z).length()
+	evaluation_camera.camera_yaw = atan2(authored_offset.x, authored_offset.z)
+	evaluation_camera.view_elevation_degrees = rad_to_deg(
+		atan2(maxf(authored_offset.y, 0.01), maxf(horizontal_distance, 0.01))
+	)
+	evaluation_camera.zoom_distance = maxf(camera_settings.get_view_size(view), 4.2)
+	evaluation_camera.set_runtime_targets(player, null)
 
 
 ## Returns the current human-readable camera arrangement.
@@ -116,22 +154,29 @@ func _update_status() -> void:
 		return
 	var player_position := player.global_position if player != null else Vector3.ZERO
 	var grounded_text := "yes" if player != null and player.is_on_floor() else "no"
-	var controller_text := "Unavailable"
-	if player != null and player.settings != null:
-		controller_text = "%s | %.1f m/s | jump %.2f m | step %.2f m | slope %.0f°" % [
-			player.get_traversal_mode_name(),
-			player.settings.movement_speed,
-			player.settings.get_jump_height(player.traversal_mode),
-			player.settings.maximum_step_height,
-			player.settings.maximum_floor_angle_degrees,
-		]
+	var controller_text := "Actual GDPlayer | production movement, weight, animation and lighting"
 	var sample: SAMPLE_SCRIPT = null
 	if floor_surface != null:
 		sample = floor_surface.sample_surface(player_position)
 	var surface_text := _format_surface_status(sample)
+	var visibility_text := "Visibility: unavailable"
+	if visibility_experiment != null:
+		visibility_text = (
+			"Visibility: %s | player meshes: %d | FPS: %d\n"
+			+ "Solid fill: #%s | bright outline: #%s | edge: %.3f m | depth bias: %.3f m\n"
+			+ "Scene rendering: unchanged; overlay appears only behind opaque depth"
+		) % [
+			visibility_experiment.get_visibility_status_name(),
+			visibility_experiment.get_silhouette_mesh_count(),
+			Engine.get_frames_per_second(),
+			visibility_experiment.silhouette_fill_colour.to_html(false),
+			visibility_experiment.silhouette_outline_colour.to_html(false),
+			visibility_experiment.outline_width,
+			visibility_experiment.occlusion_depth_bias,
+		]
 	status_label.text = (
 		"Fixture: %s\nTrial: %s\nCamera: %s\nPlayer: (%.2f, %.2f, %.2f) | grounded: %s\n"
-		+ "Controller: %s\n\n%s"
+		+ "Controller: %s\n%s\n\n%s"
 	) % [
 		FIXTURE_ID,
 		get_trial_name(),
@@ -141,6 +186,7 @@ func _update_status() -> void:
 		player_position.z,
 		grounded_text,
 		controller_text,
+		visibility_text,
 		surface_text,
 	]
 
@@ -187,30 +233,27 @@ func _get_style_name(style_index: int) -> String:
 
 func _resolve_trial_nodes() -> void:
 	_trial_starts.clear()
-	_trial_focuses.clear()
 	for path in trial_start_paths:
 		var marker := get_node_or_null(path) as Node3D
 		if marker != null:
 			_trial_starts.append(marker)
-	for path in trial_focus_paths:
-		var marker := get_node_or_null(path) as Node3D
-		if marker != null:
-			_trial_focuses.append(marker)
 
 
 func _select_trial(index: int, reset_player: bool) -> void:
 	if _trial_starts.is_empty():
 		return
 	current_trial = clampi(index, 0, _trial_starts.size() - 1)
-	var start := _trial_starts[current_trial]
-	if player != null:
-		player.set_reset_marker(start)
-		if reset_player:
-			player.reset_to_start()
-	_camera_focus = _trial_focuses[current_trial].global_position \
-		if current_trial < _trial_focuses.size() else Vector3.ZERO
+	if reset_player:
+		_reset_player_to_current_trial()
 	apply_camera_view(current_camera_view)
 	_update_status()
+
+
+func _reset_player_to_current_trial() -> void:
+	if player == null or current_trial < 0 or current_trial >= _trial_starts.size():
+		return
+	player.global_transform = _trial_starts[current_trial].global_transform
+	player.velocity = Vector3.ZERO
 
 
 func _get_east_traversal_name(cell: Vector2i) -> String:

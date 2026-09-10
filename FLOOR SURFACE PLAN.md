@@ -141,13 +141,13 @@ The only anticipated shared configuration edit is registering the new editor plu
 
 **Deliverable:** Evidence for a rendering approach before applying the final fade across all floor styles.
 
-- [ ] Derive world-aligned GPU-readable elevation and occupancy data from FloorMap, with ramp orientation/endpoints or equivalent data sufficient to represent slopes. Refresh on relevant edits, not every frame for static terrain.
-- [ ] Add a 1m platform, taller terrace and ramp obstruction fixture, plus debug player position, sample data, fade reason and an elevation-data preview.
-- [ ] Compare a fragment-depth/screen-space soft-mask approach with an elevation-guided obstruction mask or equivalent ray-based approach. Evaluate the actual Forward Plus output; do not commit to a shader technique solely from the specification.
-- [ ] Evaluate false fades, ramp accuracy, transparency sorting, shadow behaviour, overlapping top/edge materials and frame cost. Reject whole-object hiding as the final solution.
-- [ ] Implement the selected experiment with configurable radius, soft edge, fade amount and smooth restoration, using camera/player depth to distinguish obstruction from geometry behind the player.
-- [ ] Automated checks: elevation/occupancy encoding, edit invalidation, no static per-frame rebuild and CPU-side obstruction math where applicable. Shader appearance remains a rendered human check.
-- [ ] Human trial: repeatedly walk behind and in front of the platform, pause under overlap, ascend the ramp, switch named camera views and disable the effect for comparison. Confirm nearby non-obstructing terrain stays opaque.
+- [x] Derive world-aligned GPU-readable elevation and occupancy data from FloorMap, with ramp orientation/endpoints or equivalent data sufficient to represent slopes. Refresh on relevant edits, not every frame for static terrain.
+- [x] Add a 1m platform, taller terrace and ramp obstruction fixture, plus debug player position, sample data, fade reason and an elevation-data preview. Use the actual GDPlayer and production perspective follow-camera so the visual trial reflects the game.
+- [x] Compare fragment-depth/screen-space, elevation-guided and ray-gated obstruction masks in actual Forward Plus output. The transparent variants were rejected after producing false fades, hard edges, unstable shadows, depth-order artefacts and poor contrast.
+- [x] Evaluate false fades, ramp accuracy, transparency sorting, shadow behaviour and overlapping top/edge materials. Reject whole-object hiding and any selected approach that modifies scenery rendering.
+- [x] Implement the selected experiment as a separate component composed into the shared player scene, providing every gameplay level with the depth/stencil-tested solid silhouette without per-level edits. Keep FloorSurface and GridMap materials, shadows and camera layers untouched; use the authoritative animated player geometry without mutating authored material resources.
+- [x] Automated checks: elevation/occupancy comparison data, authoritative-mesh overlay ownership, authored-resource preservation, solid depth/stencil shader contracts, comparison toggle and teardown. Shader appearance remains a rendered human check.
+- [ ] Human trial: repeatedly walk behind and in front of the platform, pause while partially overlapped, ascend the ramp, switch named camera views and disable the silhouette for comparison. Confirm visible player pixels and all scenery remain unchanged while only hidden player pixels receive the solid silhouette.
 - [ ] Review: record the chosen method, rejected alternatives, material requirements, measured cost and remaining visual defects. Rework the approach if it cannot preserve player readability and structure shape.
 
 ## M8 — Grounded test objects
@@ -628,6 +628,318 @@ Decision: Awaiting human retry
 Follow-up checklist items: Expand either FloorStyle in the styles palette, change Wall Material and Wall UV Metres, and inspect outer walls, a raised ledge, a pit wall and a ramp side
 Earlier checkpoints to repeat: Floor texture continuity, pit-bottom appearance, grid/ramp tint and undoable style painting
 Evidence or feedback report path: Not created yet; standalone editor authoring has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 Forward Plus human trial 3
+Date / tester / revision: 2026-09-09 / user / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v1 / production player and perspective follow-camera
+Settings changed (before → after): Exact obstruction-ray gate with 25% centre opacity and always-attached transparent floor wrappers → trial configuration
+Automated results: Previous M7 focused checks passed before this visual review
+Human observations (expected / actual): Expected only the true obstruction to fade without affecting unrelated rendering / 3D fixture text was overdrawn even while the player was clear; the fade centre remained too transparent; the player light behaved strangely at close range to the large slope
+Decision: Changes requested
+Follow-up checklist items: Keep clear terrain in the opaque render pass; order an active translucent floor behind ordinary transparent content; increase retained opacity; keep player light origins inside the collision hull
+Earlier checkpoints to repeat: Genuine obstruction-only activation, smooth edges, restoration, ramp sides and nearby opaque scenery
+Evidence or feedback report path: User report in conversation; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 human-trial revision 3
+Date / tester / revision: 2026-09-09 / Codex automated checks / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v2 / production player and perspective follow-camera
+Settings changed (before → after): Transparent floor wrapper present for the entire run → source opaque materials while clear and temporary low-priority wrappers only during fade; 25% → 50% centre opacity; player lights 0.30m forward and outside the 0.28m capsule → 0.18m forward and inside the hull
+Automated results: Visibility experiment, assembled playground and production-player suites pass 69 focused assertions covering render-pass activation/restoration, transparent priority, obstruction gating and light placement. ./check.sh validates 194 text-resource UIDs, 120/120 scenes and 239 script/test pairs; 247 suites report 2,737 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown failure.
+Human observations (expected / actual): Expected fixture text and normal lighting to retain opaque ordering while clear, a less transparent obstruction, and no light-origin intersection at the large slope / awaiting retry
+Decision: Awaiting human retry
+Follow-up checklist items: Walk clear beside the labels and large slope first, then cross behind each obstruction and confirm the 50% centre, soft edge, text ordering and light remain stable
+Earlier checkpoints to repeat: F toggle, all named camera views, platform, terrace, pyramid and ramp
+Evidence or feedback report path: Not created yet; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 Forward Plus human trial 4
+Date / tester / revision: 2026-09-09 / user / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v2 / production player and perspective follow-camera
+Settings changed (before → after): 50% centre opacity, 1.35m radius and 0.45m soft edge → trial configuration
+Automated results: The corrected render-pass, text-ordering and light-placement checks passed before this visual tuning review
+Human observations (expected / actual): Expected a restrained local fade that preserved the obstruction / the structure remained too transparent and the circular affected area was too large
+Decision: Changes requested
+Follow-up checklist items: Increase retained structure opacity and reduce both the circle radius and feather width
+Earlier checkpoints to repeat: Soft edge quality, player readability and complete restoration after leaving obstruction
+Evidence or feedback report path: User report in conversation; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 human-trial revision 4
+Date / tester / revision: 2026-09-09 / Codex automated checks / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v3 / production player and perspective follow-camera
+Settings changed (before → after): 50% → 70% centre opacity; 1.35m → 0.90m radius; 0.45m → 0.25m soft edge
+Automated results: The focused visibility suite passes 23 assertions, including explicit default size, feather and opacity coverage. ./check.sh validates 194 text-resource UIDs, 120/120 scenes and 239 script/test pairs; 247 suites report 2,738 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown failure.
+Human observations (expected / actual): Expected a smaller, subtler local visibility assist that keeps most of the structure visible / awaiting retry
+Decision: Awaiting human retry
+Follow-up checklist items: Stand behind the 1m platform and pyramid, then compare player readability, preserved floor texture and circle scale while moving
+Earlier checkpoints to repeat: Text ordering, clear-state lighting, genuine obstruction-only activation and restoration
+Evidence or feedback report path: Not created yet; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 Forward Plus human trial 5
+Date / tester / revision: 2026-09-09 / user / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v3 / production player and perspective follow-camera
+Settings changed (before → after): 70% opacity inside a 0.90m world-space radius with 0.25m world-space feather → trial configuration
+Automated results: The tuned world-space defaults passed 23 focused assertions before this projection review
+Human observations (expected / actual): Expected a consistently sized, visibly feathered partial-transparency assist / the feather was no longer apparent, the partial transparency was too subtle to identify the assist, and nearby obstruction geometry made the hole appear larger
+Decision: Changes requested
+Follow-up checklist items: Measure aperture and feather in screen pixels, retain world-space height eligibility and collision gating, and restore a visibly partial centre opacity
+Earlier checkpoints to repeat: Constant circle size across near/far geometry, soft edge quality, player readability and preserved structure
+Evidence or feedback report path: User report in conversation; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 human-trial revision 5
+Date / tester / revision: 2026-09-09 / Codex automated checks / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v4 / production player and perspective follow-camera
+Settings changed (before → after): World-space distance to the camera/player segment → constant 90px screen-space player aperture; 0.25m → 28px feather; 70% → 62% retained opacity
+Automated results: Visibility and assembled-playground suites pass 61 focused assertions, including constant-pixel shader math, a smoothstep feather, partial alpha, obstruction gating and safe camera-plane projection. ./check.sh validates 194 text-resource UIDs, 120/120 scenes and 239 script/test pairs; 247 suites report 2,739 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown failure.
+Human observations (expected / actual): Expected the same circular size on near and far fragments, with an obvious soft transition and moderate transparency / awaiting retry
+Decision: Awaiting human retry
+Follow-up checklist items: Move behind the platform while changing camera distance, then approach the pyramid and confirm the apparent circle size and feather remain stable
+Earlier checkpoints to repeat: Clear-state text/light rendering, genuine obstruction-only activation, F comparison and smooth restoration
+Evidence or feedback report path: Not created yet; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 Forward Plus human trial 6
+Date / tester / revision: 2026-09-09 / user / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v4 / production player and perspective follow-camera
+Settings changed (before → after): Constant 90px aperture, 28px feather and 62% retained opacity → trial configuration
+Automated results: The constant-pixel hybrid passed 61 focused assertions before this visual review
+Human observations (expected / actual): Expected stable near/far sizing with a recognizable feather and partial transparency / the edge still appeared sharp, the obstruction appeared fully transparent, and fixed pixels made the aperture the wrong size after camera zoom
+Decision: Rejected
+Follow-up checklist items: Derive screen radius from projected player size rather than fixed pixels or fragment depth; remove the alpha depth pre-pass; enforce at least half opacity in the shader
+Earlier checkpoints to repeat: Near/far obstruction fragments, manual zoom, continuous edge blending and preserved obstruction texture
+Evidence or feedback report path: User report in conversation; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 human-trial revision 6
+Date / tester / revision: 2026-09-09 / Codex automated checks / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v5 / production player and perspective follow-camera
+Settings changed (before → after): Fixed 90px radius and 28px feather → 0.75 and 0.25 of the actual player's projected collision height; transparent depth pre-pass → continuous alpha blend; 62% requested opacity → 55% requested opacity with a shader-enforced 50% minimum
+Automated results: Visibility and assembled-playground suites pass 63 focused assertions covering player-collision sizing, zoom response, fragment-depth independence, smoothstep feathering, absence of the alpha depth pre-pass and the hard opacity floor. ./check.sh validates 194 text-resource UIDs, 120/120 scenes and 239 script/test pairs; 247 suites report 2,741 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown failure.
+Human observations (expected / actual): Expected the aperture to scale with the player under zoom, remain independent of obstruction depth, retain at least half of the floor and show a continuous feather / awaiting retry
+Decision: Awaiting human retry
+Follow-up checklist items: Stand behind near and far faces, zoom fully in/out and confirm the aperture tracks player size without changing across those faces; inspect centre texture and the full feather
+Earlier checkpoints to repeat: Genuine obstruction-only activation, clear-state text/light rendering, F comparison and restoration
+Evidence or feedback report path: Not created yet; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 Forward Plus human trial 7
+Date / tester / revision: 2026-09-09 / user / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v5 / production player and perspective follow-camera
+Settings changed (before → after): Player-relative continuous alpha without depth writing → trial configuration
+Automated results: The player-relative implementation passed 63 focused assertions before this rendered batching review
+Human observations (expected / actual): Expected only the player-relative aperture to blend / the entire view faded when the FloorSurface entered its transparent pass
+Decision: Changes requested
+Follow-up checklist items: Preserve continuous feathering but write depth during the ordinary transparent pass so the batched floor cannot wash over already rendered content
+Earlier checkpoints to repeat: At-least-half opacity, zoom-relative player scale, near/far geometry independence and soft edge
+Evidence or feedback report path: User report in conversation; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 human-trial revision 7
+Date / tester / revision: 2026-09-09 / Codex automated checks / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v6 / production player and perspective follow-camera
+Settings changed (before → after): Transparent blend with no depth write → transparent blend with depth_draw_always; separate alpha depth pre-pass remains disabled
+Automated results: Visibility and assembled-playground suites pass 63 focused assertions, including the explicit depth-write/no-pre-pass contract. ./check.sh validates 194 text-resource UIDs, 120/120 scenes and 239 script/test pairs; 247 suites report 2,741 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown failure.
+Human observations (expected / actual): Expected the FloorSurface to remain spatially bounded while retaining the continuous player-relative feather / awaiting retry
+Decision: Awaiting human retry
+Follow-up checklist items: Trigger an obstruction and confirm the rest of the screen remains unchanged before evaluating opacity, feather and zoom behavior
+Earlier checkpoints to repeat: Clear-state text/light rendering, genuine obstruction-only activation, F comparison and restoration
+Evidence or feedback report path: Not created yet; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 Forward Plus human trial 8
+Date / tester / revision: 2026-09-09 / user / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v6 / production player and perspective follow-camera
+Settings changed (before → after): Player-relative aperture with normal-pass depth writing and visible-mesh shadow ownership → trial configuration
+Automated results: The bounded continuous-feather implementation passed 63 focused assertions before this shadow transition review
+Human observations (expected / actual): Expected illumination and shadows to remain stable as the aperture activates / floor shadows visibly flicked between on and off when moving between unobscured and obscured states
+Decision: Changes requested
+Follow-up checklist items: Move shadow ownership out of the material-switched visible mesh and preserve identical opaque shadow geometry through activation, restoration and rebuilds
+Earlier checkpoints to repeat: Whole-screen stability, at-least-half opacity, feathering, zoom-relative sizing and near/far geometry independence
+Evidence or feedback report path: User report in conversation; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 human-trial revision 8
+Date / tester / revision: 2026-09-09 / Codex automated checks / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v7 / production player and perspective follow-camera
+Settings changed (before → after): Visible mesh alternately cast opaque/transparent shadows → visible mesh never casts shadows while a separate shadows-only node continuously shares its generated geometry and original materials
+Automated results: Visibility and assembled-playground suites pass 67 focused assertions covering stable shadow ownership before/during fade, rebuild synchronization and source-shadow restoration when the optional experiment is removed. ./check.sh validates 194 text-resource UIDs, 120/120 scenes and 239 script/test pairs; 247 suites report 2,745 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown failure.
+Human observations (expected / actual): Expected shadows to retain the same silhouette and presence across obstruction activation and restoration / awaiting retry
+Decision: Awaiting human retry
+Follow-up checklist items: Repeatedly cross the obstruction boundary under the player headlamp and directional light, watching only the platform/pyramid shadow before rechecking the accepted aperture behavior
+Earlier checkpoints to repeat: Whole-screen stability, at-least-half opacity, continuous feather, player-relative zoom sizing and near/far geometry independence
+Evidence or feedback report path: Not created yet; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 Forward Plus human trial 9
+Date / tester / revision: 2026-09-09 / user / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v7 / production player and perspective follow-camera
+Settings changed (before → after): Stable shadows and accepted player-relative aperture with the ordinary opaque character visible through it → trial configuration
+Automated results: The stable-shadow revision passed 67 focused assertions before this character-presentation review
+Human observations (expected / actual): Expected an intentional x-ray view / the fully filled opaque character resembled ordinary rendering with the depth buffer disabled
+Decision: Changes requested
+Follow-up checklist items: Fade only the imported character fill while obstructed; preserve ordinary player rendering while clear; leave contact shadow and effects alone; retain an outline-only overlay as fallback
+Earlier checkpoints to repeat: Shadow stability, whole-screen stability, feathering, zoom-relative sizing and obstruction opacity
+Evidence or feedback report path: User report in conversation; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 human-trial revision 9
+Date / tester / revision: 2026-09-09 / Codex automated checks / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v8 / production player and perspective follow-camera
+Settings changed (before → after): Opaque character seen through the faded floor → imported character surfaces temporarily use a 35%-opaque depth-independent x-ray material; clear sightlines restore authored overrides
+Automated results: Visibility and assembled-playground suites pass 72 focused assertions covering actual imported-player surface discovery, clear/obstructed/restored material ownership, x-ray opacity/depth contract and isolation from the contact shadow. ./check.sh validates 194 text-resource UIDs, 120/120 scenes and 239 script/test pairs; 247 suites report 2,750 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown failure.
+Human observations (expected / actual): Expected a lighter ghosted character fill that reads as an intentional x-ray rather than a depth-test failure / awaiting retry
+Decision: Awaiting human retry
+Follow-up checklist items: Cross behind the 1m platform slowly and compare the character fill before, during and after obstruction; if it still reads incorrectly, revert the fill pass and trial an outline-only overlay
+Earlier checkpoints to repeat: Shadow stability, whole-screen stability, at-least-half obstruction opacity, continuous feather and player-relative zoom sizing
+Evidence or feedback report path: Not created yet; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 Forward Plus human trial 10
+Date / tester / revision: 2026-09-09 / user / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v8 / production player and perspective follow-camera
+Settings changed (before → after): Per-surface transparent x-ray materials → trial configuration
+Automated results: The per-surface revision passed 72 focused assertions before this internal-depth review
+Human observations (expected / actual): Expected a coherent translucent silhouette / rear character surfaces remained visible through nearer arms and body because transparency was applied independently to every face
+Decision: Changes requested; one final filled-silhouette trial before the retained outline fallback
+Follow-up checklist items: Render the player normally into an isolated transparent viewport, then alpha-composite that resolved image once; never replace authored player materials
+Earlier checkpoints to repeat: Character readability, shadow stability, whole-screen stability, at-least-half obstruction opacity, continuous feather and player-relative zoom sizing
+Evidence or feedback report path: User report in conversation; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 human-trial revision 10
+Date / tester / revision: 2026-09-09 / Codex automated checks / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v9 / production player and perspective follow-camera
+Settings changed (before → after): Character faces independently faded to 35% → authored character rendered with normal internal depth into an isolated transparent viewport, then its completed image composited once at 35%
+Automated results: Visibility and assembled-playground suites pass 75 focused assertions covering capture isolation, authored-material preservation, obstruction-only camera-layer switching, single-pass composite opacity and exact layer restoration. ./check.sh validates 194 text-resource UIDs, 120/120 scenes and 239 script/test pairs; 247 suites report 2,753 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown failure.
+Human observations (expected / actual): Expected a translucent but internally solid character silhouette, with arms correctly occluding the body instead of showing through it / awaiting retry
+Decision: Awaiting final filled-silhouette retry; use the retained outline fallback if this presentation is still unsuitable
+Follow-up checklist items: Walk behind the 1m platform and inspect overlapping arms/body while moving; confirm clear rendering, FloorSurface shadows, aperture feather and opacity remain unchanged
+Earlier checkpoints to repeat: Shadow stability, whole-screen stability, at-least-half obstruction opacity, continuous feather and player-relative zoom sizing
+Evidence or feedback report path: Not created yet; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 Forward Plus human trial 11
+Date / tester / revision: 2026-09-10 / user / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v9 / production player and perspective follow-camera
+Settings changed (before → after): Depth-resolved SubViewport character composite at 35% opacity → trial configuration
+Automated results: The viewport-composite revision passed 75 focused assertions before this contrast and transition review
+Human observations (expected / actual): Expected the resolved translucent character to remain readable / the character disappeared against dark walls, and partial obstruction caused an abrupt gray rendering change
+Decision: Rejected together with the earlier scenery-fade and transparent-character approaches
+Follow-up checklist items: Leave every source render untouched; draw an opaque high-contrast player silhouette only at pixels where ordinary opaque scene depth is closer than the player
+Earlier checkpoints to repeat: Clear player rendering, dark/light obstruction contrast, partial overlap stability and shadow stability
+Evidence or feedback report path: User report in conversation; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 human-trial revision 11
+Date / tester / revision: 2026-09-10 / Codex automated checks / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v10 / production player and perspective follow-camera
+Settings changed (before → after): Transparent viewport composite plus FloorSurface fade → two fully opaque unshaded player-only passes, using scene-depth rejection for a deep fill and bright expanded outline; no FloorSurface, camera or authored-player mutation
+Automated results: Player-silhouette and assembled-playground suites pass 52 focused assertions covering isolated geometry copies, authored overlay preservation, source transform/visibility synchronization, solid depth-only shader contracts, comparison disable and teardown. ./check.sh validates 194 text-resource UIDs, 120/120 scenes and 239 script/test pairs; 247 suites report 2,730 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown failure.
+Human observations (expected / actual): Expected ordinary rendering everywhere visible and a stable high-contrast silhouette only over hidden player pixels / awaiting retry
+Decision: Awaiting human retry
+Follow-up checklist items: Cross the 1m platform edge slowly, pause half-obscured, then repeat against the dark pyramid and multiple camera views; confirm the wall never changes and only hidden character pixels gain the two-tone silhouette
+Earlier checkpoints to repeat: Clear player rendering, dark/light obstruction contrast, partial overlap stability and shadow stability
+Evidence or feedback report path: Not created yet; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 Forward Plus human trial 12
+Date / tester / revision: 2026-09-10 / user / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v10 / production player and perspective follow-camera
+Settings changed (before → after): Player-only solid depth silhouette → trial configuration
+Automated results: Headless structural suites passed 52 assertions, but did not compile the Forward Plus shaders
+Human observations (expected / actual): Expected a two-tone silhouette over hidden player pixels / no silhouette or visible change appeared when occluded
+Decision: Broken implementation; reproduce in the real renderer before another human retry
+Follow-up checklist items: Compile and execute both shaders under Metal Forward+, then measure hidden, partial and clear pixel output without writing rendered assets
+Earlier checkpoints to repeat: Any visible silhouette while hidden, no overlay while clear, partial overlap and unchanged scenery
+Evidence or feedback report path: User report in conversation; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 human-trial revision 12
+Date / tester / revision: 2026-09-10 / Codex automated and Forward Plus checks / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v10 / Metal Forward+ in-memory render probe plus production-player assembled fixture
+Settings changed (before → after): Invalid stage-built-in references and manual depth comparison → compiling solid shaders using inverted hardware depth, view-space source separation and expanded front-face outline
+Automated results: The real renderer exposed the original SCREEN_UV and INV_PROJECTION_MATRIX compile failures. After correction, a 3840x2160 in-memory probe measured 99,856 changed/1,260 outline pixels fully hidden, 96,064/922 partially hidden and exactly 0/0 clear. Structural player-silhouette and assembled-playground suites pass 52 assertions. ./check.sh validates 194 text-resource UIDs, 120/120 scenes and 239 script/test pairs; 247 suites report 2,730 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown failure.
+Human observations (expected / actual): Expected a stable solid silhouette only over hidden player pixels, with no effect while clear / awaiting retry
+Decision: Awaiting human retry after real-renderer verification
+Follow-up checklist items: Cross behind the 1m platform, pause partially hidden and repeat at the dark pyramid; verify the solid fill/outline appearance rather than basic effect activation
+Earlier checkpoints to repeat: Dark/light contrast, partial overlap stability, unchanged scenery and unchanged shadows
+Evidence or feedback report path: Not created yet; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 Forward Plus human trial 13
+Date / tester / revision: 2026-09-10 / user / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v10 / production player and perspective follow-camera
+Settings changed (before → after): Compiling solid depth silhouette using duplicated skinned player meshes → trial configuration
+Automated results: The controlled single-mesh Forward Plus probe passed hidden, partial and clear states, but had not exercised the six-piece production character
+Human observations (expected / actual): Expected unchanged ordinary player rendering / the unobstructed production character appeared corrupted
+Decision: Broken implementation; duplicated skinned geometry is not safe, and player self-occlusion must be distinguished from scenery occlusion
+Follow-up checklist items: Remove geometry duplication, use the authoritative animated meshes, and stencil-mark their visible frontmost pixels before drawing the obstruction silhouette
+Earlier checkpoints to repeat: Pixel-identical clear character, visible hidden silhouette, partial overlap, dark/light contrast and unchanged scenery
+Evidence or feedback report path: User report in conversation; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 human-trial revision 13
+Date / tester / revision: 2026-09-10 / Codex automated and Forward Plus checks / f0ac3d8 + working tree
+Fixture and camera view: M7 player-visibility-v10 / Metal Forward+ production-player and controlled depth probes
+Settings changed (before → after): Six independently duplicated skinned meshes → three ordered passes on each authoritative animated mesh: invisible visible-pixel stencil mark, solid expanded outline and solid fill rejected by both stencil and inverted depth
+Automated results: The production-player probe first reproduced 13,506 incorrectly changed clear pixels. After the stencil/authoritative-mesh change, the same 3840x2160 clear comparison changed only 5 of 8,294,400 pixels while the hidden player changed 22,394. The controlled probe remains exact: 99,856/1,260 fill/outline pixels hidden, 96,064/922 partially hidden and 0/0 clear. Structural suites pass 51 assertions. ./check.sh validates 194 text-resource UIDs, 120/120 scenes and 239 script/test pairs; 247 suites report 2,729 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown failure.
+Human observations (expected / actual): Expected the production character to remain visually intact while clear and gain the silhouette only behind scenery / awaiting retry
+Decision: Awaiting human retry after production-player Forward Plus verification
+Follow-up checklist items: Observe the unobstructed player while idle and walking, then cross the 1m platform edge and dark pyramid; judge visual quality only if the base character remains intact
+Earlier checkpoints to repeat: Pixel-identical clear character, dark/light contrast, partial overlap stability, unchanged scenery and unchanged shadows
+Evidence or feedback report path: Not created yet; standalone playground has no gameplay recording
+```
+
+```text
+Milestone / trial: M7 Forward Plus human trial 14
+Date / tester / revision: 2026-09-10 / user / f0ac3d8 + working tree
+Fixture and camera view: Production Level 1 and Level 2 / ordinary gameplay camera
+Settings changed (before → after): Root-level silhouette instance added only to Level 1 → trial configuration
+Automated results: Earlier renderer probes showed compatible opaque depth-writing GridMaps, but did not verify that every level instantiated the player visibility component
+Human observations (expected / actual): Expected the same obstruction silhouette across populated scenes / Level 1 worked, while Level 2 had no silhouette
+Decision: Per-level integration rejected
+Follow-up checklist items: Compose the separate visibility component into the shared player and remove the Level 1-specific scene edit
+Earlier checkpoints to repeat: Level 1 and Level 2 GridMap obstruction, clear player rendering and floor playground comparison
+Evidence or feedback report path: Latest Level 1 directed gameplay recording plus user report in conversation
+```
+
+```text
+Milestone / trial: M7 integration revision 14
+Date / tester / revision: 2026-09-10 / Codex automated checks / f0ac3d8 + working tree
+Fixture and camera view: Shared production player used by the floor playground and every mapped gameplay level
+Settings changed (before → after): Optional root-level component in selected scenes → one removable child component in player.tscn targeting its own imported character subtree
+Automated results: Player, silhouette-component and assembled-playground suites pass 63 assertions. Metal Forward+ probes using only the shared player instance produce the hidden silhouette in both Level 1 and Level 2 and effectively no clear-state output. The committed Level 1 scene has no visibility-specific diff. ./check.sh validates 194 text-resource UIDs, 120/120 scenes and 239 script/test pairs; 247 suites report 2,731 passing assertions before the pre-existing Tutorial 3 GDKillBoundary3D teardown failure.
+Human observations (expected / actual): Expected Level 2 and future levels to inherit the same effect without scene edits / awaiting cross-level retry
+Decision: Awaiting human retry
+Follow-up checklist items: Verify one genuine GridMap obstruction in Level 1 and Level 2, then spot-check a tutorial scene
+Earlier checkpoints to repeat: Hidden fill/outline, unchanged visible player, partial overlap and unchanged scenery
+Evidence or feedback report path: No new marker; structural integration checks and user report in conversation
 ```
 
 ## Deferred until a separate integration plan

@@ -1,7 +1,7 @@
 class_name FloorSurfaceCameraSettings
 extends Resource
 
-## Named fixed camera arrangements for repeatable floor-surface evaluations.
+## Named perspective follow-camera arrangements for repeatable floor-surface evaluations.
 
 enum CameraView {
 	Overview,
@@ -14,7 +14,7 @@ enum CameraView {
 @export var overview_position := Vector3(8.5, 9.0, 10.5)
 ## World point observed by the broad default 2.5D view.
 @export var overview_target := Vector3(0.0, 0.0, 0.0)
-## Orthographic width of the broad default 2.5D view.
+## Follow-camera distance used by the broad default 2.5D view.
 @export_range(1.0, 100.0, 0.1, "or_greater", "suffix:m") var overview_size := 14.0
 
 @export_group("Close")
@@ -22,7 +22,7 @@ enum CameraView {
 @export var close_position := Vector3(5.5, 5.5, 6.5)
 ## World point observed by the close inspection view.
 @export var close_target := Vector3(0.0, 0.5, 0.0)
-## Orthographic width of the close inspection view.
+## Follow-camera distance used by the close inspection view.
 @export_range(1.0, 100.0, 0.1, "or_greater", "suffix:m") var close_size := 9.0
 
 @export_group("Side")
@@ -30,7 +30,7 @@ enum CameraView {
 @export var side_position := Vector3(-10.0, 6.0, 0.0)
 ## World point observed by the side comparison view.
 @export var side_target := Vector3(0.0, 0.5, 0.0)
-## Orthographic width of the side comparison view.
+## Follow-camera distance used by the side comparison view.
 @export_range(1.0, 100.0, 0.1, "or_greater", "suffix:m") var side_size := 13.0
 
 
@@ -67,7 +67,7 @@ func get_view_target(view: CameraView) -> Vector3:
 			return overview_target
 
 
-## Returns the orthographic width for a configured arrangement.
+## Returns the perspective follow distance for a configured arrangement.
 func get_view_size(view: CameraView) -> float:
 	match view:
 		CameraView.Close:

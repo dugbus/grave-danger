@@ -2,13 +2,14 @@
 
 [ext_resource type="Script" uid="uid://d2uilba44h8qo" path="res://addons/floor_surface/test/floor_surface_playground.gd" id="1_playground"]
 [ext_resource type="Resource" path="res://addons/floor_surface/test/floor_surface_camera_settings.tres" id="2_camera_settings"]
-[ext_resource type="PackedScene" path="res://addons/floor_surface/test/floor_surface_test_player.tscn" id="3_player"]
+[ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="3_player"]
 [ext_resource type="PackedScene" path="res://addons/floor_surface/floor_surface.tscn" id="4_surface"]
 [ext_resource type="Script" uid="uid://cdlus0vrv8r3u" path="res://addons/floor_surface/floor_map.gd" id="5_map_script"]
 [ext_resource type="Resource" path="res://addons/floor_surface/default_floor_elevation_profile.tres" id="6_profile"]
 [ext_resource type="Script" uid="uid://q0ef7o077f24" path="res://addons/floor_surface/floor_style.gd" id="7_style_script"]
 [ext_resource type="Resource" uid="uid://c01b1gskf8cxp" path="res://addons/floor_surface/default_floor_style.tres" id="8_style"]
-[ext_resource type="Resource" path="res://addons/floor_surface/stone_floor_style.tres" id="9_stone_style"]
+[ext_resource type="Resource" uid="uid://cmm0bkjw8r4ce" path="res://addons/floor_surface/stone_floor_style.tres" id="9_stone_style"]
+[ext_resource type="Script" uid="uid://bov7w0cyy2jl7" path="res://game/follow_camera.gd" id="10_camera"]
 
 [sub_resource type="Environment" id="Environment_playground"]
 background_mode = 1
@@ -17,94 +18,105 @@ ambient_light_source = 3
 ambient_light_color = Color(0.44, 0.5, 0.62, 1)
 ambient_light_energy = 0.7
 
-[sub_resource type="Resource" id="Resource_tednh"]
+[sub_resource type="Resource" id="Resource_5b7yh"]
 resource_local_to_scene = true
 script = ExtResource("5_map_script")
 minimum_cell = Vector2i(-6, -5)
 dimensions = Vector2i(12, 17)
 default_present = true
-presence_exceptions = Array[Vector2i]([Vector2i(-1, -1), Vector2i(0, -1), Vector2i(-1, 0), Vector2i(0, 0), Vector2i(-6, 5), Vector2i(-5, 5), Vector2i(-4, 5), Vector2i(-3, 5), Vector2i(-2, 5), Vector2i(-1, 5), Vector2i(0, 5), Vector2i(1, 5), Vector2i(2, 5), Vector2i(3, 5), Vector2i(4, 5), Vector2i(5, 5), Vector2i(-6, 8), Vector2i(-5, 8), Vector2i(-4, 8), Vector2i(-3, 8), Vector2i(-2, 8), Vector2i(-1, 8), Vector2i(0, 8), Vector2i(1, 8), Vector2i(2, 8), Vector2i(3, 8), Vector2i(4, 8), Vector2i(5, 8), Vector2i(-6, 9), Vector2i(-5, 9), Vector2i(-4, 9), Vector2i(-3, 9), Vector2i(-2, 9), Vector2i(-1, 9), Vector2i(0, 9), Vector2i(1, 9), Vector2i(2, 9), Vector2i(3, 9), Vector2i(4, 9), Vector2i(5, 9)])
+presence_exceptions = Array[Vector2i]([Vector2i(-1, -1), Vector2i(0, -1), Vector2i(-1, 0), Vector2i(0, 0), Vector2i(-6, 5), Vector2i(-5, 5), Vector2i(-4, 5), Vector2i(-3, 5), Vector2i(-2, 5), Vector2i(-1, 5), Vector2i(0, 5), Vector2i(1, 5), Vector2i(2, 5), Vector2i(3, 5), Vector2i(4, 5), Vector2i(5, 5), Vector2i(-6, 8), Vector2i(5, 8), Vector2i(-6, 9), Vector2i(5, 9)])
 elevation_overrides = Dictionary[Vector2i, int]({
-Vector2i(-6, 10): 24,
-Vector2i(-6, 11): 24,
-Vector2i(-5, 10): 24,
-Vector2i(-5, 11): 24,
+Vector2i(-5, 6): 4,
+Vector2i(-5, 7): 4,
+Vector2i(-5, 8): 4,
+Vector2i(-5, 9): 4,
+Vector2i(-5, 10): 4,
+Vector2i(-5, 11): 4,
 Vector2i(-4, -4): 1,
 Vector2i(-4, -3): 1,
-Vector2i(-4, 6): 1,
-Vector2i(-4, 7): 1,
-Vector2i(-4, 10): 25,
-Vector2i(-4, 11): 25,
+Vector2i(-4, 6): 4,
+Vector2i(-4, 7): 4,
+Vector2i(-4, 8): 4,
+Vector2i(-4, 9): 4,
+Vector2i(-4, 10): 4,
+Vector2i(-4, 11): 4,
 Vector2i(-3, -4): 2,
 Vector2i(-3, -3): 2,
-Vector2i(-3, 6): 1,
-Vector2i(-3, 7): 1,
-Vector2i(-3, 10): 25,
-Vector2i(-3, 11): 25,
+Vector2i(-3, 6): 4,
+Vector2i(-3, 7): 12,
+Vector2i(-3, 8): 12,
+Vector2i(-3, 9): 12,
+Vector2i(-3, 10): 12,
+Vector2i(-3, 11): 4,
 Vector2i(-2, -4): 2,
 Vector2i(-2, -3): 2,
-Vector2i(-2, 6): 3,
-Vector2i(-2, 7): 3,
-Vector2i(-2, 10): 27,
-Vector2i(-2, 11): 27,
+Vector2i(-2, 6): 4,
+Vector2i(-2, 7): 12,
+Vector2i(-2, 8): 12,
+Vector2i(-2, 9): 12,
+Vector2i(-2, 10): 12,
+Vector2i(-2, 11): 4,
 Vector2i(-1, -4): 2,
 Vector2i(-1, -3): 2,
 Vector2i(-1, -2): 1,
-Vector2i(-1, 6): 3,
-Vector2i(-1, 7): 3,
-Vector2i(-1, 10): 27,
-Vector2i(-1, 11): 27,
+Vector2i(-1, 6): 4,
+Vector2i(-1, 7): 12,
+Vector2i(-1, 8): 24,
+Vector2i(-1, 9): 24,
+Vector2i(-1, 10): 12,
+Vector2i(-1, 11): 4,
 Vector2i(0, -4): 2,
 Vector2i(0, -3): 2,
 Vector2i(0, -2): 1,
 Vector2i(0, 3): 12,
-Vector2i(0, 6): 6,
-Vector2i(0, 7): 6,
-Vector2i(0, 10): 30,
-Vector2i(0, 11): 30,
+Vector2i(0, 6): 4,
+Vector2i(0, 7): 12,
+Vector2i(0, 8): 24,
+Vector2i(0, 9): 24,
+Vector2i(0, 10): 12,
+Vector2i(0, 11): 4,
 Vector2i(1, -4): 2,
 Vector2i(1, -3): 2,
 Vector2i(1, -1): 2,
 Vector2i(1, 0): 2,
 Vector2i(1, 3): 12,
-Vector2i(1, 6): 6,
-Vector2i(1, 7): 6,
-Vector2i(1, 10): 30,
-Vector2i(1, 11): 30,
+Vector2i(1, 6): 4,
+Vector2i(1, 7): 12,
+Vector2i(1, 8): 12,
+Vector2i(1, 9): 12,
+Vector2i(1, 10): 12,
+Vector2i(1, 11): 4,
 Vector2i(2, -4): 2,
 Vector2i(2, -3): 2,
-Vector2i(2, 6): 10,
-Vector2i(2, 7): 10,
-Vector2i(2, 10): 34,
-Vector2i(2, 11): 34,
+Vector2i(2, -1): 4,
+Vector2i(2, 0): 4,
+Vector2i(2, 1): 4,
+Vector2i(2, 6): 4,
+Vector2i(2, 7): 12,
+Vector2i(2, 8): 12,
+Vector2i(2, 9): 12,
+Vector2i(2, 10): 12,
+Vector2i(2, 11): 4,
 Vector2i(3, -4): 1,
 Vector2i(3, -3): 1,
-Vector2i(3, 6): 10,
-Vector2i(3, 7): 10,
-Vector2i(3, 10): 34,
-Vector2i(3, 11): 34,
-Vector2i(4, 6): 10,
-Vector2i(4, 7): 10,
-Vector2i(4, 10): 34,
-Vector2i(4, 11): 34,
-Vector2i(5, 6): 10,
-Vector2i(5, 7): 10,
-Vector2i(5, 10): 34,
-Vector2i(5, 11): 34
-})
-transition_overrides = Dictionary[Vector2i, int]({
-Vector2i(-4, 3): 1,
-Vector2i(-3, 3): 1,
-Vector2i(-2, 3): 1,
-Vector2i(-1, 3): 1,
-Vector2i(0, 3): 1
-})
-low_edge_overrides = Dictionary[Vector2i, int]({
-Vector2i(-4, 3): 4,
-Vector2i(-3, 3): 4,
-Vector2i(-2, 3): 4,
-Vector2i(-1, 3): 4,
-Vector2i(0, 3): 4
+Vector2i(3, -1): 4,
+Vector2i(3, 0): 4,
+Vector2i(3, 1): 4,
+Vector2i(3, 6): 4,
+Vector2i(3, 7): 4,
+Vector2i(3, 8): 4,
+Vector2i(3, 9): 4,
+Vector2i(3, 10): 4,
+Vector2i(3, 11): 4,
+Vector2i(4, -1): 4,
+Vector2i(4, 0): 4,
+Vector2i(4, 1): 4,
+Vector2i(4, 6): 4,
+Vector2i(4, 7): 4,
+Vector2i(4, 8): 4,
+Vector2i(4, 9): 4,
+Vector2i(4, 10): 4,
+Vector2i(4, 11): 4
 })
 style_overrides = Dictionary[Vector2i, int]({
 Vector2i(-6, -5): 1,
@@ -312,6 +324,20 @@ Vector2i(5, 9): 1,
 Vector2i(5, 10): 1,
 Vector2i(5, 11): 1
 })
+transition_overrides = Dictionary[Vector2i, int]({
+Vector2i(-4, 3): 1,
+Vector2i(-3, 3): 1,
+Vector2i(-2, 3): 1,
+Vector2i(-1, 3): 1,
+Vector2i(0, 3): 1
+})
+low_edge_overrides = Dictionary[Vector2i, int]({
+Vector2i(-4, 3): 4,
+Vector2i(-3, 3): 4,
+Vector2i(-2, 3): 4,
+Vector2i(-1, 3): 4,
+Vector2i(0, 3): 4
+})
 
 [sub_resource type="StandardMaterial3D" id="ResetMaterial"]
 shading_mode = 0
@@ -340,8 +366,7 @@ corner_radius_bottom_left = 6
 script = ExtResource("1_playground")
 camera_settings = ExtResource("2_camera_settings")
 trial_start_paths = Array[NodePath]([NodePath("ResetPosition"), NodePath("LowLaneStart"), NodePath("HighLaneStart"), NodePath("RampRouteStart")])
-trial_focus_paths = Array[NodePath]([NodePath("MainFocus"), NodePath("LowLaneFocus"), NodePath("HighLaneFocus"), NodePath("RampRouteFocus")])
-trial_names = Array[String](["Style and mixed-rim pit", "Low comparison lane", "High comparison lane — 24-unit base", "Variable five-tile ramp run"])
+trial_names = Array[String](["Walk behind the 1m platform", "Approach the taller terrace", "Circle the 6m stepped pyramid", "Ascend the five-tile ramp"])
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1292583225]
 environment = SubResource("Environment_playground")
@@ -353,12 +378,16 @@ light_energy = 1.4
 shadow_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=123923068]
-projection = 1
 current = true
-size = 14.0
+fov = 42.0
+script = ExtResource("10_camera")
+camera_offset = Vector3(0, 9, 12)
+view_elevation_degrees = 28.0
+zoom_distance = 15.0
+field_of_view = 42.0
 
 [node name="FloorSurface" parent="." unique_id=1431299148 instance=ExtResource("4_surface")]
-floor_map = SubResource("Resource_tednh")
+floor_map = SubResource("Resource_5b7yh")
 elevation_profile = ExtResource("6_profile")
 styles = Array[ExtResource("7_style_script")]([ExtResource("8_style"), ExtResource("9_stone_style")])
 
@@ -370,10 +399,10 @@ text = "M5 MIXED-RIM PIT
 VISUAL BOTTOM — NO COLLISION"
 
 [node name="ResetPosition" type="Marker3D" parent="." unique_id=1185377777]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 2.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.05, -2.5)
 
 [node name="Ring" type="MeshInstance3D" parent="ResetPosition" unique_id=1452747155]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.625, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.03, 0)
 mesh = SubResource("ResetMesh")
 
 [node name="Label" type="Label3D" parent="ResetPosition" unique_id=952953270]
@@ -382,44 +411,36 @@ billboard = 1
 no_depth_test = true
 text = "RESET"
 
-[node name="MainFocus" type="Marker3D" parent="." unique_id=2022276443]
-
 [node name="LowLaneStart" type="Marker3D" parent="." unique_id=1840423287]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0.65, 6.5)
-
-[node name="LowLaneFocus" type="Marker3D" parent="." unique_id=1170675982]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 6.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 4.5)
 
 [node name="HighLaneStart" type="Marker3D" parent="." unique_id=1881133586]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 6.65, 10.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 1.05, 8.5)
 
-[node name="HighLaneFocus" type="Marker3D" parent="." unique_id=199112997]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 10.5)
-
-[node name="RampRouteStart" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0.65, 3.5)
-
-[node name="RampRouteFocus" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.5, 3.5)
+[node name="RampRouteStart" type="Marker3D" parent="." unique_id=736968186]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0.05, 3.5)
 
 [node name="Player" parent="." unique_id=789155537 instance=ExtResource("3_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 2.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.05, -2.5)
+
+[node name="PlayerDeath" parent="Player" index="3" unique_id=360054101]
+lose_scene = ""
 
 [node name="LowLaneLabel" type="Label3D" parent="." unique_id=743546432]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 3.2, 6.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.7, 0)
 billboard = 1
 no_depth_test = true
-text = "LOW LANE — 0 UNIT BASE
-WALK STEP 1  |  NORMAL JUMP 2  |  UNENCUMBERED 3  |  BLOCKED 4"
+text = "M7 — 1 METRE OBSTRUCTION PLATFORM
+WALK BEHIND / IN FRONT / BESIDE"
 
 [node name="HighLaneLabel" type="Label3D" parent="." unique_id=88923982]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 10.2, 10.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.8, 8.5)
 billboard = 1
 no_depth_test = true
-text = "HIGH LANE — 24 UNITS / 6.00 M BASE
-SAME LOCAL DELTAS: 1  |  2  |  3  |  4"
+text = "M7 — 6 METRE STEPPED PYRAMID
+CIRCLE FROM BOTH SIDES / CHANGE CAMERA"
 
-[node name="RampRouteLabel" type="Label3D" parent="."]
+[node name="RampRouteLabel" type="Label3D" parent="." unique_id=1519793587]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4.2, 3.5)
 billboard = 1
 no_depth_test = true
@@ -427,6 +448,7 @@ text = "M6 RAMP ROUTE — WALK WITHOUT JUMPING
 3.00 M RISE OVER 5 RAMP TILES — NO SLOPE CAP"
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1835631595]
+visible = false
 
 [node name="Panel" type="PanelContainer" parent="HUD" unique_id=569430470]
 offset_left = 24.0
@@ -457,9 +479,9 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.92, 0.96, 1)
 theme_override_font_sizes/font_size = 18
 text = "Arrow keys / stick: move    Space / A: jump
-R: reset trial    V: camera    T: next trial lane    U: normal/unencumbered
-Central room: compare surfaces, fall through the pit, and walk the five-tile ramp route.
-Comparison lanes rise eastward: walk 1, jump 2, switch mode for 3, confirm 4 is blocked."
+R: reset    V: named camera angle    T: next obstruction    F: silhouette on/off    H: HUD
+Cross behind and in front of each structure; pause while overlapped and circle it from both sides.
+The floor stays unchanged; a solid two-tone player silhouette appears only behind opaque depth."
 
 [node name="Separator" type="HSeparator" parent="HUD/Panel/Margin/Rows" unique_id=586916565]
 layout_mode = 2
@@ -469,3 +491,5 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.75, 0.8, 0.88, 1)
 theme_override_font_sizes/font_size = 16
 text = "Fixture: loading"
+
+[editable path="Player"]
