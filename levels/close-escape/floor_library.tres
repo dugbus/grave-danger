@@ -1,18 +1,17 @@
-[gd_resource type="MeshLibrary" format=3]
+[gd_resource type="MeshLibrary" format=3 uid="uid://c1037sb5bw1pi"]
 
-[ext_resource type="Texture2D" path="res://Assets/environment/dirt_2.png" id="1_dirt"]
-
-[sub_resource type="BoxShape3D" id="FloorCollision"]
-size = Vector3(1, 0.5, 1)
+[ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="1_dirt"]
 
 [sub_resource type="StandardMaterial3D" id="DirtPhase0"]
 albedo_texture = ExtResource("1_dirt")
 uv1_scale = Vector3(0.5, 0.5, 1)
-uv1_offset = Vector3(0, 0, 0)
 
 [sub_resource type="PlaneMesh" id="FloorTile0"]
 material = SubResource("DirtPhase0")
 size = Vector2(1, 1)
+
+[sub_resource type="BoxShape3D" id="FloorCollision"]
+size = Vector3(1, 0.5, 1)
 
 [sub_resource type="StandardMaterial3D" id="DirtPhase1"]
 albedo_texture = ExtResource("1_dirt")
