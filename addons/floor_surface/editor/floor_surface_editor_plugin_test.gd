@@ -46,6 +46,16 @@ func run(_tree: SceneTree) -> void:
 			and method_names.has(&"_update_preview_footprint"),
 		"M6 routes inferred ramp gestures through the existing preview and undo workflow."
 	)
+	expect(
+		method_names.has(&"_get_fill_match_property") \
+			and method_names.has(&"_on_validate_requested") \
+			and method_names.has(&"_on_repair_requested"),
+		"M9 composes bounded fill with visible validation and conservative repair."
+	)
+	expect(
+		method_names.has(&"_on_conform_grounded_requested"),
+		"M8 exposes one explicit undoable grounding action."
+	)
 	var ramp_preview: Array[Vector2i] = SUBJECT._make_single_cell_preview(Vector2i(-2, 3), true)
 	expect_equal(
 		ramp_preview,

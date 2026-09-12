@@ -15,6 +15,8 @@ extends Resource
 @export_range(0, 32, 1) var colour_match_tolerance := 2
 ## Repairs connected wall pieces shortly after painting stops in the selected GridMap.
 @export var auto_repair := false
+## Maximum vertical separation that still joins cardinal autotile neighbours on gently stepped ground.
+@export_range(0.0, 10.0, 0.01, "or_greater", "suffix:m") var autotile_vertical_connection_metres := 0.0
 @export var export_origin := Vector2i.ZERO
 @export var export_size := Vector2i.ZERO
 @export var color_mappings: Array[Resource] = []

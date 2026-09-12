@@ -3,9 +3,9 @@ extends Node3D
 
 ## Runtime coordinator for the isolated human-testable floor-surface fixture.
 
-const FIXTURE_ID := "M7 / player-visibility-v11"
+const FIXTURE_ID := "M10 / complete-floor-surface-playground-v1"
 const CAMERA_VIEW_COUNT := 3
-const TRIAL_COUNT := 4
+const TRIAL_COUNT := 9
 const HUD_REFRESH_SECONDS := 0.1
 const CAMERA_SETTINGS_SCRIPT := preload(
 	"res://addons/floor_surface/test/floor_surface_camera_settings.gd"
@@ -35,9 +35,9 @@ const VISIBILITY_SCRIPT := preload(
 @export var visibility_path: NodePath = ^"Player/PlayerOcclusionSilhouette"
 ## Diagnostics canvas that can be hidden during an unobstructed visual comparison.
 @export var hud_path: NodePath = ^"HUD"
-## Shows the detailed M7 diagnostics on launch; leave disabled for an unobstructed play view.
+## Shows detailed diagnostics on launch; leave disabled for an unobstructed play view.
 @export var show_diagnostics_on_start := false
-## Repeatable room, comparison-lane and ramp-route player reset points cycled with T.
+## Repeatable room, comparison-lane, pyramid-route and gradient-wall reset points cycled with T.
 @export var trial_start_paths: Array[NodePath] = []
 ## Human-readable trial names shown in the runtime HUD.
 @export var trial_names: Array[String] = []
@@ -204,7 +204,8 @@ func _format_surface_status(sample: SAMPLE_SCRIPT) -> String:
 	return (
 		"Floor surface: valid\nCell: (%d, %d) | sampled height: %.2f m\n"
 		+ "Elevation: %d units | unit: %.2f m | normal: (%.1f, %.1f, %.1f)\n"
-		+ "East edge: %s | delta: %s\nStyle: %d — %s | transition: %s | low edge: %s"
+		+ "East edge: %s | delta: %s\nStyle: %d — %s | transition: %s | low edge: %s\n"
+		+ "Map: %d × %d / %d tops | last rebuild: %.2f ms"
 	) % [
 		sample.cell.x,
 		sample.cell.y,
@@ -222,6 +223,10 @@ func _format_surface_status(sample: SAMPLE_SCRIPT) -> String:
 		floor_surface.floor_map.get_low_edge_name(
 			floor_surface.floor_map.get_cell_low_edge(sample.cell)
 		),
+		floor_surface.floor_map.dimensions.x,
+		floor_surface.floor_map.dimensions.y,
+		floor_surface.get_generated_cell_count(),
+		float(floor_surface.get_last_rebuild_microseconds()) / 1000.0,
 	]
 
 

@@ -46,6 +46,14 @@ func _test_scene_controls(tree: SceneTree) -> void:
 		SUBJECT.SHAPE_PAINTER.ShapeMode.Rectangle,
 		"The explicit Rectangle button selects rectangle painting."
 	)
+	dock.fill_button.button_pressed = true
+	dock._on_shape_mode_selected(SUBJECT.SHAPE_PAINTER.ShapeMode.Fill)
+	expect_equal(dock.get_shape_mode(), SUBJECT.SHAPE_PAINTER.ShapeMode.Fill, "Fill is an explicit shared painting shape.")
+	expect(not dock.brush_size_option.visible, "Fill hides the unrelated brush-size control.")
+	expect(
+		dock.get_node("FillGuidance").text.contains("always bounded"),
+		"The dock documents fill safety and matching rules."
+	)
 	dock.set_target(null, null)
 	expect(not dock.is_editing_enabled(), "Painting cannot arm without a valid target.")
 	dock.set_elevation_unit(0.25)
@@ -70,6 +78,8 @@ func _test_scene_controls(tree: SceneTree) -> void:
 	dock.set_styles(styles)
 	var target := Node.new()
 	dock.set_target(target, FLOOR_MAP_SCRIPT.new())
+	expect(not dock.conform_grounded_button.disabled, "A selected surface enables explicit grounding conform.")
+	expect(not dock.validate_button.disabled, "A selected surface enables visible validation.")
 	expect(not dock.grid_overlay_toggle.disabled, "A selected surface enables the grid guide toggle.")
 	var grid_toggle_events: Array[bool] = []
 	dock.grid_overlay_toggled.connect(

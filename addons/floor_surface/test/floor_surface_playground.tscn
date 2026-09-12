@@ -10,6 +10,8 @@
 [ext_resource type="Resource" uid="uid://c01b1gskf8cxp" path="res://addons/floor_surface/default_floor_style.tres" id="8_style"]
 [ext_resource type="Resource" uid="uid://cmm0bkjw8r4ce" path="res://addons/floor_surface/stone_floor_style.tres" id="9_stone_style"]
 [ext_resource type="Script" uid="uid://bov7w0cyy2jl7" path="res://game/follow_camera.gd" id="10_camera"]
+[ext_resource type="Script" path="res://addons/floor_surface/floor_surface_grounding.gd" id="11_grounding"]
+[ext_resource type="MeshLibrary" path="res://Assets/environment/graveyard.res" id="12_graveyard"]
 
 [sub_resource type="Environment" id="Environment_playground"]
 background_mode = 1
@@ -21,10 +23,10 @@ ambient_light_energy = 0.7
 [sub_resource type="Resource" id="Resource_5b7yh"]
 resource_local_to_scene = true
 script = ExtResource("5_map_script")
-minimum_cell = Vector2i(-6, -5)
-dimensions = Vector2i(12, 17)
+minimum_cell = Vector2i(-8, -5)
+dimensions = Vector2i(16, 22)
 default_present = true
-presence_exceptions = Array[Vector2i]([Vector2i(-1, -1), Vector2i(0, -1), Vector2i(-1, 0), Vector2i(0, 0), Vector2i(-6, 5), Vector2i(-5, 5), Vector2i(-4, 5), Vector2i(-3, 5), Vector2i(-2, 5), Vector2i(-1, 5), Vector2i(0, 5), Vector2i(1, 5), Vector2i(2, 5), Vector2i(3, 5), Vector2i(4, 5), Vector2i(5, 5), Vector2i(-6, 8), Vector2i(5, 8), Vector2i(-6, 9), Vector2i(5, 9)])
+presence_exceptions = Array[Vector2i]([Vector2i(-1, -1), Vector2i(0, -1), Vector2i(-1, 0), Vector2i(0, 0), Vector2i(-6, 5), Vector2i(-5, 5), Vector2i(-4, 5), Vector2i(-3, 5), Vector2i(-2, 5), Vector2i(0, 5), Vector2i(1, 5), Vector2i(2, 5), Vector2i(3, 5), Vector2i(4, 5), Vector2i(5, 5), Vector2i(5, 8), Vector2i(-6, 9), Vector2i(-6, 12), Vector2i(-5, 12), Vector2i(-4, 12), Vector2i(-3, 12), Vector2i(-2, 12), Vector2i(-1, 12), Vector2i(1, 12), Vector2i(2, 12), Vector2i(3, 12), Vector2i(4, 12), Vector2i(5, 12)])
 elevation_overrides = Dictionary[Vector2i, int]({
 Vector2i(-5, 6): 4,
 Vector2i(-5, 7): 4,
@@ -116,7 +118,17 @@ Vector2i(4, 7): 4,
 Vector2i(4, 8): 4,
 Vector2i(4, 9): 4,
 Vector2i(4, 10): 4,
-Vector2i(4, 11): 4
+Vector2i(4, 11): 4,
+Vector2i(3, 13): 1,
+Vector2i(3, 14): 1,
+Vector2i(4, 13): 2,
+Vector2i(4, 14): 2,
+Vector2i(5, 13): 3,
+Vector2i(5, 14): 3,
+Vector2i(6, 13): 4,
+Vector2i(6, 14): 4,
+Vector2i(7, 13): 5,
+Vector2i(7, 14): 5
 })
 style_overrides = Dictionary[Vector2i, int]({
 Vector2i(-6, -5): 1,
@@ -322,21 +334,80 @@ Vector2i(5, 7): 1,
 Vector2i(5, 8): 1,
 Vector2i(5, 9): 1,
 Vector2i(5, 10): 1,
-Vector2i(5, 11): 1
+Vector2i(5, 11): 1,
+Vector2i(-6, 12): 1,
+Vector2i(-5, 12): 1,
+Vector2i(-4, 12): 1,
+Vector2i(-3, 12): 1,
+Vector2i(-2, 12): 1,
+Vector2i(-1, 12): 1,
+Vector2i(1, 12): 1,
+Vector2i(2, 12): 1,
+Vector2i(3, 12): 1,
+Vector2i(4, 12): 1,
+Vector2i(5, 12): 1
 })
 transition_overrides = Dictionary[Vector2i, int]({
-Vector2i(-4, 3): 1,
-Vector2i(-3, 3): 1,
-Vector2i(-2, 3): 1,
+Vector2i(-1, 2): 1,
+Vector2i(2, 3): 1,
+Vector2i(3, 3): 1,
+Vector2i(4, 3): 1,
+Vector2i(5, 3): 1,
+Vector2i(6, 3): 1,
 Vector2i(-1, 3): 1,
-Vector2i(0, 3): 1
+Vector2i(-1, 4): 1,
+Vector2i(-1, 5): 1,
+Vector2i(-1, 6): 1,
+Vector2i(-1, 7): 1,
+Vector2i(-7, 8): 1,
+Vector2i(-6, 8): 1,
+Vector2i(-5, 8): 1,
+Vector2i(-4, 8): 1,
+Vector2i(-3, 8): 1,
+Vector2i(-2, 8): 1,
+Vector2i(1, 9): 1,
+Vector2i(2, 9): 1,
+Vector2i(3, 9): 1,
+Vector2i(4, 9): 1,
+Vector2i(5, 9): 1,
+Vector2i(6, 9): 1,
+Vector2i(0, 10): 1,
+Vector2i(0, 11): 1,
+Vector2i(0, 12): 1,
+Vector2i(0, 13): 1,
+Vector2i(0, 14): 1,
+Vector2i(0, 15): 1
 })
 low_edge_overrides = Dictionary[Vector2i, int]({
-Vector2i(-4, 3): 4,
-Vector2i(-3, 3): 4,
-Vector2i(-2, 3): 4,
-Vector2i(-1, 3): 4,
-Vector2i(0, 3): 4
+Vector2i(-1, 2): 1,
+Vector2i(2, 3): 2,
+Vector2i(3, 3): 2,
+Vector2i(4, 3): 2,
+Vector2i(5, 3): 2,
+Vector2i(6, 3): 2,
+Vector2i(-1, 3): 1,
+Vector2i(-1, 4): 1,
+Vector2i(-1, 5): 1,
+Vector2i(-1, 6): 1,
+Vector2i(-1, 7): 1,
+Vector2i(-7, 8): 4,
+Vector2i(-6, 8): 4,
+Vector2i(-5, 8): 4,
+Vector2i(-4, 8): 4,
+Vector2i(-3, 8): 4,
+Vector2i(-2, 8): 4,
+Vector2i(1, 9): 2,
+Vector2i(2, 9): 2,
+Vector2i(3, 9): 2,
+Vector2i(4, 9): 2,
+Vector2i(5, 9): 2,
+Vector2i(6, 9): 2,
+Vector2i(0, 10): 3,
+Vector2i(0, 11): 3,
+Vector2i(0, 12): 3,
+Vector2i(0, 13): 3,
+Vector2i(0, 14): 3,
+Vector2i(0, 15): 3
 })
 
 [sub_resource type="StandardMaterial3D" id="ResetMaterial"]
@@ -362,11 +433,35 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
+[sub_resource type="StandardMaterial3D" id="GroundedUprightMaterial"]
+albedo_color = Color(0.32, 0.58, 0.47, 1)
+
+[sub_resource type="CylinderMesh" id="GroundedUprightMesh"]
+material = SubResource("GroundedUprightMaterial")
+top_radius = 0.18
+bottom_radius = 0.34
+height = 0.9
+
+[sub_resource type="StandardMaterial3D" id="GroundedAlignedMaterial"]
+albedo_color = Color(0.55, 0.38, 0.3, 1)
+
+[sub_resource type="BoxMesh" id="GroundedAlignedMesh"]
+material = SubResource("GroundedAlignedMaterial")
+size = Vector3(0.65, 0.16, 0.38)
+
+[sub_resource type="StandardMaterial3D" id="GroundedAbsoluteMaterial"]
+albedo_color = Color(0.31, 0.42, 0.62, 1)
+
+[sub_resource type="SphereMesh" id="GroundedAbsoluteMesh"]
+material = SubResource("GroundedAbsoluteMaterial")
+radius = 0.28
+height = 0.56
+
 [node name="FloorSurfacePlayground" type="Node3D" unique_id=852732978]
 script = ExtResource("1_playground")
 camera_settings = ExtResource("2_camera_settings")
-trial_start_paths = Array[NodePath]([NodePath("ResetPosition"), NodePath("LowLaneStart"), NodePath("HighLaneStart"), NodePath("RampRouteStart")])
-trial_names = Array[String](["Walk behind the 1m platform", "Approach the taller terrace", "Circle the 6m stepped pyramid", "Ascend the five-tile ramp"])
+trial_start_paths = Array[NodePath]([NodePath("GradientWallStart"), NodePath("ResetPosition"), NodePath("LowLaneStart"), NodePath("HighLaneStart"), NodePath("RampRouteStart"), NodePath("PyramidWestStart"), NodePath("PyramidEastStart"), NodePath("PyramidNorthStart"), NodePath("PyramidSouthStart")])
+trial_names = Array[String](["Inspect the gradient wall bases", "Walk behind the 1m platform", "Approach the taller terrace", "Circle the 6m stepped pyramid", "Ascend the five-tile ramp", "Pyramid route — west", "Pyramid route — east", "Pyramid route — north", "Pyramid route — south"])
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1292583225]
 environment = SubResource("Environment_playground")
@@ -391,12 +486,45 @@ floor_map = SubResource("Resource_5b7yh")
 elevation_profile = ExtResource("6_profile")
 styles = Array[ExtResource("7_style_script")]([ExtResource("8_style"), ExtResource("9_stone_style")])
 
-[node name="HoleLabel" type="Label3D" parent="." unique_id=1274125127]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
-billboard = 1
-no_depth_test = true
-text = "M5 MIXED-RIM PIT
-VISUAL BOTTOM — NO COLLISION"
+[node name="GradientWallGridMap" type="GridMap" parent="."]
+mesh_library = ExtResource("12_graveyard")
+cell_size = Vector3(1, 0.25, 1)
+cell_center_y = false
+data = {
+"cells": PackedInt32Array(2, 14, 655362, 65539, 14, 655365, 131076, 14, 655365, 196613, 14, 655365, 262150, 14, 655365, 327687, 14, 2)
+}
+
+[node name="GroundedObjects" type="Node3D" parent="."]
+
+[node name="UprightScenery" type="MeshInstance3D" parent="GroundedObjects"]
+transform = Transform3D(0.848048, 0, 0.529919, 0, 1, 0, -0.529919, 0, 0.848048, -4.5, 1.3, 8.5)
+mesh = SubResource("GroundedUprightMesh")
+
+[node name="Grounding" type="Node" parent="GroundedObjects/UprightScenery"]
+script = ExtResource("11_grounding")
+surface_path = NodePath("../../../FloorSurface")
+height_offset = 0.3
+heading_radians = 0.558505
+
+[node name="SlopeAlignedRubble" type="MeshInstance3D" parent="GroundedObjects"]
+transform = Transform3D(0.857493, -0.514496, 0, 0.514496, 0.857493, 0, 0, 0, 1, 4.5, 1.58, 3.5)
+mesh = SubResource("GroundedAlignedMesh")
+
+[node name="Grounding" type="Node" parent="GroundedObjects/SlopeAlignedRubble"]
+script = ExtResource("11_grounding")
+surface_path = NodePath("../../../FloorSurface")
+grounding_mode = 1
+height_offset = 0.08
+
+[node name="AbsoluteHeightControl" type="MeshInstance3D" parent="GroundedObjects"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 2.0, 4.5)
+mesh = SubResource("GroundedAbsoluteMesh")
+
+[node name="Grounding" type="Node" parent="GroundedObjects/AbsoluteHeightControl"]
+script = ExtResource("11_grounding")
+surface_path = NodePath("../../../FloorSurface")
+grounding_mode = 2
+grounding_stale = false
 
 [node name="ResetPosition" type="Marker3D" parent="." unique_id=1185377777]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.05, -2.5)
@@ -405,12 +533,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.05, -2.5)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.03, 0)
 mesh = SubResource("ResetMesh")
 
-[node name="Label" type="Label3D" parent="ResetPosition" unique_id=952953270]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
-billboard = 1
-no_depth_test = true
-text = "RESET"
-
 [node name="LowLaneStart" type="Marker3D" parent="." unique_id=1840423287]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 4.5)
 
@@ -418,34 +540,28 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 4.5)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 1.05, 8.5)
 
 [node name="RampRouteStart" type="Marker3D" parent="." unique_id=736968186]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0.05, 3.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0.05, 3.5)
+
+[node name="PyramidWestStart" type="Marker3D" parent="."]
+position = Vector3(-7.5, 0.05, 8.5)
+
+[node name="PyramidEastStart" type="Marker3D" parent="."]
+position = Vector3(7.5, 0.05, 9.5)
+
+[node name="PyramidNorthStart" type="Marker3D" parent="."]
+position = Vector3(-0.5, 0.05, 1.5)
+
+[node name="PyramidSouthStart" type="Marker3D" parent="."]
+position = Vector3(0.5, 0.05, 16.5)
+
+[node name="GradientWallStart" type="Marker3D" parent="."]
+position = Vector3(4.5, 0.05, 15.5)
 
 [node name="Player" parent="." unique_id=789155537 instance=ExtResource("3_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.05, -2.5)
 
 [node name="PlayerDeath" parent="Player" index="3" unique_id=360054101]
 lose_scene = ""
-
-[node name="LowLaneLabel" type="Label3D" parent="." unique_id=743546432]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.7, 0)
-billboard = 1
-no_depth_test = true
-text = "M7 — 1 METRE OBSTRUCTION PLATFORM
-WALK BEHIND / IN FRONT / BESIDE"
-
-[node name="HighLaneLabel" type="Label3D" parent="." unique_id=88923982]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.8, 8.5)
-billboard = 1
-no_depth_test = true
-text = "M7 — 6 METRE STEPPED PYRAMID
-CIRCLE FROM BOTH SIDES / CHANGE CAMERA"
-
-[node name="RampRouteLabel" type="Label3D" parent="." unique_id=1519793587]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4.2, 3.5)
-billboard = 1
-no_depth_test = true
-text = "M6 RAMP ROUTE — WALK WITHOUT JUMPING
-3.00 M RISE OVER 5 RAMP TILES — NO SLOPE CAP"
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1835631595]
 visible = false
@@ -479,8 +595,8 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.92, 0.96, 1)
 theme_override_font_sizes/font_size = 18
 text = "Arrow keys / stick: move    Space / A: jump
-R: reset    V: named camera angle    T: next obstruction    F: silhouette on/off    H: HUD
-Cross behind and in front of each structure; pause while overlapped and circle it from both sides.
+R: reset    V: named camera angle    T: next trial    F: silhouette on/off    H: HUD
+Test the pit, steps, simple ramp, grounded samples, gradient walls, and all four pyramid routes.
 The floor stays unchanged; a solid two-tone player silhouette appears only behind opaque depth."
 
 [node name="Separator" type="HSeparator" parent="HUD/Panel/Margin/Rows" unique_id=586916565]

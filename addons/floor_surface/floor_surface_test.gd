@@ -14,6 +14,7 @@ func run(tree: SceneTree) -> void:
 	_test_contiguous_ramp_edges_are_traversal_flat()
 	await _test_rebuild_and_collision_agreement(tree)
 	await _test_ramp_collision_agreement(tree)
+	await _test_multiple_surface_instances_are_isolated(tree)
 
 
 func _test_queries_boundaries_and_origin() -> void:
@@ -168,6 +169,10 @@ func _test_rebuild_and_collision_agreement(tree: SceneTree) -> void:
 	surface.rebuild()
 	expect_equal(derived.get_child_count(), child_count_before, "Repeated rebuilds do not duplicate derived nodes.")
 	expect_equal(surface.get_rebuild_count(), rebuild_count_before + 2, "Each explicit rebuild completes once.")
+	expect(
+		surface.get_last_rebuild_microseconds() >= 0,
+		"A complete rebuild records an editor-visible duration."
+	)
 	var space_state := surface.get_world_3d().direct_space_state
 	var floor_query := PhysicsRayQueryParameters3D.create(
 		Vector3(-0.5, 2.0, 0.5),
@@ -226,4 +231,37 @@ func _test_ramp_collision_agreement(tree: SceneTree) -> void:
 			"Ramp collision and authoritative sampling expose the same normal."
 		)
 	surface.queue_free()
+	await tree.process_frame
+
+
+func _test_multiple_surface_instances_are_isolated(tree: SceneTree) -> void:
+	var first_surface := SURFACE_SCENE.instantiate() as SUBJECT
+	var second_surface := SURFACE_SCENE.instantiate() as SUBJECT
+	var first_map := MAP_SCRIPT.new()
+	first_map.dimensions = Vector2i(2, 1)
+	first_map.default_present = true
+	var second_map := first_map.create_unique_copy() as MAP_SCRIPT
+	var style := STYLE_SCRIPT.new()
+	style.top_material = StandardMaterial3D.new()
+	var styles: Array[STYLE_SCRIPT] = [style]
+	expect(first_map != second_map, "The independent workflow creates a separate FloorMap resource.")
+	tree.root.add_child(first_surface)
+	tree.root.add_child(second_surface)
+	for surface in [first_surface, second_surface] as Array[SUBJECT]:
+		surface.elevation_profile = PROFILE_SCRIPT.new()
+		surface.styles = styles
+	first_surface.floor_map = first_map
+	second_surface.floor_map = second_map
+	expect(first_surface.floor_map == first_map, "The first surface retains its assigned map.")
+	expect(second_surface.floor_map == second_map, "The second surface retains its assigned map.")
+	await tree.physics_frame
+	expect_equal(first_surface.get_generated_cell_count(), 2, "The first surface builds its own map.")
+	expect_equal(second_surface.get_generated_cell_count(), 2, "The second surface builds independently.")
+	var edited_cell := Vector2i(1, 0)
+	first_map.set_floor_present(edited_cell, false)
+	expect_equal(first_surface.get_generated_cell_count(), 1, "Editing one map rebuilds only its owning surface data.")
+	expect_equal(second_surface.get_generated_cell_count(), 2, "A separate surface keeps its map and derived output.")
+	expect(second_surface.has_floor(edited_cell), "Multiple instances never share mutable FloorMap state accidentally.")
+	first_surface.queue_free()
+	second_surface.queue_free()
 	await tree.process_frame

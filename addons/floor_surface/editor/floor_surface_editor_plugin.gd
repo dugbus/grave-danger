@@ -18,6 +18,9 @@ const STYLE_PAINTER := preload(
 const TRANSITION_PAINTER := preload(
 	"res://addons/floor_surface/editor/floor_surface_transition_painter.gd"
 )
+const FLOOD_FILL := preload(
+	"res://addons/floor_surface/editor/floor_surface_flood_fill.gd"
+)
 const EDITOR_VISUALS := preload(
 	"res://addons/floor_surface/editor/floor_surface_editor_visuals.gd"
 )
@@ -26,6 +29,13 @@ const SURFACE_PICKER := preload(
 )
 const DOCK_SCRIPT := preload("res://addons/floor_surface/editor/floor_surface_dock.gd")
 const DOCK_SCENE := preload("res://addons/floor_surface/editor/floor_surface_dock.tscn")
+const GROUNDING_EDITOR := preload(
+	"res://addons/floor_surface/editor/floor_surface_grounding_editor.gd"
+)
+const GROUNDING_SCRIPT := preload("res://addons/floor_surface/floor_surface_grounding.gd")
+const VALIDATION := preload(
+	"res://addons/floor_surface/editor/floor_surface_validation.gd"
+)
 const APPLY_SNAPSHOT_METHOD := &"apply_shape_snapshot"
 const APPLY_ELEVATION_SNAPSHOT_METHOD := &"apply_elevation_snapshot"
 const APPLY_STYLE_SNAPSHOT_METHOD := &"apply_style_snapshot"
@@ -65,6 +75,9 @@ func _enter_tree() -> void:
 	_dock.brush_size_changed.connect(_on_tool_setting_changed)
 	_dock.make_unique_requested.connect(_on_make_unique_requested)
 	_dock.save_requested.connect(_on_save_requested)
+	_dock.conform_grounded_requested.connect(_on_conform_grounded_requested)
+	_dock.validate_requested.connect(_on_validate_requested)
+	_dock.repair_requested.connect(_on_repair_requested)
 	get_editor_interface().get_selection().selection_changed.connect(_on_selection_changed)
 	set_input_event_forwarding_always_enabled()
 	_on_selection_changed()
@@ -261,7 +274,14 @@ func _update_preview_footprint() -> void:
 		_update_preview()
 		return
 	var clip_to_bounds := _should_clip_to_bounds()
-	if _dock.get_shape_mode() == SHAPE_PAINTER.ShapeMode.Rectangle:
+	if _dock.get_shape_mode() == SHAPE_PAINTER.ShapeMode.Fill:
+		var fill_seed := _rectangle_start if _is_gesture_active() else _pointer_cell
+		_preview_cells = FLOOD_FILL.footprint(
+			_target.floor_map,
+			fill_seed,
+			_get_fill_match_property()
+		)
+	elif _dock.get_shape_mode() == SHAPE_PAINTER.ShapeMode.Rectangle:
 		if _is_gesture_active():
 			_preview_cells = SHAPE_PAINTER.rectangle_footprint(
 				_rectangle_start,
@@ -353,7 +373,10 @@ func _begin_gesture() -> int:
 	_last_brush_cell = _pointer_cell
 	if _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Transition:
 		_update_preview_footprint()
-	elif _dock.get_shape_mode() == SHAPE_PAINTER.ShapeMode.Brush:
+	elif _dock.get_shape_mode() in [
+		SHAPE_PAINTER.ShapeMode.Brush,
+		SHAPE_PAINTER.ShapeMode.Fill,
+	]:
 		_apply_active_cells(_preview_cells)
 	else:
 		_update_preview_footprint()
@@ -433,22 +456,36 @@ func _gesture_action_name() -> String:
 				operation_name = "Raise Elevation"
 			ELEVATION_PAINTER.Operation.LowerOne:
 				operation_name = "Lower Elevation"
-		return "%s Rectangle" % operation_name \
-			if _dock.get_shape_mode() == SHAPE_PAINTER.ShapeMode.Rectangle \
-			else "%s Stroke" % operation_name
+		return _shaped_action_name(operation_name)
 	if _dock.get_edit_mode() == DOCK_SCRIPT.EditMode.Style:
 		var style_operation := "Paint Style: %s" % _get_style_name(_dock.get_style_index())
-		return "%s Rectangle" % style_operation \
-			if _dock.get_shape_mode() == SHAPE_PAINTER.ShapeMode.Rectangle \
-			else "%s Stroke" % style_operation
+		return _shaped_action_name(style_operation)
 	var operation := (
 		"Paint Floor"
 		if _dock.get_paint_mode() == SHAPE_PAINTER.PaintMode.Paint
 		else "Erase Floor"
 	)
-	return "%s Rectangle" % operation \
-		if _dock.get_shape_mode() == SHAPE_PAINTER.ShapeMode.Rectangle \
-		else "%s Stroke" % operation
+	return _shaped_action_name(operation)
+
+
+func _shaped_action_name(operation: String) -> String:
+	match _dock.get_shape_mode() as SHAPE_PAINTER.ShapeMode:
+		SHAPE_PAINTER.ShapeMode.Rectangle:
+			return "%s Rectangle" % operation
+		SHAPE_PAINTER.ShapeMode.Fill:
+			return "%s Fill" % operation
+		_:
+			return "%s Stroke" % operation
+
+
+func _get_fill_match_property() -> FLOOD_FILL.MatchProperty:
+	match _dock.get_edit_mode() as DOCK_SCRIPT.EditMode:
+		DOCK_SCRIPT.EditMode.Elevation:
+			return FLOOD_FILL.MatchProperty.Elevation
+		DOCK_SCRIPT.EditMode.Style:
+			return FLOOD_FILL.MatchProperty.Style
+		_:
+			return FLOOD_FILL.MatchProperty.Shape
 
 
 func _should_clip_to_bounds() -> bool:
@@ -516,6 +553,99 @@ func _on_save_requested() -> void:
 		_dock.set_status("Saved shared FloorMap: %s" % floor_map.resource_path)
 	else:
 		_dock.set_status("Could not save FloorMap (error %d)." % save_error)
+
+
+func _on_validate_requested() -> void:
+	if _target == null:
+		return
+	var scene_root := get_editor_interface().get_edited_scene_root()
+	var diagnostics: Array[String] = VALIDATION.collect(scene_root, _target)
+	_dock.set_diagnostics(VALIDATION.format_report(diagnostics))
+	_dock.set_status("Validation complete: %d issue%s." % [
+		diagnostics.size(),
+		"" if diagnostics.size() == 1 else "s",
+	])
+
+
+func _on_repair_requested() -> void:
+	if _target == null or _target.floor_map == null:
+		return
+	var repair := VALIDATION.plan_safe_ramp_repair(_target)
+	var repaired_cells := repair["repaired_cells"] as Array[Vector2i]
+	if repaired_cells.is_empty():
+		var current_diagnostics: Array[String] = VALIDATION.collect(
+			get_editor_interface().get_edited_scene_root(),
+			_target
+		)
+		_dock.set_diagnostics(VALIDATION.format_report(current_diagnostics))
+		_dock.set_status("No invalid ramps were safe to repair.")
+		return
+	var undo_redo := get_undo_redo()
+	undo_redo.create_action("Repair Invalid Floor Ramps")
+	undo_redo.add_do_method(
+		_target.floor_map,
+		APPLY_TRANSITION_SNAPSHOT_METHOD,
+		repair["after"] as Dictionary
+	)
+	undo_redo.add_undo_method(
+		_target.floor_map,
+		APPLY_TRANSITION_SNAPSHOT_METHOD,
+		repair["before"] as Dictionary
+	)
+	undo_redo.commit_action()
+	_dock.set_status("Repaired %d invalid ramp%s; undo is available." % [
+		repaired_cells.size(),
+		"" if repaired_cells.size() == 1 else "s",
+	])
+	var remaining_diagnostics: Array[String] = VALIDATION.collect(
+		get_editor_interface().get_edited_scene_root(),
+		_target
+	)
+	_dock.set_diagnostics(VALIDATION.format_report(remaining_diagnostics))
+
+
+func _on_conform_grounded_requested() -> void:
+	if _target == null:
+		return
+	var scene_root := get_editor_interface().get_edited_scene_root()
+	var plan := GROUNDING_EDITOR.plan_conform(scene_root, _target)
+	var changes := plan.get("changes", []) as Array[Dictionary]
+	var errors := plan.get("errors", []) as Array[String]
+	if changes.is_empty():
+		_dock.set_status(
+			"No grounded objects conformed.%s" % _format_grounding_errors(errors)
+		)
+		return
+	var undo_redo := get_undo_redo()
+	undo_redo.create_action("Conform Grounded Objects")
+	for change in changes:
+		var grounding := change["grounding"] as GROUNDING_SCRIPT
+		undo_redo.add_do_method(
+			grounding,
+			&"apply_grounding_state",
+			change["after_transform"] as Transform3D,
+			change["after_stale"] as bool
+		)
+		undo_redo.add_undo_method(
+			grounding,
+			&"apply_grounding_state",
+			change["before_transform"] as Transform3D,
+			change["before_stale"] as bool
+		)
+	undo_redo.commit_action()
+	_dock.set_status(
+		"Conformed %d grounded object%s.%s" % [
+			changes.size(),
+			"" if changes.size() == 1 else "s",
+			_format_grounding_errors(errors),
+		]
+	)
+
+
+func _format_grounding_errors(errors: Array[String]) -> String:
+	if errors.is_empty():
+		return ""
+	return " %d skipped: %s" % [errors.size(), errors[0]]
 
 
 func _working_world_height() -> float:

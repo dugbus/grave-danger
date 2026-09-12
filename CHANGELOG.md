@@ -1,6 +1,27 @@
 # Changelog
 
+## 2026-09-12
+
+### 1300
+
+- GridMap correction now follows compatible walls across small ground-height changes, producing correctly opposed end pieces on the playground's gradient wall run.
+  - Prompt: Calculate proper GridMap end tiles across the stepped wall fixture using the real correction operation.
+
+## 2026-09-11
+
+### 2300
+
+- Floating world-space instructions no longer cover the playground geometry; named trial starts and the optional HUD remain available.
+  - Prompt: Remove obsolete floating text from the Floor Surface playground.
+- The Floor Surface playground now includes an editable graveyard GridMap wall run grounded across six quarter-metre height changes beside the pyramid.
+  - Prompt: Add walls across small gradient heights near the pyramid and remove obsolete floating text.
+
 ## 2026-09-10
+
+### 2000
+
+- Level editors can conform grounded props, preview bounded fills, validate and safely repair surfaces, then test four walkable routes to the 6 m pyramid summit with the accepted player silhouette.
+  - Prompt: Complete Floor Surface milestones M8 through M10 without replacing the accepted visibility approach.
 
 ### 1700
 

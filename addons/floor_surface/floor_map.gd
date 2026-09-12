@@ -211,7 +211,12 @@ func compact_storage() -> bool:
 
 ## Creates an independent scene-local map suitable for an explicit Make Unique workflow.
 func create_unique_copy() -> Resource:
-	var unique_map := duplicate(true)
+	var unique_map := duplicate(false)
+	unique_map.presence_exceptions = presence_exceptions.duplicate()
+	unique_map.elevation_overrides = elevation_overrides.duplicate()
+	unique_map.style_overrides = style_overrides.duplicate()
+	unique_map.transition_overrides = transition_overrides.duplicate()
+	unique_map.low_edge_overrides = low_edge_overrides.duplicate()
 	unique_map.resource_local_to_scene = true
 	return unique_map
 

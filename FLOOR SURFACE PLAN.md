@@ -46,7 +46,7 @@ Every new production script, including editor and playground behaviour, must hav
 | Surface sampler | Returns a typed result containing validity, world height, normal, cell, style and transition; shares ramp mathematics with generation. |
 | Editor plugin | Selects a FloorSurface, paints in the 3D viewport and provides a dock, overlays, validation and stroke-level undo/redo. |
 | Grounding component/scene | Holds a typed surface reference, grounding mode and explicit placement offset; works on visible, editable scene objects. |
-| Visibility controller and shaders | Consume derived elevation/occupancy data and camera/player inputs; fade obstructing fragments while preserving the surrounding structure. |
+| Player occlusion silhouette | Render a player-owned dark fill and bright outline only where opaque scene depth obscures the player; never mutate scenery materials, shadows or render layers. |
 | Playground scene | Own camera, light, CharacterBody3D player, debug UI, reset points and editable sample objects. |
 
 Generated mesh and collision nodes are derived output; authoring lives in map/style resources and ordinary placement nodes. Do not create a node for every face. Keep helper scripts small, typed and composable, and document exported settings in human terms. Use named PascalCase enums rather than numeric mode values.
@@ -139,7 +139,7 @@ The only anticipated shared configuration edit is registering the new editor plu
 
 ## M7 — Early player visibility experiment
 
-**Deliverable:** Evidence for a rendering approach before applying the final fade across all floor styles.
+**Deliverable:** Evidence for a rendering approach before validating the accepted player-owned silhouette across all floor styles.
 
 - [x] Derive world-aligned GPU-readable elevation and occupancy data from FloorMap, with ramp orientation/endpoints or equivalent data sufficient to represent slopes. Refresh on relevant edits, not every frame for static terrain.
 - [x] Add a 1m platform, taller terrace and ramp obstruction fixture, plus debug player position, sample data, fade reason and an elevation-data preview. Use the actual GDPlayer and production perspective follow-camera so the visual trial reflects the game.
@@ -154,11 +154,11 @@ The only anticipated shared configuration edit is registering the new editor plu
 
 **Deliverable:** Editable sample objects follow changed floor heights without losing deliberate offsets.
 
-- [ ] Create a reusable grounding scene/component with named upright, align-normal and absolute modes and a typed surface dependency; no production GridMap integration.
-- [ ] Define offset space and preserve authored heading/offset during initial grounding and repeated conform operations. Guard off-tree transform access in editor tooling.
-- [ ] Add upright scenery and slope-aligned rubble/decal substitutes as ordinary editable playground nodes, plus an absolute-height control object.
-- [ ] Add explicit **Conform Grounded Objects** with one undoable operation. Mark affected objects stale after floor changes and warn on absent floor; never silently move invalid placements to Y=0.
-- [ ] Automated checks: flat/ramp placement, orientation, offset preservation, repeated-conform stability, absolute-mode preservation, missing floor and undo.
+- [x] Create a reusable grounding scene/component with named upright, align-normal and absolute modes and a typed surface dependency; no production GridMap integration.
+- [x] Define offset space and preserve authored heading/offset during initial grounding and repeated conform operations. Guard off-tree transform access in editor tooling.
+- [x] Add upright scenery and slope-aligned rubble/decal substitutes as ordinary editable playground nodes, plus an absolute-height control object.
+- [x] Add explicit **Conform Grounded Objects** with one undoable operation. Mark affected objects stale after floor changes and warn on absent floor; never silently move invalid placements to Y=0.
+- [x] Automated checks: flat/ramp placement, orientation, offset preservation, repeated-conform stability, absolute-mode preservation, missing floor and undo.
 - [ ] Human trial: move samples onto a ramp, raise the supporting floor and run Conform. Check upright versus aligned orientation, explicit offsets and the unchanged absolute object; erase supporting floor and inspect the warning.
 - [ ] Review: settle whether explicit conform plus a stale-placement warning is sufficient or automatic updates are desired; implement and retry any agreed adjustment.
 
@@ -166,13 +166,13 @@ The only anticipated shared configuration edit is registering the new editor plu
 
 **Deliverable:** A designer can author and revise a substantial surface efficiently and recover from invalid edits.
 
-- [ ] Add bounded flood fill for shape, elevation and style. Document each fill's matching rule and preview the affected region; ensure absent-cell fills cannot escape map bounds.
-- [ ] Complete shared brush/rectangle/fill/sample behaviour, elevation overlay, selection readouts and direct absolute-height entry. One full gesture remains one undo action.
-- [ ] Add visible diagnostics and safe repair actions for invalid ramps, unsupported slopes, grounded objects over holes, stale grounding, missing styles/materials and unsupported transforms.
-- [ ] Rebuild all affected neighbours when topology changes, including ramp sides, pit regions, sampling data and visibility data. Undo/redo must restore derived behaviour as well as the authored map.
-- [ ] Measure the agreed playground and pyramid map sizes. Batch by material and chunk where useful; invalidate affected chunks and borders correctly if chunking is introduced. Record map size, timings and agreed responsiveness target before declaring performance acceptable.
-- [ ] Confirm save/reopen, plugin disable/enable and multiple surface instances do not duplicate derived output or accidentally share mutable per-surface state.
-- [ ] Automated checks: bounded fill, validation/repair round trips, dirty-neighbour coverage, multi-instance isolation, serialization and complete edit/undo/redo/rebuild sequences.
+- [x] Add bounded flood fill for shape, elevation and style. Document each fill's matching rule and preview the affected region; ensure absent-cell fills cannot escape map bounds.
+- [x] Complete shared brush/rectangle/fill/sample behaviour, elevation overlay, selection readouts and direct absolute-height entry. One full gesture remains one undo action.
+- [x] Add visible diagnostics and safe repair actions for invalid ramps, unsupported slopes, grounded objects over holes, stale grounding, missing styles/materials and unsupported transforms.
+- [x] Rebuild all affected neighbours when topology changes, including ramp sides, pit regions, sampling data and visibility data. Undo/redo must restore derived behaviour as well as the authored map.
+- [x] Measure the agreed playground and pyramid map sizes. Batch by material and chunk where useful; invalidate affected chunks and borders correctly if chunking is introduced. Record map size, timings and agreed responsiveness target before declaring performance acceptable.
+- [x] Confirm save/reopen, plugin disable/enable and multiple surface instances do not duplicate derived output or accidentally share mutable per-surface state.
+- [x] Automated checks: bounded fill, validation/repair round trips, dirty-neighbour coverage, multi-instance isolation, serialization and complete edit/undo/redo/rebuild sequences.
 - [ ] Human trial: build nested terraces with rectangles and direct elevation entry, paint a path, fill a style region, erase a pit and repair an invalid ramp. Undo/redo the sequence and reopen the scene.
 - [ ] Review: fix workflow friction before acceptance. A dedicated terrace/inset tool is optional only if rectangle/fill authoring proves too slow; it is not required to finish the prototype.
 
@@ -180,11 +180,11 @@ The only anticipated shared configuration edit is registering the new editor plu
 
 **Deliverable:** The full standalone playground passes the required design cases after human iteration.
 
-- [ ] Author an approximately 6m pyramid using quantised absolute terrace elevations, with a one-cell-wide ramp route on each of four sides. Choose terrace rise, cell run and controller thresholds together so ramps are walkable and unpainted terrace boundaries are blocked.
-- [ ] Verify every route reaches the summit continuously through locally valid ramps/landings. Compare equal local deltas near the base and summit; absolute height must not change their classification.
-- [ ] Complete the selected visibility effect across raised tops, vertical faces, ramp tops and ramp sides for both sample styles; restore full opacity when obstruction ends.
-- [ ] Retain every playground case: flat ground, styled pit, walkable step, normal jump, reserved unencumbered jump, blocked ledge, simple ramp, grounded objects and pyramid.
-- [ ] Automated checks: pyramid connectivity and permitted route transitions, non-route ledge classification, high-elevation samples, ramp collision continuity, rebuild determinism and all prior regression suites.
+- [x] Author an approximately 6m pyramid using quantised absolute terrace elevations, with a one-cell-wide ramp route on each of four sides. Choose terrace rise, cell run and controller thresholds together so ramps are walkable and unpainted terrace boundaries are blocked.
+- [x] Verify every route reaches the summit continuously through locally valid ramps/landings. Compare equal local deltas near the base and summit; absolute height must not change their classification.
+- [x] Apply the selected player-owned silhouette behind raised tops, vertical faces, ramp tops and ramp sides for both sample styles; leave scenery opaque and restore ordinary player rendering when obstruction ends.
+- [x] Retain every playground case: flat ground, styled pit, walkable step, normal jump, reserved unencumbered jump, blocked ledge, simple ramp, grounded objects, pyramid and an editable GridMap wall run aligned across quarter-metre floor-height changes. Keep the visual fixture free of floating world-space text.
+- [x] Automated checks: pyramid connectivity and permitted route transitions, non-route ledge classification, high-elevation samples, ramp collision continuity, rebuild determinism and all prior regression suites.
 - [ ] Human trial A — Authoring: recreate or substantially reshape nested terraces using viewport tools, directly enter the summit height, adjust routes/styles and exercise undo/redo without per-cell Inspector editing.
 - [ ] Human trial B — Movement: ascend/descend all four routes, attempt unpainted terrace shortcuts, jump near ramp joins, fall into the pit and reset. Repeat the step/jump lanes in both controller modes.
 - [ ] Human trial C — Visibility: walk behind the 1m platform, progressively taller terraces and the 6m pyramid from several sides; walk up overlapping ramps and repeatedly enter/leave obstruction. Check flicker, popping, sorting, shadows and unwanted fading of unobstructing geometry.
@@ -205,7 +205,7 @@ Tick only with recorded evidence; implementation alone does not satisfy a human 
 - [ ] Collision matches visible tops, ledges and ramps; holes have no walkable top.
 - [ ] Surface queries return correct flat and interpolated ramp heights/normals.
 - [ ] Grounded objects conform after edits while preserving modes and offsets.
-- [ ] Player visibility works behind platforms, terraces, pyramid and ramps, with smooth local fading and restoration.
+- [ ] Player visibility works behind platforms, terraces, pyramid and ramps using the accepted player-owned dark fill and bright outline, while scenery rendering remains unchanged.
 - [ ] Undo/redo, validation, repair, save/reopen and rebuild behaviour are reliable.
 - [ ] Relevant automated suites and `./check.sh` pass; outstanding human defects are resolved.
 - [ ] No existing Grave Danger level or floor implementation was changed for the prototype.

@@ -15,7 +15,9 @@ const GRID_WEST := Vector3i(-1, 0, 0)
 
 ## Hashes every enabled mapping choice that can change a repair result.
 func configuration_fingerprint(settings: Resource, item_aliases: Dictionary) -> int:
-	var signatures: Array[String] = []
+	var signatures: Array[String] = [
+		"vertical_connection_metres=%.4f" % _vertical_connection_metres(settings),
+	]
 	for mapping: Resource in settings.color_mappings:
 		if not mapping.autotile_enabled:
 			continue
@@ -66,6 +68,8 @@ func build_plan(settings: Resource, grid_map: GridMap, item_aliases: Dictionary)
 				reported_conflicts[item_id] = true
 			continue
 		cell_to_connection[cell] = String(mapping_data["connection_key"])
+	var connection_columns := _build_connection_columns(cell_to_connection)
+	var vertical_connection_metres := _vertical_connection_metres(settings)
 
 	for cell: Vector3i in cells:
 		var item_id := grid_map.get_cell_item(cell)
@@ -76,7 +80,14 @@ func build_plan(settings: Resource, grid_map: GridMap, item_aliases: Dictionary)
 			continue
 		var mapping: Resource = mapping_data["mapping"]
 		var connection_key := String(mapping_data["connection_key"])
-		var mask := _connection_neighbour_mask(cell, cell_to_connection, connection_key, true)
+		var mask := _connection_neighbour_mask(
+			cell,
+			connection_columns,
+			connection_key,
+			true,
+			vertical_connection_metres,
+			grid_map.cell_size.y
+		)
 		var alternative := mapping_data.get("alternative") as Resource
 		var previous_orientation := grid_map.get_cell_item_orientation(cell)
 		if alternative != null:
@@ -187,35 +198,121 @@ func _add_item_mapping(
 ## Builds the source-image neighbour mask for cells in the same configured connection group.
 func _connection_neighbour_mask(
 	cell: Vector3i,
-	cell_to_connection: Dictionary,
+	connection_columns: Dictionary,
 	connection_key: String,
-	flip_y_to_world_negative_z: bool
+	flip_y_to_world_negative_z: bool,
+	vertical_connection_metres: float,
+	cell_height_metres: float
 ) -> int:
 	var mask := 0
 	if flip_y_to_world_negative_z:
-		if _cell_has_connection(cell + GRID_SOUTH, cell_to_connection, connection_key):
+		if _column_has_connection(
+			cell + GRID_SOUTH,
+			connection_columns,
+			connection_key,
+			vertical_connection_metres,
+			cell_height_metres
+		):
 			mask |= PNGToGridMapAutotile.NORTH
-		if _cell_has_connection(cell + GRID_WEST, cell_to_connection, connection_key):
+		if _column_has_connection(
+			cell + GRID_WEST,
+			connection_columns,
+			connection_key,
+			vertical_connection_metres,
+			cell_height_metres
+		):
 			mask |= PNGToGridMapAutotile.EAST
-		if _cell_has_connection(cell + GRID_NORTH, cell_to_connection, connection_key):
+		if _column_has_connection(
+			cell + GRID_NORTH,
+			connection_columns,
+			connection_key,
+			vertical_connection_metres,
+			cell_height_metres
+		):
 			mask |= PNGToGridMapAutotile.SOUTH
-		if _cell_has_connection(cell + GRID_EAST, cell_to_connection, connection_key):
+		if _column_has_connection(
+			cell + GRID_EAST,
+			connection_columns,
+			connection_key,
+			vertical_connection_metres,
+			cell_height_metres
+		):
 			mask |= PNGToGridMapAutotile.WEST
 		return mask
-	if _cell_has_connection(cell + GRID_NORTH, cell_to_connection, connection_key):
+	if _column_has_connection(
+		cell + GRID_NORTH,
+		connection_columns,
+		connection_key,
+		vertical_connection_metres,
+		cell_height_metres
+	):
 		mask |= PNGToGridMapAutotile.NORTH
-	if _cell_has_connection(cell + GRID_EAST, cell_to_connection, connection_key):
+	if _column_has_connection(
+		cell + GRID_EAST,
+		connection_columns,
+		connection_key,
+		vertical_connection_metres,
+		cell_height_metres
+	):
 		mask |= PNGToGridMapAutotile.EAST
-	if _cell_has_connection(cell + GRID_SOUTH, cell_to_connection, connection_key):
+	if _column_has_connection(
+		cell + GRID_SOUTH,
+		connection_columns,
+		connection_key,
+		vertical_connection_metres,
+		cell_height_metres
+	):
 		mask |= PNGToGridMapAutotile.SOUTH
-	if _cell_has_connection(cell + GRID_WEST, cell_to_connection, connection_key):
+	if _column_has_connection(
+		cell + GRID_WEST,
+		connection_columns,
+		connection_key,
+		vertical_connection_metres,
+		cell_height_metres
+	):
 		mask |= PNGToGridMapAutotile.WEST
 	return mask
 
 
-## Reports whether a cell belongs to the target configured connection group.
-func _cell_has_connection(cell: Vector3i, cell_to_connection: Dictionary, connection_key: String) -> bool:
-	return String(cell_to_connection.get(cell, "")) == connection_key
+## Groups configured cells by their horizontal GridMap coordinate for stepped-ground lookups.
+func _build_connection_columns(cell_to_connection: Dictionary) -> Dictionary:
+	var columns := {}
+	for cell: Vector3i in cell_to_connection:
+		var column := Vector2i(cell.x, cell.z)
+		var entries: Array = columns.get(column, [])
+		entries.append({
+			"connection_key": String(cell_to_connection[cell]),
+			"y": cell.y,
+		})
+		columns[column] = entries
+	return columns
+
+
+## Reports a compatible neighbour at the same height or within the configured world-space rise.
+func _column_has_connection(
+	cell: Vector3i,
+	connection_columns: Dictionary,
+	connection_key: String,
+	vertical_connection_metres: float,
+	cell_height_metres: float
+) -> bool:
+	var entries: Array = connection_columns.get(Vector2i(cell.x, cell.z), [])
+	for entry: Dictionary in entries:
+		if String(entry["connection_key"]) != connection_key:
+			continue
+		var elevation_delta := absi(int(entry["y"]) - cell.y)
+		var vertical_distance := float(elevation_delta) * absf(cell_height_metres)
+		if is_zero_approx(vertical_distance) \
+			or vertical_distance <= vertical_connection_metres + 0.0001:
+			return true
+	return false
+
+
+## Reads the optional stepped-ground tolerance while remaining compatible with older settings resources.
+func _vertical_connection_metres(settings: Resource) -> float:
+	if settings == null or "autotile_vertical_connection_metres" not in settings:
+		return 0.0
+	return maxf(float(settings.get("autotile_vertical_connection_metres")), 0.0)
 
 
 ## Uses an explicit shared group, or connects equivalent configured variant sets.

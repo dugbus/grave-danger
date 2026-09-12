@@ -38,6 +38,9 @@ signal shape_mode_changed(shape_mode: int)
 signal brush_size_changed(brush_size: int)
 signal make_unique_requested
 signal save_requested
+signal conform_grounded_requested
+signal validate_requested
+signal repair_requested
 
 @onready var edit_toggle := %EditToggle as CheckButton
 @onready var grid_overlay_toggle := %GridOverlayToggle as CheckButton
@@ -66,6 +69,7 @@ signal save_requested
 @onready var rotate_ramp_button := %RotateRampButton as Button
 @onready var brush_button := %BrushButton as Button
 @onready var rectangle_button := %RectangleButton as Button
+@onready var fill_button := %FillButton as Button
 @onready var brush_size_option := %BrushSizeOption as OptionButton
 @onready var shape_mode_label := $ShapeModeLabel as Label
 @onready var shape_buttons := $ShapeButtons as HBoxContainer
@@ -74,6 +78,10 @@ signal save_requested
 @onready var status_label := %StatusLabel as Label
 @onready var make_unique_button := %MakeUniqueButton as Button
 @onready var save_button := %SaveButton as Button
+@onready var conform_grounded_button := %ConformGroundedButton as Button
+@onready var validate_button := %ValidateButton as Button
+@onready var repair_button := %RepairButton as Button
+@onready var diagnostics_label := %DiagnosticsLabel as Label
 
 var _configured := false
 var _has_target := false
@@ -130,9 +138,13 @@ func setup() -> void:
 	rectangle_button.pressed.connect(
 		_on_shape_mode_selected.bind(SHAPE_PAINTER.ShapeMode.Rectangle)
 	)
+	fill_button.pressed.connect(_on_shape_mode_selected.bind(SHAPE_PAINTER.ShapeMode.Fill))
 	brush_size_option.item_selected.connect(_on_brush_size_selected)
 	make_unique_button.pressed.connect(make_unique_requested.emit)
 	save_button.pressed.connect(save_requested.emit)
+	conform_grounded_button.pressed.connect(conform_grounded_requested.emit)
+	validate_button.pressed.connect(validate_requested.emit)
+	repair_button.pressed.connect(repair_requested.emit)
 
 
 ## Refreshes target identity, edit availability and shared-resource guidance.
@@ -148,9 +160,13 @@ func set_target(surface: Node, floor_map: Resource) -> void:
 	paint_mode_option.disabled = not has_target
 	brush_button.disabled = not has_target
 	rectangle_button.disabled = not has_target
+	fill_button.disabled = not has_target
 	brush_size_option.disabled = not has_target or rectangle_button.button_pressed
 	make_unique_button.disabled = not has_target
 	save_button.disabled = not has_target
+	conform_grounded_button.disabled = not has_target
+	validate_button.disabled = not has_target
+	repair_button.disabled = not has_target
 	_set_elevation_buttons_disabled(not has_target)
 	_set_style_controls_disabled(not has_target or not _has_styles)
 	_set_transition_controls_disabled(not has_target)
@@ -234,6 +250,11 @@ func clear_hover() -> void:
 ## Shows a concise save, undo or cancellation result.
 func set_status(message: String) -> void:
 	status_label.text = message
+
+
+## Replaces the persistent authoring report outside live viewport gestures.
+func set_diagnostics(message: String) -> void:
+	diagnostics_label.text = message
 
 
 ## Updates unit conversion used by the elevation entry and hover label.
@@ -337,6 +358,8 @@ func get_style_index() -> int:
 
 ## Returns the selected named shape mode.
 func get_shape_mode() -> int:
+	if fill_button.button_pressed:
+		return SHAPE_PAINTER.ShapeMode.Fill
 	return SHAPE_PAINTER.ShapeMode.Rectangle \
 		if rectangle_button.button_pressed else SHAPE_PAINTER.ShapeMode.Brush
 
@@ -377,7 +400,8 @@ func _on_transition_operation_selected(operation: TRANSITION_PAINTER.Operation) 
 
 
 func _on_shape_mode_selected(shape_mode: int) -> void:
-	brush_size_option.disabled = not _has_target or shape_mode == SHAPE_PAINTER.ShapeMode.Rectangle
+	brush_size_option.disabled = not _has_target or shape_mode != SHAPE_PAINTER.ShapeMode.Brush
+	_refresh_mode_visibility()
 	shape_mode_changed.emit(shape_mode)
 
 
@@ -392,10 +416,11 @@ func _refresh_mode_visibility() -> void:
 	style_controls.visible = edit_mode == EditMode.Style
 	transition_controls.visible = edit_mode == EditMode.Transition
 	var uses_shapes := edit_mode != EditMode.Transition
+	var uses_brush := uses_shapes and get_shape_mode() == SHAPE_PAINTER.ShapeMode.Brush
 	shape_mode_label.visible = uses_shapes
 	shape_buttons.visible = uses_shapes
-	brush_size_label.visible = uses_shapes
-	brush_size_option.visible = uses_shapes
+	brush_size_label.visible = uses_brush
+	brush_size_option.visible = uses_brush
 
 
 func _set_elevation_buttons_disabled(disabled: bool) -> void:

@@ -126,6 +126,10 @@ rules. Keep level-specific coordinates and transient tuning out of this file.
   cells and orientations, rerun full-collection routes and doorway checks, and update fixtures to
   include the actual floor after moving it. Road-aware reachability checks must still verify real
   blocking geometry at locks; treating all occupied GridMap cells as walls is no longer valid.
+- When an autotiled wall follows gently stepped ground, connect its cardinal neighbours by horizontal
+  column using an explicit world-space vertical tolerance. Keep exact-height matching as the default,
+  then run the actual GridMap correction operation and verify its end pieces, orientations and
+  unchanged second pass instead of hand-authoring the expected variants.
 - Inspect a rendered preview for composition, texture continuity and readable hazards. A neutral
   lighting preview helps inspect placement but does not establish readability under gameplay
   lighting or replace a human playthrough.

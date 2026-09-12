@@ -60,6 +60,7 @@ var _ramp_resolver := RAMP_RESOLVER_SCRIPT.new()
 var _rebuild_count := 0
 var _generated_cell_count := 0
 var _rebuild_queued := false
+var _last_rebuild_microseconds := 0
 
 
 func _ready() -> void:
@@ -91,6 +92,7 @@ func rebuild() -> int:
 		collision_shape.shape = null
 		_generated_cell_count = 0
 		return 0
+	var rebuild_started := Time.get_ticks_usec()
 	var result := _builder.build(
 		floor_map,
 		elevation_profile,
@@ -101,6 +103,7 @@ func rebuild() -> int:
 	top_mesh.mesh = result["mesh"] as ArrayMesh
 	collision_shape.shape = result["collision_shape"] as ConcavePolygonShape3D
 	_generated_cell_count = result["cell_count"] as int
+	_last_rebuild_microseconds = Time.get_ticks_usec() - rebuild_started
 	_rebuild_count += 1
 	surface_rebuilt.emit(_generated_cell_count)
 	return _generated_cell_count
@@ -243,6 +246,11 @@ func get_rebuild_count() -> int:
 	return _rebuild_count
 
 
+## Returns the most recent complete geometry/collision rebuild duration for editor diagnostics.
+func get_last_rebuild_microseconds() -> int:
+	return _last_rebuild_microseconds
+
+
 func _on_floor_map_changed() -> void:
 	if Engine.is_editor_hint():
 		_request_rebuild()
@@ -277,6 +285,7 @@ func _rebuild_editor_preview() -> int:
 		preview.mesh = null
 		_generated_cell_count = 0
 		return 0
+	var rebuild_started := Time.get_ticks_usec()
 	var result := _builder.build(
 		floor_map,
 		elevation_profile,
@@ -288,6 +297,7 @@ func _rebuild_editor_preview() -> int:
 	EDITOR_MATERIAL_PREVIEW.apply_to_mesh(preview_mesh)
 	preview.mesh = preview_mesh
 	_generated_cell_count = result["cell_count"] as int
+	_last_rebuild_microseconds = Time.get_ticks_usec() - rebuild_started
 	_rebuild_count += 1
 	surface_rebuilt.emit(_generated_cell_count)
 	return _generated_cell_count

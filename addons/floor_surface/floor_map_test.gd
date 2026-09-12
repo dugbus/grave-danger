@@ -219,6 +219,11 @@ func _test_text_resource_round_trip() -> void:
 			unique_map.resource_path.is_empty(),
 			"A unique copy no longer points at the shared resource file."
 		)
+		unique_map.set_floor_present(Vector2i(-1, 3), true)
+		expect(
+			not restored.has_floor(Vector2i(-1, 3)),
+			"An independent copy owns detached typed arrays instead of mutating its source."
+		)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(ROUND_TRIP_PATH))
 
 

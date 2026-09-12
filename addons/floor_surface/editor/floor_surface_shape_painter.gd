@@ -14,6 +14,7 @@ enum PaintMode {
 enum ShapeMode {
 	Brush,
 	Rectangle,
+	Fill,
 }
 
 

@@ -43,6 +43,32 @@ unique_name_in_owner = true
 disabled = true
 text = "Save Map"
 
+[node name="ConformGroundedButton" type="Button" parent="."]
+unique_name_in_owner = true
+disabled = true
+text = "Conform Grounded Objects"
+tooltip_text = "Move scene objects with FloorSurfaceGrounding components onto this surface as one undoable action."
+
+[node name="ValidationButtons" type="HFlowContainer" parent="."]
+
+[node name="ValidateButton" type="Button" parent="ValidationButtons"]
+unique_name_in_owner = true
+disabled = true
+text = "Validate"
+tooltip_text = "List floor, ramp, material, transform and grounded-object problems without changing the scene."
+
+[node name="RepairButton" type="Button" parent="ValidationButtons"]
+unique_name_in_owner = true
+disabled = true
+text = "Repair Safe Issues"
+tooltip_text = "Make invalid ramp cells flat as one undoable action; ambiguous authoring choices are never changed."
+
+[node name="DiagnosticsLabel" type="Label" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+text = "Diagnostics have not been run."
+autowrap_mode = 2
+
 [node name="Separator" type="HSeparator" parent="."]
 
 [node name="EditToggle" type="CheckButton" parent="."]
@@ -240,6 +266,19 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_shape")
 text = "Rectangle"
 
+[node name="FillButton" type="Button" parent="ShapeButtons"]
+unique_name_in_owner = true
+disabled = true
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = SubResource("ButtonGroup_shape")
+text = "Fill"
+tooltip_text = "Fill one bounded connected region matching occupancy, exact elevation, or style and occupancy."
+
+[node name="FillGuidance" type="Label" parent="."]
+text = "Fill is always bounded. Shape matches floor/hole state; Elevation matches exact height; Style matches style plus floor/hole state."
+autowrap_mode = 2
+
 [node name="BrushSizeLabel" type="Label" parent="."]
 text = "Brush size"
 
@@ -252,7 +291,7 @@ unique_name_in_owner = true
 text = "Cell —"
 
 [node name="Instructions" type="Label" parent="."]
-text = "Left-drag: apply active tool\nRamp Paint: drag between flat high/low landings\nRectangle: drag corner to corner\nElevation/Style Sample: click a cell\nEsc: cancel gesture\nMiddle/right mouse: navigate"
+text = "Left-drag: apply Brush or Rectangle\nFill/Sample: click a cell\nRamp Paint: drag between flat high/low landings\nEsc: cancel gesture\nMiddle/right mouse: navigate"
 autowrap_mode = 2
 
 [node name="StatusLabel" type="Label" parent="."]
