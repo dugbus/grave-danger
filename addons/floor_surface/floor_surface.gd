@@ -47,6 +47,13 @@ signal surface_rebuilt(cell_count: int)
 	set(value):
 		world_origin_xz = value
 		_request_rebuild()
+## Sparse GridMap whose equal X/Z cells receive walls and level objects on this floor.
+@export_node_path("GridMap") var placement_grid_map_path: NodePath:
+	set(value):
+		placement_grid_map_path = value
+		if is_inside_tree():
+			align_with_placement_grid_map()
+			update_configuration_warnings()
 ## Derived batched mesh replaced during every rebuild.
 @export var top_mesh_path: NodePath = ^"Derived/TopMesh"
 ## Derived static collision replaced during every rebuild.
@@ -65,6 +72,7 @@ var _last_rebuild_microseconds := 0
 
 func _ready() -> void:
 	set_notify_transform(true)
+	align_with_placement_grid_map()
 	_connect_change_signals()
 	if Engine.is_editor_hint():
 		_request_rebuild()
@@ -87,7 +95,7 @@ func rebuild() -> int:
 		return _rebuild_editor_preview()
 	if top_mesh == null or collision_shape == null:
 		return 0
-	if floor_map == null or elevation_profile == null:
+	if floor_map == null or elevation_profile == null or styles.is_empty():
 		top_mesh.mesh = null
 		collision_shape.shape = null
 		_generated_cell_count = 0
@@ -169,6 +177,47 @@ func world_to_cell(world_position: Vector3) -> Vector2i:
 	)
 
 
+## Returns the local centre of an authored cell, including its flat or ramped centre height.
+func cell_to_local(cell: Vector2i) -> Vector3:
+	var local_x := world_origin_xz.x + (float(cell.x) + 0.5) * cell_size
+	var local_z := world_origin_xz.y + (float(cell.y) + 0.5) * cell_size
+	var sample := sample_surface(Vector3(local_x, 0.0, local_z))
+	var local_y := sample.world_height if sample.valid else 0.0
+	return Vector3(local_x, local_y, local_z)
+
+
+## Returns the world-space centre of an authored cell for level content placement.
+func cell_to_world(cell: Vector2i) -> Vector3:
+	var local_position := cell_to_local(cell)
+	return to_global(local_position) if is_inside_tree() else transform * local_position
+
+
+## Reapplies the linked GridMap's cell size and cell-zero origin to this surface.
+func align_with_placement_grid_map() -> Array[String]:
+	if placement_grid_map_path.is_empty():
+		return []
+	var grid_map := get_placement_grid_map()
+	var errors := _validate_placement_grid_map(grid_map)
+	if not errors.is_empty():
+		return errors
+	var grid_to_surface := _transform_relative_to(grid_map, self)
+	var zero_cell_centre := grid_to_surface * grid_map.map_to_local(Vector3i.ZERO)
+	var aligned_origin := Vector2(zero_cell_centre.x, zero_cell_centre.z) \
+		- Vector2.ONE * grid_map.cell_size.x * 0.5
+	if not is_equal_approx(cell_size, grid_map.cell_size.x):
+		cell_size = grid_map.cell_size.x
+	if not world_origin_xz.is_equal_approx(aligned_origin):
+		world_origin_xz = aligned_origin
+	return []
+
+
+## Returns the sparse GridMap used to place walls and objects on equal floor coordinates.
+func get_placement_grid_map() -> GridMap:
+	if placement_grid_map_path.is_empty():
+		return null
+	return get_node_or_null(placement_grid_map_path) as GridMap
+
+
 ## Samples the authoritative top under X/Z; holes and outside return valid=false.
 func sample_surface(world_position: Vector3) -> SAMPLE_SCRIPT:
 	var sampled_cell := world_to_cell(world_position)
@@ -228,6 +277,13 @@ func validate_configuration() -> Array[String]:
 		else:
 			for style_error in style.validate():
 				errors.append("Palette entry %d: %s" % [style_index, style_error])
+	if not placement_grid_map_path.is_empty():
+		var placement_grid_map := get_placement_grid_map()
+		errors.append_array(_validate_placement_grid_map(placement_grid_map))
+		if placement_grid_map != null and not _is_placement_grid_map_aligned(placement_grid_map):
+			errors.append(
+				"FloorSurface origin or cell size does not match its placement GridMap; reassign the path to align it."
+			)
 	var surface_transform := global_transform if is_inside_tree() else transform
 	if not surface_transform.is_equal_approx(Transform3D.IDENTITY):
 		errors.append(
@@ -275,6 +331,53 @@ func _rebuild_deferred() -> void:
 		return
 	rebuild()
 	update_configuration_warnings()
+
+
+func _validate_placement_grid_map(grid_map: GridMap) -> Array[String]:
+	var errors: Array[String] = []
+	if grid_map == null:
+		return ["FloorSurface placement GridMap path does not resolve to a GridMap."]
+	var grid_to_surface := _transform_relative_to(grid_map, self)
+	if not grid_to_surface.basis.is_equal_approx(Basis.IDENTITY):
+		errors.append(
+			"The placement GridMap is rotated or scaled relative to FloorSurface; identity alignment is required."
+		)
+	if not is_zero_approx(grid_to_surface.origin.y):
+		errors.append(
+			"The placement GridMap is vertically offset relative to FloorSurface; a shared base height is required."
+		)
+	if not is_equal_approx(grid_map.cell_size.x, grid_map.cell_size.z):
+		errors.append("The placement GridMap must use equal X and Z sizes for square floor cells.")
+	if not grid_map.cell_center_x or not grid_map.cell_center_z:
+		errors.append("The placement GridMap must centre items along X and Z.")
+	return errors
+
+
+func _is_placement_grid_map_aligned(grid_map: GridMap) -> bool:
+	if not _validate_placement_grid_map(grid_map).is_empty():
+		return false
+	if not is_equal_approx(cell_size, grid_map.cell_size.x):
+		return false
+	var grid_to_surface := _transform_relative_to(grid_map, self)
+	var zero_cell_centre := grid_to_surface * grid_map.map_to_local(Vector3i.ZERO)
+	var expected_origin := Vector2(zero_cell_centre.x, zero_cell_centre.z) \
+		- Vector2.ONE * grid_map.cell_size.x * 0.5
+	return world_origin_xz.is_equal_approx(expected_origin)
+
+
+## Computes a Node3D transform in another Node3D's local coordinate space, on-tree or off-tree.
+func _transform_relative_to(node: Node3D, target: Node3D) -> Transform3D:
+	return _transform_to_tree_root(target).affine_inverse() * _transform_to_tree_root(node)
+
+
+func _transform_to_tree_root(node: Node3D) -> Transform3D:
+	var result := node.transform
+	var ancestor := node.get_parent()
+	while ancestor != null:
+		if ancestor is Node3D:
+			result = (ancestor as Node3D).transform * result
+		ancestor = ancestor.get_parent()
+	return result
 
 
 func _rebuild_editor_preview() -> int:

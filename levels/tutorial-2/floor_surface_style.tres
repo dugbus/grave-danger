@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FloorStyle" format=3 uid="uid://cmmqp07b1cd20"]
+
+[ext_resource type="Texture2D" uid="uid://duxurgxccegv6" path="res://Assets/environment/floors/textures/dirt_2.png" id="1_3ril7"]
+[ext_resource type="Script" uid="uid://q0ef7o077f24" path="res://addons/floor_surface/floor_style.gd" id="1_ybc1j"]
+[ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="2_3ril7"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bqaue"]
+albedo_color = Color(0.43, 0.4, 0.36, 1)
+albedo_texture = ExtResource("1_3ril7")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0oc35"]
+albedo_texture = ExtResource("2_3ril7")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1wks4"]
+albedo_color = Color(0.62, 0.58, 0.52, 1)
+albedo_texture = ExtResource("1_3ril7")
+roughness = 0.95
+
+[resource]
+script = ExtResource("1_ybc1j")
+display_name = "Original level floor"
+top_material = SubResource("StandardMaterial3D_0oc35")
+wall_material = SubResource("StandardMaterial3D_1wks4")
+pit_bottom_material = SubResource("StandardMaterial3D_bqaue")

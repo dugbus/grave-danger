@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="FloorMap" format=3]
+
+[ext_resource type="Script" path="res://addons/floor_surface/floor_map.gd" id="1_pvmv6"]
+
+[resource]
+script = ExtResource("1_pvmv6")
+minimum_cell = Vector2i(-25, -25)
+dimensions = Vector2i(100, 100)
+default_present = true

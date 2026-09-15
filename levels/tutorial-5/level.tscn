@@ -1,10 +1,13 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="PackedScene" path="res://player/player.tscn" id="1_player"]
 [ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="2_lighting"]
 [ext_resource type="Script" path="res://levels/level_settings.gd" id="3_level_settings"]
 [ext_resource type="PackedScene" path="res://levels/vampire-maze/generated_maze/generated_maze.tscn" id="4_generated_maze"]
 [ext_resource type="Resource" path="res://levels/tutorial-5/generated_maze_config.tres" id="5_config"]
+[ext_resource type="Resource" path="res://levels/tutorial-5/floor_surface_map.tres" id="6_floor_map"]
+[ext_resource type="Resource" path="res://levels/tutorial-5/floor_surface_style.tres" id="7_floor_style"]
+[ext_resource type="Script" path="res://addons/floor_surface/floor_style.gd" id="8_floor_style_script"]
 
 [node name="Tutorial5" type="Node3D"]
 
@@ -19,4 +22,10 @@ script = ExtResource("3_level_settings")
 configuration = ExtResource("5_config")
 maze_seed = 5
 
+[node name="FloorSurface" parent="GeneratedMaze/Layout" index="1"]
+floor_map = ExtResource("6_floor_map")
+styles = Array[ExtResource("8_floor_style_script")]([ExtResource("7_floor_style")])
+world_origin_xz = Vector2(-15.5, -15.5)
+
 [editable path="IndoorLighting"]
+[editable path="GeneratedMaze/Layout"]

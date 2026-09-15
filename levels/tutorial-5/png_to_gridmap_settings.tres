@@ -7,5 +7,3 @@ script = ExtResource("1_settings")
 png_path = "res://levels/tutorial-5/level.png"
 target_gridmap_path = NodePath("GeneratedMaze/Layout/PNGGridMap")
 export_size = Vector2i(31, 31)
-floor_gridmap_path = NodePath("GeneratedMaze/Layout/PNGFloorGridMap")
-floor_material_path = "res://Assets/environment/floors/dirt_floor.material"

@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="FloorMap" format=3 uid="uid://ct2edu1fn6sbq"]
+
+[ext_resource type="Script" uid="uid://cdlus0vrv8r3u" path="res://addons/floor_surface/floor_map.gd" id="1_ct52h"]
+
+[resource]
+script = ExtResource("1_ct52h")
+dimensions = Vector2i(25, 25)
+default_present = true

@@ -12,6 +12,7 @@ func run(_tree: SceneTree) -> void:
 		"res://addons/floor_surface/floor_surface_geometry_builder.gd"
 	)
 	_test_flat_top_batching()
+	_test_normalized_top_uv_mapping()
 	_test_owned_ledge_rendering_and_collision()
 	_test_pit_bottom_materials_projection_and_collision()
 	_test_material_only_style_change_preserves_collision()
@@ -56,12 +57,31 @@ func _test_flat_top_batching() -> void:
 		"The outer map boundary receives the same visible side treatment."
 	)
 	expect_equal(result["ledge_face_count"], 8, "Each exposed edge is owned exactly once.")
-	expect_equal(result["pit_region_count"], 1, "The bounded hole still resolves a wall datum.")
+	expect_equal(result["pit_region_count"], 0, "The open cut does not invent a bounded pit datum.")
 	expect_equal(result["pit_bottom_cell_count"], 0, "A missing optional pit material omits its bottom.")
 	expect(
 		_all_rendered_faces_use_clockwise_winding(mesh),
 		"Top and exposed-side faces use Godot's visible clockwise winding."
 	)
+
+
+func _test_normalized_top_uv_mapping() -> void:
+	var floor_map := MAP_SCRIPT.new()
+	floor_map.minimum_cell = Vector2i(-2, 3)
+	floor_map.dimensions = Vector2i(4, 2)
+	floor_map.default_present = true
+	var profile := PROFILE_SCRIPT.new()
+	var style := STYLE_SCRIPT.new()
+	style.top_material = StandardMaterial3D.new()
+	style.wall_material = StandardMaterial3D.new()
+	style.top_uv_mapping = STYLE_SCRIPT.TopUvMapping.SurfaceNormalized
+	var styles: Array[STYLE_SCRIPT] = [style]
+	var result := SUBJECT.new().build(floor_map, profile, styles, 2.0, Vector2(5.0, -3.0))
+	var mesh := result["mesh"] as ArrayMesh
+	var arrays := mesh.surface_get_arrays(0)
+	var top_uvs := arrays[Mesh.ARRAY_TEX_UV] as PackedVector2Array
+	expect(top_uvs.has(Vector2.ZERO), "Normalized top UVs begin at the authored floor corner.")
+	expect(top_uvs.has(Vector2.ONE), "Normalized top UVs reach one at the opposite floor corner.")
 
 
 func _test_owned_ledge_rendering_and_collision() -> void:
@@ -95,10 +115,10 @@ func _test_owned_ledge_rendering_and_collision() -> void:
 
 func _test_pit_bottom_materials_projection_and_collision() -> void:
 	var floor_map := MAP_SCRIPT.new()
-	floor_map.dimensions = Vector2i(3, 2)
+	floor_map.dimensions = Vector2i(3, 3)
 	floor_map.default_present = true
-	floor_map.set_floor_present(Vector2i(1, 0), false)
-	floor_map.set_cell_style(Vector2i(1, 0), 1)
+	floor_map.set_floor_present(Vector2i(1, 1), false)
+	floor_map.set_cell_style(Vector2i(1, 1), 1)
 	floor_map.set_cell_style(Vector2i(2, 0), 1)
 	floor_map.set_cell_style(Vector2i(2, 1), 1)
 	floor_map.set_cell_elevation(Vector2i(2, 0), 2)
@@ -147,14 +167,14 @@ func _test_pit_bottom_materials_projection_and_collision() -> void:
 		"Wall UVs use their own continuous world scale instead of the floor scale."
 	)
 	expect(
-		edge_vertices.has(Vector3(14.0, -2.5, -4.0)),
+		edge_vertices.has(Vector3(14.0, -2.5, -2.0)),
 		"The stone hole wall reaches the shared mixed-rim bottom without a crack."
 	)
 	var pit_arrays := mesh.surface_get_arrays(pit_surface)
 	var pit_vertices := pit_arrays[Mesh.ARRAY_VERTEX] as PackedVector3Array
 	var pit_uvs := pit_arrays[Mesh.ARRAY_TEX_UV] as PackedVector2Array
-	expect(pit_vertices.has(Vector3(12.0, -2.5, -4.0)), "The visual bottom meets the mixed rim datum.")
-	expect(pit_uvs.has(Vector2(24.0, -8.0)), "Pit bottoms share continuous world X/Z projection.")
+	expect(pit_vertices.has(Vector3(12.0, -2.5, -2.0)), "The visual bottom meets the mixed rim datum.")
+	expect(pit_uvs.has(Vector2(24.0, -4.0)), "Pit bottoms share continuous world X/Z projection.")
 	expect(
 		not _has_horizontal_triangle_at_height(shape.get_faces(), -2.5),
 		"Visual pit bottoms never add walkable collision."

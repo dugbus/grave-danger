@@ -6,6 +6,9 @@ const SUBJECT_PATH := "res://levels/vampire-maze/generated_maze/generated_grass.
 const SUBJECT_SCENE := preload(
 	"res://levels/vampire-maze/generated_maze/generated_grass.tscn"
 )
+const FLOOR_SURFACE_SCENE := preload("res://addons/floor_surface/floor_surface.tscn")
+const FLOOR_MAP_SCRIPT := preload("res://addons/floor_surface/floor_map.gd")
+const FLOOR_PROFILE := preload("res://addons/floor_surface/default_floor_elevation_profile.tres")
 const TUTORIAL_SCENE_PATHS: Array[String] = [
 	"res://levels/tutorial-1/level.tscn",
 	"res://levels/tutorial-2/level.tscn",
@@ -24,25 +27,26 @@ func run(tree: SceneTree) -> void:
 	off_tree_grass.free()
 
 	var holder := Node3D.new()
-	var floor_grid_map := GridMap.new()
-	var floor_mesh_library := MeshLibrary.new()
-	floor_mesh_library.create_item(0)
-	floor_grid_map.mesh_library = floor_mesh_library
+	var floor_surface := FLOOR_SURFACE_SCENE.instantiate() as FloorSurface
+	var floor_map := FLOOR_MAP_SCRIPT.new()
+	floor_map.dimensions = Vector2i(12, 12)
+	floor_map.default_present = true
+	floor_map.presence_exceptions = [Vector2i(11, 11)]
+	floor_surface.floor_map = floor_map
+	floor_surface.elevation_profile = FLOOR_PROFILE
 	var grass := SUBJECT_SCENE.instantiate() as MultiMeshInstance3D
-	holder.add_child(floor_grid_map)
+	holder.add_child(floor_surface)
 	holder.add_child(grass)
 	grass.scene_file_path = ""
-	floor_grid_map.owner = holder
+	floor_surface.owner = holder
 	grass.owner = holder
 	tree.root.add_child(holder)
 	var floor_cells := {}
 	for z_coordinate in 12:
 		for x_coordinate in 12:
 			floor_cells[Vector2i(x_coordinate, z_coordinate)] = true
-			floor_grid_map.set_cell_item(Vector3i(x_coordinate, 0, z_coordinate), 0)
 	# A logical floor entry without a corresponding floor tile must never
 	# receive grass.
-	floor_grid_map.set_cell_item(Vector3i(11, 0, 11), GridMap.INVALID_CELL_ITEM)
 	var excluded_cells := {
 		Vector2i(5, 5): true,
 		Vector2i(6, 5): true,
@@ -50,7 +54,7 @@ func run(tree: SceneTree) -> void:
 	var first_result := grass.call(
 		&"populate",
 		floor_cells,
-		floor_grid_map,
+		floor_surface,
 		excluded_cells,
 		4107,
 		25.0,
@@ -70,7 +74,7 @@ func run(tree: SceneTree) -> void:
 	var repeated_result := grass.call(
 		&"populate",
 		floor_cells,
-		floor_grid_map,
+		floor_surface,
 		excluded_cells,
 		4107,
 		25.0,
@@ -81,7 +85,7 @@ func run(tree: SceneTree) -> void:
 	var changed_result := grass.call(
 		&"populate",
 		floor_cells,
-		floor_grid_map,
+		floor_surface,
 		excluded_cells,
 		4108,
 		25.0,

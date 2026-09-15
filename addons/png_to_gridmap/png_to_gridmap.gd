@@ -1,7 +1,7 @@
 @tool
 extends EditorPlugin
 
-## Coordinates the PNG-to-GridMap editor workflow and its focused import, export, repair, and floor services.
+## Coordinates PNG-driven wall GridMap and editable FloorSurface editor workflows.
 ## The plugin connects the dock to scene-safe operations, profile persistence, and undo history.
 
 const SettingsResource := preload("res://addons/png_to_gridmap/png_to_gridmap_settings.gd")
@@ -10,7 +10,7 @@ const ProfileStoreResource := preload("res://addons/png_to_gridmap/png_to_gridma
 const ImporterResource := preload("res://addons/png_to_gridmap/png_to_gridmap_importer.gd")
 const ExporterResource := preload("res://addons/png_to_gridmap/png_to_gridmap_exporter.gd")
 const RepairerResource := preload("res://addons/png_to_gridmap/png_to_gridmap_repairer.gd")
-const FloorBuilderResource := preload("res://addons/png_to_gridmap/png_to_gridmap_floor_builder.gd")
+const FloorSurfaceBuilderResource := preload("res://addons/png_to_gridmap/png_to_floor_surface_builder.gd")
 const PathsResource := preload("res://addons/png_to_gridmap/png_to_gridmap_paths.gd")
 const MappingCatalog := preload(
 	"res://addons/png_to_gridmap/png_to_gridmap_mapping_catalog.gd"
@@ -39,7 +39,7 @@ var _profile_store: PNGToGridMapProfileStore
 var _importer: PNGToGridMapImporter
 var _exporter: PNGToGridMapExporter
 var _repairer: RefCounted
-var _floor_builder: RefCounted
+var _floor_surface_builder: RefCounted
 var _auto_repair_watch := AutoRepairWatch.new()
 var _resource_refresh_pending := true
 var _live_scene_refresh_pending := false
@@ -64,7 +64,7 @@ func _enter_tree() -> void:
 	_importer = ImporterResource.new()
 	_exporter = ExporterResource.new()
 	_repairer = RepairerResource.new()
-	_floor_builder = FloorBuilderResource.new()
+	_floor_surface_builder = FloorSurfaceBuilderResource.new()
 	_remove_stale_editor_docks()
 	var ui_state := _profile_store.load_ui_state(PNGToGridMapDock.OPERATION_IMPORT)
 	_operation_id = int(ui_state["operation_id"])
@@ -171,7 +171,7 @@ func _connect_dock_signals() -> void:
 	_dock.export_png_path_selected.connect(_on_export_png_path_selected)
 	_dock.run_requested.connect(_on_run_requested)
 	_dock.repair_gridmap_requested.connect(_on_repair_gridmap_requested)
-	_dock.create_floor_requested.connect(_on_create_floor_requested)
+	_dock.create_floor_surface_requested.connect(_on_create_floor_surface_requested)
 	_dock.floor_material_selected.connect(_on_floor_material_selected)
 	_dock.refresh_requested.connect(_on_refresh_requested)
 	_dock.operation_changed.connect(_on_operation_changed)
@@ -460,7 +460,7 @@ func _refresh_mesh_libraries() -> void:
 	_dock.set_mesh_library_paths(_mesh_library_paths)
 
 
-## Rebuilds the floor material choices from the globally configured folder.
+## Rebuilds optional top-material choices from the globally configured game folder.
 func _refresh_floor_materials() -> void:
 	_floor_material_paths = ResourceCatalog.collect_material_paths(
 		get_editor_interface().get_resource_filesystem(),
@@ -561,34 +561,32 @@ func _on_run_requested(operation_id: int) -> void:
 	else:
 		_run_import()
 
-
-## Stores the floor material selected for the current level.
+## Stores the optional top finish selected for PNG-created floor surfaces.
 func _on_floor_material_selected(path: String) -> void:
 	_settings.floor_material_path = PathsResource.localize_project_path(path)
 	_save_profile()
-	_update_dock_state("Floor material selected: %s" % _settings.floor_material_path)
+	_update_dock_state("Floor top material selected: %s" % (
+		_settings.floor_material_path if _settings.floor_material_path != "" else "keep current / default"
+	))
 
-
-## Creates or rebuilds the generated floor from every non-transparent PNG pixel.
-func _on_create_floor_requested() -> void:
+## Creates or rebuilds an editable FloorSurface from every non-transparent PNG pixel.
+func _on_create_floor_surface_requested() -> void:
 	var root := get_editor_interface().get_edited_scene_root()
-	var result: Dictionary = _floor_builder.run(_settings, _image, root, _selected_gridmap())
+	var result: Dictionary = _floor_surface_builder.run(_settings, _image, root, _selected_gridmap())
 	var errors := _to_string_array(result.get("errors", []))
 	if not errors.is_empty():
-		_update_dock_state("Create Floor could not run:\n- %s" % "\n- ".join(errors))
+		_update_dock_state("Create Floor Surface could not run:\n- %s" % "\n- ".join(errors))
 		return
-	var floor_grid_map: GridMap = result["grid_map"]
-	get_editor_interface().edit_node(floor_grid_map)
+	var floor_surface := result.get("floor_surface") as FloorSurface
+	get_editor_interface().edit_node(floor_surface)
 	get_editor_interface().mark_scene_as_unsaved()
-	_refresh_gridmap_paths()
 	_save_profile()
-	var action := "Created" if bool(result["created"]) else "Rebuilt"
-	_update_dock_state("%s %s collision-backed floor cells in %s." % [
+	var action := "Created" if bool(result.get("created", false)) else "Rebuilt"
+	_update_dock_state("%s %s editable floor cells in %s." % [
 		action,
-		int(result["placed"]),
-		floor_grid_map.name,
+		int(result.get("placed", 0)),
+		floor_surface.name,
 	])
-
 
 ## Repairs enabled autotile variants using the occupied cells in the selected GridMap.
 func _on_repair_gridmap_requested() -> void:

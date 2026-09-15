@@ -2,6 +2,8 @@ extends MultiMeshInstance3D
 class_name GDVampireMazeMinimapRouteOverlay
 
 
+const FLOOR_SURFACE_SCRIPT := preload("res://addons/floor_surface/floor_surface.gd")
+
 const INVALID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 const MINIMAP_ROUTE_VISUAL_LAYER := 1 << 18
 const CARDINAL_DIRECTIONS: Array[Vector3i] = [
@@ -17,15 +19,15 @@ const CARDINAL_DIRECTIONS: Array[Vector3i] = [
 @export var end_gate_path: NodePath = ^"../LockedGate"
 ## GridMap containing maze walls that routes cannot cross.
 @export var wall_grid_map_path: NodePath = ^"../PNGGridMap"
-## GridMap containing the floor cells on which route tiles are drawn.
-@export var floor_grid_map_path: NodePath = ^"../PNGFloorGridMap"
+## FloorSurface containing the cells on which route tiles are drawn.
+@export var floor_surface_path: NodePath = ^"../FloorSurface"
 ## Height above the floor used to prevent the coloured route from flickering.
 @export_range(0.01, 0.5, 0.01) var route_height := 0.04
 
 var player: Node3D
 var end_gate: Node3D
 var wall_grid_map: GridMap
-var floor_grid_map: GridMap
+var floor_surface: FLOOR_SURFACE_SCRIPT
 var highlighted_cells: Array[Vector3i] = []
 var last_player_cell := INVALID_CELL
 
@@ -41,9 +43,9 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	_hide_from_gameplay_camera()
-	if player == null or floor_grid_map == null:
+	if player == null or floor_surface == null:
 		_resolve_references()
-	if player == null or floor_grid_map == null:
+	if player == null or floor_surface == null:
 		return
 
 	var player_cell := _world_to_floor_cell(player.global_position)
@@ -98,33 +100,30 @@ func _resolve_references() -> void:
 	player = get_node_or_null(player_path) as Node3D
 	end_gate = get_node_or_null(end_gate_path) as Node3D
 	wall_grid_map = get_node_or_null(wall_grid_map_path) as GridMap
-	floor_grid_map = get_node_or_null(floor_grid_map_path) as GridMap
+	floor_surface = get_node_or_null(floor_surface_path) as FLOOR_SURFACE_SCRIPT
 
 
 func _has_route_references() -> bool:
 	return player != null \
 		and end_gate != null \
 		and wall_grid_map != null \
-		and floor_grid_map != null \
+		and floor_surface != null \
 		and multimesh != null
 
 
 func _get_walkable_cells() -> Dictionary:
 	var walkable_cells: Dictionary = {}
-	for floor_cell in floor_grid_map.get_used_cells():
-		var floor_position := floor_grid_map.to_global(floor_grid_map.map_to_local(floor_cell))
+	for floor_cell in floor_surface.floor_map.get_present_cells():
+		var floor_position := floor_surface.cell_to_world(floor_cell)
 		var wall_cell := wall_grid_map.local_to_map(wall_grid_map.to_local(floor_position))
 		if wall_grid_map.get_cell_item(wall_cell) == GridMap.INVALID_CELL_ITEM:
-			walkable_cells[floor_cell] = true
+			walkable_cells[Vector3i(floor_cell.x, 0, floor_cell.y)] = true
 	return walkable_cells
 
 
 func _world_to_floor_cell(world_position: Vector3) -> Vector3i:
-	var cell := floor_grid_map.local_to_map(floor_grid_map.to_local(world_position))
-	var floor_cells := floor_grid_map.get_used_cells()
-	if not floor_cells.is_empty():
-		cell.y = floor_cells[0].y
-	return cell
+	var cell := floor_surface.world_to_cell(world_position)
+	return Vector3i(cell.x, 0, cell.y)
 
 
 func _find_nearest_walkable_cell(origin: Vector3i, walkable_cells: Dictionary) -> Vector3i:
@@ -167,8 +166,8 @@ func _apply_highlighted_cells() -> void:
 
 	multimesh.instance_count = highlighted_cells.size()
 	for index in highlighted_cells.size():
-		var floor_position := floor_grid_map.map_to_local(highlighted_cells[index])
-		var world_position := floor_grid_map.to_global(floor_position)
+		var cell := highlighted_cells[index]
+		var world_position := floor_surface.cell_to_world(Vector2i(cell.x, cell.z))
 		var overlay_position := to_local(world_position)
 		overlay_position.y += route_height
 		multimesh.set_instance_transform(index, Transform3D(Basis.IDENTITY, overlay_position))

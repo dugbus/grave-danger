@@ -11,6 +11,12 @@
 [ext_resource type="Texture2D" uid="uid://c65qemtmkpaca" path="res://Assets/environment/dirt_2.png" id="9_ywqr7"]
 [ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]
 
+[ext_resource type="PackedScene" path="res://addons/floor_surface/floor_surface.tscn" id="900_floor_surface"]
+[ext_resource type="Resource" path="res://levels/4/floor_surface_map.tres" id="901_floor_map"]
+[ext_resource type="Resource" path="res://addons/floor_surface/default_floor_elevation_profile.tres" id="902_floor_profile"]
+[ext_resource type="Resource" path="res://levels/4/floor_surface_style.tres" id="903_floor_style"]
+[ext_resource type="Script" path="res://addons/floor_surface/floor_style.gd" id="904_floor_style_script"]
+
 [sub_resource type="Curve3D" id="Curve3D_ywqr7"]
 resource_local_to_scene = true
 _data = {
@@ -221,14 +227,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 48)
 coin_count = 10
 random_seed = 4008
 
-[node name="Tiled Floor" type="Node3D" parent="." unique_id=805366673]
-
-[node name="StaticBody3D" type="StaticBody3D" parent="Tiled Floor" unique_id=28699236]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiled Floor/StaticBody3D" unique_id=1772009123]
-mesh = SubResource("PlaneMesh_e87q2")
-surface_material_override/0 = SubResource("ShaderMaterial_l4oko")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiled Floor/StaticBody3D" unique_id=1945503350]
-shape = SubResource("BoxShape3D_41ed0")
+[node name="FloorSurface" parent="." instance=ExtResource("900_floor_surface")]
+floor_map = ExtResource("901_floor_map")
+elevation_profile = ExtResource("902_floor_profile")
+styles = Array[ExtResource("904_floor_style_script")]([ExtResource("903_floor_style")])
+world_origin_xz = Vector2(-59.5, -89.5)
+placement_grid_map_path = NodePath("../PNGGridMap")

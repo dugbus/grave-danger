@@ -9,6 +9,7 @@ signal vampire_layout_landmarks_changed(layout_landmarks: Array[Dictionary])
 signal level_completed
 
 const PLANNER_SCRIPT := preload("res://levels/vampire-maze/generated_maze/generated_content_planner.gd")
+const FLOOR_SURFACE_SCRIPT := preload("res://addons/floor_surface/floor_surface.gd")
 const LOCKABLE_PASSAGE_SCRIPT := preload("res://placeables/lockables/lockable_hinged_passage.gd")
 const TREASURE_PILE_SCENE := preload("res://placeables/treasure/treasure_pile.tscn")
 const TREASURE_COFFIN_SCENE := preload(
@@ -38,7 +39,7 @@ const DOOR_WIDTH_SCALE := 1.36
 var _last_plan: Dictionary = {}
 var _player: Node3D
 var _vampire: PhysicsBody3D
-var _floor_grid_map: GridMap
+var _floor_surface: FLOOR_SURFACE_SCRIPT
 var _vampire_collision_bodies: Array[PhysicsBody3D] = []
 var _end_gate: Node3D
 var _exit_staircase: Node3D
@@ -49,7 +50,7 @@ func regenerate_content(
     floor_cells: Dictionary,
     maze_result: Dictionary,
     seed_value: int,
-    floor_grid_map: GridMap,
+    floor_surface: FLOOR_SURFACE_SCRIPT,
     configuration: Resource,
     player: Node3D,
     vampire: PhysicsBody3D
@@ -57,9 +58,9 @@ func regenerate_content(
     _clear_generated_children()
     _player = player
     _vampire = vampire
-    _floor_grid_map = floor_grid_map
-    if floor_grid_map == null:
-        return {"errors": ["Generated content requires the maze floor GridMap."]}
+    _floor_surface = floor_surface
+    if floor_surface == null:
+        return {"errors": ["Generated content requires the maze FloorSurface."]}
 
     var planner: RefCounted = PLANNER_SCRIPT.new()
     var plan := planner.call(
@@ -82,18 +83,18 @@ func regenerate_content(
     _end_gate = _instance_end_gate(maze_result.get("end_gate_spawn") as Transform3D)
     _exit_staircase = _end_gate.get_node_or_null("ProceduralStaircase") as Node3D \
         if _end_gate != null else null
-    _instance_doors(plan.get("doors", []) as Array, floor_grid_map)
-    _instance_keys(plan.get("keys", []) as Array, floor_grid_map)
-    _instance_coffins(plan.get("coffins", []) as Array, floor_grid_map, seed_value)
+    _instance_doors(plan.get("doors", []) as Array, floor_surface)
+    _instance_keys(plan.get("keys", []) as Array, floor_surface)
+    _instance_coffins(plan.get("coffins", []) as Array, floor_surface, seed_value)
     _instance_treasure_caches(
         plan.get("treasure_caches", []) as Array,
-        floor_grid_map,
+        floor_surface,
         seed_value
     )
-    _instance_bat_nests(plan.get("bat_nests", []) as Array, floor_grid_map)
+    _instance_bat_nests(plan.get("bat_nests", []) as Array, floor_surface)
     var grass_result := _instance_grass(
         floor_cells,
-        floor_grid_map,
+        floor_surface,
         plan,
         seed_value,
         configuration
@@ -146,7 +147,7 @@ func make_generated_children_editable() -> int:
 ## Returns world-space objectives the vampire knows before the hunt begins.
 func get_vampire_layout_landmarks() -> Array[Dictionary]:
     var known_landmarks: Array[Dictionary] = []
-    if _floor_grid_map == null or _last_plan.is_empty():
+    if _floor_surface == null or _last_plan.is_empty():
         return known_landmarks
 
     _append_plan_landmarks(
@@ -203,7 +204,7 @@ func _append_plan_landmarks(
         known_landmarks.append({
             "id": StringName("%s_%02d" % [kind, index + 1]),
             "kind": kind,
-            "position": _world_position_for_cell(_floor_grid_map, cell),
+            "position": _world_position_for_cell(_floor_surface, cell),
         })
 
 
@@ -219,7 +220,7 @@ func _append_key_landmarks(
         known_landmarks.append({
             "id": StringName("%s_%02d" % [kind, index + 1]),
             "kind": kind,
-            "position": _world_position_for_cell(_floor_grid_map, cell),
+            "position": _world_position_for_cell(_floor_surface, cell),
         })
 
 
@@ -246,7 +247,7 @@ func _on_exit_staircase_completed() -> void:
 
 func _instance_doors(
     placements: Array,
-    floor_grid_map: GridMap
+    floor_surface: FLOOR_SURFACE_SCRIPT
 ) -> void:
     for index in placements.size():
         var placement := placements[index] as Dictionary
@@ -262,8 +263,8 @@ func _instance_doors(
 
         var first_cell := placement["cell"] as Vector2i
         var second_cell := placement["paired_cell"] as Vector2i
-        var first_position := _world_position_for_cell(floor_grid_map, first_cell)
-        var second_position := _world_position_for_cell(floor_grid_map, second_cell)
+        var first_position := _world_position_for_cell(floor_surface, first_cell)
+        var second_position := _world_position_for_cell(floor_surface, second_cell)
         var travel_direction := placement["travel_direction"] as Vector2i
         var angle := PI * 0.5 if travel_direction.x != 0 else 0.0
         var door_basis := Basis(Vector3.UP, angle).scaled(Vector3(DOOR_WIDTH_SCALE, 1.0, 1.0))
@@ -276,7 +277,7 @@ func _instance_doors(
         _add_vampire_collision_exceptions(door)
 
 
-func _instance_keys(placements: Array, floor_grid_map: GridMap) -> void:
+func _instance_keys(placements: Array, floor_surface: FLOOR_SURFACE_SCRIPT) -> void:
     for index in placements.size():
         var placement := placements[index] as Dictionary
         var item_type := placement["item_type"] as StringName
@@ -287,12 +288,12 @@ func _instance_keys(placements: Array, floor_grid_map: GridMap) -> void:
         key.name = "Generated%sKey%02d" % ["Gold" if item_type == &"key" else "Silver", index + 1]
         _add_generated_child(key)
         var cell := placement["cell"] as Vector2i
-        key.global_position = _world_position_for_cell(floor_grid_map, cell) + Vector3.UP * 0.08
+        key.global_position = _world_position_for_cell(floor_surface, cell) + Vector3.UP * 0.08
 
 
 func _instance_grass(
     floor_cells: Dictionary,
-    floor_grid_map: GridMap,
+    floor_surface: FLOOR_SURFACE_SCRIPT,
     plan: Dictionary,
     seed_value: int,
     configuration: Resource
@@ -314,7 +315,7 @@ func _instance_grass(
     return grass.call(
         &"populate",
         floor_cells,
-        floor_grid_map,
+        floor_surface,
         excluded_cells,
         seed_value,
         float(configuration.get("grass_coverage_percent")),
@@ -351,7 +352,7 @@ func _build_grass_excluded_cells(plan: Dictionary, route_clearance: int) -> Dict
 
 func _instance_coffins(
     placements: Array,
-    floor_grid_map: GridMap,
+    floor_surface: FLOOR_SURFACE_SCRIPT,
     seed_value: int
 ) -> void:
     for index in placements.size():
@@ -363,13 +364,13 @@ func _instance_coffins(
         _add_generated_child(coffin)
         _add_vampire_collision_exceptions(coffin)
         var cell := placement["cell"] as Vector2i
-        coffin.global_position = _world_position_for_cell(floor_grid_map, cell)
+        coffin.global_position = _world_position_for_cell(floor_surface, cell)
         coffin.rotation.y = float(posmod(seed_value + index, 4)) * PI * 0.5
 
 
 func _instance_treasure_caches(
     placements: Array,
-    floor_grid_map: GridMap,
+    floor_surface: FLOOR_SURFACE_SCRIPT,
     seed_value: int
 ) -> void:
     for index in placements.size():
@@ -384,10 +385,10 @@ func _instance_treasure_caches(
             pile.call(&"set_treasure_count", item_type, int(counts.get(item_type, 0)))
         _add_generated_child(pile)
         var cell := placement["cell"] as Vector2i
-        pile.global_position = _world_position_for_cell(floor_grid_map, cell) + Vector3.UP * 0.12
+        pile.global_position = _world_position_for_cell(floor_surface, cell) + Vector3.UP * 0.12
 
 
-func _instance_bat_nests(placements: Array, floor_grid_map: GridMap) -> void:
+func _instance_bat_nests(placements: Array, floor_surface: FLOOR_SURFACE_SCRIPT) -> void:
     for index in placements.size():
         var placement := placements[index] as Dictionary
         var bat_noise := BAT_NOISE_SCENE.instantiate() as Node3D
@@ -398,11 +399,11 @@ func _instance_bat_nests(placements: Array, floor_grid_map: GridMap) -> void:
             bat_noise.connect(&"noise_triggered", _on_bat_noise_triggered)
         _add_generated_child(bat_noise)
         var cell := placement["cell"] as Vector2i
-        bat_noise.global_position = _world_position_for_cell(floor_grid_map, cell) + Vector3.UP * 1.6
+        bat_noise.global_position = _world_position_for_cell(floor_surface, cell) + Vector3.UP * 1.6
 
 
-func _world_position_for_cell(floor_grid_map: GridMap, cell: Vector2i) -> Vector3:
-    return floor_grid_map.to_global(floor_grid_map.map_to_local(Vector3i(cell.x, 0, cell.y)))
+func _world_position_for_cell(floor_surface: FLOOR_SURFACE_SCRIPT, cell: Vector2i) -> Vector3:
+    return floor_surface.cell_to_world(cell)
 
 
 func _add_generated_child(node: Node) -> void:

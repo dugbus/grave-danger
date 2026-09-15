@@ -1,10 +1,13 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://levels/vampire-maze/generated_maze/generated_maze.gd" id="1_generator"]
 [ext_resource type="Resource" path="res://levels/vampire-maze/generated_maze/generated_maze_config.tres" id="2_config"]
+[ext_resource type="PackedScene" path="res://levels/vampire-maze/generated_maze/generated_maze_layout.tscn" id="3_layout"]
 [ext_resource type="Material" path="res://Assets/environment/floors/dirt_floor.material" id="4_floor_material"]
 
 [node name="GeneratedMaze" type="Node3D"]
 script = ExtResource("1_generator")
 configuration = ExtResource("2_config")
 floor_material = ExtResource("4_floor_material")
+
+[node name="Layout" parent="." instance=ExtResource("3_layout")]

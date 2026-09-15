@@ -117,8 +117,7 @@ func _apply_finished_playthrough(level_samples: Dictionary) -> void:
 			push_warning("Could not open sampled level scene: %s" % level_path)
 			continue
 
-		get_editor_interface().open_scene_from_path(level_path)
-		var scene_root := await _wait_for_edited_scene(level_path)
+		var scene_root := await _get_or_open_edited_scene(level_path)
 		if scene_root == null or not scene_root is Node3D:
 			push_warning("Sampled level is not an editable Node3D scene: %s" % level_path)
 			continue
@@ -133,6 +132,22 @@ func _apply_finished_playthrough(level_samples: Dictionary) -> void:
 			var walked_path := _marker_builder.find_walked_path(marker_container)
 			if walked_path != null:
 				get_editor_interface().get_selection().add_node(walked_path)
+
+
+## Reuses the current scene so populated embedded resources are not needlessly reloaded.
+func _get_or_open_edited_scene(level_path: String) -> Node:
+	var scene_root := get_editor_interface().get_edited_scene_root()
+	if edited_scene_matches_level(scene_root, level_path):
+		return scene_root
+	get_editor_interface().open_scene_from_path(level_path)
+	return await _wait_for_edited_scene(level_path)
+
+
+## Reports whether marker application can safely use the editor's already-loaded scene.
+static func edited_scene_matches_level(scene_root: Node, level_path: String) -> bool:
+	return scene_root != null \
+		and not level_path.is_empty() \
+		and scene_root.scene_file_path == level_path
 
 
 func _wait_for_edited_scene(level_path: String) -> Node:

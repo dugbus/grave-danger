@@ -28,7 +28,7 @@ const LEVEL_PROPERTIES := [
 	&"auto_repair",
 	&"export_origin",
 	&"export_size",
-	&"floor_gridmap_path",
+	&"floor_surface_path",
 	&"floor_material_path",
 ]
 

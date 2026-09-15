@@ -4,6 +4,11 @@ extends Resource
 
 ## Reusable visual palette entry kept independent from authored floor topology.
 
+enum TopUvMapping {
+	WorldScaled,
+	SurfaceNormalized,
+}
+
 ## Human-readable palette name shown by the viewport style painter.
 @export var display_name := "Floor style":
 	set(value):
@@ -17,6 +22,13 @@ extends Resource
 		if is_equal_approx(world_uv_metres, value):
 			return
 		world_uv_metres = value
+		emit_changed()
+## Coordinate mapping used by top materials; normalized mode preserves whole-floor legacy shaders.
+@export var top_uv_mapping := TopUvMapping.WorldScaled:
+	set(value):
+		if top_uv_mapping == value:
+			return
+		top_uv_mapping = value
 		emit_changed()
 ## World metres covered by one material UV repeat on outer walls, ledges and hole sides.
 @export_range(0.01, 100.0, 0.01, "or_greater", "suffix:m") var wall_uv_metres := 1.0:

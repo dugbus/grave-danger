@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="FloorMap" format=3 uid="uid://8ys3pdhsft05"]
+
+[ext_resource type="Script" uid="uid://cdlus0vrv8r3u" path="res://addons/floor_surface/floor_map.gd" id="1_uw44a"]
+
+[resource]
+script = ExtResource("1_uw44a")
+minimum_cell = Vector2i(-75, -12)
+dimensions = Vector2i(150, 24)
+default_present = true

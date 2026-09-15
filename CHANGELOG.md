@@ -1,6 +1,41 @@
 # Changelog
 
+## 2026-09-13
+
+### 1600
+
+- Every replacement level floor is now authored through the FloorSurface painting path, retains its original top finish and UV scale, and uses independent FloorSurface wall and pit materials.
+  - Prompt: Recreate every replacement floor with the FloorSurface authoring tool.
+
+### 1500
+
+- Enclosed floor holes in the Debug Level and Level 7 now have player-scale stone walls, while exterior empty space remains outside the pit system.
+  - Prompt: Give the Debug Level and any other affected levels visible walls inside floor holes.
+
 ## 2026-09-12
+
+### 1800
+
+- Finished playthrough markers now reuse the already-open level instead of reloading populated grass and route MultiMeshes in the editor.
+  - Prompt: Remove the MultiMesh transform-format error after a recorded playthrough.
+- Editable floors now share exact cell coordinates with their placement GridMaps across every compatible authored level, with balanced outer padding where legacy slabs were asymmetric.
+  - Prompt: Audit every level after finding a possible floor and GridMap offset.
+
+### 1600
+
+- Each regenerated maze now owns independent editable floor map and style data while retaining visible mesh, collision and wall alignment.
+  - Prompt: Keep Tutorial 2 and generated mazes aligned when editable floors expand.
+- Tutorial 2, PNG-created floors and generated mazes now share exact FloorSurface and placement-GridMap cell origins, with expanded floor coordinates immediately available for sparse GridMap object placement.
+  - Prompt: Keep Tutorial 2 and generated mazes aligned when editable floors expand.
+- Level editors can create or rebuild an editable FloorSurface from opaque PNG pixels while retaining authored heights, styles, and separate wall finishes on existing floors.
+  - Prompt: Keep PNG level layouts as a starting point for the new editable floor system.
+
+### 1400
+
+- Generated mazes now build their flat floor through editable FloorSurface map and style resources, and the obsolete PNG floor creation controls have been removed.
+  - Prompt: Move every existing flat level floor onto the editable FloorSurface system and retire the old floor implementation.
+- Level editors can now select and paint a level-specific FloorSurface in every playable level while retaining each floor's original footprint, material, texture scale, holes, and collision.
+  - Prompt: Move every existing flat level floor onto the editable FloorSurface system and retire the old floor implementation.
 
 ### 1300
 

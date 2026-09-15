@@ -113,6 +113,12 @@ rules. Keep level-specific coordinates and transient tuning out of this file.
   Prefer a native `FloorGridMap` child of the main level scene for directly edited floor data.
   If deliberately using nested layout or grass scenes, expose their editable children and verify
   access from the main scene—not only by opening the nested source.
+- Thin legacy floor slabs do not provide a readable default depth for newly generated holes. Audit
+  enclosed empty regions separately from exterior voids, size their walls against the player and
+  camera, and verify the derived mesh reaches the configured pit datum in the migrated level data.
+- Bulk floor replacement must replay each footprint through the production FloorSurface shape
+  painter and begin exposed-side settings from a FloorSurface style. Matching serialized cells is
+  not enough when a direct conversion can preserve unsuitable legacy slab assumptions.
 - Validate the scene with `PackedScene.GEN_EDIT_STATE_INSTANCE`: check parent/owner, editable
   instance flags where needed, visible state and populated cells. This checks saved editor state,
   not the user's currently open editor. If the user still cannot see a node, inspect which scene

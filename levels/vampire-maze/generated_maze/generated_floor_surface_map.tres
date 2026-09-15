@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="FloorMap" format=3 uid="uid://domit60fyug83"]
+
+[ext_resource type="Script" uid="uid://cdlus0vrv8r3u" path="res://addons/floor_surface/floor_map.gd" id="1_map"]
+
+[resource]
+resource_local_to_scene = true
+script = ExtResource("1_map")
+default_present = true

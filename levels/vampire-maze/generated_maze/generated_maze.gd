@@ -19,8 +19,13 @@ enum MazeConnectionAxis {
 
 const REPAIRER_SCRIPT := preload("res://addons/png_to_gridmap/png_to_gridmap_repairer.gd")
 const MESH_CATALOG_SCRIPT := preload("res://addons/png_to_gridmap/png_to_gridmap_mesh_catalog.gd")
+const FLOOR_SURFACE_SCRIPT := preload("res://addons/floor_surface/floor_surface.gd")
+const GRID_ALIGNMENT_SCRIPT := preload("res://addons/floor_surface/floor_surface_grid_alignment.gd")
 const GridBuilder := preload("res://levels/vampire-maze/generated_maze/generated_maze_grid_builder.gd")
 const FloorRoute := preload("res://levels/vampire-maze/generated_maze/generated_floor_route.gd")
+const FloorSurfaceSettings := preload(
+    "res://levels/vampire-maze/generated_maze/generated_floor_surface_settings.gd"
+)
 const LayoutBuilder := preload("res://levels/vampire-maze/generated_maze/generated_maze_layout_builder.gd")
 const DEFAULT_CONFIG := preload("res://levels/vampire-maze/generated_maze/generated_maze_config.tres")
 const CARDINAL_DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT]
@@ -29,7 +34,6 @@ const EDITOR_REGENERATION_DEBOUNCE_MILLISECONDS := 300
 const PERIMETER_CONNECTIONS_PER_BREAK := 12
 const INTERNAL_CONNECTION_RANDOM_SALT := 1597463007
 const CURRENT_GENERATION_VERSION := 20
-
 ## Seed used for deterministic scene and runtime maze generation.
 @export var maze_seed := 1:
     set(value):
@@ -74,8 +78,8 @@ const CURRENT_GENERATION_VERSION := 20
 @export_group("")
 ## Child GridMap that receives generated and repaired wall cells.
 @export var wall_grid_map_path: NodePath = ^"Layout/PNGGridMap"
-## Child GridMap that receives a complete floor below the maze.
-@export var floor_grid_map_path: NodePath = ^"Layout/PNGFloorGridMap"
+## Child FloorSurface that receives the complete editable floor below the maze.
+@export var floor_surface_path: NodePath = ^"Layout/FloorSurface"
 ## Player placed in the generated entrance corner.
 @export var player_path: NodePath = ^"../Player"
 ## Optional vampire placed two cells inside the locked gate opposite the player.
@@ -184,17 +188,17 @@ func _generate_from_config(
     elif populate_grid_maps and LayoutBuilder.replace(self) == null:
         errors.append("GeneratedMaze could not create its Layout node.")
     var wall_grid_map := get_node_or_null(wall_grid_map_path) as GridMap
-    var floor_grid_map := get_node_or_null(floor_grid_map_path) as GridMap
+    var floor_surface := get_node_or_null(floor_surface_path) as FLOOR_SURFACE_SCRIPT
     if wall_grid_map == null:
         errors.append("GeneratedMaze could not find its wall GridMap.")
-    if floor_grid_map == null:
-        errors.append("GeneratedMaze could not find its floor GridMap.")
+    if floor_surface == null:
+        errors.append("GeneratedMaze could not find its FloorSurface.")
     if not errors.is_empty():
         _is_generating = false
         return {"errors": errors}
 
-    GDGeneratedFloorSettings.apply(
-        floor_grid_map,
+    FloorSurfaceSettings.apply(
+        floor_surface,
         floor_material,
         floor_texture_tiles
     )
@@ -232,7 +236,7 @@ func _generate_from_config(
     if populate_grid_maps:
         var placement_errors := _populate_grid_maps(
             wall_grid_map,
-            floor_grid_map,
+            floor_surface,
             floor_cells,
             width,
             height,
@@ -313,7 +317,7 @@ func _generate_from_config(
             floor_cells,
             result,
             seed_value,
-            floor_grid_map,
+            floor_surface,
             content_configuration,
             player,
             vampire as PhysicsBody3D
@@ -350,8 +354,8 @@ func _can_reuse_runtime_grid_maps(runtime_configuration: Resource) -> bool:
     if runtime_configuration == null:
         return false
     var wall_grid_map := get_node_or_null(wall_grid_map_path) as GridMap
-    var floor_grid_map := get_node_or_null(floor_grid_map_path) as GridMap
-    if wall_grid_map == null or floor_grid_map == null:
+    var floor_surface := get_node_or_null(floor_surface_path) as FLOOR_SURFACE_SCRIPT
+    if wall_grid_map == null or floor_surface == null or floor_surface.floor_map == null:
         return false
 
     var width := maxi(int(runtime_configuration.get("width")), 7)
@@ -361,12 +365,12 @@ func _can_reuse_runtime_grid_maps(runtime_configuration: Resource) -> bool:
             or baked_width != width \
             or baked_height != height:
         return false
-    if floor_grid_map.get_used_cells().size() != width * height:
+    if floor_surface.floor_map.get_present_cells().size() != width * height:
         return false
-    if floor_grid_map.get_cell_item(Vector3i.ZERO) == GridMap.INVALID_CELL_ITEM \
-            or floor_grid_map.get_cell_item(
-                Vector3i(width - 1, 0, height - 1)
-            ) == GridMap.INVALID_CELL_ITEM:
+    if not floor_surface.has_floor(Vector2i.ZERO) \
+            or not floor_surface.has_floor(Vector2i(width - 1, height - 1)):
+        return false
+    if not GRID_ALIGNMENT_SCRIPT.is_aligned(floor_surface, wall_grid_map):
         return false
     return not wall_grid_map.get_used_cells().is_empty()
 
@@ -932,7 +936,7 @@ func _get_logical_maze_layout(
 
 func _populate_grid_maps(
     wall_grid_map: GridMap,
-    floor_grid_map: GridMap,
+    floor_surface: FLOOR_SURFACE_SCRIPT,
     floor_cells: Dictionary,
     width: int,
     height: int,
@@ -940,7 +944,7 @@ func _populate_grid_maps(
 ) -> Array[String]:
     return _grid_builder.populate(
         wall_grid_map,
-        floor_grid_map,
+        floor_surface,
         floor_cells,
         width,
         height,

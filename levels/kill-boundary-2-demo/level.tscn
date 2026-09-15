@@ -10,6 +10,13 @@
 [ext_resource type="PackedScene" uid="uid://cujenbxxb5lj5" path="res://placeables/collectibles/flask_breathing_space.tscn" id="8_space"]
 [ext_resource type="PackedScene" uid="uid://bilrp2by5t4q1" path="res://placeables/collectibles/flask_no_boundary.tscn" id="9_remove"]
 [ext_resource type="Script" uid="uid://ceyo0fmieerd8" path="res://levels/kill-boundary-2-demo/kill_boundary_2_demo_controls.gd" id="10_controls"]
+[ext_resource type="MeshLibrary" path="res://Assets/environment/graveyard.res" id="11_placement_library"]
+
+[ext_resource type="PackedScene" path="res://addons/floor_surface/floor_surface.tscn" id="900_floor_surface"]
+[ext_resource type="Resource" path="res://levels/kill-boundary-2-demo/floor_surface_map.tres" id="901_floor_map"]
+[ext_resource type="Resource" path="res://addons/floor_surface/default_floor_elevation_profile.tres" id="902_floor_profile"]
+[ext_resource type="Resource" path="res://levels/kill-boundary-2-demo/floor_surface_style.tres" id="903_floor_style"]
+[ext_resource type="Script" path="res://addons/floor_surface/floor_style.gd" id="904_floor_style_script"]
 
 [sub_resource type="StandardMaterial3D" id="FloorMaterial"]
 albedo_color = Color(0.15, 0.18, 0.22, 1)
@@ -33,15 +40,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 script = ExtResource("3_settings")
 show_minimap = true
 
-[node name="Floor" type="StaticBody3D" parent="." unique_id=1904808095]
+[node name="PlacementGridMap" type="GridMap" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -16)
+mesh_library = ExtResource("11_placement_library")
+cell_size = Vector3(1, 1, 1)
+cell_center_y = false
 
-[node name="Mesh" type="MeshInstance3D" parent="Floor" unique_id=1780783682]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
-mesh = SubResource("FloorMesh")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=849958061]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
-shape = SubResource("FloorCollision")
+[node name="FloorSurface" parent="." instance=ExtResource("900_floor_surface")]
+floor_map = ExtResource("901_floor_map")
+elevation_profile = ExtResource("902_floor_profile")
+styles = Array[ExtResource("904_floor_style_script")]([ExtResource("903_floor_style")])
+world_origin_xz = Vector2(-16, -16)
+placement_grid_map_path = NodePath("../PlacementGridMap")
 
 [node name="KillBoundary2" parent="." unique_id=1885470510 instance=ExtResource("4_boundary")]
 playback_mode = 1

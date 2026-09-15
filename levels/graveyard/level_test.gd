@@ -8,7 +8,7 @@ func run(_tree: SceneTree) -> void:
 	expect_script_contract(SUBJECT, SUBJECT_PATH)
 	var level := SUBJECT.new() as GDLevel05
 	expect(
-		level.height_map_texture != null,
-		"The terrain height map participates in threaded level dependency loading."
+		level.floor_size == Vector2(100.0, 100.0),
+		"Graveyard dressing uses the same flat authored extent as its FloorSurface."
 	)
 	level.free()

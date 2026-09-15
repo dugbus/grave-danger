@@ -13,6 +13,12 @@
 [ext_resource type="PackedScene" uid="uid://ba4h31e1vsl1n" path="res://placeables/lockables/locked_gate.tscn" id="11_qg1rj"]
 [ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]
 
+[ext_resource type="PackedScene" path="res://addons/floor_surface/floor_surface.tscn" id="900_floor_surface"]
+[ext_resource type="Resource" path="res://levels/6/floor_surface_map.tres" id="901_floor_map"]
+[ext_resource type="Resource" path="res://addons/floor_surface/default_floor_elevation_profile.tres" id="902_floor_profile"]
+[ext_resource type="Resource" path="res://levels/6/floor_surface_style.tres" id="903_floor_style"]
+[ext_resource type="Script" path="res://addons/floor_surface/floor_style.gd" id="904_floor_style_script"]
+
 [sub_resource type="Curve3D" id="Curve3D_htss5"]
 resource_local_to_scene = true
 closed = true
@@ -771,16 +777,11 @@ transform = Transform3D(0.82843196, 0, -0.5600897, 0, 1, 0, 0.5600897, 0, 0.8284
 [node name="HealthPotion7" parent="Objects" unique_id=271569598 instance=ExtResource("7_viipc")]
 transform = Transform3D(0.82843196, 0, -0.5600897, 0, 1, 0, 0.5600897, 0, 0.82843196, -0.40864182, -5.9604645e-08, -1.5397129)
 
-[node name="Tiled Floor" type="Node3D" parent="." unique_id=1554348646]
-
-[node name="StaticBody3D" type="StaticBody3D" parent="Tiled Floor" unique_id=1720588140]
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Tiled Floor/StaticBody3D" unique_id=943036324]
-mesh = SubResource("PlaneMesh_floor")
-surface_material_override/0 = SubResource("ShaderMaterial_floor")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Tiled Floor/StaticBody3D" unique_id=55617674]
-shape = SubResource("BoxShape3D_floor")
+[node name="FloorSurface" parent="." instance=ExtResource("900_floor_surface")]
+floor_map = ExtResource("901_floor_map")
+elevation_profile = ExtResource("902_floor_profile")
+styles = Array[ExtResource("904_floor_style_script")]([ExtResource("903_floor_style")])
+placement_grid_map_path = NodePath("../GridMap")
 
 [node name="GridMap" type="GridMap" parent="." unique_id=746807472]
 mesh_library = ExtResource("9_nwn5v")

@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://wakxwbb1skgm" path="res://levels/graveyard/level.gd" id="1_level5_script"]
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
-[ext_resource type="Texture2D" uid="uid://gadfwxebefkl" path="res://Assets/environment/textures/graveyard_grass.png" id="4_grass"]
 [ext_resource type="MeshLibrary" uid="uid://cunnj75ip2b7a" path="res://Assets/environment/graveyard.res" id="6_2lsge"]
 [ext_resource type="PackedScene" uid="uid://fv08wdi8kict" path="res://Assets/kenney-graveyard/pine.glb" id="8_m3ptj"]
 [ext_resource type="Script" uid="uid://bov7w0cyy2jl7" path="res://game/follow_camera.gd" id="9_7eg3p"]
@@ -23,12 +22,11 @@
 [ext_resource type="Material" uid="uid://cu5fhcmgsc4va" path="res://Assets/environment/road.material" id="22_xj8vh"]
 [ext_resource type="PackedScene" uid="uid://dathjrgpejj8w" path="res://Assets/kenney-graveyard/rocks-tall.glb" id="23_vcbxs"]
 [ext_resource type="PackedScene" path="res://levels/graveyard/level_select_crypt.tscn" id="23_xj8vh"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hill_grass"]
-resource_local_to_scene = true
-cull_mode = 2
-albedo_texture = ExtResource("4_grass")
-roughness = 0.95
+[ext_resource type="PackedScene" path="res://addons/floor_surface/floor_surface.tscn" id="900_floor_surface"]
+[ext_resource type="Resource" path="res://levels/graveyard/floor_surface_map.tres" id="901_floor_map"]
+[ext_resource type="Resource" path="res://addons/floor_surface/default_floor_elevation_profile.tres" id="902_floor_profile"]
+[ext_resource type="Resource" path="res://levels/graveyard/floor_surface_style.tres" id="903_floor_style"]
+[ext_resource type="Script" path="res://addons/floor_surface/floor_style.gd" id="904_floor_style_script"]
 
 [sub_resource type="Environment" id="Environment_level5"]
 background_mode = 1
@@ -40,9 +38,14 @@ ambient_light_energy = 0.15
 [node name="GraveYardLevel" type="Node3D" unique_id=2124946868]
 script = ExtResource("1_level5_script")
 generate_tree_surround = false
-terrain_tint = Color(0.6666667, 0.6666667, 0.6666667, 1)
-terrain_material = SubResource("StandardMaterial3D_hill_grass")
 direct_run_camera_profile = ExtResource("10_camera_profile")
+
+[node name="FloorSurface" parent="." instance=ExtResource("900_floor_surface")]
+floor_map = ExtResource("901_floor_map")
+elevation_profile = ExtResource("902_floor_profile")
+styles = Array[ExtResource("904_floor_style_script")]([ExtResource("903_floor_style")])
+world_origin_xz = Vector2(-24.5, -24.5)
+placement_grid_map_path = NodePath("../PNGGridMap")
 
 [node name="Player" parent="." unique_id=244343110 instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.364414, -0.30537456, -23.739996)

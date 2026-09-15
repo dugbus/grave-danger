@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="FloorMap" format=3 uid="uid://d40kfwlg0yxl"]
+
+[ext_resource type="Script" uid="uid://cdlus0vrv8r3u" path="res://addons/floor_surface/floor_map.gd" id="1_5nm2r"]
+
+[resource]
+script = ExtResource("1_5nm2r")
+dimensions = Vector2i(256, 16)
+default_present = true
+presence_exceptions = Array[Vector2i]([Vector2i(251, 6), Vector2i(253, 6), Vector2i(252, 7), Vector2i(251, 8), Vector2i(253, 8), Vector2i(251, 11), Vector2i(252, 11), Vector2i(253, 11), Vector2i(251, 12), Vector2i(252, 12), Vector2i(253, 12), Vector2i(251, 13), Vector2i(252, 13), Vector2i(253, 13)])

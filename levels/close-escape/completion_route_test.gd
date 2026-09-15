@@ -179,7 +179,7 @@ func _path(start: Vector2i, goal: Vector2i, grid: GridMap, blocked: Dictionary, 
 func _check_passage_clearance(tree: SceneTree, level: Node3D) -> void:
 	var harness := Node3D.new()
 	harness.add_child(level.get_node(^"AuthoredLayout").duplicate())
-	harness.add_child(level.get_node(^"FloorGridMap").duplicate())
+	harness.add_child(level.get_node(^"FloorSurface").duplicate())
 	var passages: Array[GDLockableHingedPassage] = []
 	for child in level.get_node(^"Progression").get_children():
 		if child is GDLockableHingedPassage:

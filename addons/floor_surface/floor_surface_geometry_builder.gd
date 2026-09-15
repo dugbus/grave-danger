@@ -19,6 +19,8 @@ enum EdgeDirection {
 
 var _cell_size := 1.0
 var _world_origin_xz := Vector2.ZERO
+var _surface_uv_origin := Vector2.ZERO
+var _surface_uv_size := Vector2.ONE
 var _pit_bottom_heights: Dictionary[Vector2i, float] = {}
 var _surface_descriptions: Dictionary[Vector2i, Dictionary] = {}
 
@@ -35,6 +37,8 @@ func build(
 	var collision_vertices: Array[Vector3] = []
 	_cell_size = maxf(cell_size, 0.01)
 	_world_origin_xz = world_origin_xz
+	_surface_uv_origin = world_origin_xz + Vector2(floor_map.minimum_cell) * _cell_size
+	_surface_uv_size = Vector2(floor_map.dimensions) * _cell_size
 	var pit_result := PIT_RESOLVER_SCRIPT.new().resolve(floor_map, profile, styles)
 	_pit_bottom_heights = pit_result["bottom_heights"] as Dictionary[Vector2i, float]
 	var present_cells := floor_map.get_present_cells()
@@ -69,6 +73,7 @@ func build(
 		var pit_uvs: Array[Vector2] = []
 		var style := styles[style_index] as STYLE_SCRIPT
 		var top_uv_metres := maxf(style.world_uv_metres, 0.01)
+		var top_uv_mapping := style.top_uv_mapping as STYLE_SCRIPT.TopUvMapping
 		var wall_uv_metres := maxf(style.wall_uv_metres, 0.01)
 		for cell in present_cells:
 			if _resolve_style_index(floor_map.get_cell_style(cell), styles.size()) != style_index:
@@ -79,7 +84,8 @@ func build(
 				top_uvs,
 				cell,
 				_surface_descriptions[cell],
-				top_uv_metres
+				top_uv_metres,
+				top_uv_mapping
 			)
 			ledge_face_count += _append_owned_ledges(
 				edge_vertices,
@@ -104,7 +110,8 @@ func build(
 						pit_uvs,
 						hole_cell,
 						_pit_bottom_heights[hole_cell],
-						top_uv_metres
+						top_uv_metres,
+						top_uv_mapping
 					)
 					pit_bottom_cell_count += 1
 		_append_mesh_surface(mesh, top_vertices, top_normals, top_uvs, style.top_material)
@@ -169,13 +176,22 @@ func _append_flat_cell(
 	uvs: Array[Vector2],
 	cell: Vector2i,
 	height: float,
-	world_uv_metres: float
+	world_uv_metres: float,
+	top_uv_mapping: STYLE_SCRIPT.TopUvMapping
 ) -> void:
 	var description := {
 		"corner_heights": [height, height, height, height] as Array[float],
 		"normal": Vector3.UP,
 	}
-	_append_cell_top(vertices, normals, uvs, cell, description, world_uv_metres)
+	_append_cell_top(
+		vertices,
+		normals,
+		uvs,
+		cell,
+		description,
+		world_uv_metres,
+		top_uv_mapping
+	)
 
 
 func _append_cell_top(
@@ -184,7 +200,8 @@ func _append_cell_top(
 	uvs: Array[Vector2],
 	cell: Vector2i,
 	description: Dictionary,
-	world_uv_metres: float
+	world_uv_metres: float,
+	top_uv_mapping: STYLE_SCRIPT.TopUvMapping
 ) -> void:
 	var corners := _get_cell_corners_from_description(cell, description)
 	var triangle_vertices: Array[Vector3] = [
@@ -192,12 +209,12 @@ func _append_cell_top(
 		corners[0], corners[3], corners[2],
 	]
 	var triangle_uvs: Array[Vector2] = [
-		_top_uv(corners[0], world_uv_metres),
-		_top_uv(corners[2], world_uv_metres),
-		_top_uv(corners[1], world_uv_metres),
-		_top_uv(corners[0], world_uv_metres),
-		_top_uv(corners[3], world_uv_metres),
-		_top_uv(corners[2], world_uv_metres),
+		_top_uv(corners[0], world_uv_metres, top_uv_mapping),
+		_top_uv(corners[2], world_uv_metres, top_uv_mapping),
+		_top_uv(corners[1], world_uv_metres, top_uv_mapping),
+		_top_uv(corners[0], world_uv_metres, top_uv_mapping),
+		_top_uv(corners[3], world_uv_metres, top_uv_mapping),
+		_top_uv(corners[2], world_uv_metres, top_uv_mapping),
 	]
 	vertices.append_array(triangle_vertices)
 	uvs.append_array(triangle_uvs)
@@ -385,7 +402,13 @@ func _get_neighbour_height_at_corner(neighbour: Vector2i, corner: Vector3) -> fl
 	return corner.y
 
 
-func _top_uv(vertex: Vector3, world_uv_metres: float) -> Vector2:
+func _top_uv(
+	vertex: Vector3,
+	world_uv_metres: float,
+	top_uv_mapping: STYLE_SCRIPT.TopUvMapping
+) -> Vector2:
+	if top_uv_mapping == STYLE_SCRIPT.TopUvMapping.SurfaceNormalized:
+		return (Vector2(vertex.x, vertex.z) - _surface_uv_origin) / _surface_uv_size
 	return Vector2(vertex.x, vertex.z) / world_uv_metres
 
 

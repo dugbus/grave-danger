@@ -11,35 +11,28 @@ func run(_tree: SceneTree) -> void:
 	var reference := REFERENCE.instantiate() as Node3D
 	var layout := level.get_node(^"AuthoredLayout") as Node3D
 	var walls := layout.get_node(^"WallGridMap") as GridMap
-	var floor_grid := level.get_node(^"FloorGridMap") as GridMap
-	var reference_floor := (
-		reference.get_node(^"Tiled Floor/StaticBody3D/MeshInstance3D") as MeshInstance3D
-	)
-	var reference_material := reference_floor.get_surface_override_material(0) as ShaderMaterial
+	var floor_surface := level.get_node(^"FloorSurface") as FloorSurface
 	var floor_reference := FLOOR_REFERENCE.instantiate() as Node3D
-	var tutorial_grid := floor_reference.get_node(^"Layout/PNGFloorGridMap") as GridMap
-	var floor_material := (
-		floor_grid.mesh_library.get_item_mesh(0).surface_get_material(0) as StandardMaterial3D
-	)
+	var tutorial_surface := floor_reference.get_node(^"Layout/FloorSurface") as FloorSurface
+	var floor_material := floor_surface.styles[0].top_material as StandardMaterial3D
+	var reference_material := tutorial_surface.styles[0].top_material as StandardMaterial3D
 	expect(
-		floor_material.albedo_texture == reference_material.get_shader_parameter(&"tiled_texture"),
-		"The floor grid uses Level 1's dirt texture."
+		floor_material.albedo_texture == reference_material.albedo_texture,
+		"The editable floor surface uses the established dirt texture."
 	)
 	expect(
 		(
-			floor_grid.get_used_cells().size() == 35 * 29
-			and floor_grid.collision_layer == tutorial_grid.collision_layer
-			and floor_grid.cell_size == tutorial_grid.cell_size
-			and floor_grid.cell_center_y == tutorial_grid.cell_center_y
-			and floor_grid.transform == walls.transform
+			floor_surface.floor_map.get_present_cells().size() == 35 * 29
+			and floor_surface.cell_size == tutorial_surface.cell_size
+			and floor_surface.world_origin_xz == Vector2(walls.position.x, walls.position.z)
+			and floor_surface.transform == Transform3D.IDENTITY
 			and level.get_node_or_null(^"Floor") == null
 		),
-		"Tutorial-style floor tiles cover the level with no separate slab underneath."
+		"The FloorSurface covers the level with no separate slab underneath."
 	)
-	_check_floor_phases(floor_grid, tutorial_grid)
 	# Navigation currently selects the first covering grid, so keep the wall grid first.
 	expect(
-		layout.get_index() < floor_grid.get_index(),
+		layout.get_index() < floor_surface.get_index(),
 		"The floor does not take precedence over the zombie wall grid."
 	)
 	var wall_count := 0
@@ -134,53 +127,21 @@ func _check_editor_access() -> void:
 	# Use the same instance edit state as the editor, not just a runtime load.
 	var editable_level := LEVEL.instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE) as Node3D
 	var layout := editable_level.get_node(^"AuthoredLayout") as Node3D
-	var floor_grid := editable_level.get_node(^"FloorGridMap") as GridMap
+	var floor_surface := editable_level.get_node(^"FloorSurface") as FloorSurface
 	expect(
 		editable_level.is_editable_instance(layout)
-		and floor_grid.owner == editable_level
-		and floor_grid.get_parent() == editable_level
-		and floor_grid.visible
+		and floor_surface.owner == editable_level
+		and floor_surface.get_parent() == editable_level
+		and floor_surface.visible
 		and layout.visible
-		and floor_grid.get_used_cells().size() == 35 * 29,
-		"The populated floor GridMap is owned directly by the main level, not a nested scene."
+		and floor_surface.floor_map.get_present_cells().size() == 35 * 29,
+		"The populated FloorSurface is owned directly by the main level and remains editable."
 	)
 	expect(
 		editable_level.is_editable_instance(editable_level.get_node(^"PaintedGrass")),
 		"Grass paint groups are also exposed in the main level editor."
 	)
 	editable_level.free()
-
-
-func _check_floor_phases(floor_grid: GridMap, tutorial_grid: GridMap) -> void:
-	var library := floor_grid.mesh_library
-	expect(
-		library.get_item_list().size() == 4, "Floor library has Tutorial 1's four texture phases."
-	)
-	for item in library.get_item_list():
-		var material := library.get_item_mesh(item).surface_get_material(0) as StandardMaterial3D
-		var reference_mesh := tutorial_grid.mesh_library.get_item_mesh(item) as PlaneMesh
-		var reference_material := reference_mesh.material as StandardMaterial3D
-		var shapes := library.get_item_shapes(item)
-		expect(
-			(
-				material.albedo_texture == reference_material.albedo_texture
-				and material.uv1_scale == reference_material.uv1_scale
-				and material.uv1_offset == reference_material.uv1_offset
-				and (library.get_item_mesh(item) as PlaneMesh).size == reference_mesh.size
-				and shapes.size() == 2
-				and (shapes[0] as BoxShape3D).size == Vector3(1, 0.5, 1)
-				and (shapes[1] as Transform3D).origin == Vector3(0, -0.25, 0)
-			),
-			"Floor phase %d matches Tutorial 1's UVs and flush tile collision." % item
-		)
-	var phases_match := true
-	for cell in floor_grid.get_used_cells():
-		phases_match = (
-			phases_match
-			and floor_grid.get_cell_item(cell) == posmod(cell.x, 2) + posmod(cell.z, 2) * 2
-		)
-	expect(phases_match, "Floor texture phases alternate continuously across cell edges.")
-
 
 func _read_painted_buffers() -> Dictionary:
 	var result: Dictionary = {}

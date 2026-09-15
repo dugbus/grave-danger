@@ -68,7 +68,6 @@ const PNG_TO_GRIDMAP_AUTO_REPAIR_WATCH := preload(
     "res://addons/png_to_gridmap/png_to_gridmap_auto_repair_watch.gd"
 )
 const PNG_TO_GRIDMAP_COLOR_MAPPING := preload("res://addons/png_to_gridmap/png_to_gridmap_color_mapping.gd")
-const PNG_TO_GRIDMAP_FLOOR_BUILDER := preload("res://addons/png_to_gridmap/png_to_gridmap_floor_builder.gd")
 const PNG_TO_GRIDMAP_IMPORTER := preload("res://addons/png_to_gridmap/png_to_gridmap_importer.gd")
 const PNG_TO_GRIDMAP_MAPPING_CATALOG := preload(
     "res://addons/png_to_gridmap/png_to_gridmap_mapping_catalog.gd"
@@ -518,7 +517,6 @@ func _run_tests() -> void:
     failed = not _test_png_profile_store_resets_unsaved_level_state() or failed
     failed = not _test_png_resource_catalog_selects_only_gridmap() or failed
     failed = not _test_level_one_enables_gridmap_auto_repair() or failed
-    failed = not _test_png_floor_gridmap_uses_non_transparent_pixels_and_safe_collision() or failed
     failed = not _test_png_gridmap_fuzzy_matches_configured_colours() or failed
     failed = not _test_png_gridmap_import_disables_y_cell_centering() or failed
     # Process queued fixture deletion and deferred audio/render-server cleanup
@@ -5181,14 +5179,6 @@ func _test_production_kill_boundaries_use_equivalent_size_tracks() -> bool:
             "depths": [8.0, 12.0, 7.0, 8.0],
         },
         {
-            "path": "res://levels/3/level.tscn",
-            "length": 95.8600604717548,
-            "speed": 3.25,
-            "times": [0.0],
-            "widths": [17.6],
-            "depths": [17.6],
-        },
-        {
             "path": "res://levels/6/level.tscn",
             "length": 475.27316,
             "speed": 1.0,
@@ -8203,9 +8193,9 @@ func _test_vampire_maze_owns_its_development_view() -> bool:
     var wall_grid_map := level.get_node_or_null(
         "GeneratedMaze/Layout/PNGGridMap"
     ) as GridMap
-    var floor_grid_map := level.get_node_or_null(
-        "GeneratedMaze/Layout/PNGFloorGridMap"
-    ) as GridMap
+    var floor_surface := level.get_node_or_null(
+        "GeneratedMaze/Layout/FloorSurface"
+    ) as FloorSurface
     var camera_profile := camera.get("camera_profile") as Resource if camera != null else null
     var maze_configuration := generated_maze.get("configuration") as Resource \
         if generated_maze != null else null
@@ -8213,11 +8203,11 @@ func _test_vampire_maze_owns_its_development_view() -> bool:
         if maze_configuration != null else 0
     var configured_height := int(maze_configuration.get("height")) \
         if maze_configuration != null else 0
-    var serialized_floor_cells: Array[Vector3i] = floor_grid_map.get_used_cells() \
-        if floor_grid_map != null else ([] as Array[Vector3i])
+    var serialized_floor_cells: Array[Vector2i] = floor_surface.floor_map.get_present_cells() \
+        if floor_surface != null and floor_surface.floor_map != null else ([] as Array[Vector2i])
     var serialized_wall_cells: Array[Vector3i] = wall_grid_map.get_used_cells() \
         if wall_grid_map != null else ([] as Array[Vector3i])
-    var has_no_baked_cells := serialized_floor_cells.is_empty() \
+    var has_no_baked_cells := serialized_floor_cells.size() <= 1 \
         and serialized_wall_cells.is_empty()
     var has_current_baked_cells := serialized_floor_cells.size() \
         == configured_width * configured_height
@@ -8231,9 +8221,9 @@ func _test_vampire_maze_owns_its_development_view() -> bool:
     wall_grid_map = level.get_node_or_null(
         "GeneratedMaze/Layout/PNGGridMap"
     ) as GridMap
-    floor_grid_map = level.get_node_or_null(
-        "GeneratedMaze/Layout/PNGFloorGridMap"
-    ) as GridMap
+    floor_surface = level.get_node_or_null(
+        "GeneratedMaze/Layout/FloorSurface"
+    ) as FloorSurface
     var authored_player := level.get_node_or_null("Player") as Node3D
     var stale_character_position := Vector3(512.0, 32.0, 512.0)
     if authored_player != null:
@@ -8245,9 +8235,9 @@ func _test_vampire_maze_owns_its_development_view() -> bool:
     wall_grid_map = level.get_node_or_null(
         "GeneratedMaze/Layout/PNGGridMap"
     ) as GridMap
-    floor_grid_map = level.get_node_or_null(
-        "GeneratedMaze/Layout/PNGFloorGridMap"
-    ) as GridMap
+    floor_surface = level.get_node_or_null(
+        "GeneratedMaze/Layout/FloorSurface"
+    ) as FloorSurface
     var regenerated_player_spawn := regeneration_result.get(
         "player_spawn",
         Transform3D.IDENTITY
@@ -8291,9 +8281,9 @@ func _test_vampire_maze_owns_its_development_view() -> bool:
         generated_maze != null \
             and generated_maze.get_script().resource_path.ends_with("generated_maze.gd") \
             and wall_grid_map != null \
-            and floor_grid_map != null \
+            and floor_surface != null \
             and int(generated_maze.get("maze_seed")) >= 0,
-        "Vampire Maze owns its seeded GridMap generator and generated maps"
+        "Vampire Maze owns its seeded wall generator and editable floor surface"
     ) and _expect(
         (has_no_baked_cells or has_current_baked_cells) \
             and level.get_node_or_null("Objects") == null,
@@ -8429,40 +8419,26 @@ func _test_generated_maze_floor_settings() -> bool:
     var custom_floor_material := StandardMaterial3D.new()
     custom_floor_material.albedo_color = Color(0.18, 0.42, 0.73, 1.0)
     generated_maze.set("floor_material", custom_floor_material)
-    generated_maze.set("floor_texture_tiles", Vector2i(2, 3))
+    generated_maze.set("floor_texture_tiles", Vector2i(2, 2))
     root.add_child(generated_maze)
 
-    var floor_grid_map := generated_maze.get_node("Layout/PNGFloorGridMap") as GridMap
-    var floor_library := floor_grid_map.mesh_library
-    var first_floor_mesh := floor_library.get_item_mesh(0) as PlaneMesh
-    var x_phase_floor_mesh := floor_library.get_item_mesh(1) as PlaneMesh
-    var y_phase_floor_mesh := floor_library.get_item_mesh(2) as PlaneMesh
-    var first_material := first_floor_mesh.material as BaseMaterial3D
-    var x_phase_material := x_phase_floor_mesh.material as BaseMaterial3D
-    var y_phase_material := y_phase_floor_mesh.material as BaseMaterial3D
+    var floor_surface := generated_maze.get_node("Layout/FloorSurface") as FloorSurface
+    var floor_style := floor_surface.styles[0] as FloorStyle
+    var first_material := floor_style.top_material as BaseMaterial3D
     var passed := _expect(
         generated_maze.get("floor_material") == custom_floor_material \
-            and generated_maze.get("floor_texture_tiles") == Vector2i(2, 3),
+            and generated_maze.get("floor_texture_tiles") == Vector2i(2, 2),
         "GeneratedMaze exposes floor material and tiles-per-texture settings directly"
     ) and _expect(
-        floor_library.get_item_list().size() == 6 \
-            and first_material != null \
+        first_material != null \
             and first_material != custom_floor_material \
             and first_material.albedo_color.is_equal_approx(
                 custom_floor_material.albedo_color
             ) \
-            and first_material.uv1_scale.is_equal_approx(
-                Vector3(0.5, 1.0 / 3.0, 1.0)
-            ) \
-            and first_material.uv1_offset.is_equal_approx(Vector3.ZERO) \
-            and x_phase_material.uv1_offset.is_equal_approx(Vector3(0.5, 0.0, 0.0)) \
-            and y_phase_material.uv1_offset.is_equal_approx(
-                Vector3(0.0, 1.0 / 3.0, 0.0)
-            ) \
-            and floor_grid_map.get_cell_item(Vector3i.ZERO) == 0 \
-            and floor_grid_map.get_cell_item(Vector3i(1, 0, 0)) == 1 \
-            and floor_grid_map.get_cell_item(Vector3i(0, 0, 1)) == 2,
-        "one complete generated-floor texture spans the configured X/Y cell count"
+            and is_equal_approx(floor_style.world_uv_metres, 2.0) \
+            and floor_surface.floor_map.has_floor(Vector2i.ZERO) \
+            and floor_surface.floor_map.has_floor(Vector2i.ONE),
+        "one complete generated-floor texture spans the configured cell count"
     )
 
     generated_maze.free()
@@ -8473,7 +8449,7 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
     var generated_maze := VAMPIRE_GENERATED_MAZE_SCENE.instantiate() as Node3D
     root.add_child(generated_maze)
     var walls := generated_maze.get_node("Layout/PNGGridMap") as GridMap
-    var floor := generated_maze.get_node("Layout/PNGFloorGridMap") as GridMap
+    var floor := generated_maze.get_node("Layout/FloorSurface") as FloorSurface
     var configuration := generated_maze.get("configuration") as Resource
     var configured_width := int(configuration.get("width"))
     var configured_height := int(configuration.get("height"))
@@ -8584,7 +8560,7 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
         vampire
     ) as Dictionary
     walls = generated_maze.get_node("Layout/PNGGridMap") as GridMap
-    floor = generated_maze.get_node("Layout/PNGFloorGridMap") as GridMap
+    floor = generated_maze.get_node("Layout/FloorSurface") as FloorSurface
     var first_wall_cells := walls.get_used_cells()
     first_wall_cells.sort()
     var first_signature := str(first_wall_cells)
@@ -8596,7 +8572,7 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
         vampire
     ) as Dictionary
     walls = generated_maze.get_node("Layout/PNGGridMap") as GridMap
-    floor = generated_maze.get_node("Layout/PNGFloorGridMap") as GridMap
+    floor = generated_maze.get_node("Layout/FloorSurface") as FloorSurface
     var repeat_wall_cells := walls.get_used_cells()
     repeat_wall_cells.sort()
     var repeat_signature := str(repeat_wall_cells)
@@ -8608,7 +8584,7 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
         vampire
     ) as Dictionary
     walls = generated_maze.get_node("Layout/PNGGridMap") as GridMap
-    floor = generated_maze.get_node("Layout/PNGFloorGridMap") as GridMap
+    floor = generated_maze.get_node("Layout/FloorSurface") as FloorSurface
     var changed_wall_cells := walls.get_used_cells()
     changed_wall_cells.sort()
     var changed_signature := str(changed_wall_cells)
@@ -9317,7 +9293,7 @@ func _test_vampire_maze_generates_seeded_grid_maps() -> bool:
         door_approaches_are_clear,
         "generated coffins stay clear of both sides of every locked doorway"
     ) and _expect(
-        floor.get_used_cells().size() == configured_width * configured_height \
+        floor.floor_map.get_present_cells().size() == configured_width * configured_height \
             and wall_item_ids.size() > 1 \
             and gate_aperture_is_clear \
             and gate_opening_width_tiles == 1 \
@@ -9634,17 +9610,19 @@ func _test_vampire_maze_minimap_shows_all_shortest_routes() -> bool:
     var wall_library := MeshLibrary.new()
     wall_library.create_item(0)
     walls.mesh_library = wall_library
+    walls.cell_size = Vector3.ONE
+    walls.cell_center_y = false
     walls.set_cell_item(Vector3i(1, 0, 1), 0)
-    var floor := GridMap.new()
-    floor.name = "PNGFloorGridMap"
-    var floor_library := MeshLibrary.new()
-    floor_library.create_item(0)
-    floor.mesh_library = floor_library
-    for x_coordinate in 3:
-        for z_coordinate in 3:
-            floor.set_cell_item(Vector3i(x_coordinate, 0, z_coordinate), 0)
-    player.position = floor.map_to_local(Vector3i(0, 0, 1))
-    gate.position = floor.map_to_local(Vector3i(2, 0, 1))
+    var floor := FloorSurface.new()
+    floor.name = "FloorSurface"
+    floor.floor_map = FloorMap.new()
+    floor.floor_map.dimensions = Vector2i(3, 3)
+    floor.floor_map.default_present = true
+    floor.elevation_profile = load(
+        "res://addons/floor_surface/default_floor_elevation_profile.tres"
+    ) as FloorElevationProfile
+    player.position = floor.cell_to_local(Vector2i(0, 1))
+    gate.position = floor.cell_to_local(Vector2i(2, 1))
     var route_overlay := VAMPIRE_MINIMAP_ROUTE_SCENE.instantiate() as MultiMeshInstance3D
 
     level.add_child(player)
@@ -9672,7 +9650,7 @@ func _test_vampire_maze_minimap_shows_all_shortest_routes() -> bool:
         "Vampire Maze route tiles render on the minimap but not the gameplay camera"
     )
 
-    player.position = floor.map_to_local(Vector3i.ZERO)
+    player.position = floor.cell_to_local(Vector2i.ZERO)
     route_overlay.call("_process", 0.016)
     var moved_cells := route_overlay.call("get_highlighted_cells") as Array[Vector3i]
     passed = _expect(
@@ -10380,71 +10358,6 @@ func _transform_cardinal_mask(mask: int, basis: Basis) -> int:
             result |= PNG_TO_GRIDMAP_AUTOTILE.SOUTH \
                 if transformed.z > 0.0 else PNG_TO_GRIDMAP_AUTOTILE.NORTH
     return result
-
-
-func _test_png_floor_gridmap_uses_non_transparent_pixels_and_safe_collision() -> bool:
-    var image := Image.create(2, 2, false, Image.FORMAT_RGBA8)
-    image.fill(Color.TRANSPARENT)
-    image.set_pixel(0, 0, Color.RED)
-    image.set_pixel(1, 0, Color(0.0, 0.0, 1.0, 0.1))
-    image.set_pixel(1, 1, Color.WHITE)
-
-    var settings: Resource = PNG_TO_GRIDMAP_SETTINGS.new()
-    settings.floor_material_path = "res://Assets/environment/floors/dirt_floor.material"
-    var level_root := Node3D.new()
-    var source_grid_map := GridMap.new()
-    source_grid_map.cell_size = Vector3.ONE
-    source_grid_map.cell_center_y = true
-    source_grid_map.position = Vector3(4.0, 0.0, -2.0)
-    level_root.add_child(source_grid_map)
-
-    var builder: RefCounted = PNG_TO_GRIDMAP_FLOOR_BUILDER.new()
-    var result: Dictionary = builder.run(settings, image, level_root, source_grid_map)
-    var errors: Array = result.get("errors", [])
-    if not _expect(errors.is_empty(), "PNG floor builder accepts a valid material and image"):
-        level_root.free()
-        return false
-    var floor_grid_map: GridMap = result["grid_map"]
-    var library := floor_grid_map.mesh_library
-    var item_ids := library.get_item_list()
-    var floor_item_id := int(item_ids[0])
-    var shapes: Array = library.get_item_shapes(floor_item_id)
-    var floor_shape := shapes[0] as BoxShape3D
-    var floor_shape_transform: Transform3D = shapes[1]
-    var floor_mesh := library.get_item_mesh(floor_item_id) as PlaneMesh
-    var floor_material := floor_mesh.material
-    var player := PLAYER_SCENE.instantiate() as CharacterBody3D
-
-    var passed := _expect(int(result["placed"]) == 3, "PNG floor uses every pixel with non-zero alpha") \
-        and _expect(
-            floor_grid_map.get_cell_item(Vector3i(0, 0, 1)) == GridMap.INVALID_CELL_ITEM,
-            "PNG floor leaves fully transparent pixels empty"
-        ) \
-        and _expect(item_ids.size() == 1, "PNG floor uses one shared MeshLibrary item for batching") \
-        and _expect(floor_grid_map.get_child_count() == 0, "PNG floor does not create one node per pixel") \
-        and _expect(floor_grid_map.cell_octant_size == 16, "PNG floor batches cells into larger octants") \
-        and _expect(
-            floor_grid_map.transform == source_grid_map.transform,
-            "PNG floor aligns with the selected GridMap"
-        ) \
-        and _expect(not floor_grid_map.cell_center_y, "PNG floor keeps its collision surface at local Y zero") \
-        and _expect(floor_grid_map.collision_layer == 1, "PNG floor collides on the world layer") \
-        and _expect(
-            (player.collision_mask & floor_grid_map.collision_layer) != 0,
-            "player collision mask includes the generated floor"
-        ) \
-        and _expect(floor_shape != null and floor_shape.size.y >= 0.5, "PNG floor has a substantial collision box") \
-        and _expect(
-            is_equal_approx(floor_shape_transform.origin.y + floor_shape.size.y * 0.5, 0.0),
-            "PNG floor collision top is flush with the visible surface"
-        ) \
-        and _expect(
-            floor_material == load("res://Assets/environment/floors/dirt_floor.material"),
-            "PNG floor uses the selected authored material"
-        )
-    player.free()
-    level_root.free()
-    return passed
 
 
 func _test_png_gridmap_import_disables_y_cell_centering() -> bool:

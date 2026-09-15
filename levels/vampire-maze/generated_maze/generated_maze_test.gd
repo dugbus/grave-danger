@@ -8,6 +8,7 @@ const SUBJECT_SCENE := preload(
 const FloorRoute := preload(
 	"res://levels/vampire-maze/generated_maze/generated_floor_route.gd"
 )
+const GridAlignment := preload("res://addons/floor_surface/floor_surface_grid_alignment.gd")
 
 
 func run(tree: SceneTree) -> void:
@@ -61,7 +62,23 @@ func run(tree: SceneTree) -> void:
 		if key.get("item_type") == &"key":
 			gold_key_cell = key.get("cell") as Vector2i
 			break
-	var structural_floor_grid_map := layout.get_node("PNGFloorGridMap") as GridMap
+	var structural_floor_surface := layout.get_node("FloorSurface") as FloorSurface
+	var generated_width := int(configuration.get("width"))
+	var generated_height := int(configuration.get("height"))
+	var outside_floor_cell := Vector2i(generated_width + 2, generated_height + 2)
+	var generated_cell_count := structural_floor_surface.rebuild()
+	expect(
+		GridAlignment.is_aligned(structural_floor_surface, wall_grid_map) \
+			and GridAlignment.floor_cell_to_grid_cell(
+				structural_floor_surface,
+				wall_grid_map,
+				outside_floor_cell
+			) == outside_floor_cell \
+			and generated_cell_count == generated_width * generated_height \
+			and structural_floor_surface.top_mesh.mesh != null \
+			and structural_floor_surface.collision_shape.shape != null,
+		"GeneratedMaze builds aligned visible and collidable FloorSurface authoring data."
+	)
 	var generated_content := layout.get_node("GeneratedContent")
 	var generated_grass := generated_content.get_node_or_null("GeneratedGrass") \
 		as MultiMeshInstance3D
@@ -76,11 +93,8 @@ func run(tree: SceneTree) -> void:
 		as Node3D
 	var generated_gold_key_model := generated_gold_key.get_node_or_null(^"KeyModel") \
 		as Node3D if generated_gold_key != null else null
-	var expected_key_position := structural_floor_grid_map.to_global(
-		structural_floor_grid_map.map_to_local(
-			Vector3i(gold_key_cell.x, 0, gold_key_cell.y)
-		)
-	) + Vector3.UP * 0.08
+	var expected_key_position := structural_floor_surface.cell_to_world(gold_key_cell) \
+		+ Vector3.UP * 0.08
 	var has_road_beside_centreline := false
 	for routed_cell_value in routed_cells:
 		if not key_route.has(routed_cell_value as Vector2i):
@@ -157,8 +171,7 @@ func run(tree: SceneTree) -> void:
 		seed_change_queued \
 			and rebuilt_layout.get_instance_id() != layout_instance_id_before_seed_change \
 			and rebuilt_layout.has_node("PNGGridMap") \
-			and rebuilt_layout.has_node("PNGFloorGridMap") \
-			and not rebuilt_layout.has_node("RoutedFloorGridMap") \
+			and rebuilt_layout.has_node("FloorSurface") \
 			and rebuilt_layout.has_node("GeneratedContent") \
 			and generated_seeds == ([1731] as Array[int]) \
 			and walls_before_seed_change != walls_after_seed_change \

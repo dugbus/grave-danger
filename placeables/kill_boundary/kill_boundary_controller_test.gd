@@ -2,13 +2,13 @@ extends "res://tests/test_case.gd"
 
 const SUBJECT := preload("res://placeables/kill_boundary/kill_boundary_controller.gd")
 const SUBJECT_PATH := "res://placeables/kill_boundary/kill_boundary_controller.gd"
-const TUTORIAL_THREE_LEVEL := preload("res://levels/tutorial-3/level.tscn")
+const TUTORIAL_TWO_LEVEL := preload("res://levels/tutorial-2/level.tscn")
 
 
 func run(tree: SceneTree) -> void:
 	expect_script_contract(SUBJECT, SUBJECT_PATH)
 
-	var level := TUTORIAL_THREE_LEVEL.instantiate()
+	var level := TUTORIAL_TWO_LEVEL.instantiate()
 	tree.root.add_child(level)
 	var boundary := level.get_node("GDKillBoundary3D") as GDKillBoundary3D
 	var player := level.get_node("Player") as GDPlayer
@@ -31,10 +31,10 @@ func run(tree: SceneTree) -> void:
 	var player_top := player_collision.global_position.y + player_shape.height * 0.5
 	expect(
 		death_controller.flame_energy < energy_before,
-		"Tutorial 3's grounded flame boundary damages the player at its perimeter."
+		"Tutorial 2's grounded flame boundary damages the player at its perimeter."
 	)
 	expect(
 		blocker_bottom <= player_top,
-		"Tutorial 3's boundary blockers overlap the player's collision height."
+		"Tutorial 2's boundary blockers overlap the player's collision height."
 	)
 	level.free()

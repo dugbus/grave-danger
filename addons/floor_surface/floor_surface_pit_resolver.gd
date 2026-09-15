@@ -34,6 +34,8 @@ func resolve(
 			if floor_map.has_floor(cell) or visited.has(cell):
 				continue
 			var region := _collect_region(cell, floor_map, visited)
+			if not _is_bounded_region(region, floor_map):
+				continue
 			var rim := _collect_rim(region, floor_map)
 			if rim.is_empty():
 				continue
@@ -67,6 +69,14 @@ func _collect_region(
 			visited[neighbour] = true
 			pending.append(neighbour)
 	return region
+
+
+func _is_bounded_region(region: Array[Vector2i], floor_map: MAP_SCRIPT) -> bool:
+	for cell in region:
+		for direction in CARDINAL_DIRECTIONS:
+			if not floor_map.is_in_bounds(cell + direction):
+				return false
+	return true
 
 
 func _collect_rim(region: Array[Vector2i], floor_map: MAP_SCRIPT) -> Array[Vector2i]:

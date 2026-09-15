@@ -2,12 +2,12 @@
 
 ## Authored visual dressing
 
-In `level.tscn`, select `CloseEscape/FloorGridMap` directly to paint the floor.
+In `level.tscn`, select `CloseEscape/FloorSurface` directly to paint the floor.
 It is a native child of the main scene, with its cells saved there, not in a nested instance.
 Expand the editable `AuthoredLayout` instance to paint `WallGridMap`; its source remains
 `authored_layout.tscn`. The floor follows Tutorial 1: one-metre tiles, four alternating UV
 phases of the same dirt texture used by Level 1, and tile collision ending at Y=0.
-There is no separate floor slab. Keep `AuthoredLayout` before `FloorGridMap` in the
+There is no separate floor slab. Keep `AuthoredLayout` before `FloorSurface` in the
 scene tree because zombie navigation selects the first grid covering its route.
 
 The 134 road cells form interrupted worn paths and small asymmetric threshold

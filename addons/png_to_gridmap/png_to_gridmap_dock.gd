@@ -14,7 +14,7 @@ signal load_png_selected(path: String)
 signal export_png_path_selected(path: String)
 signal run_requested(operation_id: int)
 signal repair_gridmap_requested
-signal create_floor_requested
+signal create_floor_surface_requested
 signal floor_material_selected(path: String)
 signal refresh_requested
 signal operation_changed(operation_id: int, advanced_visible: bool)
@@ -136,10 +136,10 @@ func set_mesh_library_paths(paths: Array[String]) -> void:
 	)
 
 
-## Rebuilds the floor material dropdown from the globally configured folder.
+## Rebuilds the optional top-material dropdown from the configured game floor folder.
 func set_floor_material_paths(paths: Array[String]) -> void:
 	_floor_material_option.clear()
-	_floor_material_option.add_item("No floor material selected")
+	_floor_material_option.add_item("Keep current / use default floor finish")
 	_floor_material_option.set_item_metadata(0, "")
 	for path in paths:
 		_floor_material_option.add_item(path.get_file().get_basename().capitalize())
@@ -320,14 +320,14 @@ func _connect_scene_signals() -> void:
 	)
 	var library_browse_button := _configuration_popup.get_node(^"PopupContent/LibraryRow/Browse") as Button
 	library_browse_button.pressed.connect(func() -> void: _mesh_library_dialog.popup_file_dialog())
-	_floor_materials_folder_edit.text_submitted.connect(func(value: String) -> void:
-		_set_floor_materials_folder(value)
-	)
+	_floor_materials_folder_edit.text_submitted.connect(_set_floor_materials_folder)
 	_floor_materials_folder_edit.focus_exited.connect(func() -> void:
 		_set_floor_materials_folder(_floor_materials_folder_edit.text)
 	)
 	var folder_browse_button := _configuration_popup.get_node(^"PopupContent/FolderRow/Browse") as Button
-	folder_browse_button.pressed.connect(func() -> void: _floor_materials_folder_dialog.popup_file_dialog())
+	folder_browse_button.pressed.connect(
+		func() -> void: _floor_materials_folder_dialog.popup_file_dialog()
+	)
 	var add_mapping_button := _configuration_popup.get_node(
 		^"PopupContent/ManualMappingRow/AddMapping"
 	) as Button
@@ -346,8 +346,8 @@ func _connect_scene_signals() -> void:
 	(get_node(^"FooterButtons/RepairGridMap") as Button).pressed.connect(
 		func() -> void: repair_gridmap_requested.emit()
 	)
-	(get_node(^"FooterButtons/CreateFloor") as Button).pressed.connect(
-		func() -> void: create_floor_requested.emit()
+	(get_node(^"FooterButtons/CreateFloorSurface") as Button).pressed.connect(
+		func() -> void: create_floor_surface_requested.emit()
 	)
 	_png_open_dialog.file_selected.connect(func(path: String) -> void: load_png_selected.emit(path))
 	_png_save_dialog.file_selected.connect(func(path: String) -> void: export_png_path_selected.emit(path))
@@ -407,7 +407,7 @@ func _set_mesh_library_path(value: String) -> void:
 	mesh_library_selected.emit(path)
 
 
-## Applies a user-entered folder to the shared floor-material choices.
+## Applies a user-entered project folder to the shared floor-material choices.
 func _set_floor_materials_folder(value: String) -> void:
 	var path := value.strip_edges()
 	_floor_materials_folder_edit.text = path
@@ -758,9 +758,9 @@ func _tooltip_for_control(control: Control) -> String:
 				"After you finish painting, automatically fit wall ends, corners, "
 				+ "and junctions to their neighbours."
 			)
-		"Floor GridMap": return "Choose the look of the floor created beneath the picture."
 		"Wall pieces file": return "Choose the shared file containing the wall pieces used by picture colours."
-		"Floor materials folder": return "Choose the shared folder whose floor finishes appear in the floor list."
+		"Floor Surface": return "Choose an optional top finish for the editable floor made from PNG opacity."
+		"Floor materials folder": return "Choose the shared game folder whose floor finishes appear in the list."
 		"Browse": return "Choose this location from the project."
 		"Add mapping": return "Configure this colour with a MeshLibrary piece."
 		"Add Colour Mapping": return "Add a colour and its MeshLibrary piece without loading a PNG."
@@ -769,7 +769,8 @@ func _tooltip_for_control(control: Control) -> String:
 		"Choose PNG": return "Choose where the picture made from the GridMap will be saved."
 		"Run": return "Carry out the selected import or export."
 		"Repair Gridmap": return "Update connected wall pieces so corners, ends, and junctions fit their neighbours."
-		"Create Floor": return "Create or rebuild a floor beneath every painted square in the picture."
+		"Create / Rebuild Floor Surface":
+			return "Create an editable FloorSurface from opaque PNG pixels, or update the existing floor shape."
 		"Autotile": return "Use neighbouring squares to choose ends, corners, and junctions automatically."
 		"Add": return "Add another decorative wall piece that can stand in for this colour."
 		"Remove": return "Remove this decorative wall-piece choice."

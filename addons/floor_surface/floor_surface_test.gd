@@ -10,11 +10,30 @@ const STYLE_SCRIPT := preload("res://addons/floor_surface/floor_style.gd")
 func run(tree: SceneTree) -> void:
 	expect_script_contract(SUBJECT, "res://addons/floor_surface/floor_surface.gd")
 	_test_queries_boundaries_and_origin()
+	_test_cell_to_world_uses_surface_height()
 	_test_ramp_queries_and_validation()
 	_test_contiguous_ramp_edges_are_traversal_flat()
+	await _test_incomplete_palette_is_safe(tree)
 	await _test_rebuild_and_collision_agreement(tree)
 	await _test_ramp_collision_agreement(tree)
 	await _test_multiple_surface_instances_are_isolated(tree)
+
+
+func _test_incomplete_palette_is_safe(tree: SceneTree) -> void:
+	var surface := SURFACE_SCENE.instantiate() as FloorSurface
+	var floor_map := MAP_SCRIPT.new()
+	floor_map.default_present = true
+	surface.floor_map = floor_map
+	surface.elevation_profile = PROFILE_SCRIPT.new()
+	surface.styles.clear()
+	tree.root.add_child(surface)
+	expect_equal(surface.get_generated_cell_count(), 0, "An incomplete palette builds no geometry.")
+	expect(
+		surface.top_mesh.mesh == null and surface.collision_shape.shape == null,
+		"An incomplete palette safely clears its derived mesh and collision."
+	)
+	surface.queue_free()
+	await tree.process_frame
 
 
 func _test_queries_boundaries_and_origin() -> void:
@@ -67,6 +86,26 @@ func _test_queries_boundaries_and_origin() -> void:
 		surface.validate_configuration().size(),
 		2,
 		"Missing palette and unsupported root height are both reported."
+	)
+	surface.free()
+
+
+func _test_cell_to_world_uses_surface_height() -> void:
+	var surface := SUBJECT.new()
+	var floor_map := MAP_SCRIPT.new()
+	floor_map.dimensions = Vector2i.ONE
+	floor_map.default_present = true
+	floor_map.set_cell_elevation(Vector2i.ZERO, 4)
+	var profile := PROFILE_SCRIPT.new()
+	profile.elevation_unit = 0.25
+	surface.floor_map = floor_map
+	surface.elevation_profile = profile
+	surface.world_origin_xz = Vector2(-2.0, 3.0)
+	surface.cell_size = 2.0
+	expect_equal(
+		surface.cell_to_world(Vector2i.ZERO),
+		Vector3(-1.0, 1.0, 4.0),
+		"Cell centres include the authored elevation and world origin."
 	)
 	surface.free()
 

@@ -22,9 +22,9 @@ extends Resource
 @export var color_mappings: Array[Resource] = []
 ## PNG colours deliberately removed from the shared mapping list by a level editor.
 @export var ignored_colour_keys: Array[String] = []
-## Generated floor GridMap path used to rebuild the same node on later runs.
-@export var floor_gridmap_path: NodePath
-## Material applied to every generated floor tile for this level.
+## Editable FloorSurface path rebuilt by later PNG floor imports in this level.
+@export var floor_surface_path: NodePath
+## Optional top material applied without replacing the FloorSurface wall material.
 @export_file("*.material", "*.tres") var floor_material_path := ""
-## Global folder scanned for floor materials shown by the converter.
+## Shared project folder scanned for floor finishes shown by the converter.
 @export_dir var floor_materials_folder := "res://Assets/environment/floors"

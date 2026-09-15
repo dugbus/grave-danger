@@ -11,7 +11,7 @@ func run(tree: SceneTree) -> void:
 	var level := LEVEL.instantiate() as Node3D
 	var harness := Node3D.new()
 	harness.add_child(level.get_node(^"AuthoredLayout").duplicate())
-	harness.add_child(level.get_node(^"FloorGridMap").duplicate())
+	harness.add_child(level.get_node(^"FloorSurface").duplicate())
 	tree.root.add_child(harness)
 	GDNavigationBootstrap._ensure_navigation_region(harness)
 	var zombies: Array[GDZombiePath] = []
@@ -22,7 +22,7 @@ func run(tree: SceneTree) -> void:
 		zombie.set_physics_process(false)
 		zombie.zombie_body.global_position = position
 		zombies.append(zombie)
-	# Use real discovery, including the tiled floor grid. It must not hide
+	# Use real discovery, including the editable floor surface. It must not hide
 	# the wall grid and make zombies choose straight paths through room dividers.
 	GDNavigationBootstrap._set_zombie_navigation_grid_maps(harness)
 	await tree.physics_frame

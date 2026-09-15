@@ -12,7 +12,7 @@ func run(tree: SceneTree) -> void:
 	var player := PLAYER.instantiate() as CharacterBody3D
 	var harness := Node3D.new()
 	harness.add_child(level.get_node(^"AuthoredLayout").duplicate())
-	harness.add_child(level.get_node(^"FloorGridMap").duplicate())
+	harness.add_child(level.get_node(^"FloorSurface").duplicate())
 	tree.root.add_child(harness)
 	await tree.physics_frame
 	await tree.physics_frame

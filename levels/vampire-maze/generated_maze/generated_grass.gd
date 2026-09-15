@@ -4,6 +4,8 @@ extends "res://addons/simplegrasstextured/grass.gd"
 
 ## Adds deterministic plasma-clustered generation to the editable grass addon node.
 
+const FLOOR_SURFACE_SCRIPT := preload("res://addons/floor_surface/floor_surface.gd")
+
 const NOISE_SEED_SALT := 1327217884
 const TRANSFORM_SEED_SALT := 915488749
 const MINIMUM_BLADE_SCALE := 0.82
@@ -23,26 +25,24 @@ func _ready() -> void:
 ## Replaces the current MultiMesh transforms with one seeded patch layout.
 func populate(
 	floor_cells: Dictionary,
-	floor_grid_map: GridMap,
+	floor_surface: FLOOR_SURFACE_SCRIPT,
 	excluded_cells: Dictionary,
 	seed_value: int,
 	coverage_percent: float,
 	patch_size_tiles: float,
 	blades_per_cell: int
 ) -> Dictionary:
-	if floor_grid_map == null or not floor_grid_map.is_inside_tree() \
+	if floor_surface == null or not floor_surface.is_inside_tree() \
 			or not is_inside_tree():
 		_clear_instances()
-		return {"errors": ["Generated grass requires scene-tree GridMap and grass nodes."]}
+		return {"errors": ["Generated grass requires scene-tree FloorSurface and grass nodes."]}
 
 	var plasma := _create_plasma(seed_value, patch_size_tiles)
 
 	var candidates: Array[Dictionary] = []
 	for cell_value in floor_cells:
 		var cell := cell_value as Vector2i
-		var floor_cell := Vector3i(cell.x, 0, cell.y)
-		if excluded_cells.has(cell) \
-				or floor_grid_map.get_cell_item(floor_cell) == GridMap.INVALID_CELL_ITEM:
+		if excluded_cells.has(cell) or not floor_surface.has_floor(cell):
 			continue
 		candidates.append({
 			"cell": cell,
@@ -80,9 +80,7 @@ func populate(
 	random.seed = seed_value ^ TRANSFORM_SEED_SALT
 	var transforms: Array[Transform3D] = []
 	for cell in selected_cells:
-		var cell_world_position := floor_grid_map.to_global(
-			floor_grid_map.map_to_local(Vector3i(cell.x, 0, cell.y))
-		)
+		var cell_world_position := floor_surface.cell_to_world(cell)
 		var cell_local_position := to_local(cell_world_position)
 		for _blade_index in int(blade_counts[cell]):
 			var blade_position := cell_local_position + Vector3(

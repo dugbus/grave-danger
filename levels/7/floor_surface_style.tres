@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="FloorStyle" format=3 uid="uid://64i33sal5fey"]
+
+[ext_resource type="Script" uid="uid://q0ef7o077f24" path="res://addons/floor_surface/floor_style.gd" id="1_bf04s"]
+[ext_resource type="Texture2D" uid="uid://pqy1y7bohghx" path="res://Assets/environment/floors/textures/floor-albedo.png" id="1_n2m3e"]
+[ext_resource type="Shader" uid="uid://c8vy24lq7es0j" path="res://addons/floor_surface/shaders/world_projected_floor.gdshader" id="2_55xrv"]
+[ext_resource type="Texture2D" uid="uid://b5a4j03d8o6en" path="res://Assets/environment/floors/textures/floor-normal.png" id="2_k87f0"]
+[ext_resource type="Texture2D" uid="uid://cj5phhpf53e7v" path="res://Assets/environment/floor-albedo.png" id="3_k2d3w"]
+[ext_resource type="Texture2D" uid="uid://m00ogltqm2a0" path="res://Assets/environment/walls_wall-stone.jpg" id="4_wall"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_34inn"]
+albedo_color = Color(0.4, 0.4, 0.44, 1)
+albedo_texture = ExtResource("1_n2m3e")
+roughness = 0.95
+normal_enabled = true
+normal_texture = ExtResource("2_k87f0")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_n2m3e"]
+render_priority = 0
+shader = ExtResource("2_55xrv")
+shader_parameter/tiled_texture = ExtResource("3_k2d3w")
+shader_parameter/floor_tile_size = Vector2(8.01, 8.01)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_j52sc"]
+albedo_color = Color(0.62, 0.62, 0.66, 1)
+albedo_texture = ExtResource("4_wall")
+roughness = 0.88
+
+[resource]
+script = ExtResource("1_bf04s")
+display_name = "Original level floor"
+top_material = SubResource("ShaderMaterial_n2m3e")
+wall_material = SubResource("StandardMaterial3D_j52sc")
+pit_bottom_material = SubResource("StandardMaterial3D_34inn")
+pit_depth = 3.0
