@@ -2,6 +2,11 @@
 
 ## 2026-09-16
 
+### 1300
+
+- Level editors keep their selected scene nodes after playthrough position markers are rebuilt.
+  - Prompt: Restore the selected editor node after a play test records position markers.
+
 ### 0100
 
 - Floor Surface instructions now appear on hover, live readouts no longer resize the dock, and an always-visible scrollbar keeps lower controls reachable.

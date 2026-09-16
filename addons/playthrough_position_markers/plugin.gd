@@ -111,6 +111,15 @@ func _on_playthrough_finished(session_id: int) -> void:
 
 
 func _apply_finished_playthrough(level_samples: Dictionary) -> void:
+	var editor_interface := get_editor_interface()
+	var selection := editor_interface.get_selection()
+	var selected_scene_root := editor_interface.get_edited_scene_root()
+	var selected_scene_path := (
+		selected_scene_root.scene_file_path if selected_scene_root != null else ""
+	)
+	var selected_node_paths := capture_selection_paths(
+		selected_scene_root, selection.get_selected_nodes()
+	)
 	for level_path_value in level_samples:
 		var level_path := level_path_value as String
 		if not ResourceLoader.exists(level_path, "PackedScene"):
@@ -124,14 +133,52 @@ func _apply_finished_playthrough(level_samples: Dictionary) -> void:
 
 		var samples := level_samples[level_path] as Array
 		_marker_builder.replace_markers(scene_root as Node3D, samples)
-		get_editor_interface().mark_scene_as_unsaved()
-		get_editor_interface().get_selection().clear()
+		editor_interface.mark_scene_as_unsaved()
+		selection.clear()
+		var restored_nodes := resolve_selection_paths(
+			scene_root, selected_scene_path, selected_node_paths
+		)
+		if not restored_nodes.is_empty():
+			for selected_node in restored_nodes:
+				selection.add_node(selected_node)
+			continue
+
 		var marker_container := _marker_builder.find_marker_container(scene_root as Node3D)
-		if marker_container != null:
-			get_editor_interface().get_selection().add_node(marker_container)
-			var walked_path := _marker_builder.find_walked_path(marker_container)
-			if walked_path != null:
-				get_editor_interface().get_selection().add_node(walked_path)
+		if marker_container == null:
+			continue
+		selection.add_node(marker_container)
+		var walked_path := _marker_builder.find_walked_path(marker_container)
+		if walked_path != null:
+			selection.add_node(walked_path)
+
+
+## Records selected nodes by scene-relative path so replaced marker nodes can be resolved again.
+static func capture_selection_paths(
+	scene_root: Node, selected_nodes: Array[Node]
+) -> Array[NodePath]:
+	var node_paths: Array[NodePath] = []
+	if scene_root == null:
+		return node_paths
+
+	for selected_node in selected_nodes:
+		if selected_node == scene_root or scene_root.is_ancestor_of(selected_node):
+			node_paths.append(scene_root.get_path_to(selected_node))
+	return node_paths
+
+
+## Resolves every still-existing selection when the originally selected scene is active again.
+static func resolve_selection_paths(
+	scene_root: Node, selected_scene_path: String, node_paths: Array[NodePath]
+) -> Array[Node]:
+	var resolved_nodes: Array[Node] = []
+	if scene_root == null or scene_root.scene_file_path != selected_scene_path:
+		return resolved_nodes
+
+	for node_path in node_paths:
+		var selected_node := scene_root.get_node_or_null(node_path)
+		if selected_node != null:
+			resolved_nodes.append(selected_node)
+	return resolved_nodes
 
 
 ## Reuses the current scene so populated embedded resources are not needlessly reloaded.
