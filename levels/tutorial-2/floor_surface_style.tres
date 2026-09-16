@@ -19,6 +19,7 @@ roughness = 0.95
 [resource]
 script = ExtResource("1_ybc1j")
 display_name = "Original level floor"
+world_uv_metres = 4.0
 top_material = SubResource("StandardMaterial3D_0oc35")
 wall_material = SubResource("StandardMaterial3D_1wks4")
 pit_bottom_material = SubResource("StandardMaterial3D_bqaue")

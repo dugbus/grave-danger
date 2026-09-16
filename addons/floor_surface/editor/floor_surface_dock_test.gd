@@ -10,6 +10,8 @@ func run(tree: SceneTree) -> void:
 	expect_script_contract(SUBJECT, "res://addons/floor_surface/editor/floor_surface_dock.gd")
 	_test_ownership_guidance()
 	await _test_scene_controls(tree)
+	await _test_short_dock_scrolling(tree)
+	await _test_stable_readout_layout(tree)
 
 
 func _test_ownership_guidance() -> void:
@@ -51,8 +53,8 @@ func _test_scene_controls(tree: SceneTree) -> void:
 	expect_equal(dock.get_shape_mode(), SUBJECT.SHAPE_PAINTER.ShapeMode.Fill, "Fill is an explicit shared painting shape.")
 	expect(not dock.brush_size_option.visible, "Fill hides the unrelated brush-size control.")
 	expect(
-		dock.get_node("FillGuidance").text.contains("always bounded"),
-		"The dock documents fill safety and matching rules."
+		dock.fill_button.tooltip_text.contains("always bounded"),
+		"Fill hover help documents safety and matching rules without a paragraph."
 	)
 	dock.set_target(null, null)
 	expect(not dock.is_editing_enabled(), "Painting cannot arm without a valid target.")
@@ -93,8 +95,8 @@ func _test_scene_controls(tree: SceneTree) -> void:
 	expect(dock.style_controls.visible, "Style has a direct, visible edit mode.")
 	expect_equal(dock.style_option.item_count, 2, "The palette exposes both reusable style names.")
 	expect(
-		dock.get_node("StyleControls/StyleGuidance").text.contains("Inspector"),
-		"The dock explains where shared style appearance and depth are configured."
+		dock.style_option.tooltip_text.contains("Inspector"),
+		"Style hover help explains where appearance and depth are configured."
 	)
 	dock.style_option.select(1)
 	expect_equal(dock.get_style_index(), 1, "Style selection returns the stable palette index.")
@@ -111,10 +113,10 @@ func _test_scene_controls(tree: SceneTree) -> void:
 	expect(dock.transition_controls.visible, "Ramp authoring has a direct, visible edit mode.")
 	expect(not dock.shape_buttons.visible, "Ramp boundary drags hide unrelated brush and rectangle controls.")
 	expect(
-		dock.get_node("TransitionControls/TransitionGuidance").text.contains(
+		dock.paint_ramp_button.tooltip_text.contains(
 			"flat high landing"
 		),
-		"Ramp guidance identifies both drag endpoints as retained flat landings."
+		"Ramp hover help identifies both drag endpoints as retained flat landings."
 	)
 	expect_equal(
 		dock.get_transition_operation(),
@@ -136,4 +138,87 @@ func _test_scene_controls(tree: SceneTree) -> void:
 	)
 	target.free()
 	dock.queue_free()
+	await tree.process_frame
+
+
+func _test_short_dock_scrolling(tree: SceneTree) -> void:
+	var dock := DOCK_SCENE.instantiate() as SUBJECT
+	dock.size = Vector2(360, 240)
+	tree.root.add_child(dock)
+	dock.setup()
+	for frame in 4:
+		await tree.process_frame
+	var scroll := dock as ScrollContainer
+	var scrollbar := scroll.get_v_scroll_bar()
+	expect(scrollbar.visible, "A short dock shows a vertical scrollbar for overflowing controls.")
+	expect(dock.size.y <= 240.0, "The dock fits the available height instead of expanding to its content.")
+	expect(
+		dock.status_label.get_global_rect().position.y >= scroll.get_global_rect().end.y,
+		"The bottom status initially lies below the short dock viewport."
+	)
+	scroll.ensure_control_visible(dock.status_label)
+	await tree.process_frame
+	expect(scroll.scroll_vertical > 0, "Scrolling moves the overflowing dock content.")
+	expect(
+		dock.status_label.get_global_rect().end.y <= scroll.get_global_rect().end.y,
+		"Scrolling makes the bottom status reachable within the dock."
+	)
+	dock.queue_free()
+	await tree.process_frame
+
+
+func _test_stable_readout_layout(tree: SceneTree) -> void:
+	var dock := DOCK_SCENE.instantiate() as SUBJECT
+	var host := VBoxContainer.new()
+	host.size = Vector2(360, 240)
+	host.add_child(dock)
+	tree.root.add_child(host)
+	dock.setup()
+	var short_style := STYLE_SCRIPT.new()
+	short_style.display_name = "Stone"
+	dock.set_styles([short_style] as Array[STYLE_SCRIPT])
+	dock.style_button.button_pressed = true
+	dock._on_edit_mode_selected(SUBJECT.EditMode.Style)
+	for frame in 4:
+		await tree.process_frame
+	var content := dock.get_node("Content") as VBoxContainer
+	var initial_minimum := dock.get_combined_minimum_size()
+	var initial_content_height := content.size.y
+	var detailed_message := "A lengthy authoring report with detailed cell coordinates. ".repeat(20)
+	dock.set_status(detailed_message)
+	dock.set_diagnostics(detailed_message + "\nSecond diagnostic line.")
+	dock.set_style_hover(Vector2i(10000, -10000), 999, detailed_message)
+	var long_style := STYLE_SCRIPT.new()
+	long_style.display_name = detailed_message
+	dock.set_styles([long_style] as Array[STYLE_SCRIPT])
+	var target := Node.new()
+	target.name = detailed_message.replace(".", "")
+	dock.set_target(target, FLOOR_MAP_SCRIPT.new())
+	for frame in 4:
+		await tree.process_frame
+	expect_equal(
+		dock.get_combined_minimum_size(), initial_minimum,
+		"Long live text cannot change the dock minimum width or height."
+	)
+	expect_equal(content.size.y, initial_content_height, "Long feedback cannot grow the control rows.")
+	expect(dock.size.y <= host.size.y, "The dock fits an editor-like container at limited height.")
+	expect(dock.get_v_scroll_bar().visible, "The dock keeps a visible vertical scrollbar in its host.")
+	expect_equal(dock.status_label.tooltip_text, detailed_message, "Status hover retains the full report.")
+	expect(
+		dock.diagnostics_label.tooltip_text.contains("\nSecond diagnostic line."),
+		"Diagnostic hover retains multiline detail without changing dock height."
+	)
+	expect(
+		dock.edit_toggle.tooltip_text.contains("Esc") \
+			and dock.edit_toggle.tooltip_text.contains("Middle/right"),
+		"Painting hover help retains cancellation and navigation instructions."
+	)
+	expect(dock.ownership_label.tooltip_text.contains("saved with this scene"), "Ownership help stays on hover.")
+	expect(
+		dock.find_children("*Guidance", "Label", true, false).is_empty() \
+			and dock.find_child("Instructions", true, false) == null,
+		"Instruction paragraphs no longer consume dock space."
+	)
+	target.free()
+	host.queue_free()
 	await tree.process_frame

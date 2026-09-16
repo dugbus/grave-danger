@@ -12,83 +12,95 @@
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_transition_operation"]
 
-[node name="FloorSurfaceDock" type="VBoxContainer"]
+[node name="FloorSurfaceDock" type="ScrollContainer"]
 custom_minimum_size = Vector2(280, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+follow_focus = true
 script = ExtResource("1_dock")
 
-[node name="Title" type="Label" parent="."]
+[node name="Content" type="VBoxContainer" parent="."]
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="Content"]
+tooltip_text = "Floor Surface editor. Left-drag applies Brush or Rectangle; Fill and Sample use a click. Ramp painting drags between flat high and low landings. Esc cancels the active gesture. Middle/right mouse navigates."
 theme_override_font_sizes/font_size = 18
 text = "Floor Surface"
 
-[node name="TargetLabel" type="Label" parent="."]
+[node name="TargetLabel" type="Label" parent="Content"]
 unique_name_in_owner = true
 text = "Target: select a FloorSurface"
-autowrap_mode = 2
+clip_text = true
+text_overrun_behavior = 3
 
-[node name="OwnershipLabel" type="Label" parent="."]
+[node name="OwnershipLabel" type="Label" parent="Content"]
 unique_name_in_owner = true
 text = "No editable FloorMap selected."
-autowrap_mode = 2
+clip_text = true
+text_overrun_behavior = 3
 
-[node name="ResourceButtons" type="HFlowContainer" parent="."]
+[node name="ResourceButtons" type="HFlowContainer" parent="Content"]
 
-[node name="MakeUniqueButton" type="Button" parent="ResourceButtons"]
+[node name="MakeUniqueButton" type="Button" parent="Content/ResourceButtons"]
 unique_name_in_owner = true
 disabled = true
 text = "Use Independent Copy"
 tooltip_text = "Copy the shared FloorMap into this scene so edits here cannot change another surface."
 
-[node name="SaveButton" type="Button" parent="ResourceButtons"]
+[node name="SaveButton" type="Button" parent="Content/ResourceButtons"]
+tooltip_text = "Save the selected external FloorMap file. Independent scene-local maps are saved with their scene."
 unique_name_in_owner = true
 disabled = true
 text = "Save Map"
 
-[node name="ConformGroundedButton" type="Button" parent="."]
+[node name="ConformGroundedButton" type="Button" parent="Content"]
 unique_name_in_owner = true
 disabled = true
 text = "Conform Grounded Objects"
 tooltip_text = "Move scene objects with FloorSurfaceGrounding components onto this surface as one undoable action."
 
-[node name="ValidationButtons" type="HFlowContainer" parent="."]
+[node name="ValidationButtons" type="HFlowContainer" parent="Content"]
 
-[node name="ValidateButton" type="Button" parent="ValidationButtons"]
+[node name="ValidateButton" type="Button" parent="Content/ValidationButtons"]
 unique_name_in_owner = true
 disabled = true
 text = "Validate"
 tooltip_text = "List floor, ramp, material, transform and grounded-object problems without changing the scene."
 
-[node name="RepairButton" type="Button" parent="ValidationButtons"]
+[node name="RepairButton" type="Button" parent="Content/ValidationButtons"]
 unique_name_in_owner = true
 disabled = true
 text = "Repair Safe Issues"
 tooltip_text = "Make invalid ramp cells flat as one undoable action; ambiguous authoring choices are never changed."
 
-[node name="DiagnosticsLabel" type="Label" parent="."]
+[node name="DiagnosticsLabel" type="Label" parent="Content"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 44)
 text = "Diagnostics have not been run."
-autowrap_mode = 2
+clip_text = true
+text_overrun_behavior = 3
 
-[node name="Separator" type="HSeparator" parent="."]
+[node name="Separator" type="HSeparator" parent="Content"]
 
-[node name="EditToggle" type="CheckButton" parent="."]
+[node name="EditToggle" type="CheckButton" parent="Content"]
 unique_name_in_owner = true
 disabled = true
 text = "Enable Viewport Painting"
-tooltip_text = "When enabled, left-drag paints. Middle/right mouse navigation remains available."
+tooltip_text = "Left-drag applies Brush or Rectangle. Fill/Sample: click a cell. Ramp Paint: drag between flat high/low landings. Esc cancels the gesture. Middle/right mouse navigates."
 
-[node name="GridOverlayToggle" type="CheckButton" parent="."]
+[node name="GridOverlayToggle" type="CheckButton" parent="Content"]
 unique_name_in_owner = true
 disabled = true
 text = "Show Grid / Checker Guide"
 tooltip_text = "Temporary editor-only alignment guide. Turn it off to inspect the actual floor texture."
 
-[node name="EditModeLabel" type="Label" parent="."]
+[node name="EditModeLabel" type="Label" parent="Content"]
 text = "Edit"
 
-[node name="EditModeButtons" type="HBoxContainer" parent="."]
+[node name="EditModeButtons" type="HFlowContainer" parent="Content"]
 
-[node name="FloorShapeButton" type="Button" parent="EditModeButtons"]
+[node name="FloorShapeButton" type="Button" parent="Content/EditModeButtons"]
 unique_name_in_owner = true
 disabled = true
 size_flags_horizontal = 3
@@ -97,7 +109,7 @@ button_pressed = true
 button_group = SubResource("ButtonGroup_edit_mode")
 text = "Floor Shape"
 
-[node name="ElevationButton" type="Button" parent="EditModeButtons"]
+[node name="ElevationButton" type="Button" parent="Content/EditModeButtons"]
 unique_name_in_owner = true
 disabled = true
 size_flags_horizontal = 3
@@ -105,7 +117,8 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_edit_mode")
 text = "Elevation"
 
-[node name="StyleButton" type="Button" parent="EditModeButtons"]
+[node name="StyleButton" type="Button" parent="Content/EditModeButtons"]
+tooltip_text = "Paint or sample floor styles. Configure each FloorStyle resource in the Inspector."
 unique_name_in_owner = true
 disabled = true
 size_flags_horizontal = 3
@@ -113,7 +126,8 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_edit_mode")
 text = "Style"
 
-[node name="TransitionButton" type="Button" parent="EditModeButtons"]
+[node name="TransitionButton" type="Button" parent="Content/EditModeButtons"]
+tooltip_text = "Create, flatten or rotate ramps. Paint Ramp drags between flat high and low landings."
 unique_name_in_owner = true
 disabled = true
 size_flags_horizontal = 3
@@ -121,25 +135,29 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_edit_mode")
 text = "Ramp"
 
-[node name="ShapeControls" type="VBoxContainer" parent="."]
+[node name="ShapeControls" type="VBoxContainer" parent="Content"]
 unique_name_in_owner = true
 
-[node name="PaintModeLabel" type="Label" parent="ShapeControls"]
+[node name="PaintModeLabel" type="Label" parent="Content/ShapeControls"]
 text = "Operation"
 
-[node name="PaintModeOption" type="OptionButton" parent="ShapeControls"]
+[node name="PaintModeOption" type="OptionButton" parent="Content/ShapeControls"]
+tooltip_text = "Paint floor adds tiles and expands the floor as needed. Erase removes tiles and automatically trims unused outer bounds."
 unique_name_in_owner = true
 disabled = true
 
-[node name="ElevationControls" type="VBoxContainer" parent="."]
+[node name="ElevationControls" type="VBoxContainer" parent="Content"]
 unique_name_in_owner = true
 visible = false
 
-[node name="ElevationReadout" type="Label" parent="ElevationControls"]
+[node name="ElevationReadout" type="Label" parent="Content/ElevationControls"]
 unique_name_in_owner = true
 text = "Elevation 0 — 0.00 m"
+clip_text = true
+text_overrun_behavior = 3
 
-[node name="AbsoluteElevation" type="SpinBox" parent="ElevationControls"]
+[node name="AbsoluteElevation" type="SpinBox" parent="Content/ElevationControls"]
+tooltip_text = "Absolute elevation in profile units; the readout shows the corresponding height in metres."
 unique_name_in_owner = true
 min_value = -10000.0
 max_value = 10000.0
@@ -148,9 +166,9 @@ allow_greater = true
 allow_lesser = true
 suffix = " units"
 
-[node name="ElevationOperationButtons" type="HFlowContainer" parent="ElevationControls"]
+[node name="ElevationOperationButtons" type="HFlowContainer" parent="Content/ElevationControls"]
 
-[node name="SetElevationButton" type="Button" parent="ElevationControls/ElevationOperationButtons"]
+[node name="SetElevationButton" type="Button" parent="Content/ElevationControls/ElevationOperationButtons"]
 unique_name_in_owner = true
 toggle_mode = true
 button_pressed = true
@@ -158,43 +176,44 @@ button_group = SubResource("ButtonGroup_elevation_operation")
 text = "Set"
 tooltip_text = "Paint cells directly to the entered absolute elevation."
 
-[node name="RaiseElevationButton" type="Button" parent="ElevationControls/ElevationOperationButtons"]
+[node name="RaiseElevationButton" type="Button" parent="Content/ElevationControls/ElevationOperationButtons"]
+tooltip_text = "Raise each painted cell by one elevation unit per gesture."
 unique_name_in_owner = true
 toggle_mode = true
 button_group = SubResource("ButtonGroup_elevation_operation")
 text = "Raise +1"
 
-[node name="LowerElevationButton" type="Button" parent="ElevationControls/ElevationOperationButtons"]
+[node name="LowerElevationButton" type="Button" parent="Content/ElevationControls/ElevationOperationButtons"]
+tooltip_text = "Lower each painted cell by one elevation unit per gesture."
 unique_name_in_owner = true
 toggle_mode = true
 button_group = SubResource("ButtonGroup_elevation_operation")
 text = "Lower -1"
 
-[node name="SampleElevationButton" type="Button" parent="ElevationControls/ElevationOperationButtons"]
+[node name="SampleElevationButton" type="Button" parent="Content/ElevationControls/ElevationOperationButtons"]
 unique_name_in_owner = true
 toggle_mode = true
 button_group = SubResource("ButtonGroup_elevation_operation")
 text = "Sample"
 tooltip_text = "Click an existing floor cell to copy its absolute elevation into the entry."
 
-[node name="StyleControls" type="VBoxContainer" parent="."]
+[node name="StyleControls" type="VBoxContainer" parent="Content"]
 unique_name_in_owner = true
 visible = false
 
-[node name="StyleLabel" type="Label" parent="StyleControls"]
+[node name="StyleLabel" type="Label" parent="Content/StyleControls"]
 text = "Surface style"
 
-[node name="StyleOption" type="OptionButton" parent="StyleControls"]
+[node name="StyleOption" type="OptionButton" parent="Content/StyleControls"]
+tooltip_text = "Paint chooses a palette entry. Edit that FloorStyle resource in the Inspector to set separate Top, Wall and Pit Bottom materials, floor/wall texture scales and pit depth."
 unique_name_in_owner = true
 disabled = true
+clip_text = true
+fit_to_longest_item = false
 
-[node name="StyleGuidance" type="Label" parent="StyleControls"]
-text = "Paint chooses a palette entry. Edit that FloorStyle resource in the Inspector to set separate Top, Wall and Pit Bottom materials, floor/wall texture scales and pit depth."
-autowrap_mode = 2
+[node name="StyleOperationButtons" type="HBoxContainer" parent="Content/StyleControls"]
 
-[node name="StyleOperationButtons" type="HBoxContainer" parent="StyleControls"]
-
-[node name="PaintStyleButton" type="Button" parent="StyleControls/StyleOperationButtons"]
+[node name="PaintStyleButton" type="Button" parent="Content/StyleControls/StyleOperationButtons"]
 unique_name_in_owner = true
 disabled = true
 size_flags_horizontal = 3
@@ -204,7 +223,7 @@ button_group = SubResource("ButtonGroup_style_operation")
 text = "Paint Style"
 tooltip_text = "Paint the selected style onto floor tiles or bounded hole cells."
 
-[node name="SampleStyleButton" type="Button" parent="StyleControls/StyleOperationButtons"]
+[node name="SampleStyleButton" type="Button" parent="Content/StyleControls/StyleOperationButtons"]
 unique_name_in_owner = true
 disabled = true
 size_flags_horizontal = 3
@@ -213,43 +232,43 @@ button_group = SubResource("ButtonGroup_style_operation")
 text = "Sample"
 tooltip_text = "Click a floor or bounded hole cell to copy its style into the selector."
 
-[node name="TransitionControls" type="VBoxContainer" parent="."]
+[node name="TransitionControls" type="VBoxContainer" parent="Content"]
 unique_name_in_owner = true
 visible = false
 
-[node name="TransitionGuidance" type="Label" parent="TransitionControls"]
-text = "Drag between a flat high landing and a flat low landing. Tiles between them become one continuous ramp; a longer drag makes the same rise gentler."
-autowrap_mode = 2
+[node name="TransitionOperationButtons" type="HFlowContainer" parent="Content/TransitionControls"]
 
-[node name="TransitionOperationButtons" type="HFlowContainer" parent="TransitionControls"]
-
-[node name="PaintRampButton" type="Button" parent="TransitionControls/TransitionOperationButtons"]
+[node name="PaintRampButton" type="Button" parent="Content/TransitionControls/TransitionOperationButtons"]
+tooltip_text = "Drag between a flat high landing and a flat low landing. Tiles between them become one continuous ramp; a longer drag makes the same rise gentler. Esc cancels the drag."
 unique_name_in_owner = true
 toggle_mode = true
 button_pressed = true
 button_group = SubResource("ButtonGroup_transition_operation")
 text = "Paint Ramp"
 
-[node name="EraseRampButton" type="Button" parent="TransitionControls/TransitionOperationButtons"]
+[node name="EraseRampButton" type="Button" parent="Content/TransitionControls/TransitionOperationButtons"]
 unique_name_in_owner = true
 toggle_mode = true
 button_group = SubResource("ButtonGroup_transition_operation")
 text = "Make Flat"
 tooltip_text = "Remove the ramp transition while preserving this cell's current elevation."
 
-[node name="RotateRampButton" type="Button" parent="TransitionControls/TransitionOperationButtons"]
+[node name="RotateRampButton" type="Button" parent="Content/TransitionControls/TransitionOperationButtons"]
 unique_name_in_owner = true
 toggle_mode = true
 button_group = SubResource("ButtonGroup_transition_operation")
 text = "Rotate 90°"
 tooltip_text = "Correct an existing ramp by rotating its low edge clockwise."
 
-[node name="ShapeModeLabel" type="Label" parent="."]
+[node name="ShapeModeLabel" type="Label" parent="Content"]
+unique_name_in_owner = true
 text = "Painting tool"
 
-[node name="ShapeButtons" type="HBoxContainer" parent="."]
+[node name="ShapeButtons" type="HBoxContainer" parent="Content"]
+unique_name_in_owner = true
 
-[node name="BrushButton" type="Button" parent="ShapeButtons"]
+[node name="BrushButton" type="Button" parent="Content/ShapeButtons"]
+tooltip_text = "Left-drag to paint with the selected brush size. Esc cancels the gesture."
 unique_name_in_owner = true
 disabled = true
 size_flags_horizontal = 3
@@ -258,7 +277,8 @@ button_pressed = true
 button_group = SubResource("ButtonGroup_shape")
 text = "Brush"
 
-[node name="RectangleButton" type="Button" parent="ShapeButtons"]
+[node name="RectangleButton" type="Button" parent="Content/ShapeButtons"]
+tooltip_text = "Left-drag between opposite corners to paint a rectangle. Esc cancels the gesture."
 unique_name_in_owner = true
 disabled = true
 size_flags_horizontal = 3
@@ -266,35 +286,32 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_shape")
 text = "Rectangle"
 
-[node name="FillButton" type="Button" parent="ShapeButtons"]
+[node name="FillButton" type="Button" parent="Content/ShapeButtons"]
 unique_name_in_owner = true
 disabled = true
 size_flags_horizontal = 3
 toggle_mode = true
 button_group = SubResource("ButtonGroup_shape")
 text = "Fill"
-tooltip_text = "Fill one bounded connected region matching occupancy, exact elevation, or style and occupancy."
+tooltip_text = "Click to fill one bounded connected region. Fill is always bounded: Shape matches floor/hole state; Elevation matches exact height; Style matches style plus floor/hole state."
 
-[node name="FillGuidance" type="Label" parent="."]
-text = "Fill is always bounded. Shape matches floor/hole state; Elevation matches exact height; Style matches style plus floor/hole state."
-autowrap_mode = 2
-
-[node name="BrushSizeLabel" type="Label" parent="."]
+[node name="BrushSizeLabel" type="Label" parent="Content"]
+unique_name_in_owner = true
 text = "Brush size"
 
-[node name="BrushSizeOption" type="OptionButton" parent="."]
+[node name="BrushSizeOption" type="OptionButton" parent="Content"]
+tooltip_text = "Width and depth of the square brush in floor cells."
 unique_name_in_owner = true
 disabled = true
 
-[node name="HoverLabel" type="Label" parent="."]
+[node name="HoverLabel" type="Label" parent="Content"]
 unique_name_in_owner = true
 text = "Cell —"
+clip_text = true
+text_overrun_behavior = 3
 
-[node name="Instructions" type="Label" parent="."]
-text = "Left-drag: apply Brush or Rectangle\nFill/Sample: click a cell\nRamp Paint: drag between flat high/low landings\nEsc: cancel gesture\nMiddle/right mouse: navigate"
-autowrap_mode = 2
-
-[node name="StatusLabel" type="Label" parent="."]
+[node name="StatusLabel" type="Label" parent="Content"]
 unique_name_in_owner = true
 text = "Select a FloorSurface to begin."
-autowrap_mode = 2
+clip_text = true
+text_overrun_behavior = 3

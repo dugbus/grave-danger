@@ -1,6 +1,6 @@
 @tool
 class_name FloorSurfaceDock
-extends VBoxContainer
+extends ScrollContainer
 
 ## Presents editor-only topology, elevation and style controls for the selected FloorSurface.
 
@@ -71,9 +71,9 @@ signal repair_requested
 @onready var rectangle_button := %RectangleButton as Button
 @onready var fill_button := %FillButton as Button
 @onready var brush_size_option := %BrushSizeOption as OptionButton
-@onready var shape_mode_label := $ShapeModeLabel as Label
-@onready var shape_buttons := $ShapeButtons as HBoxContainer
-@onready var brush_size_label := $BrushSizeLabel as Label
+@onready var shape_mode_label := %ShapeModeLabel as Label
+@onready var shape_buttons := %ShapeButtons as HBoxContainer
+@onready var brush_size_label := %BrushSizeLabel as Label
 @onready var hover_label := %HoverLabel as Label
 @onready var status_label := %StatusLabel as Label
 @onready var make_unique_button := %MakeUniqueButton as Button
@@ -172,11 +172,13 @@ func set_target(surface: Node, floor_map: Resource) -> void:
 	_set_transition_controls_disabled(not has_target)
 	if not has_target:
 		edit_toggle.button_pressed = false
-		target_label.text = "Target: select a FloorSurface"
-		ownership_label.text = "No editable FloorMap selected."
+		_set_readout(target_label, "Target: select a FloorSurface")
+		_set_readout(ownership_label, "No FloorMap selected.")
 		return
-	target_label.text = "Target: %s" % surface.name
-	ownership_label.text = describe_map_ownership(floor_map)
+	_set_readout(target_label, "Target: %s" % surface.name)
+	var independent := floor_map.resource_local_to_scene or floor_map.resource_path.is_empty()
+	ownership_label.text = "Independent map" if independent else "Shared map file"
+	ownership_label.tooltip_text = describe_map_ownership(floor_map)
 	make_unique_button.disabled = (
 		floor_map.resource_local_to_scene or floor_map.resource_path.is_empty()
 	)
@@ -201,32 +203,32 @@ func set_styles(styles: Array[STYLE_SCRIPT]) -> void:
 
 ## Displays the current hover footprint in map coordinates.
 func set_hover(cell: Vector2i, cell_count: int) -> void:
-	hover_label.text = "Cell %s — %d cell%s" % [
+	_set_readout(hover_label, "Cell %s — %d cell%s" % [
 		cell,
 		cell_count,
 		"" if cell_count == 1 else "s",
-	]
+	])
 
 
 ## Displays the hovered cell's exact integer elevation and converted physical height.
 func set_elevation_hover(cell: Vector2i, cell_count: int, elevation: int) -> void:
-	hover_label.text = "Cell %s — %d cell%s — %d units / %.2f m" % [
+	_set_readout(hover_label, "Cell %s — %d cell%s — %d units / %.2f m" % [
 		cell,
 		cell_count,
 		"" if cell_count == 1 else "s",
 		elevation,
 		float(elevation) * _elevation_unit,
-	]
+	])
 
 
 ## Displays the hovered cell's palette identity for either a top or a hole.
 func set_style_hover(cell: Vector2i, cell_count: int, style_name: String) -> void:
-	hover_label.text = "Cell %s — %d cell%s — %s" % [
+	_set_readout(hover_label, "Cell %s — %d cell%s — %s" % [
 		cell,
 		cell_count,
 		"" if cell_count == 1 else "s",
 		style_name,
-	]
+	])
 
 
 ## Displays authored ramp direction without resizing the dock for live validation details.
@@ -237,24 +239,27 @@ func set_transition_hover(
 	_error: String
 ) -> void:
 	if low_edge_name.is_empty() or low_edge_name == "None":
-		hover_label.text = "Cell %s — %s" % [cell, transition_name]
+		_set_readout(hover_label, "Cell %s — %s" % [cell, transition_name])
 	else:
-		hover_label.text = "Cell %s — %s — low edge %s" % [cell, transition_name, low_edge_name]
+		_set_readout(
+			hover_label,
+			"Cell %s — %s — low edge %s" % [cell, transition_name, low_edge_name]
+		)
 
 
 ## Clears cursor feedback when the viewport ray no longer reaches the working plane.
 func clear_hover() -> void:
-	hover_label.text = "Cell —"
+	_set_readout(hover_label, "Cell —")
 
 
 ## Shows a concise save, undo or cancellation result.
 func set_status(message: String) -> void:
-	status_label.text = message
+	_set_readout(status_label, message)
 
 
 ## Replaces the persistent authoring report outside live viewport gestures.
 func set_diagnostics(message: String) -> void:
-	diagnostics_label.text = message
+	_set_readout(diagnostics_label, message)
 
 
 ## Updates unit conversion used by the elevation entry and hover label.
@@ -445,7 +450,13 @@ func _set_transition_controls_disabled(disabled: bool) -> void:
 
 func _update_elevation_readout() -> void:
 	var elevation := get_absolute_elevation()
-	elevation_readout.text = "Elevation %d — %.2f m" % [
+	_set_readout(elevation_readout, "Elevation %d — %.2f m" % [
 		elevation,
 		float(elevation) * _elevation_unit,
-	]
+	])
+
+
+## Keeps live feedback to one line while retaining the complete message on hover.
+func _set_readout(label: Label, message: String) -> void:
+	label.text = message.replace("\n", " ")
+	label.tooltip_text = message

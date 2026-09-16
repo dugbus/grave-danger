@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-16
+
+### 0100
+
+- Floor Surface instructions now appear on hover, live readouts no longer resize the dock, and an always-visible scrollbar keeps lower controls reachable.
+  - Prompt: Move Floor Surface instructions into hover help and keep the dock scrollable without text-driven resizing.
+
+## 2026-09-15
+
+### 2100
+
+- Level editors can scroll the Floor Surface dock to reach every control when dock space is limited.
+  - Prompt: Add missing scrolling to the Floor Surface dock.
+
 ## 2026-09-13
 
 ### 1600
