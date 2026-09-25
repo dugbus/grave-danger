@@ -36,6 +36,7 @@
 [ext_resource type="PackedScene" uid="uid://bsukaqxfm6nb3" path="res://placeables/wall_breakable/wall_breakable.tscn" id="36_y1ybh"]
 [ext_resource type="PackedScene" uid="uid://bsfvmbl5st70a" path="res://player/adventurer.tscn" id="37_758o1"]
 [ext_resource type="Script" uid="uid://dapd5yutddmj6" path="res://addons/playthrough_position_markers/editor_only_marker_group.gd" id="42_j7r8b"]
+[ext_resource type="PackedScene" uid="uid://b414crh74ta53" path="res://player/andy_no_hat.tscn" id="43_khk1w"]
 [ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]
 [ext_resource type="PackedScene" path="res://addons/floor_surface/floor_surface.tscn" id="900_floor_surface"]
 [ext_resource type="Resource" uid="uid://d40kfwlg0yxl" path="res://levels/debug-level/floor_surface_map.tres" id="901_floor_map"]
@@ -43,7 +44,7 @@
 [ext_resource type="Resource" uid="uid://cq3ca1g2f5phj" path="res://levels/debug-level/floor_surface_style.tres" id="903_floor_style"]
 [ext_resource type="Script" uid="uid://q0ef7o077f24" path="res://addons/floor_surface/floor_style.gd" id="904_floor_style_script"]
 
-[sub_resource type="Curve3D" id="Curve3D_khk1w"]
+[sub_resource type="Curve3D" id="Curve3D_lnbif"]
 resource_local_to_scene = true
 closed = true
 _data = {
@@ -52,7 +53,7 @@ _data = {
 }
 point_count = 88
 
-[sub_resource type="Animation" id="Animation_lnbif"]
+[sub_resource type="Animation" id="Animation_46618"]
 resource_local_to_scene = true
 resource_name = "kill_boundary_preview"
 length = 475.27316
@@ -497,16 +498,8 @@ tracks/6/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_88ebk"]
 _data = {
-&"kill_boundary": SubResource("Animation_lnbif")
+&"kill_boundary": SubResource("Animation_46618")
 }
-
-[sub_resource type="Curve3D" id="Curve3D_46618"]
-resource_local_to_scene = true
-_data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
-"tilts": PackedFloat32Array(0, 0)
-}
-point_count = 2
 
 [sub_resource type="Curve3D" id="Curve3D_3amwx"]
 resource_local_to_scene = true
@@ -540,6 +533,14 @@ _data = {
 }
 point_count = 2
 
+[sub_resource type="Curve3D" id="Curve3D_2yksf"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
 [sub_resource type="Curve3D" id="Curve3D_j7r8b"]
 resource_local_to_scene = true
 _data = {
@@ -566,8 +567,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.929, 12, -0.62695503)
 [node name="KillBoundary3D" parent="." unique_id=1881794757 instance=ExtResource("4_flame")]
 transform = Transform3D(1.0000013, 0, 0, 0, 1, 0, 0, 0, 1.0000013, 0.18119812, 0, -0.41855812)
 visible = false
-curve = SubResource("Curve3D_khk1w")
-boundary_animation = SubResource("Animation_lnbif")
+curve = SubResource("Curve3D_lnbif")
+boundary_animation = SubResource("Animation_46618")
 bounds_size = Vector2(8, 8)
 
 [node name="BoundaryCenter" parent="KillBoundary3D" index="0"]
@@ -695,12 +696,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44.445827, 0, 0.18532312)
 
 [node name="Skeleton" parent="." unique_id=955868217 instance=ExtResource("32_dhv6f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.231255, -2.9802322e-08, 0.0104568)
-curve = SubResource("Curve3D_46618")
+curve = SubResource("Curve3D_3amwx")
 loop_patrol = false
 
 [node name="Zombie" parent="." unique_id=734149938 instance=ExtResource("33_ef6pm")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.092558, -2.9802322e-08, -0.024227142)
-curve = SubResource("Curve3D_3amwx")
+curve = SubResource("Curve3D_mm5g7")
 loop_patrol = false
 
 [node name="GDFlaskBreathingSpace" parent="Zombie" unique_id=486637941 instance=ExtResource("7_y1ybh")]
@@ -810,13 +811,13 @@ spawn_time = 26.0
 
 [node name="Skeleton" parent="Zombie" unique_id=854635641 instance=ExtResource("32_dhv6f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.964327, 2.9802322e-08, 4.9696436)
-curve = SubResource("Curve3D_mm5g7")
+curve = SubResource("Curve3D_kfalc")
 loop_patrol = false
 spawn_time = 27.0
 
 [node name="Zombie" parent="Zombie" unique_id=550416171 instance=ExtResource("33_ef6pm")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17437172, 2.9802322e-08, 4.9349594)
-curve = SubResource("Curve3D_kfalc")
+curve = SubResource("Curve3D_nglf8")
 loop_patrol = false
 spawn_time = 28.0
 
@@ -831,7 +832,7 @@ transform = Transform3D(0.019169781, 0, -0.99981624, 0, 1, 0, 0.99981624, 0, 0.0
 
 [node name="Skeleton2" parent="." unique_id=1099228950 instance=ExtResource("32_dhv6f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 121.485016, 0, 3.637745)
-curve = SubResource("Curve3D_nglf8")
+curve = SubResource("Curve3D_2yksf")
 
 [node name="Node3D" parent="." unique_id=542482281 instance=ExtResource("36_y1ybh")]
 transform = Transform3D(-0.04726977, 0, 0.9988822, 0, 1, 0, -0.9988822, 0, -0.04726977, 111.41294, 0.15643682, 2.5413938)
@@ -1204,5 +1205,8 @@ outline_modulate = Color(0.08, 0.03, 0.01, 1)
 text = "0:40–0:42"
 font_size = 28
 outline_size = 3
+
+[node name="andy_no_hat" parent="." unique_id=31714194 instance=ExtResource("43_khk1w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 117.27272, 0, 3.5299418)
 
 [editable path="KillBoundary3D"]

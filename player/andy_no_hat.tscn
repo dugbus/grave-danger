@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://b414crh74ta53"]
+
+[ext_resource type="PackedScene" uid="uid://bv20rq6cgs6f1" path="res://player/andy_no_hat.glb" id="1_ucijn"]
+
+[node name="andy_no_hat" unique_id=31714194 instance=ExtResource("1_ucijn")]
