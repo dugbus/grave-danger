@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://xqfgqrd742ki"
-path.s3tc="res://.godot/imported/andy_no_hat_stylized_character_3d_model_metallic-stylized_character_3d_model_roughness.png-2763507a5e7b06ff99bc8cef537ec325.s3tc.ctex"
-path.etc2="res://.godot/imported/andy_no_hat_stylized_character_3d_model_metallic-stylized_character_3d_model_roughness.png-2763507a5e7b06ff99bc8cef537ec325.etc2.ctex"
+uid="uid://bkmfpv4oe11am"
+path.s3tc="res://.godot/imported/andy_rigged_stylized_character_3d_model_metallic-stylized_character_3d_model_roughness.png-32b4af8b937ea15f410a027e37475948.s3tc.ctex"
+path.etc2="res://.godot/imported/andy_rigged_stylized_character_3d_model_metallic-stylized_character_3d_model_roughness.png-32b4af8b937ea15f410a027e37475948.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -15,8 +15,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://player/andy_no_hat_stylized_character_3d_model_metallic-stylized_character_3d_model_roughness.png"
-dest_files=["res://.godot/imported/andy_no_hat_stylized_character_3d_model_metallic-stylized_character_3d_model_roughness.png-2763507a5e7b06ff99bc8cef537ec325.s3tc.ctex", "res://.godot/imported/andy_no_hat_stylized_character_3d_model_metallic-stylized_character_3d_model_roughness.png-2763507a5e7b06ff99bc8cef537ec325.etc2.ctex"]
+source_file="res://player/andy_rigged_stylized_character_3d_model_metallic-stylized_character_3d_model_roughness.png"
+dest_files=["res://.godot/imported/andy_rigged_stylized_character_3d_model_metallic-stylized_character_3d_model_roughness.png-32b4af8b937ea15f410a027e37475948.s3tc.ctex", "res://.godot/imported/andy_rigged_stylized_character_3d_model_metallic-stylized_character_3d_model_roughness.png-32b4af8b937ea15f410a027e37475948.etc2.ctex"]
 
 [params]
 

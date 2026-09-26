@@ -2,21 +2,21 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d0d8yq1jfp3mw"
-path.s3tc="res://.godot/imported/adventurer_adventurer_3d_model_basecolor.jpg-258d45b59ce88a5b11a11a9bdfc6c448.s3tc.ctex"
-path.etc2="res://.godot/imported/adventurer_adventurer_3d_model_basecolor.jpg-258d45b59ce88a5b11a11a9bdfc6c448.etc2.ctex"
+uid="uid://dyubq1b5wyp3f"
+path.s3tc="res://.godot/imported/andy_rigged_tripo_rgb_8dcc7b62-d841-449a-8405-402bbf5246a7.jpg-0b611036933dac7bdef63811e744e3ff.s3tc.ctex"
+path.etc2="res://.godot/imported/andy_rigged_tripo_rgb_8dcc7b62-d841-449a-8405-402bbf5246a7.jpg-0b611036933dac7bdef63811e744e3ff.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "22707dcb30f8ddebe5fff49407766585"
+"md5": "ca30bf6fc97a87797ca65394e3ec0640"
 }
 
 [deps]
 
-source_file="res://player/adventurer_adventurer_3d_model_basecolor.jpg"
-dest_files=["res://.godot/imported/adventurer_adventurer_3d_model_basecolor.jpg-258d45b59ce88a5b11a11a9bdfc6c448.s3tc.ctex", "res://.godot/imported/adventurer_adventurer_3d_model_basecolor.jpg-258d45b59ce88a5b11a11a9bdfc6c448.etc2.ctex"]
+source_file="res://player/andy_rigged_tripo_rgb_8dcc7b62-d841-449a-8405-402bbf5246a7.jpg"
+dest_files=["res://.godot/imported/andy_rigged_tripo_rgb_8dcc7b62-d841-449a-8405-402bbf5246a7.jpg-0b611036933dac7bdef63811e744e3ff.s3tc.ctex", "res://.godot/imported/andy_rigged_tripo_rgb_8dcc7b62-d841-449a-8405-402bbf5246a7.jpg-0b611036933dac7bdef63811e744e3ff.etc2.ctex"]
 
 [params]
 

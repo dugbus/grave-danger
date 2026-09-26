@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b348t4jwfxjg8"
-path.s3tc="res://.godot/imported/andy_no_hat_tripo_normal_f64a826a-33f0-45c6-8e6d-92fb032f3c0c.jpg-65981306b52f4ec81594515f03cbfcf9.s3tc.ctex"
-path.etc2="res://.godot/imported/andy_no_hat_tripo_normal_f64a826a-33f0-45c6-8e6d-92fb032f3c0c.jpg-65981306b52f4ec81594515f03cbfcf9.etc2.ctex"
+uid="uid://besu2wmbfolyx"
+path.s3tc="res://.godot/imported/andy_rigged_tripo_normal_f64a826a-33f0-45c6-8e6d-92fb032f3c0c.jpg-57082d4b935c2f5e3c10cbed4629faf8.s3tc.ctex"
+path.etc2="res://.godot/imported/andy_rigged_tripo_normal_f64a826a-33f0-45c6-8e6d-92fb032f3c0c.jpg-57082d4b935c2f5e3c10cbed4629faf8.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -15,8 +15,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://player/andy_no_hat_tripo_normal_f64a826a-33f0-45c6-8e6d-92fb032f3c0c.jpg"
-dest_files=["res://.godot/imported/andy_no_hat_tripo_normal_f64a826a-33f0-45c6-8e6d-92fb032f3c0c.jpg-65981306b52f4ec81594515f03cbfcf9.s3tc.ctex", "res://.godot/imported/andy_no_hat_tripo_normal_f64a826a-33f0-45c6-8e6d-92fb032f3c0c.jpg-65981306b52f4ec81594515f03cbfcf9.etc2.ctex"]
+source_file="res://player/andy_rigged_tripo_normal_f64a826a-33f0-45c6-8e6d-92fb032f3c0c.jpg"
+dest_files=["res://.godot/imported/andy_rigged_tripo_normal_f64a826a-33f0-45c6-8e6d-92fb032f3c0c.jpg-57082d4b935c2f5e3c10cbed4629faf8.s3tc.ctex", "res://.godot/imported/andy_rigged_tripo_normal_f64a826a-33f0-45c6-8e6d-92fb032f3c0c.jpg-57082d4b935c2f5e3c10cbed4629faf8.etc2.ctex"]
 
 [params]
 
@@ -31,7 +31,7 @@ compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=1
-roughness/src_normal="res://player/andy_no_hat_tripo_normal_f64a826a-33f0-45c6-8e6d-92fb032f3c0c.jpg"
+roughness/src_normal="res://player/andy_rigged_tripo_normal_f64a826a-33f0-45c6-8e6d-92fb032f3c0c.jpg"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

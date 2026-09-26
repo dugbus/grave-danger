@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://c53cq3p1utubw"
-path="res://.godot/imported/adventurer.glb-7aa22a6b263f5f1de3e5feb5f9483d22.scn"
+uid="uid://bmkyv0ves7wyr"
+path="res://.godot/imported/andy_rigged.glb-ef6184bcc4f4aa2ca3031610c8e0d601.scn"
 
 [deps]
 
-source_file="res://player/adventurer.glb"
-dest_files=["res://.godot/imported/adventurer.glb-7aa22a6b263f5f1de3e5feb5f9483d22.scn"]
+source_file="res://player/andy_rigged.glb"
+dest_files=["res://.godot/imported/andy_rigged.glb-ef6184bcc4f4aa2ca3031610c8e0d601.scn"]
 
 [params]
 
