@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-27
+
+### 1300
+
+- The player now adopts new-character idle, walk, and death animations independently, uses the legacy model for missing clips, and keeps the new T-pose for idle while no new animations exist.
+  - Prompt: Use new character animations as they become available and fall back state by state.
+
+### 1200
+
+- Skeletons now draw in front of the player when the player walks behind them, while scenery still reveals the player silhouette.
+  - Prompt: Keep the player visually behind a skeleton when walking behind it.
+
+### 0300
+
+- The player now uses the new character model, with future idle, walk, and death animations enabled automatically when they are added.
+  - Prompt: Replace the player model now and enable animations as they are added.
+
 ## 2026-09-16
 
 ### 1300

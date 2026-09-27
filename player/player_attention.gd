@@ -24,8 +24,8 @@ const COLLECTIBLE_GROUPS: Array[StringName] = [
 @export var travel_pivot_path: NodePath = ^"../Pivot"
 ## Child pivot followed by the headlamp while the player glances.
 @export var look_direction_path: NodePath = ^"../Pivot/LookDirection"
-## Imported character containing the separately turnable head mesh.
-@export var character_path: NodePath = ^"../Pivot/Character"
+## New imported character containing a separately turnable head mesh when one becomes available.
+@export var character_path: NodePath = ^"../Pivot/Character/NewCharacter"
 ## Existing spotlight that follows the player's procedural head turn.
 @export var headlamp_path: NodePath = ^"../Pivot/PlayerHeadlampLight"
 ## Authored ray used to reject attention targets hidden by level geometry.

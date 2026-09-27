@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="FloorStyle" format=3]
+[gd_resource type="Resource" script_class="FloorStyle" format=3 uid="uid://d2j15b2d1d7j6"]
 
-[ext_resource type="Script" path="res://addons/floor_surface/floor_style.gd" id="1_1r65s"]
-[ext_resource type="Texture2D" path="res://Assets/environment/floors/textures/dirt_2.png" id="1_ptvj5"]
+[ext_resource type="Script" uid="uid://q0ef7o077f24" path="res://addons/floor_surface/floor_style.gd" id="1_1r65s"]
+[ext_resource type="Texture2D" uid="uid://duxurgxccegv6" path="res://Assets/environment/floors/textures/dirt_2.png" id="1_ptvj5"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8mbcx"]
 albedo_color = Color(0.43, 0.4, 0.36, 1)

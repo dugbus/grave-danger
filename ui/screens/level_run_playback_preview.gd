@@ -85,6 +85,8 @@ static func find_animation_player(node: Node) -> AnimationPlayer:
 
 
 static func find_animation(player_node: AnimationPlayer, candidates: Array[String]) -> String:
+	if player_node == null:
+		return ""
 	for candidate in candidates:
 		for animation_name in player_node.get_animation_list():
 			if animation_name.to_lower() == candidate:

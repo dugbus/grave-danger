@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://pqtcng2uw3dw"]
 
-[ext_resource type="PackedScene" uid="uid://bg1o6o88d6aih" path="res://Assets/kenney-graveyard/character-keeper.glb" id="1_4flbx"]
+[ext_resource type="PackedScene" uid="uid://b4rhshe713rs0" path="res://player/andy_rigged.tscn" id="1_4flbx"]
+[ext_resource type="PackedScene" uid="uid://bg1o6o88d6aih" path="res://Assets/kenney-graveyard/character-keeper.glb" id="20_legacy_character"]
 [ext_resource type="Script" uid="uid://dtq13owafx466" path="res://player/player.gd" id="1_onrkg"]
 [ext_resource type="Script" uid="uid://clsohtxpkv21k" path="res://player/player_movement.gd" id="3_i5lcx"]
 [ext_resource type="Script" uid="uid://dv3aldc2lljxt" path="res://player/player_inventory.gd" id="4_nltvg"]
@@ -184,7 +185,15 @@ collision_mask = 5
 
 [node name="Pivot" type="Node3D" parent="." unique_id=2026899053]
 
-[node name="Character" parent="Pivot" unique_id=2053546351 instance=ExtResource("1_4flbx")]
+[node name="Character" type="Node3D" parent="Pivot" unique_id=2053546351]
+
+[node name="NewCharacter" parent="Pivot/Character" instance=ExtResource("1_4flbx")]
+
+[node name="LegacyCharacter" parent="Pivot/Character" instance=ExtResource("20_legacy_character")]
+visible = false
+
+[node name="PlayerEffectHead" type="Marker3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 
 [node name="LookDirection" type="Node3D" parent="Pivot" unique_id=774174708]
 

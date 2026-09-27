@@ -6,6 +6,7 @@
 [ext_resource type="PlaneMesh" path="res://game/contact_shadow_mesh.tres" id="4_shadow_mesh"]
 [ext_resource type="Material" path="res://game/contact_shadow_material.tres" id="5_shadow_material"]
 [ext_resource type="Script" path="res://enemies/ground_enemy_editor_placement.gd" id="6_editor_placement"]
+[ext_resource type="PackedScene" path="res://player/visibility/player_occlusion_blocker.tscn" id="7_occlusion_blocker"]
 
 [sub_resource type="Curve3D" id="Curve3D_skeleton_patrol"]
 resource_local_to_scene = true
@@ -48,6 +49,8 @@ shape = SubResource("CapsuleShape3D_skeleton_body")
 [node name="Pivot" type="Node3D" parent="PathFollow3D/DropPivot" unique_id=68188564]
 
 [node name="Character" parent="PathFollow3D/DropPivot/Pivot" unique_id=1931978503 instance=ExtResource("1_skeleton")]
+
+[node name="PlayerOcclusionBlocker" parent="PathFollow3D/DropPivot/Pivot" instance=ExtResource("7_occlusion_blocker")]
 
 [node name="SkeletonLight" type="OmniLight3D" parent="PathFollow3D/DropPivot/Pivot" unique_id=530975026]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16, 1.08, 0.22)

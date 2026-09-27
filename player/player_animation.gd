@@ -24,8 +24,10 @@ const WALK_ANIMATION_CANDIDATES = ["walk", "sprint", "move-forward"]
 const DEATH_ANIMATION_CANDIDATES = ["death", "die", "fall"]
 
 
-## Imported character subtree that contains meshes and animation players.
-@export var character_path: NodePath = ^"../Pivot/Character"
+## New character subtree preferred whenever it supplies the requested animation.
+@export var character_path: NodePath = ^"../Pivot/Character/NewCharacter"
+## Legacy character subtree shown only when the new character lacks a requested animation.
+@export var fallback_character_path: NodePath = ^"../Pivot/Character/LegacyCharacter"
 ## Visual pivot used for quick hit reactions.
 @export var pivot_path: NodePath = ^"../Pivot"
 ## Local Y offset used for the non-physics hit hop.
@@ -36,13 +38,25 @@ const DEATH_ANIMATION_CANDIDATES = ["death", "die", "fall"]
 @export var hit_reaction_down_seconds := 0.09
 
 @onready var character: Node = get_node_or_null(character_path)
+@onready var fallback_character: Node = get_node_or_null(fallback_character_path)
 @onready var pivot := get_node_or_null(pivot_path) as Node3D
 
 var animation_player: AnimationPlayer
+var primary_animation_player: AnimationPlayer
+var fallback_animation_player: AnimationPlayer
+var idle_animation_player: AnimationPlayer
+var walk_animation_player: AnimationPlayer
+var death_animation_player: AnimationPlayer
+var idle_character: Node3D
+var walk_character: Node3D
+var death_character: Node3D
+var active_character: Node3D
 var idle_animation := ""
 var walk_animation := ""
 var death_animation := ""
 var current_animation := ""
+var primary_has_animations := false
+var idle_uses_t_pose := false
 var previous_walk_animation_phase := -1.0
 var hit_reaction_tween: Tween
 var hit_reaction_base_y := 0.0
@@ -53,34 +67,31 @@ func _ready() -> void:
 	# imported character subtree rather than the physics body.
 	if character != null:
 		_configure_character_visuals(character)
-		animation_player = _find_animation_player(character)
+		primary_animation_player = _find_animation_player(character)
+	if fallback_character != null:
+		_configure_character_visuals(fallback_character)
+		fallback_animation_player = _find_animation_player(fallback_character)
 
 	if pivot != null:
 		hit_reaction_base_y = pivot.position.y
 
-	if animation_player == null:
-		push_warning("Player character has no AnimationPlayer.")
-		return
-
-	idle_animation = _find_animation(IDLE_ANIMATION_CANDIDATES)
-	walk_animation = _find_animation(WALK_ANIMATION_CANDIDATES)
-	death_animation = _find_animation(DEATH_ANIMATION_CANDIDATES)
-
-	_set_animation_loop(idle_animation)
-	_set_animation_loop(walk_animation)
-	_play_animation(idle_animation)
+	_resolve_animation_sources()
+	_set_animation_loop(idle_animation_player, idle_animation)
+	_set_animation_loop(walk_animation_player, walk_animation)
+	_play_selected_animation(idle_character, idle_animation_player, idle_animation)
 
 
 func update_movement(input_strength: float, inventory: Node) -> void:
 	# Movement returns the same analogue strength it used for speed, so animation
 	# playback can stay visually synchronized with actual movement.
 	if input_strength <= 0.05:
+		_play_selected_animation(idle_character, idle_animation_player, idle_animation)
 		if animation_player != null:
 			animation_player.speed_scale = 1.0
-		_play_animation(idle_animation)
 		_reset_footstep_phase()
 		return
 
+	_play_selected_animation(walk_character, walk_animation_player, walk_animation)
 	if animation_player != null:
 		# Carrying gold slows the walk cycle as well as the player's movement.
 		var weight_animation_multiplier: float = inventory.weight_multiplier(1.0, MIN_WEIGHT_ANIMATION_MULTIPLIER)
@@ -88,7 +99,6 @@ func update_movement(input_strength: float, inventory: Node) -> void:
 			lerpf(MIN_WALK_ANIMATION_SPEED, MAX_WALK_ANIMATION_SPEED, input_strength)
 			* weight_animation_multiplier
 		)
-	_play_animation(walk_animation)
 	_update_footstep_phase()
 
 
@@ -96,10 +106,40 @@ func play_death() -> void:
 	# Death animation is intentionally slower for readability during the camera
 	# close-up.
 	_stop_hit_reaction(true)
+	_play_selected_animation(death_character, death_animation_player, death_animation)
 	if animation_player != null:
 		animation_player.speed_scale = 0.5
-	_play_animation(death_animation)
 	_reset_footstep_phase()
+
+
+## Mirrors live animation fallback in recorded-run previews without inventory state.
+func update_replay(input_strength: float, is_dead: bool, delta: float) -> void:
+	if is_dead:
+		_play_selected_animation(death_character, death_animation_player, death_animation)
+		if animation_player != null:
+			animation_player.speed_scale = 0.5
+	elif input_strength > 0.05:
+		_play_selected_animation(walk_character, walk_animation_player, walk_animation)
+		if animation_player != null:
+			animation_player.speed_scale = lerpf(
+				MIN_WALK_ANIMATION_SPEED,
+				MAX_WALK_ANIMATION_SPEED,
+				clampf(input_strength, 0.0, 1.0)
+			)
+	else:
+		_play_selected_animation(idle_character, idle_animation_player, idle_animation)
+		if animation_player != null:
+			animation_player.speed_scale = 1.0
+	if animation_player != null:
+		animation_player.advance(delta)
+
+
+## Disables automatic clip advancement so recorded-run previews can step exact frame deltas.
+func prepare_replay() -> void:
+	if primary_animation_player != null:
+		primary_animation_player.process_mode = Node.PROCESS_MODE_DISABLED
+	if fallback_animation_player != null:
+		fallback_animation_player.process_mode = Node.PROCESS_MODE_DISABLED
 
 
 func play_hit_reaction() -> void:
@@ -126,18 +166,86 @@ func play_hit_reaction() -> void:
 	)
 
 
-func _play_animation(animation_name: String) -> void:
-	# Avoid restarting the same animation every frame; only crossfade when the
-	# requested state actually changes.
-	if animation_player == null or animation_name.is_empty() or current_animation == animation_name:
+func _resolve_animation_sources() -> void:
+	primary_has_animations = _has_authored_animations(primary_animation_player)
+	var primary_idle := _find_animation(primary_animation_player, IDLE_ANIMATION_CANDIDATES)
+	var primary_walk := _find_animation(primary_animation_player, WALK_ANIMATION_CANDIDATES)
+	var primary_death := _find_animation(primary_animation_player, DEATH_ANIMATION_CANDIDATES)
+	var fallback_idle := _find_animation(fallback_animation_player, IDLE_ANIMATION_CANDIDATES)
+	var fallback_walk := _find_animation(fallback_animation_player, WALK_ANIMATION_CANDIDATES)
+	var fallback_death := _find_animation(fallback_animation_player, DEATH_ANIMATION_CANDIDATES)
+
+	idle_uses_t_pose = not primary_has_animations
+	if not primary_idle.is_empty():
+		idle_character = character as Node3D
+		idle_animation_player = primary_animation_player
+		idle_animation = primary_idle
+	elif idle_uses_t_pose:
+		idle_character = character as Node3D
+	else:
+		idle_character = fallback_character as Node3D
+		idle_animation_player = fallback_animation_player
+		idle_animation = fallback_idle
+
+	if not primary_walk.is_empty():
+		walk_character = character as Node3D
+		walk_animation_player = primary_animation_player
+		walk_animation = primary_walk
+	else:
+		walk_character = fallback_character as Node3D
+		walk_animation_player = fallback_animation_player
+		walk_animation = fallback_walk
+
+	if not primary_death.is_empty():
+		death_character = character as Node3D
+		death_animation_player = primary_animation_player
+		death_animation = primary_death
+	else:
+		death_character = fallback_character as Node3D
+		death_animation_player = fallback_animation_player
+		death_animation = fallback_death
+
+	if walk_character == null:
+		walk_character = character as Node3D
+	if death_character == null:
+		death_character = character as Node3D
+
+
+func _play_selected_animation(
+	selected_character: Node3D,
+	selected_player: AnimationPlayer,
+	selected_animation: String
+) -> void:
+	if selected_character == null:
+		return
+	var selection_is_unchanged := active_character == selected_character \
+		and animation_player == selected_player \
+		and current_animation == selected_animation
+	_set_active_character(selected_character)
+	if selection_is_unchanged:
 		return
 
-	current_animation = animation_name
-	animation_player.play(animation_name, 0.15)
+	if animation_player != null and animation_player != selected_player:
+		animation_player.stop()
+	animation_player = selected_player
+	current_animation = selected_animation
+	if animation_player != null and not current_animation.is_empty():
+		animation_player.play(current_animation, 0.15)
+
+
+func _set_active_character(selected_character: Node3D) -> void:
+	active_character = selected_character
+	if character is Node3D:
+		(character as Node3D).visible = selected_character == character
+	if fallback_character is Node3D:
+		(fallback_character as Node3D).visible = selected_character == fallback_character
 
 
 func _update_footstep_phase() -> void:
-	if animation_player == null or current_animation != walk_animation or walk_animation.is_empty():
+	if animation_player == null \
+			or animation_player != walk_animation_player \
+			or current_animation != walk_animation \
+			or walk_animation.is_empty():
 		_reset_footstep_phase()
 		return
 
@@ -156,23 +264,35 @@ func _reset_footstep_phase() -> void:
 	previous_walk_animation_phase = -1.0
 
 
-func _find_animation(candidates: Array) -> String:
-	# Imported animation names vary by asset. Prefer known semantic names, then
-	# fall back to the first available animation so the character still moves.
+func _find_animation(player: AnimationPlayer, candidates: Array) -> String:
+	if player == null:
+		return ""
+	# Imported animation libraries may prefix authored clip names.
 	for candidate in candidates:
-		for animation_name in animation_player.get_animation_list():
-			if animation_name.to_lower() == candidate:
-				return animation_name
+		for animation_name in player.get_animation_list():
+			var normalized_name := String(animation_name).to_lower()
+			if normalized_name == candidate or normalized_name.ends_with("/" + candidate):
+				return String(animation_name)
 
-	return animation_player.get_animation_list()[0] if not animation_player.get_animation_list().is_empty() else ""
+	return ""
 
 
-func _set_animation_loop(animation_name: String) -> void:
+func _has_authored_animations(player: AnimationPlayer) -> bool:
+	if player == null:
+		return false
+	for animation_name in player.get_animation_list():
+		var normalized_name := String(animation_name).to_lower()
+		if normalized_name != "reset" and not normalized_name.ends_with("/reset"):
+			return true
+	return false
+
+
+func _set_animation_loop(player: AnimationPlayer, animation_name: String) -> void:
 	# Idle and walk should loop forever. Death is intentionally not passed here.
-	if animation_name.is_empty():
+	if player == null or animation_name.is_empty():
 		return
 
-	var animation := animation_player.get_animation(animation_name)
+	var animation := player.get_animation(animation_name)
 	if animation != null:
 		animation.loop_mode = Animation.LOOP_LINEAR
 

@@ -40,6 +40,7 @@ var playback_level: Node3D
 var playback_player: Node3D
 var playback_pivot: Node3D
 var playback_camera: Camera3D
+var animation_controller: Node
 var animation_player: AnimationPlayer
 var walk_animation := ""
 var idle_animation := ""
@@ -240,8 +241,14 @@ func _create_preview(level_scene: PackedScene) -> void:
     playback_camera.current = true
     playback_camera.fov = float(recording.get("camera_fov", 34.0))
     playback_session_root.add_child(playback_camera)
-    animation_player = _find_animation_player(playback_player)
-    if animation_player != null:
+    animation_controller = playback_player.get_node_or_null(^"PlayerAnimation")
+    var uses_animation_controller := animation_controller != null \
+        and animation_controller.has_method(&"update_replay")
+    if uses_animation_controller:
+        animation_controller.call(&"prepare_replay")
+    else:
+        animation_player = _find_animation_player(playback_player)
+    if not uses_animation_controller and animation_player != null:
         walk_animation = _find_animation(animation_player, WALK_ANIMATION_CANDIDATES)
         idle_animation = _find_animation(animation_player, IDLE_ANIMATION_CANDIDATES)
         death_animation = _find_animation(animation_player, DEATH_ANIMATION_CANDIDATES)
@@ -291,14 +298,18 @@ func _apply_frame(frame_index: int, interpolation: float) -> void:
 
 
 func _update_animation(delta: float, frame_index: int) -> void:
-    if animation_player == null:
-        return
     var movement_inputs := recording.get("movement_inputs", PackedVector2Array()) \
         as PackedVector2Array
     var movement_strength := movement_inputs[frame_index].length() \
         if frame_index < movement_inputs.size() else 0.0
     var playback_actor := playback_player as GDLevelRunPlaybackPlayer
     var is_dead := playback_actor != null and playback_actor.is_dead()
+    if animation_controller != null and animation_controller.has_method(&"update_replay"):
+        animation_controller.call(&"update_replay", movement_strength, is_dead, delta)
+        current_animation = animation_controller.get("current_animation") as String
+        return
+    if animation_player == null:
+        return
     var requested_animation := death_animation if is_dead \
         else walk_animation if movement_strength > 0.05 else idle_animation
     if not requested_animation.is_empty() and requested_animation != current_animation:
@@ -420,6 +431,7 @@ func _remove_preview_world() -> void:
     var previous_level := playback_level
     var previous_camera := playback_camera
     playback_session_root = null
+    animation_controller = null
     animation_player = null
     playback_player = null
     playback_pivot = null

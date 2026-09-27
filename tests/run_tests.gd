@@ -2686,9 +2686,7 @@ func _test_player_death_uses_face_blood_and_body_throes() -> bool:
     var death_controller := player.get_node("PlayerDeath") as GDPlayerDeath
     var death_effects := player.get_node("PlayerDeathEffects") as Node3D
     var attention := player.get_node("PlayerAttention") as GDPlayerAttention
-    var head := player.get_node(
-        "Pivot/Character/character-keeper/root/torso/head"
-    ) as Node3D
+    var head := player.get_node("Pivot/PlayerEffectHead") as Node3D
     var visual_pivot := player.get_node("Pivot") as Node3D
     var blood_emitters: Array[GPUParticles3D] = [
         player.get_node("PlayerDeathEffects/MouthBlood") as GPUParticles3D,
@@ -2746,14 +2744,13 @@ func _test_player_death_uses_face_blood_and_body_throes() -> bool:
     var environment_impact := environment_splatter.get_node_or_null(
         "ImpactBlood"
     ) as GPUParticles3D if environment_splatter != null else null
-    var head_mesh := head as MeshInstance3D
-    var head_bounds := head_mesh.get_aabb()
     var current_head_inverse := head.global_transform.affine_inverse()
-    var sources_are_below_hat := true
+    var sources_are_on_face := true
     for emitter in blood_emitters:
         var source_offset := (current_head_inverse * emitter.global_transform).origin
-        sources_are_below_hat = sources_are_below_hat \
-            and source_offset.y < head_bounds.position.y + head_bounds.size.y * 0.5 \
+        sources_are_on_face = sources_are_on_face \
+            and source_offset.y >= PLAYER_DEATH_EFFECTS_SCRIPT.MOUTH_FACE_OFFSET.y \
+            and source_offset.y <= PLAYER_DEATH_EFFECTS_SCRIPT.LEFT_EYE_FACE_OFFSET.y \
             and source_offset.z > 0.16 \
             and source_offset.z < 0.21
     var player_projector_reaches_face := player_splatter != null \
@@ -2792,8 +2789,8 @@ func _test_player_death_uses_face_blood_and_body_throes() -> bool:
     ) and _expect(
         all_face_sources_keep_emitting \
             and face_sources_are_placed \
-            and sources_are_below_hat,
-        "player death keeps spraying blood from facial features below the hat"
+            and sources_are_on_face,
+        "player death keeps spraying blood from the replacement character's face"
     ) and _expect(
         splatters_attach_to_their_receivers and player_projector_reaches_face,
         "blood impacts visibly mark and overlap the corpse and contacted environment"
@@ -2821,12 +2818,7 @@ func _test_fire_boundary_death_blackens_and_burns_player() -> bool:
         player.get_node("PlayerDeathEffects/RightEyeBlood") as GPUParticles3D,
     ]
     var character := player.get_node("Pivot/Character") as Node3D
-    var torso := player.get_node(
-        "Pivot/Character/character-keeper/root/torso"
-    ) as MeshInstance3D
-    var head := player.get_node(
-        "Pivot/Character/character-keeper/root/torso/head"
-    ) as MeshInstance3D
+    var effect_head := player.get_node("Pivot/PlayerEffectHead") as Marker3D
     var visual_pivot := player.get_node("Pivot") as Node3D
     var base_pivot_rotation := visual_pivot.rotation
     death_controller.return_delay = 60.0
@@ -2851,17 +2843,17 @@ func _test_fire_boundary_death_blackens_and_burns_player() -> bool:
             and not emitter.emitting
     var fire_process_material := fire_particles.process_material as ParticleProcessMaterial
     var head_fire_position := fire_particles.global_transform.affine_inverse() \
-        * head.global_position
-    var torso_fire_position := fire_particles.global_transform.affine_inverse() \
-        * torso.global_position
+        * effect_head.global_position
+    var body_center_fire_position := fire_particles.global_transform.affine_inverse() \
+        * (character.global_position + Vector3.UP * 0.5)
     var fire_extents := fire_process_material.emission_box_extents
     var upper_body_stays_inside_fire_volume := (
         absf(head_fire_position.x) <= fire_extents.x \
         and absf(head_fire_position.y) <= fire_extents.y \
         and absf(head_fire_position.z) <= fire_extents.z \
-        and absf(torso_fire_position.x) <= fire_extents.x \
-        and absf(torso_fire_position.y) <= fire_extents.y \
-        and absf(torso_fire_position.z) <= fire_extents.z
+        and absf(body_center_fire_position.x) <= fire_extents.x \
+        and absf(body_center_fire_position.y) <= fire_extents.y \
+        and absf(body_center_fire_position.z) <= fire_extents.z
     )
     var fire_mesh := fire_particles.draw_pass_1 as QuadMesh
     var fire_shader_material := fire_mesh.material as ShaderMaterial
@@ -4389,29 +4381,33 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
             and level_selection.shop_purchases == replay_purchases_before,
         "replay collection and completion isolation leave saved player progress unchanged"
     ) and passed
-    var preview_animation_player := level_run_playback.call(
-        "_find_animation_player",
-        preview_player
-    ) as AnimationPlayer
+    var preview_animation_controller := preview_player.get_node(
+        "PlayerAnimation"
+    ) as GDPlayerAnimation
     level_run_playback.playback_player = preview_player
-    level_run_playback.animation_player = preview_animation_player
-    level_run_playback.death_animation = level_run_playback.call(
-        "_find_animation",
-        preview_animation_player,
-        GDLevelRunPlayback.DEATH_ANIMATION_CANDIDATES
-    ) as String
+    level_run_playback.animation_controller = preview_animation_controller
+    preview_animation_controller.prepare_replay()
     level_run_playback.recording = {
         "movement_inputs": PackedVector2Array([Vector2.ONE]),
     }
     preview_player.die_from_flames()
     level_run_playback.call("_update_animation", 1.0 / 60.0, 0)
+    var preview_new_character := preview_player.get_node(
+        "Pivot/Character/NewCharacter"
+    ) as Node3D
+    var preview_legacy_character := preview_player.get_node(
+        "Pivot/Character/LegacyCharacter"
+    ) as Node3D
     passed = _expect(
         preview_player.is_dead() \
-            and not level_run_playback.death_animation.is_empty() \
-            and level_run_playback.current_animation == level_run_playback.death_animation \
-            and preview_animation_player.current_animation == level_run_playback.death_animation \
-            and is_equal_approx(preview_animation_player.speed_scale, 0.5),
-        "replay hazards play the local death animation without a recorded death flag"
+            and not preview_new_character.visible \
+            and preview_legacy_character.visible \
+            and preview_animation_controller.current_animation == "die" \
+            and is_equal_approx(
+                preview_animation_controller.animation_player.speed_scale,
+                0.5
+            ),
+        "replay hazards use the same legacy fallback for a missing new death animation"
     ) and passed
     var final_pose_camera := Camera3D.new()
     playback_viewport.add_child(final_pose_camera)
@@ -6165,14 +6161,8 @@ func _test_characters_glance_and_return_with_safe_head_turns() -> bool:
     var player_attention: Node = player.get_node("PlayerAttention")
     var player_pivot := player.get_node("Pivot") as Node3D
     var player_look_direction := player.get_node("Pivot/LookDirection") as Node3D
-    var player_head := player.get_node(
-        "Pivot/Character/character-keeper/root/torso/head"
-    ) as Node3D
-    var player_torso := player_head.get_parent() as Node3D
-    var player_torso_rest_yaw := player_torso.rotation.y
     var player_headlamp := player.get_node("Pivot/PlayerHeadlampLight") as SpotLight3D
-    var player_headlamp_offset := player_head.global_transform.affine_inverse() \
-        * player_headlamp.global_transform
+    var player_headlamp_rest_transform := player_headlamp.global_transform
     var player_travel_yaw := player_pivot.rotation.y
     player_attention.update_attention(0.2)
     player_attention.call("_process", 0.0)
@@ -6182,13 +6172,15 @@ func _test_characters_glance_and_return_with_safe_head_turns() -> bool:
             <= float(player_attention.get_maximum_head_turn_radians()) \
         and is_equal_approx(player_pivot.rotation.y, player_travel_yaw) \
         and not is_zero_approx(player_look_direction.rotation.y)
-    var player_headlamp_follows_head := (
-        player_head.global_transform.affine_inverse() * player_headlamp.global_transform
-    ).is_equal_approx(player_headlamp_offset)
-    var player_upper_body_supports_look := not is_equal_approx(
-        player_torso.rotation.y,
-        player_torso_rest_yaw
-    )
+    var expected_player_headlamp_rotation := Quaternion(
+        Vector3.UP,
+        float(player_attention.get_current_head_yaw())
+    ) * player_headlamp_rest_transform.basis.get_rotation_quaternion()
+    var player_headlamp_follows_attention := player_headlamp.global_basis \
+        .get_rotation_quaternion().is_equal_approx(expected_player_headlamp_rotation) \
+        and player_headlamp.global_position.is_equal_approx(
+            player_headlamp_rest_transform.origin
+        )
     coin.queue_free()
     await process_frame
     player_attention.update_attention(0.1)
@@ -6325,11 +6317,10 @@ func _test_characters_glance_and_return_with_safe_head_turns() -> bool:
             and vampire_continuously_scans_at_rest,
         "vampire continuously searches at rest without exceeding a safe head turn"
     ) and _expect(
-        player_headlamp_follows_head \
+        player_headlamp_follows_attention \
             and vampire_headlamp_follows_head \
-            and player_upper_body_supports_look \
             and vampire_upper_body_supports_look,
-        "readable head turns include the upper body and keep headlamps attached"
+        "model-independent player attention and animated vampire turns keep headlamps attached"
     ) and _expect(
         minimap_and_sight_share_look_direction and stationary_attention_is_stronger,
         "Vampire sight and the shared attention ramp use the live look direction"

@@ -16,8 +16,8 @@ const BLOOD_SPLATTER_SCRIPT := preload("res://player/blood_splatter_decal.gd")
 
 ## Visual pivot rotated additively over the imported death animation.
 @export var visual_pivot_path: NodePath = ^"../Pivot"
-## Imported head mesh used to keep each blood source attached to the animated face.
-@export var head_path: NodePath = ^"../Pivot/Character/character-keeper/root/torso/head"
+## Model-independent face anchor used until the imported character exposes an animated head.
+@export var head_path: NodePath = ^"../Pivot/PlayerEffectHead"
 ## Imported character root whose visible meshes become charred after a fire death.
 @export var character_path: NodePath = ^"../Pivot/Character"
 ## Attention controller disabled at death so its live head turn cannot fight the final pose.

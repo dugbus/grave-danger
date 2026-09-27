@@ -6,6 +6,11 @@ const SUBJECT_PATH := "res://ui/screens/level_run_playback_preview.gd"
 
 func run(_tree: SceneTree) -> void:
 	expect_script_contract(SUBJECT, SUBJECT_PATH)
+	expect_equal(
+		SUBJECT.find_animation(null, ["idle"]),
+		"",
+		"Static replacement characters can be previewed before animations arrive."
+	)
 	var root := Node.new()
 	var boundary := BoundaryStub.new()
 	boundary.add_to_group(&"kill_boundary")
