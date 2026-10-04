@@ -8,9 +8,9 @@ signal footstep_phase_reached
 # the GLB subtree at runtime because imported scenes often nest AnimationPlayer
 # nodes differently after asset updates.
 
-# Animation speed range used by analogue movement.
-const MIN_WALK_ANIMATION_SPEED = 0.45
-const MAX_WALK_ANIMATION_SPEED = 1.0
+# Doubled animation speed range used by analogue movement to prevent foot sliding.
+const MIN_WALK_ANIMATION_SPEED = 0.9
+const MAX_WALK_ANIMATION_SPEED = 2.0
 
 # Lowest animation speed multiplier when carrying the maximum treasure weight.
 const MIN_WEIGHT_ANIMATION_MULTIPLIER = 0.65

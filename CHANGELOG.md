@@ -2,6 +2,11 @@
 
 ## 2026-09-27
 
+### 2000
+
+- The player's walk cycle now plays twice as fast to keep their feet better aligned with movement.
+  - Prompt: Increase the new walk animation playback speed by two times to reduce sliding.
+
 ### 1300
 
 - The player now adopts new-character idle, walk, and death animations independently, uses the legacy model for missing clips, and keeps the new T-pose for idle while no new animations exist.

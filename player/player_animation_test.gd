@@ -30,8 +30,9 @@ func _test_new_clips_replace_legacy_one_state_at_a_time(tree: SceneTree) -> void
 		new_character.visible \
 			and not legacy_character.visible \
 			and controller.current_animation == "walk" \
-			and controller.animation_player == controller.primary_animation_player,
-		"An available new walk clip replaces only the legacy walk state."
+			and controller.animation_player == controller.primary_animation_player \
+			and is_equal_approx(controller.animation_player.speed_scale, 2.0),
+		"An available new walk clip replaces the legacy walk state at doubled playback speed."
 	)
 	controller.play_death()
 	expect(
