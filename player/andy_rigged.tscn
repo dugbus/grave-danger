@@ -2,4 +2,4 @@
 
 [ext_resource type="PackedScene" uid="uid://bmkyv0ves7wyr" path="res://player/andy_rigged.glb" id="1_3lsqf"]
 
-[node name="andy_rigged" unique_id=388116288 instance=ExtResource("1_3lsqf")]
+[node name="andy_rigged" unique_id=2038001053 instance=ExtResource("1_3lsqf")]
