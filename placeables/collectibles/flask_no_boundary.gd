@@ -15,8 +15,7 @@ func _apply_effect(_body: Node3D) -> bool:
 		return false
 
 	return kill_boundary.remove_for_level(
-		FLASK_PROPERTIES.no_boundary_sink_seconds,
-		FLASK_PROPERTIES.no_boundary_sink_distance
+		FLASK_PROPERTIES.no_boundary_sink_seconds, FLASK_PROPERTIES.no_boundary_sink_distance
 	)
 
 

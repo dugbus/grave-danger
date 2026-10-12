@@ -1,11 +1,7 @@
 extends "res://tests/test_case.gd"
 
-const SUBJECT := preload(
-	"res://levels/vampire-maze/generated_maze/generated_maze_layout_builder.gd"
-)
-const SUBJECT_PATH := (
-	"res://levels/vampire-maze/generated_maze/generated_maze_layout_builder.gd"
-)
+const SUBJECT := preload("res://levels/vampire-maze/generated_maze/generated_maze_layout_builder.gd")
+const SUBJECT_PATH := "res://levels/vampire-maze/generated_maze/generated_maze_layout_builder.gd"
 
 
 func run(_tree: SceneTree) -> void:
@@ -19,20 +15,24 @@ func run(_tree: SceneTree) -> void:
 	var second_layout := SUBJECT.replace(host)
 	var second_floor := second_layout.get_node("FloorSurface") as FloorSurface
 	expect(
-		second_layout != null \
-			and second_layout.get_instance_id() != first_layout_id \
-			and host.get_child_count() == 1 \
-			and second_layout.name == &"Layout" \
-			and second_layout.has_node("PNGGridMap") \
-			and second_layout.has_node("FloorSurface") \
-			and second_layout.has_node("GeneratedContent"),
+		(
+			second_layout != null
+			and second_layout.get_instance_id() != first_layout_id
+			and host.get_child_count() == 1
+			and second_layout.name == &"Layout"
+			and second_layout.has_node("PNGGridMap")
+			and second_layout.has_node("FloorSurface")
+			and second_layout.has_node("GeneratedContent")
+		),
 		"Layout replacement keeps an editable FloorSurface beside the wall GridMap."
 	)
 	expect(
-		second_floor.floor_map != first_map \
-			and second_floor.styles[0] != first_style \
-			and second_floor.floor_map.resource_local_to_scene \
-			and second_floor.styles[0].resource_local_to_scene,
+		(
+			second_floor.floor_map != first_map
+			and second_floor.styles[0] != first_style
+			and second_floor.floor_map.resource_local_to_scene
+			and second_floor.styles[0].resource_local_to_scene
+		),
 		"Each generated layout owns independent editable floor map and style resources."
 	)
 	host.free()

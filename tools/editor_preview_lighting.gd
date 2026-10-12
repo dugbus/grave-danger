@@ -2,7 +2,6 @@
 extends Node3D
 class_name GDEditorPreviewLighting
 
-
 const EDITOR_PREVIEW_LIGHT_NAME := "EditorPreviewFillLight"
 const EDITOR_PREVIEW_LIGHT_LAYERS := (1 << 20) - 1
 

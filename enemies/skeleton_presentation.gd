@@ -12,10 +12,7 @@ static func find_animation_player(node: Node) -> AnimationPlayer:
 	return null
 
 
-static func resolve_animation_name(
-	animation_player: AnimationPlayer,
-	animation_name: String
-) -> String:
+static func resolve_animation_name(animation_player: AnimationPlayer, animation_name: String) -> String:
 	if animation_player == null or animation_name.is_empty():
 		return ""
 	if animation_player.has_animation(animation_name):
@@ -35,10 +32,7 @@ static func collect_geometry(node: Node) -> Array[GeometryInstance3D]:
 	return geometry_instances
 
 
-static func _collect_geometry_recursive(
-	node: Node,
-	geometry_instances: Array[GeometryInstance3D]
-) -> void:
+static func _collect_geometry_recursive(node: Node, geometry_instances: Array[GeometryInstance3D]) -> void:
 	if node is GeometryInstance3D:
 		geometry_instances.append(node as GeometryInstance3D)
 	for child in node.get_children():

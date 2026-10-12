@@ -84,6 +84,7 @@ func _build_materials() -> void:
 	_fill_material.set_shader_parameter(&"silhouette_colour", silhouette_fill_colour)
 	_fill_material.set_shader_parameter(&"occlusion_depth_bias", occlusion_depth_bias)
 	_mask_material.set_shader_parameter(&"visible_surface_bias", occlusion_depth_bias)
+	_mask_material.set_shader_parameter(&"outline_width", outline_width)
 	_outline_material.set_shader_parameter(&"outline_colour", silhouette_outline_colour)
 	_outline_material.set_shader_parameter(&"outline_width", outline_width)
 	_outline_material.set_shader_parameter(&"occlusion_depth_bias", occlusion_depth_bias)
@@ -132,8 +133,7 @@ func _apply_visibility() -> void:
 func _release_silhouette_overlays() -> void:
 	for index in _source_meshes.size():
 		var source_mesh := _source_meshes[index]
-		if is_instance_valid(source_mesh) \
-				and source_mesh.material_overlay == _applied_overlays[index]:
+		if is_instance_valid(source_mesh) and source_mesh.material_overlay == _applied_overlays[index]:
 			source_mesh.material_overlay = _source_overlays[index]
 	_source_meshes.clear()
 	_source_overlays.clear()

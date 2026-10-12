@@ -5,7 +5,9 @@ const SUBJECT_PATH := "res://enemies/zombie.gd"
 const ZOMBIE_SCENE := preload("res://enemies/zombie.tscn")
 
 
-class DeathCollisionSubject extends GDZombiePath:
+class DeathCollisionSubject:
+	extends GDZombiePath
+
 	func _play_death_scream() -> void:
 		pass
 
@@ -35,8 +37,14 @@ func _test_death_releases_collision() -> void:
 			zombie.die_from_spike_trap()
 		else:
 			zombie._die_from_rolling_ball()
-		expect(zombie.is_dead and zombie.state == GDZombiePath.ZombieState.Die, "Spike and crush deaths retain the explicit dead state.")
-		expect(body.collision_layer == 0 and body.collision_mask == 0, "Both death causes immediately remove the upright corpse's physical blocking.")
+		expect(
+			zombie.is_dead and zombie.state == GDZombiePath.ZombieState.Die,
+			"Spike and crush deaths retain the explicit dead state."
+		)
+		expect(
+			body.collision_layer == 0 and body.collision_mask == 0,
+			"Both death causes immediately remove the upright corpse's physical blocking."
+		)
 		zombie.free()
 
 
@@ -47,18 +55,14 @@ func _test_authored_start_matches_first_path_point() -> void:
 	var editor_placement := zombie.get_node(^"GroundEditorPlacement") as GDGroundEnemyEditorPlacement
 	var first_path_point := zombie.curve.get_point_position(0)
 	expect(
-		first_path_point.is_zero_approx()
-			and path_follow.position.is_equal_approx(first_path_point),
+		first_path_point.is_zero_approx() and path_follow.position.is_equal_approx(first_path_point),
 		"The zombie editor origin, path follower, and first patrol point coincide."
 	)
 	expect(
 		zombie_body.position.is_equal_approx(first_path_point),
 		"The authored zombie body starts on the first patrol point for editor placement."
 	)
-	expect(
-		is_zero_approx(zombie_body.position.y),
-		"The authored zombie body origin rests at ground height."
-	)
+	expect(is_zero_approx(zombie_body.position.y), "The authored zombie body origin rests at ground height.")
 	expect_equal(
 		editor_placement.floor_sample_path,
 		NodePath("../ZombieBody"),

@@ -1,7 +1,6 @@
 extends "res://placeables/physics_placeable.gd"
 class_name GDInventoryPickup
 
-
 ## Item definition added to the player's inventory when collected.
 @export var carried_item: Resource
 ## Seconds a newly spawned or dropped item waits before pickup is allowed.

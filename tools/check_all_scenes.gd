@@ -1,10 +1,7 @@
 extends SceneTree
 
 const EXCLUDE_DIRS := [
-	"res://.godot",
-	"res://addons/copy_all_errors",
-	"res://addons/simplegrasstextured",
-	"res://tests/run_tests.gd"
+	"res://.godot", "res://addons/copy_all_errors", "res://addons/simplegrasstextured", "res://tests/run_tests.gd"
 ]
 const TEXT_RESOURCE_EXTENSIONS: Array[String] = ["tscn", "tres"]
 
@@ -58,11 +55,7 @@ func _settle_engine_teardown() -> void:
 	RenderingServer.force_sync()
 
 
-func _collect_resources(
-	dir_path: String,
-	scenes: Array[String],
-	text_resources: Array[String]
-) -> void:
+func _collect_resources(dir_path: String, scenes: Array[String], text_resources: Array[String]) -> void:
 	for excluded in EXCLUDE_DIRS:
 		if dir_path.begins_with(excluded):
 			return
@@ -90,8 +83,7 @@ func _collect_resources(
 			_collect_resources(path, scenes, text_resources)
 		elif name.ends_with(".tscn") or name.ends_with(".scn"):
 			scenes.append(path)
-		if not is_directory \
-				and TEXT_RESOURCE_EXTENSIONS.has(name.get_extension().to_lower()):
+		if not is_directory and TEXT_RESOURCE_EXTENSIONS.has(name.get_extension().to_lower()):
 			text_resources.append(path)
 
 	dir.list_dir_end()
@@ -109,8 +101,7 @@ func _validate_text_resource_uids(resource_paths: Array[String]) -> void:
 		if not root_uid.is_empty():
 			if root_paths_by_uid.has(root_uid):
 				push_error(
-					"Duplicate root UID %s: %s and %s"
-					% [root_uid, String(root_paths_by_uid[root_uid]), resource_path]
+					"Duplicate root UID %s: %s and %s" % [root_uid, String(root_paths_by_uid[root_uid]), resource_path]
 				)
 				failures += 1
 			else:
@@ -123,11 +114,7 @@ func _validate_text_resource_uids(resource_paths: Array[String]) -> void:
 			_validate_external_resource_uid(resource_path, line_index + 1, line)
 
 
-func _validate_external_resource_uid(
-	owner_path: String,
-	line_number: int,
-	declaration: String
-) -> void:
+func _validate_external_resource_uid(owner_path: String, line_number: int, declaration: String) -> void:
 	var declared_uid := _get_quoted_attribute(declaration, "uid")
 	if declared_uid.is_empty():
 		return
@@ -140,22 +127,23 @@ func _validate_external_resource_uid(
 	if declared_id == actual_id and actual_id != ResourceUID.INVALID_ID:
 		return
 
-	var actual_uid := ResourceUID.id_to_text(actual_id) \
-		if actual_id != ResourceUID.INVALID_ID else "no UID"
+	var actual_uid := ResourceUID.id_to_text(actual_id) if actual_id != ResourceUID.INVALID_ID else "no UID"
 	push_error(
-		"%s:%d declares stale UID %s for %s (actual: %s)"
-		% [owner_path, line_number, declared_uid, referenced_path, actual_uid]
+		(
+			"%s:%d declares stale UID %s for %s (actual: %s)"
+			% [owner_path, line_number, declared_uid, referenced_path, actual_uid]
+		)
 	)
 	failures += 1
 
 
 func _get_quoted_attribute(declaration: String, attribute: String) -> String:
-	var prefix := " %s=\"" % attribute
+	var prefix := ' %s="' % attribute
 	var value_start := declaration.find(prefix)
 	if value_start < 0:
 		return ""
 	value_start += prefix.length()
-	var value_end := declaration.find("\"", value_start)
+	var value_end := declaration.find('"', value_start)
 	if value_end < 0:
 		return ""
 	return declaration.substr(value_start, value_end - value_start)
@@ -166,11 +154,7 @@ func _check_scene(scene_path: String) -> void:
 
 	# Validation owns this scene load only for the duration of this function.
 	# Avoid adding its dependency graph to the process-wide resource cache.
-	var res := ResourceLoader.load(
-		scene_path,
-		"PackedScene",
-		ResourceLoader.CACHE_MODE_IGNORE_DEEP
-	)
+	var res := ResourceLoader.load(scene_path, "PackedScene", ResourceLoader.CACHE_MODE_IGNORE_DEEP)
 
 	if res == null:
 		print("--- %s" % scene_path)

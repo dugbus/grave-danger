@@ -139,16 +139,12 @@ func _evaluate_playback_position(time_seconds: float) -> GDKillBoundary2State:
 		or time_seconds <= authored_duration
 	):
 		return evaluate_at(time_seconds)
-	var return_ratio := clampf(
-		(time_seconds - authored_duration) / maxf(loop_return_seconds, 0.01), 0.0, 1.0
-	)
+	var return_ratio := clampf((time_seconds - authored_duration) / maxf(loop_return_seconds, 0.01), 0.0, 1.0)
 	var last_pose := sequence.get_pose(sequence.get_pose_count() - 1)
 	return _interpolate_poses(last_pose, sequence.get_pose(0), return_ratio)
 
 
-func _interpolate_poses(
-	pose_a: GDKillBoundary2Pose, pose_b: GDKillBoundary2Pose, ratio: float
-) -> GDKillBoundary2State:
+func _interpolate_poses(pose_a: GDKillBoundary2Pose, pose_b: GDKillBoundary2Pose, ratio: float) -> GDKillBoundary2State:
 	var eased := _apply_easing(clampf(ratio, 0.0, 1.0), pose_a.outgoing_easing)
 	state.set_values(
 		pose_a.position.lerp(pose_b.position, eased),

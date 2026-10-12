@@ -1,7 +1,6 @@
 class_name GDGameFont
 extends RefCounted
 
-
 const ALMENDRA_FONT_PATH := "res://Assets/fonts/Almendra-Bold.ttf"
 
 

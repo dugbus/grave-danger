@@ -11,10 +11,7 @@ var wall_item_ids: Dictionary = {}
 
 
 func configure(
-	vampire_body: CharacterBody3D,
-	vampire_settings: Resource,
-	grid_map: GridMap,
-	wall_ids: Dictionary
+	vampire_body: CharacterBody3D, vampire_settings: Resource, grid_map: GridMap, wall_ids: Dictionary
 ) -> void:
 	body = vampire_body
 	settings = vampire_settings
@@ -23,10 +20,7 @@ func configure(
 
 
 func get_direction_epsilon() -> float:
-	return maxf(
-		get_minimum_world_cell_edge_length() * DIRECTION_EPSILON_CELL_FRACTION,
-		0.0001
-	)
+	return maxf(get_minimum_world_cell_edge_length() * DIRECTION_EPSILON_CELL_FRACTION, 0.0001)
 
 
 func get_minimum_world_cell_edge_length() -> float:
@@ -49,14 +43,8 @@ func get_wall_clearance_offset(cell: Vector3i) -> Vector3:
 	if wall_grid_map == null:
 		return Vector3.ZERO
 	var offset := Vector3.ZERO
-	var required_x_offset := maxf(
-		_get_local_body_clearance_x() - wall_grid_map.cell_size.x * 0.5,
-		0.0
-	)
-	var required_z_offset := maxf(
-		_get_local_body_clearance_z() - wall_grid_map.cell_size.z * 0.5,
-		0.0
-	)
+	var required_x_offset := maxf(_get_local_body_clearance_x() - wall_grid_map.cell_size.x * 0.5, 0.0)
+	var required_z_offset := maxf(_get_local_body_clearance_z() - wall_grid_map.cell_size.z * 0.5, 0.0)
 	if _is_wall(cell + Vector3i(1, 0, 0)):
 		offset.x -= required_x_offset
 	if _is_wall(cell + Vector3i(-1, 0, 0)):
@@ -89,23 +77,17 @@ func get_body_clear_target_point(cell: Vector3i, world_target: Vector3) -> Vecto
 		maximum_z -= body_clearance_z
 	if _is_wall(cell + Vector3i(0, 0, -1)):
 		minimum_z += body_clearance_z
-	local_target.x = clampf(local_target.x, minimum_x, maximum_x) \
-		if minimum_x <= maximum_x else cell_centre.x
-	local_target.z = clampf(local_target.z, minimum_z, maximum_z) \
-		if minimum_z <= maximum_z else cell_centre.z
+	local_target.x = clampf(local_target.x, minimum_x, maximum_x) if minimum_x <= maximum_x else cell_centre.x
+	local_target.z = clampf(local_target.z, minimum_z, maximum_z) if minimum_z <= maximum_z else cell_centre.z
 	return wall_grid_map.to_global(local_target)
 
 
 func _get_local_body_clearance_x() -> float:
-	return _get_body_clearance_world() / maxf(
-		wall_grid_map.global_transform.basis.x.length(), 0.0001
-	)
+	return _get_body_clearance_world() / maxf(wall_grid_map.global_transform.basis.x.length(), 0.0001)
 
 
 func _get_local_body_clearance_z() -> float:
-	return _get_body_clearance_world() / maxf(
-		wall_grid_map.global_transform.basis.z.length(), 0.0001
-	)
+	return _get_body_clearance_world() / maxf(wall_grid_map.global_transform.basis.z.length(), 0.0001)
 
 
 func _get_body_clearance_world() -> float:
@@ -123,8 +105,7 @@ func _get_body_clearance_world() -> float:
 	elif collision_shape.shape is CylinderShape3D:
 		shape_radius = (collision_shape.shape as CylinderShape3D).radius
 	var horizontal_scale := maxf(
-		collision_shape.global_transform.basis.x.length(),
-		collision_shape.global_transform.basis.z.length()
+		collision_shape.global_transform.basis.x.length(), collision_shape.global_transform.basis.z.length()
 	)
 	return shape_radius * horizontal_scale + TARGET_WALL_CLEARANCE_MARGIN
 

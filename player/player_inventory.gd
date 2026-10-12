@@ -1,7 +1,6 @@
 extends Node
 class_name GDPlayerInventory
 
-
 const GOLD_COIN_ITEM_TYPE := &"gold_coin"
 const GEM_ITEM_TYPES: Array[StringName] = [
 	&"diamond",
@@ -166,10 +165,7 @@ func _spawn_dropped_item(item: Resource) -> bool:
 
 
 func _get_varied_drop_direction(back: Vector3) -> Vector3:
-	var angle := drop_position_rng.randf_range(
-		-DROP_DIRECTION_VARIANCE_RADIANS,
-		DROP_DIRECTION_VARIANCE_RADIANS
-	)
+	var angle := drop_position_rng.randf_range(-DROP_DIRECTION_VARIANCE_RADIANS, DROP_DIRECTION_VARIANCE_RADIANS)
 	return back.rotated(Vector3.UP, angle).normalized()
 
 

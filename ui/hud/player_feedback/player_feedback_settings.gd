@@ -4,11 +4,11 @@ extends Resource
 ## Shared controller configuration for player-authored Codex feedback markers.
 
 enum FeedbackButton {
-    Disabled = -1,
-    FaceBottom = JOY_BUTTON_A,
-    FaceRight = JOY_BUTTON_B,
-    FaceLeft = JOY_BUTTON_X,
-    FaceTop = JOY_BUTTON_Y,
+	Disabled = -1,
+	FaceBottom = JOY_BUTTON_A,
+	FaceRight = JOY_BUTTON_B,
+	FaceLeft = JOY_BUTTON_X,
+	FaceTop = JOY_BUTTON_Y,
 }
 
 ## Controller button that pauses play and opens feedback for the current moment.
@@ -33,20 +33,17 @@ enum FeedbackButton {
 @export_range(1.0, 25.0, 1.0) var maximum_playback_mebibytes := 5.0
 
 
-static func get_button_from_name(
-    button_name: String,
-    fallback: FeedbackButton
-) -> FeedbackButton:
-    match button_name.strip_edges().to_lower():
-        "cross", "a", "bottom":
-            return FeedbackButton.FaceBottom
-        "circle", "b", "right":
-            return FeedbackButton.FaceRight
-        "square", "x", "left":
-            return FeedbackButton.FaceLeft
-        "triangle", "y", "top":
-            return FeedbackButton.FaceTop
-        "disabled", "none":
-            return FeedbackButton.Disabled
-        _:
-            return fallback
+static func get_button_from_name(button_name: String, fallback: FeedbackButton) -> FeedbackButton:
+	match button_name.strip_edges().to_lower():
+		"cross", "a", "bottom":
+			return FeedbackButton.FaceBottom
+		"circle", "b", "right":
+			return FeedbackButton.FaceRight
+		"square", "x", "left":
+			return FeedbackButton.FaceLeft
+		"triangle", "y", "top":
+			return FeedbackButton.FaceTop
+		"disabled", "none":
+			return FeedbackButton.Disabled
+		_:
+			return fallback

@@ -29,9 +29,7 @@ func configure(
 func set_render_effect(value: GDKillBoundary2Settings.RenderEffect) -> void:
 	render_effect = value
 	var audio_path := (
-		GHOST_BOUNDARY_SOUND_PATH
-		if value == GDKillBoundary2Settings.RenderEffect.Ghost
-		else NEAR_FLAMES_SOUND_PATH
+		GHOST_BOUNDARY_SOUND_PATH if value == GDKillBoundary2Settings.RenderEffect.Ghost else NEAR_FLAMES_SOUND_PATH
 	)
 	var loaded_stream := GDAudio.load_stream(audio_path)
 	if loaded_stream != null:
@@ -54,11 +52,7 @@ func set_effects_enabled(value: bool) -> void:
 
 
 func update_proximity(delta: float) -> void:
-	if Engine.is_editor_hint() \
-			or not effects_enabled \
-			or settings == null \
-			or geometry == null \
-			or not is_inside_tree():
+	if Engine.is_editor_hint() or not effects_enabled or settings == null or geometry == null or not is_inside_tree():
 		return
 	var closest_distance := INF
 	for body_value in get_tree().get_nodes_in_group(FLAME_VULNERABLE_GROUP):
@@ -69,21 +63,12 @@ func update_proximity(delta: float) -> void:
 		closest_distance = minf(closest_distance, maxf(signed_distance, 0.0))
 	var target_volume := settings.near_flame_audio_min_db
 	if closest_distance < INF:
-		var closeness := (
-			1.0
-			- clampf(closest_distance / maxf(settings.near_flame_audio_distance, 0.001), 0.0, 1.0)
-		)
+		var closeness := 1.0 - clampf(closest_distance / maxf(settings.near_flame_audio_distance, 0.001), 0.0, 1.0)
 		closeness = pow(closeness, settings.near_flame_audio_curve)
-		target_volume = lerpf(
-			settings.near_flame_audio_min_db, settings.near_flame_audio_max_db, closeness
-		)
+		target_volume = lerpf(settings.near_flame_audio_min_db, settings.near_flame_audio_max_db, closeness)
 	var ratio := 1.0 - exp(-settings.near_flame_audio_lag * maxf(delta, 0.0))
 	volume_db = lerpf(volume_db, _adjusted_volume(target_volume), ratio)
 
 
 func _adjusted_volume(value: float) -> float:
-	return (
-		value + GHOST_VOLUME_BOOST_DB
-		if render_effect == GDKillBoundary2Settings.RenderEffect.Ghost
-		else value
-	)
+	return value + GHOST_VOLUME_BOOST_DB if render_effect == GDKillBoundary2Settings.RenderEffect.Ghost else value

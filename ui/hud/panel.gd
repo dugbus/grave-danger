@@ -130,10 +130,7 @@ func _sync_screen_container() -> void:
 	var viewport_size := size
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		viewport_size = get_viewport_rect().size
-	var scale_factor := minf(
-		viewport_size.x / reference_screen_size.x,
-		viewport_size.y / reference_screen_size.y
-	)
+	var scale_factor := minf(viewport_size.x / reference_screen_size.x, viewport_size.y / reference_screen_size.y)
 	var scaled_size := reference_screen_size * scale_factor
 	screen_container.position = (viewport_size - scaled_size) * 0.5
 	screen_container.size = reference_screen_size

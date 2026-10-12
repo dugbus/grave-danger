@@ -8,14 +8,8 @@ const SCENE := preload("res://placeables/kill-boundary-2/kill_boundary_2.tscn")
 func run(_tree: SceneTree) -> void:
 	expect_script_contract(SUBJECT, SUBJECT_PATH)
 	var boundary := SCENE.instantiate() as GDKillBoundary2
-	expect(
-		boundary.is_in_group(&"kill_boundary"),
-		"Kill Boundary 2 joins the existing discovery group."
-	)
-	expect(
-		boundary.get_class() == "Node",
-		"The boundary root has no spatial transform or transform gizmo."
-	)
+	expect(boundary.is_in_group(&"kill_boundary"), "Kill Boundary 2 joins the existing discovery group.")
+	expect(boundary.get_class() == "Node", "The boundary root has no spatial transform or transform gizmo.")
 	expect(
 		boundary.sequence.get_pose(0) is GDKillBoundary2Pose,
 		"Authored poses are selectable Node3D children in the scene tree."
@@ -41,11 +35,13 @@ func run(_tree: SceneTree) -> void:
 	)
 	var source := (SUBJECT as Script).get_source_code()
 	expect(
-		source.contains("Turn this off when another level event")
-		and source.contains("Single Shot stays at the final pose")
-		and source.contains("None is useful for an invisible hazard")
-		and source.contains("Lower values keep the")
-		and source.contains("camera closer; raise it"),
+		(
+			source.contains("Turn this off when another level event")
+			and source.contains("Single Shot stays at the final pose")
+			and source.contains("None is useful for an invisible hazard")
+			and source.contains("Lower values keep the")
+			and source.contains("camera closer; raise it")
+		),
 		"Boundary-wide Inspector settings explain when to change them and the resulting effect."
 	)
 	for compatibility_method in [

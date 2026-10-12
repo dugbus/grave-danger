@@ -8,9 +8,7 @@ const NAVIGATION_BOOTSTRAP := preload("res://game/navigation_bootstrap.gd")
 const RUN_RECORDER_SCRIPT := preload("res://game/run_recorder.gd")
 const CODEX_SESSION_OPTIONS := preload("res://game/codex_session_options.gd")
 const SCENE_LOADER_SCRIPT := preload("res://autoload/scene_loader.gd")
-const PLAYER_FEEDBACK_SETTINGS := preload(
-	"res://ui/hud/player_feedback/player_feedback_settings.gd"
-)
+const PLAYER_FEEDBACK_SETTINGS := preload("res://ui/hud/player_feedback/player_feedback_settings.gd")
 
 const CURRENT_LEVEL_NAME := "CurrentLevel"
 const PLAYTHROUGH_POSITION_CAPTURE_PATH := ^"PlaythroughPositionCapture"
@@ -131,19 +129,20 @@ func _begin_run_recording() -> void:
 	run_recorder = RUN_RECORDER_SCRIPT.new() as RUN_RECORDER_SCRIPT
 	run_recorder.name = "RunRecorder"
 	add_child(run_recorder)
-	run_recorder.repository_feedback_status.connect(
-		_on_repository_feedback_status
-	)
-	run_recorder.begin_recording(
-		level_selection.get_selected_level_id(),
-		player,
-		get_viewport().get_camera_3d(),
-		level_selection,
-		current_level,
-		{
-			"shop_purchases": level_selection.shop_purchases.duplicate(true),
-		},
-		_get_codex_session_context()
+	run_recorder.repository_feedback_status.connect(_on_repository_feedback_status)
+	(
+		run_recorder
+		. begin_recording(
+			level_selection.get_selected_level_id(),
+			player,
+			get_viewport().get_camera_3d(),
+			level_selection,
+			current_level,
+			{
+				"shop_purchases": level_selection.shop_purchases.duplicate(true),
+			},
+			_get_codex_session_context()
+		)
 	)
 	var feedback_hud := get_node_or_null("PlayerFeedback")
 	if feedback_hud != null:
@@ -154,15 +153,13 @@ func _configure_codex_directed_test() -> bool:
 	codex_session_options = CODEX_SESSION_OPTIONS.parse(OS.get_cmdline_user_args())
 	for error: String in codex_session_options.get("errors", []) as Array[String]:
 		push_warning(error)
-	if int(codex_session_options.get(
-		"mode",
-		CODEX_SESSION_OPTIONS.SessionMode.Disabled
-	)) != CODEX_SESSION_OPTIONS.SessionMode.DirectedTest:
+	if (
+		int(codex_session_options.get("mode", CODEX_SESSION_OPTIONS.SessionMode.Disabled))
+		!= CODEX_SESSION_OPTIONS.SessionMode.DirectedTest
+	):
 		return true
 	if not bool(codex_session_options.get("confirmed", false)):
-		push_error(
-			"Codex directed test refused to start without explicit user readiness confirmation."
-		)
+		push_error("Codex directed test refused to start without explicit user readiness confirmation.")
 		get_tree().quit(4)
 		return false
 
@@ -180,23 +177,21 @@ func _configure_codex_directed_test() -> bool:
 
 
 func _show_codex_test_instruction() -> void:
-	if int(codex_session_options.get(
-		"mode",
-		CODEX_SESSION_OPTIONS.SessionMode.Disabled
-	)) != CODEX_SESSION_OPTIONS.SessionMode.DirectedTest:
+	if (
+		int(codex_session_options.get("mode", CODEX_SESSION_OPTIONS.SessionMode.Disabled))
+		!= CODEX_SESSION_OPTIONS.SessionMode.DirectedTest
+	):
 		return
 	var instruction_hud := get_node_or_null("CodexTestInstruction")
 	if instruction_hud != null and instruction_hud.has_method("show_instruction"):
-		instruction_hud.show_instruction(
-			String(codex_session_options.get("instruction", ""))
-		)
+		instruction_hud.show_instruction(String(codex_session_options.get("instruction", "")))
 
 
 func _get_codex_session_context() -> Dictionary:
-	if int(codex_session_options.get(
-		"mode",
-		CODEX_SESSION_OPTIONS.SessionMode.Disabled
-	)) != CODEX_SESSION_OPTIONS.SessionMode.DirectedTest:
+	if (
+		int(codex_session_options.get("mode", CODEX_SESSION_OPTIONS.SessionMode.Disabled))
+		!= CODEX_SESSION_OPTIONS.SessionMode.DirectedTest
+	):
 		return {}
 	return {
 		"source": "codex_directed_test",
@@ -209,23 +204,25 @@ func _configure_player_feedback() -> void:
 	var feedback_hud := get_node_or_null("PlayerFeedback")
 	if feedback_hud == null:
 		return
-	if feedback_hud.has_signal("feedback_submitted") \
-			and not feedback_hud.feedback_submitted.is_connected(_on_feedback_submitted):
+	if (
+		feedback_hud.has_signal("feedback_submitted")
+		and not feedback_hud.feedback_submitted.is_connected(_on_feedback_submitted)
+	):
 		feedback_hud.feedback_submitted.connect(_on_feedback_submitted)
-	if feedback_hud.has_signal("feedback_note_submitted") \
-			and not feedback_hud.feedback_note_submitted.is_connected(
-				_on_feedback_note_submitted
-			):
+	if (
+		feedback_hud.has_signal("feedback_note_submitted")
+		and not feedback_hud.feedback_note_submitted.is_connected(_on_feedback_note_submitted)
+	):
 		feedback_hud.feedback_note_submitted.connect(_on_feedback_note_submitted)
-	if feedback_hud.has_signal("feedback_dialog_opened") \
-			and not feedback_hud.feedback_dialog_opened.is_connected(
-				_on_feedback_dialog_opened
-			):
+	if (
+		feedback_hud.has_signal("feedback_dialog_opened")
+		and not feedback_hud.feedback_dialog_opened.is_connected(_on_feedback_dialog_opened)
+	):
 		feedback_hud.feedback_dialog_opened.connect(_on_feedback_dialog_opened)
-	if feedback_hud.has_signal("feedback_dialog_closed") \
-			and not feedback_hud.feedback_dialog_closed.is_connected(
-				_on_feedback_dialog_closed
-			):
+	if (
+		feedback_hud.has_signal("feedback_dialog_closed")
+		and not feedback_hud.feedback_dialog_closed.is_connected(_on_feedback_dialog_closed)
+	):
 		feedback_hud.feedback_dialog_closed.connect(_on_feedback_dialog_closed)
 	if not feedback_hud.has_method("configure_buttons"):
 		return
@@ -233,12 +230,10 @@ func _configure_player_feedback() -> void:
 	var default_text := PLAYER_FEEDBACK_SETTINGS.FeedbackButton.Disabled
 	feedback_hud.configure_buttons(
 		PLAYER_FEEDBACK_SETTINGS.get_button_from_name(
-			String(codex_session_options.get("report_button", "square")),
-			default_report
+			String(codex_session_options.get("report_button", "square")), default_report
 		),
 		PLAYER_FEEDBACK_SETTINGS.get_button_from_name(
-			String(codex_session_options.get("text_button", "disabled")),
-			default_text
+			String(codex_session_options.get("text_button", "disabled")), default_text
 		)
 	)
 
@@ -288,10 +283,15 @@ func _capture_feedback_snapshot() -> Dictionary:
 			continue
 		var diagnostics: Variant = node.call("get_codex_diagnostics")
 		if diagnostics is Dictionary:
-			diagnostic_nodes.append({
-				"path": String(current_level.get_path_to(node)),
-				"state": diagnostics,
-			})
+			(
+				diagnostic_nodes
+				. append(
+					{
+						"path": String(current_level.get_path_to(node)),
+						"state": diagnostics,
+					}
+				)
+			)
 	return snapshot
 
 
@@ -341,11 +341,16 @@ func _start_gameplay_music() -> void:
 func _precache_result_screens() -> void:
 	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
 	if scene_loader != null:
-		scene_loader.request_scenes([
-			WIN_SCENE,
-			"res://ui/screens/lose_screen.tscn",
-			"res://ui/screens/level_select_screen.tscn",
-		])
+		(
+			scene_loader
+			. request_scenes(
+				[
+					WIN_SCENE,
+					"res://ui/screens/lose_screen.tscn",
+					"res://ui/screens/level_select_screen.tscn",
+				]
+			)
+		)
 
 
 func _configure_runtime_references() -> void:
@@ -376,8 +381,7 @@ func _configure_runtime_references() -> void:
 	var energy_hud := get_node_or_null("GameRuntime/EnergyHud")
 	if energy_hud != null and energy_hud.has_method("set_runtime_references") and player != null:
 		energy_hud.set_runtime_references(
-			player.get_node_or_null("PlayerDeath"),
-			player.get_node_or_null("PlayerInventory")
+			player.get_node_or_null("PlayerDeath"), player.get_node_or_null("PlayerInventory")
 		)
 
 	var elapsed_time_hud := get_node_or_null("GameRuntime/ElapsedTimeHud")
@@ -420,8 +424,7 @@ func _configure_runtime_cameras(root: Node, target: Node, kill_boundary: Node, m
 
 
 func _find_camera(root: Node) -> Camera3D:
-	if root is Camera3D \
-			and (not root.has_method("is_runtime_camera_enabled") or root.is_runtime_camera_enabled()):
+	if root is Camera3D and (not root.has_method("is_runtime_camera_enabled") or root.is_runtime_camera_enabled()):
 		return root as Camera3D
 
 	for child in root.get_children():
@@ -481,9 +484,10 @@ func _get_kill_boundary() -> Node:
 			providers.append(node)
 	if providers.size() > 1:
 		push_error(
-			"Level '%s' contains %d kill_boundary providers; exactly one is supported. " \
-			+ "Using the first provider in scene-tree order." \
-			% [current_level.name, providers.size()]
+			(
+				"Level '%s' contains %d kill_boundary providers; exactly one is supported. "
+				+ "Using the first provider in scene-tree order." % [current_level.name, providers.size()]
+			)
 		)
 	return providers.front() if not providers.is_empty() else null
 
@@ -521,8 +525,11 @@ func _show_win_screen() -> void:
 	var tween := SCREEN_FADE.fade_out(self, "ResultFade", win_fade_out_duration, "ResultFadeLayer")
 	await tween.finished
 
-	var change_error := await scene_loader.change_scene_to_file(WIN_SCENE) \
-		if scene_loader != null else get_tree().change_scene_to_file(WIN_SCENE)
+	var change_error := (
+		await scene_loader.change_scene_to_file(WIN_SCENE)
+		if scene_loader != null
+		else get_tree().change_scene_to_file(WIN_SCENE)
+	)
 	if change_error != OK:
 		showing_result = false
 		push_error("Could not open the win screen: %s" % error_string(change_error))

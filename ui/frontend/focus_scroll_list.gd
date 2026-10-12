@@ -47,10 +47,7 @@ func _process(delta: float) -> void:
 
 
 func configure_rows(
-	new_rows: Array[Button],
-	left_button: Button = null,
-	right_button: Button = null,
-	bottom_actions: Array[Button] = []
+	new_rows: Array[Button], left_button: Button = null, right_button: Button = null, bottom_actions: Array[Button] = []
 ) -> void:
 	rows = new_rows
 	exit_left = left_button
@@ -70,17 +67,13 @@ func configure_rows(
 		var index := focusable_indices[focus_position]
 		var row := rows[index]
 		var previous_row := rows[focusable_indices[maxi(focus_position - 1, 0)]]
-		var next_row := rows[
-			focusable_indices[mini(focus_position + 1, focusable_indices.size() - 1)]
-		]
+		var next_row := rows[focusable_indices[mini(focus_position + 1, focusable_indices.size() - 1)]]
 		row.focus_neighbor_top = row.get_path_to(previous_row)
 		row.focus_neighbor_bottom = row.get_path_to(next_row)
 		row.focus_previous = row.get_path_to(previous_row)
 		row.focus_next = row.get_path_to(next_row)
-		row.focus_neighbor_left = row.get_path_to(exit_left) if exit_left != null \
-			else row.get_path_to(row)
-		row.focus_neighbor_right = row.get_path_to(exit_right) if exit_right != null \
-			else row.get_path_to(row)
+		row.focus_neighbor_left = row.get_path_to(exit_left) if exit_left != null else row.get_path_to(row)
+		row.focus_neighbor_right = row.get_path_to(exit_right) if exit_right != null else row.get_path_to(row)
 		if not row.focus_entered.is_connected(_on_row_focused.bind(index)):
 			row.focus_entered.connect(_on_row_focused.bind(index))
 
@@ -149,11 +142,7 @@ func move_focus(direction: Vector2i) -> void:
 		if direction.y < 0:
 			focus_selected_or_last_row()
 		elif direction.x != 0:
-			var next_action_index := clampi(
-				focused_action_index + signi(direction.x),
-				0,
-				exit_actions.size() - 1
-			)
+			var next_action_index := clampi(focused_action_index + signi(direction.x), 0, exit_actions.size() - 1)
 			exit_actions[next_action_index].grab_focus()
 		return
 
@@ -210,8 +199,7 @@ func scroll_row_into_view(index: int, center := false) -> void:
 		if row_rect.end.y > viewport_rect.end.y - scaled_margin:
 			target_scroll += (row_rect.end.y - viewport_rect.end.y + scaled_margin) / vertical_scale
 		elif row_rect.position.y < viewport_rect.position.y + scaled_margin:
-			target_scroll -= (viewport_rect.position.y + scaled_margin - row_rect.position.y) \
-				/ vertical_scale
+			target_scroll -= (viewport_rect.position.y + scaled_margin - row_rect.position.y) / vertical_scale
 
 	var scroll_bar := get_v_scroll_bar()
 	var maximum_scroll := maxf(scroll_bar.max_value - scroll_bar.page, 0.0)
@@ -225,12 +213,7 @@ func scroll_row_into_view(index: int, center := false) -> void:
 	scroll_tween = create_tween()
 	scroll_tween.set_trans(Tween.TRANS_QUART)
 	scroll_tween.set_ease(Tween.EASE_OUT)
-	scroll_tween.tween_method(
-		_set_scroll_vertical,
-		float(scroll_vertical),
-		target_scroll,
-		focus_scroll_duration
-	)
+	scroll_tween.tween_method(_set_scroll_vertical, float(scroll_vertical), target_scroll, focus_scroll_duration)
 
 
 func _on_row_focused(index: int) -> void:

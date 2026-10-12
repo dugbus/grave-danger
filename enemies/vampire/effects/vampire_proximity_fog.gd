@@ -1,7 +1,6 @@
 extends CanvasLayer
 class_name GDVampireProximityFog
 
-
 const FOG_CANVAS_LAYER := 2
 
 ## Full-screen rectangle containing the purple fog shader material.
@@ -31,19 +30,25 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if suppressed:
 		return
-	if vampire == null or player == null or settings == null \
-		or not is_instance_valid(vampire) or not is_instance_valid(player):
+	if (
+		vampire == null
+		or player == null
+		or settings == null
+		or not is_instance_valid(vampire)
+		or not is_instance_valid(player)
+	):
 		target_intensity = 0.0
 	else:
-		var horizontal_distance := Vector2(
-			vampire.global_position.x - player.global_position.x,
-			vampire.global_position.z - player.global_position.z
-		).length()
+		var horizontal_distance := (
+			Vector2(
+				vampire.global_position.x - player.global_position.x,
+				vampire.global_position.z - player.global_position.z
+			)
+			. length()
+		)
 		target_intensity = calculate_intensity(horizontal_distance)
 
-	var smooth_weight := 1.0 - exp(-settings.proximity_fog_response_speed * delta) \
-		if settings != null \
-		else 1.0
+	var smooth_weight := 1.0 - exp(-settings.proximity_fog_response_speed * delta) if settings != null else 1.0
 	visible_intensity = lerpf(visible_intensity, target_intensity, smooth_weight)
 	_apply_intensity()
 
@@ -61,11 +66,7 @@ func calculate_intensity(distance: float) -> float:
 
 	var start_distance: float = settings.proximity_fog_distance
 	var full_distance: float = minf(settings.proximity_fog_full_distance, start_distance - 0.01)
-	var distance_ratio := clampf(
-		(start_distance - distance) / maxf(start_distance - full_distance, 0.01),
-		0.0,
-		1.0
-	)
+	var distance_ratio := clampf((start_distance - distance) / maxf(start_distance - full_distance, 0.01), 0.0, 1.0)
 	var eased_ratio := distance_ratio * distance_ratio * (3.0 - 2.0 * distance_ratio)
 	return eased_ratio * settings.proximity_fog_max_intensity
 

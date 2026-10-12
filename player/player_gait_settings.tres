@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="GDPlayerGaitSettings" format=3 uid="uid://dfs84ahdimxhx"]
+
+[ext_resource type="Script" uid="uid://v37xknrul3f1" path="res://player/player_gait_settings.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+foot_plant_blend_fraction = 0.25

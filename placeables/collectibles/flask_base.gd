@@ -36,7 +36,6 @@
 extends "res://placeables/physics_placeable.gd"
 class_name GDFlaskBase
 
-
 const DRINKING_SOUND := preload("res://Assets/audio/drinking-liquid.mp3")
 const FLASK_IMPACT_SOUND_PATH := "res://Assets/audio/flask-hits-ground.mp3"
 const IMPACT_AUDIO_NAME := "FlaskImpactAudio"
@@ -95,13 +94,11 @@ const FLASK_PROPERTIES := preload("res://placeables/collectibles/global_flask_pr
 # Whether this flask should display a countdown timer.
 @export var show_hud_countdown := false
 
-
 # Root visual node that is animated.
 @onready var visual: Node3D = $Visual
 
 # Pickup trigger area.
 @onready var pickup_area: Area3D = $PickupArea
-
 
 # Prevents multiple collection attempts.
 var is_being_collected := false
@@ -287,12 +284,12 @@ func _collect() -> void:
 	_play_pickup_sound()
 
 	var tween := create_tween()
-	tween.tween_property(
-		visual,
-		"scale",
-		Vector3.ZERO,
-		maxf(collect_shrink_duration, 0.01)
-	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	(
+		tween
+		. tween_property(visual, "scale", Vector3.ZERO, maxf(collect_shrink_duration, 0.01))
+		. set_trans(Tween.TRANS_BACK)
+		. set_ease(Tween.EASE_IN)
+	)
 
 	await tween.finished
 
@@ -337,13 +334,7 @@ func _show_hud_countdown(body: Node3D) -> void:
 	if body.has_method("show_flask_effect_countdown"):
 		body.show_flask_effect_countdown(effect_id, liquid_color, duration)
 	else:
-		get_tree().call_group(
-			"active_flask_hud",
-			"show_flask_effect",
-			effect_id,
-			liquid_color,
-			duration
-		)
+		get_tree().call_group("active_flask_hud", "show_flask_effect", effect_id, liquid_color, duration)
 
 
 # Applies the configured liquid colour to all matching materials.

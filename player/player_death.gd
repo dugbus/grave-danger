@@ -18,7 +18,6 @@ enum DeathCause {
 	NonFireBoundary,
 }
 
-
 # Death is isolated so hazards only need one public Player method while the
 # component owns the one-way transition into the death state.
 
@@ -26,6 +25,8 @@ enum DeathCause {
 @export var animation_controller_path: NodePath = ^"../PlayerAnimation"
 ## Node that adds cause-specific fire or blood effects and visible twitching to the death animation.
 @export var death_effects_path: NodePath = ^"../PlayerDeathEffects"
+## Attention controller released before the death animation takes ownership of the head.
+@export var attention_path: NodePath = ^"../PlayerAttention"
 ## Scene loaded after the death delay and fade complete.
 @export var lose_scene := "res://ui/screens/lose_screen.tscn"
 ## Seconds to wait after death before starting the lose-screen fade.
@@ -38,6 +39,7 @@ enum DeathCause {
 @onready var player := get_parent() as CharacterBody3D
 @onready var animation_controller: Node = get_node_or_null(animation_controller_path)
 @onready var death_effects: Node = get_node_or_null(death_effects_path)
+@onready var attention := get_node_or_null(attention_path) as GDPlayerAttention
 
 var is_dead := false
 var showing_lose_screen := false
@@ -67,10 +69,7 @@ func apply_percent_damage(percent_of_max: float) -> void:
 	if max_flame_energy <= 0.0:
 		return
 
-	_apply_damage(
-		max_flame_energy * maxf(percent_of_max, 0.0) * 0.01,
-		DeathCause.SpikeTrap
-	)
+	_apply_damage(max_flame_energy * maxf(percent_of_max, 0.0) * 0.01, DeathCause.SpikeTrap)
 
 
 func drain_flame_energy() -> void:
@@ -164,6 +163,8 @@ func _die(death_cause: DeathCause) -> void:
 		# gravity/deceleration while the player remains dead.
 		player.velocity = Vector3.ZERO
 
+	if attention != null:
+		attention.stop_tracking()
 	if animation_controller != null:
 		animation_controller.play_death()
 	if death_effects != null:
@@ -206,8 +207,11 @@ func _show_lose_screen_after_death() -> void:
 	await tween.finished
 
 	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
-	var change_error := await scene_loader.change_scene_to_file(lose_scene) \
-		if scene_loader != null else get_tree().change_scene_to_file(lose_scene)
+	var change_error := (
+		await scene_loader.change_scene_to_file(lose_scene)
+		if scene_loader != null
+		else get_tree().change_scene_to_file(lose_scene)
+	)
 	if change_error != OK:
 		showing_lose_screen = false
 		push_error("Could not open the lose screen: %s" % error_string(change_error))

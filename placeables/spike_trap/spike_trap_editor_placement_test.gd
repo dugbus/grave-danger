@@ -16,10 +16,7 @@ func _test_socket_plane_uses_fixed_height(tree: SceneTree) -> void:
 	spike_trap.add_child(subject as Node)
 	tree.root.add_child(spike_trap)
 
-	expect(
-		subject.apply_fixed_height(),
-		"The editor placement helper can correct a floating spike trap."
-	)
+	expect(subject.apply_fixed_height(), "The editor placement helper can correct a floating spike trap.")
 	expect(
 		is_equal_approx(spike_trap.position.y, subject.fixed_height),
 		"The editor placement helper puts the spike-trap socket plane at its fixed height."

@@ -1,7 +1,6 @@
 extends Control
 class_name GDActiveFlaskHud
 
-
 const EFFECT_SLOT_SCENE := preload("res://ui/hud/active_flask_effect_slot.tscn")
 const LIQUID_MATERIAL_NAME := "FlaskLiquidMaterial"
 const SLOT_SIZE := Vector2(328.0, 408.0)
@@ -64,12 +63,17 @@ func show_flask_effect(effect_id: StringName, color: Color, duration: float) -> 
 
 	var slot := _create_effect_slot(color, _get_effect_label(effect_id))
 	container.add_child(slot["root"])
-	active_effects.append({
-		"remaining": duration,
-		"root": slot["root"],
-		"visual": slot["visual"],
-		"label": slot["label"],
-	})
+	(
+		active_effects
+		. append(
+			{
+				"remaining": duration,
+				"root": slot["root"],
+				"visual": slot["visual"],
+				"label": slot["label"],
+			}
+		)
+	)
 	(slot["label"] as Label).text = _format_time(duration)
 
 

@@ -3,9 +3,7 @@ extends "res://tests/test_case.gd"
 const SIMPLE_GRASS_SCRIPT := preload("res://addons/simplegrasstextured/grass.gd")
 const SUBJECT := preload("res://levels/vampire-maze/generated_maze/generated_grass.gd")
 const SUBJECT_PATH := "res://levels/vampire-maze/generated_maze/generated_grass.gd"
-const SUBJECT_SCENE := preload(
-	"res://levels/vampire-maze/generated_maze/generated_grass.tscn"
-)
+const SUBJECT_SCENE := preload("res://levels/vampire-maze/generated_maze/generated_grass.tscn")
 const FLOOR_SURFACE_SCENE := preload("res://addons/floor_surface/floor_surface.tscn")
 const FLOOR_MAP_SCRIPT := preload("res://addons/floor_surface/floor_map.gd")
 const FLOOR_PROFILE := preload("res://addons/floor_surface/default_floor_elevation_profile.tres")
@@ -51,16 +49,9 @@ func run(tree: SceneTree) -> void:
 		Vector2i(5, 5): true,
 		Vector2i(6, 5): true,
 	}
-	var first_result := grass.call(
-		&"populate",
-		floor_cells,
-		floor_surface,
-		excluded_cells,
-		4107,
-		25.0,
-		4.5,
-		3
-	) as Dictionary
+	var first_result := (
+		grass.call(&"populate", floor_cells, floor_surface, excluded_cells, 4107, 25.0, 4.5, 3) as Dictionary
+	)
 	var first_cells := first_result.get("cells", []) as Array
 	var first_blade_counts := first_result.get("blade_counts", {}) as Dictionary
 	var cells_with_selected_neighbours := 0
@@ -71,72 +62,59 @@ func run(tree: SceneTree) -> void:
 				cells_with_selected_neighbours += 1
 				break
 	var first_buffer := grass.multimesh.buffer.duplicate()
-	var repeated_result := grass.call(
-		&"populate",
-		floor_cells,
-		floor_surface,
-		excluded_cells,
-		4107,
-		25.0,
-		4.5,
-		3
-	) as Dictionary
+	var repeated_result := (
+		grass.call(&"populate", floor_cells, floor_surface, excluded_cells, 4107, 25.0, 4.5, 3) as Dictionary
+	)
 	var repeated_buffer := grass.multimesh.buffer.duplicate()
-	var changed_result := grass.call(
-		&"populate",
-		floor_cells,
-		floor_surface,
-		excluded_cells,
-		4108,
-		25.0,
-		4.5,
-		3
-	) as Dictionary
+	var changed_result := (
+		grass.call(&"populate", floor_cells, floor_surface, excluded_cells, 4108, 25.0, 4.5, 3) as Dictionary
+	)
 	var material := grass.material_override as ShaderMaterial
 	var grass_script := grass.get_script() as Script
 	expect(
-		(first_result.get("errors", []) as Array).is_empty() \
-			and first_cells.size() == 35 \
-			and cells_with_selected_neighbours >= 30 \
-			and not first_cells.has(Vector2i(5, 5)) \
-			and not first_cells.has(Vector2i(6, 5)) \
-			and not first_cells.has(Vector2i(11, 11)) \
-			and first_blade_counts.values().min() == 1 \
-			and first_blade_counts.values().max() == 3 \
-			and int(first_result.get("instance_count", 0)) > first_cells.size() \
-			and int(first_result.get("instance_count", 0)) < first_cells.size() * 3 \
-			and first_buffer.size() \
-				== int(first_result.get("instance_count", 0)) * 12 \
-			and repeated_result.get("cells", []) == first_cells \
-			and repeated_buffer == first_buffer \
-			and changed_result.get("cells", []) != first_cells \
-			and grass.custom_aabb.size.x > 1.0 \
-			and grass.custom_aabb.size.z > 1.0 \
-			and grass.multimesh.mesh.resource_path \
-				== "res://Assets/environment/grass-small.res" \
-			and grass_script != null \
-			and grass_script.get_base_script() == SIMPLE_GRASS_SCRIPT \
-			and grass.has_meta(&"SimpleGrassTextured") \
-			and grass.has_method(&"add_grass") \
-			and grass.has_method(&"erase") \
-			and material != null \
-			and material.shader.resource_path \
-				== "res://addons/simplegrasstextured/shaders/grass.gdshader",
+		(
+			(first_result.get("errors", []) as Array).is_empty()
+			and first_cells.size() == 35
+			and cells_with_selected_neighbours >= 30
+			and not first_cells.has(Vector2i(5, 5))
+			and not first_cells.has(Vector2i(6, 5))
+			and not first_cells.has(Vector2i(11, 11))
+			and first_blade_counts.values().min() == 1
+			and first_blade_counts.values().max() == 3
+			and int(first_result.get("instance_count", 0)) > first_cells.size()
+			and int(first_result.get("instance_count", 0)) < first_cells.size() * 3
+			and first_buffer.size() == int(first_result.get("instance_count", 0)) * 12
+			and repeated_result.get("cells", []) == first_cells
+			and repeated_buffer == first_buffer
+			and changed_result.get("cells", []) != first_cells
+			and grass.custom_aabb.size.x > 1.0
+			and grass.custom_aabb.size.z > 1.0
+			and grass.multimesh.mesh.resource_path == "res://Assets/environment/grass-small.res"
+			and grass_script != null
+			and grass_script.get_base_script() == SIMPLE_GRASS_SCRIPT
+			and grass.has_meta(&"SimpleGrassTextured")
+			and grass.has_method(&"add_grass")
+			and grass.has_method(&"erase")
+			and material != null
+			and material.shader.resource_path == "res://addons/simplegrasstextured/shaders/grass.gdshader"
+		),
 		"Generated grass uses editable addon grass with deterministic floor patches."
 	)
 	var packed_holder_scene := PackedScene.new()
 	var pack_error := packed_holder_scene.pack(holder)
 	var packed_holder := packed_holder_scene.instantiate() as Node3D
-	var packed_grass := packed_holder.get_node_or_null(^"GeneratedGrass") \
-		as MultiMeshInstance3D if packed_holder != null else null
+	var packed_grass := (
+		packed_holder.get_node_or_null(^"GeneratedGrass") as MultiMeshInstance3D if packed_holder != null else null
+	)
 	expect(
-		pack_error == OK \
-			and packed_grass != null \
-			and packed_grass.multimesh.instance_count \
-				== grass.multimesh.instance_count \
-			and packed_grass.multimesh.buffer == grass.multimesh.buffer \
-			and packed_grass.has_meta(&"SimpleGrassTextured") \
-			and packed_grass.has_method(&"add_grass"),
+		(
+			pack_error == OK
+			and packed_grass != null
+			and packed_grass.multimesh.instance_count == grass.multimesh.instance_count
+			and packed_grass.multimesh.buffer == grass.multimesh.buffer
+			and packed_grass.has_meta(&"SimpleGrassTextured")
+			and packed_grass.has_method(&"add_grass")
+		),
 		"Generated grass retains editable addon transforms when Layout is packed."
 	)
 	if packed_holder != null:
@@ -149,18 +127,17 @@ func _expect_tutorial_grass_uses_addon() -> void:
 	for tutorial_scene_path in TUTORIAL_SCENE_PATHS:
 		var tutorial_scene := load(tutorial_scene_path) as PackedScene
 		var tutorial_root := tutorial_scene.instantiate() as Node3D
-		var grass := tutorial_root.get_node_or_null(
-			^"Layout/GeneratedContent/GeneratedGrass"
-		) as MultiMeshInstance3D
+		var grass := tutorial_root.get_node_or_null(^"Layout/GeneratedContent/GeneratedGrass") as MultiMeshInstance3D
 		var grass_script := grass.get_script() as Script if grass != null else null
 		expect(
-			grass != null \
-				and grass_script != null \
-				and grass_script.get_base_script() == SIMPLE_GRASS_SCRIPT \
-				and grass.has_meta(&"SimpleGrassTextured") \
-				and grass.has_method(&"add_grass") \
-				and grass.has_method(&"erase"),
-			"%s keeps its generated grass editable with the addon tools." \
-				% tutorial_scene_path
+			(
+				grass != null
+				and grass_script != null
+				and grass_script.get_base_script() == SIMPLE_GRASS_SCRIPT
+				and grass.has_meta(&"SimpleGrassTextured")
+				and grass.has_method(&"add_grass")
+				and grass.has_method(&"erase")
+			),
+			"%s keeps its generated grass editable with the addon tools." % tutorial_scene_path
 		)
 		tutorial_root.free()

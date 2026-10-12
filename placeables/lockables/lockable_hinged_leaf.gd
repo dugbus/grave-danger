@@ -1,7 +1,6 @@
 extends RigidBody3D
 class_name GDLockableHingedLeaf
 
-
 const WORLD_COLLISION_LAYER := 1
 const PLAYER_COLLISION_LAYER := 2
 const MIN_PUSH_SPEED_SQUARED := 0.01

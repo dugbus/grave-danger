@@ -26,20 +26,13 @@ var transitioning := false
 var analog_x_armed := true
 
 @onready var percentage_value_label := (
-	get_node(
-		"ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/PercentageValueLabel"
-	)
-	as Label
+	get_node("ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/PercentageValueLabel") as Label
 )
 @onready var treasure_tiles := (
-	get_node("ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles")
-	as HFlowContainer
+	get_node("ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/TreasureTiles") as HFlowContainer
 )
 @onready var content_separator := (
-	get_node(
-		"ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/ContentSeparator"
-	)
-	as TextureRect
+	get_node("ScreenContainer/ResultFrame/Content/ResultContentCenter/ResultContent/ContentSeparator") as TextureRect
 )
 @onready var back_button := get_node("ScreenContainer/BottomActions/BackButton") as Button
 @onready var secondary_button := get_node("ScreenContainer/BottomActions/SecondaryButton") as Button
@@ -52,9 +45,7 @@ func _ready() -> void:
 	_update_result_details(displayed_treasure)
 	_bind_actions()
 	_precache_result_actions()
-	SCREEN_FADE.fade_in(
-		self, "ResultFade", fade_duration, Color.BLACK, FADE_LAYER_NAME, FADE_LAYER_INDEX
-	)
+	SCREEN_FADE.fade_in(self, "ResultFade", fade_duration, Color.BLACK, FADE_LAYER_NAME, FADE_LAYER_INDEX)
 	_focus_default_action.call_deferred()
 
 
@@ -111,9 +102,7 @@ func _update_result_details(displayed_treasure: Dictionary) -> void:
 		if quantity_label != null:
 			quantity_label.text = "x%d" % quantity
 		tile.visible = quantity > 0
-		tile.modulate = (
-			Color.WHITE if outcome == ResultOutcome.Win else Color(0.46, 0.46, 0.46, 1.0)
-		)
+		tile.modulate = (Color.WHITE if outcome == ResultOutcome.Win else Color(0.46, 0.46, 0.46, 1.0))
 		if tile.visible:
 			visible_tile_count += 1
 
@@ -131,10 +120,7 @@ func _record_level_result() -> Dictionary:
 	if level_selection == null:
 		return attempt_treasure if outcome == ResultOutcome.Lose else {}
 	var newly_recovered := level_selection.record_selected_level_result(
-		stats.treasure_collected,
-		stats.get_completion_percentage(),
-		outcome == ResultOutcome.Win,
-		attempt_treasure
+		stats.treasure_collected, stats.get_completion_percentage(), outcome == ResultOutcome.Win, attempt_treasure
 	)
 	return newly_recovered if outcome == ResultOutcome.Win else attempt_treasure
 
@@ -158,22 +144,21 @@ func _change_scene(scene_path: String) -> void:
 	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
 	if scene_loader != null:
 		scene_loader.request_scene(scene_path)
-	var tween := SCREEN_FADE.fade_out(
-		self, "ResultFade", fade_duration, FADE_LAYER_NAME, FADE_LAYER_INDEX
-	)
+	var tween := SCREEN_FADE.fade_out(self, "ResultFade", fade_duration, FADE_LAYER_NAME, FADE_LAYER_INDEX)
 	await tween.finished
 	if scene_loader != null and scene_path == GAME_SCENE_PATH:
 		var level_selection := get_node_or_null("/root/LevelSelection") as GDLevelSelection
 		if level_selection != null:
-			var selected_scene := await scene_loader.load_scene(
-				level_selection.get_selected_level_scene_path()
-			)
+			var selected_scene := await scene_loader.load_scene(level_selection.get_selected_level_scene_path())
 			if selected_scene == null:
 				transitioning = false
 				push_error("Could not prepare the selected level for retry.")
 				return
-	var change_error := await scene_loader.change_scene_to_file(scene_path) \
-		if scene_loader != null else get_tree().change_scene_to_file(scene_path)
+	var change_error := (
+		await scene_loader.change_scene_to_file(scene_path)
+		if scene_loader != null
+		else get_tree().change_scene_to_file(scene_path)
+	)
 	if change_error != OK:
 		transitioning = false
 		push_error("Could not leave result screen: %s" % error_string(change_error))

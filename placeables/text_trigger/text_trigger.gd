@@ -2,7 +2,6 @@
 class_name GDTextTrigger
 extends "res://placeables/area_placeable.gd"
 
-
 const TEXT_SHADER := preload("res://ui/hud/flask_effect_text.gdshader")
 const TEXT_VISUAL_LAYER := 1 << 19
 const FADE_IN_DURATION := 0.2
@@ -25,9 +24,7 @@ const DIM_OVERLAY_DISTANCE_PADDING := 0.35
 @export var trigger_size := Vector3.ONE:
 	set(value):
 		trigger_size = Vector3(
-			maxf(value.x, MIN_TRIGGER_SIZE),
-			maxf(value.y, MIN_TRIGGER_SIZE),
-			maxf(value.z, MIN_TRIGGER_SIZE)
+			maxf(value.x, MIN_TRIGGER_SIZE), maxf(value.y, MIN_TRIGGER_SIZE), maxf(value.z, MIN_TRIGGER_SIZE)
 		)
 		_apply_trigger_size()
 @export_group("Detection")
@@ -338,15 +335,15 @@ func _update_transform() -> void:
 	var camera_basis := camera.global_transform.basis
 	var perspective_basis := camera_basis
 	perspective_basis = perspective_basis.rotated(perspective_basis.y.normalized(), deg_to_rad(perspective_yaw_degrees))
-	perspective_basis = perspective_basis.rotated(perspective_basis.x.normalized(), deg_to_rad(perspective_pitch_degrees))
+	perspective_basis = perspective_basis.rotated(
+		perspective_basis.x.normalized(), deg_to_rad(perspective_pitch_degrees)
+	)
 
 	heading_text_mesh_instance.global_transform = Transform3D(
-		perspective_basis,
-		base_position + camera_basis.y.normalized() * heading_y_offset
+		perspective_basis, base_position + camera_basis.y.normalized() * heading_y_offset
 	)
 	body_text_mesh_instance.global_transform = Transform3D(
-		perspective_basis,
-		base_position + camera_basis.y.normalized() * body_y_offset
+		perspective_basis, base_position + camera_basis.y.normalized() * body_y_offset
 	)
 	_update_dim_overlay(camera)
 	_update_text_light(camera, base_position)
@@ -393,8 +390,7 @@ func _update_dim_overlay(camera: Camera3D) -> void:
 
 	dim_overlay_mesh.size = Vector2(half_width * 2.0, half_height * 2.0)
 	dim_overlay_mesh_instance.global_transform = Transform3D(
-		camera_basis,
-		camera.global_position - camera_basis.z.normalized() * distance
+		camera_basis, camera.global_position - camera_basis.z.normalized() * distance
 	)
 
 
@@ -459,10 +455,12 @@ func _is_continue_input(event: InputEvent) -> bool:
 		return joypad_event.pressed and joypad_event.button_index == JOY_BUTTON_A
 
 	var key_event := event as InputEventKey
-	return key_event != null \
-		and key_event.pressed \
-		and not key_event.echo \
+	return (
+		key_event != null
+		and key_event.pressed
+		and not key_event.echo
 		and key_event.physical_keycode in [KEY_ENTER, KEY_SPACE]
+	)
 
 
 func _suppress_flask_effect_text() -> void:

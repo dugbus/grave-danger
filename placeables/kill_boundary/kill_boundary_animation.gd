@@ -24,8 +24,9 @@ func _sync_animation_player() -> void:
 		library = AnimationLibrary.new()
 		animation_player.add_animation_library("", library)
 
-	var installed_animation := library.get_animation(DEFAULT_ANIMATION_NAME) \
-		if library.has_animation(DEFAULT_ANIMATION_NAME) else null
+	var installed_animation := (
+		library.get_animation(DEFAULT_ANIMATION_NAME) if library.has_animation(DEFAULT_ANIMATION_NAME) else null
+	)
 	if installed_animation != boundary_animation:
 		if installed_animation != null:
 			animation_player.stop()
@@ -87,10 +88,7 @@ func _sync_movement_to_animation() -> void:
 	if animation_player.current_animation.is_empty():
 		return
 	var animation_position := animation_player.current_animation_position
-	var animation_is_playing_forward := (
-		animation_player.is_playing()
-		and animation_player.get_playing_speed() > 0.0
-	)
+	var animation_is_playing_forward := animation_player.is_playing() and animation_player.get_playing_speed() > 0.0
 	_update_movement_cycle_distance(animation, animation_position, animation_is_playing_forward)
 
 	_sync_boundary_scale_rotation_to_animation(animation, animation_position)
@@ -105,10 +103,7 @@ func _update_movement_cycle_distance(
 ) -> void:
 	if animation.loop_mode != Animation.LOOP_LINEAR:
 		movement_cycle_distance = 0.0
-	elif (
-		animation_is_playing_forward
-		and animation_position + 0.001 < last_animation_position
-	):
+	elif animation_is_playing_forward and animation_position + 0.001 < last_animation_position:
 		movement_cycle_distance += _calculate_travel_distance(animation, animation.length)
 
 
@@ -121,11 +116,7 @@ func _update_removed_boundary_visuals(delta: float) -> void:
 
 
 func _sync_editor_preview_animation() -> void:
-	if (
-		not Engine.is_editor_hint()
-		or not is_inside_tree()
-		or not _has_previewable_editor_path()
-	):
+	if not Engine.is_editor_hint() or not is_inside_tree() or not _has_previewable_editor_path():
 		return
 
 	var animation_player := get_node_or_null(ANIMATION_PLAYER_NAME) as AnimationPlayer
@@ -138,28 +129,19 @@ func _sync_editor_preview_animation() -> void:
 		var section_needs_update := (
 			not animation_player.has_section()
 			or not is_zero_approx(animation_player.get_section_start_time())
-			or not is_equal_approx(
-				animation_player.get_section_end_time(),
-				derived_ping_pong_end_time
-			)
+			or not is_equal_approx(animation_player.get_section_end_time(), derived_ping_pong_end_time)
 		)
 		if section_needs_update:
 			animation_player.set_section(0.0, derived_ping_pong_end_time)
 	elif animation_player.has_section():
 		animation_player.reset_section()
 	var preview_time := _get_editor_preview_time(animation_player, animation)
-	var preview_is_playing_forward := (
-		animation_player.is_playing()
-		and animation_player.get_playing_speed() > 0.0
-	)
+	var preview_is_playing_forward := animation_player.is_playing() and animation_player.get_playing_speed() > 0.0
 	if not preview_is_playing_forward:
 		movement_cycle_distance = 0.0
 	_update_movement_cycle_distance(animation, preview_time, preview_is_playing_forward)
 	_sync_boundary_scale_rotation_to_animation(animation, preview_time)
-	_set_center_progress(
-		center,
-		movement_cycle_distance + _calculate_travel_distance(animation, preview_time)
-	)
+	_set_center_progress(center, movement_cycle_distance + _calculate_travel_distance(animation, preview_time))
 	last_animation_position = preview_time
 
 
@@ -223,31 +205,17 @@ func _apply_boundary_scale_rotation() -> void:
 func _sync_boundary_scale_rotation_to_animation(animation: Animation, time: float) -> void:
 	var sample_time := clampf(time, 0.0, animation.length)
 	boundary_scale_x = _sample_float_animation_track(
-		animation,
-		BOUNDARY_SCALE_X_TRACK_PATH,
-		sample_time,
-		IDENTITY_BOUNDARY_SCALE
+		animation, BOUNDARY_SCALE_X_TRACK_PATH, sample_time, IDENTITY_BOUNDARY_SCALE
 	)
 	boundary_scale_z = _sample_float_animation_track(
-		animation,
-		BOUNDARY_SCALE_Z_TRACK_PATH,
-		sample_time,
-		IDENTITY_BOUNDARY_SCALE
+		animation, BOUNDARY_SCALE_Z_TRACK_PATH, sample_time, IDENTITY_BOUNDARY_SCALE
 	)
 	boundary_rotation_z_radians = _sample_float_animation_track(
-		animation,
-		BOUNDARY_ROTATION_Z_RADIANS_TRACK_PATH,
-		sample_time,
-		0.0
+		animation, BOUNDARY_ROTATION_Z_RADIANS_TRACK_PATH, sample_time, 0.0
 	)
 
 
-func _sample_float_animation_track(
-	animation: Animation,
-	track_path: NodePath,
-	time: float,
-	fallback: float
-) -> float:
+func _sample_float_animation_track(animation: Animation, track_path: NodePath, time: float, fallback: float) -> float:
 	var track := animation.find_track(track_path, Animation.TYPE_VALUE)
 	if track < 0 or animation.track_get_key_count(track) == 0:
 		return fallback
@@ -299,9 +267,7 @@ func _add_default_boundary_size_track(animation: Animation, track_path: NodePath
 
 
 func _upgrade_boundary_scale_rotation_tracks_from_source(
-	animation: Animation,
-	source_track: int,
-	source_has_rotation: bool
+	animation: Animation, source_track: int, source_has_rotation: bool
 ) -> void:
 	if _has_boundary_scale_rotation_tracks(animation):
 		return
@@ -334,10 +300,7 @@ func _add_boundary_value_track(animation: Animation, track_path: NodePath, sourc
 	var track := animation.add_track(Animation.TYPE_VALUE)
 	animation.track_set_path(track, track_path)
 	animation.track_set_interpolation_type(track, animation.track_get_interpolation_type(source_track))
-	animation.track_set_interpolation_loop_wrap(
-		track,
-		animation.track_get_interpolation_loop_wrap(source_track)
-	)
+	animation.track_set_interpolation_loop_wrap(track, animation.track_get_interpolation_loop_wrap(source_track))
 	return track
 
 
@@ -425,17 +388,16 @@ func _sync_path_point_animation_markers() -> void:
 
 	for existing_name_string in boundary_animation.get_marker_names():
 		var existing_name := StringName(existing_name_string)
-		if (
-			String(existing_name).begins_with(PATH_POINT_MARKER_PREFIX)
-			and not desired_markers.has(existing_name)
-		):
+		if String(existing_name).begins_with(PATH_POINT_MARKER_PREFIX) and not desired_markers.has(existing_name):
 			boundary_animation.remove_marker(existing_name)
 
 	for marker_name in desired_markers:
 		var marker_time := desired_markers[marker_name]
 		if boundary_animation.has_marker(marker_name):
 			var time_matches := is_equal_approx(boundary_animation.get_marker_time(marker_name), marker_time)
-			var color_matches := boundary_animation.get_marker_color(marker_name).is_equal_approx(PATH_POINT_MARKER_COLOR)
+			var color_matches := boundary_animation.get_marker_color(marker_name).is_equal_approx(
+				PATH_POINT_MARKER_COLOR
+			)
 			if time_matches and color_matches:
 				continue
 			boundary_animation.remove_marker(marker_name)
@@ -466,10 +428,7 @@ func _ensure_animation_reaches_path_end(animation: Animation) -> bool:
 		return false
 
 	var final_speed := _sample_float_animation_track(
-		animation,
-		MOVEMENT_SPEED_TRACK_PATH,
-		animation.length,
-		movement_speed
+		animation, MOVEMENT_SPEED_TRACK_PATH, animation.length, movement_speed
 	)
 	final_speed = maxf(final_speed, 0.0)
 	if final_speed <= 0.0001:
@@ -491,10 +450,7 @@ func _update_path_point_animation_markers(delta: float) -> void:
 		return
 
 	editor_path_marker_stable_time += delta
-	if (
-		editor_path_marker_stable_time < EDITOR_PATH_MARKER_REFRESH_DELAY
-		or not _is_editor_animation_edit_safe()
-	):
+	if editor_path_marker_stable_time < EDITOR_PATH_MARKER_REFRESH_DELAY or not _is_editor_animation_edit_safe():
 		return
 
 	_sync_path_point_animation_markers()
@@ -520,10 +476,7 @@ func _update_speed_change_ripple_retime(delta: float) -> void:
 		return
 
 	editor_speed_stable_time += delta
-	if (
-		editor_speed_stable_time < EDITOR_PATH_MARKER_REFRESH_DELAY
-		or not _is_editor_animation_edit_safe()
-	):
+	if editor_speed_stable_time < EDITOR_PATH_MARKER_REFRESH_DELAY or not _is_editor_animation_edit_safe():
 		return
 
 	if ripple_retime_after_speed_key_edit:

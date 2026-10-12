@@ -9,7 +9,9 @@ func _ready() -> void:
 	_configure_path_follow()
 	_sync_animation_player()
 	if boundary_animation != null:
-		_sync_boundary_scale_rotation_to_animation(boundary_animation, _get_first_animation_key_time(boundary_animation))
+		_sync_boundary_scale_rotation_to_animation(
+			boundary_animation, _get_first_animation_key_time(boundary_animation)
+		)
 	_apply_boundary_scale_rotation()
 	_create_flame_material()
 	_create_ghost_material()
@@ -166,10 +168,7 @@ func expand_runtime_bounds_percent(percent: float) -> bool:
 
 
 func expand_runtime_bounds_percent_for(
-	percent: float,
-	active_seconds: float,
-	expansion_transition_seconds: float,
-	contraction_transition_seconds := -1.0
+	percent: float, active_seconds: float, expansion_transition_seconds: float, contraction_transition_seconds := -1.0
 ) -> bool:
 	if boundary_removed_for_level or not _runtime_effects_enabled():
 		return false
@@ -179,17 +178,11 @@ func expand_runtime_bounds_percent_for(
 		return false
 
 	active_runtime_bounds_multipliers.append(multiplier)
-	_animate_runtime_bounds_multiplier(
-		_get_target_runtime_bounds_multiplier(),
-		expansion_transition_seconds
+	_animate_runtime_bounds_multiplier(_get_target_runtime_bounds_multiplier(), expansion_transition_seconds)
+	var resolved_contraction_seconds := (
+		contraction_transition_seconds if contraction_transition_seconds >= 0.0 else expansion_transition_seconds
 	)
-	var resolved_contraction_seconds := contraction_transition_seconds \
-		if contraction_transition_seconds >= 0.0 else expansion_transition_seconds
-	_restore_runtime_bounds_after(
-		multiplier,
-		active_seconds,
-		resolved_contraction_seconds
-	)
+	_restore_runtime_bounds_after(multiplier, active_seconds, resolved_contraction_seconds)
 	return true
 
 
@@ -280,11 +273,7 @@ func begin_runtime_animation() -> void:
 
 func _play_boundary_animation(animation_player: AnimationPlayer) -> void:
 	if ping_pong_boundary_animation and derived_ping_pong_end_time > 0.0:
-		animation_player.play_section(
-			DEFAULT_ANIMATION_NAME,
-			0.0,
-			derived_ping_pong_end_time
-		)
+		animation_player.play_section(DEFAULT_ANIMATION_NAME, 0.0, derived_ping_pong_end_time)
 		return
 
 	if animation_player.has_section():

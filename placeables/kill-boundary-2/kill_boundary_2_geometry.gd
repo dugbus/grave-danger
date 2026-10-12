@@ -27,13 +27,9 @@ func apply_state(state: GDKillBoundary2State, size_multiplier := 1.0) -> void:
 
 
 ## Builds stable rectangle-distance samples around a rectangle-to-ellipse superellipse profile.
-static func build_points(
-	size: Vector2, rounding: float, requested_segments: int
-) -> PackedVector2Array:
+static func build_points(size: Vector2, rounding: float, requested_segments: int) -> PackedVector2Array:
 	var safe_segments := maxi(requested_segments, 8)
-	var half_size := Vector2(
-		maxf(size.x * 0.5, MINIMUM_HALF_SIZE), maxf(size.y * 0.5, MINIMUM_HALF_SIZE)
-	)
+	var half_size := Vector2(maxf(size.x * 0.5, MINIMUM_HALF_SIZE), maxf(size.y * 0.5, MINIMUM_HALF_SIZE))
 	var safe_rounding := clampf(rounding, 0.0, 1.0)
 	var rectangle_points := _build_rectangle_points(half_size, safe_segments)
 	if safe_rounding <= 0.000001:
@@ -51,8 +47,7 @@ static func get_signed_distance(point: Vector2, polygon: PackedVector2Array) -> 
 	var closest_distance := INF
 	for index in polygon.size():
 		closest_distance = minf(
-			closest_distance,
-			_distance_to_segment(point, polygon[index], polygon[(index + 1) % polygon.size()])
+			closest_distance, _distance_to_segment(point, polygon[index], polygon[(index + 1) % polygon.size()])
 		)
 	return closest_distance if Geometry2D.is_point_in_polygon(point, polygon) else -closest_distance
 
@@ -79,9 +74,7 @@ static func _sample_profile(half_size: Vector2, rounding: float, angle: float) -
 	var x_ratio := absf(direction.x) / half_size.x
 	var y_ratio := absf(direction.y) / half_size.y
 	var largest_ratio := maxf(x_ratio, y_ratio)
-	var scaled_sum := (
-		pow(x_ratio / largest_ratio, exponent) + pow(y_ratio / largest_ratio, exponent)
-	)
+	var scaled_sum := pow(x_ratio / largest_ratio, exponent) + pow(y_ratio / largest_ratio, exponent)
 	var radius := pow(scaled_sum, -1.0 / exponent) / largest_ratio
 	return direction * radius
 
@@ -113,9 +106,7 @@ static func _build_rectangle_points(half_size: Vector2, target_count: int) -> Pa
 		var edge_finish := key_points[(edge_index + 1) % key_points.size()]
 		var edge_segment_count := edge_segment_counts[edge_index]
 		for segment_index in edge_segment_count:
-			result.append(
-				edge_start.lerp(edge_finish, float(segment_index) / float(edge_segment_count))
-			)
+			result.append(edge_start.lerp(edge_finish, float(segment_index) / float(edge_segment_count)))
 	return result
 
 

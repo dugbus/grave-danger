@@ -237,8 +237,7 @@ func _configure_reusable_camera(camera: Camera3D, player: Node3D) -> void:
 		camera.set_script(FOLLOW_CAMERA_SCRIPT)
 	if not Engine.is_editor_hint() and camera.has_method(&"set_runtime_targets"):
 		camera.call(&"set_runtime_targets", player, null)
-	if not Engine.is_editor_hint() and direct_run_camera_profile != null \
-			and camera.has_method(&"apply_camera_profile"):
+	if not Engine.is_editor_hint() and direct_run_camera_profile != null and camera.has_method(&"apply_camera_profile"):
 		camera.call(&"apply_camera_profile", direct_run_camera_profile)
 	else:
 		_set_property_if_available(camera, &"camera_offset", direct_run_camera_offset)

@@ -66,27 +66,18 @@ func _ripple_retime_tracks_after_speed_change(old_animation: Animation, new_anim
 	var incoming_scale := 1.0
 	if changed_key_index > 0:
 		incoming_scale = _get_distance_preserving_interval_scale(
-			old_animation,
-			new_animation,
-			previous_anchor_time,
-			changed_key_time
+			old_animation, new_animation, previous_anchor_time, changed_key_time
 		)
 		if incoming_scale <= 0.0:
 			return false
 
 	var outgoing_scale := _get_distance_preserving_interval_scale(
-		old_animation,
-		new_animation,
-		changed_key_time,
-		old_next_anchor_time
+		old_animation, new_animation, changed_key_time, old_next_anchor_time
 	)
 	if outgoing_scale <= 0.0:
 		return false
 
-	var new_changed_key_time := (
-		previous_anchor_time
-		+ (changed_key_time - previous_anchor_time) * incoming_scale
-	)
+	var new_changed_key_time := previous_anchor_time + (changed_key_time - previous_anchor_time) * incoming_scale
 	var new_next_anchor_time := new_changed_key_time + outgoing_duration * outgoing_scale
 	var time_delta := new_next_anchor_time - old_next_anchor_time
 	_retime_animation_keys_for_speed_intervals(
@@ -113,10 +104,7 @@ func _ripple_retime_tracks_after_speed_change(old_animation: Animation, new_anim
 
 
 func _get_distance_preserving_interval_scale(
-	old_animation: Animation,
-	new_animation: Animation,
-	interval_start: float,
-	interval_end: float
+	old_animation: Animation, new_animation: Animation, interval_start: float, interval_end: float
 ) -> float:
 	var old_distance := (
 		_calculate_travel_distance(old_animation, interval_end)
@@ -151,16 +139,18 @@ func _retime_animation_keys_for_speed_intervals(
 		for key_index in animation.track_get_key_count(track_index):
 			var old_key_time := animation.track_get_key_time(track_index, key_index)
 			key_times.append(old_key_time)
-			target_times.append(_map_two_sided_ripple_retime(
-				old_key_time,
-				previous_anchor_time,
-				changed_key_time,
-				old_next_anchor_time,
-				new_changed_key_time,
-				incoming_scale,
-				outgoing_scale,
-				time_delta
-			))
+			target_times.append(
+				_map_two_sided_ripple_retime(
+					old_key_time,
+					previous_anchor_time,
+					changed_key_time,
+					old_next_anchor_time,
+					new_changed_key_time,
+					incoming_scale,
+					outgoing_scale,
+					time_delta
+				)
+			)
 
 		for key_index in key_times.size():
 			if target_times[key_index] < key_times[key_index]:
@@ -268,7 +258,8 @@ func _integrate_speed_interval(animation: Animation, speed_track: int, start_tim
 	for sample_index in SAMPLE_COUNT + 1:
 		var sample_time := start_time + step * float(sample_index)
 		var speed := maxf(float(animation.value_track_interpolate(speed_track, sample_time)), 0.0)
-		var weight := 1.0 if sample_index == 0 or sample_index == SAMPLE_COUNT else (4.0 if sample_index % 2 == 1 else 2.0)
+		var weight := (
+			1.0 if sample_index == 0 or sample_index == SAMPLE_COUNT else (4.0 if sample_index % 2 == 1 else 2.0)
+		)
 		weighted_speed += speed * weight
 	return weighted_speed * step / 3.0
-

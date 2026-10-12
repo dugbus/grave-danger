@@ -1,7 +1,6 @@
 extends Resource
 class_name GDCarriedItem
 
-
 ## Stable identifier used by gameplay code, for example &"gold_coin" or &"key".
 @export var item_type: StringName
 ## Label for debugging and future UI.

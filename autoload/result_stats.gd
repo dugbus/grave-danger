@@ -1,7 +1,6 @@
 extends Node
 class_name GDResultStats
 
-
 ## Treasure value deposited during the current level attempt.
 var treasure_collected := 0
 ## Total treasure value available during the current level attempt.

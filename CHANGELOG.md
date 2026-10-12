@@ -1,5 +1,104 @@
 # Changelog
 
+## 2026-10-12
+
+### 1600
+
+- Level editors have consistently formatted scripts and a validation check that catches spacing drift before commit.
+  - Prompt: Standardize script spacing now and prevent future formatting churn.
+- Blood droplets remain red when the player silhouette is enabled, and exposed character edges no longer leak gold while walls still reveal the silhouette.
+  - Prompt: Keep blood red and remove stray gold from the player outline.
+- The new character's death blood stains the cheek and mouth area using model-specific face settings, with sprays aligned to its facial features.
+  - Prompt: Fix death blood splats that still miss the face.
+
+### 1500
+
+- Millstones crush enemies at their configured minimum rolling speed, and Tutorial 5 releases its inherited maze layout cleanly.
+  - Prompt: Bring tests up to date, check for real regressions, and prepare a reliable commit.
+- The player's persistent bloody-face mark sits on the current rig's cheek and stays attached as the body falls.
+  - Prompt: Bring tests up to date, check for real regressions, and keep death blood on the face.
+
+### 1400
+
+- Tutorial 5 once again uses its level-owned floor map and style, so edits to those resources affect the level.
+  - Prompt: Fix the review findings for replay zombie damage, Tutorial 5 floor ownership, and death-head caching.
+- Zombie punches in recorded-run previews use preview-only health and death, keeping level selection open.
+  - Prompt: Fix the review findings for replay zombie damage, Tutorial 5 floor ownership, and death-head caching.
+- Death clears the player's enemy-tracking head turn, and blood follows the head's final animated pose.
+  - Prompt: Stop dead players looking at enemies and align death blood with the head.
+- Zombies move into arm's reach before punching, and players who retreat beyond reach avoid the hit.
+  - Prompt: Make zombies approach close enough for an outstretched arm to touch the player before attacking.
+- The player's rigged head once again turns toward attention targets, with the headlamp following its animated position.
+  - Prompt: Investigate and restore broken player head tracking.
+
+### 1300
+
+- Walking foot plants ease in and out of contact, preserving the authored leg motion at landing and lift-off while keeping the middle of each stance planted.
+  - Prompt: Improve walking animation quality by removing snapping from foot syncing.
+
+### 0300
+
+- Movement can interrupt zombie-hit stagger after its first quarter, and repeated hits no longer restart the recovery window.
+  - Prompt: Allow movement to interrupt stagger after 25 percent so the player can escape.
+
+### 0100
+
+- Zombie-hit stagger stops walking and jumping until the authored reaction finishes, while gravity continues and normal movement speed returns afterward.
+  - Prompt: Prevent the player moving while stagger faces the zombie.
+- After staggering, the player faces the direction of travel before walking resumes, or restores the pre-hit facing when stopped.
+  - Prompt: Fix backward walking after a zombie hit.
+- Death blood follows the animated face as the player falls, and zombie-hit staggers face the attacking zombie until the reaction ends.
+  - Prompt: Keep death blood over the animated face and make zombie-hit stagger face the attacker.
+
+### 0000
+
+- Surviving a zombie punch plays the authored stagger once, then blends back to idle or walking; lethal hits still play death.
+  - Prompt: Play the authored stagger when a zombie hits the player.
+- The player scene loads correctly after merging the updated character asset with walking foot planting.
+  - Prompt: Check the newly pulled character animations for integration issues.
+
+## 2026-10-09
+
+### 1600
+
+- The player now blends into the authored idle without game-side foot grounding overrides.
+  - Prompt: Remove the idle grounding workaround so the animation can be fixed in the authored asset.
+
+### 1500
+
+- The player keeps the authored idle animation while both feet settle to heights supplied by the current character rig.
+  - Prompt: Restore authored idle with grounding that adapts to asset updates.
+
+### 1300
+
+- The player now rests with both feet grounded when idle, and feet settle naturally after walking instead of freezing mid-swing.
+  - Prompt: Fix the player foot remaining airborne while idle.
+- The player character and levels load correctly again after repairing the character scene's resource declarations.
+  - Prompt: Repair missing-resource errors when loading the game.
+
+## 2026-10-06
+
+### 1700
+
+- The player's original movement speed and weight response are restored; only animation cadence is capped, with shorter grounded contacts and longer transfers at high speed.
+  - Prompt: Preserve the player's original top speed while keeping the bounded foot-transfer animation.
+- Walking now has a stride-based speed cap and a small alternating push-off lift between foot contacts, avoiding runaway leg cycles while keeping planted feet fixed.
+  - Prompt: Cap the walking pace and transfer between planted feet with a small push-off.
+
+### 0000
+
+- The new character's ankles and toes stay planted during grounded steps and turns, with footstep sounds at contact; jumping and death release the feet.
+  - Prompt: Match walking animation to actual movement and prevent planted feet sliding.
+- Walking cadence follows actual travel through acceleration, braking, carried weight, tight gaps and collisions, including recorded-run previews.
+  - Prompt: Match walking animation to actual movement and prevent planted feet sliding.
+
+## 2026-10-05
+
+### 2300
+
+- The new player inherits its imported starting pose without a saved skeleton pose overriding the rig.
+  - Prompt: Investigate the new player's straight left leg and possible head-look interference.
+
 ## 2026-09-27
 
 ### 2000

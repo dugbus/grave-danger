@@ -15,9 +15,7 @@ func _test_upright_basis_preserves_scale() -> void:
 	var rotated_basis := Basis.from_euler(Vector3(0.35, 1.1, -0.2)).scaled(scale)
 	var upright_basis := SUBJECT.upright_basis(rotated_basis) as Basis
 	expect(
-		upright_basis.is_equal_approx(
-			Basis.IDENTITY.scaled(rotated_basis.get_scale())
-		),
+		upright_basis.is_equal_approx(Basis.IDENTITY.scaled(rotated_basis.get_scale())),
 		"The upright basis removes every rotation while preserving scale."
 	)
 
@@ -34,9 +32,7 @@ func _test_make_upright_ignores_parent_orientation(tree: SceneTree) -> void:
 
 	expect(SUBJECT.make_upright(enemy_carrier), "An in-tree enemy carrier is corrected.")
 	expect(
-		enemy_carrier.global_basis.is_equal_approx(
-			Basis.IDENTITY.scaled(Vector3(0.9, 1.1, 1.2))
-		),
+		enemy_carrier.global_basis.is_equal_approx(Basis.IDENTITY.scaled(Vector3(0.9, 1.1, 1.2))),
 		"The enemy carrier remains upright beneath a fully rotated path."
 	)
 	expect(

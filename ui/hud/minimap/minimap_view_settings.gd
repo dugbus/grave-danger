@@ -1,7 +1,6 @@
 extends Resource
 class_name GDMinimapViewSettings
 
-
 ## Fraction of the game viewport width used by the minimap panel.
 @export_range(0.05, 0.5, 0.01) var viewport_width_fraction := 0.2
 

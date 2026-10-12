@@ -56,41 +56,46 @@ func _resolve_references() -> void:
 func _connect_inventory_signal() -> void:
 	if player_inventory == null:
 		return
-	if player_inventory.has_signal("item_count_changed") \
-		and not player_inventory.item_count_changed.is_connected(_on_item_count_changed):
+	if (
+		player_inventory.has_signal("item_count_changed")
+		and not player_inventory.item_count_changed.is_connected(_on_item_count_changed)
+	):
 		player_inventory.item_count_changed.connect(_on_item_count_changed)
-	if player_inventory.has_signal("inventory_capacity_changed") \
-		and not player_inventory.inventory_capacity_changed.is_connected(
-			_on_inventory_capacity_changed
-		):
+	if (
+		player_inventory.has_signal("inventory_capacity_changed")
+		and not player_inventory.inventory_capacity_changed.is_connected(_on_inventory_capacity_changed)
+	):
 		player_inventory.inventory_capacity_changed.connect(_on_inventory_capacity_changed)
 
 
 func _connect_player_signals() -> void:
-	if death_controller != null \
-		and not death_controller.flame_energy_changed.is_connected(_on_flame_energy_changed):
+	if death_controller != null and not death_controller.flame_energy_changed.is_connected(_on_flame_energy_changed):
 		death_controller.flame_energy_changed.connect(_on_flame_energy_changed)
-	if player != null and player.has_signal("flask_effect_started") \
-		and not player.flask_effect_started.is_connected(_on_flask_effect_started):
+	if (
+		player != null
+		and player.has_signal("flask_effect_started")
+		and not player.flask_effect_started.is_connected(_on_flask_effect_started)
+	):
 		player.flask_effect_started.connect(_on_flask_effect_started)
 
 
 func _disconnect_runtime_signals() -> void:
-	if is_instance_valid(death_controller) \
-		and death_controller.flame_energy_changed.is_connected(_on_flame_energy_changed):
+	if (
+		is_instance_valid(death_controller)
+		and death_controller.flame_energy_changed.is_connected(_on_flame_energy_changed)
+	):
 		death_controller.flame_energy_changed.disconnect(_on_flame_energy_changed)
-	if is_instance_valid(player) and player.has_signal("flask_effect_started") \
-		and player.flask_effect_started.is_connected(_on_flask_effect_started):
+	if (
+		is_instance_valid(player)
+		and player.has_signal("flask_effect_started")
+		and player.flask_effect_started.is_connected(_on_flask_effect_started)
+	):
 		player.flask_effect_started.disconnect(_on_flask_effect_started)
 	if is_instance_valid(player_inventory):
 		if player_inventory.item_count_changed.is_connected(_on_item_count_changed):
 			player_inventory.item_count_changed.disconnect(_on_item_count_changed)
-		if player_inventory.inventory_capacity_changed.is_connected(
-			_on_inventory_capacity_changed
-		):
-			player_inventory.inventory_capacity_changed.disconnect(
-				_on_inventory_capacity_changed
-			)
+		if player_inventory.inventory_capacity_changed.is_connected(_on_inventory_capacity_changed):
+			player_inventory.inventory_capacity_changed.disconnect(_on_inventory_capacity_changed)
 
 
 func _bind_hud_panel() -> void:
@@ -131,11 +136,7 @@ func _on_flask_effect_started(effect_id: StringName, liquid_color: Color, durati
 		active_flask_hud.show_flask_effect(effect_id, liquid_color, duration)
 
 
-func _on_flame_energy_changed(
-	_current_energy: float,
-	_maximum_energy: float,
-	_dead: bool
-) -> void:
+func _on_flame_energy_changed(_current_energy: float, _maximum_energy: float, _dead: bool) -> void:
 	_update_health_display()
 
 

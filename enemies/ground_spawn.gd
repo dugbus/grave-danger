@@ -23,9 +23,7 @@ static func snap_to_nearby_floor(
 	var sample_position := floor_sample_node.global_position
 	var query := PhysicsRayQueryParameters3D.create(
 		sample_position + Vector3.UP * SETTINGS.below_floor_search_distance,
-		sample_position + Vector3.DOWN * (
-			SETTINGS.above_floor_search_distance + SETTINGS.floor_contact_epsilon
-		),
+		sample_position + Vector3.DOWN * (SETTINGS.above_floor_search_distance + SETTINGS.floor_contact_epsilon),
 		collision_mask,
 		excluded_bodies
 	)
@@ -38,9 +36,11 @@ static func snap_to_nearby_floor(
 	var floor_normal := hit.get("normal", Vector3.ZERO) as Vector3
 	var floor_position := hit.get("position", sample_position) as Vector3
 	var vertical_correction := floor_position.y - sample_position.y
-	if floor_normal.y < minimum_floor_normal_y \
-			or vertical_correction > SETTINGS.below_floor_search_distance \
-			or vertical_correction < -SETTINGS.above_floor_search_distance:
+	if (
+		floor_normal.y < minimum_floor_normal_y
+		or vertical_correction > SETTINGS.below_floor_search_distance
+		or vertical_correction < -SETTINGS.above_floor_search_distance
+	):
 		return false
 
 	placement_node.global_position += Vector3.UP * vertical_correction

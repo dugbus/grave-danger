@@ -39,8 +39,9 @@ func encode_frame(
 	var camera_position := camera_transform.origin
 	var player_delta := (player_position - previous_player_position) * POSITION_SCALE
 	var camera_delta := (camera_position - previous_camera_position) * POSITION_SCALE
-	var requires_absolute_position := is_first_frame \
-		or not _fits_signed_16(player_delta) or not _fits_signed_16(camera_delta)
+	var requires_absolute_position := (
+		is_first_frame or not _fits_signed_16(player_delta) or not _fits_signed_16(camera_delta)
+	)
 	_ensure_capacity(ABSOLUTE_FRAME_SIZE if requires_absolute_position else NORMAL_FRAME_SIZE)
 
 	_encode_float(delta)
@@ -73,16 +74,12 @@ func encode_frame(
 	else:
 		_encode_vector3_delta(player_delta)
 		_encode_vector3_delta(camera_delta)
-		previous_player_position += Vector3(
-			roundi(player_delta.x),
-			roundi(player_delta.y),
-			roundi(player_delta.z)
-		) / POSITION_SCALE
-		previous_camera_position += Vector3(
-			roundi(camera_delta.x),
-			roundi(camera_delta.y),
-			roundi(camera_delta.z)
-		) / POSITION_SCALE
+		previous_player_position += (
+			Vector3(roundi(player_delta.x), roundi(player_delta.y), roundi(player_delta.z)) / POSITION_SCALE
+		)
+		previous_camera_position += (
+			Vector3(roundi(camera_delta.x), roundi(camera_delta.y), roundi(camera_delta.z)) / POSITION_SCALE
+		)
 
 
 func take_payload() -> PackedByteArray:
@@ -102,9 +99,14 @@ func _ensure_capacity(additional_bytes: int) -> void:
 
 
 func _fits_signed_16(value: Vector3) -> bool:
-	return value.x >= SIGNED_16_MIN and value.x <= SIGNED_16_MAX \
-		and value.y >= SIGNED_16_MIN and value.y <= SIGNED_16_MAX \
-		and value.z >= SIGNED_16_MIN and value.z <= SIGNED_16_MAX
+	return (
+		value.x >= SIGNED_16_MIN
+		and value.x <= SIGNED_16_MAX
+		and value.y >= SIGNED_16_MIN
+		and value.y <= SIGNED_16_MAX
+		and value.z >= SIGNED_16_MIN
+		and value.z <= SIGNED_16_MAX
+	)
 
 
 func _encode_u8(value: int) -> void:

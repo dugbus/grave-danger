@@ -64,10 +64,7 @@ func _run() -> void:
 		)
 		if directory_error != OK:
 			push_error(
-				(
-					"Could not create screenshot directory %s: %s"
-					% [resolution_directory, error_string(directory_error)]
-				)
+				"Could not create screenshot directory %s: %s" % [resolution_directory, error_string(directory_error)]
 			)
 			failure_count += scene_paths.size()
 			continue
@@ -118,11 +115,7 @@ func _parse_resolutions(value: String) -> Error:
 	var parsed_resolutions: Array[Vector2i] = []
 	for entry in value.split(",", false):
 		var dimensions := entry.strip_edges().to_lower().split("x", false)
-		if (
-			dimensions.size() != 2
-			or not dimensions[0].is_valid_int()
-			or not dimensions[1].is_valid_int()
-		):
+		if dimensions.size() != 2 or not dimensions[0].is_valid_int() or not dimensions[1].is_valid_int():
 			push_error("Invalid resolution: %s" % entry)
 			return ERR_INVALID_PARAMETER
 		var resolution := Vector2i(int(dimensions[0]), int(dimensions[1]))
@@ -220,14 +213,10 @@ func _capture_scene(scene_path: String, resolution_directory: String) -> Error:
 	await process_frame
 
 	var image := capture_viewport.get_texture().get_image()
-	var screenshot_path := resolution_directory.path_join(
-		"%s.png" % scene_path.get_file().get_basename()
-	)
+	var screenshot_path := resolution_directory.path_join("%s.png" % scene_path.get_file().get_basename())
 	var save_error := image.save_png(ProjectSettings.globalize_path(screenshot_path))
 	if save_error == OK:
-		print(
-			"Captured %s at %dx%d" % [scene_path, capture_viewport.size.x, capture_viewport.size.y]
-		)
+		print("Captured %s at %dx%d" % [scene_path, capture_viewport.size.x, capture_viewport.size.y])
 	else:
 		push_error("Could not save %s: %s" % [screenshot_path, error_string(save_error)])
 

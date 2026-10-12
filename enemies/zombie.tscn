@@ -24,7 +24,7 @@ radius = 0.22
 height = 0.74
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_attack_hitbox"]
-radius = 0.68
+radius = 0.18
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_crush_check"]
 radius = 0.65
@@ -97,7 +97,7 @@ monitoring = false
 monitorable = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ZombieBody/AttackHitboxRight" unique_id=1970428815]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 0.48, 0.62)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.125, 0.48, 0.32)
 shape = SubResource("SphereShape3D_attack_hitbox")
 
 [node name="AttackHitboxLeft" type="Area3D" parent="ZombieBody" unique_id=1525807254]
@@ -107,7 +107,7 @@ monitoring = false
 monitorable = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ZombieBody/AttackHitboxLeft" unique_id=1549866898]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.28, 0.48, 0.62)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.125, 0.48, 0.32)
 shape = SubResource("SphereShape3D_attack_hitbox")
 
 [node name="CrushCheckArea" type="Area3D" parent="ZombieBody" unique_id=449208303]

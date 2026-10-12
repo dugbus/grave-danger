@@ -13,26 +13,16 @@ func run(_tree: SceneTree) -> void:
 	var heavily_rounded := GDKillBoundary2Geometry.build_points(Vector2(8.0, 4.0), 0.8, 32)
 	var ellipse := GDKillBoundary2Geometry.build_points(Vector2(8.0, 4.0), 1.0, 32)
 	var circle := GDKillBoundary2Geometry.build_points(Vector2(8.0, 8.0), 1.0, 32)
+	expect(rectangle.size() == 32 and ellipse.size() == 32, "Every shape uses the configured canonical segment count.")
+	expect(_maximum_x(ellipse) > 3.99 and _maximum_y(ellipse) > 1.99, "Full rounding preserves both ellipse axes.")
 	expect(
-		rectangle.size() == 32 and ellipse.size() == 32,
-		"Every shape uses the configured canonical segment count."
-	)
-	expect(
-		_maximum_x(ellipse) > 3.99 and _maximum_y(ellipse) > 1.99,
-		"Full rounding preserves both ellipse axes."
-	)
-	expect(
-		_is_on_rectangle_edge(rectangle, Vector2(4.0, 2.0)),
-		"Zero rounding produces an exact rectangular perimeter."
+		_is_on_rectangle_edge(rectangle, Vector2(4.0, 2.0)), "Zero rounding produces an exact rectangular perimeter."
 	)
 	expect(
 		_contains_all_rectangle_corners(rectangle, Vector2(4.0, 2.0)),
 		"Zero rounding preserves all four sharp rectangle vertices during resampling."
 	)
-	expect(
-		rounded != rectangle and rounded != ellipse,
-		"Intermediate rounding produces a distinct rounded rectangle."
-	)
+	expect(rounded != rectangle and rounded != ellipse, "Intermediate rounding produces a distinct rounded rectangle.")
 	expect(
 		_maximum_x(nearly_sharp) > 3.99 and _maximum_y(nearly_sharp) > 1.99,
 		"Near-zero rounding preserves the authored width and depth."
@@ -54,9 +44,7 @@ func run(_tree: SceneTree) -> void:
 		),
 		"Animated aspect-ratio changes never reassign canonical perimeter indices."
 	)
-	var almost_rectangle := GDKillBoundary2Geometry.build_points(
-		Vector2(8.0, 4.0), 0.00001, 32
-	)
+	var almost_rectangle := GDKillBoundary2Geometry.build_points(Vector2(8.0, 4.0), 0.00001, 32)
 	expect(
 		_maximum_point_shift(rectangle, almost_rectangle) < 0.001,
 		"The final rounded-to-sharp step remains visually continuous."
@@ -88,10 +76,7 @@ func _maximum_y(points: PackedVector2Array) -> float:
 
 func _is_on_rectangle_edge(points: PackedVector2Array, half_size: Vector2) -> bool:
 	for point in points:
-		if (
-			not is_equal_approx(absf(point.x), half_size.x)
-			and not is_equal_approx(absf(point.y), half_size.y)
-		):
+		if not is_equal_approx(absf(point.x), half_size.x) and not is_equal_approx(absf(point.y), half_size.y):
 			return false
 	return true
 
@@ -132,10 +117,7 @@ func _has_stable_sample_directions(first: PackedVector2Array, second: PackedVect
 
 
 func _has_stable_normalized_topology(
-	first: PackedVector2Array,
-	first_half_size: Vector2,
-	second: PackedVector2Array,
-	second_half_size: Vector2
+	first: PackedVector2Array, first_half_size: Vector2, second: PackedVector2Array, second_half_size: Vector2
 ) -> bool:
 	if first.size() != second.size():
 		return false

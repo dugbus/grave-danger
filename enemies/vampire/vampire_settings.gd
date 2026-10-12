@@ -1,7 +1,6 @@
 extends Resource
 class_name GDVampireSettings
 
-
 ## Scale applied to the imported vampire model relative to its authored size.
 @export_range(0.1, 8.0, 0.1) var model_scale := 2.0
 ## Maximum hunting speed used by the Vampire's route following.

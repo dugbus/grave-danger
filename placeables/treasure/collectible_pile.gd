@@ -2,7 +2,6 @@
 class_name GDCollectiblePile
 extends "res://placeables/placeable.gd"
 
-
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const PREVIEW_CONTAINER_NAME := "EditorPreviewItems"
 const EDITOR_SELECTION_PLACEHOLDER_NAME := "EditorSelectionPlaceholder"
@@ -196,10 +195,7 @@ func _spawn_collectible() -> bool:
 	spawned_items += 1
 
 	var local_offset := _random_local_spawn_offset(rng, spawn_height)
-	var spawn_transform := Transform3D(
-		Basis(Vector3.UP, rng.randf_range(0.0, TAU)),
-		global_transform * local_offset
-	)
+	var spawn_transform := Transform3D(Basis(Vector3.UP, rng.randf_range(0.0, TAU)), global_transform * local_offset)
 
 	if collectible.has_method("throw_from"):
 		collectible.throw_from(spawn_transform, Vector3.ZERO)
@@ -208,9 +204,7 @@ func _spawn_collectible() -> bool:
 
 	if collectible is RigidBody3D:
 		(collectible as RigidBody3D).angular_velocity = Vector3(
-			rng.randf_range(-2.0, 2.0),
-			rng.randf_range(-2.0, 2.0),
-			rng.randf_range(-2.0, 2.0)
+			rng.randf_range(-2.0, 2.0), rng.randf_range(-2.0, 2.0), rng.randf_range(-2.0, 2.0)
 		)
 
 	return true
@@ -234,9 +228,7 @@ func _is_near_camera_view() -> bool:
 	if camera == null:
 		return true
 
-	var viewport_rect := Rect2(Vector2.ZERO, get_viewport().get_visible_rect().size).grow(
-		spawn_screen_margin
-	)
+	var viewport_rect := Rect2(Vector2.ZERO, get_viewport().get_visible_rect().size).grow(spawn_screen_margin)
 	for point in _get_visibility_probe_points():
 		if camera.is_position_behind(point):
 			continue
@@ -294,8 +286,7 @@ func _refresh_editor_preview() -> void:
 
 		item_preview.name = "ItemPreview%d" % index
 		item_preview.transform = Transform3D(
-			Basis(Vector3.UP, preview_rng.randf_range(0.0, TAU)),
-			_editor_preview_offset(preview_rng, index)
+			Basis(Vector3.UP, preview_rng.randf_range(0.0, TAU)), _editor_preview_offset(preview_rng, index)
 		)
 		item_preview.process_mode = Node.PROCESS_MODE_DISABLED
 		preview_container.add_child(item_preview)
@@ -305,14 +296,12 @@ func _refresh_editor_preview() -> void:
 
 func _editor_preview_offset(source_rng: RandomNumberGenerator, index: int) -> Vector3:
 	var offset := _random_local_spawn_offset(source_rng, 0.0)
-	var center_weight := 1.0 - clampf(
-		Vector2(offset.x, offset.z).length() / pile_radius,
-		0.0,
-		1.0
-	)
-	offset.y = preview_base_height \
-		+ (center_weight * center_weight * preview_center_height) \
+	var center_weight := 1.0 - clampf(Vector2(offset.x, offset.z).length() / pile_radius, 0.0, 1.0)
+	offset.y = (
+		preview_base_height
+		+ (center_weight * center_weight * preview_center_height)
 		+ (float(index % 5) * preview_item_spacing)
+	)
 	return offset
 
 
@@ -329,9 +318,7 @@ func _get_or_create_preview_container() -> Node3D:
 
 
 func _configure_editor_selection_placeholder() -> void:
-	var placeholder := get_node_or_null(
-		EDITOR_SELECTION_PLACEHOLDER_NAME
-	) as MeshInstance3D
+	var placeholder := get_node_or_null(EDITOR_SELECTION_PLACEHOLDER_NAME) as MeshInstance3D
 	if placeholder == null:
 		return
 
@@ -340,8 +327,7 @@ func _configure_editor_selection_placeholder() -> void:
 		return
 
 	var placeholder_height := maxf(
-		preview_base_height + preview_center_height + preview_item_spacing * 5.0,
-		EDITOR_SELECTION_MINIMUM_HEIGHT
+		preview_base_height + preview_center_height + preview_item_spacing * 5.0, EDITOR_SELECTION_MINIMUM_HEIGHT
 	)
 	placeholder_mesh.top_radius = pile_radius
 	placeholder_mesh.bottom_radius = pile_radius
@@ -351,9 +337,7 @@ func _configure_editor_selection_placeholder() -> void:
 
 
 func _hide_editor_selection_placeholder() -> void:
-	var placeholder := get_node_or_null(
-		EDITOR_SELECTION_PLACEHOLDER_NAME
-	) as MeshInstance3D
+	var placeholder := get_node_or_null(EDITOR_SELECTION_PLACEHOLDER_NAME) as MeshInstance3D
 	if placeholder != null:
 		placeholder.visible = false
 

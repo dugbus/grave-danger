@@ -32,8 +32,7 @@ func populate(
 	patch_size_tiles: float,
 	blades_per_cell: int
 ) -> Dictionary:
-	if floor_surface == null or not floor_surface.is_inside_tree() \
-			or not is_inside_tree():
+	if floor_surface == null or not floor_surface.is_inside_tree() or not is_inside_tree():
 		_clear_instances()
 		return {"errors": ["Generated grass requires scene-tree FloorSurface and grass nodes."]}
 
@@ -44,19 +43,18 @@ func populate(
 		var cell := cell_value as Vector2i
 		if excluded_cells.has(cell) or not floor_surface.has_floor(cell):
 			continue
-		candidates.append({
-			"cell": cell,
-			"score": plasma.get_noise_2d(float(cell.x), float(cell.y)),
-		})
+		(
+			candidates
+			. append(
+				{
+					"cell": cell,
+					"score": plasma.get_noise_2d(float(cell.x), float(cell.y)),
+				}
+			)
+		)
 	candidates.sort_custom(_sort_patch_candidate)
 	var selected_count := clampi(
-		roundi(
-			float(candidates.size())
-			* clampf(coverage_percent, 0.0, 100.0)
-			/ 100.0
-		),
-		0,
-		candidates.size()
+		roundi(float(candidates.size()) * clampf(coverage_percent, 0.0, 100.0) / 100.0), 0, candidates.size()
 	)
 	var selected_cells: Array[Vector2i] = []
 	var blade_counts := {}
@@ -70,10 +68,7 @@ func populate(
 		var selected_cell := candidate["cell"] as Vector2i
 		selected_cells.append(selected_cell)
 		blade_counts[selected_cell] = _blade_count_for_plasma_score(
-			float(candidate["score"]),
-			minimum_selected_score,
-			maximum_selected_score,
-			blades_per_cell
+			float(candidate["score"]), minimum_selected_score, maximum_selected_score, blades_per_cell
 		)
 
 	var random := RandomNumberGenerator.new()
@@ -83,19 +78,16 @@ func populate(
 		var cell_world_position := floor_surface.cell_to_world(cell)
 		var cell_local_position := to_local(cell_world_position)
 		for _blade_index in int(blade_counts[cell]):
-			var blade_position := cell_local_position + Vector3(
-				random.randf_range(-CELL_JITTER_RADIUS, CELL_JITTER_RADIUS),
-				FLOOR_OFFSET,
-				random.randf_range(-CELL_JITTER_RADIUS, CELL_JITTER_RADIUS)
+			var blade_position := (
+				cell_local_position
+				+ Vector3(
+					random.randf_range(-CELL_JITTER_RADIUS, CELL_JITTER_RADIUS),
+					FLOOR_OFFSET,
+					random.randf_range(-CELL_JITTER_RADIUS, CELL_JITTER_RADIUS)
+				)
 			)
-			var blade_scale := random.randf_range(
-				MINIMUM_BLADE_SCALE,
-				MAXIMUM_BLADE_SCALE
-			)
-			var blade_basis := Basis(
-				Vector3.UP,
-				random.randf_range(0.0, TAU)
-			).scaled(Vector3.ONE * blade_scale)
+			var blade_scale := random.randf_range(MINIMUM_BLADE_SCALE, MAXIMUM_BLADE_SCALE)
+			var blade_basis := Basis(Vector3.UP, random.randf_range(0.0, TAU)).scaled(Vector3.ONE * blade_scale)
 			transforms.append(Transform3D(blade_basis, blade_position))
 	_set_transforms(transforms)
 	return {
@@ -120,15 +112,13 @@ func _apply_transforms(transforms: Array[Transform3D]) -> void:
 	# Updating each instance also refreshes the editor renderer immediately;
 	# the packed buffer above keeps those transforms serializable with Layout.
 	for transform_index in transforms.size():
-		generated_multimesh.set_instance_transform(
-			transform_index,
-			transforms[transform_index]
-		)
+		generated_multimesh.set_instance_transform(transform_index, transforms[transform_index])
 	multimesh = generated_multimesh
 	generated_multimesh.visible_instance_count = -1
 	custom_aabb = _calculate_bounds(transforms, source_mesh)
 	generated_multimesh.emit_changed()
 	notify_property_list_changed()
+
 
 func _create_plasma(seed_value: int, patch_size_tiles: float) -> FastNoiseLite:
 	var plasma := FastNoiseLite.new()
@@ -143,34 +133,22 @@ func _create_plasma(seed_value: int, patch_size_tiles: float) -> FastNoiseLite:
 
 
 func _blade_count_for_plasma_score(
-	score: float,
-	minimum_score: float,
-	maximum_score: float,
-	maximum_blades: int
+	score: float, minimum_score: float, maximum_score: float, maximum_blades: int
 ) -> int:
 	var safe_maximum_blades := maxi(maximum_blades, 1)
 	if is_equal_approx(minimum_score, maximum_score):
 		return safe_maximum_blades
 	var density := inverse_lerp(minimum_score, maximum_score, score)
-	return clampi(
-		roundi(lerpf(1.0, float(safe_maximum_blades), density)),
-		1,
-		safe_maximum_blades
-	)
+	return clampi(roundi(lerpf(1.0, float(safe_maximum_blades), density)), 1, safe_maximum_blades)
 
 
-func _calculate_bounds(
-	transforms: Array[Transform3D],
-	source_mesh: Mesh
-) -> AABB:
+func _calculate_bounds(transforms: Array[Transform3D], source_mesh: Mesh) -> AABB:
 	if transforms.is_empty() or source_mesh == null:
 		return AABB()
 	var mesh_bounds := source_mesh.get_aabb()
 	var generated_bounds := transforms[0] * mesh_bounds
 	for transform_index in range(1, transforms.size()):
-		generated_bounds = generated_bounds.merge(
-			transforms[transform_index] * mesh_bounds
-		)
+		generated_bounds = generated_bounds.merge(transforms[transform_index] * mesh_bounds)
 	return generated_bounds.grow(CELL_JITTER_RADIUS)
 
 

@@ -27,4 +27,14 @@ func run(_tree: SceneTree) -> void:
 		not millstone.can_kill_enemy_by_rolling(Vector3(-0.3, 0.0, 0.0)),
 		"A fast millstone does not crush an enemy behind its travel direction."
 	)
+	millstone.linear_velocity = Vector3.RIGHT * millstone.enemy_crush_speed
+	expect(
+		millstone.can_kill_enemy_by_rolling(Vector3(0.3, 0.0, 0.0)),
+		"A speed exactly at the crush threshold survives Vector3 float precision."
+	)
+	millstone.linear_velocity = Vector3.RIGHT * (millstone.enemy_crush_speed - 0.01)
+	expect(
+		not millstone.can_kill_enemy_by_rolling(Vector3(0.3, 0.0, 0.0)),
+		"Motion below the threshold still cannot crush an enemy."
+	)
 	millstone.free()

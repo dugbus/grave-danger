@@ -76,11 +76,14 @@ func find_level_index(level_reference: String) -> int:
 
 	for index in level_entries.size():
 		var level_data := get_level_entry(index)
-		if normalized_reference in [
-			get_level_id(index).to_lower(),
-			String(level_data.get("name", "")).to_lower(),
-			get_level_folder_name(index).to_lower(),
-		]:
+		if (
+			normalized_reference
+			in [
+				get_level_id(index).to_lower(),
+				String(level_data.get("name", "")).to_lower(),
+				get_level_folder_name(index).to_lower(),
+			]
+		):
 			return index
 	return -1
 

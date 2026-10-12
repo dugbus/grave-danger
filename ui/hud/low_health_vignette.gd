@@ -21,46 +21,46 @@ var visible_intensity := 0.0
 
 
 func _ready() -> void:
-    process_mode = Node.PROCESS_MODE_ALWAYS
-    layer = VIGNETTE_LAYER
-    _configure_rect()
-    _apply_intensity()
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	layer = VIGNETTE_LAYER
+	_configure_rect()
+	_apply_intensity()
 
 
 func set_health_ratio(ratio: float, is_dead: bool = false) -> void:
-    var health_ratio := clampf(ratio, 0.0, 1.0)
-    if is_dead:
-        target_intensity = 1.0
-        return
+	var health_ratio := clampf(ratio, 0.0, 1.0)
+	if is_dead:
+		target_intensity = 1.0
+		return
 
-    var denominator := maxf(start_health_ratio - full_health_ratio, 0.001)
-    target_intensity = clampf((start_health_ratio - health_ratio) / denominator, 0.0, 1.0)
+	var denominator := maxf(start_health_ratio - full_health_ratio, 0.001)
+	target_intensity = clampf((start_health_ratio - health_ratio) / denominator, 0.0, 1.0)
 
 
 func get_target_intensity() -> float:
-    return target_intensity
+	return target_intensity
 
 
 func _process(delta: float) -> void:
-    var smooth_t := 1.0 - exp(-response_speed * delta)
-    visible_intensity = lerpf(visible_intensity, target_intensity, smooth_t)
-    _apply_intensity()
+	var smooth_t := 1.0 - exp(-response_speed * delta)
+	visible_intensity = lerpf(visible_intensity, target_intensity, smooth_t)
+	_apply_intensity()
 
 
 func _configure_rect() -> void:
-    if vignette_rect == null:
-        return
+	if vignette_rect == null:
+		return
 
-    vignette_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    vignette_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-    vignette_rect.visible = false
+	vignette_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vignette_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vignette_rect.visible = false
 
 
 func _apply_intensity() -> void:
-    if vignette_rect == null:
-        return
+	if vignette_rect == null:
+		return
 
-    vignette_rect.visible = visible_intensity > 0.001
-    var shader_material := vignette_rect.material as ShaderMaterial
-    if shader_material != null:
-        shader_material.set_shader_parameter(&"intensity", visible_intensity)
+	vignette_rect.visible = visible_intensity > 0.001
+	var shader_material := vignette_rect.material as ShaderMaterial
+	if shader_material != null:
+		shader_material.set_shader_parameter(&"intensity", visible_intensity)

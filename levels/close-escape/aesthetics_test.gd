@@ -32,8 +32,7 @@ func run(_tree: SceneTree) -> void:
 	)
 	# Navigation currently selects the first covering grid, so keep the wall grid first.
 	expect(
-		layout.get_index() < floor_surface.get_index(),
-		"The floor does not take precedence over the zombie wall grid."
+		layout.get_index() < floor_surface.get_index(), "The floor does not take precedence over the zombie wall grid."
 	)
 	var wall_count := 0
 	var road_count := 0
@@ -42,16 +41,12 @@ func run(_tree: SceneTree) -> void:
 		var item := walls.get_cell_item(cell)
 		if walls.mesh_library.get_item_name(item) == "Road":
 			road_count += 1
-			var basis := walls.get_basis_with_orthogonal_index(
-				walls.get_cell_item_orientation(cell)
-			)
+			var basis := walls.get_basis_with_orthogonal_index(walls.get_cell_item_orientation(cell))
 			roads_are_flat = roads_are_flat and basis.y.is_equal_approx(Vector3.UP)
 			roads_are_flat = roads_are_flat and walls.mesh_library.get_item_shapes(item).is_empty()
 		else:
 			wall_count += 1
-	expect(
-		wall_count == 297, "All 297 authored wall cells remain; paving does not replace barriers."
-	)
+	expect(wall_count == 297, "All 297 authored wall cells remain; paving does not replace barriers.")
 	expect(
 		road_count >= 100 and road_count < 180 and roads_are_flat,
 		"Roads are sparse, upright, non-colliding accents, not blanket paving."
@@ -65,17 +60,11 @@ func run(_tree: SceneTree) -> void:
 	var serialized_buffers := _read_painted_buffers()
 	for child in grass.get_children():
 		var patch := child as MultiMeshInstance3D
-		matching_technique = (
-			matching_technique and patch.get_script() == reference_grass.get_script()
-		)
-		matching_technique = (
-			matching_technique and patch.multimesh.mesh == reference_grass.multimesh.mesh
-		)
+		matching_technique = (matching_technique and patch.get_script() == reference_grass.get_script())
+		matching_technique = (matching_technique and patch.multimesh.mesh == reference_grass.multimesh.mesh)
 		var texture := patch.get(&"texture_albedo") as GradientTexture2D
 		var reference_texture := reference_grass.get(&"texture_albedo") as GradientTexture2D
-		matching_technique = (
-			matching_technique and texture.gradient.colors == reference_texture.gradient.colors
-		)
+		matching_technique = (matching_technique and texture.gradient.colors == reference_texture.gradient.colors)
 		total += patch.multimesh.instance_count
 		# The dummy renderer discards MultiMesh transforms. Validate the authored
 		# buffer directly so the same placement checks also run in headless CI.
@@ -89,9 +78,7 @@ func run(_tree: SceneTree) -> void:
 			var point := Vector3(buffer[offset + 3], buffer[offset + 7], buffer[offset + 11])
 			var cell := walls.local_to_map(point - walls.position)
 			occupied_cells[cell] = true
-			clear_placements = (
-				clear_placements and walls.get_cell_item(cell) == GridMap.INVALID_CELL_ITEM
-			)
+			clear_placements = (clear_placements and walls.get_cell_item(cell) == GridMap.INVALID_CELL_ITEM)
 			clear_placements = clear_placements and _keeps_objectives_clear(level, point)
 	expect(
 		matching_technique and grass.get_child_count() == 4,
@@ -114,10 +101,7 @@ func run(_tree: SceneTree) -> void:
 			continue
 		var point := (hazard as Node3D).position
 		var cell := walls.local_to_map(point - walls.position)
-		expect(
-			walls.get_cell_item(cell) == GridMap.INVALID_CELL_ITEM,
-			"Road stones do not cover %s." % hazard.name
-		)
+		expect(walls.get_cell_item(cell) == GridMap.INVALID_CELL_ITEM, "Road stones do not cover %s." % hazard.name)
 	level.free()
 	reference.free()
 	floor_reference.free()
@@ -129,12 +113,14 @@ func _check_editor_access() -> void:
 	var layout := editable_level.get_node(^"AuthoredLayout") as Node3D
 	var floor_surface := editable_level.get_node(^"FloorSurface") as FloorSurface
 	expect(
-		editable_level.is_editable_instance(layout)
-		and floor_surface.owner == editable_level
-		and floor_surface.get_parent() == editable_level
-		and floor_surface.visible
-		and layout.visible
-		and floor_surface.floor_map.get_present_cells().size() == 35 * 29,
+		(
+			editable_level.is_editable_instance(layout)
+			and floor_surface.owner == editable_level
+			and floor_surface.get_parent() == editable_level
+			and floor_surface.visible
+			and layout.visible
+			and floor_surface.floor_map.get_present_cells().size() == 35 * 29
+		),
 		"The populated FloorSurface is owned directly by the main level and remains editable."
 	)
 	expect(
@@ -142,6 +128,7 @@ func _check_editor_access() -> void:
 		"Grass paint groups are also exposed in the main level editor."
 	)
 	editable_level.free()
+
 
 func _read_painted_buffers() -> Dictionary:
 	var result: Dictionary = {}
@@ -151,9 +138,7 @@ func _read_painted_buffers() -> Dictionary:
 		if line.begins_with('[sub_resource type="MultiMesh"'):
 			resource_id = line.get_slice('id="', 1).get_slice('"', 0)
 		elif line.begins_with("buffer = PackedFloat32Array("):
-			var values := line.trim_prefix("buffer = PackedFloat32Array(").trim_suffix(")").split(
-				","
-			)
+			var values := line.trim_prefix("buffer = PackedFloat32Array(").trim_suffix(")").split(",")
 			var buffer := PackedFloat32Array()
 			for value in values:
 				buffer.append(float(value))
@@ -165,9 +150,7 @@ func _keeps_objectives_clear(level: Node3D, point: Vector3) -> bool:
 	for group_path in [^"Progression", ^"Hazards", ^"Treasure", ^"Deposits", ^"Supplies"]:
 		for child in level.get_node(group_path).get_children():
 			var objective := child as Node3D
-			var distance := Vector2(point.x, point.z).distance_to(
-				Vector2(objective.position.x, objective.position.z)
-			)
+			var distance := Vector2(point.x, point.z).distance_to(Vector2(objective.position.x, objective.position.z))
 			var clearance := 1.0
 			if String(objective.name).contains("Spike"):
 				clearance = 1.3

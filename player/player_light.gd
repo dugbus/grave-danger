@@ -20,6 +20,7 @@ class_name GDPlayerLight
 
 var time_passed := 0.0
 
+
 func _process(delta: float) -> void:
 	time_passed += delta
 
@@ -39,7 +40,7 @@ func _process(delta: float) -> void:
 	# Asymmetric remap: torch dips more than it peaks
 	var flicker: float
 	if combined < 0.0:
-		flicker = combined * dip_amount   # full dip range
+		flicker = combined * dip_amount  # full dip range
 	else:
 		flicker = combined * peak_amount  # reduced peak range
 

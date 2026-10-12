@@ -1,7 +1,6 @@
 extends Resource
 class_name GDPlayerJumpSettings
 
-
 @export_group("Height")
 ## World-space height of the common cemetery wall used as the player jump reference.
 @export_range(0.01, 20.0, 0.001, "or_greater", "suffix:m") var wall_height := 0.725

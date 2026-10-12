@@ -1,7 +1,6 @@
 class_name GDBoxPushable
 extends "res://placeables/character_placeable.gd"
 
-
 const PLAYER_COLLISION_LAYER := 2
 const WORLD_COLLISION_LAYER := 1
 const MIN_PUSH_SPEED := 0.05

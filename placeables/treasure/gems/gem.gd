@@ -13,25 +13,25 @@ var item_group: StringName
 
 
 func _ready() -> void:
-    add_to_group(GEM_GROUP)
-    add_to_group(PICKUP_RADIUS_SCALABLE_GROUP)
-    if carried_item != null:
-        item_group = carried_item.get("item_type") as StringName
-        if item_group != &"":
-            add_to_group(item_group)
-    set_pickup_radius_multiplier(_get_runtime_pickup_radius_multiplier())
-    super._ready()
+	add_to_group(GEM_GROUP)
+	add_to_group(PICKUP_RADIUS_SCALABLE_GROUP)
+	if carried_item != null:
+		item_group = carried_item.get("item_type") as StringName
+		if item_group != &"":
+			add_to_group(item_group)
+	set_pickup_radius_multiplier(_get_runtime_pickup_radius_multiplier())
+	super._ready()
 
 
 func _physics_process(delta: float) -> void:
-    if global_position.y < despawn_below_y:
-        queue_free()
-        return
+	if global_position.y < despawn_below_y:
+		queue_free()
+		return
 
-    super._physics_process(delta)
+	super._physics_process(delta)
 
 
 func _after_collection_deactivated() -> void:
-    remove_from_group(GEM_GROUP)
-    if item_group != &"":
-        remove_from_group(item_group)
+	remove_from_group(GEM_GROUP)
+	if item_group != &"":
+		remove_from_group(item_group)

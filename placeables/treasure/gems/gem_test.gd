@@ -37,19 +37,19 @@ func _expect_doubled_gem_dimensions(gem_scene: PackedScene) -> void:
 	var body_collision := gem.get_node_or_null(^"CollisionShape3D") as CollisionShape3D
 	var body_shape := body_collision.shape as ConvexPolygonShape3D if body_collision != null else null
 	expect(
-		body_shape != null and _get_point_bounds(body_shape.points).size.is_equal_approx(
-			EXPECTED_PHYSICS_SIZE
-		),
+		body_shape != null and _get_point_bounds(body_shape.points).size.is_equal_approx(EXPECTED_PHYSICS_SIZE),
 		"%s has collision matching its doubled visual size." % gem_scene.resource_path
 	)
 
 	var pickup_collision := gem.get_node_or_null(^"PickupArea/CollisionShape3D") as CollisionShape3D
 	var pickup_shape := pickup_collision.shape as SphereShape3D if pickup_collision != null else null
 	expect(
-		pickup_collision != null \
-				and pickup_collision.position.is_equal_approx(EXPECTED_PICKUP_POSITION) \
-				and pickup_shape != null \
-				and is_equal_approx(pickup_shape.radius, EXPECTED_PICKUP_RADIUS),
+		(
+			pickup_collision != null
+			and pickup_collision.position.is_equal_approx(EXPECTED_PICKUP_POSITION)
+			and pickup_shape != null
+			and is_equal_approx(pickup_shape.radius, EXPECTED_PICKUP_RADIUS)
+		),
 		"%s doubles its pickup volume with the larger gem." % gem_scene.resource_path
 	)
 	gem.free()

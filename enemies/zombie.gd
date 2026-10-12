@@ -48,6 +48,7 @@ func _uses_custom_placeable_spawn() -> bool:
 func is_placeable_spawned() -> bool:
 	return has_dropped_in
 
+
 func _physics_process(delta: float) -> void:
 	if zombie_body == null:
 		_update_animation(0.0)
@@ -84,19 +85,16 @@ func _physics_process(delta: float) -> void:
 	if not has_moved_body_this_frame:
 		_move_body()
 
+
 func _snap_to_ground_on_spawn() -> void:
 	if spawn_floor_checked or zombie_body == null:
 		return
 
 	spawn_floor_checked = true
 	GROUND_SPAWN.snap_to_nearby_floor(
-		self,
-		zombie_body,
-		self,
-		map_collision_mask,
-		navigation_collision_floor_normal_y,
-		[zombie_body.get_rid()]
+		self, zombie_body, self, map_collision_mask, navigation_collision_floor_normal_y, [zombie_body.get_rid()]
 	)
+
 
 func set_navigation_ready(is_ready: bool) -> void:
 	navigation_ready = is_ready
@@ -108,14 +106,17 @@ func set_navigation_ready(is_ready: bool) -> void:
 		_change_state(ZombieState.LevelStart)
 		_stop_body()
 
+
 func set_ai_enabled(enabled: bool) -> void:
 	set_navigation_ready(enabled)
+
 
 func set_ai_player(target_player: Node3D) -> void:
 	player = target_player
 	vision_timer = 0.0
 	last_seen_timer = lost_sight_seconds
 	cached_player_visible = false
+
 
 func set_navigation_grid_maps(grid_maps: Array[GridMap]) -> void:
 	navigation_grid_maps.clear()
@@ -128,14 +129,18 @@ func set_navigation_grid_maps(grid_maps: Array[GridMap]) -> void:
 		navigation_grid_maps.append(grid_map)
 		navigation_grid_bounds_by_id[grid_map.get_instance_id()] = _get_grid_navigation_bounds(grid_map)
 
+
 func get_zombie_state() -> ZombieState:
 	return state
+
 
 func die_from_spike_trap() -> void:
 	_die_from_rolling_ball()
 
+
 func can_be_hit_by_spike_trap() -> bool:
 	return not is_dead
+
 
 func get_spike_trap_position() -> Vector3:
 	return _get_body_position()
@@ -148,12 +153,12 @@ func get_player_attention_position() -> Vector3:
 
 ## Reports whether this zombie is active and visible enough to track.
 func is_available_for_player_attention() -> bool:
-	return has_dropped_in and not is_dead and drop_pivot != null \
-		and drop_pivot.is_visible_in_tree()
+	return has_dropped_in and not is_dead and drop_pivot != null and drop_pivot.is_visible_in_tree()
 
 
 func force_state_for_test(next_state: ZombieState) -> void:
 	_change_state(next_state)
+
 
 func _configure_nodes() -> void:
 	map_collision_mask &= ~PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
@@ -161,12 +166,15 @@ func _configure_nodes() -> void:
 	if zombie_body != null:
 		zombie_body.collision_layer |= ZOMBIE_COLLISION_LAYER
 		zombie_body.collision_mask = (
-			zombie_body.collision_mask
-			| WORLD_COLLISION_LAYER
-			| PLAYER_COLLISION_LAYER
-			| ZOMBIE_COLLISION_LAYER
-			| SKELETON_COLLISION_LAYER
-		) & ~PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
+			(
+				zombie_body.collision_mask
+				| WORLD_COLLISION_LAYER
+				| PLAYER_COLLISION_LAYER
+				| ZOMBIE_COLLISION_LAYER
+				| SKELETON_COLLISION_LAYER
+			)
+			& ~PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
+		)
 
 	if navigation_agent != null:
 		navigation_agent.path_desired_distance = 0.18
@@ -177,8 +185,10 @@ func _configure_nodes() -> void:
 		crush_check_area.monitoring = true
 		crush_check_area.monitorable = false
 
+
 func _seed_deterministic_rng() -> void:
 	footstep_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"zombie")
+
 
 func _update_state(delta: float) -> void:
 	if is_dead:
@@ -227,6 +237,7 @@ func _update_state(delta: float) -> void:
 		ZombieState.Die:
 			_stop_body()
 
+
 func _update_patrol(delta: float) -> void:
 	if patrol_points.is_empty():
 		_change_state(ZombieState.Sitdown)
@@ -244,6 +255,7 @@ func _update_patrol(delta: float) -> void:
 
 	var horizontal_speed := _follow_navigation_target(current_target, delta)
 	_after_motion(delta, horizontal_speed)
+
 
 func _update_chase(delta: float, visible_player: bool) -> void:
 	if player == null or _is_player_dead():
@@ -284,6 +296,7 @@ func _update_chase(delta: float, visible_player: bool) -> void:
 		_update_animation(horizontal_speed)
 		_update_footsteps(delta, horizontal_speed)
 
+
 func _update_search_last_seen(delta: float, visible_player: bool) -> void:
 	if visible_player:
 		_change_state(ZombieState.Chase)
@@ -303,6 +316,7 @@ func _update_search_last_seen(delta: float, visible_player: bool) -> void:
 	if search_timer >= search_duration:
 		_change_state(ZombieState.ReturnToPatrol)
 
+
 func _update_return_to_patrol(delta: float, visible_player: bool) -> void:
 	if visible_player:
 		_change_state(ZombieState.Chase)
@@ -319,6 +333,7 @@ func _update_return_to_patrol(delta: float, visible_player: bool) -> void:
 
 	var horizontal_speed := _follow_navigation_target(current_target, delta)
 	_after_motion(delta, horizontal_speed)
+
 
 func _update_position_for_attack(delta: float, visible_player: bool) -> void:
 	var should_follow_target := true
@@ -353,9 +368,12 @@ func _update_position_for_attack(delta: float, visible_player: bool) -> void:
 			_change_state(ZombieState.Chase)
 			should_follow_target = false
 
-	if should_follow_target and (
-		not has_attack_position_target
-		or _has_static_blocker_between(_get_player_navigation_position(), attack_position_target)
+	if (
+		should_follow_target
+		and (
+			not has_attack_position_target
+			or _has_static_blocker_between(_get_player_navigation_position(), attack_position_target)
+		)
 	):
 		if not _select_attack_position_target():
 			_change_state(ZombieState.Chase)
@@ -373,6 +391,7 @@ func _update_position_for_attack(delta: float, visible_player: bool) -> void:
 			_select_attack_position_target()
 
 		_after_motion(delta, horizontal_speed)
+
 
 func _update_attack(delta: float, visible_player: bool) -> void:
 	_stop_body()
@@ -412,6 +431,7 @@ func _update_attack(delta: float, visible_player: bool) -> void:
 	else:
 		_change_state(ZombieState.Chase)
 
+
 func _update_sitdown(delta: float, visible_player: bool) -> void:
 	_stop_body()
 	sit_vision_timer -= delta
@@ -435,6 +455,7 @@ func _update_sitdown(delta: float, visible_player: bool) -> void:
 		sit_repath_timer = sit_repath_interval
 		if _select_closest_reachable_patrol_target():
 			_change_state(ZombieState.ReturnToPatrol)
+
 
 func _change_state(next_state: ZombieState) -> void:
 	if state == next_state:
@@ -473,6 +494,7 @@ func _change_state(next_state: ZombieState) -> void:
 		ZombieState.Die:
 			_set_attack_hitboxes_enabled(false)
 
+
 func _return_to_patrol_after_player_death() -> void:
 	cached_player_visible = false
 	last_seen_timer = lost_sight_seconds
@@ -486,11 +508,13 @@ func _return_to_patrol_after_player_death() -> void:
 	if state != ZombieState.Patrol and state != ZombieState.ReturnToPatrol:
 		_change_state(ZombieState.ReturnToPatrol)
 
+
 func _after_motion(delta: float, horizontal_speed: float) -> void:
 	_update_animation(horizontal_speed)
 	_update_footsteps(delta, horizontal_speed)
 	if stuck_timer >= stuck_seconds_before_sit:
 		_change_state(ZombieState.Sitdown)
+
 
 func _is_crushed(delta: float) -> bool:
 	if crush_check_area == null:
@@ -504,6 +528,7 @@ func _is_crushed(delta: float) -> bool:
 
 	crush_timer = crush_timer + delta if crushed else 0.0
 	return crush_timer >= crush_confirm_seconds
+
 
 func _update_rolling_ball_death(_delta: float) -> void:
 	if not rolling_ball_death_enabled or is_dead:
@@ -534,10 +559,13 @@ func _update_rolling_ball_death(_delta: float) -> void:
 		if collider_3d == null:
 			continue
 
-		var encroachment_percent := _get_rolling_ball_encroachment_percent(detection_center, collider_3d.global_position)
+		var encroachment_percent := _get_rolling_ball_encroachment_percent(
+			detection_center, collider_3d.global_position
+		)
 		if encroachment_percent >= rolling_ball_death_encroachment_percent:
 			_die_from_rolling_ball()
 			return
+
 
 func _get_detection_center() -> Vector3:
 	var collision_shape := _find_collision_shape(kill_area)
@@ -545,6 +573,7 @@ func _get_detection_center() -> Vector3:
 		return collision_shape.global_position
 
 	return _get_body_position()
+
 
 func _get_rolling_ball_encroachment_percent(detection_center: Vector3, ball_position: Vector3) -> float:
 	var horizontal_delta := ball_position - detection_center
@@ -556,6 +585,7 @@ func _get_rolling_ball_encroachment_percent(detection_center: Vector3, ball_posi
 
 	var detection_radius := maxf(rolling_ball_death_detection_radius, 0.001)
 	return clampf(overlap_depth / detection_radius * 100.0, 0.0, 100.0)
+
 
 func _die_from_rolling_ball() -> void:
 	if is_dead:
@@ -579,6 +609,7 @@ func _die_from_rolling_ball() -> void:
 		zombie_light.visible = false
 
 	_disappear_after_death()
+
 
 func _is_rolling_ball_body(collider: Object, target_position := Vector3.INF) -> bool:
 	if collider == null or not collider is Node:

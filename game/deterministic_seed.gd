@@ -1,7 +1,6 @@
 extends RefCounted
 class_name GDDeterministicSeed
 
-
 const HASH_MODULUS := 2147483647
 const HASH_OFFSET := 2166136261
 const HASH_PRIME := 16777619

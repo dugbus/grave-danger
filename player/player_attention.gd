@@ -1,7 +1,6 @@
 extends Node3D
 class_name GDPlayerAttention
 
-
 enum AttentionPhase {
 	Travel,
 	EnemyTracking,
@@ -10,6 +9,7 @@ enum AttentionPhase {
 	Returning,
 }
 
+const HEAD_LOOK := preload("res://player/player_head_look.gd")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const LOOK_SETTINGS := preload("res://game/character_look_settings.tres")
 const COLLECTIBLE_LOOK_DISTANCE := 3.25
@@ -24,7 +24,7 @@ const COLLECTIBLE_GROUPS: Array[StringName] = [
 @export var travel_pivot_path: NodePath = ^"../Pivot"
 ## Child pivot followed by the headlamp while the player glances.
 @export var look_direction_path: NodePath = ^"../Pivot/LookDirection"
-## New imported character containing a separately turnable head mesh when one becomes available.
+## Character containing a rigged head modifier or a separately turnable head mesh.
 @export var character_path: NodePath = ^"../Pivot/Character/NewCharacter"
 ## Existing spotlight that follows the player's procedural head turn.
 @export var headlamp_path: NodePath = ^"../Pivot/PlayerHeadlampLight"
@@ -38,6 +38,7 @@ const COLLECTIBLE_GROUPS: Array[StringName] = [
 @onready var headlamp := get_node_or_null(headlamp_path) as SpotLight3D
 @onready var sight_ray := get_node_or_null(sight_ray_path) as RayCast3D
 
+var tracking_stopped := false
 var phase := AttentionPhase.Travel
 var current_head_yaw := 0.0
 var target_head_yaw := 0.0
@@ -50,6 +51,9 @@ var movement_focus_ratio := 0.0
 var target_enemy: Node3D
 var target_collectible: Node3D
 var acknowledged_collectible_ids: Array[int] = []
+var head_look: HEAD_LOOK
+var head_skeleton: Skeleton3D
+var head_bone := -1
 var head: Node3D
 var torso: Node3D
 var head_rest_yaw := 0.0
@@ -62,6 +66,11 @@ var glance_rng := RandomNumberGenerator.new()
 func _ready() -> void:
 	process_priority = 100
 	glance_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"player_attention")
+	if character != null:
+		head_look = character.find_child("HeadLook", true, false) as HEAD_LOOK
+	if head_look != null:
+		head_skeleton = head_look.get_skeleton()
+		head_bone = head_skeleton.find_bone("DEF-spine.006")
 	head = _find_named_node(character, &"head")
 	if head != null:
 		head_rest_yaw = head.rotation.y
@@ -70,38 +79,64 @@ func _ready() -> void:
 		torso_rest_yaw = torso.rotation.y
 	if headlamp != null:
 		headlamp_rest_transform = headlamp.global_transform
-		if head != null:
-			headlamp_head_offset = head.global_transform.affine_inverse() \
-				* headlamp.global_transform
+		if head_skeleton != null and head_bone >= 0:
+			headlamp_head_offset = _rigged_head_transform().affine_inverse() * headlamp.global_transform
+		elif head != null:
+			headlamp_head_offset = head.global_transform.affine_inverse() * headlamp.global_transform
 	if sight_ray != null and player != null:
 		sight_ray.add_exception(player)
 	_schedule_next_glance()
 
 
 func _process(_delta: float) -> void:
-	var upper_body_yaw := current_head_yaw \
-		* float(LOOK_SETTINGS.upper_body_turn_fraction)
+	if tracking_stopped:
+		return
+	var upper_body_yaw := current_head_yaw * float(LOOK_SETTINGS.upper_body_turn_fraction)
 	if torso != null:
 		torso.rotation.y = torso_rest_yaw + upper_body_yaw
 	if head != null:
 		# The imported animation owns pitch and roll; this late process pass owns yaw.
 		head.rotation.y = head_rest_yaw + current_head_yaw - upper_body_yaw
 	if headlamp != null:
-		if head != null:
+		if head_skeleton != null and head_bone >= 0:
+			headlamp.global_transform = _rigged_head_transform() * headlamp_head_offset
+		elif head != null:
 			# Preserve the authored lamp offset while following the complete animated head.
 			headlamp.global_transform = head.global_transform * headlamp_head_offset
 		else:
-			var fallback_rotation := Quaternion(Vector3.UP, current_head_yaw) \
-				* headlamp_rest_transform.basis.get_rotation_quaternion()
-			headlamp.global_transform = Transform3D(
-				Basis(fallback_rotation),
-				headlamp_rest_transform.origin
+			var fallback_rotation := (
+				Quaternion(Vector3.UP, current_head_yaw) * headlamp_rest_transform.basis.get_rotation_quaternion()
 			)
+			headlamp.global_transform = Transform3D(Basis(fallback_rotation), headlamp_rest_transform.origin)
+
+
+## Death releases procedural head control so the authored final pose owns the face.
+func stop_tracking() -> void:
+	tracking_stopped = true
+	set_process(false)
+	current_head_yaw = 0.0
+	target_head_yaw = 0.0
+	target_enemy = null
+	target_collectible = null
+	phase = AttentionPhase.Travel
+	if head_look != null:
+		head_look.head_yaw = 0.0
+	if look_direction != null:
+		look_direction.rotation.y = 0.0
+	if head != null:
+		head.rotation.y = head_rest_yaw
+	if torso != null:
+		torso.rotation.y = torso_rest_yaw
+
+
+func _rigged_head_transform() -> Transform3D:
+	var pose := head_look.head_transform if head_look.head_bone >= 0 else head_skeleton.get_bone_global_pose(head_bone)
+	return head_skeleton.global_transform * pose
 
 
 ## Tracks close visible enemies before considering collectibles or ambient glances.
 func update_attention(delta: float, current_movement_focus_ratio: float = 0.0) -> void:
-	if player == null or travel_pivot == null or look_direction == null:
+	if tracking_stopped or player == null or travel_pivot == null or look_direction == null:
 		return
 	movement_focus_ratio = clampf(current_movement_focus_ratio, 0.0, 1.0)
 	var nearby_enemy := _find_nearby_enemy()
@@ -134,19 +169,17 @@ func update_attention(delta: float, current_movement_focus_ratio: float = 0.0) -
 					_choose_wandering_glance()
 		AttentionPhase.CollectibleGlance:
 			glance_elapsed += maxf(delta, 0.0)
-			if not is_instance_valid(target_collectible) \
-					or not _is_collectible_available(target_collectible) \
-					or glance_elapsed >= float(LOOK_SETTINGS.get_wandering_hold_seconds(
-						movement_focus_ratio
-					)):
+			if (
+				not is_instance_valid(target_collectible)
+				or not _is_collectible_available(target_collectible)
+				or glance_elapsed >= float(LOOK_SETTINGS.get_wandering_hold_seconds(movement_focus_ratio))
+			):
 				phase = AttentionPhase.Returning
 				target_collectible = null
 		AttentionPhase.WanderingGlance:
 			target_collectible = null
 			glance_elapsed += maxf(delta, 0.0)
-			if glance_elapsed >= float(LOOK_SETTINGS.get_wandering_hold_seconds(
-				movement_focus_ratio
-			)):
+			if glance_elapsed >= float(LOOK_SETTINGS.get_wandering_hold_seconds(movement_focus_ratio)):
 				glance_elapsed = 0.0
 				if _uses_continuous_idle_scan():
 					_choose_wandering_glance()
@@ -163,18 +196,17 @@ func update_attention(delta: float, current_movement_focus_ratio: float = 0.0) -
 					phase = AttentionPhase.Travel
 					_schedule_next_glance()
 
-	target_head_yaw = _yaw_to_enemy(target_enemy) \
-		if phase == AttentionPhase.EnemyTracking else 0.0
+	target_head_yaw = _yaw_to_enemy(target_enemy) if phase == AttentionPhase.EnemyTracking else 0.0
 	if phase == AttentionPhase.CollectibleGlance:
 		target_head_yaw = _yaw_to_collectible(target_collectible)
 	if phase == AttentionPhase.WanderingGlance:
 		target_head_yaw = _get_wandering_target_yaw()
 	current_head_yaw = move_toward(
-		current_head_yaw,
-		target_head_yaw,
-		float(LOOK_SETTINGS.head_turn_speed) * maxf(delta, 0.0)
+		current_head_yaw, target_head_yaw, float(LOOK_SETTINGS.head_turn_speed) * maxf(delta, 0.0)
 	)
 	look_direction.rotation.y = current_head_yaw
+	if head_look != null:
+		head_look.head_yaw = current_head_yaw
 
 
 ## Returns the close enemy currently holding priority over other attention.
@@ -212,16 +244,17 @@ func _find_nearby_enemy() -> Node3D:
 		var distance_squared := horizontal_offset.length_squared()
 		if distance_squared > pow(float(LOOK_SETTINGS.enemy_attention_distance), 2.0):
 			continue
-		if absf(_raw_yaw_to_position(target_position)) \
-				> _enemy_attention_half_arc_radians():
+		if absf(_raw_yaw_to_position(target_position)) > _enemy_attention_half_arc_radians():
 			continue
 		var sight_target := target_position + Vector3.UP * ENEMY_SIGHT_TARGET_HEIGHT
 		if not _has_line_of_sight(candidate, sight_target):
 			continue
-		if distance_squared < closest_distance_squared or (
-				is_equal_approx(distance_squared, closest_distance_squared) \
-				and (closest_enemy == null \
-				or str(candidate.get_path()) < str(closest_enemy.get_path()))
+		if (
+			distance_squared < closest_distance_squared
+			or (
+				is_equal_approx(distance_squared, closest_distance_squared)
+				and (closest_enemy == null or str(candidate.get_path()) < str(closest_enemy.get_path()))
+			)
 		):
 			closest_enemy = candidate
 			closest_distance_squared = distance_squared
@@ -259,9 +292,9 @@ func _find_nearby_collectible() -> Node3D:
 	for candidate in candidates:
 		if acknowledged_collectible_ids.has(candidate.get_instance_id()):
 			continue
-		if _is_in_safe_head_arc(candidate) and _has_line_of_sight(
-			candidate,
-			candidate.global_position + Vector3.UP * 0.25
+		if (
+			_is_in_safe_head_arc(candidate)
+			and _has_line_of_sight(candidate, candidate.global_position + Vector3.UP * 0.25)
 		):
 			return candidate
 	return null
@@ -280,8 +313,7 @@ func _is_collectible_available(candidate: Node3D) -> bool:
 
 
 func _is_in_safe_head_arc(candidate: Node3D) -> bool:
-	return absf(_raw_yaw_to_collectible(candidate)) \
-		<= _movement_scaled_head_turn_radians()
+	return absf(_raw_yaw_to_collectible(candidate)) <= _movement_scaled_head_turn_radians()
 
 
 func _has_line_of_sight(candidate: Node3D, target_position: Vector3) -> bool:
@@ -297,9 +329,7 @@ func _has_line_of_sight(candidate: Node3D, target_position: Vector3) -> bool:
 
 func _yaw_to_collectible(candidate: Node3D) -> float:
 	return clampf(
-		_raw_yaw_to_collectible(candidate),
-		-_movement_scaled_head_turn_radians(),
-		_movement_scaled_head_turn_radians()
+		_raw_yaw_to_collectible(candidate), -_movement_scaled_head_turn_radians(), _movement_scaled_head_turn_radians()
 	)
 
 
@@ -326,8 +356,7 @@ func _raw_yaw_to_position(world_position: Vector3) -> float:
 	world_direction.y = 0.0
 	if world_direction.is_zero_approx():
 		return 0.0
-	var local_direction := travel_pivot.global_basis.inverse() \
-		* world_direction.normalized()
+	var local_direction := travel_pivot.global_basis.inverse() * world_direction.normalized()
 	return atan2(local_direction.x, local_direction.z)
 
 
@@ -340,15 +369,11 @@ func _enemy_attention_half_arc_radians() -> float:
 
 
 func _movement_scaled_head_turn_radians() -> float:
-	return float(LOOK_SETTINGS.get_wandering_head_turn_radians(
-		movement_focus_ratio
-	))
+	return float(LOOK_SETTINGS.get_wandering_head_turn_radians(movement_focus_ratio))
 
 
 func _get_wandering_target_yaw() -> float:
-	return _movement_scaled_head_turn_radians() \
-		* wandering_glance_fraction \
-		* wandering_glance_side
+	return _movement_scaled_head_turn_radians() * wandering_glance_fraction * wandering_glance_side
 
 
 func _choose_wandering_glance() -> void:
@@ -359,18 +384,16 @@ func _choose_wandering_glance() -> void:
 
 
 func _uses_continuous_idle_scan() -> bool:
-	return float(LOOK_SETTINGS.get_wandering_strength(movement_focus_ratio)) \
+	return (
+		float(LOOK_SETTINGS.get_wandering_strength(movement_focus_ratio))
 		>= float(LOOK_SETTINGS.continuous_idle_strength_threshold)
+	)
 
 
 func _schedule_next_glance() -> void:
 	next_glance_seconds = glance_rng.randf_range(
-		float(LOOK_SETTINGS.get_wandering_interval_min_seconds(
-			movement_focus_ratio
-		)),
-		float(LOOK_SETTINGS.get_wandering_interval_max_seconds(
-			movement_focus_ratio
-		))
+		float(LOOK_SETTINGS.get_wandering_interval_min_seconds(movement_focus_ratio)),
+		float(LOOK_SETTINGS.get_wandering_interval_max_seconds(movement_focus_ratio))
 	)
 
 

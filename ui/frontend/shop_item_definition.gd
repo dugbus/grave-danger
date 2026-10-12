@@ -6,8 +6,8 @@ extends Resource
 const SHOP_STAT_MODIFIER_SCRIPT := preload("res://ui/frontend/shop_stat_modifier.gd")
 
 enum Availability {
-    Available,
-    Unavailable,
+	Available,
+	Unavailable,
 }
 
 ## Stable identifier used to select and save this shop item.

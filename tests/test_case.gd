@@ -36,19 +36,9 @@ func expect_script_contract(subject: Script, expected_path: String) -> void:
 	if subject == null:
 		return
 
-	expect_equal(
-		subject.resource_path,
-		expected_path,
-		"The sibling test references its exact production script."
-	)
-	expect(
-		not subject.get_source_code().strip_edges().is_empty(),
-		"The production script contains executable source."
-	)
-	expect(
-		_has_named_members(subject),
-		"The production script exposes a named member API."
-	)
+	expect_equal(subject.resource_path, expected_path, "The sibling test references its exact production script.")
+	expect(not subject.get_source_code().strip_edges().is_empty(), "The production script contains executable source.")
+	expect(_has_named_members(subject), "The production script exposes a named member API.")
 	_expect_default_construction(subject)
 
 
@@ -107,9 +97,11 @@ func _expect_property_round_trips(subject: Script, instance: Object) -> void:
 		var property := property_value as Dictionary
 		var property_name := property.get("name", &"") as StringName
 		var usage := int(property.get("usage", PROPERTY_USAGE_NONE))
-		if property_name == &"" \
-				or (usage & PROPERTY_USAGE_SCRIPT_VARIABLE) == 0 \
-				or (usage & PROPERTY_USAGE_READ_ONLY) != 0:
+		if (
+			property_name == &""
+			or (usage & PROPERTY_USAGE_SCRIPT_VARIABLE) == 0
+			or (usage & PROPERTY_USAGE_READ_ONLY) != 0
+		):
 			continue
 
 		var original_value: Variant = instance.get(property_name)
@@ -120,12 +112,13 @@ func _expect_property_round_trips(subject: Script, instance: Object) -> void:
 
 	expect(
 		changed_properties.is_empty(),
-		"%d script properties safely retain their default values off-tree%s." \
+		(
+			"%d script properties safely retain their default values off-tree%s."
 			% [
 				checked_property_count,
-				" (changed: %s)" % ", ".join(changed_properties) \
-					if not changed_properties.is_empty() else "",
+				" (changed: %s)" % ", ".join(changed_properties) if not changed_properties.is_empty() else "",
 			]
+		)
 	)
 
 

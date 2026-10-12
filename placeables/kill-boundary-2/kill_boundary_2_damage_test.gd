@@ -39,8 +39,7 @@ func run(_tree: SceneTree) -> void:
 	var first_shape := damage.segments[0].get_node(^"CollisionShape3D") as CollisionShape3D
 	var second_shape := damage.segments[1].get_node(^"CollisionShape3D") as CollisionShape3D
 	expect(
-		first_shape.shape != second_shape.shape,
-		"Each lethal segment owns its independently resizable collision shape."
+		first_shape.shape != second_shape.shape, "Each lethal segment owns its independently resizable collision shape."
 	)
 	body.free()
 	damage.free()

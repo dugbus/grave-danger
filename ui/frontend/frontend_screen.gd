@@ -23,8 +23,7 @@ func _enter_tree() -> void:
 
 
 func _exit_tree() -> void:
-	if observed_viewport != null \
-			and observed_viewport.size_changed.is_connected(_on_viewport_size_changed):
+	if observed_viewport != null and observed_viewport.size_changed.is_connected(_on_viewport_size_changed):
 		observed_viewport.size_changed.disconnect(_on_viewport_size_changed)
 	observed_viewport = null
 
@@ -55,10 +54,7 @@ func _sync_screen_container() -> void:
 	var available_size := _get_available_screen_size()
 	if available_size.x <= 0.0 or available_size.y <= 0.0:
 		return
-	var scale_factor := minf(
-		available_size.x / reference_screen_size.x,
-		available_size.y / reference_screen_size.y
-	)
+	var scale_factor := minf(available_size.x / reference_screen_size.x, available_size.y / reference_screen_size.y)
 	var scaled_size := reference_screen_size * scale_factor
 	screen_container.position = (available_size - scaled_size) * 0.5
 	screen_container.size = reference_screen_size
@@ -85,8 +81,10 @@ func _is_accept_event(event: InputEvent) -> bool:
 	if event is InputEventJoypadButton:
 		return event.pressed and event.button_index == JOY_BUTTON_A
 	if event is InputEventKey:
-		return event.pressed and not event.echo and (
-			event.physical_keycode == KEY_ENTER or event.physical_keycode == KEY_SPACE
+		return (
+			event.pressed
+			and not event.echo
+			and (event.physical_keycode == KEY_ENTER or event.physical_keycode == KEY_SPACE)
 		)
 	return false
 

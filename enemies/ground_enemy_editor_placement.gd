@@ -49,14 +49,9 @@ func _process(_delta: float) -> void:
 func snap_parent_to_ground() -> bool:
 	var placement_node := get_parent() as Node3D
 	var floor_sample_node := get_node_or_null(floor_sample_path) as Node3D
-	if placement_node == null or floor_sample_node == null \
-			or not placement_node.is_inside_tree():
+	if placement_node == null or floor_sample_node == null or not placement_node.is_inside_tree():
 		return false
 
 	return GROUND_SPAWN.snap_to_nearby_floor(
-		placement_node,
-		floor_sample_node,
-		placement_node,
-		collision_mask,
-		minimum_floor_normal_y
+		placement_node, floor_sample_node, placement_node, collision_mask, minimum_floor_normal_y
 	)

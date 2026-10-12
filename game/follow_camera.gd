@@ -1,7 +1,6 @@
 extends Camera3D
 class_name GDFollowCamera
 
-
 ## Character or focus node this camera normally follows.
 @export var target_path: NodePath = ^"../Player"
 
@@ -189,11 +188,7 @@ func _update_manual_zoom(delta: float) -> void:
 	var zoom_input := Input.get_axis("camera_zoom_in", "camera_zoom_out")
 	zoom_input = 0.0 if absf(zoom_input) < camera_input_deadzone else zoom_input
 
-	zoom_distance = clampf(
-		zoom_distance + zoom_input * manual_zoom_speed * delta,
-		min_zoom_distance,
-		max_zoom_distance
-	)
+	zoom_distance = clampf(zoom_distance + zoom_input * manual_zoom_speed * delta, min_zoom_distance, max_zoom_distance)
 
 
 func _update_boundary_zoom(delta: float) -> void:
@@ -255,17 +250,15 @@ func _get_initial_bounds_distance(bounds_size: Vector2) -> float:
 
 func _get_boundary_fit_points(bounds_size: Vector2) -> Array[Vector3]:
 	if kill_boundary.has_method(&"get_camera_fit_world_points"):
-		var exact_points := (
-			kill_boundary.call(&"get_camera_fit_world_points") as PackedVector3Array
-		)
+		var exact_points := kill_boundary.call(&"get_camera_fit_world_points") as PackedVector3Array
 		if not exact_points.is_empty():
 			var exact_result: Array[Vector3] = []
 			var exact_focus := _get_boundary_fit_focus()
-			var exact_height := maxf(kill_boundary.get_bounds_height(), 0.0) \
-				if kill_boundary.has_method(&"get_bounds_height") else 0.0
+			var exact_height := (
+				maxf(kill_boundary.get_bounds_height(), 0.0) if kill_boundary.has_method(&"get_bounds_height") else 0.0
+			)
 			for world_point in exact_points:
-				var padded := exact_focus \
-					+ (world_point - exact_focus) * boundary_padding
+				var padded := exact_focus + (world_point - exact_focus) * boundary_padding
 				exact_result.append(padded)
 				if exact_height > 0.0:
 					exact_result.append(padded + Vector3.UP * exact_height)
@@ -361,11 +354,7 @@ func _get_rotated_camera_offset_for_distance(distance: float) -> Vector3:
 		horizontal_distance = cos(elevation) * distance
 		vertical_distance = sin(elevation) * distance
 
-	return Vector3(
-		sin(camera_yaw) * horizontal_distance,
-		vertical_distance,
-		cos(camera_yaw) * horizontal_distance
-	)
+	return Vector3(sin(camera_yaw) * horizontal_distance, vertical_distance, cos(camera_yaw) * horizontal_distance)
 
 
 func _get_camera_transform_for_distance(distance: float, fit_focus: Vector3) -> Transform3D:

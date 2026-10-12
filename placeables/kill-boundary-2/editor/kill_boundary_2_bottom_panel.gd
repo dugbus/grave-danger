@@ -42,27 +42,15 @@ func bind_boundary(new_boundary: GDKillBoundary2, undo_redo: EditorUndoRedoManag
 		boundary.preview_stop()
 	if boundary != null and boundary.sequence.sequence_changed.is_connected(_on_sequence_changed):
 		boundary.sequence.sequence_changed.disconnect(_on_sequence_changed)
-	if (
-		boundary != null
-		and boundary.editor_active_pose_changed.is_connected(_on_active_pose_changed)
-	):
+	if boundary != null and boundary.editor_active_pose_changed.is_connected(_on_active_pose_changed):
 		boundary.editor_active_pose_changed.disconnect(_on_active_pose_changed)
-	if (
-		boundary != null
-		and boundary.playback_configuration_changed.is_connected(_on_playback_configuration_changed)
-	):
+	if boundary != null and boundary.playback_configuration_changed.is_connected(_on_playback_configuration_changed):
 		boundary.playback_configuration_changed.disconnect(_on_playback_configuration_changed)
 	boundary = new_boundary
 	controller.configure(boundary, undo_redo)
-	if (
-		boundary != null
-		and not boundary.sequence.sequence_changed.is_connected(_on_sequence_changed)
-	):
+	if boundary != null and not boundary.sequence.sequence_changed.is_connected(_on_sequence_changed):
 		boundary.sequence.sequence_changed.connect(_on_sequence_changed)
-	if (
-		boundary != null
-		and not boundary.editor_active_pose_changed.is_connected(_on_active_pose_changed)
-	):
+	if boundary != null and not boundary.editor_active_pose_changed.is_connected(_on_active_pose_changed):
 		boundary.editor_active_pose_changed.connect(_on_active_pose_changed)
 	if (
 		boundary != null
@@ -108,8 +96,10 @@ func _build_interface() -> void:
 		navigation,
 		"Edit Pose",
 		_on_edit_pose_pressed,
-		"Select the active Pose in the scene and Inspector so its position, yaw, size, and "
-		+ "rounding can be edited in the viewport."
+		(
+			"Select the active Pose in the scene and Inspector so its position, yaw, size, and "
+			+ "rounding can be edited in the viewport."
+		)
 	)
 	_previous_button = _add_button(
 		navigation,
@@ -118,10 +108,7 @@ func _build_interface() -> void:
 		"Edit the pose immediately before this one and show it in the preview."
 	)
 	_next_button = _add_button(
-		navigation,
-		"Next",
-		_on_next_pressed,
-		"Edit the pose immediately after this one and show it in the preview."
+		navigation, "Next", _on_next_pressed, "Edit the pose immediately after this one and show it in the preview."
 	)
 	_add_button(
 		navigation,
@@ -145,8 +132,7 @@ func _build_interface() -> void:
 	var authoring := HBoxContainer.new()
 	add_child(authoring)
 	var time_help := (
-		"Choose when the boundary reaches this pose, measured from the start. Pose 1 always "
-		+ "stays at 0 seconds."
+		"Choose when the boundary reaches this pose, measured from the start. Pose 1 always " + "stays at 0 seconds."
 	)
 	_add_label(authoring, "Absolute time", time_help)
 	_time_spin = SpinBox.new()
@@ -160,8 +146,7 @@ func _build_interface() -> void:
 	_duration_label = _add_label(
 		authoring,
 		"Duration: —",
-		"Shows how long the boundary takes to reach the next pose. Change either pose's "
-		+ "Absolute Time to alter it."
+		"Shows how long the boundary takes to reach the next pose. Change either pose's " + "Absolute Time to alter it."
 	)
 	var easing_help := (
 		"Choose how movement leaves this pose. Constant moves evenly; Smooth starts and ends "
@@ -191,17 +176,9 @@ func _build_interface() -> void:
 	var transport := HBoxContainer.new()
 	add_child(transport)
 	_add_button(
-		transport,
-		"Start",
-		_on_start_pressed,
-		"Jump to Pose 1 and pause there, ready to preview from the beginning."
+		transport, "Start", _on_start_pressed, "Jump to Pose 1 and pause there, ready to preview from the beginning."
 	)
-	_add_button(
-		transport,
-		"Play",
-		_on_play_pressed,
-		"Run or resume the boundary preview from its current point."
-	)
+	_add_button(transport, "Play", _on_play_pressed, "Run or resume the boundary preview from its current point.")
 	_add_button(
 		transport,
 		"Stop",
@@ -251,9 +228,7 @@ func _build_interface() -> void:
 	timeline.add_child(_scrubber)
 
 
-func _add_button(
-	parent: Control, text_value: String, callback: Callable, help_text: String
-) -> Button:
+func _add_button(parent: Control, text_value: String, callback: Callable, help_text: String) -> Button:
 	var button := Button.new()
 	button.text = text_value
 	button.tooltip_text = help_text
@@ -289,9 +264,7 @@ func _refresh() -> void:
 		_scrubber
 	]:
 		(control as Control).set_process_input(has_boundary)
-		(control as Control).mouse_filter = (
-			Control.MOUSE_FILTER_STOP if has_boundary else Control.MOUSE_FILTER_IGNORE
-		)
+		(control as Control).mouse_filter = (Control.MOUSE_FILTER_STOP if has_boundary else Control.MOUSE_FILTER_IGNORE)
 	if not has_boundary:
 		_pose_label.text = "Select a Kill Boundary 2"
 		_refreshing = false
@@ -303,9 +276,7 @@ func _refresh() -> void:
 	_pose_option.clear()
 	for pose_index in count:
 		var listed_pose := boundary.sequence.get_pose(pose_index)
-		_pose_option.add_item(
-			"Pose %d — %.2f s" % [pose_index + 1, listed_pose.time_seconds], pose_index
-		)
+		_pose_option.add_item("Pose %d — %.2f s" % [pose_index + 1, listed_pose.time_seconds], pose_index)
 	_pose_option.select(_pose_option.get_item_index(index))
 	_previous_button.disabled = index <= 0
 	_next_button.disabled = index >= count - 1
@@ -313,9 +284,7 @@ func _refresh() -> void:
 	_time_spin.editable = index > 0
 	_time_spin.value = pose.time_seconds
 	var duration := (
-		boundary.sequence.get_pose(index + 1).time_seconds - pose.time_seconds
-		if index + 1 < count
-		else -1.0
+		boundary.sequence.get_pose(index + 1).time_seconds - pose.time_seconds if index + 1 < count else -1.0
 	)
 	if duration >= 0.0:
 		_duration_label.text = "Next duration: %.2f s" % duration
@@ -380,16 +349,12 @@ func _on_time_changed(value: float) -> void:
 
 func _on_easing_selected(index: int) -> void:
 	if not _refreshing:
-		controller.set_pose_easing(
-			_easing_option.get_item_id(index) as GDKillBoundary2Pose.TransitionEasing
-		)
+		controller.set_pose_easing(_easing_option.get_item_id(index) as GDKillBoundary2Pose.TransitionEasing)
 
 
 func _on_retiming_selected(index: int) -> void:
 	if not _refreshing and boundary != null:
-		controller.set_retiming_mode(
-			_retiming_option.get_item_id(index) as GDKillBoundary2Sequence.RetimingMode
-		)
+		controller.set_retiming_mode(_retiming_option.get_item_id(index) as GDKillBoundary2Sequence.RetimingMode)
 
 
 func _on_start_pressed() -> void:

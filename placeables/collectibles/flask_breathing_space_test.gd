@@ -12,12 +12,8 @@ class TestBoundary:
 	var expansion_transition_seconds := 0.0
 	var contraction_transition_seconds := 0.0
 
-
 	func expand_runtime_bounds_percent_for(
-		percent: float,
-		duration: float,
-		expansion_seconds: float,
-		contraction_seconds: float
+		percent: float, duration: float, expansion_seconds: float, contraction_seconds: float
 	) -> bool:
 		expansion_percent = percent
 		active_seconds = duration
@@ -31,7 +27,6 @@ class TestFlask:
 
 	var boundary: Node
 
-
 	func _get_kill_boundary() -> Node:
 		return boundary
 
@@ -43,11 +38,13 @@ func run(_tree: SceneTree) -> void:
 	flask.boundary = boundary
 	var applied := flask.call(&"_apply_effect", null) as bool
 	expect(
-		applied \
-			and is_equal_approx(boundary.expansion_percent, 25.0) \
-			and is_equal_approx(boundary.active_seconds, 8.0) \
-			and is_equal_approx(boundary.expansion_transition_seconds, 1.0) \
-			and is_equal_approx(boundary.contraction_transition_seconds, 4.0),
+		(
+			applied
+			and is_equal_approx(boundary.expansion_percent, 25.0)
+			and is_equal_approx(boundary.active_seconds, 8.0)
+			and is_equal_approx(boundary.expansion_transition_seconds, 1.0)
+			and is_equal_approx(boundary.contraction_transition_seconds, 4.0)
+		),
 		"Breathing-space flasks pass separate one-second expansion and four-second contraction timings."
 	)
 	flask.free()

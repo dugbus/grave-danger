@@ -19,31 +19,22 @@ static func resolve_names(animation_players: Array[AnimationPlayer]) -> Dictiona
 		var animation_list := animation_player.get_animation_list()
 		if animation_list.is_empty():
 			continue
-		animation_names[animation_player] = _get_flap_animation_name(
-			animation_player,
-			animation_list
-		)
+		animation_names[animation_player] = _get_flap_animation_name(animation_player, animation_list)
 	return animation_names
 
 
-static func play(
-	animation_players: Array[AnimationPlayer],
-	animation_names: Dictionary,
-	speed_scale: float
-) -> void:
+static func play(animation_players: Array[AnimationPlayer], animation_names: Dictionary, speed_scale: float) -> void:
 	for animation_player in animation_players:
 		if not animation_names.has(animation_player):
 			continue
 		var animation_name := animation_names[animation_player] as StringName
 		animation_player.speed_scale = speed_scale
-		if animation_player.current_animation != animation_name \
-				or not animation_player.is_playing():
+		if animation_player.current_animation != animation_name or not animation_player.is_playing():
 			animation_player.play(animation_name, -1.0, speed_scale)
 
 
 static func _get_flap_animation_name(
-	animation_player: AnimationPlayer,
-	animation_list: PackedStringArray
+	animation_player: AnimationPlayer, animation_list: PackedStringArray
 ) -> StringName:
 	if animation_list.size() == 1:
 		return StringName(animation_list[0])
@@ -67,9 +58,7 @@ static func _get_flap_animation_name(
 	return COMBINED_FLAP_ANIMATION
 
 
-static func _get_or_create_default_animation_library(
-	animation_player: AnimationPlayer
-) -> AnimationLibrary:
+static func _get_or_create_default_animation_library(animation_player: AnimationPlayer) -> AnimationLibrary:
 	if animation_player.has_animation_library(&""):
 		return animation_player.get_animation_library(&"")
 	var animation_library := AnimationLibrary.new()

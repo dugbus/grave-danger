@@ -19,10 +19,13 @@ func run(tree: SceneTree) -> void:
 	var blocker_body := boundary.blocker_bodies[0] as StaticBody3D
 	var blocker_shape := boundary.blocker_collisions[0].shape as BoxShape3D
 
-	player.global_position = center.global_transform * Vector3(
-		boundary.get_bounds_size().x * 0.5,
-		0.0,
-		0.0,
+	player.global_position = (
+		center.global_transform
+		* Vector3(
+			boundary.get_bounds_size().x * 0.5,
+			0.0,
+			0.0,
+		)
 	)
 	player.global_position.y = 0.0
 	var energy_before := death_controller.flame_energy
@@ -33,8 +36,5 @@ func run(tree: SceneTree) -> void:
 		death_controller.flame_energy < energy_before,
 		"Tutorial 2's grounded flame boundary damages the player at its perimeter."
 	)
-	expect(
-		blocker_bottom <= player_top,
-		"Tutorial 2's boundary blockers overlap the player's collision height."
-	)
+	expect(blocker_bottom <= player_top, "Tutorial 2's boundary blockers overlap the player's collision height.")
 	level.free()

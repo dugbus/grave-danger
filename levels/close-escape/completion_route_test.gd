@@ -6,14 +6,29 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 # Conservative travel pace includes steering; dwell budgets allow collecting, banking and threats.
 const WALK_SPEED := 2.5
 const ROUTE: Array[NodePath] = [
-	^"Treasure/CacheA1", ^"Treasure/CacheA2", ^"Deposits/DepositA",
-	^"Treasure/CacheA3", ^"Progression/SilverKey1", ^"Progression/SilverDoor1",
-	^"Treasure/CacheB1", ^"Progression/SilverKey2", ^"Treasure/CacheB2",
-	^"Deposits/DepositB", ^"Treasure/CacheB3", ^"Progression/SilverDoor2",
-	^"Treasure/CacheC1", ^"Deposits/DepositC", ^"Treasure/CacheC2",
-	^"Progression/SilverKey3", ^"Progression/SilverDoor3",
-	^"Treasure/CacheC3", ^"Deposits/VaultDeposit", ^"Treasure/CacheC4",
-	^"Progression/GoldKey", ^"Deposits/VaultDeposit", ^"Progression/FinalGate",
+	^"Treasure/CacheA1",
+	^"Treasure/CacheA2",
+	^"Deposits/DepositA",
+	^"Treasure/CacheA3",
+	^"Progression/SilverKey1",
+	^"Progression/SilverDoor1",
+	^"Treasure/CacheB1",
+	^"Progression/SilverKey2",
+	^"Treasure/CacheB2",
+	^"Deposits/DepositB",
+	^"Treasure/CacheB3",
+	^"Progression/SilverDoor2",
+	^"Treasure/CacheC1",
+	^"Deposits/DepositC",
+	^"Treasure/CacheC2",
+	^"Progression/SilverKey3",
+	^"Progression/SilverDoor3",
+	^"Treasure/CacheC3",
+	^"Deposits/VaultDeposit",
+	^"Treasure/CacheC4",
+	^"Progression/GoldKey",
+	^"Deposits/VaultDeposit",
+	^"Progression/FinalGate",
 ]
 
 
@@ -51,7 +66,10 @@ func _check_route(tree: SceneTree, walk_speed: float, collect_all: bool, pause_s
 	var visited: Dictionary = {}
 	var unsafe_samples := 0
 	for target_path in ROUTE:
-		if not collect_all and (String(target_path).begins_with("Treasure/") or String(target_path).begins_with("Deposits/")):
+		if (
+			not collect_all
+			and (String(target_path).begins_with("Treasure/") or String(target_path).begins_with("Deposits/"))
+		):
 			continue
 		var target := level.get_node(target_path) as Node3D
 		var target_cell := _cell(target)
@@ -82,7 +100,17 @@ func _check_route(tree: SceneTree, walk_speed: float, collect_all: bool, pause_s
 				pressure.advance_catch_up(animator, step)
 				if not _safe(animator, animator.authored_position, origin.lerp(destination, float(sample) / 4.0)):
 					unsafe_samples += 1
-					print("Unsafe approach %s at real %.1f / flame %.1f: %s" % [target.name, seconds, animator.authored_position, origin.lerp(destination, float(sample) / 4.0)])
+					print(
+						(
+							"Unsafe approach %s at real %.1f / flame %.1f: %s"
+							% [
+								target.name,
+								seconds,
+								animator.authored_position,
+								origin.lerp(destination, float(sample) / 4.0)
+							]
+						)
+					)
 			current = cell
 		for index in pressure.passages.size():
 			if target == pressure.passages[index]:
@@ -119,18 +147,30 @@ func _check_route(tree: SceneTree, walk_speed: float, collect_all: bool, pause_s
 				animator.advance(0.1)
 				pressure.advance_catch_up(animator, 0.1)
 			seconds += pause_seconds
-			expect(is_equal_approx(animator.authored_position, before_pause), "Pause relief does not become delayed forward access.")
+			expect(
+				is_equal_approx(animator.authored_position, before_pause),
+				"Pause relief does not become delayed forward access."
+			)
 			animator.set_paused(false)
 	if collect_all:
 		expect(visited.size() == 10 and coins == 240, "Route visits all ten caches and all 240 coins.")
-	expect(unsafe_samples == 0, "Whole collection route clears the moving flame by 0.6m (%d unsafe samples)." % unsafe_samples)
+	expect(
+		unsafe_samples == 0,
+		"Whole collection route clears the moving flame by 0.6m (%d unsafe samples)." % unsafe_samples
+	)
 	var vault_entry := _cell(level.get_node(^"Progression/SilverDoor3") as Node3D)
 	var optional_cache := _cell(level.get_node(^"Treasure/CacheC3") as Node3D)
 	var gold_key_cell := _cell(level.get_node(^"Progression/GoldKey") as Node3D)
 	blocked[Vector2i(25, 24)] = true
 	blocked[Vector2i(25, 25)] = true
-	expect(_path(vault_entry, optional_cache, grid, blocked, false).is_empty(), "Optional 30-coin cache requires crossing its spike branch.")
-	expect(not _path(vault_entry, gold_key_cell, grid, blocked, false).is_empty(), "Gold-key route can skip the optional spike branch.")
+	expect(
+		_path(vault_entry, optional_cache, grid, blocked, false).is_empty(),
+		"Optional 30-coin cache requires crossing its spike branch."
+	)
+	expect(
+		not _path(vault_entry, gold_key_cell, grid, blocked, false).is_empty(),
+		"Gold-key route can skip the optional spike branch."
+	)
 	await _check_passage_clearance(tree, level)
 	animator.free()
 	level.free()
@@ -143,7 +183,9 @@ func _cell(node: Node3D) -> Vector2i:
 func _safe(animator: GDKillBoundary2Animator, seconds: float, point: Vector2) -> bool:
 	var state := animator.evaluate_at(seconds)
 	var polygon := GDKillBoundary2Geometry.build_points(state.size, state.rounding, 64)
-	return GDKillBoundary2Geometry.get_signed_distance(point - Vector2(state.position.x, state.position.z), polygon) >= 0.6
+	return (
+		GDKillBoundary2Geometry.get_signed_distance(point - Vector2(state.position.x, state.position.z), polygon) >= 0.6
+	)
 
 
 func _path(start: Vector2i, goal: Vector2i, grid: GridMap, blocked: Dictionary, adjacent: bool) -> Array[Vector2i]:
@@ -198,7 +240,10 @@ func _check_passage_clearance(tree: SceneTree, level: Node3D) -> void:
 	await tree.physics_frame
 	await tree.physics_frame
 	for passage in passages:
-		expect(_passage_sweep(passage) >= 0.99, "%s has capsule clearance through its opened frame and adjacent walls." % passage.name)
+		expect(
+			_passage_sweep(passage) >= 0.99,
+			"%s has capsule clearance through its opened frame and adjacent walls." % passage.name
+		)
 	harness.free()
 
 

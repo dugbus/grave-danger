@@ -9,80 +9,80 @@ var recorded_run_settings: Dictionary = {}
 
 
 func _ready() -> void:
-    super._ready()
-    if death_controller != null:
-        playback_flame_energy = death_controller.max_flame_energy
+	super._ready()
+	if death_controller != null:
+		playback_flame_energy = death_controller.max_flame_energy
 
 
 func _physics_process(_delta: float) -> void:
-    pass
+	pass
 
 
 func apply_recorded_run_settings(settings: Dictionary) -> void:
-    recorded_run_settings = settings.duplicate(true)
+	recorded_run_settings = settings.duplicate(true)
 
 
-func try_collect_health_flask(
-    _health_flask: Node3D,
-    _heal_percent_of_max: float,
-    _heal_duration: float
-) -> bool:
-    return true
+func try_collect_health_flask(_health_flask: Node3D, _heal_percent_of_max: float, _heal_duration: float) -> bool:
+	return true
 
 
 func apply_temporary_poison_damage(_damage_points: float, _restore_after_seconds: float) -> bool:
-    return true
+	return true
 
 
-func show_flask_effect_countdown(
-    _effect_id: StringName,
-    _liquid_color: Color,
-    _duration: float
-) -> void:
-    pass
+func show_flask_effect_countdown(_effect_id: StringName, _liquid_color: Color, _duration: float) -> void:
+	pass
 
 
 func die_from_flames() -> void:
-    _playback_die()
+	_playback_die()
 
 
 func die_from_fall() -> void:
-    _playback_die()
+	_playback_die()
 
 
 func is_dead() -> bool:
-    return playback_dead
+	return playback_dead
 
 
 func apply_flame_damage(amount: float) -> void:
-    if playback_dead:
-        return
-    playback_flame_energy = maxf(playback_flame_energy - maxf(amount, 0.0), 0.0)
-    if playback_flame_energy <= 0.0:
-        _playback_die()
+	if playback_dead:
+		return
+	playback_flame_energy = maxf(playback_flame_energy - maxf(amount, 0.0), 0.0)
+	if playback_flame_energy <= 0.0:
+		_playback_die()
+
+
+## Replay punches use preview-only health and cannot start a real scene transition.
+func apply_zombie_damage(amount: float, attacker_position: Vector3 = Vector3.INF) -> void:
+	if playback_dead or amount <= 0.0:
+		return
+	apply_flame_damage(amount)
+	if not playback_dead and animation_controller != null:
+		(animation_controller as GDPlayerAnimation).play_stagger(attacker_position)
 
 
 func apply_spike_trap_damage(percent_of_max: float) -> void:
-    if playback_dead:
-        return
-    var maximum_energy: float = death_controller.max_flame_energy \
-        if death_controller != null else 100.0
-    apply_flame_damage(maximum_energy * maxf(percent_of_max, 0.0) * 0.01)
+	if playback_dead:
+		return
+	var maximum_energy: float = death_controller.max_flame_energy if death_controller != null else 100.0
+	apply_flame_damage(maximum_energy * maxf(percent_of_max, 0.0) * 0.01)
 
 
 func can_be_hit_by_spike_trap() -> bool:
-    return not playback_dead
+	return not playback_dead
 
 
 func drain_flame_energy() -> void:
-    _playback_die()
+	_playback_die()
 
 
 func _playback_die() -> void:
-    if playback_dead:
-        return
-    playback_dead = true
-    playback_flame_energy = 0.0
-    velocity = Vector3.ZERO
-    if animation_controller != null:
-        animation_controller.play_death()
+	if playback_dead:
+		return
+	playback_dead = true
+	playback_flame_energy = 0.0
+	velocity = Vector3.ZERO
+	if animation_controller != null:
+		animation_controller.play_death()

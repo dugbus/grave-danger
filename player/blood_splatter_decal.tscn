@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://player/blood_splatter_decal.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://player/blood_splatter.svg" id="2_splatter"]
+[ext_resource type="Material" path="res://player/visibility/player_occlusion_blocker_material.tres" id="3_blood_blocker"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_surface_mark"]
 transparency = 1
@@ -19,6 +20,7 @@ material = SubResource("StandardMaterial3D_surface_mark")
 size = Vector2(1, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_impact_blood"]
+next_pass = ExtResource("3_blood_blocker")
 shading_mode = 0
 albedo_color = Color(0.5, 0.006, 0.012, 1)
 emission_enabled = true

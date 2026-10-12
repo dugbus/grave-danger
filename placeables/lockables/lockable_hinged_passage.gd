@@ -1,7 +1,6 @@
 extends "res://placeables/placeable.gd"
 class_name GDLockableHingedPassage
 
-
 signal unlocked
 signal level_completed
 

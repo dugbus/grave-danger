@@ -39,11 +39,14 @@ func _process(_delta: float) -> void:
 func request_scene(scene_path: String, high_priority := false) -> Error:
 	if scene_path.is_empty() or not ResourceLoader.exists(scene_path, "PackedScene"):
 		return ERR_FILE_NOT_FOUND
-	if get_scene_state(scene_path) in [
-		SceneLoadState.Queued,
-		SceneLoadState.Loading,
-		SceneLoadState.Loaded,
-	]:
+	if (
+		get_scene_state(scene_path)
+		in [
+			SceneLoadState.Queued,
+			SceneLoadState.Loading,
+			SceneLoadState.Loaded,
+		]
+	):
 		discard_after_load.erase(scene_path)
 		if high_priority and get_scene_state(scene_path) == SceneLoadState.Queued:
 			pending_scene_paths.erase(scene_path)
@@ -146,20 +149,15 @@ func _start_next_request() -> void:
 		if get_scene_state(scene_path) != SceneLoadState.Queued:
 			continue
 		if ResourceLoader.has_cached(scene_path):
-			var already_cached := ResourceLoader.load(
-				scene_path,
-				"PackedScene",
-				ResourceLoader.CACHE_MODE_REUSE
-			) as PackedScene
+			var already_cached := (
+				ResourceLoader.load(scene_path, "PackedScene", ResourceLoader.CACHE_MODE_REUSE) as PackedScene
+			)
 			if already_cached != null:
 				_store_loaded_scene(scene_path, already_cached)
 				continue
 
 		var request_error := ResourceLoader.load_threaded_request(
-			scene_path,
-			"PackedScene",
-			USE_SUB_THREADS,
-			ResourceLoader.CACHE_MODE_REUSE
+			scene_path, "PackedScene", USE_SUB_THREADS, ResourceLoader.CACHE_MODE_REUSE
 		)
 		if request_error != OK:
 			_mark_scene_failed(scene_path)

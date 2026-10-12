@@ -1,7 +1,6 @@
 extends Control
 class_name GDMinimapView
 
-
 const DEFAULT_SETTINGS := preload("res://ui/hud/minimap/minimap_view_settings.tres")
 const VIEWPORT_CONTAINER_NAME := "ViewportContainer"
 const MINIMAP_VIEWPORT_NAME := "MinimapViewport"
@@ -41,15 +40,12 @@ var minimap_enabled := false
 var display_mode := DisplayMode.Corner
 
 @onready var viewport_container := get_node_or_null(VIEWPORT_CONTAINER_NAME) as SubViewportContainer
-@onready var minimap_viewport := (
-	get_node_or_null("%s/%s" % [VIEWPORT_CONTAINER_NAME, MINIMAP_VIEWPORT_NAME]) as SubViewport
-)
+@onready
+var minimap_viewport := get_node_or_null("%s/%s" % [VIEWPORT_CONTAINER_NAME, MINIMAP_VIEWPORT_NAME]) as SubViewport
 @onready var minimap_camera := (
 	get_node_or_null("%s/%s/%s" % [VIEWPORT_CONTAINER_NAME, MINIMAP_VIEWPORT_NAME, MINIMAP_CAMERA_NAME]) as Camera3D
 )
-@onready var vampire_overlay: Control = (
-	get_node_or_null(VAMPIRE_OVERLAY_NAME) as Control
-)
+@onready var vampire_overlay: Control = get_node_or_null(VAMPIRE_OVERLAY_NAME) as Control
 
 
 func _ready() -> void:
@@ -106,7 +102,9 @@ func set_minimap_enabled(enabled: bool) -> void:
 
 	if minimap_viewport != null:
 		minimap_viewport.process_mode = Node.PROCESS_MODE_INHERIT if enabled else Node.PROCESS_MODE_DISABLED
-		minimap_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS if enabled else SubViewport.UPDATE_DISABLED
+		minimap_viewport.render_target_update_mode = (
+			SubViewport.UPDATE_ALWAYS if enabled else SubViewport.UPDATE_DISABLED
+		)
 
 	if minimap_camera != null:
 		minimap_camera.current = enabled
@@ -183,22 +181,13 @@ func _configure_vampire_overlay() -> void:
 	if not minimap_enabled:
 		vampire_overlay.call("clear_runtime_references")
 		return
-	vampire_overlay.call(
-		"set_runtime_references",
-		target,
-		minimap_camera,
-		viewport_container
-	)
+	vampire_overlay.call("set_runtime_references", target, minimap_camera, viewport_container)
 
 
 func _configure_vampire_overlay_display() -> void:
 	if vampire_overlay == null:
 		return
-	vampire_overlay.call(
-		"set_expanded_layout",
-		is_minimap_expanded(),
-		_get_settings()
-	)
+	vampire_overlay.call("set_expanded_layout", is_minimap_expanded(), _get_settings())
 
 
 func _update_camera_transform() -> void:
@@ -321,11 +310,8 @@ func _has_playable_bounds() -> bool:
 func _get_playable_bounds() -> AABB:
 	if _is_valid_playable_bounds(level_bounds, has_level_bounds):
 		return level_bounds
-	if kill_boundary != null \
-			and kill_boundary.has_method(&"get_boundary_world_points"):
-		var exact_points := (
-			kill_boundary.call(&"get_boundary_world_points") as PackedVector3Array
-		)
+	if kill_boundary != null and kill_boundary.has_method(&"get_boundary_world_points"):
+		var exact_points := kill_boundary.call(&"get_boundary_world_points") as PackedVector3Array
 		if not exact_points.is_empty():
 			var minimum := exact_points[0]
 			var maximum := exact_points[0]
@@ -380,8 +366,7 @@ func _get_minimap_render_size(active_settings: GDMinimapViewSettings) -> Vector2
 		panel_size = visible_size - Vector2.ONE * active_settings.expanded_screen_margin * 2.0
 	else:
 		var panel_width := maxf(
-			visible_size.x * active_settings.viewport_width_fraction,
-			active_settings.minimum_panel_width
+			visible_size.x * active_settings.viewport_width_fraction, active_settings.minimum_panel_width
 		)
 		var panel_height := panel_width / maxf(active_settings.panel_aspect_ratio, 0.001)
 		panel_size = Vector2(panel_width, panel_height)

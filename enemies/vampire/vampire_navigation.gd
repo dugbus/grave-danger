@@ -3,9 +3,7 @@ class_name GDVampireNavigation
 
 const INVALID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 const RouteSearch := preload("res://enemies/vampire/vampire_route_search.gd")
-const NavigationClearance := preload(
-	"res://enemies/vampire/vampire_navigation_clearance.gd"
-)
+const NavigationClearance := preload("res://enemies/vampire/vampire_navigation_clearance.gd")
 const FORWARD_DIRECTION_ALIGNMENT := 0.5
 const PREDICTION_FRONTIER_FRACTION := 0.7
 
@@ -62,11 +60,7 @@ var _route_search := RouteSearch.new()
 var _navigation_clearance := NavigationClearance.new()
 
 
-func configure(
-		vampire_body: CharacterBody3D,
-		visual_pivot: Node3D,
-		vampire_settings: Resource
-) -> void:
+func configure(vampire_body: CharacterBody3D, visual_pivot: Node3D, vampire_settings: Resource) -> void:
 	body = vampire_body
 	pivot = visual_pivot
 	settings = vampire_settings
@@ -125,11 +119,7 @@ func select_target(noise_position: Vector3) -> bool:
 
 
 ## Builds a safe tile route while retaining a body-clear player line for close interception.
-func select_visible_target(
-		route_target: Vector3,
-		confirmed_player_position: Vector3,
-		direct_path_clear: bool
-) -> bool:
+func select_visible_target(route_target: Vector3, confirmed_player_position: Vector3, direct_path_clear: bool) -> bool:
 	target_position = route_target
 	visible_player_position = confirmed_player_position
 	has_visible_player_position = true
@@ -140,10 +130,7 @@ func select_visible_target(
 
 
 ## Refreshes the confirmed player and body-clear line without rebuilding the tile route.
-func update_visible_player_position(
-		confirmed_player_position: Vector3,
-		direct_path_clear: bool
-) -> void:
+func update_visible_player_position(confirmed_player_position: Vector3, direct_path_clear: bool) -> void:
 	visible_player_position = confirmed_player_position
 	has_visible_player_position = true
 	visible_player_direct_path_clear = direct_path_clear
@@ -154,12 +141,8 @@ func refresh_visible_route_target(confirmed_player_position: Vector3) -> bool:
 	if body == null or wall_grid_map == null or not has_target or route_points.is_empty():
 		return false
 
-	var current_target_cell := wall_grid_map.local_to_map(
-		wall_grid_map.to_local(route_points[-1])
-	)
-	var confirmed_target_cell := wall_grid_map.local_to_map(
-		wall_grid_map.to_local(confirmed_player_position)
-	)
+	var current_target_cell := wall_grid_map.local_to_map(wall_grid_map.to_local(route_points[-1]))
+	var confirmed_target_cell := wall_grid_map.local_to_map(wall_grid_map.to_local(confirmed_player_position))
 	current_target_cell.y = wall_grid_y
 	confirmed_target_cell.y = wall_grid_y
 	if not _cell_is_in_bounds(confirmed_target_cell) or _is_wall(confirmed_target_cell):
@@ -168,8 +151,7 @@ func refresh_visible_route_target(confirmed_player_position: Vector3) -> bool:
 	if confirmed_target_cell == current_target_cell:
 		target_position = confirmed_player_position
 		route_points[route_points.size() - 1] = _get_body_clear_target_point(
-			confirmed_target_cell,
-			confirmed_player_position
+			confirmed_target_cell, confirmed_player_position
 		)
 		return true
 
@@ -180,23 +162,23 @@ func refresh_visible_route_target(confirmed_player_position: Vector3) -> bool:
 	if route_points.size() >= 2:
 		route_arrival_direction = route_points[-1] - route_points[-2]
 	route_arrival_direction.y = 0.0
-	var step_direction := wall_grid_map.to_global(
-		wall_grid_map.map_to_local(confirmed_target_cell)
-	) - wall_grid_map.to_global(wall_grid_map.map_to_local(current_target_cell))
+	var step_direction := (
+		wall_grid_map.to_global(wall_grid_map.map_to_local(confirmed_target_cell))
+		- wall_grid_map.to_global(wall_grid_map.map_to_local(current_target_cell))
+	)
 	step_direction.y = 0.0
-	if route_arrival_direction.is_zero_approx() \
-			or route_arrival_direction.normalized().dot(step_direction.normalized()) < 0.5:
+	if (
+		route_arrival_direction.is_zero_approx()
+		or route_arrival_direction.normalized().dot(step_direction.normalized()) < 0.5
+	):
 		return false
 
 	# The previous destination becomes an ordinary body-clear lane waypoint, while
 	# the new endpoint follows the player. No route index or velocity is reset.
 	route_points[route_points.size() - 1] = wall_grid_map.to_global(
-		wall_grid_map.map_to_local(current_target_cell) \
-			+ _get_wall_clearance_offset(current_target_cell)
+		wall_grid_map.map_to_local(current_target_cell) + _get_wall_clearance_offset(current_target_cell)
 	)
-	route_points.append(
-		_get_body_clear_target_point(confirmed_target_cell, confirmed_player_position)
-	)
+	route_points.append(_get_body_clear_target_point(confirmed_target_cell, confirmed_player_position))
 	target_position = confirmed_player_position
 	return true
 
@@ -242,9 +224,7 @@ func update_velocity(delta: float) -> float:
 	# Preserve speed but never lateral momentum when a tile waypoint changes. Blending
 	# velocity vectors here cuts inside maze corners even though the route itself is safe.
 	var next_speed := move_toward(
-		current_horizontal_velocity.length(),
-		float(settings.max_speed),
-		float(settings.acceleration) * delta
+		current_horizontal_velocity.length(), float(settings.max_speed), float(settings.acceleration) * delta
 	)
 	current_horizontal_velocity = direction * next_speed
 	body.velocity.x = current_horizontal_velocity.x
@@ -274,14 +254,8 @@ func update_after_movement(delta: float) -> void:
 		waypoint = route_points[route_index]
 	var remaining_offset := waypoint - body.global_position
 	remaining_offset.y = 0.0
-	var progress_speed := (movement_start_waypoint_distance - remaining_offset.length()) \
-		/ maxf(delta, 0.0001)
-	_update_wall_stall_recovery(
-		delta,
-		collided_with_wall,
-		progress_speed,
-		current_horizontal_velocity.length()
-	)
+	var progress_speed := (movement_start_waypoint_distance - remaining_offset.length()) / maxf(delta, 0.0001)
+	_update_wall_stall_recovery(delta, collided_with_wall, progress_speed, current_horizontal_velocity.length())
 
 
 func get_route_points() -> Array[Vector3]:
@@ -308,17 +282,14 @@ func get_active_route_direction() -> Vector3:
 
 
 ## Reports whether the retained route still ends close enough to catch a visible player.
-func is_route_endpoint_within_distance(
-		confirmed_player_position: Vector3,
-		maximum_distance: float
-) -> bool:
+func is_route_endpoint_within_distance(confirmed_player_position: Vector3, maximum_distance: float) -> bool:
 	var endpoint := target_position
 	if not route_points.is_empty():
 		endpoint = route_points.back()
-	return Vector2(
-		endpoint.x - confirmed_player_position.x,
-		endpoint.z - confirmed_player_position.z
-	).length() <= maxf(maximum_distance, 0.0)
+	return (
+		Vector2(endpoint.x - confirmed_player_position.x, endpoint.z - confirmed_player_position.z).length()
+		<= maxf(maximum_distance, 0.0)
+	)
 
 
 ## Returns how often stall detection has rebuilt the current route for tests and diagnostics.
@@ -378,21 +349,14 @@ func get_path_arrival_direction(origin: Vector3, destination: Vector3) -> Vector
 	origin_cell.y = wall_grid_y
 	destination_cell.y = wall_grid_y
 	origin_cell = _find_nearest_open_cell(origin_cell, wall_grid_map.to_local(origin))
-	destination_cell = _find_nearest_open_cell(
-		destination_cell,
-		wall_grid_map.to_local(destination)
-	)
+	destination_cell = _find_nearest_open_cell(destination_cell, wall_grid_map.to_local(destination))
 	if origin_cell == INVALID_CELL or destination_cell == INVALID_CELL:
 		return Vector3.ZERO
 	var cell_route := _find_cell_route(origin_cell, destination_cell)
 	if cell_route.size() < 2:
 		return Vector3.ZERO
-	var previous_point := wall_grid_map.to_global(
-		wall_grid_map.map_to_local(cell_route[cell_route.size() - 2])
-	)
-	var final_point := wall_grid_map.to_global(
-		wall_grid_map.map_to_local(cell_route[cell_route.size() - 1])
-	)
+	var previous_point := wall_grid_map.to_global(wall_grid_map.map_to_local(cell_route[cell_route.size() - 2]))
+	var final_point := wall_grid_map.to_global(wall_grid_map.map_to_local(cell_route[cell_route.size() - 1]))
 	var arrival_direction := final_point - previous_point
 	arrival_direction.y = 0.0
 	return arrival_direction.normalized()
@@ -427,16 +391,9 @@ func get_path_distance(origin: Vector3, destination: Vector3) -> float:
 		return Vector2(destination.x - origin.x, destination.z - origin.z).length()
 	var route_distance := 0.0
 	for cell_index in range(1, cell_route.size()):
-		var previous_point := wall_grid_map.to_global(
-			wall_grid_map.map_to_local(cell_route[cell_index - 1])
-		)
-		var current_point := wall_grid_map.to_global(
-			wall_grid_map.map_to_local(cell_route[cell_index])
-		)
-		route_distance += Vector2(
-			current_point.x - previous_point.x,
-			current_point.z - previous_point.z
-		).length()
+		var previous_point := wall_grid_map.to_global(wall_grid_map.map_to_local(cell_route[cell_index - 1]))
+		var current_point := wall_grid_map.to_global(wall_grid_map.map_to_local(cell_route[cell_index]))
+		route_distance += Vector2(current_point.x - previous_point.x, current_point.z - previous_point.z).length()
 	return route_distance
 
 
@@ -453,19 +410,14 @@ func predict_reachable_target(
 	var horizontal_velocity := last_seen_velocity
 	horizontal_velocity.y = 0.0
 	var prediction_distance := minf(
-		horizontal_velocity.length() * maxf(prediction_seconds, 0.0),
-		maxf(maximum_distance, 0.0)
+		horizontal_velocity.length() * maxf(prediction_seconds, 0.0), maxf(maximum_distance, 0.0)
 	)
 	if prediction_distance <= 0.001:
 		return last_seen_position
 
 	var direction := horizontal_velocity.normalized()
 	var candidates := get_reachable_search_points(
-		last_seen_position,
-		prediction_distance,
-		PREDICTION_FRONTIER_FRACTION,
-		direction,
-		minimum_alignment
+		last_seen_position, prediction_distance, PREDICTION_FRONTIER_FRACTION, direction, minimum_alignment
 	)
 	if candidates.is_empty():
 		return last_seen_position
@@ -474,8 +426,7 @@ func predict_reachable_target(
 
 	var eligible_candidates: Array[Vector3] = []
 	for candidate in candidates:
-		if position_is_ruled_out.is_valid() \
-				and bool(position_is_ruled_out.call(candidate)):
+		if position_is_ruled_out.is_valid() and bool(position_is_ruled_out.call(candidate)):
 			continue
 		eligible_candidates.append(candidate)
 	if eligible_candidates.is_empty():
@@ -485,22 +436,21 @@ func predict_reachable_target(
 	var selected_offset := selected - last_seen_position
 	selected_offset.y = 0.0
 	var selected_forward_distance := selected_offset.dot(direction)
-	var selected_distance_error := absf(
-		selected_offset.length() - prediction_distance
-	)
+	var selected_distance_error := absf(selected_offset.length() - prediction_distance)
 	for candidate_index in range(1, eligible_candidates.size()):
 		var candidate := eligible_candidates[candidate_index]
 		var offset := candidate - last_seen_position
 		offset.y = 0.0
 		var forward_distance := offset.dot(direction)
 		var distance_error := absf(offset.length() - prediction_distance)
-		var wins_forward_tie := is_equal_approx(
-			forward_distance,
-			selected_forward_distance
-		) and (
-			distance_error < selected_distance_error \
-			or (is_equal_approx(distance_error, selected_distance_error) \
-				and _sort_search_point(candidate, selected))
+		var wins_forward_tie := (
+			is_equal_approx(forward_distance, selected_forward_distance)
+			and (
+				distance_error < selected_distance_error
+				or (
+					is_equal_approx(distance_error, selected_distance_error) and _sort_search_point(candidate, selected)
+				)
+			)
 		)
 		if forward_distance > selected_forward_distance or wins_forward_tie:
 			selected = candidate
@@ -511,10 +461,7 @@ func predict_reachable_target(
 
 ## Returns whether a candidate is close enough to reuse the current route destination.
 func is_target_near(candidate: Vector3, maximum_distance: float) -> bool:
-	var horizontal_distance := Vector2(
-		candidate.x - target_position.x,
-		candidate.z - target_position.z
-	).length()
+	var horizontal_distance := Vector2(candidate.x - target_position.x, candidate.z - target_position.z).length()
 	return horizontal_distance <= maxf(maximum_distance, 0.0)
 
 
@@ -545,19 +492,16 @@ func face_direction(direction: Vector3, delta: float) -> void:
 
 ## Returns reachable maze positions near the edge of the preferred branch's travel distance.
 func get_reachable_search_points(
-		origin: Vector3,
-		maximum_travel_distance: float,
-		minimum_distance_fraction: float,
-		preferred_direction: Vector3 = Vector3.ZERO,
-		minimum_direction_alignment: float = -1.0
+	origin: Vector3,
+	maximum_travel_distance: float,
+	minimum_distance_fraction: float,
+	preferred_direction: Vector3 = Vector3.ZERO,
+	minimum_direction_alignment: float = -1.0
 ) -> Array[Vector3]:
 	var search_points: Array[Vector3] = []
 	last_search_direction_match = SearchDirectionMatch.None
 	last_frontier_search_was_truncated = false
-	if body == null \
-			or settings == null \
-			or wall_grid_map == null \
-			or grid_bounds.size == Vector2i.ZERO:
+	if body == null or settings == null or wall_grid_map == null or grid_bounds.size == Vector2i.ZERO:
 		return search_points
 
 	var origin_cell := wall_grid_map.local_to_map(wall_grid_map.to_local(origin))
@@ -567,9 +511,7 @@ func get_reachable_search_points(
 		return search_points
 
 	var cell_travel_distance := _get_maximum_world_cell_edge_length()
-	var maximum_steps := floori(
-		maxf(maximum_travel_distance, 0.0) / cell_travel_distance
-	)
+	var maximum_steps := floori(maxf(maximum_travel_distance, 0.0) / cell_travel_distance)
 	if maximum_steps <= 0:
 		return search_points
 	var pending: Array[Vector3i] = [origin_cell]
@@ -577,8 +519,7 @@ func get_reachable_search_points(
 	var distance_by_cell: Dictionary = {origin_cell: 0}
 	var first_step_by_cell: Dictionary = {origin_cell: Vector3i.ZERO}
 	var furthest_steps := 0
-	while read_index < pending.size() \
-			and distance_by_cell.size() < settings.maximum_route_search_cells:
+	while read_index < pending.size() and distance_by_cell.size() < settings.maximum_route_search_cells:
 		var current := pending[read_index]
 		read_index += 1
 		var current_steps := int(distance_by_cell[current])
@@ -586,22 +527,18 @@ func get_reachable_search_points(
 		if current_steps >= maximum_steps:
 			continue
 		for neighbor in _get_neighbors(current):
-			if distance_by_cell.has(neighbor) \
-					or not _cell_is_in_bounds(neighbor) \
-					or _is_wall(neighbor):
+			if distance_by_cell.has(neighbor) or not _cell_is_in_bounds(neighbor) or _is_wall(neighbor):
 				continue
 			distance_by_cell[neighbor] = current_steps + 1
-			first_step_by_cell[neighbor] = neighbor - current \
-				if current == origin_cell \
-				else first_step_by_cell[current] as Vector3i
+			first_step_by_cell[neighbor] = (
+				neighbor - current if current == origin_cell else first_step_by_cell[current] as Vector3i
+			)
 			pending.append(neighbor)
-	last_frontier_search_was_truncated = read_index < pending.size() \
-		and distance_by_cell.size() >= settings.maximum_route_search_cells
-
-	var minimum_steps := maxi(
-		floori(float(furthest_steps) * clampf(minimum_distance_fraction, 0.0, 1.0)),
-		1
+	last_frontier_search_was_truncated = (
+		read_index < pending.size() and distance_by_cell.size() >= settings.maximum_route_search_cells
 	)
+
+	var minimum_steps := maxi(floori(float(furthest_steps) * clampf(minimum_distance_fraction, 0.0, 1.0)), 1)
 	var direction_alignment_by_cell: Dictionary = {}
 	var furthest_non_backtracking_steps := 0
 	var furthest_forward_steps := 0
@@ -614,39 +551,21 @@ func get_reachable_search_points(
 			if cell == origin_cell:
 				continue
 			var first_step := first_step_by_cell[cell] as Vector3i
-			var first_step_point := wall_grid_map.to_global(
-				wall_grid_map.map_to_local(origin_cell + first_step)
-			)
-			var origin_point := wall_grid_map.to_global(
-				wall_grid_map.map_to_local(origin_cell)
-			)
+			var first_step_point := wall_grid_map.to_global(wall_grid_map.map_to_local(origin_cell + first_step))
+			var origin_point := wall_grid_map.to_global(wall_grid_map.map_to_local(origin_cell))
 			var first_world_direction := first_step_point - origin_point
 			first_world_direction.y = 0.0
-			var direction_alignment := first_world_direction.normalized().dot(
-				horizontal_preference
-			)
+			var direction_alignment := first_world_direction.normalized().dot(horizontal_preference)
 			direction_alignment_by_cell[cell] = direction_alignment
 			var cell_steps := int(distance_by_cell[cell])
 			if direction_alignment >= minimum_direction_alignment:
-				furthest_non_backtracking_steps = maxi(
-					furthest_non_backtracking_steps,
-					cell_steps
-				)
-			if direction_alignment >= maxf(
-				minimum_direction_alignment,
-				FORWARD_DIRECTION_ALIGNMENT
-			):
+				furthest_non_backtracking_steps = maxi(furthest_non_backtracking_steps, cell_steps)
+			if direction_alignment >= maxf(minimum_direction_alignment, FORWARD_DIRECTION_ALIGNMENT):
 				furthest_forward_steps = maxi(furthest_forward_steps, cell_steps)
 
 	var distance_fraction := clampf(minimum_distance_fraction, 0.0, 1.0)
-	var minimum_non_backtracking_steps := maxi(
-		floori(float(furthest_non_backtracking_steps) * distance_fraction),
-		1
-	)
-	var minimum_forward_steps := maxi(
-		floori(float(furthest_forward_steps) * distance_fraction),
-		1
-	)
+	var minimum_non_backtracking_steps := maxi(floori(float(furthest_non_backtracking_steps) * distance_fraction), 1)
+	var minimum_forward_steps := maxi(floori(float(furthest_forward_steps) * distance_fraction), 1)
 	var unique_points: Dictionary = {}
 	var non_backtracking_points: Array[Vector3] = []
 	var forward_points: Array[Vector3] = []
@@ -654,9 +573,7 @@ func get_reachable_search_points(
 		var cell := cell_value as Vector3i
 		if cell == origin_cell:
 			continue
-		var point := wall_grid_map.to_global(
-			wall_grid_map.map_to_local(cell) + _get_wall_clearance_offset(cell)
-		)
+		var point := wall_grid_map.to_global(wall_grid_map.map_to_local(cell) + _get_wall_clearance_offset(cell))
 		point.y = body.global_position.y
 		if unique_points.has(point):
 			continue
@@ -667,13 +584,12 @@ func get_reachable_search_points(
 		if not direction_alignment_by_cell.has(cell):
 			continue
 		var direction_alignment := float(direction_alignment_by_cell[cell])
-		if direction_alignment >= minimum_direction_alignment \
-				and cell_steps >= minimum_non_backtracking_steps:
+		if direction_alignment >= minimum_direction_alignment and cell_steps >= minimum_non_backtracking_steps:
 			non_backtracking_points.append(point)
-		if direction_alignment >= maxf(
-			minimum_direction_alignment,
-			FORWARD_DIRECTION_ALIGNMENT
-		) and cell_steps >= minimum_forward_steps:
+		if (
+			direction_alignment >= maxf(minimum_direction_alignment, FORWARD_DIRECTION_ALIGNMENT)
+			and cell_steps >= minimum_forward_steps
+		):
 			forward_points.append(point)
 
 	if not forward_points.is_empty():
@@ -707,14 +623,8 @@ func _build_route_to(world_target: Vector3, simplify_route: bool) -> Array[Vecto
 	var target_cell := wall_grid_map.local_to_map(wall_grid_map.to_local(world_target))
 	start_cell.y = wall_grid_y
 	target_cell.y = wall_grid_y
-	start_cell = _find_nearest_open_cell(
-		start_cell,
-		wall_grid_map.to_local(body.global_position)
-	)
-	target_cell = _find_nearest_open_cell(
-		target_cell,
-		wall_grid_map.to_local(world_target)
-	)
+	start_cell = _find_nearest_open_cell(start_cell, wall_grid_map.to_local(body.global_position))
+	target_cell = _find_nearest_open_cell(target_cell, wall_grid_map.to_local(world_target))
 	if start_cell == INVALID_CELL or target_cell == INVALID_CELL:
 		last_route_search_status = RouteSearchStatus.Unreachable
 		return calculated_route
@@ -726,9 +636,7 @@ func _build_route_to(world_target: Vector3, simplify_route: bool) -> Array[Vecto
 	var first_destination_index := 1 if selected_cell_route.size() > 1 else 0
 	for cell_index in range(first_destination_index, selected_cell_route.size()):
 		var cell := selected_cell_route[cell_index]
-		var point := wall_grid_map.to_global(
-			wall_grid_map.map_to_local(cell) + _get_wall_clearance_offset(cell)
-		)
+		var point := wall_grid_map.to_global(wall_grid_map.map_to_local(cell) + _get_wall_clearance_offset(cell))
 		point.y = body.global_position.y
 		calculated_route.append(point)
 
@@ -742,20 +650,21 @@ func _build_route_to(world_target: Vector3, simplify_route: bool) -> Array[Vecto
 func _advance_reached_route_points() -> void:
 	while route_index < route_points.size():
 		var waypoint := route_points[route_index]
-		var horizontal_distance := Vector2(
-			body.global_position.x - waypoint.x,
-			body.global_position.z - waypoint.z
-		).length()
+		var horizontal_distance := (
+			Vector2(body.global_position.x - waypoint.x, body.global_position.z - waypoint.z).length()
+		)
 		var reached_distance := _get_route_point_reached_distance(route_index)
 		if horizontal_distance > reached_distance:
 			return
 		route_index += 1
 
 	if has_visible_player_position and visible_player_direct_path_clear:
-		var player_distance := Vector2(
-			visible_player_position.x - body.global_position.x,
-			visible_player_position.z - body.global_position.z
-		).length()
+		var player_distance := (
+			Vector2(
+				visible_player_position.x - body.global_position.x, visible_player_position.z - body.global_position.z
+			)
+			. length()
+		)
 		if player_distance > float(settings.target_reached_distance):
 			return
 
@@ -777,14 +686,13 @@ func _visible_player_is_closer_than(next_waypoint: Vector3) -> bool:
 		return false
 	if route_index >= route_points.size():
 		return true
-	var waypoint_distance := Vector2(
-		next_waypoint.x - body.global_position.x,
-		next_waypoint.z - body.global_position.z
-	).length()
-	var player_distance := Vector2(
-		visible_player_position.x - body.global_position.x,
-		visible_player_position.z - body.global_position.z
-	).length()
+	var waypoint_distance := (
+		Vector2(next_waypoint.x - body.global_position.x, next_waypoint.z - body.global_position.z).length()
+	)
+	var player_distance := (
+		Vector2(visible_player_position.x - body.global_position.x, visible_player_position.z - body.global_position.z)
+		. length()
+	)
 	return player_distance < waypoint_distance
 
 
@@ -798,10 +706,7 @@ func _abandon_blocked_visible_shortcut() -> void:
 
 
 func _stop_horizontal(delta: float) -> void:
-	current_horizontal_velocity = current_horizontal_velocity.move_toward(
-		Vector3.ZERO,
-		settings.deceleration * delta
-	)
+	current_horizontal_velocity = current_horizontal_velocity.move_toward(Vector3.ZERO, settings.deceleration * delta)
 	body.velocity.x = current_horizontal_velocity.x
 	body.velocity.z = current_horizontal_velocity.z
 
@@ -830,10 +735,7 @@ func _rebuild_route() -> void:
 
 
 func _update_wall_stall_recovery(
-		delta: float,
-		_collided_with_wall: bool,
-		progress_speed: float,
-		commanded_speed: float
+	delta: float, _collided_with_wall: bool, progress_speed: float, commanded_speed: float
 ) -> void:
 	if commanded_speed < settings.wall_stall_minimum_speed:
 		_reset_stall_tracking()
@@ -843,8 +745,7 @@ func _update_wall_stall_recovery(
 	wall_stall_progress_distance += maxf(progress_speed, 0.0) * delta
 	if wall_stall_elapsed < settings.wall_stall_recovery_seconds:
 		return
-	var average_progress_speed := wall_stall_progress_distance \
-		/ maxf(wall_stall_elapsed, _get_direction_epsilon())
+	var average_progress_speed := wall_stall_progress_distance / maxf(wall_stall_elapsed, _get_direction_epsilon())
 	if average_progress_speed >= settings.wall_stall_minimum_progress_speed:
 		_reset_stall_tracking()
 		return
@@ -869,10 +770,7 @@ func _find_cell_route(start_cell: Vector3i, end_cell: Vector3i) -> Array[Vector3
 	return route
 
 
-func _get_cell_route_between_world_positions(
-		origin: Vector3,
-		destination: Vector3
-) -> Array[Vector3i]:
+func _get_cell_route_between_world_positions(origin: Vector3, destination: Vector3) -> Array[Vector3i]:
 	var result := _route_search.get_cell_route_between_world_positions(origin, destination)
 	last_route_search_status = int(result["status"]) as RouteSearchStatus
 	var route: Array[Vector3i] = []
@@ -888,10 +786,7 @@ func _simplify_cell_route(route: Array[Vector3i]) -> Array[Vector3i]:
 	return _route_search.simplify_cell_route(route)
 
 
-func _find_nearest_open_cell(
-		origin: Vector3i,
-		reference_local_position: Vector3
-) -> Vector3i:
+func _find_nearest_open_cell(origin: Vector3i, reference_local_position: Vector3) -> Vector3i:
 	return _route_search.find_nearest_open_cell(origin, reference_local_position)
 
 
@@ -989,6 +884,8 @@ func _get_wall_grid_y(grid_map: GridMap) -> int:
 
 
 func _is_wall_item(grid_map: GridMap, item_id: int) -> bool:
-	return item_id != GridMap.INVALID_CELL_ITEM \
-		and grid_map.mesh_library != null \
+	return (
+		item_id != GridMap.INVALID_CELL_ITEM
+		and grid_map.mesh_library != null
 		and grid_map.mesh_library.get_item_name(item_id).to_lower().contains("wall")
+	)

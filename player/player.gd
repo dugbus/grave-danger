@@ -1,7 +1,6 @@
 extends CharacterBody3D
 class_name GDPlayer
 
-
 signal flask_effect_started(effect_id: StringName, liquid_color: Color, duration: float)
 ## Emitted when a grounded jump starts so nearby gameplay objects can react to it.
 signal jump_started
@@ -52,20 +51,35 @@ func _physics_process(delta: float) -> void:
 	if death_controller.is_dead:
 		movement.update_dead_motion(delta)
 		move_and_slide()
+		animation_controller.update_dead_animation(delta)
+		return
+
+	# Movement can escape the hit pose after its mandatory opening has played.
+	var animation := animation_controller as GDPlayerAnimation
+	if animation.is_staggering():
+		animation.try_interrupt_stagger(movement.get_requested_walk_direction())
+	if animation.is_staggering():
+		movement.update_stagger_motion(delta)
+		var vertical_velocity := velocity.y
+		move_and_slide()
+		animation_controller.update_movement(Vector3.ZERO, delta, is_on_floor())
+		movement.update_landing(vertical_velocity)
+		_die_if_fallen_below_floor()
 		return
 
 	# Keep the frame order explicit:
 	# gravity/jump first, then repeatable drop input, then horizontal movement,
-	# then animation from the final input strength.
+	# then animation from the distance the physics body actually travelled.
 	movement.apply_gravity_and_jump(delta, inventory)
 	inventory.update_drop_input(delta)
 
 	var input_strength: float = movement.update_walk(delta, inventory)
 	attention.update_attention(delta, input_strength)
-	animation_controller.update_movement(input_strength, inventory)
 
 	var push_velocity := velocity
+	var position_before_move := global_position
 	move_and_slide()
+	animation_controller.update_movement(global_position - position_before_move, delta, is_on_floor())
 	movement.update_landing(push_velocity.y)
 	_die_if_fallen_below_floor()
 	_push_slide_colliders(push_velocity, delta)
@@ -80,8 +94,7 @@ func try_collect_carried_item(pickup: Node3D) -> bool:
 
 func emit_pickup_noise() -> void:
 	var physics_frame := Engine.get_physics_frames()
-	if physics_frame - last_pickup_noise_physics_frame \
-			< PICKUP_NOISE_COOLDOWN_PHYSICS_FRAMES:
+	if physics_frame - last_pickup_noise_physics_frame < PICKUP_NOISE_COOLDOWN_PHYSICS_FRAMES:
 		return
 	last_pickup_noise_physics_frame = physics_frame
 	pickup_noise_emitted.emit(global_position)
@@ -217,6 +230,15 @@ func is_below_fall_death_height() -> bool:
 	return global_position.y < FLOOR_LEVEL_Y - FALL_DEATH_DEPTH
 
 
+## Zombie damage shares the health pool but uses its authored stagger reaction.
+func apply_zombie_damage(amount: float, attacker_position: Vector3 = Vector3.INF) -> void:
+	var was_dead := is_dead()
+	death_controller.apply_flame_damage(amount)
+	if was_dead or is_dead() or amount <= 0.0:
+		return
+	(animation_controller as GDPlayerAnimation).play_stagger(attacker_position)
+
+
 func apply_flame_damage(amount: float) -> void:
 	var was_dead := is_dead()
 	death_controller.apply_flame_damage(amount)
@@ -316,8 +338,5 @@ func _push_slide_colliders(push_velocity: Vector3, delta: float) -> void:
 		collider.push_from_character(push_velocity, collision_normal, delta)
 		if collider is RollingRock:
 			velocity = (collider as RollingRock).get_character_push_assist_velocity(
-				push_velocity,
-				velocity,
-				collision_normal,
-				delta
+				push_velocity, velocity, collision_normal, delta
 			)

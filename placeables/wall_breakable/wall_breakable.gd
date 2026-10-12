@@ -3,7 +3,6 @@ extends Node3D
 
 ## Plays a single spatial collapse sound once this wall's rigid bricks are genuinely dislodged.
 
-
 @export_group("Collapse Detection")
 ## Minimum distance a brick must leave its settled position before the wall counts as breaking.
 @export_range(0.0, 1.0, 0.005, "suffix:m") var minimum_collapse_displacement := 0.025
@@ -17,9 +16,7 @@ extends Node3D
 @export var collapse_audio_player_path: NodePath = ^"CollapseAudioPlayer"
 @export_group("")
 
-@onready var collapse_audio_player := (
-	get_node_or_null(collapse_audio_player_path) as AudioStreamPlayer3D
-)
+@onready var collapse_audio_player := get_node_or_null(collapse_audio_player_path) as AudioStreamPlayer3D
 
 var tracked_bricks: Array[RigidBody3D] = []
 var settled_brick_positions: Array[Vector3] = []
@@ -57,10 +54,7 @@ func _physics_process(delta: float) -> void:
 
 
 func is_collapse_motion(displacement: float, speed: float) -> bool:
-	return (
-		displacement >= minimum_collapse_displacement
-		and speed >= minimum_collapse_speed
-	)
+	return displacement >= minimum_collapse_displacement and speed >= minimum_collapse_speed
 
 
 func _collect_rigid_bricks() -> void:

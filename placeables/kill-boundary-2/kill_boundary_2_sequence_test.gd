@@ -9,8 +9,7 @@ func run(_tree: SceneTree) -> void:
 	var sequence := GDKillBoundary2Sequence.new()
 	sequence.ensure_default_pose()
 	expect(
-		sequence.get_pose_count() == 1 and is_zero_approx(sequence.get_duration()),
-		"A sequence creates Pose 1 at zero."
+		sequence.get_pose_count() == 1 and is_zero_approx(sequence.get_duration()), "A sequence creates Pose 1 at zero."
 	)
 	expect(
 		sequence.get_pose(0) is Node3D and sequence.get_pose(0).get_parent() == sequence,
@@ -37,16 +36,15 @@ func run(_tree: SceneTree) -> void:
 	)
 	var duplicate_index := sequence.duplicate_pose(1)
 	expect(
-		duplicate_index == 2
-		and is_equal_approx(sequence.get_pose(duplicate_index).time_seconds, 5.01)
-		and is_equal_approx(sequence.get_pose(3).time_seconds, 8.0),
+		(
+			duplicate_index == 2
+			and is_equal_approx(sequence.get_pose(duplicate_index).time_seconds, 5.01)
+			and is_equal_approx(sequence.get_pose(3).time_seconds, 8.0)
+		),
 		"Duplicating inserts five seconds later and shifts every later pose by five seconds."
 	)
 	sequence.delete_pose(0)
-	expect(
-		is_zero_approx(sequence.get_pose(0).time_seconds),
-		"Deleting Pose 1 rebases the remaining sequence."
-	)
+	expect(is_zero_approx(sequence.get_pose(0).time_seconds), "Deleting Pose 1 rebases the remaining sequence.")
 	var first_time_before_delete := sequence.get_pose(0).time_seconds
 	sequence.delete_pose(1)
 	expect(
@@ -56,9 +54,7 @@ func run(_tree: SceneTree) -> void:
 	var snapshot := sequence.create_snapshot()
 	sequence.add_default_pose()
 	sequence.restore_snapshot(snapshot)
-	expect(
-		sequence.get_pose_count() == snapshot.size(), "Snapshots restore the complete pose list."
-	)
+	expect(sequence.get_pose_count() == snapshot.size(), "Snapshots restore the complete pose list.")
 	var retained_source_pose := sequence.get_pose(0)
 	var before_duplicate := sequence.create_snapshot()
 	sequence.duplicate_pose(0)
@@ -71,9 +67,7 @@ func run(_tree: SceneTree) -> void:
 	)
 	var timed_pose := sequence.get_pose(1)
 	var before_time_edit := sequence.create_snapshot()
-	sequence.set_pose_time(
-		1, timed_pose.time_seconds + 0.5, GDKillBoundary2Sequence.RetimingMode.ShiftFollowing
-	)
+	sequence.set_pose_time(1, timed_pose.time_seconds + 0.5, GDKillBoundary2Sequence.RetimingMode.ShiftFollowing)
 	var after_time_edit := sequence.create_snapshot()
 	sequence.restore_snapshot(before_time_edit)
 	sequence.restore_snapshot(after_time_edit)
@@ -95,9 +89,11 @@ func run(_tree: SceneTree) -> void:
 	var geometry_yaw := geometry_pose.yaw_radians
 	sequence.set_pose_geometry(1, Vector3(3.0, 0.0, -2.0), Vector2(5.0, 7.0))
 	expect(
-		geometry_pose.position.is_equal_approx(Vector3(3.0, 0.0, -2.0))
-		and geometry_pose.size.is_equal_approx(Vector2(5.0, 7.0))
-		and is_equal_approx(geometry_pose.yaw_radians, geometry_yaw),
+		(
+			geometry_pose.position.is_equal_approx(Vector3(3.0, 0.0, -2.0))
+			and geometry_pose.size.is_equal_approx(Vector2(5.0, 7.0))
+			and is_equal_approx(geometry_pose.yaw_radians, geometry_yaw)
+		),
 		"Anchored resizing applies position and size together without changing yaw."
 	)
 	sequence.free()

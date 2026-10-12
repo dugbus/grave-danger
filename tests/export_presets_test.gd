@@ -13,11 +13,7 @@ enum TargetPreset {
 
 func run(_tree: SceneTree) -> void:
 	var presets := ConfigFile.new()
-	expect_equal(
-		presets.load(EXPORT_PRESETS_PATH),
-		OK,
-		"The shared export preset configuration loads."
-	)
+	expect_equal(presets.load(EXPORT_PRESETS_PATH), OK, "The shared export preset configuration loads.")
 	_expect_macos_preset(presets)
 	_expect_windows_preset(presets)
 	_expect_ios_preset(presets)
@@ -60,48 +56,28 @@ func _expect_windows_preset(presets: ConfigFile) -> void:
 		"x86_64",
 		"The Windows build targets 64-bit Intel and AMD processors."
 	)
-	_expect_shared_native_settings(
-		presets,
-		section,
-		"builds/GraveDanger-Windows-x86_64.exe"
-	)
+	_expect_shared_native_settings(presets, section, "builds/GraveDanger-Windows-x86_64.exe")
 
 
 func _expect_ios_preset(presets: ConfigFile) -> void:
 	var section := _preset_section(TargetPreset.IosArm64)
 	expect_equal(
-		presets.get_value("runnable_presets", "iOS", ""),
-		"iOS ARM64",
-		"The ARM64 preset is the runnable iOS target."
+		presets.get_value("runnable_presets", "iOS", ""), "iOS ARM64", "The ARM64 preset is the runnable iOS target."
 	)
-	expect_equal(
-		presets.get_value(section, "platform", ""),
-		"iOS",
-		"The mobile build targets Godot's iOS exporter."
-	)
+	expect_equal(presets.get_value(section, "platform", ""), "iOS", "The mobile build targets Godot's iOS exporter.")
 	expect_equal(
 		presets.get_value("%s.options" % section, "architectures/arm64", false),
 		true,
 		"The iOS build enables the required ARM64 architecture."
 	)
 	expect(
-		not String(
-			presets.get_value(
-				"%s.options" % section,
-				"application/bundle_identifier",
-				""
-			)
-		).is_empty(),
+		not String(presets.get_value("%s.options" % section, "application/bundle_identifier", "")).is_empty(),
 		"The iOS build has a valid-form bundle identifier ready for local signing."
 	)
 	_expect_shared_native_settings(presets, section, "builds/GraveDanger-iOS.zip")
 
 
-func _expect_shared_native_settings(
-	presets: ConfigFile,
-	section: String,
-	expected_path: String
-) -> void:
+func _expect_shared_native_settings(presets: ConfigFile, section: String, expected_path: String) -> void:
 	expect_equal(
 		presets.get_value(section, "exclude_filter", ""),
 		TEST_EXCLUDE_FILTER,

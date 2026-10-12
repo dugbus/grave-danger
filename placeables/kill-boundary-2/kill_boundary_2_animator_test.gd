@@ -39,11 +39,7 @@ func run(_tree: SceneTree) -> void:
 	animator.advance(2.0)
 	animator.advance(2.0)
 	expect(
-		(
-			is_equal_approx(animator.authored_position, 1.0)
-			and not animator.playing
-			and completion_count[0] == 1
-		),
+		is_equal_approx(animator.authored_position, 1.0) and not animator.playing and completion_count[0] == 1,
 		"Single Shot clamps at the end and completes exactly once."
 	)
 	animator.playback_mode = GDKillBoundary2Animator.PlaybackMode.Loop
@@ -52,62 +48,49 @@ func run(_tree: SceneTree) -> void:
 	animator.restart()
 	animator.advance(1.0)
 	expect(
-		is_equal_approx(animator.authored_position, 1.0)
-		and is_equal_approx(animator.state.position.x, 10.0),
+		is_equal_approx(animator.authored_position, 1.0) and is_equal_approx(animator.state.position.x, 10.0),
 		"Loop reaches and evaluates the final authored pose before returning."
 	)
 	animator.advance(0.25)
 	expect(
-		is_equal_approx(animator.authored_position, 1.25)
-		and is_equal_approx(animator.state.position.x, 8.4375),
+		is_equal_approx(animator.authored_position, 1.25) and is_equal_approx(animator.state.position.x, 8.4375),
 		"The final pose's outgoing easing controls the closing Loop transition."
 	)
 	animator.advance(0.25)
 	expect(
-		is_equal_approx(animator.authored_position, 1.5)
-		and is_equal_approx(animator.state.position.x, 5.0)
-		and animator.state.size.is_equal_approx(Vector2(6.0, 7.0))
-		and is_equal_approx(animator.state.rounding, 0.5),
+		(
+			is_equal_approx(animator.authored_position, 1.5)
+			and is_equal_approx(animator.state.position.x, 5.0)
+			and animator.state.size.is_equal_approx(Vector2(6.0, 7.0))
+			and is_equal_approx(animator.state.rounding, 0.5)
+		),
 		"Loop return duration and the final pose's easing tween every state value to Pose 1."
 	)
 	animator.advance(0.5)
 	expect(
-		is_zero_approx(animator.authored_position)
-		and is_zero_approx(animator.state.position.x),
+		is_zero_approx(animator.authored_position) and is_zero_approx(animator.state.position.x),
 		"Loop crosses its cycle boundary continuously at Pose 1."
 	)
 	animator.playback_mode = GDKillBoundary2Animator.PlaybackMode.PingPong
 	animator.restart()
 	animator.advance(1.5)
-	expect(
-		is_equal_approx(animator.authored_position, 0.5),
-		"Ping Pong reverses authored time cleanly."
-	)
+	expect(is_equal_approx(animator.authored_position, 0.5), "Ping Pong reverses authored time cleanly.")
 	animator.playback_speed = 0.5
 	animator.restart()
 	animator.advance(1.0)
-	expect(
-		is_equal_approx(animator.authored_position, 0.5),
-		"Playback speed scales clock advancement only."
-	)
+	expect(is_equal_approx(animator.authored_position, 0.5), "Playback speed scales clock advancement only.")
 	animator.set_paused(true)
 	animator.advance(1.0)
-	expect(
-		is_equal_approx(animator.authored_position, 0.5), "Pausing freezes authored sequence time."
-	)
+	expect(is_equal_approx(animator.authored_position, 0.5), "Pausing freezes authored sequence time.")
 	animator.seek(0.75)
 	expect(is_equal_approx(animator.authored_position, 0.75), "Seeking evaluates exact time.")
 	var static_animator := GDKillBoundary2Animator.new()
 	var static_sequence := GDKillBoundary2Sequence.new()
 	static_sequence.ensure_default_pose()
-	static_animator.configure(
-		static_sequence, GDKillBoundary2Animator.PlaybackMode.Loop, 2.0, 3.0
-	)
+	static_animator.configure(static_sequence, GDKillBoundary2Animator.PlaybackMode.Loop, 2.0, 3.0)
 	static_animator.restart()
 	static_animator.advance(10.0)
-	expect(
-		is_zero_approx(static_animator.authored_position), "A single-pose sequence remains static."
-	)
+	expect(is_zero_approx(static_animator.authored_position), "A single-pose sequence remains static.")
 	static_animator.free()
 	animator.free()
 	static_sequence.free()

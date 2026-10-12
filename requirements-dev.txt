@@ -1,0 +1,2 @@
+# Provides both gdformat and gdlint with reproducible formatting rules.
+gdtoolkit==4.5.0

@@ -1,27 +1,26 @@
 extends "res://placeables/path_placeable.gd"
 
-
 @warning_ignore("unused_signal")
 signal navigation_ready_changed(is_ready: bool)
 
 enum ZombieState {
-    LevelStart,
-    Patrol,
-    Chase,
-    SearchLastSeen,
-    ReturnToPatrol,
-    PositionForAttack,
-    Attack,
-    Sitdown,
-    Crushed,
-    Die,
+	LevelStart,
+	Patrol,
+	Chase,
+	SearchLastSeen,
+	ReturnToPatrol,
+	PositionForAttack,
+	Attack,
+	Sitdown,
+	Crushed,
+	Die,
 }
 
 const FOOTSTEP_SOUND_PATHS: Array[String] = [
-    "res://Assets/audio/footstep1.mp3",
-    "res://Assets/audio/footstep2.mp3",
-    "res://Assets/audio/footstep3.mp3",
-    "res://Assets/audio/footstep4.mp3",
+	"res://Assets/audio/footstep1.mp3",
+	"res://Assets/audio/footstep2.mp3",
+	"res://Assets/audio/footstep3.mp3",
+	"res://Assets/audio/footstep4.mp3",
 ]
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 const DEFAULT_PUNCH_HIT_SOUND_PATH := "res://Assets/audio/punch.mp3"
@@ -44,9 +43,7 @@ const SKELETON_COLLISION_LAYER := 1 << 5
 const ENEMY_GEOMETRY_VISUAL_LAYER := 1 << 18
 const ALL_VISUAL_LAYERS := (1 << 20) - 1
 const ALL_SHADOW_CASTER_LAYERS := (1 << 32) - 1
-const ENEMY_LIGHT_SHADOW_CASTER_MASK := (
-    ALL_SHADOW_CASTER_LAYERS & ~ENEMY_GEOMETRY_VISUAL_LAYER
-)
+const ENEMY_LIGHT_SHADOW_CASTER_MASK := ALL_SHADOW_CASTER_LAYERS & ~ENEMY_GEOMETRY_VISUAL_LAYER
 const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 
 ## Compatibility sampler for existing level `PathFollow3D` overrides.
@@ -80,10 +77,10 @@ const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 @export var kill_confirmation_time := 0.08
 ## Legacy serialized enemy delay; new level editing uses the shared Spawn Time field.
 @export_storage var drop_in_time: float:
-    get:
-        return spawn_time
-    set(value):
-        spawn_time = maxf(value, 0.0)
+	get:
+		return spawn_time
+	set(value):
+		spawn_time = maxf(value, 0.0)
 ## Height above the patrol path used at the start of the drop-in.
 @export var drop_height := 3.2
 ## Seconds taken to fall from drop_height to the path.
@@ -116,8 +113,10 @@ const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 @export var vision_range := 5.0
 @export var fov_degrees := 70.0
 @export var player_target_height := 0.65
-@export var attack_range := 0.95
-@export var attack_continue_range := 1.35
+## Body-center distance where an extended arm can reach the player capsule.
+@export var attack_range := 0.6
+## Small hysteresis margin before a missed punch resumes chasing the player.
+@export var attack_continue_range := 0.65
 ## Number of candidate positions checked around the player when another zombie blocks the chase.
 @export var attack_position_slot_count := 8
 ## Minimum spacing kept from other zombies when choosing a melee attack position.
@@ -179,10 +178,10 @@ const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 @export var run_animation_speed_scale := 1.0
 @export var death_animation_speed_scale := 0.5
 @export var attack_animation_names: Array[String] = [
-    "attack-kick-right",
-    "attack-kick-left",
-    "attack-melee-right",
-    "attack-melee-left",
+	"attack-kick-right",
+	"attack-kick-left",
+	"attack-melee-right",
+	"attack-melee-left",
 ]
 @export_group("")
 
@@ -274,90 +273,90 @@ var has_moved_body_this_frame := false
 
 
 func _get_body_position() -> Vector3:
-    return zombie_body.global_position if zombie_body != null else global_position
+	return zombie_body.global_position if zombie_body != null else global_position
 
 
 func _get_vision_origin() -> Vector3:
-    if vision_origin != null:
-        return vision_origin.global_position
-    return _get_body_position() + Vector3.UP * 0.9
+	if vision_origin != null:
+		return vision_origin.global_position
+	return _get_body_position() + Vector3.UP * 0.9
 
 
 func _get_player_target_position() -> Vector3:
-    if player == null:
-        return last_seen_position + Vector3.UP * player_target_height
-    return player.global_position + Vector3.UP * player_target_height
+	if player == null:
+		return last_seen_position + Vector3.UP * player_target_height
+	return player.global_position + Vector3.UP * player_target_height
 
 
 func _get_player_navigation_position() -> Vector3:
-    if player == null:
-        return last_seen_position
+	if player == null:
+		return last_seen_position
 
-    var navigation_position := player.global_position
-    navigation_position.y = _get_body_position().y
-    return navigation_position
+	var navigation_position := player.global_position
+	navigation_position.y = _get_body_position().y
+	return navigation_position
 
 
 func _find_collision_shape(node: Node) -> CollisionShape3D:
-    if node == null:
-        return null
+	if node == null:
+		return null
 
-    for child in node.get_children():
-        if child is CollisionShape3D:
-            return child as CollisionShape3D
+	for child in node.get_children():
+		if child is CollisionShape3D:
+			return child as CollisionShape3D
 
-        var result := _find_collision_shape(child)
-        if result != null:
-            return result
+		var result := _find_collision_shape(child)
+		if result != null:
+			return result
 
-    return null
+	return null
 
 
 func _find_animation_player(node: Node) -> AnimationPlayer:
-    if node is AnimationPlayer:
-        return node as AnimationPlayer
+	if node is AnimationPlayer:
+		return node as AnimationPlayer
 
-    for child in node.get_children():
-        var result := _find_animation_player(child)
-        if result != null:
-            return result
+	for child in node.get_children():
+		var result := _find_animation_player(child)
+		if result != null:
+			return result
 
-    return null
+	return null
 
 
 func _is_descendant_of(candidate: Object, ancestor: Node) -> bool:
-    if candidate == null or ancestor == null or not candidate is Node:
-        return false
+	if candidate == null or ancestor == null or not candidate is Node:
+		return false
 
-    var node := candidate as Node
-    while node != null:
-        if node == ancestor:
-            return true
-        node = node.get_parent()
+	var node := candidate as Node
+	while node != null:
+		if node == ancestor:
+			return true
+		node = node.get_parent()
 
-    return false
+	return false
 
 
 func _get_vision_excludes() -> Array[RID]:
-    var excludes: Array[RID] = []
-    if zombie_body != null:
-        excludes.append(zombie_body.get_rid())
-    return excludes
+	var excludes: Array[RID] = []
+	if zombie_body != null:
+		excludes.append(zombie_body.get_rid())
+	return excludes
 
 
 func _is_live_player_body(body: Node) -> bool:
-    if body == null:
-        return false
+	if body == null:
+		return false
 
-    if body.has_method("is_dead") and body.is_dead():
-        return false
+	if body.has_method("is_dead") and body.is_dead():
+		return false
 
-    return body.has_method("apply_flame_damage") or body.has_method("die_from_enemy")
+	return body.has_method("apply_flame_damage") or body.has_method("die_from_enemy")
 
 
 func has_reserved_attack_position() -> bool:
-    return has_attack_position_target
+	return has_attack_position_target
 
 
 func get_reserved_attack_position() -> Vector3:
-    return attack_position_target
+	return attack_position_target

@@ -1,7 +1,6 @@
 extends Control
 class_name GDTitleScreen
 
-
 # Scene loaded when the player leaves the title screen.
 const LEVEL_SELECT_SCENE := "res://ui/screens/level_select_screen.tscn"
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
@@ -66,8 +65,11 @@ func _start_game() -> void:
 		frontend_audio.call("play_select")
 	starting = true
 	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
-	var change_error := await scene_loader.change_scene_to_file(LEVEL_SELECT_SCENE) \
-		if scene_loader != null else get_tree().change_scene_to_file(LEVEL_SELECT_SCENE)
+	var change_error := (
+		await scene_loader.change_scene_to_file(LEVEL_SELECT_SCENE)
+		if scene_loader != null
+		else get_tree().change_scene_to_file(LEVEL_SELECT_SCENE)
+	)
 	if change_error != OK:
 		starting = false
 		push_error("Could not open Level Select: %s" % error_string(change_error))

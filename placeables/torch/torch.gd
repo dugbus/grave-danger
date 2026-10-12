@@ -34,9 +34,7 @@ var flicker_elapsed := 0.0
 @onready var flame_particles := get_node_or_null("%FlameParticles") as GPUParticles3D
 @onready var ember_particles := get_node_or_null("%EmberParticles") as CPUParticles3D
 @onready var flame_light := get_node_or_null("%FlameLight") as OmniLight3D
-@onready var outline_mesh := get_node_or_null(
-	"RaisedWallMount/Model/RootNode/Torch1"
-) as MeshInstance3D
+@onready var outline_mesh := get_node_or_null("RaisedWallMount/Model/RootNode/Torch1") as MeshInstance3D
 
 
 func _ready() -> void:
@@ -65,8 +63,8 @@ func _process(delta: float) -> void:
 	flicker_elapsed += delta
 	var first_wave := sin(flicker_elapsed * FLICKER_SPEED)
 	var second_wave := sin(flicker_elapsed * FLICKER_SPEED * 1.73 + 1.2)
-	flame_light.light_energy = DEFAULT_LIGHT_ENERGY * (
-		1.0 + first_wave * FLICKER_AMOUNT + second_wave * FLICKER_AMOUNT * 0.35
+	flame_light.light_energy = (
+		DEFAULT_LIGHT_ENERGY * (1.0 + first_wave * FLICKER_AMOUNT + second_wave * FLICKER_AMOUNT * 0.35)
 	)
 
 
@@ -92,11 +90,7 @@ func update_outline_for_player(player: Node3D) -> void:
 
 	var fade_distance := maxf(outline_activation_distance, outline_full_intensity_distance + 0.01)
 	var distance_to_player := global_position.distance_to(player.global_position)
-	var intensity := 1.0 - smoothstep(
-		outline_full_intensity_distance,
-		fade_distance,
-		distance_to_player
-	)
+	var intensity := 1.0 - smoothstep(outline_full_intensity_distance, fade_distance, distance_to_player)
 	_set_outline_intensity(intensity)
 
 

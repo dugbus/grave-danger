@@ -41,16 +41,12 @@ func _populate_options() -> void:
 
 func _apply_effect(option_index: int) -> void:
 	if _boundary != null:
-		_boundary.set_render_effect(
-			_effect_option.get_item_id(option_index) as GDKillBoundary2Settings.RenderEffect
-		)
+		_boundary.set_render_effect(_effect_option.get_item_id(option_index) as GDKillBoundary2Settings.RenderEffect)
 
 
 func _apply_playback_mode(option_index: int) -> void:
 	if _boundary != null:
-		_boundary.set_playback_mode(
-			_mode_option.get_item_id(option_index) as GDKillBoundary2Animator.PlaybackMode
-		)
+		_boundary.set_playback_mode(_mode_option.get_item_id(option_index) as GDKillBoundary2Animator.PlaybackMode)
 
 
 func _apply_speed(option_index: int) -> void:

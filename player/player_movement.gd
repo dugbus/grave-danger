@@ -1,7 +1,6 @@
 extends Node
 class_name GDPlayerMovement
 
-
 # Movement is a child component of Player. It writes to the parent
 # CharacterBody3D velocity, but leaves move_and_slide() to player.gd so every
 # feature contributes to one final physics move each frame.
@@ -96,7 +95,7 @@ func apply_gravity_and_jump(delta: float, inventory: Node) -> void:
 		var settings := JUMP_SETTINGS as GDPlayerJumpSettings
 		var gravity_magnitude := player.get_gravity().length()
 		var jump_velocity := settings.get_jump_velocity(gravity_magnitude)
-		player.velocity.y = jump_velocity * inventory.weight_multiplier(1.0, settings.min_weight_jump_multiplier)
+		player.velocity.y = (jump_velocity * inventory.weight_multiplier(1.0, settings.min_weight_jump_multiplier))
 		_play_jump_sound(settings)
 		if player.has_method(&"notify_jump_started"):
 			player.call(&"notify_jump_started")
@@ -106,15 +105,20 @@ func update_landing(pre_move_vertical_velocity: float) -> void:
 	if player == null:
 		return
 
-	_process_landing_state(
-		player.is_on_floor(),
-		maxf(-pre_move_vertical_velocity, 0.0)
-	)
+	_process_landing_state(player.is_on_floor(), maxf(-pre_move_vertical_velocity, 0.0))
+
+
+## Read intended travel without accelerating or turning during the stagger lock.
+func get_requested_walk_direction() -> Vector3:
+	var input := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if input.length() <= WALK_INPUT_THRESHOLD:
+		return Vector3.ZERO
+	return _get_camera_relative_direction(input)
 
 
 func update_walk(delta: float, inventory: Node) -> float:
-	# Returns input strength so the animation component can match walk playback
-	# speed to the same analogue input used for movement.
+	# Returns effective input strength for attention to focus while moving.
+	# Animation cadence uses actual post-collision displacement in player.gd.
 	if player == null:
 		return 0.0
 
@@ -157,6 +161,18 @@ func update_walk(delta: float, inventory: Node) -> float:
 	current_horizontal_speed = horizontal_velocity.length()
 
 	return effective_input_strength
+
+
+## A stagger cancels horizontal momentum and input while preserving vertical physics.
+func update_stagger_motion(delta: float) -> void:
+	if player == null:
+		return
+	player.velocity.x = 0.0
+	player.velocity.z = 0.0
+	footstep_distance_accumulator = 0.0
+	current_horizontal_speed = 0.0
+	if not player.is_on_floor():
+		player.velocity += player.get_gravity() * delta
 
 
 func update_dead_motion(delta: float) -> void:
@@ -336,10 +352,7 @@ func _probe_side_clearance(origin: Vector3, direction: Vector3) -> float:
 		return squeeze_probe_distance
 
 	var query := PhysicsRayQueryParameters3D.create(
-		origin,
-		origin + direction * squeeze_probe_distance,
-		player.collision_mask,
-		[player.get_rid()]
+		origin, origin + direction * squeeze_probe_distance, player.collision_mask, [player.get_rid()]
 	)
 	query.collide_with_areas = false
 	query.collide_with_bodies = true

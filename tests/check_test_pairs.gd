@@ -36,20 +36,17 @@ func _run() -> void:
 
 func _validate_test_suite(test_path: String) -> int:
 	var source_code := FileAccess.get_file_as_string(test_path)
-	var has_test_base := source_code.contains(
-		"extends \"res://tests/test_case.gd\""
-	)
+	var has_test_base := source_code.contains('extends "res://tests/test_case.gd"')
 	var has_run_entry_point := source_code.contains("func run(")
-	var has_assertion := source_code.contains("expect(") \
-		or source_code.contains("expect_equal(") \
+	var has_assertion := (
+		source_code.contains("expect(")
+		or source_code.contains("expect_equal(")
 		or source_code.contains("expect_script_contract(")
+	)
 	if has_test_base and has_run_entry_point and has_assertion:
 		return 0
 
-	push_error(
-		"Sibling test must extend the test base, implement run(), and assert behavior: %s" \
-		% test_path
-	)
+	push_error("Sibling test must extend the test base, implement run(), and assert behavior: %s" % test_path)
 	return 1
 
 

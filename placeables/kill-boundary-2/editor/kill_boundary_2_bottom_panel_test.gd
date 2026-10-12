@@ -5,12 +5,12 @@ const BOUNDARY_SCENE := preload("res://placeables/kill-boundary-2/kill_boundary_
 
 
 func run(_tree: SceneTree) -> void:
-	expect_script_contract(
-		SUBJECT, "res://placeables/kill-boundary-2/editor/kill_boundary_2_bottom_panel.gd"
-	)
+	expect_script_contract(SUBJECT, "res://placeables/kill-boundary-2/editor/kill_boundary_2_bottom_panel.gd")
 	expect(
-		(SUBJECT as Script).get_source_code().contains("Select the boundary root to manage or delete it")
-		and (SUBJECT as Script).get_source_code().contains("_on_edit_pose_pressed"),
+		(
+			(SUBJECT as Script).get_source_code().contains("Select the boundary root to manage or delete it")
+			and (SUBJECT as Script).get_source_code().contains("_on_edit_pose_pressed")
+		),
 		"The panel separates root management from explicit pose viewport editing."
 	)
 	expect(
@@ -18,13 +18,17 @@ func run(_tree: SceneTree) -> void:
 		"Previous and Next select the authored pose node in the scene tree and Inspector."
 	)
 	expect(
-		(SUBJECT as Script).get_source_code().contains("Loop return easing")
-		and (SUBJECT as Script).get_source_code().contains("set_loop_return_seconds"),
+		(
+			(SUBJECT as Script).get_source_code().contains("Loop return easing")
+			and (SUBJECT as Script).get_source_code().contains("set_loop_return_seconds")
+		),
 		"The panel exposes and explains the closing Loop transition timing."
 	)
 	expect(
-		(SUBJECT as Script).get_source_code().contains("_pose_option.add_item")
-		and (SUBJECT as Script).get_source_code().contains("_on_pose_selected"),
+		(
+			(SUBJECT as Script).get_source_code().contains("_pose_option.add_item")
+			and (SUBJECT as Script).get_source_code().contains("_on_pose_selected")
+		),
 		"The panel provides a synchronized pose-number and absolute-time dropdown."
 	)
 	expect(
@@ -46,22 +50,24 @@ func run(_tree: SceneTree) -> void:
 		"Every interactive bottom-panel control provides plain-language hover help."
 	)
 	expect(
-		panel._scrubber.get_parent().get_parent() == panel
-		and panel._scrubber.get_parent() != panel._speed_spin.get_parent()
-		and panel._scrubber.size_flags_horizontal & Control.SIZE_EXPAND != 0,
+		(
+			panel._scrubber.get_parent().get_parent() == panel
+			and panel._scrubber.get_parent() != panel._speed_spin.get_parent()
+			and panel._scrubber.size_flags_horizontal & Control.SIZE_EXPAND != 0
+		),
 		"The timeline scrubber has its own full-width row beneath the transport controls."
 	)
 	expect(
-		panel._pose_option.item_count == 2
-		and panel._pose_option.get_item_text(1).contains("Pose 2")
-		and panel._pose_option.get_item_text(1).contains("1.00 s"),
+		(
+			panel._pose_option.item_count == 2
+			and panel._pose_option.get_item_text(1).contains("Pose 2")
+			and panel._pose_option.get_item_text(1).contains("1.00 s")
+		),
 		"The pose dropdown lists every pose with its absolute authored time."
 	)
 	panel._on_pose_selected(1)
 	expect_equal(
-		boundary.editor_active_pose_index,
-		1,
-		"Choosing a pose from the dropdown synchronizes the active viewport pose."
+		boundary.editor_active_pose_index, 1, "Choosing a pose from the dropdown synchronizes the active viewport pose."
 	)
 	panel.bind_boundary(null)
 	expect(panel.boundary == null, "The panel disconnects cleanly on deselection.")
@@ -74,9 +80,7 @@ func run(_tree: SceneTree) -> void:
 	preview_boundary.sequence.set_pose_transform(second_pose, Vector3(4.0, 0.0, 0.0), 0.0)
 	preview_boundary.playback_mode = GDKillBoundary2Animator.PlaybackMode.Loop
 	preview_boundary.loop_return_seconds = 1.0
-	preview_boundary.animator.configure(
-		preview_boundary.sequence, GDKillBoundary2Animator.PlaybackMode.Loop, 1.0, 1.0
-	)
+	preview_boundary.animator.configure(preview_boundary.sequence, GDKillBoundary2Animator.PlaybackMode.Loop, 1.0, 1.0)
 	var preview_panel := GDKillBoundary2BottomPanel.new()
 	preview_panel.bind_boundary(preview_boundary)
 	preview_boundary.preview_play()
@@ -87,8 +91,10 @@ func run(_tree: SceneTree) -> void:
 	)
 	preview_boundary.preview_seek(1.5)
 	expect(
-		is_equal_approx(preview_boundary.get_boundary_animation_duration(), 2.0)
-		and is_equal_approx(preview_boundary.animator.state.position.x, 2.0),
+		(
+			is_equal_approx(preview_boundary.get_boundary_animation_duration(), 2.0)
+			and is_equal_approx(preview_boundary.animator.state.position.x, 2.0)
+		),
 		"The editor scrubber timeline includes and evaluates the closing Loop transition."
 	)
 	preview_panel.bind_boundary(null)
@@ -99,11 +105,7 @@ func run(_tree: SceneTree) -> void:
 
 func _all_authoring_controls_have_help(parent: Node) -> bool:
 	for child in parent.get_children():
-		if (
-			child is Button
-			or child is SpinBox
-			or child is HSlider
-		) and (child as Control).tooltip_text.is_empty():
+		if (child is Button or child is SpinBox or child is HSlider) and (child as Control).tooltip_text.is_empty():
 			return false
 		if not _all_authoring_controls_have_help(child):
 			return false

@@ -4,7 +4,6 @@
 class_name RollingRock
 extends GDSpherePushable
 
-
 @export_group("Visual Rolling")
 @export var visual_rock_path: NodePath = NodePath("RollingRock")
 @export_range(0.01, 10.0, 0.01) var visual_roll_radius := 0.5
@@ -52,10 +51,7 @@ func can_kill_enemy_by_rolling(_target_position := Vector3.INF) -> bool:
 
 
 func get_character_push_assist_velocity(
-	_requested_velocity: Vector3,
-	_resulting_velocity: Vector3,
-	_collision_normal: Vector3,
-	_delta: float
+	_requested_velocity: Vector3, _resulting_velocity: Vector3, _collision_normal: Vector3, _delta: float
 ) -> Vector3:
 	return _resulting_velocity
 
@@ -109,12 +105,7 @@ func _update_rolling_audio(speed: float, delta: float) -> void:
 	if trapped_audio_timer > 0.0:
 		fade_seconds = trapped_audio_fade_seconds
 
-	current_audio_volume_db = _move_volume_towards(
-		current_audio_volume_db,
-		target_volume_db,
-		fade_seconds,
-		delta
-	)
+	current_audio_volume_db = _move_volume_towards(current_audio_volume_db, target_volume_db, fade_seconds, delta)
 
 	rolling_audio.volume_db = current_audio_volume_db
 

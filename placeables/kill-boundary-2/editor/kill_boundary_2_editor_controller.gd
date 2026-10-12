@@ -30,9 +30,7 @@ func configure(new_boundary: GDKillBoundary2, new_undo_redo: EditorUndoRedoManag
 	active_pose_index = (
 		0
 		if boundary == null
-		else clampi(
-			boundary.editor_active_pose_index, 0, maxi(boundary.sequence.get_pose_count() - 1, 0)
-		)
+		else clampi(boundary.editor_active_pose_index, 0, maxi(boundary.sequence.get_pose_count() - 1, 0))
 	)
 
 
@@ -47,8 +45,7 @@ func select_pose(index: int) -> void:
 
 func add_pose() -> void:
 	_commit_sequence_change(
-		&"Add Kill Boundary Pose",
-		func() -> void: active_pose_index = boundary.sequence.add_default_pose()
+		&"Add Kill Boundary Pose", func() -> void: active_pose_index = boundary.sequence.add_default_pose()
 	)
 	select_pose(active_pose_index)
 
@@ -74,38 +71,29 @@ func delete_pose() -> void:
 func set_pose_time(value: float) -> void:
 	_commit_sequence_change(
 		&"Set Kill Boundary Pose Time",
-		func() -> void:
-			boundary.sequence.set_pose_time(active_pose_index, value, boundary.retiming_mode)
+		func() -> void: boundary.sequence.set_pose_time(active_pose_index, value, boundary.retiming_mode)
 	)
 	select_pose(active_pose_index)
 
 
 func set_pose_easing(value: GDKillBoundary2Pose.TransitionEasing) -> void:
 	_commit_sequence_change(
-		&"Set Kill Boundary Pose Easing",
-		func() -> void: boundary.sequence.set_pose_easing(active_pose_index, value)
+		&"Set Kill Boundary Pose Easing", func() -> void: boundary.sequence.set_pose_easing(active_pose_index, value)
 	)
 	select_pose(active_pose_index)
 
 
 func set_retiming_mode(value: GDKillBoundary2Sequence.RetimingMode) -> void:
-	_commit_boundary_property(
-		&"Set Kill Boundary Retiming Mode", &"retiming_mode", boundary.retiming_mode, value
-	)
+	_commit_boundary_property(&"Set Kill Boundary Retiming Mode", &"retiming_mode", boundary.retiming_mode, value)
 
 
 func set_playback_speed(value: float) -> void:
-	_commit_boundary_property(
-		&"Set Kill Boundary Preview Speed", &"playback_speed", boundary.playback_speed, value
-	)
+	_commit_boundary_property(&"Set Kill Boundary Preview Speed", &"playback_speed", boundary.playback_speed, value)
 
 
 func set_loop_return_seconds(value: float) -> void:
 	_commit_boundary_property(
-		&"Set Kill Boundary Loop Return Duration",
-		&"loop_return_seconds",
-		boundary.loop_return_seconds,
-		value
+		&"Set Kill Boundary Loop Return Duration", &"loop_return_seconds", boundary.loop_return_seconds, value
 	)
 
 
@@ -119,16 +107,13 @@ func set_pose_transform(index: int, transform: Transform3D) -> void:
 
 
 func set_pose_size(index: int, size: Vector2) -> void:
-	_commit_sequence_change(
-		&"Resize Kill Boundary Pose", func() -> void: boundary.sequence.set_pose_size(index, size)
-	)
+	_commit_sequence_change(&"Resize Kill Boundary Pose", func() -> void: boundary.sequence.set_pose_size(index, size))
 	select_pose(index)
 
 
 func set_pose_rounding(index: int, rounding: float) -> void:
 	_commit_sequence_change(
-		&"Round Kill Boundary Pose",
-		func() -> void: boundary.sequence.set_pose_rounding(index, rounding)
+		&"Round Kill Boundary Pose", func() -> void: boundary.sequence.set_pose_rounding(index, rounding)
 	)
 	select_pose(index)
 
@@ -154,9 +139,7 @@ func get_handle_positions(pose: GDKillBoundary2Pose) -> PackedVector3Array:
 	return result
 
 
-func size_from_handle(
-	pose: GDKillBoundary2Pose, kind: HandleKind, pose_local_hit: Vector3
-) -> Vector2:
+func size_from_handle(pose: GDKillBoundary2Pose, kind: HandleKind, pose_local_hit: Vector3) -> Vector2:
 	var offset := Vector2(pose_local_hit.x, pose_local_hit.z)
 	var signs := _get_handle_axis_signs(kind)
 	var half := pose.size * 0.5
@@ -169,14 +152,10 @@ func size_from_handle(
 
 
 ## Moves the pose centre so the edge or corner opposite the dragged handle stays fixed.
-func position_from_handle(
-	pose: GDKillBoundary2Pose, kind: HandleKind, resized: Vector2
-) -> Vector3:
+func position_from_handle(pose: GDKillBoundary2Pose, kind: HandleKind, resized: Vector2) -> Vector3:
 	var signs := _get_handle_axis_signs(kind)
 	var local_shift := Vector3(
-		float(signs.x) * (resized.x - pose.size.x) * 0.5,
-		0.0,
-		float(signs.y) * (resized.y - pose.size.y) * 0.5
+		float(signs.x) * (resized.x - pose.size.x) * 0.5, 0.0, float(signs.y) * (resized.y - pose.size.y) * 0.5
 	)
 	return pose.position + pose.basis * local_shift
 
@@ -184,9 +163,7 @@ func position_from_handle(
 func rounding_from_handle(pose: GDKillBoundary2Pose, pose_local_hit: Vector3) -> float:
 	var offset := Vector2(pose_local_hit.x, pose_local_hit.z).abs()
 	var half := pose.size * 0.5
-	var normalized_inset := maxf(
-		1.0 - offset.x / maxf(half.x, 0.05), 1.0 - offset.y / maxf(half.y, 0.05)
-	)
+	var normalized_inset := maxf(1.0 - offset.x / maxf(half.x, 0.05), 1.0 - offset.y / maxf(half.y, 0.05))
 	return clampf(normalized_inset * 2.0, 0.0, 1.0)
 
 

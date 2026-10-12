@@ -38,10 +38,15 @@ func capture(frame_index: int, frame_time: float) -> Dictionary:
 		if tracked_node == null:
 			continue
 		var position := tracked_node.global_position
-		states.append({
-			"path": stored_path,
-			"position": [position.x, position.y, position.z],
-		})
+		(
+			states
+			. append(
+				{
+					"path": stored_path,
+					"position": [position.x, position.y, position.z],
+				}
+			)
+		)
 	return {
 		"frame": frame_index,
 		"time": frame_time,

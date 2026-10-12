@@ -1,7 +1,6 @@
 extends Node3D
 class_name GDVampireMaze
 
-
 const RUN_PLAYBACK_SESSION_GROUP: StringName = &"run_playback_session"
 const MAXIMUM_GENERATED_CONTENT_STARTUP_FRAMES := 120
 
@@ -32,9 +31,11 @@ func _ready() -> void:
 		return
 	generated_content = get_node_or_null(generated_content_path)
 	var generated_maze := get_node_or_null(^"GeneratedMaze")
-	if generated_maze != null \
-			and generated_maze.has_signal(&"maze_generated") \
-			and not generated_maze.maze_generated.is_connected(_on_maze_generated):
+	if (
+		generated_maze != null
+		and generated_maze.has_signal(&"maze_generated")
+		and not generated_maze.maze_generated.is_connected(_on_maze_generated)
+	):
 		generated_maze.maze_generated.connect(_on_maze_generated)
 	# GeneratedMaze may replace its gate during a queued startup regeneration.
 	# Keep checking until that deterministic generation pass has completed.
@@ -62,14 +63,16 @@ func _configure_runtime_if_available() -> bool:
 		_configure_runtime()
 		return _runtime_configured
 	var current_generated_content := get_node_or_null(generated_content_path)
-	var generated_plan: Dictionary = current_generated_content.get_last_plan() \
-		if current_generated_content != null \
-			and current_generated_content.has_method(&"get_last_plan") \
+	var generated_plan: Dictionary = (
+		current_generated_content.get_last_plan()
+		if current_generated_content != null and current_generated_content.has_method(&"get_last_plan")
 		else {}
-	var generated_gate := current_generated_content.get_end_gate() as Node3D \
-		if current_generated_content != null \
-		and current_generated_content.has_method(&"get_end_gate") \
+	)
+	var generated_gate := (
+		current_generated_content.get_end_gate() as Node3D
+		if current_generated_content != null and current_generated_content.has_method(&"get_end_gate")
 		else null
+	)
 	if generated_gate == null and generated_plan.is_empty():
 		return false
 	_configure_runtime()
@@ -83,20 +86,15 @@ func _configure_runtime() -> void:
 	vampire = get_node_or_null(vampire_path)
 	end_gate = get_node_or_null(end_gate_path) as Node3D
 	generated_content = get_node_or_null(generated_content_path)
-	if end_gate == null \
-			and generated_content != null \
-			and generated_content.has_method(&"get_end_gate"):
+	if end_gate == null and generated_content != null and generated_content.has_method(&"get_end_gate"):
 		end_gate = generated_content.get_end_gate() as Node3D
 	var wall_grid_map := get_node_or_null(wall_grid_map_path) as GridMap
 	if vampire != null:
 		if not vampire.validate_configuration(player, end_gate, wall_grid_map):
 			return
 		vampire.configure_navigation(wall_grid_map)
-		if generated_content != null \
-				and generated_content.has_method("get_vampire_layout_landmarks"):
-			vampire.configure_layout_knowledge(
-				generated_content.get_vampire_layout_landmarks() as Array[Dictionary]
-			)
+		if generated_content != null and generated_content.has_method("get_vampire_layout_landmarks"):
+			vampire.configure_layout_knowledge(generated_content.get_vampire_layout_landmarks() as Array[Dictionary])
 		if player != null:
 			vampire.configure_hunt(player, end_gate, player.global_position)
 	else:
@@ -107,21 +105,13 @@ func _configure_runtime() -> void:
 		player.connect(&"pickup_noise_emitted", _on_player_pickup_noise)
 	if generated_content != null and generated_content.has_signal("bat_noise_triggered"):
 		generated_content.connect(&"bat_noise_triggered", _on_bat_noise)
-	if generated_content != null \
-			and generated_content.has_signal("vampire_layout_landmarks_changed"):
-		generated_content.connect(
-			&"vampire_layout_landmarks_changed",
-			_on_vampire_layout_landmarks_changed
-		)
+	if generated_content != null and generated_content.has_signal("vampire_layout_landmarks_changed"):
+		generated_content.connect(&"vampire_layout_landmarks_changed", _on_vampire_layout_landmarks_changed)
 
 	for deposit in find_children("*", "Node", true, false):
 		if deposit.has_signal("treasure_item_absorbed"):
-			deposit.connect(
-				&"treasure_item_absorbed",
-				_on_coffin_treasure_absorbed.bind(deposit as Node3D)
-			)
-			if vampire != null \
-					and vampire.has_method(&"add_passthrough_obstacle"):
+			deposit.connect(&"treasure_item_absorbed", _on_coffin_treasure_absorbed.bind(deposit as Node3D))
+			if vampire != null and vampire.has_method(&"add_passthrough_obstacle"):
 				vampire.add_passthrough_obstacle(deposit.get_parent())
 
 
@@ -150,18 +140,12 @@ func _on_bat_noise(noise_position: Vector3) -> void:
 		vampire.hear_noise(noise_position)
 
 
-func _on_coffin_treasure_absorbed(
-		_item_type: StringName,
-		_value: int,
-		deposit: Node3D
-) -> void:
+func _on_coffin_treasure_absorbed(_item_type: StringName, _value: int, deposit: Node3D) -> void:
 	if vampire != null and deposit != null:
 		vampire.hear_landmark_noise(deposit.global_position)
 
 
-func _on_vampire_layout_landmarks_changed(
-		layout_landmarks: Array[Dictionary]
-) -> void:
+func _on_vampire_layout_landmarks_changed(layout_landmarks: Array[Dictionary]) -> void:
 	if vampire != null:
 		vampire.configure_layout_knowledge(layout_landmarks)
 

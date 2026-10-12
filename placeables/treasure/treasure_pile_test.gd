@@ -21,25 +21,18 @@ func _expect_catalog_cache_uses_metadata_only() -> void:
 		for value in entry.values():
 			if value is Resource:
 				cached_resources += 1
-	expect_equal(
-		cached_resources,
-		0,
-		"The treasure catalog caches metadata without retaining resource cycles."
-	)
+	expect_equal(cached_resources, 0, "The treasure catalog caches metadata without retaining resource cycles.")
 	pile.free()
 
 
 func _expect_default_scatter_fits_generated_floor_tile() -> void:
-	var pile_scene := load(
-		"res://placeables/treasure/treasure_pile.tscn"
-	) as PackedScene
+	var pile_scene := load("res://placeables/treasure/treasure_pile.tscn") as PackedScene
 	var pile := pile_scene.instantiate() as GDTreasurePile
 	var coin := GOLD_COIN_SCENE.instantiate() as GDGoldCoin
 	var collision_shape := coin.get_node("CollisionShape3D") as CollisionShape3D
 	var coin_shape := collision_shape.shape as CylinderShape3D
 	expect(
-		pile.pile_radius + coin_shape.radius + FLOOR_EDGE_MARGIN \
-			<= GENERATED_FLOOR_TILE_HALF_EXTENT,
+		pile.pile_radius + coin_shape.radius + FLOOR_EDGE_MARGIN <= GENERATED_FLOOR_TILE_HALF_EXTENT,
 		"Mixed treasure stays inside one generated floor tile with collider clearance."
 	)
 	coin.free()

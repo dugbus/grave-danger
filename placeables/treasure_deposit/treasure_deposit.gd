@@ -124,9 +124,7 @@ func _bind_jump_bonus(body: Node3D) -> void:
 
 func _unbind_jump_bonus(body: Node3D) -> void:
 	var callback := jump_callbacks_by_body.get(body, Callable()) as Callable
-	if body != null \
-			and not callback.is_null() \
-			and body.is_connected(&"jump_started", callback):
+	if body != null and not callback.is_null() and body.is_connected(&"jump_started", callback):
 		body.disconnect(&"jump_started", callback)
 	jump_callbacks_by_body.erase(body)
 
@@ -143,10 +141,7 @@ func _on_candidate_jump_started(body: Node3D) -> void:
 
 func _take_carried_gold_coin(player_body: Node3D) -> Resource:
 	if player_body.has_method("take_carried_item_of_type"):
-		return player_body.call(
-			"take_carried_item_of_type",
-			GOLD_COIN_ITEM_TYPE
-		) as Resource
+		return player_body.call("take_carried_item_of_type", GOLD_COIN_ITEM_TYPE) as Resource
 
 	return null
 
@@ -176,27 +171,27 @@ func _launch_deposit_treasure(player_body: Node3D, item: Resource) -> void:
 	treasure_visual.global_position = start_position
 
 	var tween := create_tween()
-	tween.tween_method(
-		func(progress: float) -> void:
-			if not is_instance_valid(treasure_visual):
-				return
+	(
+		tween
+		. tween_method(
+			func(progress: float) -> void:
+				if not is_instance_valid(treasure_visual):
+					return
 
-			var arc_position := start_position.lerp(end_position, progress)
-			arc_position.y += sin(progress * PI) * launch_height
-			treasure_visual.global_position = arc_position,
-		0.0,
-		1.0,
-		flight_time
-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+				var arc_position := start_position.lerp(end_position, progress)
+				arc_position.y += sin(progress * PI) * launch_height
+				treasure_visual.global_position = arc_position,
+			0.0,
+			1.0,
+			flight_time
+		)
+		. set_trans(Tween.TRANS_SINE)
+		. set_ease(Tween.EASE_OUT)
+	)
 	tween.parallel().tween_property(
-		treasure_visual,
-		"rotation",
-		treasure_visual.rotation + Vector3(PI * 3.0, PI * 2.0, PI),
-		flight_time
+		treasure_visual, "rotation", treasure_visual.rotation + Vector3(PI * 3.0, PI * 2.0, PI), flight_time
 	)
-	tween.tween_callback(
-		_finish_deposit_treasure.bind(treasure_visual, treasure_value, item)
-	)
+	tween.tween_callback(_finish_deposit_treasure.bind(treasure_visual, treasure_value, item))
 
 
 func _create_visual_treasure(item: Resource) -> Node3D:
@@ -234,18 +229,13 @@ func _prepare_deposit_visual(node: Node) -> void:
 	if node is CollisionShape3D:
 		(node as CollisionShape3D).disabled = true
 	if node is GeometryInstance3D:
-		(node as GeometryInstance3D).cast_shadow = \
-			GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		(node as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 	for child in node.get_children():
 		_prepare_deposit_visual(child)
 
 
-func _finish_deposit_treasure(
-	treasure_visual: Node3D,
-	treasure_value: int,
-	item: Resource
-) -> void:
+func _finish_deposit_treasure(treasure_visual: Node3D, treasure_value: int, item: Resource) -> void:
 	if is_instance_valid(treasure_visual):
 		treasure_visual.queue_free()
 	_absorb_treasure(treasure_value, item)
@@ -278,24 +268,34 @@ func _wobble() -> void:
 	wobble_node.rotation = wobble_rest_rotation
 	var wobble_angle := deg_to_rad(wobble_angle_degrees)
 	wobble_tween = create_tween()
-	wobble_tween.tween_property(
-		wobble_node,
-		"rotation",
-		wobble_rest_rotation + Vector3(wobble_angle, 0.0, -wobble_angle * 0.6),
-		wobble_duration * 0.35
-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	wobble_tween.tween_property(
-		wobble_node,
-		"rotation",
-		wobble_rest_rotation + Vector3(-wobble_angle * 0.55, 0.0, wobble_angle * 0.35),
-		wobble_duration * 0.3
-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	wobble_tween.tween_property(
-		wobble_node,
-		"rotation",
-		wobble_rest_rotation,
-		wobble_duration * 0.35
-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	(
+		wobble_tween
+		. tween_property(
+			wobble_node,
+			"rotation",
+			wobble_rest_rotation + Vector3(wobble_angle, 0.0, -wobble_angle * 0.6),
+			wobble_duration * 0.35
+		)
+		. set_trans(Tween.TRANS_SINE)
+		. set_ease(Tween.EASE_OUT)
+	)
+	(
+		wobble_tween
+		. tween_property(
+			wobble_node,
+			"rotation",
+			wobble_rest_rotation + Vector3(-wobble_angle * 0.55, 0.0, wobble_angle * 0.35),
+			wobble_duration * 0.3
+		)
+		. set_trans(Tween.TRANS_SINE)
+		. set_ease(Tween.EASE_IN_OUT)
+	)
+	(
+		wobble_tween
+		. tween_property(wobble_node, "rotation", wobble_rest_rotation, wobble_duration * 0.35)
+		. set_trans(Tween.TRANS_SINE)
+		. set_ease(Tween.EASE_IN)
+	)
 
 
 func _play_absorb_sound(item: Resource = null) -> void:
@@ -307,13 +307,7 @@ func _play_absorb_sound(item: Resource = null) -> void:
 		ABSORB_SOUND_VOLUME_MIN_DB + ABSORB_SOUND_VOLUME_OFFSET_DB,
 		ABSORB_SOUND_VOLUME_MAX_DB + ABSORB_SOUND_VOLUME_OFFSET_DB
 	)
-	GDAudio.play_one_shot_3d(
-		self,
-		absorb_sound,
-		"TreasureAbsorbAudio",
-		volume_db,
-		pitch_scale
-	)
+	GDAudio.play_one_shot_3d(self, absorb_sound, "TreasureAbsorbAudio", volume_db, pitch_scale)
 
 
 func _random_landing_offset() -> Vector3:

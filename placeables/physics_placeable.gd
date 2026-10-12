@@ -3,7 +3,6 @@ extends RigidBody3D
 
 ## Rigid-body map-item base that releases delayed items from a configurable height.
 
-
 @warning_ignore("unused_signal")
 signal placeable_spawned
 
@@ -23,21 +22,14 @@ var placeable_spawn_controller: Node
 
 
 func _ready() -> void:
-    add_to_group(MAP_PLACEABLE_GROUP)
-    if Engine.is_editor_hint() or spawn_time <= 0.0:
-        return
-    placeable_spawn_controller = SPAWN_CONTROLLER.new() as Node
-    placeable_spawn_controller.name = "PlaceableSpawnController"
-    add_child(placeable_spawn_controller)
-    placeable_spawn_controller.configure(
-        self,
-        self,
-        spawn_time,
-        spawn_drop_height,
-        true,
-        spawn_spin_speed
-    )
+	add_to_group(MAP_PLACEABLE_GROUP)
+	if Engine.is_editor_hint() or spawn_time <= 0.0:
+		return
+	placeable_spawn_controller = SPAWN_CONTROLLER.new() as Node
+	placeable_spawn_controller.name = "PlaceableSpawnController"
+	add_child(placeable_spawn_controller)
+	placeable_spawn_controller.configure(self, self, spawn_time, spawn_drop_height, true, spawn_spin_speed)
 
 
 func is_placeable_spawned() -> bool:
-    return placeable_spawn_controller == null or placeable_spawn_controller.is_spawned()
+	return placeable_spawn_controller == null or placeable_spawn_controller.is_spawned()

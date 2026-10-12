@@ -29,15 +29,13 @@ func _rebuild() -> void:
 	for index in boundary.sequence.get_pose_count():
 		var pose := boundary.sequence.get_pose(index)
 		_add_label(
-			"Pose %d\n%.2f s" % [index + 1, pose.time_seconds],
-			_get_pose_position(pose) + Vector3(0.0, 1.1, 0.0)
+			"Pose %d\n%.2f s" % [index + 1, pose.time_seconds], _get_pose_position(pose) + Vector3(0.0, 1.1, 0.0)
 		)
 		if index + 1 < boundary.sequence.get_pose_count():
 			var next_pose := boundary.sequence.get_pose(index + 1)
 			_add_label(
 				"%.2f s" % (next_pose.time_seconds - pose.time_seconds),
-				_get_pose_position(pose).lerp(_get_pose_position(next_pose), 0.5)
-				+ Vector3(0.0, 0.55, 0.0)
+				_get_pose_position(pose).lerp(_get_pose_position(next_pose), 0.5) + Vector3(0.0, 0.55, 0.0)
 			)
 
 

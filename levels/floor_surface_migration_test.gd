@@ -35,58 +35,107 @@ const NESTED_EDITABLE_PATHS := {
 	"res://levels/vampire-maze/level.tscn": "GeneratedMaze/Layout",
 }
 const STATIC_PLACEMENT_PAIRS := {
-	"res://levels/tutorial-1/level.tscn": [
-		NodePath("Layout/FloorSurface"), NodePath("Layout/PNGGridMap"), Vector2i.ZERO,
+	"res://levels/tutorial-1/level.tscn":
+	[
+		NodePath("Layout/FloorSurface"),
+		NodePath("Layout/PNGGridMap"),
+		Vector2i.ZERO,
 	],
-	"res://levels/tutorial-2/level.tscn": [
-		NodePath("Layout/FloorSurface"), NodePath("Layout/PNGGridMap"), Vector2i.ZERO,
+	"res://levels/tutorial-2/level.tscn":
+	[
+		NodePath("Layout/FloorSurface"),
+		NodePath("Layout/PNGGridMap"),
+		Vector2i.ZERO,
 	],
-	"res://levels/tutorial-3/level.tscn": [
-		NodePath("Layout/FloorSurface"), NodePath("Layout/PNGGridMap"), Vector2i.ZERO,
+	"res://levels/tutorial-3/level.tscn":
+	[
+		NodePath("Layout/FloorSurface"),
+		NodePath("Layout/PNGGridMap"),
+		Vector2i.ZERO,
 	],
-	"res://levels/tutorial-4/level.tscn": [
-		NodePath("Layout/FloorSurface"), NodePath("Layout/PNGGridMap"), Vector2i.ZERO,
+	"res://levels/tutorial-4/level.tscn":
+	[
+		NodePath("Layout/FloorSurface"),
+		NodePath("Layout/PNGGridMap"),
+		Vector2i.ZERO,
 	],
-	"res://levels/debug-level/level.tscn": [
-		NodePath("FloorSurface"), NodePath("PNGGridMap"), Vector2i.ZERO,
+	"res://levels/debug-level/level.tscn":
+	[
+		NodePath("FloorSurface"),
+		NodePath("PNGGridMap"),
+		Vector2i.ZERO,
 	],
-	"res://levels/1/level.tscn": [
-		NodePath("FloorSurface"), NodePath("GridMap"), Vector2i(-2, -2),
+	"res://levels/1/level.tscn":
+	[
+		NodePath("FloorSurface"),
+		NodePath("GridMap"),
+		Vector2i(-2, -2),
 	],
-	"res://levels/2/level.tscn": [
-		NodePath("FloorSurface"), NodePath("GridMap"), Vector2i(-16, -16),
+	"res://levels/2/level.tscn":
+	[
+		NodePath("FloorSurface"),
+		NodePath("GridMap"),
+		Vector2i(-16, -16),
 	],
-	"res://levels/3/level.tscn": [
-		NodePath("FloorSurface"), NodePath("GridMap"), Vector2i(-75, -12),
+	"res://levels/3/level.tscn":
+	[
+		NodePath("FloorSurface"),
+		NodePath("GridMap"),
+		Vector2i(-75, -12),
 	],
-	"res://levels/4/level.tscn": [
-		NodePath("FloorSurface"), NodePath("PNGGridMap"), Vector2i(-2, -3),
+	"res://levels/4/level.tscn":
+	[
+		NodePath("FloorSurface"),
+		NodePath("PNGGridMap"),
+		Vector2i(-2, -3),
 	],
-	"res://levels/5/level.tscn": [
-		NodePath("FloorSurface"), NodePath("PNGGridMap"), Vector2i(0, -1),
+	"res://levels/5/level.tscn":
+	[
+		NodePath("FloorSurface"),
+		NodePath("PNGGridMap"),
+		Vector2i(0, -1),
 	],
-	"res://levels/6/level.tscn": [
-		NodePath("FloorSurface"), NodePath("GridMap"), Vector2i(-26, -26),
+	"res://levels/6/level.tscn":
+	[
+		NodePath("FloorSurface"),
+		NodePath("GridMap"),
+		Vector2i(-26, -26),
 	],
-	"res://levels/7/level.tscn": [
-		NodePath("FloorSurface"), NodePath("PNGGridMap"), Vector2i.ZERO,
+	"res://levels/7/level.tscn":
+	[
+		NodePath("FloorSurface"),
+		NodePath("PNGGridMap"),
+		Vector2i.ZERO,
 	],
-	"res://levels/8/level.tscn": [
-		NodePath("FloorSurface"), NodePath("PNGGridMap"), Vector2i(-10, -10),
+	"res://levels/8/level.tscn":
+	[
+		NodePath("FloorSurface"),
+		NodePath("PNGGridMap"),
+		Vector2i(-10, -10),
 	],
-	"res://levels/graveyard/level.tscn": [
-		NodePath("FloorSurface"), NodePath("PNGGridMap"), Vector2i(-25, -25),
+	"res://levels/graveyard/level.tscn":
+	[
+		NodePath("FloorSurface"),
+		NodePath("PNGGridMap"),
+		Vector2i(-25, -25),
 	],
-	"res://levels/vampire-maze/level.tscn": [
+	"res://levels/vampire-maze/level.tscn":
+	[
 		NodePath("GeneratedMaze/Layout/FloorSurface"),
 		NodePath("GeneratedMaze/Layout/PNGGridMap"),
 		Vector2i.ZERO,
 	],
-	"res://levels/kill-boundary-2-demo/level.tscn": [
-		NodePath("FloorSurface"), NodePath("PlacementGridMap"), Vector2i.ZERO,
+	"res://levels/kill-boundary-2-demo/level.tscn":
+	[
+		NodePath("FloorSurface"),
+		NodePath("PlacementGridMap"),
+		Vector2i.ZERO,
 	],
-	"res://levels/close-escape/level.tscn": [
-		NodePath("FloorSurface"), NodePath("AuthoredLayout/WallGridMap"), Vector2i.ZERO,
+	"res://levels/close-escape/level.tscn":
+	[
+		NodePath("FloorSurface"),
+		NodePath("AuthoredLayout/WallGridMap"),
+		Vector2i.ZERO,
 	],
 }
 const BALANCED_PLACEMENT_LEVELS: Array[String] = [
@@ -114,26 +163,17 @@ const CARDINAL_DIRECTIONS: Array[Vector2i] = [
 ]
 const MINIMUM_READABLE_PIT_DEPTH := 2.0
 const GridAlignment := preload("res://addons/floor_surface/floor_surface_grid_alignment.gd")
-const GeometryBuilder := preload(
-	"res://addons/floor_surface/floor_surface_geometry_builder.gd"
-)
+const GeometryBuilder := preload("res://addons/floor_surface/floor_surface_geometry_builder.gd")
 const PitResolver := preload("res://addons/floor_surface/floor_surface_pit_resolver.gd")
-const ShapePainter := preload(
-	"res://addons/floor_surface/editor/floor_surface_shape_painter.gd"
-)
-const ElevationProfile := preload(
-	"res://addons/floor_surface/default_floor_elevation_profile.tres"
-)
+const ShapePainter := preload("res://addons/floor_surface/editor/floor_surface_shape_painter.gd")
+const ElevationProfile := preload("res://addons/floor_surface/default_floor_elevation_profile.tres")
 
 
 func run(_tree: SceneTree) -> void:
 	for path_value: Variant in LEVEL_DIMENSIONS:
 		_check_level(String(path_value), LEVEL_DIMENSIONS[path_value] as Vector2i)
 	for path_value: Variant in STATIC_PLACEMENT_PAIRS:
-		_check_static_placement_alignment(
-			String(path_value),
-			STATIC_PLACEMENT_PAIRS[path_value] as Array
-		)
+		_check_static_placement_alignment(String(path_value), STATIC_PLACEMENT_PAIRS[path_value] as Array)
 	for path_value: Variant in GENERATED_FLOOR_DIMENSIONS:
 		var map_path := String(path_value)
 		_check_map(map_path, GENERATED_FLOOR_DIMENSIONS[path_value] as Vector2i)
@@ -153,13 +193,11 @@ func _check_level(scene_path: String, expected_dimensions: Vector2i) -> void:
 		"%s declares exactly one editable FloorSurface override." % scene_path
 	)
 	expect(
-		level_source.contains('path="%s"' % map_path) \
-			and level_source.contains('path="%s"' % style_path),
+		level_source.contains('path="%s"' % map_path) and level_source.contains('path="%s"' % style_path),
 		"%s references its own editable floor map and style." % scene_path
 	)
 	expect(
-		not level_source.contains("PNGFloorGridMap") \
-			and not level_source.contains("FloorGridMap"),
+		not level_source.contains("PNGFloorGridMap") and not level_source.contains("FloorGridMap"),
 		"%s contains no legacy floor GridMap node." % scene_path
 	)
 	if NESTED_EDITABLE_PATHS.has(scene_path):
@@ -182,13 +220,11 @@ func _check_map(map_path: String, expected_dimensions: Vector2i) -> void:
 	var source := FileAccess.get_file_as_string(map_path)
 	var floor_map := load(map_path) as FloorMap
 	expect(
-		floor_map.dimensions == expected_dimensions \
-			and not floor_map.get_present_cells().is_empty(),
+		floor_map.dimensions == expected_dimensions and not floor_map.get_present_cells().is_empty(),
 		"%s preserves the complete original floor footprint." % map_path
 	)
 	expect(
-		not source.contains("elevation_overrides") \
-			and not source.contains("transition_overrides"),
+		not source.contains("elevation_overrides") and not source.contains("transition_overrides"),
 		"%s preserves the original flat elevation." % map_path
 	)
 	var repainted_map := FloorMap.new()
@@ -219,14 +255,8 @@ func _check_style(style_path: String) -> void:
 		style.get_wall_material() != null and style.get_wall_material() != style.top_material,
 		"%s uses an independent FloorSurface wall material." % style_path
 	)
-	expect(
-		style.pit_bottom_material != null,
-		"%s uses an explicit FloorSurface pit-bottom material." % style_path
-	)
-	expect(
-		style.pit_depth >= MINIMUM_READABLE_PIT_DEPTH,
-		"%s uses player-scale FloorSurface wall depth." % style_path
-	)
+	expect(style.pit_bottom_material != null, "%s uses an explicit FloorSurface pit-bottom material." % style_path)
+	expect(style.pit_depth >= MINIMUM_READABLE_PIT_DEPTH, "%s uses player-scale FloorSurface wall depth." % style_path)
 
 
 func _check_static_placement_alignment(scene_path: String, pair: Array) -> void:
@@ -237,29 +267,24 @@ func _check_static_placement_alignment(scene_path: String, pair: Array) -> void:
 	var expected_minimum := pair[2] as Vector2i
 	var expanded_cell := expected_minimum - Vector2i.ONE
 	expect(
-		floor_surface.placement_grid_map_path == floor_surface.get_path_to(placement_grid_map) \
-			and GridAlignment.is_aligned(floor_surface, placement_grid_map) \
-			and floor_surface.floor_map.minimum_cell == expected_minimum,
+		(
+			floor_surface.placement_grid_map_path == floor_surface.get_path_to(placement_grid_map)
+			and GridAlignment.is_aligned(floor_surface, placement_grid_map)
+			and floor_surface.floor_map.minimum_cell == expected_minimum
+		),
 		"%s keeps its floor and object-placement coordinates aligned." % scene_path
 	)
 	expect_equal(
-		GridAlignment.floor_cell_to_grid_cell(
-			floor_surface,
-			placement_grid_map,
-			expanded_cell
-		),
+		GridAlignment.floor_cell_to_grid_cell(floor_surface, placement_grid_map, expanded_cell),
 		expanded_cell,
 		"%s can place GridMap objects beyond its current floor edge." % scene_path
 	)
 	if BALANCED_PLACEMENT_LEVELS.has(scene_path):
 		var used_bounds := _horizontal_used_bounds(placement_grid_map)
 		var lower_padding := used_bounds.position - floor_surface.floor_map.minimum_cell
-		var upper_padding := floor_surface.floor_map.minimum_cell \
-			+ floor_surface.floor_map.dimensions - used_bounds.end
+		var upper_padding := floor_surface.floor_map.minimum_cell + floor_surface.floor_map.dimensions - used_bounds.end
 		expect_equal(
-			lower_padding,
-			upper_padding,
-			"%s keeps equal floor padding on opposite GridMap edges." % scene_path
+			lower_padding, upper_padding, "%s keeps equal floor padding on opposite GridMap edges." % scene_path
 		)
 	level.free()
 
@@ -278,18 +303,8 @@ func _check_readable_pit_walls(map_path: String) -> void:
 		expected_region_count,
 		"%s resolves only its enclosed holes as pit regions." % map_path
 	)
-	expect_equal(
-		bottoms.size(),
-		expected_cell_count,
-		"%s retains every enclosed hole cell." % map_path
-	)
-	var build_result := GeometryBuilder.new().build(
-		floor_map,
-		ElevationProfile,
-		styles,
-		1.0,
-		Vector2.ZERO
-	)
+	expect_equal(bottoms.size(), expected_cell_count, "%s retains every enclosed hole cell." % map_path)
+	var build_result := GeometryBuilder.new().build(floor_map, ElevationProfile, styles, 1.0, Vector2.ZERO)
 	var mesh := build_result["mesh"] as ArrayMesh
 	var collision_shape := build_result["collision_shape"] as ConcavePolygonShape3D
 	expect_equal(
@@ -320,11 +335,7 @@ func _check_readable_pit_walls(map_path: String) -> void:
 		for direction in CARDINAL_DIRECTIONS:
 			if not floor_map.has_floor(hole_cell + direction):
 				continue
-			var bottom_corners := _pit_edge_bottom_corners(
-				hole_cell,
-				direction,
-				bottom_height
-			)
+			var bottom_corners := _pit_edge_bottom_corners(hole_cell, direction, bottom_height)
 			expect(
 				wall_vertices.has(bottom_corners[0]) and wall_vertices.has(bottom_corners[1]),
 				"%s closes the complete wall beside hole cell %s." % [map_path, hole_cell]
@@ -343,9 +354,7 @@ func _find_material_surface(mesh: ArrayMesh, material: Material) -> int:
 
 
 func _pit_edge_bottom_corners(
-	hole_cell: Vector2i,
-	neighbour_direction: Vector2i,
-	bottom_height: float
+	hole_cell: Vector2i, neighbour_direction: Vector2i, bottom_height: float
 ) -> Array[Vector3]:
 	var minimum_x := float(hole_cell.x)
 	var minimum_z := float(hole_cell.y)

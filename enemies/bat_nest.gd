@@ -387,7 +387,9 @@ func _start_flying_off() -> void:
 		var random_spread := rng.randf_range(-spread_radians * 0.35, spread_radians * 0.35)
 		var spread := spread_ratio * spread_radians + random_spread
 		bat_state.fly_direction = fly_off_group_direction.rotated(Vector3.UP, spread).normalized()
-		bat_state.fly_start_direction = _get_horizontal_direction_or_fallback(bat_state.velocity, bat_state.fly_direction)
+		bat_state.fly_start_direction = _get_horizontal_direction_or_fallback(
+			bat_state.velocity, bat_state.fly_direction
+		)
 
 
 func _update_flying_off(delta: float) -> void:
@@ -405,13 +407,10 @@ func _update_flying_off(delta: float) -> void:
 			cohesion_velocity = cohesion.normalized() * cohesion_weight
 
 		var turn_direction := _slerp_horizontal_direction(
-			bat_state.fly_start_direction,
-			bat_state.fly_direction,
-			turn_ratio
+			bat_state.fly_start_direction, bat_state.fly_direction, turn_ratio
 		)
 		bat_state.velocity = _limit_velocity(
-			(turn_direction * fly_off_speed) + rise_velocity + cohesion_velocity,
-			fly_off_speed + fly_off_rise_speed
+			(turn_direction * fly_off_speed) + rise_velocity + cohesion_velocity, fly_off_speed + fly_off_rise_speed
 		)
 		_move_bat(bat_state, delta)
 
@@ -462,8 +461,7 @@ func _update_flap_audio(delta: float) -> void:
 	flap_audio_player.bus = &"SFX"
 	flap_audio_player.volume_db = _get_faded_audio_volume_db(flap_sound_volume_db)
 	flap_audio_player.pitch_scale = rng.randf_range(
-		minf(flap_sound_pitch_min, flap_sound_pitch_max),
-		maxf(flap_sound_pitch_min, flap_sound_pitch_max)
+		minf(flap_sound_pitch_min, flap_sound_pitch_max), maxf(flap_sound_pitch_min, flap_sound_pitch_max)
 	)
 	flap_audio_player.max_distance = flap_sound_max_distance
 	flap_audio_player.unit_size = flap_sound_unit_size
@@ -508,8 +506,7 @@ func _update_squeak_audio(delta: float) -> void:
 	squeak_audio_player.bus = &"SFX"
 	squeak_audio_player.volume_db = _get_faded_audio_volume_db(squeak_sound_volume_db)
 	squeak_audio_player.pitch_scale = rng.randf_range(
-		minf(squeak_sound_pitch_min, squeak_sound_pitch_max),
-		maxf(squeak_sound_pitch_min, squeak_sound_pitch_max)
+		minf(squeak_sound_pitch_min, squeak_sound_pitch_max), maxf(squeak_sound_pitch_min, squeak_sound_pitch_max)
 	)
 	squeak_audio_player.max_distance = squeak_sound_max_distance
 	squeak_audio_player.unit_size = squeak_sound_unit_size
@@ -528,8 +525,7 @@ func _start_audio_playback(audio_player: AudioStreamPlayer3D) -> void:
 
 func _randomize_next_flap_sound() -> void:
 	flap_sound_timer = rng.randf_range(
-		minf(flap_sound_interval_min, flap_sound_interval_max),
-		maxf(flap_sound_interval_min, flap_sound_interval_max)
+		minf(flap_sound_interval_min, flap_sound_interval_max), maxf(flap_sound_interval_min, flap_sound_interval_max)
 	)
 
 
@@ -882,11 +878,7 @@ func _update_bat_animations() -> void:
 
 
 func _play_bat_animations(bat_state: BatState) -> void:
-	BatAnimation.play(
-		bat_state.animation_players,
-		bat_state.animation_names,
-		flap_animation_speed_scale
-	)
+	BatAnimation.play(bat_state.animation_players, bat_state.animation_names, flap_animation_speed_scale)
 
 
 func _get_flap_animation_name(animation_player: AnimationPlayer, animation_list: PackedStringArray) -> StringName:

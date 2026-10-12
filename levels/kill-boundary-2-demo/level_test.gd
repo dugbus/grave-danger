@@ -13,9 +13,10 @@ func run(_tree: SceneTree) -> void:
 		"The demo exposes all five poses as selectable scene-tree nodes."
 	)
 	expect(
-		is_equal_approx(boundary.loop_return_seconds, 3.0)
-		and boundary.sequence.get_pose(4).outgoing_easing
-		== GDKillBoundary2Pose.TransitionEasing.Smooth,
+		(
+			is_equal_approx(boundary.loop_return_seconds, 3.0)
+			and boundary.sequence.get_pose(4).outgoing_easing == GDKillBoundary2Pose.TransitionEasing.Smooth
+		),
 		"The demo authors a visible smooth three-second Loop return to Pose 1."
 	)
 	expect_equal(
@@ -38,18 +39,12 @@ func run(_tree: SceneTree) -> void:
 		GDKillBoundary2Pose.TransitionEasing.Decelerate,
 		"Transition 4 demonstrates Decelerate easing."
 	)
-	expect(
-		boundary.find_children("*", "Path3D", true, false).is_empty(),
-		"The demo boundary contains no Path3D."
-	)
+	expect(boundary.find_children("*", "Path3D", true, false).is_empty(), "The demo boundary contains no Path3D.")
 	expect(
 		boundary.find_children("*", "AnimationPlayer", true, false).is_empty(),
 		"The demo boundary contains no AnimationPlayer."
 	)
-	expect(
-		demo.get_node_or_null(^"DemoHUD/Controls") != null,
-		"The demo includes its runtime validation HUD."
-	)
+	expect(demo.get_node_or_null(^"DemoHUD/Controls") != null, "The demo includes its runtime validation HUD.")
 	expect(
 		(
 			demo.get_node_or_null(^"PauseBoundaryFlask") != null

@@ -52,10 +52,7 @@ func _ready() -> void:
 	_populate_level_list()
 	_bind_bottom_actions()
 	scroll_container.configure_rows(
-		level_buttons,
-		back_button,
-		shop_button,
-		[back_button, settings_button, shop_button]
+		level_buttons, back_button, shop_button, [back_button, settings_button, shop_button]
 	)
 	_focus_initial_level()
 	_precache_selected_level()
@@ -90,31 +87,25 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _bind_scene_nodes() -> void:
 	screen_container = get_node_or_null(screen_container_path) as Control
-	scroll_container = get_node(
-        "ScreenContainer/LevelListFrame/Content/LevelScroll"
-	) as FOCUS_SCROLL_LIST_SCRIPT
+	scroll_container = get_node("ScreenContainer/LevelListFrame/Content/LevelScroll") as FOCUS_SCROLL_LIST_SCRIPT
 	level_list = scroll_container.get_node("ListMargin/LevelList") as VBoxContainer
-	selected_tomb_name_label = get_node(
-        "ScreenContainer/LootFrame/Content/SelectedTombPanel/SelectedTombNameLabel"
-	) as Label
-	selected_tomb_status_label = get_node(
-        "ScreenContainer/LootFrame/Content/SelectedTombPanel/SelectedTombStatusLabel"
-	) as Label
-	level_run_playback = get_node(
-        "ScreenContainer/LootFrame/Content/LevelRunPlayback"
-	) as LEVEL_RUN_PLAYBACK_SCRIPT
-	liberated_loot_heading_label = get_node(
-        "ScreenContainer/LootFrame/Content/SelectedTombPanel/LiberatedLootHeadingLabel"
-	) as Label
-	liberated_summary_label = get_node(
-        "ScreenContainer/LootFrame/Content/SelectedTombPanel/LiberatedSummaryLabel"
-	) as Label
-	loot_summary_separator = get_node(
-        "ScreenContainer/LootFrame/Content/SelectedTombPanel/LootSummarySeparator"
-	) as TextureRect
-	loot_tiles = get_node(
-        "ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles"
-	) as GridContainer
+	selected_tomb_name_label = (
+		get_node("ScreenContainer/LootFrame/Content/SelectedTombPanel/SelectedTombNameLabel") as Label
+	)
+	selected_tomb_status_label = (
+		get_node("ScreenContainer/LootFrame/Content/SelectedTombPanel/SelectedTombStatusLabel") as Label
+	)
+	level_run_playback = get_node("ScreenContainer/LootFrame/Content/LevelRunPlayback") as LEVEL_RUN_PLAYBACK_SCRIPT
+	liberated_loot_heading_label = (
+		get_node("ScreenContainer/LootFrame/Content/SelectedTombPanel/LiberatedLootHeadingLabel") as Label
+	)
+	liberated_summary_label = (
+		get_node("ScreenContainer/LootFrame/Content/SelectedTombPanel/LiberatedSummaryLabel") as Label
+	)
+	loot_summary_separator = (
+		get_node("ScreenContainer/LootFrame/Content/SelectedTombPanel/LootSummarySeparator") as TextureRect
+	)
+	loot_tiles = get_node("ScreenContainer/LootFrame/Content/SelectedTombPanel/LootTiles") as GridContainer
 	back_button = get_node("ScreenContainer/BottomActions/BackButton") as Button
 	settings_button = get_node("ScreenContainer/BottomActions/SettingsButton") as Button
 	shop_button = get_node("ScreenContainer/BottomActions/ShopButton") as Button
@@ -170,13 +161,11 @@ func _create_level_button(index: int) -> Button:
 	var is_tutorial := bool(level_data.get("tutorial", false))
 	status.text = _get_level_status_text(result_status, is_tutorial)
 	status.add_theme_color_override(
-		&"font_color",
-		Color(0.58, 0.86, 0.82) if is_tutorial else _get_status_color(index, available)
+		&"font_color", Color(0.58, 0.86, 0.82) if is_tutorial else _get_status_color(index, available)
 	)
 	percentage.text = _get_percentage_text(index, available)
 	percentage.add_theme_color_override(&"font_color", _get_percentage_color(index, available))
-	plays.text = _get_play_count_text(int(_get_level_result(index).get("play_count", 0))) \
-		if available else "0 PLAYS"
+	plays.text = _get_play_count_text(int(_get_level_result(index).get("play_count", 0))) if available else "0 PLAYS"
 	return button
 
 
@@ -203,8 +192,7 @@ func _on_button_focused(index: int) -> void:
 		var scene_loader := _get_scene_loader()
 		if scene_loader != null:
 			var focused_level_path := level_selection.get_level_scene_path(index)
-			if not precached_level_path.is_empty() \
-					and precached_level_path != focused_level_path:
+			if not precached_level_path.is_empty() and precached_level_path != focused_level_path:
 				scene_loader.release_scene(precached_level_path)
 			precached_level_path = focused_level_path
 			scene_loader.request_scene(focused_level_path, true)
@@ -218,16 +206,13 @@ func _update_selected_level_details(index: int) -> void:
 	var level_data := level_selection.get_level_data(index) if level_selection != null else {}
 	var available := level_selection.is_level_available(index) if level_selection != null else false
 	var result := _get_level_result(index)
-	selected_tomb_name_label.text = String(
-		level_data.get("name", "Level %d" % (index + 1))
-	).to_upper()
+	selected_tomb_name_label.text = String(level_data.get("name", "Level %d" % (index + 1))).to_upper()
 	selected_tomb_status_label.text = _get_selected_tomb_status(index, available, result)
 	var level_was_played := bool(result.get("played", false))
 	if level_run_playback != null:
 		if _should_show_level_run_playback(level_data, result):
 			level_run_playback.show_level_run(
-				String(level_data.get("id", "")),
-				String(level_data.get("scene_path", ""))
+				String(level_data.get("id", "")), String(level_data.get("scene_path", ""))
 			)
 		else:
 			level_run_playback.clear_level_run()
@@ -248,16 +233,18 @@ func _update_selected_level_details(index: int) -> void:
 	loot_summary_separator.visible = has_liberated_loot
 	liberated_summary_label.visible = has_liberated_loot
 	if has_liberated_loot:
-		liberated_summary_label.text = "%d PIECE%s LIBERATED  •  %d%% RECOVERED" % [
-			liberated_total,
-			"" if liberated_total == 1 else "S",
-			int(result.get("best_percentage", 0)),
-		]
+		liberated_summary_label.text = (
+			"%d PIECE%s LIBERATED  •  %d%% RECOVERED"
+			% [
+				liberated_total,
+				"" if liberated_total == 1 else "S",
+				int(result.get("best_percentage", 0)),
+			]
+		)
 
 
 func _should_show_level_run_playback(level_data: Dictionary, result: Dictionary) -> bool:
-	return bool(level_data.get("run_playback_enabled", true)) \
-		and bool(result.get("played", false))
+	return bool(level_data.get("run_playback_enabled", true)) and bool(result.get("played", false))
 
 
 func _get_selected_tomb_status(index: int, available: bool, result: Dictionary) -> String:
@@ -267,11 +254,14 @@ func _get_selected_tomb_status(index: int, available: bool, result: Dictionary) 
 	var play_count := int(result.get("play_count", 0))
 	if _get_result_state(result) == LevelResultState.Unplayed:
 		return "%s  •  %s" % [status, _get_play_count_text(play_count)]
-	return "%s  •  %d%% RECOVERED  •  %s" % [
-		status,
-		int(result.get("best_percentage", 0)),
-		_get_play_count_text(play_count),
-	]
+	return (
+		"%s  •  %d%% RECOVERED  •  %s"
+		% [
+			status,
+			int(result.get("best_percentage", 0)),
+			_get_play_count_text(play_count),
+		]
+	)
 
 
 func _on_button_gui_input(event: InputEvent, index: int) -> void:
@@ -364,10 +354,7 @@ func _start_level(index: int) -> void:
 		return
 	_play_select_sound()
 	starting = true
-	await _change_scene_after_playback_shutdown(
-		game_scene,
-		level_selection.get_selected_level_scene_path()
-	)
+	await _change_scene_after_playback_shutdown(game_scene, level_selection.get_selected_level_scene_path())
 
 
 func _return_to_title() -> void:
@@ -394,10 +381,7 @@ func _open_settings() -> void:
 	await _change_scene_after_playback_shutdown(SETTINGS_SCENE_PATH)
 
 
-func _change_scene_after_playback_shutdown(
-	scene_path: String,
-	required_dependency_path := ""
-) -> void:
+func _change_scene_after_playback_shutdown(scene_path: String, required_dependency_path := "") -> void:
 	var scene_loader := _get_scene_loader()
 	if scene_loader != null:
 		scene_loader.request_scene(scene_path)
@@ -413,8 +397,11 @@ func _change_scene_after_playback_shutdown(
 			starting = false
 			push_warning("Could not prepare scene dependency '%s'." % required_dependency_path)
 			return
-	var change_error := await scene_loader.change_scene_to_file(scene_path) \
-		if scene_loader != null else get_tree().change_scene_to_file(scene_path)
+	var change_error := (
+		await scene_loader.change_scene_to_file(scene_path)
+		if scene_loader != null
+		else get_tree().change_scene_to_file(scene_path)
+	)
 	if change_error != OK:
 		starting = false
 		push_warning("Could not open scene '%s'." % scene_path)

@@ -122,11 +122,7 @@ func _configure_level_trigger() -> void:
 
 	var aabb := trigger_mesh.mesh.get_aabb()
 	var shape := BoxShape3D.new()
-	shape.size = Vector3(
-		maxf(aabb.size.x, 0.05),
-		maxf(aabb.size.y, 0.05),
-		maxf(aabb.size.z, 0.05)
-	)
+	shape.size = Vector3(maxf(aabb.size.x, 0.05), maxf(aabb.size.y, 0.05), maxf(aabb.size.z, 0.05))
 	level_trigger_center = aabb.position + aabb.size * 0.5
 	level_trigger_half_extents = shape.size * 0.5
 
@@ -318,8 +314,7 @@ func _is_collision_shape_inside_level_trigger(collision: CollisionShape3D) -> bo
 	var shape := collision.shape
 	if shape is SphereShape3D:
 		return _is_trigger_sphere_inside(
-			collision.global_position,
-			_get_scaled_sphere_radius(collision, shape as SphereShape3D)
+			collision.global_position, _get_scaled_sphere_radius(collision, shape as SphereShape3D)
 		)
 	if shape is CapsuleShape3D:
 		return _is_trigger_capsule_inside(collision, shape as CapsuleShape3D)
@@ -410,15 +405,16 @@ func _start_level_transition() -> void:
 	await tween.finished
 	if is_inside_tree():
 		if scene_loader != null:
-			var selected_scene := await scene_loader.load_scene(
-				level_selection.get_selected_level_scene_path()
-			)
+			var selected_scene := await scene_loader.load_scene(level_selection.get_selected_level_scene_path())
 			if selected_scene == null:
 				is_changing_level = false
 				push_warning("Could not prepare target level %d." % target_level_number)
 				return
-		var change_error := await scene_loader.change_scene_to_file(GAME_SCENE) \
-			if scene_loader != null else get_tree().change_scene_to_file(GAME_SCENE)
+		var change_error := (
+			await scene_loader.change_scene_to_file(GAME_SCENE)
+			if scene_loader != null
+			else get_tree().change_scene_to_file(GAME_SCENE)
+		)
 		if change_error != OK:
 			is_changing_level = false
 			push_warning("Could not enter target level %d." % target_level_number)

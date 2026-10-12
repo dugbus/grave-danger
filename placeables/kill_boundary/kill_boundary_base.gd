@@ -2,7 +2,6 @@
 @abstract
 extends "res://placeables/path_placeable.gd"
 
-
 const EDITOR_PREVIEW_CONTAINER_NAME := "EditorPreview"
 const BOUNDARY_CENTER_NAME := "BoundaryCenter"
 const ANIMATION_PLAYER_NAME := "BoundaryAnimationPlayer"
@@ -390,8 +389,7 @@ func _configure_animation_loop_mode() -> void:
 		and not animation_player.current_animation.is_empty()
 	)
 	var playback_was_active := playback_is_configured and animation_player.is_playing()
-	var playback_position := animation_player.current_animation_position \
-		if playback_is_configured else 0.0
+	var playback_position := animation_player.current_animation_position if playback_is_configured else 0.0
 	var requested_loop_mode := _get_requested_animation_loop_mode()
 	if boundary_animation.loop_mode != requested_loop_mode:
 		boundary_animation.loop_mode = requested_loop_mode
@@ -402,15 +400,8 @@ func _configure_animation_loop_mode() -> void:
 		if playback_is_configured and derived_ping_pong_end_time > 0.0:
 			animation_player.set_section(0.0, derived_ping_pong_end_time)
 			if playback_was_active:
-				animation_player.play_section(
-					DEFAULT_ANIMATION_NAME,
-					0.0,
-					derived_ping_pong_end_time
-				)
-				animation_player.seek(
-					clampf(playback_position, 0.0, derived_ping_pong_end_time),
-					true
-				)
+				animation_player.play_section(DEFAULT_ANIMATION_NAME, 0.0, derived_ping_pong_end_time)
+				animation_player.seek(clampf(playback_position, 0.0, derived_ping_pong_end_time), true)
 		return
 
 	derived_ping_pong_end_time = -1.0
@@ -420,10 +411,7 @@ func _configure_animation_loop_mode() -> void:
 		animation_player.reset_section()
 	if playback_was_active:
 		animation_player.play(DEFAULT_ANIMATION_NAME)
-		animation_player.seek(
-			clampf(playback_position, 0.0, boundary_animation.length),
-			true
-		)
+		animation_player.seek(clampf(playback_position, 0.0, boundary_animation.length), true)
 
 
 func _get_requested_animation_loop_mode() -> Animation.LoopMode:
@@ -440,8 +428,8 @@ func _get_requested_animation_loop_mode() -> Animation.LoopMode:
 @abstract func _apply_flame_heat(delta: float) -> void
 @abstract func _apply_ghosts_to_boundary(meshes: Array[MeshInstance3D], is_editor_preview := false) -> void
 @abstract func _apply_player_blockers_to_segments(
-    meshes: Array[MeshInstance3D],
-    collisions: Array[CollisionShape3D],
+	meshes: Array[MeshInstance3D],
+	collisions: Array[CollisionShape3D],
 ) -> void
 @abstract func _configure_path_follow() -> void
 @abstract func _create_flame_material() -> void
@@ -456,18 +444,18 @@ func _get_requested_animation_loop_mode() -> Animation.LoopMode:
 @abstract func _get_speed_track_signature(animation: Animation) -> String
 @abstract func _get_target_runtime_bounds_multiplier() -> float
 @abstract func _integrate_speed_interval(
-    animation: Animation,
-    speed_track: int,
-    start_time: float,
-    end_time: float,
+	animation: Animation,
+	speed_track: int,
+	start_time: float,
+	end_time: float,
 ) -> float
 @abstract func _is_editor_animation_edit_safe() -> bool
 @abstract func _is_flame_effect_active() -> bool
 @abstract func _is_ghost_effect_active() -> bool
 @abstract func _restore_runtime_bounds_after(
-    multiplier: float,
-    active_seconds: float,
-    contraction_transition_seconds: float,
+	multiplier: float,
+	active_seconds: float,
+	contraction_transition_seconds: float,
 ) -> void
 @abstract func _sync_path_point_animation_markers() -> void
 @abstract func _resume_runtime_motion_after(token: int, seconds: float) -> void

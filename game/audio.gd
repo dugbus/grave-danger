@@ -1,7 +1,6 @@
 class_name GDAudio
 extends RefCounted
 
-
 enum FootstepSoundProfile {
 	Player,
 	Enemy,
@@ -22,6 +21,9 @@ const DUNGEON_REVERB_SPREAD := 0.9
 const DUNGEON_REVERB_HIPASS := 0.2
 const DUNGEON_REVERB_DRY := 1.0
 const DUNGEON_REVERB_WET := 0.16
+
+## Shared playback boundary with an optional executor supplied by the current host.
+const PLAYBACK_HOST := preload("res://game/audio_playback_host.tres")
 
 
 ## Gives gameplay sound effects a restrained stone-dungeon acoustic without changing music.
@@ -98,11 +100,7 @@ static func load_streams(sound_paths: Array[String]) -> Array[AudioStream]:
 
 
 static func play_one_shot(
-	parent: Node,
-	stream: AudioStream,
-	sound_name: String,
-	volume_db: float = 0.0,
-	pitch_scale: float = 1.0
+	parent: Node, stream: AudioStream, sound_name: String, volume_db: float = 0.0, pitch_scale: float = 1.0
 ) -> AudioStreamPlayer:
 	if parent == null or stream == null:
 		return null
@@ -115,7 +113,7 @@ static func play_one_shot(
 	sound_player.bus = SFX_BUS
 	sound_player.finished.connect(sound_player.queue_free)
 	parent.add_child(sound_player)
-	sound_player.play()
+	_start_audio_playback(sound_player)
 	return sound_player
 
 
@@ -144,8 +142,17 @@ static func play_one_shot_3d(
 	sound_player.attenuation_model = attenuation_model
 	sound_player.finished.connect(sound_player.queue_free)
 	parent.add_child(sound_player)
-	sound_player.play()
+	_start_audio_playback(sound_player)
 	return sound_player
+
+
+static func _start_audio_playback(player: Node) -> void:
+	if PLAYBACK_HOST.execute(player):
+		return
+	if player is AudioStreamPlayer:
+		(player as AudioStreamPlayer).play()
+	elif player is AudioStreamPlayer3D:
+		(player as AudioStreamPlayer3D).play()
 
 
 static func play_random_footstep_3d(
@@ -168,9 +175,7 @@ static func play_random_footstep_3d(
 		return null
 
 	var speed_volume_boost := clampf(
-		(horizontal_speed - speed_threshold) / maxf(max_speed - speed_threshold, 0.001),
-		0.0,
-		1.0
+		(horizontal_speed - speed_threshold) / maxf(max_speed - speed_threshold, 0.001), 0.0, 1.0
 	)
 	var volume_db := lerpf(volume_min_db, volume_max_db, speed_volume_boost)
 	var variance := maxf(volume_variance_db, 0.0)
@@ -231,11 +236,7 @@ static func _pick_stream(streams: Array[AudioStream], rng: RandomNumberGenerator
 	return streams[0]
 
 
-static func _randf_range(
-	min_value: float,
-	max_value: float,
-	rng: RandomNumberGenerator
-) -> float:
+static func _randf_range(min_value: float, max_value: float, rng: RandomNumberGenerator) -> float:
 	if rng != null:
 		return rng.randf_range(min_value, max_value)
 

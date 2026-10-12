@@ -32,8 +32,7 @@ func _test_snap_parent_to_ground(tree: SceneTree) -> void:
 	await tree.physics_frame
 
 	expect(
-		subject.snap_parent_to_ground(),
-		"The editor placement helper finds walkable ground beneath an airborne enemy."
+		subject.snap_parent_to_ground(), "The editor placement helper finds walkable ground beneath an airborne enemy."
 	)
 	expect(
 		absf(placement_node.global_position.y) <= 0.001,

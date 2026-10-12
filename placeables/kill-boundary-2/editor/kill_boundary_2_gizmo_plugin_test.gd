@@ -4,9 +4,7 @@ const SUBJECT := preload("res://placeables/kill-boundary-2/editor/kill_boundary_
 
 
 func run(_tree: SceneTree) -> void:
-	expect_script_contract(
-		SUBJECT, "res://placeables/kill-boundary-2/editor/kill_boundary_2_gizmo_plugin.gd"
-	)
+	expect_script_contract(SUBJECT, "res://placeables/kill-boundary-2/editor/kill_boundary_2_gizmo_plugin.gd")
 	var source := (SUBJECT as Script).get_source_code()
 	expect(
 		source.contains("gizmo.add_collision_segments(lines)"),
@@ -21,14 +19,15 @@ func run(_tree: SceneTree) -> void:
 		"No synthetic picking cross or sub-gizmo obscures the native transform widget."
 	)
 	expect(
-		source.contains("if not is_active:")
-		and source.contains("controller.get_handle_positions(pose)"),
+		source.contains("if not is_active:") and source.contains("controller.get_handle_positions(pose)"),
 		"The active pose keeps its complete edge, corner, and rounding controls."
 	)
 	expect(
-		source.contains("controller.position_from_handle")
-		and source.contains("set_pose_geometry")
-		and source.contains("opposite side stays fixed"),
+		(
+			source.contains("controller.position_from_handle")
+			and source.contains("set_pose_geometry")
+			and source.contains("opposite side stays fixed")
+		),
 		"Size handles move the pose origin so the opposite edge or corner remains fixed."
 	)
 	expect(

@@ -50,6 +50,8 @@
 - Godot 4.7 only.
 - Use statically typed GDScript.
 - Use tabs for GDScript indentation, displayed at four columns.
+- After changing `.gd` scripts, use the `format-gdscript` skill in `.agents/skills/format-gdscript/SKILL.md` and run `./format.sh` with only the script paths changed by the current task, including tests.
+- Formatting is defined by `gdformatrc`; keep formatter safety checks enabled. Reserve `./format.sh --all` for explicitly requested repository-wide formatting passes.
 - Prefer composition over deep inheritance.
 - Keep scripts below 500 lines where practical.
 - Keep functions small and single-purpose.
@@ -111,3 +113,6 @@ Run the relevant checks after code changes:
 The scene scan rejects duplicate root UIDs and stale `ext_resource` UIDs. Resolve those
 failures in the text scene or resource that declares them; do not re-save or modify a
 binary asset merely to make its old UID valid again.
+
+`./check.sh` also checks all first-party GDScript formatting without changing files.
+Install the formatter and linter with `python3 -m pip install -r requirements-dev.txt`.

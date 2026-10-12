@@ -1,7 +1,6 @@
 extends MultiMeshInstance3D
 class_name GDVampireMazeMinimapRouteOverlay
 
-
 const FLOOR_SURFACE_SCRIPT := preload("res://addons/floor_surface/floor_surface.gd")
 
 const INVALID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
@@ -61,14 +60,8 @@ func refresh_route() -> void:
 		return
 
 	var walkable_cells := _get_walkable_cells()
-	var start_cell := _find_nearest_walkable_cell(
-		_world_to_floor_cell(player.global_position),
-		walkable_cells
-	)
-	var end_cell := _find_nearest_walkable_cell(
-		_world_to_floor_cell(end_gate.global_position),
-		walkable_cells
-	)
+	var start_cell := _find_nearest_walkable_cell(_world_to_floor_cell(player.global_position), walkable_cells)
+	var end_cell := _find_nearest_walkable_cell(_world_to_floor_cell(end_gate.global_position), walkable_cells)
 	last_player_cell = start_cell
 	if start_cell == INVALID_CELL or end_cell == INVALID_CELL:
 		_apply_highlighted_cells()
@@ -104,11 +97,7 @@ func _resolve_references() -> void:
 
 
 func _has_route_references() -> bool:
-	return player != null \
-		and end_gate != null \
-		and wall_grid_map != null \
-		and floor_surface != null \
-		and multimesh != null
+	return player != null and end_gate != null and wall_grid_map != null and floor_surface != null and multimesh != null
 
 
 func _get_walkable_cells() -> Dictionary:

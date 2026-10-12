@@ -1,7 +1,6 @@
 class_name GDPushable
 extends "res://placeables/physics_placeable.gd"
 
-
 const PLAYER_COLLISION_LAYER := 2
 const WORLD_COLLISION_LAYER := 1
 const MIN_PUSH_SPEED := 0.05
@@ -117,8 +116,8 @@ func push_from_character(character_velocity: Vector3, collision_normal: Vector3,
 
 		if moving_into_contact > 0.05:
 			recent_push_direction = (
-				velocity_push_direction + contact_push_direction * character_contact_push_bias
-			).normalized()
+				(velocity_push_direction + contact_push_direction * character_contact_push_bias).normalized()
+			)
 
 	recent_push_speed = minf(horizontal_velocity.length(), max_character_push_speed)
 	recent_push_timer = character_push_memory_seconds

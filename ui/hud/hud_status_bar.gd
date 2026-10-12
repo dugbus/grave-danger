@@ -29,9 +29,9 @@ var bar_width := 420.0
 var bar_height := 26.0
 var bar_top := 20.0
 var warning_enabled := true
-var fill_start_color := Color(1.0,1.0,1.0)
-var fill_mid_color := Color(1.0,1.0,1.0)
-var fill_end_color := Color(1.0,1.0,1.0)
+var fill_start_color := Color(1.0, 1.0, 1.0)
+var fill_mid_color := Color(1.0, 1.0, 1.0)
+var fill_end_color := Color(1.0, 1.0, 1.0)
 var warning_start_color := Color(1.0, 0.1, 0.06)
 var warning_end_color := Color(1.0, 0.1, 0.1)
 
@@ -106,10 +106,7 @@ func _sync_viewport_rect() -> void:
 
 
 func _refresh_processing() -> void:
-	set_process(
-		absf(visible_ratio - target_ratio) > RATIO_SETTLED_EPSILON
-		or _is_warning_active()
-	)
+	set_process(absf(visible_ratio - target_ratio) > RATIO_SETTLED_EPSILON or _is_warning_active())
 
 
 func _draw() -> void:
@@ -119,10 +116,7 @@ func _draw() -> void:
 	var resolved_width := minf(bar_width, maxf(size.x - 32.0, 120.0))
 	var resolved_height := minf(bar_height, maxf(size.y * 0.18, 12.0))
 
-	var outer_rect := Rect2(
-		Vector2((size.x - resolved_width) * 0.5, bar_top),
-		Vector2(resolved_width, resolved_height)
-	)
+	var outer_rect := Rect2(Vector2((size.x - resolved_width) * 0.5, bar_top), Vector2(resolved_width, resolved_height))
 
 	var track_rect := outer_rect.grow(-inset_pixels)
 	if track_rect.size.x <= 0.0 or track_rect.size.y <= 0.0:
@@ -188,8 +182,7 @@ func _draw_gradient_capsule(rect: Rect2) -> void:
 		var x1 := body_x + body_width * t1
 		var color_t := clampf((x0 + (x1 - x0) * 0.5 - rect.position.x) / rect.size.x, 0.0, 1.0)
 		draw_rect(
-			Rect2(Vector2(x0, rect.position.y), Vector2(maxf(x1 - x0 + 1.0, 1.0), rect.size.y)),
-			_fill_color(color_t)
+			Rect2(Vector2(x0, rect.position.y), Vector2(maxf(x1 - x0 + 1.0, 1.0), rect.size.y)), _fill_color(color_t)
 		)
 	_draw_capsule_cap(rect.position + Vector2(rect.size.x - radius, radius), radius, _fill_color(1.0))
 
@@ -218,10 +211,7 @@ func _draw_tick_marks(rect: Rect2) -> void:
 
 func _draw_top_glass(rect: Rect2) -> void:
 	var radius := rect.size.y * 0.5
-	var glass_rect := Rect2(
-		rect.position + Vector2(radius, 3.0),
-		Vector2(maxf(rect.size.x - radius * 2.0, 0.0), 3.0)
-	)
+	var glass_rect := Rect2(rect.position + Vector2(radius, 3.0), Vector2(maxf(rect.size.x - radius * 2.0, 0.0), 3.0))
 	if glass_rect.size.x > 1.0:
 		draw_rect(glass_rect, Color(1.0, 1.0, 1.0, 0.18))
 
@@ -236,9 +226,11 @@ func _draw_label(rect: Rect2) -> void:
 	# Center the label in the bar.
 	var font_size := float(label_font_size)
 	var text_size := font.get_string_size(label_text, HORIZONTAL_ALIGNMENT_CENTER, -1.0, int(font_size))
-	var text_position := rect.position + Vector2(
-		(rect.size.x - text_size.x) * 0.5,
-		(rect.size.y - text_size.y) * 0.5 + font.get_ascent(int(font_size))
+	var text_position := (
+		rect.position
+		+ Vector2(
+			(rect.size.x - text_size.x) * 0.5, (rect.size.y - text_size.y) * 0.5 + font.get_ascent(int(font_size))
+		)
 	)
 
 	draw_string(
@@ -311,6 +303,7 @@ func _create_circle_points(center: Vector2, radius: float) -> PackedVector2Array
 func _get_arc_segment_count(radius: float) -> int:
 	return clampi(int(ceil(radius * 0.55)), 12, 32)
 
+
 func _fill_color(t: float) -> Color:
 	var value := clampf(t, 0.0, 1.0)
 
@@ -334,6 +327,6 @@ func _fill_color(t: float) -> Color:
 	if warning_active:
 		var flash_on := int(elapsed * 6.0) % 2 == 0
 		if flash_on:
-			return Color(0.0,0.0,0.0,0.0)
+			return Color(0.0, 0.0, 0.0, 0.0)
 
 	return base_color

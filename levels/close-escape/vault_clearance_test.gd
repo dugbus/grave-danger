@@ -17,7 +17,10 @@ func run(tree: SceneTree) -> void:
 	await tree.physics_frame
 	await tree.physics_frame
 	var collision := player.get_node(^"CollisionShape3D") as CollisionShape3D
-	expect(_escape_fraction(harness, player, collision) >= 0.99, "The real player capsule clears the spike pocket's return opening without a zombie.")
+	expect(
+		_escape_fraction(harness, player, collision) >= 0.99,
+		"The real player capsule clears the spike pocket's return opening without a zombie."
+	)
 	var zombie := ZOMBIE.instantiate() as GDZombiePath
 	zombie.ai_enabled_on_ready = false
 	zombie.death_disappear_delay = 0.0
@@ -27,15 +30,24 @@ func run(tree: SceneTree) -> void:
 	zombie.zombie_body.global_position = RECORDED_ZOMBIE_POSITION
 	await tree.physics_frame
 	await tree.physics_frame
-	expect(_escape_fraction(harness, player, collision) < 0.99, "The recorded zombie body blocks the return opening while alive.")
+	expect(
+		_escape_fraction(harness, player, collision) < 0.99,
+		"The recorded zombie body blocks the return opening while alive."
+	)
 	zombie.die_from_spike_trap()
 	await tree.physics_frame
 	await tree.physics_frame
 	expect(zombie.is_dead, "The spike death uses the actual zombie death path.")
-	expect(_escape_fraction(harness, player, collision) >= 0.99, "A spike-killed zombie immediately releases the recorded escape route.")
+	expect(
+		_escape_fraction(harness, player, collision) >= 0.99,
+		"A spike-killed zombie immediately releases the recorded escape route."
+	)
 	await tree.create_timer(0.25).timeout
 	expect(not zombie.drop_pivot.visible, "The corpse completes its visual disappearance.")
-	expect(_escape_fraction(harness, player, collision) >= 0.99, "The vanished corpse cannot leave an invisible barrier in the vault.")
+	expect(
+		_escape_fraction(harness, player, collision) >= 0.99,
+		"The vanished corpse cannot leave an invisible barrier in the vault."
+	)
 	harness.free()
 	player.free()
 	level.free()

@@ -2,4 +2,54 @@
 
 [ext_resource type="PackedScene" uid="uid://bmkyv0ves7wyr" path="res://player/andy_rigged.glb" id="1_3lsqf"]
 
+[ext_resource type="Script" path="res://player/player_foot_plant.gd" id="2_plant"]
+
+[ext_resource type="Script" path="res://player/player_head_look.gd" id="3_head"]
+
+[ext_resource type="Script" path="res://player/player_face_anchor.gd" id="4_face_anchor"]
+[ext_resource type="Resource" path="res://player/andy_face_settings.tres" id="5_face_settings"]
+
 [node name="andy_rigged" unique_id=2038001053 instance=ExtResource("1_3lsqf")]
+
+[node name="Skeleton3D" parent="rig_deform" index="0"]
+
+[node name="FootPlant" type="SkeletonModifier3D" parent="rig_deform/Skeleton3D"]
+script = ExtResource("2_plant")
+
+[node name="LeftFootTarget" type="Marker3D" parent="rig_deform/Skeleton3D"]
+
+[node name="RightFootTarget" type="Marker3D" parent="rig_deform/Skeleton3D"]
+
+[node name="LeftKneePole" type="Marker3D" parent="rig_deform/Skeleton3D"]
+
+[node name="RightKneePole" type="Marker3D" parent="rig_deform/Skeleton3D"]
+
+[node name="LeftFootIK" type="TwoBoneIK3D" parent="rig_deform/Skeleton3D"]
+influence = 0.0
+setting_count = 1
+settings/0/target_node = NodePath("../LeftFootTarget")
+settings/0/pole_node = NodePath("../LeftKneePole")
+settings/0/root_bone_name = "DEF-thigh.L"
+settings/0/middle_bone_name = "DEF-shin.L"
+settings/0/end_bone_name = "DEF-foot.L"
+
+[node name="RightFootIK" type="TwoBoneIK3D" parent="rig_deform/Skeleton3D"]
+influence = 0.0
+setting_count = 1
+settings/0/target_node = NodePath("../RightFootTarget")
+settings/0/pole_node = NodePath("../RightKneePole")
+settings/0/root_bone_name = "DEF-thigh.R"
+settings/0/middle_bone_name = "DEF-shin.R"
+settings/0/end_bone_name = "DEF-foot.R"
+
+[node name="FootRotation" type="SkeletonModifier3D" parent="rig_deform/Skeleton3D"]
+script = ExtResource("2_plant")
+modification_pass = 1
+
+[node name="DeathEffectHead" type="BoneAttachment3D" parent="rig_deform/Skeleton3D"]
+bone_name = "DEF-spine.006"
+script = ExtResource("4_face_anchor")
+face_settings = ExtResource("5_face_settings")
+
+[node name="HeadLook" type="SkeletonModifier3D" parent="rig_deform/Skeleton3D"]
+script = ExtResource("3_head")

@@ -14,8 +14,7 @@ func _apply_effect(body: Node3D) -> bool:
 		return false
 
 	return body.increase_pickup_radius_percent_for(
-		FLASK_PROPERTIES.pickup_radius_percent,
-		FLASK_PROPERTIES.pickup_radius_seconds
+		FLASK_PROPERTIES.pickup_radius_percent, FLASK_PROPERTIES.pickup_radius_seconds
 	)
 
 

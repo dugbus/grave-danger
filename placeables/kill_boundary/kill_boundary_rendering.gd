@@ -357,4 +357,3 @@ func _update_preview_boundary() -> void:
 	if blocker_preview_meshes.size() == boundary_segments:
 		var no_blocker_collisions: Array[CollisionShape3D] = []
 		_apply_player_blockers_to_segments(blocker_preview_meshes, no_blocker_collisions)
-

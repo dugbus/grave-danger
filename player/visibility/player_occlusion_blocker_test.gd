@@ -23,47 +23,42 @@ func run(tree: SceneTree) -> void:
 	await tree.process_frame
 
 	expect_equal(
-		blocker.get_blocked_mesh_count(),
-		1,
-		"The occluding character mesh receives a silhouette-blocking pass."
+		blocker.get_blocked_mesh_count(), 1, "The occluding character mesh receives a silhouette-blocking pass."
 	)
 	var applied_overlay := source_mesh.material_overlay
 	var blocker_material := applied_overlay.next_pass as ShaderMaterial
 	expect(
-		applied_overlay != authored_overlay \
-			and authored_overlay.next_pass == null \
-			and blocker_material != null \
-			and blocker_material.render_priority == SUBJECT.BLOCKER_RENDER_PRIORITY,
+		(
+			applied_overlay != authored_overlay
+			and authored_overlay.next_pass == null
+			and blocker_material != null
+			and blocker_material.render_priority == SUBJECT.BLOCKER_RENDER_PRIORITY
+		),
 		"The blocker extends a private overlay copy before the player silhouette renders."
 	)
 	expect(blocker.is_blocking_active(), "Silhouette blocking starts active.")
 	blocker.set_blocking_enabled(false)
 	expect(
-		not blocker.is_blocking_active() \
-			and source_mesh.material_overlay == authored_overlay,
+		not blocker.is_blocking_active() and source_mesh.material_overlay == authored_overlay,
 		"Disabling blocking restores the exact authored overlay."
 	)
 	blocker.set_blocking_enabled(true)
-	expect(
-		source_mesh.material_overlay == applied_overlay,
-		"Re-enabling restores the prepared blocker pass."
-	)
+	expect(source_mesh.material_overlay == applied_overlay, "Re-enabling restores the prepared blocker pass.")
 
-	var blocker_source := FileAccess.get_file_as_string(
-		"res://player/visibility/player_occlusion_blocker.gdshader"
-	)
+	var blocker_source := FileAccess.get_file_as_string("res://player/visibility/player_occlusion_blocker.gdshader")
 	expect(
-		blocker_source.contains("stencil_mode write, compare_always, 37") \
-			and blocker_source.contains("depth_test_default") \
-			and blocker_source.contains("ALPHA = 0.0;"),
+		(
+			blocker_source.contains("stencil_mode write, compare_always, 37")
+			and blocker_source.contains("depth_test_default")
+			and blocker_source.contains("ALPHA = 0.0;")
+		),
 		"Visible enemy depth writes an invisible stencil value shared by the player silhouette."
 	)
 
 	blocker.queue_free()
 	await tree.process_frame
 	expect(
-		source_mesh.material_overlay == authored_overlay,
-		"Removing the component restores the exact authored overlay."
+		source_mesh.material_overlay == authored_overlay, "Removing the component restores the exact authored overlay."
 	)
 	root.queue_free()
 	await tree.process_frame

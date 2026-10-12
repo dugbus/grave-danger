@@ -44,15 +44,16 @@ func _expect_out_of_bounds_coin_recovers_on_floor(tree: SceneTree) -> void:
 		"A gold coin remains available after crossing the out-of-bounds threshold."
 	)
 	expect(
-		coin.get_out_of_bounds_recovery_count() == 1 \
-			and coin.is_in_group("recovered_gold_coin"),
+		coin.get_out_of_bounds_recovery_count() == 1 and coin.is_in_group("recovered_gold_coin"),
 		"Out-of-bounds recovery is detected and recorded on the recovered coin."
 	)
 	expect(
-		is_equal_approx(coin.global_position.y, 0.1) \
-			and coin.freeze \
-			and coin.linear_velocity.is_zero_approx() \
-			and coin.angular_velocity.is_zero_approx(),
+		(
+			is_equal_approx(coin.global_position.y, 0.1)
+			and coin.freeze
+			and coin.linear_velocity.is_zero_approx()
+			and coin.angular_velocity.is_zero_approx()
+		),
 		"A recovered coin rests motionless above the nearest floor surface."
 	)
 

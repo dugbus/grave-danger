@@ -17,9 +17,7 @@ func run(_tree: SceneTree) -> void:
 	root.add_child(boundary)
 	SUBJECT.start_runtime(root)
 	expect_equal(
-		boundary.begin_count,
-		1,
-		"Replay startup begins any grouped boundary exposing the compatibility method."
+		boundary.begin_count, 1, "Replay startup begins any grouped boundary exposing the compatibility method."
 	)
 	root.free()
 

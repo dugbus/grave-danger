@@ -37,16 +37,16 @@ func _expect_edge_anchored_layout(layout: PackedScene, outcome_name: String) -> 
 	screen_container.size = Vector2(1600.0, 900.0)
 
 	expect(
-		title.anchor_right == 1.0
+		(
+			title.anchor_right == 1.0
 			and title.position.y >= 32.0
 			and result_frame.anchor_right == 1.0
-			and result_frame.anchor_bottom == 1.0,
+			and result_frame.anchor_bottom == 1.0
+		),
 		"%s results anchor their title and content frame within the available canvas." % outcome_name
 	)
 	expect(
-		actions.anchor_top == 1.0
-			and actions.anchor_bottom == 1.0
-			and is_equal_approx(actions.offset_bottom, -40.0),
+		actions.anchor_top == 1.0 and actions.anchor_bottom == 1.0 and is_equal_approx(actions.offset_bottom, -40.0),
 		"%s result actions stay at the bottom with a visible border gap." % outcome_name
 	)
 	screen.free()

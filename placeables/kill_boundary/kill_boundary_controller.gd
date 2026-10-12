@@ -45,7 +45,9 @@ func _apply_boundary_to_segments(meshes: Array[MeshInstance3D], collisions: Arra
 			area.rotation = mesh_instance.rotation
 			mesh_instance.position = Vector3.ZERO
 			mesh_instance.rotation = Vector3.ZERO
-			(collision.shape as BoxShape3D).size = Vector3(segment_length + flame_thickness, flame_height, flame_thickness)
+			(collision.shape as BoxShape3D).size = Vector3(
+				segment_length + flame_thickness, flame_height, flame_thickness
+			)
 		perimeter_offset += segment_length
 
 
@@ -71,15 +73,15 @@ func _apply_ghosts_to_boundary(meshes: Array[MeshInstance3D], is_editor_preview 
 			mesh_instance.visible = spirits_visible
 			mesh_instance.position = Vector3(ground_position.x, flame_y, ground_position.y)
 			mesh_instance.rotation = Vector3.ZERO
-			mesh_instance.extra_cull_margin = maxf(ghost_height_range.y + ghost_rise_distance + ghost_wave_amplitude, 1.0)
+			mesh_instance.extra_cull_margin = maxf(
+				ghost_height_range.y + ghost_rise_distance + ghost_wave_amplitude, 1.0
+			)
 			_configure_ghost_ribbon(mesh_instance, rng, is_editor_preview)
 			ghost_index += 1
 
 
 func _configure_ghost_ribbon(
-	mesh_instance: MeshInstance3D,
-	rng: RandomNumberGenerator,
-	is_editor_preview := false
+	mesh_instance: MeshInstance3D, rng: RandomNumberGenerator, is_editor_preview := false
 ) -> void:
 	var height := rng.randf_range(ghost_height_range.x, ghost_height_range.y)
 	var width := rng.randf_range(ghost_width_range.x, ghost_width_range.y)
@@ -92,12 +94,10 @@ func _configure_ghost_ribbon(
 	mesh_instance.set_instance_shader_parameter("ghost_height", height)
 	mesh_instance.set_instance_shader_parameter("rise_distance", ghost_rise_distance * rng.randf_range(0.72, 1.18))
 	mesh_instance.set_instance_shader_parameter(
-		"emerge_depth",
-		height * rng.randf_range(ghost_emerge_depth_ratio_range.x, ghost_emerge_depth_ratio_range.y)
+		"emerge_depth", height * rng.randf_range(ghost_emerge_depth_ratio_range.x, ghost_emerge_depth_ratio_range.y)
 	)
 	mesh_instance.set_instance_shader_parameter(
-		"rise_speed",
-		rng.randf_range(ghost_rise_speed_range.x, ghost_rise_speed_range.y)
+		"rise_speed", rng.randf_range(ghost_rise_speed_range.x, ghost_rise_speed_range.y)
 	)
 	var cycle_offset := rng.randf()
 	if is_editor_preview:
@@ -105,19 +105,18 @@ func _configure_ghost_ribbon(
 	mesh_instance.set_instance_shader_parameter("cycle_offset", cycle_offset)
 	mesh_instance.set_instance_shader_parameter("wave_phase", rng.randf_range(0.0, TAU))
 	mesh_instance.set_instance_shader_parameter(
-		"wave_amplitude",
-		ghost_wave_amplitude * rng.randf_range(0.45, 1.3) * lerpf(0.85, 1.15, size_ratio)
+		"wave_amplitude", ghost_wave_amplitude * rng.randf_range(0.45, 1.3) * lerpf(0.85, 1.15, size_ratio)
 	)
 	mesh_instance.set_instance_shader_parameter(
-		"wave_frequency",
-		rng.randf_range(ghost_wave_frequency_range.x, ghost_wave_frequency_range.y)
+		"wave_frequency", rng.randf_range(ghost_wave_frequency_range.x, ghost_wave_frequency_range.y)
 	)
 	mesh_instance.set_instance_shader_parameter(
-		"wave_speed",
-		rng.randf_range(ghost_wave_speed_range.x, ghost_wave_speed_range.y)
+		"wave_speed", rng.randf_range(ghost_wave_speed_range.x, ghost_wave_speed_range.y)
 	)
 	mesh_instance.set_instance_shader_parameter("lean", rng.randf_range(ghost_lean_range.x, ghost_lean_range.y))
-	mesh_instance.set_instance_shader_parameter("opacity", rng.randf_range(ghost_opacity_range.x, ghost_opacity_range.y))
+	mesh_instance.set_instance_shader_parameter(
+		"opacity", rng.randf_range(ghost_opacity_range.x, ghost_opacity_range.y)
+	)
 
 
 func _update_ghost_billboards() -> void:
@@ -162,7 +161,9 @@ func _apply_player_blockers_to_segments(meshes: Array[MeshInstance3D], collision
 		var segment_length := delta.length()
 		var outward := Vector2(delta.y, -delta.x).normalized()
 		var midpoint := (start + finish) * 0.5 + outward * center_offset
-		var blocker_size := Vector3(segment_length + center_offset * 2.0, player_blocking_height, player_blocking_thickness)
+		var blocker_size := Vector3(
+			segment_length + center_offset * 2.0, player_blocking_height, player_blocking_thickness
+		)
 		var segment_rotation := Vector3(0.0, atan2(-delta.y, delta.x), 0.0)
 		var segment_position := Vector3(midpoint.x, flame_y + player_blocking_height * 0.5, midpoint.y)
 		if not meshes.is_empty():
@@ -283,8 +284,7 @@ func _apply_flame_heat(delta: float) -> void:
 		var body_3d := body as Node3D
 		if not is_instance_valid(body_3d):
 			continue
-		if body_3d.has_method("is_immune_to_kill_boundary") \
-				and bool(body_3d.call("is_immune_to_kill_boundary")):
+		if body_3d.has_method("is_immune_to_kill_boundary") and bool(body_3d.call("is_immune_to_kill_boundary")):
 			continue
 
 		if not _is_inside_flame_damage_height(body_3d.global_position):
@@ -347,12 +347,12 @@ func _sink_removed_boundary(seconds: float, distance: float) -> void:
 	var duration := maxf(seconds, 0.05)
 	var drop_distance := maxf(distance, 0.1)
 	var tween := create_tween()
-	tween.tween_property(
-		self,
-		"position",
-		position + Vector3.DOWN * drop_distance,
-		duration
-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	(
+		tween
+		. tween_property(self, "position", position + Vector3.DOWN * drop_distance, duration)
+		. set_trans(Tween.TRANS_SINE)
+		. set_ease(Tween.EASE_IN)
+	)
 	tween.finished.connect(queue_free)
 
 
@@ -380,30 +380,30 @@ func _animate_runtime_bounds_multiplier(target_multiplier: float, seconds: float
 		runtime_bounds_tween.kill()
 
 	runtime_bounds_tween = create_tween()
-	runtime_bounds_tween.tween_method(
-		func(value: float) -> void:
-			if boundary_removed_for_level:
-				return
-			runtime_bounds_multiplier = maxf(value, 0.01)
-			_sync_boundary(),
-		runtime_bounds_multiplier,
-		maxf(target_multiplier, 0.01),
-		maxf(seconds, 0.01)
-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	(
+		runtime_bounds_tween
+		. tween_method(
+			func(value: float) -> void:
+				if boundary_removed_for_level:
+					return
+				runtime_bounds_multiplier = maxf(value, 0.01)
+				_sync_boundary(),
+			runtime_bounds_multiplier,
+			maxf(target_multiplier, 0.01),
+			maxf(seconds, 0.01)
+		)
+		. set_trans(Tween.TRANS_SINE)
+		. set_ease(Tween.EASE_IN_OUT)
+	)
 
 
 func _restore_runtime_bounds_after(
-	multiplier: float,
-	active_seconds: float,
-	contraction_transition_seconds: float
+	multiplier: float, active_seconds: float, contraction_transition_seconds: float
 ) -> void:
 	await get_tree().create_timer(maxf(active_seconds, 0.01)).timeout
 	if is_inside_tree() and not boundary_removed_for_level:
 		active_runtime_bounds_multipliers.erase(multiplier)
-		_animate_runtime_bounds_multiplier(
-			_get_target_runtime_bounds_multiplier(),
-			contraction_transition_seconds
-		)
+		_animate_runtime_bounds_multiplier(_get_target_runtime_bounds_multiplier(), contraction_transition_seconds)
 
 
 func _get_target_runtime_bounds_multiplier() -> float:
@@ -435,7 +435,9 @@ func _get_signed_distance_to_boundary(point: Vector2) -> float:
 	var polygon := _get_boundary_points()
 	var closest_distance := INF
 	for i in polygon.size():
-		closest_distance = minf(closest_distance, _distance_to_segment(point, polygon[i], polygon[(i + 1) % polygon.size()]))
+		closest_distance = minf(
+			closest_distance, _distance_to_segment(point, polygon[i], polygon[(i + 1) % polygon.size()])
+		)
 	return closest_distance if Geometry2D.is_point_in_polygon(point, polygon) else -closest_distance
 
 

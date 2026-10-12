@@ -15,9 +15,7 @@ var touching_bodies: Array[Node3D] = []
 var effects_enabled := true
 
 
-func configure(
-	new_settings: GDKillBoundary2Settings, new_geometry: GDKillBoundary2Geometry
-) -> void:
+func configure(new_settings: GDKillBoundary2Settings, new_geometry: GDKillBoundary2Geometry) -> void:
 	settings = new_settings
 	geometry = new_geometry
 	_ensure_count()
@@ -47,16 +45,12 @@ func apply_geometry(points: PackedVector2Array) -> void:
 		var delta := finish - start
 		var area := segments[index]
 		area.position = Vector3(
-			(start.x + finish.x) * 0.5,
-			settings.flame_y + settings.flame_height * 0.5,
-			(start.y + finish.y) * 0.5
+			(start.x + finish.x) * 0.5, settings.flame_y + settings.flame_height * 0.5, (start.y + finish.y) * 0.5
 		)
 		area.rotation = Vector3(0.0, atan2(-delta.y, delta.x), 0.0)
 		var collision := area.get_node(^"CollisionShape3D") as CollisionShape3D
 		(collision.shape as BoxShape3D).size = Vector3(
-			delta.length() + settings.flame_thickness,
-			settings.flame_height,
-			settings.flame_thickness
+			delta.length() + settings.flame_thickness, settings.flame_height, settings.flame_thickness
 		)
 
 
@@ -67,31 +61,20 @@ func apply_damage(delta: float) -> void:
 		var body := body_value as Node3D
 		if body == null or not is_instance_valid(body):
 			continue
-		if (
-			body.has_method(&"is_immune_to_kill_boundary")
-			and bool(body.call(&"is_immune_to_kill_boundary"))
-		):
+		if body.has_method(&"is_immune_to_kill_boundary") and bool(body.call(&"is_immune_to_kill_boundary")):
 			continue
 		if not _is_inside_damage_height(body.global_position):
 			continue
 		var signed_distance := geometry.get_signed_distance_world(body.global_position)
 		var outside_depth := maxf(-signed_distance, 0.0)
-		var touching := (
-			touching_bodies.has(body) or signed_distance <= settings.flame_damage_inner_depth
-		)
+		var touching := touching_bodies.has(body) or signed_distance <= settings.flame_damage_inner_depth
 		if not touching and outside_depth <= 0.0:
 			continue
 		var multiplier := 1.0
 		if outside_depth > 0.0:
-			var outside_ratio := clampf(
-				outside_depth / maxf(settings.outside_damage_ramp_depth, 0.001), 0.0, 1.0
-			)
-			multiplier = lerpf(
-				1.0, maxf(settings.max_outside_damage_multiplier, 1.0), outside_ratio
-			)
-		_apply_damage_to_body(
-			body, settings.flame_damage_per_second * multiplier * maxf(delta, 0.0)
-		)
+			var outside_ratio := clampf(outside_depth / maxf(settings.outside_damage_ramp_depth, 0.001), 0.0, 1.0)
+			multiplier = lerpf(1.0, maxf(settings.max_outside_damage_multiplier, 1.0), outside_ratio)
+		_apply_damage_to_body(body, settings.flame_damage_per_second * multiplier * maxf(delta, 0.0))
 
 
 func _apply_damage_to_body(body: Node3D, amount: float) -> void:

@@ -18,9 +18,7 @@ func run(_tree: SceneTree) -> void:
 	expect(is_equal_approx(pose.rounding, 1.0), "Rounding is clamped to ellipse.")
 	expect(is_zero_approx(pose.time_seconds), "Pose time cannot become negative.")
 	expect(
-		pose.scale.is_equal_approx(Vector3.ONE)
-		and is_zero_approx(pose.rotation.x)
-		and is_zero_approx(pose.rotation.z),
+		pose.scale.is_equal_approx(Vector3.ONE) and is_zero_approx(pose.rotation.x) and is_zero_approx(pose.rotation.z),
 		"Pose transforms retain position and yaw while discarding pitch, roll, and scale."
 	)
 	var copy := GDKillBoundary2Pose.new()
@@ -33,12 +31,13 @@ func run(_tree: SceneTree) -> void:
 			has_boundary_proxy = true
 			break
 	expect(
-		not has_boundary_proxy,
-		"Pose Inspectors expose only pose-owned authoring values, not boundary-wide settings."
+		not has_boundary_proxy, "Pose Inspectors expose only pose-owned authoring values, not boundary-wide settings."
 	)
 	expect(
-		(SUBJECT as Script).get_source_code().contains("0 is a sharp rectangle")
-		and (SUBJECT as Script).get_source_code().contains("Constant moves evenly"),
+		(
+			(SUBJECT as Script).get_source_code().contains("0 is a sharp rectangle")
+			and (SUBJECT as Script).get_source_code().contains("Constant moves evenly")
+		),
 		"Pose-owned settings retain plain-language Inspector hover help."
 	)
 	copy.free()

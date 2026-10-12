@@ -75,16 +75,10 @@ func _redraw(gizmo: EditorNode3DGizmo) -> void:
 	var ids := PackedInt32Array()
 	for id in GDKillBoundary2EditorController.HandleKind.values():
 		ids.append(id as int)
-	gizmo.add_handles(
-		controller.get_handle_positions(pose), get_material(HANDLE_MATERIAL, gizmo), ids
-	)
+	gizmo.add_handles(controller.get_handle_positions(pose), get_material(HANDLE_MATERIAL, gizmo), ids)
 
 
-func _draw_pose(
-	gizmo: EditorNode3DGizmo,
-	pose: GDKillBoundary2Pose,
-	is_active: bool
-) -> void:
+func _draw_pose(gizmo: EditorNode3DGizmo, pose: GDKillBoundary2Pose, is_active: bool) -> void:
 	var points_2d := GDKillBoundary2Geometry.build_points(pose.size, pose.rounding, 48)
 	var lines := PackedVector3Array()
 	for index in points_2d.size():
@@ -99,19 +93,13 @@ func _draw_pose(
 
 
 func _draw_arrows(
-	gizmo: EditorNode3DGizmo,
-	selected_pose: GDKillBoundary2Pose,
-	sequence: GDKillBoundary2Sequence
+	gizmo: EditorNode3DGizmo, selected_pose: GDKillBoundary2Pose, sequence: GDKillBoundary2Sequence
 ) -> void:
 	var lines := PackedVector3Array()
 	var selected_inverse := selected_pose.global_transform.affine_inverse()
 	for index in sequence.get_pose_count() - 1:
-		var start := selected_inverse * (
-			sequence.get_pose(index).global_position + Vector3.UP * 0.18
-		)
-		var finish := selected_inverse * (
-			sequence.get_pose(index + 1).global_position + Vector3.UP * 0.18
-		)
+		var start := selected_inverse * (sequence.get_pose(index).global_position + Vector3.UP * 0.18)
+		var finish := selected_inverse * (sequence.get_pose(index + 1).global_position + Vector3.UP * 0.18)
 		lines.append(start)
 		lines.append(finish)
 		var direction := (finish - start).normalized()
@@ -144,11 +132,7 @@ func _get_handle_value(gizmo: EditorNode3DGizmo, handle_id: int, _secondary: boo
 
 
 func _set_handle(
-	gizmo: EditorNode3DGizmo,
-	handle_id: int,
-	_secondary: bool,
-	camera: Camera3D,
-	screen_position: Vector2
+	gizmo: EditorNode3DGizmo, handle_id: int, _secondary: bool, camera: Camera3D, screen_position: Vector2
 ) -> void:
 	var pose := gizmo.get_node_3d() as GDKillBoundary2Pose
 	var sequence := pose.get_parent() as GDKillBoundary2Sequence
@@ -167,15 +151,11 @@ func _set_handle(
 	else:
 		var kind := handle_id as GDKillBoundary2EditorController.HandleKind
 		var resized := controller.size_from_handle(pose, kind, local_hit)
-		sequence.set_pose_geometry(
-			pose_index, controller.position_from_handle(pose, kind, resized), resized
-		)
+		sequence.set_pose_geometry(pose_index, controller.position_from_handle(pose, kind, resized), resized)
 	pose.update_gizmos()
 
 
-func _commit_handle(
-	gizmo: EditorNode3DGizmo, handle_id: int, _secondary: bool, restore: Variant, cancel: bool
-) -> void:
+func _commit_handle(gizmo: EditorNode3DGizmo, handle_id: int, _secondary: bool, restore: Variant, cancel: bool) -> void:
 	var pose := gizmo.get_node_3d() as GDKillBoundary2Pose
 	var sequence := pose.get_parent() as GDKillBoundary2Sequence
 	if sequence == null:
@@ -189,11 +169,7 @@ func _commit_handle(
 
 
 func _commit_rounding_handle(
-	sequence: GDKillBoundary2Sequence,
-	pose_index: int,
-	current: float,
-	restore: Variant,
-	cancel: bool
+	sequence: GDKillBoundary2Sequence, pose_index: int, current: float, restore: Variant, cancel: bool
 ) -> void:
 	if cancel:
 		sequence.set_pose_rounding(pose_index, float(restore))
@@ -205,11 +181,7 @@ func _commit_rounding_handle(
 
 
 func _commit_size_handle(
-	sequence: GDKillBoundary2Sequence,
-	pose_index: int,
-	pose: GDKillBoundary2Pose,
-	restore: Variant,
-	cancel: bool
+	sequence: GDKillBoundary2Sequence, pose_index: int, pose: GDKillBoundary2Pose, restore: Variant, cancel: bool
 ) -> void:
 	var restore_values := restore as Dictionary
 	var restore_position := restore_values.get("position", pose.position) as Vector3
@@ -218,12 +190,8 @@ func _commit_size_handle(
 		sequence.set_pose_geometry(pose_index, restore_position, restore_size)
 	elif controller.undo_redo != null:
 		controller.undo_redo.create_action("Resize Kill Boundary Pose", UndoRedo.MERGE_ENDS)
-		controller.undo_redo.add_do_method(
-			sequence, &"set_pose_geometry", pose_index, pose.position, pose.size
-		)
-		controller.undo_redo.add_undo_method(
-			sequence, &"set_pose_geometry", pose_index, restore_position, restore_size
-		)
+		controller.undo_redo.add_do_method(sequence, &"set_pose_geometry", pose_index, pose.position, pose.size)
+		controller.undo_redo.add_undo_method(sequence, &"set_pose_geometry", pose_index, restore_position, restore_size)
 		controller.undo_redo.commit_action(false)
 
 

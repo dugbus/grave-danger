@@ -12,27 +12,21 @@ const PLANNER_SCRIPT := preload("res://levels/vampire-maze/generated_maze/genera
 const FLOOR_SURFACE_SCRIPT := preload("res://addons/floor_surface/floor_surface.gd")
 const LOCKABLE_PASSAGE_SCRIPT := preload("res://placeables/lockables/lockable_hinged_passage.gd")
 const TREASURE_PILE_SCENE := preload("res://placeables/treasure/treasure_pile.tscn")
-const TREASURE_COFFIN_SCENE := preload(
-    "res://placeables/treasure_deposit/treasure_deposit_coffin.tscn"
-)
+const TREASURE_COFFIN_SCENE := preload("res://placeables/treasure_deposit/treasure_deposit_coffin.tscn")
 const LOCKED_DOOR_SCENE := preload("res://placeables/lockables/locked_door.tscn")
 const LOCKED_GATE_SCENE := preload("res://placeables/lockables/locked_gate.tscn")
 const GOLD_KEY_SCENE := preload("res://inventory/key.tscn")
 const SILVER_KEY_SCENE := preload("res://inventory/silver_key.tscn")
-const BAT_NOISE_SCENE := preload(
-    "res://levels/vampire-maze/generated_maze/generated_bat_noise.tscn"
-)
-const GENERATED_GRASS_SCENE := preload(
-    "res://levels/vampire-maze/generated_maze/generated_grass.tscn"
-)
+const BAT_NOISE_SCENE := preload("res://levels/vampire-maze/generated_maze/generated_bat_noise.tscn")
+const GENERATED_GRASS_SCENE := preload("res://levels/vampire-maze/generated_maze/generated_grass.tscn")
 const TREASURE_TYPES: Array[StringName] = [
-    &"gold_coin",
-    &"diamond",
-    &"ruby",
-    &"sapphire",
-    &"emerald",
-    &"amethyst",
-    &"gold_bar",
+	&"gold_coin",
+	&"diamond",
+	&"ruby",
+	&"sapphire",
+	&"emerald",
+	&"amethyst",
+	&"gold_bar",
 ]
 const DOOR_WIDTH_SCALE := 1.36
 
@@ -47,420 +41,381 @@ var _exit_staircase: Node3D
 
 ## Replaces this node's generated children with the supplied deterministic plan.
 func regenerate_content(
-    floor_cells: Dictionary,
-    maze_result: Dictionary,
-    seed_value: int,
-    floor_surface: FLOOR_SURFACE_SCRIPT,
-    configuration: Resource,
-    player: Node3D,
-    vampire: PhysicsBody3D
+	floor_cells: Dictionary,
+	maze_result: Dictionary,
+	seed_value: int,
+	floor_surface: FLOOR_SURFACE_SCRIPT,
+	configuration: Resource,
+	player: Node3D,
+	vampire: PhysicsBody3D
 ) -> Dictionary:
-    _clear_generated_children()
-    _player = player
-    _vampire = vampire
-    _floor_surface = floor_surface
-    if floor_surface == null:
-        return {"errors": ["Generated content requires the maze FloorSurface."]}
+	_clear_generated_children()
+	_player = player
+	_vampire = vampire
+	_floor_surface = floor_surface
+	if floor_surface == null:
+		return {"errors": ["Generated content requires the maze FloorSurface."]}
 
-    var planner: RefCounted = PLANNER_SCRIPT.new()
-    var plan := planner.call(
-        &"build_plan",
-        floor_cells,
-        maze_result.get("player_cell") as Vector3i,
-        maze_result.get("vampire_cell") as Vector3i,
-        maze_result.get("end_gate_cell") as Vector3i,
-        Vector2i(
-            int(maze_result.get("width", 0)),
-            int(maze_result.get("height", 0))
-        ),
-        seed_value,
-        configuration
-    ) as Dictionary
-    _last_plan = plan
-    if not (plan.get("errors", []) as Array).is_empty():
-        return plan
+	var planner: RefCounted = PLANNER_SCRIPT.new()
+	var plan := (
+		planner.call(
+			&"build_plan",
+			floor_cells,
+			maze_result.get("player_cell") as Vector3i,
+			maze_result.get("vampire_cell") as Vector3i,
+			maze_result.get("end_gate_cell") as Vector3i,
+			Vector2i(int(maze_result.get("width", 0)), int(maze_result.get("height", 0))),
+			seed_value,
+			configuration
+		)
+		as Dictionary
+	)
+	_last_plan = plan
+	if not (plan.get("errors", []) as Array).is_empty():
+		return plan
 
-    _end_gate = _instance_end_gate(maze_result.get("end_gate_spawn") as Transform3D)
-    _exit_staircase = _end_gate.get_node_or_null("ProceduralStaircase") as Node3D \
-        if _end_gate != null else null
-    _instance_doors(plan.get("doors", []) as Array, floor_surface)
-    _instance_keys(plan.get("keys", []) as Array, floor_surface)
-    _instance_coffins(plan.get("coffins", []) as Array, floor_surface, seed_value)
-    _instance_treasure_caches(
-        plan.get("treasure_caches", []) as Array,
-        floor_surface,
-        seed_value
-    )
-    _instance_bat_nests(plan.get("bat_nests", []) as Array, floor_surface)
-    var grass_result := _instance_grass(
-        floor_cells,
-        floor_surface,
-        plan,
-        seed_value,
-        configuration
-    )
-    plan["grass"] = grass_result
-    for grass_error in grass_result.get("errors", []):
-        (plan["errors"] as Array).append(String(grass_error))
-    _last_plan = plan
-    vampire_layout_landmarks_changed.emit(get_vampire_layout_landmarks())
-    return plan
+	_end_gate = _instance_end_gate(maze_result.get("end_gate_spawn") as Transform3D)
+	_exit_staircase = _end_gate.get_node_or_null("ProceduralStaircase") as Node3D if _end_gate != null else null
+	_instance_doors(plan.get("doors", []) as Array, floor_surface)
+	_instance_keys(plan.get("keys", []) as Array, floor_surface)
+	_instance_coffins(plan.get("coffins", []) as Array, floor_surface, seed_value)
+	_instance_treasure_caches(plan.get("treasure_caches", []) as Array, floor_surface, seed_value)
+	_instance_bat_nests(plan.get("bat_nests", []) as Array, floor_surface)
+	var grass_result := _instance_grass(floor_cells, floor_surface, plan, seed_value, configuration)
+	plan["grass"] = grass_result
+	for grass_error in grass_result.get("errors", []):
+		(plan["errors"] as Array).append(String(grass_error))
+	_last_plan = plan
+	vampire_layout_landmarks_changed.emit(get_vampire_layout_landmarks())
+	return plan
 
 
 ## Returns the latest data-first plan for minimap tooling, tests, and runtime configuration.
 func get_last_plan() -> Dictionary:
-    return _last_plan.duplicate(true)
+	return _last_plan.duplicate(true)
 
 
 ## Returns the exit instantiated by the latest generated content pass.
 func get_end_gate() -> Node3D:
-    return _end_gate
+	return _end_gate
 
 
 ## Returns the reusable staircase and guarded completion trigger owned by the current gate.
 func get_exit_staircase() -> Node3D:
-    return _exit_staircase
+	return _exit_staircase
 
 
 ## Returns generated solid bodies ignored only by the current vampire.
 func get_vampire_collision_bodies() -> Array[PhysicsBody3D]:
-    return _vampire_collision_bodies.duplicate()
+	return _vampire_collision_bodies.duplicate()
 
 
 ## Makes generated scene roots persistent and their instanced children editable.
 func make_generated_children_editable() -> int:
-    var persistent_root_count := 0
-    if not Engine.is_editor_hint() or not is_inside_tree():
-        return persistent_root_count
-    var edited_scene_root := get_tree().edited_scene_root
-    if edited_scene_root == null:
-        return persistent_root_count
-    for child in get_children():
-        if not _assign_editor_owner(child):
-            continue
-        persistent_root_count += 1
-        if not child.scene_file_path.is_empty():
-            edited_scene_root.set_editable_instance(child, true)
-    return persistent_root_count
+	var persistent_root_count := 0
+	if not Engine.is_editor_hint() or not is_inside_tree():
+		return persistent_root_count
+	var edited_scene_root := get_tree().edited_scene_root
+	if edited_scene_root == null:
+		return persistent_root_count
+	for child in get_children():
+		if not _assign_editor_owner(child):
+			continue
+		persistent_root_count += 1
+		if not child.scene_file_path.is_empty():
+			edited_scene_root.set_editable_instance(child, true)
+	return persistent_root_count
 
 
 ## Returns world-space objectives the vampire knows before the hunt begins.
 func get_vampire_layout_landmarks() -> Array[Dictionary]:
-    var known_landmarks: Array[Dictionary] = []
-    if _floor_surface == null or _last_plan.is_empty():
-        return known_landmarks
+	var known_landmarks: Array[Dictionary] = []
+	if _floor_surface == null or _last_plan.is_empty():
+		return known_landmarks
 
-    _append_plan_landmarks(
-        known_landmarks,
-        _last_plan.get("treasure_caches", []) as Array,
-        &"treasure_pile"
-    )
-    _append_key_landmarks(
-        known_landmarks,
-        _last_plan.get("keys", []) as Array
-    )
-    _append_plan_landmarks(
-        known_landmarks,
-        _last_plan.get("coffins", []) as Array,
-        &"coffin"
-    )
-    _append_plan_landmarks(
-        known_landmarks,
-        _last_plan.get("doors", []) as Array,
-        &"locked_door"
-    )
-    if is_instance_valid(_end_gate):
-        known_landmarks.append({
-            "id": &"end_gate",
-            "kind": &"end_gate",
-            "position": _end_gate.global_position,
-        })
-    return known_landmarks
+	_append_plan_landmarks(known_landmarks, _last_plan.get("treasure_caches", []) as Array, &"treasure_pile")
+	_append_key_landmarks(known_landmarks, _last_plan.get("keys", []) as Array)
+	_append_plan_landmarks(known_landmarks, _last_plan.get("coffins", []) as Array, &"coffin")
+	_append_plan_landmarks(known_landmarks, _last_plan.get("doors", []) as Array, &"locked_door")
+	if is_instance_valid(_end_gate):
+		(
+			known_landmarks
+			. append(
+				{
+					"id": &"end_gate",
+					"kind": &"end_gate",
+					"position": _end_gate.global_position,
+				}
+			)
+		)
+	return known_landmarks
 
 
 func _exit_tree() -> void:
-    _clear_vampire_collision_exceptions()
+	_clear_vampire_collision_exceptions()
 
 
 func _clear_generated_children() -> void:
-    _clear_vampire_collision_exceptions()
-    _end_gate = null
-    _exit_staircase = null
-    for child in get_children():
-        if Engine.is_editor_hint() and child.owner != null:
-            child.owner = null
-        remove_child(child)
-        child.free()
+	_clear_vampire_collision_exceptions()
+	_end_gate = null
+	_exit_staircase = null
+	for child in get_children():
+		if Engine.is_editor_hint() and child.owner != null:
+			child.owner = null
+		remove_child(child)
+		child.free()
 
 
-func _append_plan_landmarks(
-    known_landmarks: Array[Dictionary],
-    placements: Array,
-    kind: StringName
-) -> void:
-    for index in placements.size():
-        var placement := placements[index] as Dictionary
-        var cell := placement["cell"] as Vector2i
-        known_landmarks.append({
-            "id": StringName("%s_%02d" % [kind, index + 1]),
-            "kind": kind,
-            "position": _world_position_for_cell(_floor_surface, cell),
-        })
+func _append_plan_landmarks(known_landmarks: Array[Dictionary], placements: Array, kind: StringName) -> void:
+	for index in placements.size():
+		var placement := placements[index] as Dictionary
+		var cell := placement["cell"] as Vector2i
+		(
+			known_landmarks
+			. append(
+				{
+					"id": StringName("%s_%02d" % [kind, index + 1]),
+					"kind": kind,
+					"position": _world_position_for_cell(_floor_surface, cell),
+				}
+			)
+		)
 
 
-func _append_key_landmarks(
-    known_landmarks: Array[Dictionary],
-    placements: Array
-) -> void:
-    for index in placements.size():
-        var placement := placements[index] as Dictionary
-        var item_type := placement["item_type"] as StringName
-        var kind := &"gold_key" if item_type == &"key" else &"silver_key"
-        var cell := placement["cell"] as Vector2i
-        known_landmarks.append({
-            "id": StringName("%s_%02d" % [kind, index + 1]),
-            "kind": kind,
-            "position": _world_position_for_cell(_floor_surface, cell),
-        })
+func _append_key_landmarks(known_landmarks: Array[Dictionary], placements: Array) -> void:
+	for index in placements.size():
+		var placement := placements[index] as Dictionary
+		var item_type := placement["item_type"] as StringName
+		var kind := &"gold_key" if item_type == &"key" else &"silver_key"
+		var cell := placement["cell"] as Vector2i
+		(
+			known_landmarks
+			. append(
+				{
+					"id": StringName("%s_%02d" % [kind, index + 1]),
+					"kind": kind,
+					"position": _world_position_for_cell(_floor_surface, cell),
+				}
+			)
+		)
 
 
 func _instance_end_gate(spawn_transform: Transform3D) -> Node3D:
-    var end_gate := LOCKED_GATE_SCENE.instantiate() as Node3D
-    if end_gate == null:
-        return null
-    end_gate.name = "GeneratedLockedGate"
-    end_gate.set(
-        &"key_requirement",
-        LOCKABLE_PASSAGE_SCRIPT.KeyRequirement.GoldKey
-    )
-    end_gate.set(&"starts_locked", true)
-    end_gate.set(&"completes_level", true)
-    end_gate.transform = global_transform.affine_inverse() * spawn_transform
-    _add_generated_child(end_gate)
-    end_gate.connect(&"level_completed", _on_exit_staircase_completed)
-    return end_gate
+	var end_gate := LOCKED_GATE_SCENE.instantiate() as Node3D
+	if end_gate == null:
+		return null
+	end_gate.name = "GeneratedLockedGate"
+	end_gate.set(&"key_requirement", LOCKABLE_PASSAGE_SCRIPT.KeyRequirement.GoldKey)
+	end_gate.set(&"starts_locked", true)
+	end_gate.set(&"completes_level", true)
+	end_gate.transform = global_transform.affine_inverse() * spawn_transform
+	_add_generated_child(end_gate)
+	end_gate.connect(&"level_completed", _on_exit_staircase_completed)
+	return end_gate
 
 
 func _on_exit_staircase_completed() -> void:
-    level_completed.emit()
+	level_completed.emit()
 
 
-func _instance_doors(
-    placements: Array,
-    floor_surface: FLOOR_SURFACE_SCRIPT
-) -> void:
-    for index in placements.size():
-        var placement := placements[index] as Dictionary
-        var door := LOCKED_DOOR_SCENE.instantiate() as Node3D
-        if door == null:
-            continue
-        door.name = "GeneratedLockedDoor%02d" % [index + 1]
-        door.set(
-            &"key_requirement",
-            LOCKABLE_PASSAGE_SCRIPT.KeyRequirement.SilverKey
-        )
-        door.set(&"starts_locked", true)
+func _instance_doors(placements: Array, floor_surface: FLOOR_SURFACE_SCRIPT) -> void:
+	for index in placements.size():
+		var placement := placements[index] as Dictionary
+		var door := LOCKED_DOOR_SCENE.instantiate() as Node3D
+		if door == null:
+			continue
+		door.name = "GeneratedLockedDoor%02d" % [index + 1]
+		door.set(&"key_requirement", LOCKABLE_PASSAGE_SCRIPT.KeyRequirement.SilverKey)
+		door.set(&"starts_locked", true)
 
-        var first_cell := placement["cell"] as Vector2i
-        var second_cell := placement["paired_cell"] as Vector2i
-        var first_position := _world_position_for_cell(floor_surface, first_cell)
-        var second_position := _world_position_for_cell(floor_surface, second_cell)
-        var travel_direction := placement["travel_direction"] as Vector2i
-        var angle := PI * 0.5 if travel_direction.x != 0 else 0.0
-        var door_basis := Basis(Vector3.UP, angle).scaled(Vector3(DOOR_WIDTH_SCALE, 1.0, 1.0))
-        var door_transform := Transform3D(
-            door_basis,
-            (first_position + second_position) * 0.5
-        )
-        door.transform = global_transform.affine_inverse() * door_transform
-        _add_generated_child(door)
-        _add_vampire_collision_exceptions(door)
+		var first_cell := placement["cell"] as Vector2i
+		var second_cell := placement["paired_cell"] as Vector2i
+		var first_position := _world_position_for_cell(floor_surface, first_cell)
+		var second_position := _world_position_for_cell(floor_surface, second_cell)
+		var travel_direction := placement["travel_direction"] as Vector2i
+		var angle := PI * 0.5 if travel_direction.x != 0 else 0.0
+		var door_basis := Basis(Vector3.UP, angle).scaled(Vector3(DOOR_WIDTH_SCALE, 1.0, 1.0))
+		var door_transform := Transform3D(door_basis, (first_position + second_position) * 0.5)
+		door.transform = global_transform.affine_inverse() * door_transform
+		_add_generated_child(door)
+		_add_vampire_collision_exceptions(door)
 
 
 func _instance_keys(placements: Array, floor_surface: FLOOR_SURFACE_SCRIPT) -> void:
-    for index in placements.size():
-        var placement := placements[index] as Dictionary
-        var item_type := placement["item_type"] as StringName
-        var key_scene := GOLD_KEY_SCENE if item_type == &"key" else SILVER_KEY_SCENE
-        var key := key_scene.instantiate() as Node3D
-        if key == null:
-            continue
-        key.name = "Generated%sKey%02d" % ["Gold" if item_type == &"key" else "Silver", index + 1]
-        _add_generated_child(key)
-        var cell := placement["cell"] as Vector2i
-        key.global_position = _world_position_for_cell(floor_surface, cell) + Vector3.UP * 0.08
+	for index in placements.size():
+		var placement := placements[index] as Dictionary
+		var item_type := placement["item_type"] as StringName
+		var key_scene := GOLD_KEY_SCENE if item_type == &"key" else SILVER_KEY_SCENE
+		var key := key_scene.instantiate() as Node3D
+		if key == null:
+			continue
+		key.name = "Generated%sKey%02d" % ["Gold" if item_type == &"key" else "Silver", index + 1]
+		_add_generated_child(key)
+		var cell := placement["cell"] as Vector2i
+		key.global_position = _world_position_for_cell(floor_surface, cell) + Vector3.UP * 0.08
 
 
 func _instance_grass(
-    floor_cells: Dictionary,
-    floor_surface: FLOOR_SURFACE_SCRIPT,
-    plan: Dictionary,
-    seed_value: int,
-    configuration: Resource
+	floor_cells: Dictionary,
+	floor_surface: FLOOR_SURFACE_SCRIPT,
+	plan: Dictionary,
+	seed_value: int,
+	configuration: Resource
 ) -> Dictionary:
-    if not bool(configuration.get("grass_enabled")):
-        return {"errors": [], "cells": [], "instance_count": 0}
-    var grass := GENERATED_GRASS_SCENE.instantiate() as MultiMeshInstance3D
-    if grass == null:
-        return {"errors": ["Generated content could not instantiate its grass scene."]}
-    grass.name = "GeneratedGrass"
-    # The grass scene supplies the correct Level 1 mesh, material, and behaviour,
-    # while a local root lets the generated MultiMesh buffer persist with Layout.
-    grass.scene_file_path = ""
-    _add_generated_child(grass)
-    var excluded_cells := _build_grass_excluded_cells(
-        plan,
-        int(configuration.get("grass_route_clearance_tiles"))
-    )
-    return grass.call(
-        &"populate",
-        floor_cells,
-        floor_surface,
-        excluded_cells,
-        seed_value,
-        float(configuration.get("grass_coverage_percent")),
-        float(configuration.get("grass_patch_size_tiles")),
-        int(configuration.get("grass_blades_per_cell"))
-    ) as Dictionary
+	if not bool(configuration.get("grass_enabled")):
+		return {"errors": [], "cells": [], "instance_count": 0}
+	var grass := GENERATED_GRASS_SCENE.instantiate() as MultiMeshInstance3D
+	if grass == null:
+		return {"errors": ["Generated content could not instantiate its grass scene."]}
+	grass.name = "GeneratedGrass"
+	# The grass scene supplies the correct Level 1 mesh, material, and behaviour,
+	# while a local root lets the generated MultiMesh buffer persist with Layout.
+	grass.scene_file_path = ""
+	_add_generated_child(grass)
+	var excluded_cells := _build_grass_excluded_cells(plan, int(configuration.get("grass_route_clearance_tiles")))
+	return (
+		grass.call(
+			&"populate",
+			floor_cells,
+			floor_surface,
+			excluded_cells,
+			seed_value,
+			float(configuration.get("grass_coverage_percent")),
+			float(configuration.get("grass_patch_size_tiles")),
+			int(configuration.get("grass_blades_per_cell"))
+		)
+		as Dictionary
+	)
 
 
 func _build_grass_excluded_cells(plan: Dictionary, route_clearance: int) -> Dictionary:
-    var excluded_cells := {}
-    for route_cell_value in plan.get("main_path", []):
-        var route_cell := route_cell_value as Vector2i
-        for offset_y in range(-route_clearance, route_clearance + 1):
-            var remaining_clearance := route_clearance - absi(offset_y)
-            for offset_x in range(-remaining_clearance, remaining_clearance + 1):
-                excluded_cells[route_cell + Vector2i(offset_x, offset_y)] = true
-    for collection_name in [
-        &"doors",
-        &"keys",
-        &"coffins",
-        &"treasure_caches",
-        &"bat_nests",
-    ]:
-        for placement_value in plan.get(collection_name, []):
-            var placement := placement_value as Dictionary
-            if placement.has("cell"):
-                excluded_cells[placement["cell"] as Vector2i] = true
-            if placement.has("paired_cell"):
-                excluded_cells[placement["paired_cell"] as Vector2i] = true
-            for blocked_cell_value in placement.get("blocked_cells", []):
-                excluded_cells[blocked_cell_value as Vector2i] = true
-    return excluded_cells
+	var excluded_cells := {}
+	for route_cell_value in plan.get("main_path", []):
+		var route_cell := route_cell_value as Vector2i
+		for offset_y in range(-route_clearance, route_clearance + 1):
+			var remaining_clearance := route_clearance - absi(offset_y)
+			for offset_x in range(-remaining_clearance, remaining_clearance + 1):
+				excluded_cells[route_cell + Vector2i(offset_x, offset_y)] = true
+	for collection_name in [
+		&"doors",
+		&"keys",
+		&"coffins",
+		&"treasure_caches",
+		&"bat_nests",
+	]:
+		for placement_value in plan.get(collection_name, []):
+			var placement := placement_value as Dictionary
+			if placement.has("cell"):
+				excluded_cells[placement["cell"] as Vector2i] = true
+			if placement.has("paired_cell"):
+				excluded_cells[placement["paired_cell"] as Vector2i] = true
+			for blocked_cell_value in placement.get("blocked_cells", []):
+				excluded_cells[blocked_cell_value as Vector2i] = true
+	return excluded_cells
 
 
-func _instance_coffins(
-    placements: Array,
-    floor_surface: FLOOR_SURFACE_SCRIPT,
-    seed_value: int
-) -> void:
-    for index in placements.size():
-        var placement := placements[index] as Dictionary
-        var coffin := TREASURE_COFFIN_SCENE.instantiate() as Node3D
-        if coffin == null:
-            continue
-        coffin.name = "GeneratedTreasureCoffin%02d" % [index + 1]
-        _add_generated_child(coffin)
-        _add_vampire_collision_exceptions(coffin)
-        var cell := placement["cell"] as Vector2i
-        coffin.global_position = _world_position_for_cell(floor_surface, cell)
-        coffin.rotation.y = float(posmod(seed_value + index, 4)) * PI * 0.5
+func _instance_coffins(placements: Array, floor_surface: FLOOR_SURFACE_SCRIPT, seed_value: int) -> void:
+	for index in placements.size():
+		var placement := placements[index] as Dictionary
+		var coffin := TREASURE_COFFIN_SCENE.instantiate() as Node3D
+		if coffin == null:
+			continue
+		coffin.name = "GeneratedTreasureCoffin%02d" % [index + 1]
+		_add_generated_child(coffin)
+		_add_vampire_collision_exceptions(coffin)
+		var cell := placement["cell"] as Vector2i
+		coffin.global_position = _world_position_for_cell(floor_surface, cell)
+		coffin.rotation.y = float(posmod(seed_value + index, 4)) * PI * 0.5
 
 
-func _instance_treasure_caches(
-    placements: Array,
-    floor_surface: FLOOR_SURFACE_SCRIPT,
-    seed_value: int
-) -> void:
-    for index in placements.size():
-        var placement := placements[index] as Dictionary
-        var pile := TREASURE_PILE_SCENE.instantiate() as Node3D
-        if pile == null:
-            continue
-        pile.name = "GeneratedTreasureCache%02d" % [index + 1]
-        pile.set(&"random_seed", seed_value + index * 977)
-        var counts := placement["counts"] as Dictionary
-        for item_type in TREASURE_TYPES:
-            pile.call(&"set_treasure_count", item_type, int(counts.get(item_type, 0)))
-        _add_generated_child(pile)
-        var cell := placement["cell"] as Vector2i
-        pile.global_position = _world_position_for_cell(floor_surface, cell) + Vector3.UP * 0.12
+func _instance_treasure_caches(placements: Array, floor_surface: FLOOR_SURFACE_SCRIPT, seed_value: int) -> void:
+	for index in placements.size():
+		var placement := placements[index] as Dictionary
+		var pile := TREASURE_PILE_SCENE.instantiate() as Node3D
+		if pile == null:
+			continue
+		pile.name = "GeneratedTreasureCache%02d" % [index + 1]
+		pile.set(&"random_seed", seed_value + index * 977)
+		var counts := placement["counts"] as Dictionary
+		for item_type in TREASURE_TYPES:
+			pile.call(&"set_treasure_count", item_type, int(counts.get(item_type, 0)))
+		_add_generated_child(pile)
+		var cell := placement["cell"] as Vector2i
+		pile.global_position = _world_position_for_cell(floor_surface, cell) + Vector3.UP * 0.12
 
 
 func _instance_bat_nests(placements: Array, floor_surface: FLOOR_SURFACE_SCRIPT) -> void:
-    for index in placements.size():
-        var placement := placements[index] as Dictionary
-        var bat_noise := BAT_NOISE_SCENE.instantiate() as Node3D
-        if bat_noise == null:
-            continue
-        bat_noise.name = "GeneratedBatNoise%02d" % [index + 1]
-        if bat_noise.has_signal(&"noise_triggered"):
-            bat_noise.connect(&"noise_triggered", _on_bat_noise_triggered)
-        _add_generated_child(bat_noise)
-        var cell := placement["cell"] as Vector2i
-        bat_noise.global_position = _world_position_for_cell(floor_surface, cell) + Vector3.UP * 1.6
+	for index in placements.size():
+		var placement := placements[index] as Dictionary
+		var bat_noise := BAT_NOISE_SCENE.instantiate() as Node3D
+		if bat_noise == null:
+			continue
+		bat_noise.name = "GeneratedBatNoise%02d" % [index + 1]
+		if bat_noise.has_signal(&"noise_triggered"):
+			bat_noise.connect(&"noise_triggered", _on_bat_noise_triggered)
+		_add_generated_child(bat_noise)
+		var cell := placement["cell"] as Vector2i
+		bat_noise.global_position = _world_position_for_cell(floor_surface, cell) + Vector3.UP * 1.6
 
 
 func _world_position_for_cell(floor_surface: FLOOR_SURFACE_SCRIPT, cell: Vector2i) -> Vector3:
-    return floor_surface.cell_to_world(cell)
+	return floor_surface.cell_to_world(cell)
 
 
 func _add_generated_child(node: Node) -> void:
-    add_child(node)
-    if not _assign_editor_owner(node):
-        return
-    # Generated scene roots remain expandable while the live Layout exists.
-    # Rebuilding the Layout clears their ownership before removing them.
-    if not node.scene_file_path.is_empty():
-        get_tree().edited_scene_root.set_editable_instance(node, true)
+	add_child(node)
+	if not _assign_editor_owner(node):
+		return
+	# Generated scene roots remain expandable while the live Layout exists.
+	# Rebuilding the Layout clears their ownership before removing them.
+	if not node.scene_file_path.is_empty():
+		get_tree().edited_scene_root.set_editable_instance(node, true)
 
 
 func _assign_editor_owner(node: Node) -> bool:
-    if not Engine.is_editor_hint() or not is_inside_tree():
-        return false
-    var edited_scene_root := get_tree().edited_scene_root
-    if edited_scene_root == null \
-            or (edited_scene_root != node and not edited_scene_root.is_ancestor_of(node)):
-        return false
-    node.owner = edited_scene_root
-    return node.owner == edited_scene_root
+	if not Engine.is_editor_hint() or not is_inside_tree():
+		return false
+	var edited_scene_root := get_tree().edited_scene_root
+	if edited_scene_root == null or (edited_scene_root != node and not edited_scene_root.is_ancestor_of(node)):
+		return false
+	node.owner = edited_scene_root
+	return node.owner == edited_scene_root
 
 
 func _add_vampire_collision_exceptions(root: Node) -> void:
-    if _vampire == null:
-        return
-    for collision_body in _get_physics_bodies(root):
-        if _vampire_collision_bodies.has(collision_body):
-            continue
-        _vampire.add_collision_exception_with(collision_body)
-        collision_body.add_collision_exception_with(_vampire)
-        _vampire_collision_bodies.append(collision_body)
+	if _vampire == null:
+		return
+	for collision_body in _get_physics_bodies(root):
+		if _vampire_collision_bodies.has(collision_body):
+			continue
+		_vampire.add_collision_exception_with(collision_body)
+		collision_body.add_collision_exception_with(_vampire)
+		_vampire_collision_bodies.append(collision_body)
 
 
 func _clear_vampire_collision_exceptions() -> void:
-    if is_instance_valid(_vampire):
-        for collision_body in _vampire_collision_bodies:
-            if not is_instance_valid(collision_body):
-                continue
-            _vampire.remove_collision_exception_with(collision_body)
-            collision_body.remove_collision_exception_with(_vampire)
-    _vampire_collision_bodies.clear()
+	if is_instance_valid(_vampire):
+		for collision_body in _vampire_collision_bodies:
+			if not is_instance_valid(collision_body):
+				continue
+			_vampire.remove_collision_exception_with(collision_body)
+			collision_body.remove_collision_exception_with(_vampire)
+	_vampire_collision_bodies.clear()
 
 
 func _get_physics_bodies(root: Node) -> Array[PhysicsBody3D]:
-    var found: Array[PhysicsBody3D] = []
-    _collect_physics_bodies(root, found)
-    return found
+	var found: Array[PhysicsBody3D] = []
+	_collect_physics_bodies(root, found)
+	return found
 
 
 func _collect_physics_bodies(root: Node, found: Array[PhysicsBody3D]) -> void:
-    if root is PhysicsBody3D:
-        found.append(root as PhysicsBody3D)
-    for child in root.get_children():
-        _collect_physics_bodies(child, found)
+	if root is PhysicsBody3D:
+		found.append(root as PhysicsBody3D)
+	for child in root.get_children():
+		_collect_physics_bodies(child, found)
 
 
 func _on_bat_noise_triggered(noise_origin: Vector3) -> void:
-    var target_position := _player.global_position if _player != null else noise_origin
-    bat_noise_triggered.emit(target_position)
+	var target_position := _player.global_position if _player != null else noise_origin
+	bat_noise_triggered.emit(target_position)

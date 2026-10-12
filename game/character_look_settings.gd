@@ -1,7 +1,6 @@
 extends Resource
 class_name GDCharacterLookSettings
 
-
 ## Maximum sideways head turn that remains safe while a character keeps walking.
 @export_range(0.0, 90.0, 1.0, "suffix:°") var maximum_head_turn_degrees := 60.0
 ## Maximum wandering head turn retained while moving at full pace.
@@ -34,41 +33,35 @@ class_name GDCharacterLookSettings
 
 ## Returns one at rest and approaches zero as movement reaches full pace.
 func get_wandering_strength(movement_focus_ratio: float) -> float:
-    var focus_ratio := clampf(movement_focus_ratio, 0.0, 1.0)
-    return 1.0 - pow(focus_ratio, movement_focus_exponent)
+	var focus_ratio := clampf(movement_focus_ratio, 0.0, 1.0)
+	return 1.0 - pow(focus_ratio, movement_focus_exponent)
 
 
 ## Returns the movement-scaled limit used only for ambient wandering glances.
 func get_wandering_head_turn_radians(movement_focus_ratio: float) -> float:
-    return deg_to_rad(lerpf(
-        focused_head_turn_degrees,
-        maximum_head_turn_degrees,
-        get_wandering_strength(movement_focus_ratio)
-    ))
+	return deg_to_rad(
+		lerpf(focused_head_turn_degrees, maximum_head_turn_degrees, get_wandering_strength(movement_focus_ratio))
+	)
 
 
 ## Returns how long an ambient glance should linger at the current pace.
 func get_wandering_hold_seconds(movement_focus_ratio: float) -> float:
-    return lerpf(
-        focused_glance_hold_seconds,
-        glance_hold_seconds,
-        get_wandering_strength(movement_focus_ratio)
-    )
+	return lerpf(focused_glance_hold_seconds, glance_hold_seconds, get_wandering_strength(movement_focus_ratio))
 
 
 ## Returns the shortest delay between wandering glances at the current pace.
 func get_wandering_interval_min_seconds(movement_focus_ratio: float) -> float:
-    return lerpf(
-        focused_glance_interval_min_seconds,
-        idle_glance_interval_min_seconds,
-        get_wandering_strength(movement_focus_ratio)
-    )
+	return lerpf(
+		focused_glance_interval_min_seconds,
+		idle_glance_interval_min_seconds,
+		get_wandering_strength(movement_focus_ratio)
+	)
 
 
 ## Returns the longest delay between wandering glances at the current pace.
 func get_wandering_interval_max_seconds(movement_focus_ratio: float) -> float:
-    return lerpf(
-        focused_glance_interval_max_seconds,
-        idle_glance_interval_max_seconds,
-        get_wandering_strength(movement_focus_ratio)
-    )
+	return lerpf(
+		focused_glance_interval_max_seconds,
+		idle_glance_interval_max_seconds,
+		get_wandering_strength(movement_focus_ratio)
+	)

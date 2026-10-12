@@ -1,7 +1,6 @@
 extends MeshInstance3D
 class_name GDFlaskEffectText
 
-
 const EFFECT_LABELS := {
 	&"health_flask": "Healing",
 	&"breathing_space": "Expand",
@@ -86,13 +85,18 @@ func show_flask_effect(effect_id: StringName, liquid_color: Color, duration: flo
 
 	var effect := _find_effect(effect_id)
 	if effect.is_empty():
-		active_effects.append({
-			"id": effect_id,
-			"label": _get_effect_label(effect_id),
-			"remaining": duration,
-			"duration": duration,
-			"color": liquid_color,
-		})
+		(
+			active_effects
+			. append(
+				{
+					"id": effect_id,
+					"label": _get_effect_label(effect_id),
+					"remaining": duration,
+					"duration": duration,
+					"color": liquid_color,
+				}
+			)
+		)
 	else:
 		effect["remaining"] = duration
 		effect["duration"] = duration
@@ -210,7 +214,9 @@ func _update_transform() -> void:
 	var desired_position := _get_camera_overlay_position(camera)
 	var perspective_basis := camera.global_transform.basis
 	perspective_basis = perspective_basis.rotated(perspective_basis.y.normalized(), deg_to_rad(perspective_yaw_degrees))
-	perspective_basis = perspective_basis.rotated(perspective_basis.x.normalized(), deg_to_rad(perspective_pitch_degrees))
+	perspective_basis = perspective_basis.rotated(
+		perspective_basis.x.normalized(), deg_to_rad(perspective_pitch_degrees)
+	)
 	global_transform = Transform3D(perspective_basis, desired_position)
 	_update_text_light(camera, desired_position)
 

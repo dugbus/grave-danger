@@ -1,7 +1,6 @@
 class_name Millstone
 extends RollingRock
 
-
 @export_group("Millstone Rolling")
 ## Local horizontal direction in which this millstone can roll when placed in a level.
 @export var local_roll_direction := Vector3.RIGHT
@@ -40,11 +39,7 @@ func push(impulse: Vector3) -> void:
 	super.push(constrained_impulse)
 
 
-func push_from_character(
-	character_velocity: Vector3,
-	collision_normal: Vector3,
-	delta: float
-) -> void:
+func push_from_character(character_velocity: Vector3, collision_normal: Vector3, delta: float) -> void:
 	var world_roll_direction := _get_world_roll_direction()
 	var contact_direction := _get_character_contact_direction(collision_normal)
 	if not _is_contact_on_rolling_side(contact_direction, world_roll_direction):
@@ -58,10 +53,7 @@ func push_from_character(
 
 
 func get_character_push_assist_velocity(
-	requested_velocity: Vector3,
-	resulting_velocity: Vector3,
-	collision_normal: Vector3,
-	delta: float
+	requested_velocity: Vector3, resulting_velocity: Vector3, collision_normal: Vector3, delta: float
 ) -> Vector3:
 	var world_roll_direction := _get_world_roll_direction()
 	var contact_direction := _get_character_contact_direction(collision_normal)
@@ -73,13 +65,10 @@ func get_character_push_assist_velocity(
 		return resulting_velocity
 
 	var resulting_horizontal := Vector3(resulting_velocity.x, 0.0, resulting_velocity.z)
-	var along_roll_velocity := (
-		world_roll_direction * resulting_horizontal.dot(world_roll_direction)
-	)
+	var along_roll_velocity := world_roll_direction * resulting_horizontal.dot(world_roll_direction)
 	var sideways_velocity := resulting_horizontal - along_roll_velocity
 	sideways_velocity = sideways_velocity.move_toward(
-		Vector3.ZERO,
-		push_alignment_assist_acceleration * maxf(delta, 0.0)
+		Vector3.ZERO, push_alignment_assist_acceleration * maxf(delta, 0.0)
 	)
 
 	var assisted_velocity := along_roll_velocity + sideways_velocity
@@ -115,7 +104,8 @@ func _physics_process(delta: float) -> void:
 
 func can_kill_enemy_by_rolling(target_position := Vector3.INF) -> bool:
 	var rolling_velocity := _project_onto_roll_direction(linear_velocity)
-	if rolling_velocity.length() < enemy_crush_speed:
+	var rolling_speed := rolling_velocity.length()
+	if rolling_speed < enemy_crush_speed and not is_equal_approx(rolling_speed, enemy_crush_speed):
 		return false
 	if not target_position.is_finite():
 		return true
@@ -176,9 +166,8 @@ func _get_character_contact_direction(collision_normal: Vector3) -> Vector3:
 	return contact_direction.normalized()
 
 
-func _is_contact_on_rolling_side(
-	contact_direction: Vector3,
-	world_roll_direction: Vector3
-) -> bool:
-	return not contact_direction.is_zero_approx() \
+func _is_contact_on_rolling_side(contact_direction: Vector3, world_roll_direction: Vector3) -> bool:
+	return (
+		not contact_direction.is_zero_approx()
 		and absf(contact_direction.dot(world_roll_direction)) >= rolling_side_alignment
+	)

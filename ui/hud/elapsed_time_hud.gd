@@ -1,7 +1,6 @@
 extends CanvasLayer
 class_name GDElapsedTimeHud
 
-
 ## Node that provides the elapsed time value through get_elapsed_time().
 @export var time_source_path: NodePath
 ## Existing label to update. If missing, a fallback label is created.
@@ -76,10 +75,13 @@ func _update_label() -> void:
 	elapsed_label.visible = true
 	elapsed_label.text = "Elapsed %s" % _format_elapsed_seconds(elapsed_seconds)
 	if _is_boundary_animation_active():
-		elapsed_label.text += "\nBoundary %s / %s" % [
-			_format_elapsed_seconds(float(time_source.get_boundary_animation_position())),
-			_format_elapsed_seconds(float(time_source.get_boundary_animation_duration())),
-		]
+		elapsed_label.text += (
+			"\nBoundary %s / %s"
+			% [
+				_format_elapsed_seconds(float(time_source.get_boundary_animation_position())),
+				_format_elapsed_seconds(float(time_source.get_boundary_animation_duration())),
+			]
+		)
 
 
 func _is_boundary_animation_active() -> bool:

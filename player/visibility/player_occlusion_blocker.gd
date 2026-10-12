@@ -2,7 +2,6 @@ class_name PlayerOcclusionBlocker
 extends Node
 ## Prevents the player's through-scenery silhouette from drawing over this visual.
 
-
 const BLOCKER_SHADER_PATH := "res://player/visibility/player_occlusion_blocker.gdshader"
 const BLOCKER_RENDER_PRIORITY := -1
 
@@ -96,8 +95,7 @@ func _apply_blocking() -> void:
 func _release_blocker_overlays() -> void:
 	for index in _source_meshes.size():
 		var source_mesh := _source_meshes[index]
-		if is_instance_valid(source_mesh) \
-				and source_mesh.material_overlay == _applied_overlays[index]:
+		if is_instance_valid(source_mesh) and source_mesh.material_overlay == _applied_overlays[index]:
 			source_mesh.material_overlay = _source_overlays[index]
 	_source_meshes.clear()
 	_source_overlays.clear()

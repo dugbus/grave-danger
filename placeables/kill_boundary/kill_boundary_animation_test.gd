@@ -17,13 +17,11 @@ func run(tree: SceneTree) -> void:
 	boundary.boundary_animation = animation
 	boundary.ping_pong_boundary_animation = true
 	expect(
-		animation.loop_mode == Animation.LOOP_PINGPONG,
-		"Ping-pong playback can be enabled for the boundary animation."
+		animation.loop_mode == Animation.LOOP_PINGPONG, "Ping-pong playback can be enabled for the boundary animation."
 	)
 	boundary.ping_pong_boundary_animation = false
 	expect(
-		animation.loop_mode == Animation.LOOP_LINEAR,
-		"Linear looping is restored when ping-pong playback is disabled."
+		animation.loop_mode == Animation.LOOP_LINEAR, "Linear looping is restored when ping-pong playback is disabled."
 	)
 	boundary.loop_boundary_path = false
 	expect(
@@ -33,15 +31,11 @@ func run(tree: SceneTree) -> void:
 
 	boundary.curve = Curve3D.new()
 	boundary.curve.add_point(Vector3.ZERO)
-	expect(
-		not boundary._has_previewable_editor_path(),
-		"A one-point path does not drive the editor boundary preview."
-	)
+	expect(not boundary._has_previewable_editor_path(), "A one-point path does not drive the editor boundary preview.")
 
 	boundary.curve.add_point(Vector3.ZERO)
 	expect(
-		not boundary._has_previewable_editor_path(),
-		"A zero-length path does not drive the editor boundary preview."
+		not boundary._has_previewable_editor_path(), "A zero-length path does not drive the editor boundary preview."
 	)
 
 	boundary.curve.set_point_position(1, Vector3.RIGHT)
@@ -81,10 +75,12 @@ func run(tree: SceneTree) -> void:
 	)
 	tree.root.add_child(boundary)
 	expect(
-		animation_player.has_animation(&"RESET") \
-			and animation_player.has_animation(boundary.DEFAULT_ANIMATION_NAME) \
-			and animation_player.get_animation_library("") == authored_library \
-			and animation.find_track(boundary.MOVEMENT_SPEED_TRACK_PATH, Animation.TYPE_VALUE) >= 0,
+		(
+			animation_player.has_animation(&"RESET")
+			and animation_player.has_animation(boundary.DEFAULT_ANIMATION_NAME)
+			and animation_player.get_animation_library("") == authored_library
+			and animation.find_track(boundary.MOVEMENT_SPEED_TRACK_PATH, Animation.TYPE_VALUE) >= 0
+		),
 		"Boundary updates preserve authored libraries and add a track-driven movement fallback."
 	)
 	animation_player.pause()
@@ -103,10 +99,7 @@ func run(tree: SceneTree) -> void:
 	var track_driven_animation := Animation.new()
 	track_driven_animation.length = 10.0
 	var track_driven_speed_track := track_driven_animation.add_track(Animation.TYPE_VALUE)
-	track_driven_animation.track_set_path(
-		track_driven_speed_track,
-		boundary.MOVEMENT_SPEED_TRACK_PATH
-	)
+	track_driven_animation.track_set_path(track_driven_speed_track, boundary.MOVEMENT_SPEED_TRACK_PATH)
 	track_driven_animation.track_insert_key(track_driven_speed_track, 0.0, 1.0)
 	boundary.boundary_animation = track_driven_animation
 	boundary.set_process(false)
@@ -139,20 +132,28 @@ func run(tree: SceneTree) -> void:
 	timed_boundary.boundary_animation = timed_animation
 	timed_boundary._sync_path_point_animation_markers()
 	expect(
-		is_equal_approx(timed_boundary.derived_ping_pong_end_time, 10.0 - 2.0 * sqrt(5.0)) \
-			and is_equal_approx(timed_animation.length, 20.0) \
-			and timed_animation.track_get_key_count(speed_track) == 4,
-		"Boundary duration finds the path-end time across multiple interpolated speed keys (got %f)." \
+		(
+			is_equal_approx(timed_boundary.derived_ping_pong_end_time, 10.0 - 2.0 * sqrt(5.0))
+			and is_equal_approx(timed_animation.length, 20.0)
+			and timed_animation.track_get_key_count(speed_track) == 4
+		),
+		(
+			"Boundary duration finds the path-end time across multiple interpolated speed keys (got %f)."
 			% timed_boundary.derived_ping_pong_end_time
+		)
 	)
 	timed_boundary.curve.set_point_position(1, Vector3(20.0, 0.0, 0.0))
 	timed_boundary._sync_path_point_animation_markers()
 	expect(
-		is_equal_approx(timed_boundary.derived_ping_pong_end_time, 10.5) \
-			and is_equal_approx(timed_animation.length, 20.0) \
-			and timed_animation.track_get_key_count(speed_track) == 4,
-		"Boundary duration extends when the path needs more travel time at the keyed speeds (got %f)." \
+		(
+			is_equal_approx(timed_boundary.derived_ping_pong_end_time, 10.5)
+			and is_equal_approx(timed_animation.length, 20.0)
+			and timed_animation.track_get_key_count(speed_track) == 4
+		),
+		(
+			"Boundary duration extends when the path needs more travel time at the keyed speeds (got %f)."
 			% timed_boundary.derived_ping_pong_end_time
+		)
 	)
 	var timed_player := AnimationPlayer.new()
 	timed_player.name = timed_boundary.ANIMATION_PLAYER_NAME
@@ -162,12 +163,11 @@ func run(tree: SceneTree) -> void:
 	timed_player.add_animation_library(&"", timed_library)
 	timed_boundary._play_boundary_animation(timed_player)
 	expect(
-		timed_player.has_section() \
-			and is_zero_approx(timed_player.get_section_start_time()) \
-			and is_equal_approx(
-				timed_player.get_section_end_time(),
-				timed_boundary.derived_ping_pong_end_time
-			),
+		(
+			timed_player.has_section()
+			and is_zero_approx(timed_player.get_section_start_time())
+			and is_equal_approx(timed_player.get_section_end_time(), timed_boundary.derived_ping_pong_end_time)
+		),
 		"Ping-pong playback uses the derived path-end section without truncating authored keys."
 	)
 	timed_player.advance(timed_boundary.derived_ping_pong_end_time + 0.5)
@@ -175,9 +175,11 @@ func run(tree: SceneTree) -> void:
 	timed_boundary.ping_pong_boundary_animation = false
 	timed_player.advance(0.25)
 	expect(
-		timed_animation.loop_mode == Animation.LOOP_LINEAR \
-			and not timed_player.has_section() \
-			and timed_player.current_animation_position > reversed_position,
+		(
+			timed_animation.loop_mode == Animation.LOOP_LINEAR
+			and not timed_player.has_section()
+			and timed_player.current_animation_position > reversed_position
+		),
 		"Disabling ping-pong restarts an active editor preview in the forward direction."
 	)
 	timed_boundary.free()

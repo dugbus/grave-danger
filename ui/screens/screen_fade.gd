@@ -19,22 +19,14 @@ static func fade_in(
 
 
 static func fade_out(
-	owner: Node,
-	fade_name: String,
-	duration: float,
-	layer_name := "",
-	layer_index := DEFAULT_LAYER
+	owner: Node, fade_name: String, duration: float, layer_name := "", layer_index := DEFAULT_LAYER
 ) -> Tween:
 	var fade := create_overlay(owner, fade_name, Color(0.0, 0.0, 0.0, 0.0), layer_name, layer_index)
 	return tween_alpha(owner, fade, 1.0, duration)
 
 
 static func create_overlay(
-	owner: Node,
-	fade_name: String,
-	color: Color,
-	layer_name := "",
-	layer_index := DEFAULT_LAYER
+	owner: Node, fade_name: String, color: Color, layer_name := "", layer_index := DEFAULT_LAYER
 ) -> ColorRect:
 	var parent := owner
 	if not layer_name.is_empty():

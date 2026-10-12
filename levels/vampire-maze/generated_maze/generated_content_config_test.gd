@@ -10,16 +10,12 @@ func run(_tree: SceneTree) -> void:
 	configuration.set("grass_coverage_percent", 31.0)
 	configuration.set("grass_patch_size_tiles", 6.0)
 	expect(
-		bool(configuration.get("grass_enabled")) \
-			and is_equal_approx(
-				float(configuration.get("grass_coverage_percent")),
-				31.0
-			) \
-			and is_equal_approx(
-				float(configuration.get("grass_patch_size_tiles")),
-				6.0
-			) \
-			and int(configuration.get("grass_blades_per_cell")) == 32 \
-			and int(configuration.get("grass_route_clearance_tiles")) == 0,
+		(
+			bool(configuration.get("grass_enabled"))
+			and is_equal_approx(float(configuration.get("grass_coverage_percent")), 31.0)
+			and is_equal_approx(float(configuration.get("grass_patch_size_tiles")), 6.0)
+			and int(configuration.get("grass_blades_per_cell")) == 32
+			and int(configuration.get("grass_route_clearance_tiles")) == 0
+		),
 		"Generated content exposes reactive grass-patch controls."
 	)

@@ -1,7 +1,6 @@
 extends Node3D
 class_name GDVampireDevelopmentView
 
-
 ## Level-only camera used while the development view node is visible.
 @export var camera_path: NodePath = ^"Camera3D"
 ## Vampire-maze indoor environment whose ambient energy is raised for development.
@@ -35,8 +34,7 @@ func _ready() -> void:
 func _apply_development_visibility() -> void:
 	var enabled := is_visible_in_tree()
 	if indoor_environment != null:
-		indoor_environment.ambient_light_energy = development_ambient_energy \
-			if enabled else original_ambient_energy
+		indoor_environment.ambient_light_energy = development_ambient_energy if enabled else original_ambient_energy
 
 	if camera == null:
 		return

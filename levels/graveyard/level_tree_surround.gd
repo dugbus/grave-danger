@@ -75,10 +75,7 @@ func _find_first_mesh_instance(root: Node) -> MeshInstance3D:
 
 
 func _build_tree_transforms(
-	level_size: Vector2,
-	height_sampler: Callable,
-	random_seed: int,
-	tree_mesh_count: int
+	level_size: Vector2, height_sampler: Callable, random_seed: int, tree_mesh_count: int
 ) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = random_seed + 17041
@@ -112,9 +109,7 @@ func _build_tree_transforms(
 			var mesh_index := rng.randi_range(0, tree_mesh_count - 1)
 			var tree_transform := _build_tree_transform(position_2d, height_sampler, rng)
 			var chunk_key := Vector3i(
-				floori(position_2d.x / chunk_size),
-				mesh_index,
-				floori(position_2d.y / chunk_size)
+				floori(position_2d.x / chunk_size), mesh_index, floori(position_2d.y / chunk_size)
 			)
 
 			if not transforms_by_chunk.has(chunk_key):
@@ -182,16 +177,14 @@ func _calculate_chunk_aabb(transforms: Array) -> AABB:
 	var first_transform := transforms[0] as Transform3D
 	var first_scale := _get_uniform_scale(first_transform)
 	var bounds := AABB(
-		first_transform.origin + Vector3(-1.0, -0.2, -1.0) * first_scale,
-		Vector3(2.0, 3.2, 2.0) * first_scale
+		first_transform.origin + Vector3(-1.0, -0.2, -1.0) * first_scale, Vector3(2.0, 3.2, 2.0) * first_scale
 	)
 
 	for index in range(1, transforms.size()):
 		var tree_transform := transforms[index] as Transform3D
 		var uniform_scale := _get_uniform_scale(tree_transform)
 		var tree_bounds := AABB(
-			tree_transform.origin + Vector3(-1.0, -0.2, -1.0) * uniform_scale,
-			Vector3(2.0, 3.2, 2.0) * uniform_scale
+			tree_transform.origin + Vector3(-1.0, -0.2, -1.0) * uniform_scale, Vector3(2.0, 3.2, 2.0) * uniform_scale
 		)
 		bounds = bounds.merge(tree_bounds)
 

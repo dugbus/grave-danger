@@ -5,11 +5,7 @@ const POSITION_TOLERANCE := 0.05
 
 
 static func report_due(
-	recording: Dictionary,
-	playback_level: Node3D,
-	playback_time: float,
-	checkpoint_index: int,
-	warned_paths: Dictionary
+	recording: Dictionary, playback_level: Node3D, playback_time: float, checkpoint_index: int, warned_paths: Dictionary
 ) -> int:
 	if not OS.is_debug_build() or playback_level == null:
 		return checkpoint_index
@@ -19,21 +15,13 @@ static func report_due(
 		var checkpoint := checkpoints[checkpoint_index] as Dictionary
 		if float(checkpoint.get("time", 0.0)) > playback_time:
 			return checkpoint_index
-		_report_checkpoint(
-			playback_level,
-			checkpoint,
-			String(run_metadata.get("level_id", "unknown")),
-			warned_paths
-		)
+		_report_checkpoint(playback_level, checkpoint, String(run_metadata.get("level_id", "unknown")), warned_paths)
 		checkpoint_index += 1
 	return checkpoint_index
 
 
 static func _report_checkpoint(
-	playback_level: Node3D,
-	checkpoint: Dictionary,
-	recorded_level_id: String,
-	warned_paths: Dictionary
+	playback_level: Node3D, checkpoint: Dictionary, recorded_level_id: String, warned_paths: Dictionary
 ) -> void:
 	var checkpoint_time := float(checkpoint.get("time", 0.0))
 	var states := checkpoint.get("states", []) as Array
@@ -45,8 +33,10 @@ static func _report_checkpoint(
 		var actual_node := playback_level.get_node_or_null(NodePath(stored_path)) as Node3D
 		if actual_node == null:
 			push_warning(
-				"Run playback drift in level '%s' at %.2fs: missing tracked node '%s'." \
-				% [recorded_level_id, checkpoint_time, stored_path]
+				(
+					"Run playback drift in level '%s' at %.2fs: missing tracked node '%s'."
+					% [recorded_level_id, checkpoint_time, stored_path]
+				)
 			)
 			warned_paths[stored_path] = true
 			continue
@@ -55,16 +45,19 @@ static func _report_checkpoint(
 		if position_error <= POSITION_TOLERANCE:
 			continue
 		var warning_text := (
-			"Run playback drift in level '%s' at %.2fs: '%s' is %.3fm from its recording "
-			+ "(expected %s, actual %s)."
-		) % [
-			recorded_level_id,
-			checkpoint_time,
-			stored_path,
-			position_error,
-			expected_position,
-			actual_node.global_position,
-		]
+			(
+				"Run playback drift in level '%s' at %.2fs: '%s' is %.3fm from its recording "
+				+ "(expected %s, actual %s)."
+			)
+			% [
+				recorded_level_id,
+				checkpoint_time,
+				stored_path,
+				position_error,
+				expected_position,
+				actual_node.global_position,
+			]
+		)
 		push_warning(warning_text)
 		warned_paths[stored_path] = true
 

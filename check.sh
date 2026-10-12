@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+./format.sh --check --all
+
 readonly teardown_diagnostic_pattern='ObjectDB instances were leaked at exit|resources still in use at exit|RID allocations .* were leaked at exit|Pages in use exist at exit'
 readonly dummy_shader_diagnostic_pattern='RID allocations of type .*RendererDummy.*DummyShader.* were leaked at exit'
 

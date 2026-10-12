@@ -9,9 +9,7 @@ signal boundary_removed
 signal playback_configuration_changed
 
 const KILL_BOUNDARY_GROUP: StringName = &"kill_boundary"
-const DEFAULT_SETTINGS := preload(
-	"res://placeables/kill-boundary-2/kill_boundary_2_settings.tres"
-)
+const DEFAULT_SETTINGS := preload("res://placeables/kill-boundary-2/kill_boundary_2_settings.tres")
 
 ## Start moving automatically when the level begins. Turn this off when another level event
 ## should decide when the boundary starts; the boundary still appears at Pose 1.
@@ -181,9 +179,11 @@ func get_boundary_animation_duration() -> float:
 	var authored_duration := sequence.get_duration()
 	return (
 		authored_duration + loop_return_seconds
-		if playback_mode == GDKillBoundary2Animator.PlaybackMode.Loop
-		and sequence.get_pose_count() > 1
-		and authored_duration > 0.0
+		if (
+			playback_mode == GDKillBoundary2Animator.PlaybackMode.Loop
+			and sequence.get_pose_count() > 1
+			and authored_duration > 0.0
+		)
 		else authored_duration
 	)
 
@@ -225,8 +225,7 @@ func get_bounds_height() -> float:
 
 ## Returns the exact canonical perimeter currently used by visuals and collision.
 func get_boundary_world_points() -> PackedVector3Array:
-	return geometry.get_world_points() if geometry != null and not boundary_removed_for_level \
-		else PackedVector3Array()
+	return geometry.get_world_points() if geometry != null and not boundary_removed_for_level else PackedVector3Array()
 
 
 func pause_runtime_for(seconds: float) -> bool:
@@ -251,10 +250,7 @@ func expand_runtime_bounds_percent(percent: float) -> bool:
 
 
 func expand_runtime_bounds_percent_for(
-	percent: float,
-	active_seconds: float,
-	expansion_transition_seconds: float,
-	contraction_transition_seconds := -1.0
+	percent: float, active_seconds: float, expansion_transition_seconds: float, contraction_transition_seconds := -1.0
 ) -> bool:
 	if boundary_removed_for_level or not _is_boundary_visible():
 		return false
@@ -262,11 +258,10 @@ func expand_runtime_bounds_percent_for(
 	if multiplier <= 1.0:
 		return false
 	active_runtime_bounds_multipliers.append(multiplier)
-	_animate_runtime_bounds_multiplier(
-		_get_target_runtime_bounds_multiplier(), expansion_transition_seconds
+	_animate_runtime_bounds_multiplier(_get_target_runtime_bounds_multiplier(), expansion_transition_seconds)
+	var contraction_seconds := (
+		contraction_transition_seconds if contraction_transition_seconds >= 0.0 else expansion_transition_seconds
 	)
-	var contraction_seconds := contraction_transition_seconds \
-		if contraction_transition_seconds >= 0.0 else expansion_transition_seconds
 	_restore_runtime_bounds_after(multiplier, maxf(active_seconds, 0.0), contraction_seconds)
 	return true
 
@@ -346,8 +341,7 @@ func _cache_components() -> void:
 	geometry = get_node_or_null(^"Geometry") as GDKillBoundary2Geometry
 	boundary_space = get_node_or_null(^"BoundarySpace") as Node3D
 	state_root = get_node_or_null(^"BoundarySpace/StateRoot") as Node3D
-	presentation = get_node_or_null(^"BoundarySpace/StateRoot/Presentation") \
-		as GDKillBoundary2Presentation
+	presentation = get_node_or_null(^"BoundarySpace/StateRoot/Presentation") as GDKillBoundary2Presentation
 	damage = get_node_or_null(^"BoundarySpace/StateRoot/Damage") as GDKillBoundary2Damage
 	blockers = get_node_or_null(^"BoundarySpace/StateRoot/Blockers") as GDKillBoundary2Blockers
 	proximity_audio = get_node_or_null(^"ProximityAudio") as GDKillBoundary2Audio
@@ -403,9 +397,7 @@ func _sync_render_effect() -> void:
 func _on_sequence_changed() -> void:
 	if animator == null:
 		return
-	editor_active_pose_index = clampi(
-		editor_active_pose_index, 0, maxi(sequence.get_pose_count() - 1, 0)
-	)
+	editor_active_pose_index = clampi(editor_active_pose_index, 0, maxi(sequence.get_pose_count() - 1, 0))
 	animator.seek(animator.authored_position)
 
 
@@ -435,11 +427,7 @@ func _set_runtime_effects_enabled(enabled: bool, keep_visuals := false) -> void:
 
 
 func _is_boundary_visible() -> bool:
-	return (
-		not boundary_removed_for_level
-		and boundary_space != null
-		and boundary_space.visible
-	)
+	return not boundary_removed_for_level and boundary_space != null and boundary_space.visible
 
 
 func _get_target_runtime_bounds_multiplier() -> float:
@@ -462,9 +450,7 @@ func _animate_runtime_bounds_multiplier(target: float, seconds: float) -> void:
 		_apply_runtime_bounds_multiplier(target)
 		return
 	runtime_bounds_tween = create_tween()
-	runtime_bounds_tween.tween_method(
-		_apply_runtime_bounds_multiplier, runtime_bounds_multiplier, target, seconds
-	)
+	runtime_bounds_tween.tween_method(_apply_runtime_bounds_multiplier, runtime_bounds_multiplier, target, seconds)
 
 
 func _resume_runtime_after(pause_token: int, seconds: float) -> void:
@@ -473,13 +459,9 @@ func _resume_runtime_after(pause_token: int, seconds: float) -> void:
 		animator.set_paused(false)
 
 
-func _restore_runtime_bounds_after(
-	multiplier: float, active_seconds: float, contraction_seconds: float
-) -> void:
+func _restore_runtime_bounds_after(multiplier: float, active_seconds: float, contraction_seconds: float) -> void:
 	await get_tree().create_timer(active_seconds).timeout
 	if boundary_removed_for_level:
 		return
 	active_runtime_bounds_multipliers.erase(multiplier)
-	_animate_runtime_bounds_multiplier(
-		_get_target_runtime_bounds_multiplier(), maxf(contraction_seconds, 0.0)
-	)
+	_animate_runtime_bounds_multiplier(_get_target_runtime_bounds_multiplier(), maxf(contraction_seconds, 0.0))

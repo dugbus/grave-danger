@@ -2,13 +2,10 @@
 class_name GDGoldCoinPile
 extends "res://placeables/treasure/collectible_pile.gd"
 
-
 const GOLD_COIN_SCENE := preload("res://placeables/treasure/gold_coin.tscn")
 const GOLD_COIN_MODEL := preload("res://Assets/environment/skull-coin.glb")
 const GOLD_COIN_ITEM := preload("res://placeables/treasure/gold_coin_inventory.tres")
-const TREASURE_OUTLINE_MATERIAL := preload(
-    "res://placeables/treasure/treasure_outline_material.tres"
-)
+const TREASURE_OUTLINE_MATERIAL := preload("res://placeables/treasure/treasure_outline_material.tres")
 
 ## Total number of coins this pile will spawn.
 @export_range(0, 500, 1) var coin_count := 200:

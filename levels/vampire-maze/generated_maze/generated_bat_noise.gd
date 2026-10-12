@@ -6,10 +6,10 @@ extends Node3D
 signal noise_triggered(noise_origin: Vector3)
 
 enum WatchedBatState {
-    Roosting,
-    Swarming,
-    FlyingOff,
-    Finished,
+	Roosting,
+	Swarming,
+	FlyingOff,
+	Finished,
 }
 
 ## Bat nest whose first take-off triggers the generated dungeon noise.
@@ -22,10 +22,10 @@ var _noise_emitted := false
 
 
 func _physics_process(_delta: float) -> void:
-    if _noise_emitted or _bat_nest == null or not _bat_nest.has_method("get_bat_nest_state"):
-        return
-    var current_state := int(_bat_nest.call("get_bat_nest_state")) as WatchedBatState
-    if _previous_state == WatchedBatState.Roosting and current_state != WatchedBatState.Roosting:
-        _noise_emitted = true
-        noise_triggered.emit(global_position)
-    _previous_state = current_state
+	if _noise_emitted or _bat_nest == null or not _bat_nest.has_method("get_bat_nest_state"):
+		return
+	var current_state := int(_bat_nest.call("get_bat_nest_state")) as WatchedBatState
+	if _previous_state == WatchedBatState.Roosting and current_state != WatchedBatState.Roosting:
+		_noise_emitted = true
+		noise_triggered.emit(global_position)
+	_previous_state = current_state

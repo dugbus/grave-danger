@@ -10,8 +10,8 @@ const SHOP_ITEM_DEFINITION_SCRIPT := preload("res://ui/frontend/shop_item_defini
 
 
 func get_available_items() -> Array[SHOP_ITEM_DEFINITION_SCRIPT]:
-    var available_items: Array[SHOP_ITEM_DEFINITION_SCRIPT] = []
-    for item in items:
-        if item != null and item.availability == SHOP_ITEM_DEFINITION_SCRIPT.Availability.Available:
-            available_items.append(item)
-    return available_items
+	var available_items: Array[SHOP_ITEM_DEFINITION_SCRIPT] = []
+	for item in items:
+		if item != null and item.availability == SHOP_ITEM_DEFINITION_SCRIPT.Availability.Available:
+			available_items.append(item)
+	return available_items

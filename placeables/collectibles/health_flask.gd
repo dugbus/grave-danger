@@ -15,9 +15,7 @@ func _apply_effect(body: Node3D) -> bool:
 		return false
 
 	return body.try_collect_health_flask(
-		self,
-		FLASK_PROPERTIES.health_heal_percent_of_max,
-		FLASK_PROPERTIES.health_heal_duration
+		self, FLASK_PROPERTIES.health_heal_percent_of_max, FLASK_PROPERTIES.health_heal_duration
 	)
 
 

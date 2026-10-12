@@ -2,7 +2,7 @@ extends "res://placeables/path_placeable.gd"
 class_name GDSkeletonPath
 
 const FOOTSTEP_SOUND_PATHS: Array[String] = [
-    "res://Assets/audio/skeleton-footstep.mp3",
+	"res://Assets/audio/skeleton-footstep.mp3",
 ]
 const LANDING_SOUND_PATH := "res://Assets/audio/skeleton-landing.mp3"
 const LANDING_AUDIO_NAME := "SkeletonLandingAudio"
@@ -22,9 +22,7 @@ const SKELETON_COLLISION_LAYER := 1 << 5
 const ENEMY_GEOMETRY_VISUAL_LAYER := 1 << 18
 const ALL_VISUAL_LAYERS := (1 << 20) - 1
 const ALL_SHADOW_CASTER_LAYERS := (1 << 32) - 1
-const ENEMY_LIGHT_SHADOW_CASTER_MASK := (
-    ALL_SHADOW_CASTER_LAYERS & ~ENEMY_GEOMETRY_VISUAL_LAYER
-)
+const ENEMY_LIGHT_SHADOW_CASTER_MASK := ALL_SHADOW_CASTER_LAYERS & ~ENEMY_GEOMETRY_VISUAL_LAYER
 const MODEL_FORWARD_YAW_OFFSET := 0.0
 const FLOOR_PROBE_MARGIN := 0.05
 const FLOOR_SNAP_DISTANCE := 0.1
@@ -53,10 +51,10 @@ const LANDING_AUDIO_UNIT_SIZE := 16.0
 @export var kill_confirmation_time := 0.08
 ## Legacy serialized enemy delay; new level editing uses the shared Spawn Time field.
 @export_storage var drop_in_time: float:
-    get:
-        return spawn_time
-    set(value):
-        spawn_time = maxf(value, 0.0)
+	get:
+		return spawn_time
+	set(value):
+		spawn_time = maxf(value, 0.0)
 ## Height above the patrol path used at the start of the drop-in.
 @export var drop_height := 3.2
 ## Seconds taken to fall from drop_height to the path.
@@ -74,9 +72,7 @@ const LANDING_AUDIO_UNIT_SIZE := 16.0
 ## Physics layers that make the skeleton reverse when detected ahead on its path.
 @export_flags_3d_physics var map_collision_mask := WORLD_COLLISION_LAYER
 ## Enemy body layers that make the skeleton reverse before overlapping another enemy.
-@export_flags_3d_physics var enemy_collision_mask := (
-    ZOMBIE_COLLISION_LAYER | SKELETON_COLLISION_LAYER
-)
+@export_flags_3d_physics var enemy_collision_mask := ZOMBIE_COLLISION_LAYER | SKELETON_COLLISION_LAYER
 ## Height above the path used for the map collision probe.
 @export_range(0.0, 2.0, 0.01) var map_collision_probe_height := 0.45
 ## Extra distance ahead of the skeleton checked for map blockers.
@@ -183,792 +179,758 @@ var spawn_floor_checked := false
 
 
 func _ready() -> void:
-    add_to_group(CHARACTER_GROUP)
-    add_to_group(ENEMY_GROUP)
-    add_to_group(SKELETON_GROUP)
-    map_collision_mask &= ~PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
-    enemy_collision_mask &= ~PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
-    if skeleton_body != null:
-        skeleton_body.collision_mask &= ~PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
-    footstep_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"skeleton_audio")
-    _load_footstep_sounds()
-    landing_sound = GDAudio.load_stream(LANDING_SOUND_PATH)
-    _randomize_next_footstep_distance()
-    _apply_start_progress()
-    GROUND_ENEMY_ORIENTATION.make_upright(drop_pivot)
-    GROUND_ENEMY_ORIENTATION.make_upright(shadow)
-    _configure_shadow_casting()
-    _configure_skeleton_light()
+	add_to_group(CHARACTER_GROUP)
+	add_to_group(ENEMY_GROUP)
+	add_to_group(SKELETON_GROUP)
+	map_collision_mask &= ~PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
+	enemy_collision_mask &= ~PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
+	if skeleton_body != null:
+		skeleton_body.collision_mask &= ~PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
+	footstep_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"skeleton_audio")
+	_load_footstep_sounds()
+	landing_sound = GDAudio.load_stream(LANDING_SOUND_PATH)
+	_randomize_next_footstep_distance()
+	_apply_start_progress()
+	GROUND_ENEMY_ORIENTATION.make_upright(drop_pivot)
+	GROUND_ENEMY_ORIENTATION.make_upright(shadow)
+	_configure_shadow_casting()
+	_configure_skeleton_light()
 
-    if kill_area != null:
-        kill_area.body_entered.connect(_on_kill_area_body_entered)
+	if kill_area != null:
+		kill_area.body_entered.connect(_on_kill_area_body_entered)
 
-    if character != null:
-        animation_player = _find_animation_player(character)
-        _resolve_animation_names()
+	if character != null:
+		animation_player = _find_animation_player(character)
+		_resolve_animation_names()
 
-    if spawn_time > 0.0:
-        _set_active_visible(false)
-    else:
-        _finish_drop_in()
-    super._ready()
+	if spawn_time > 0.0:
+		_set_active_visible(false)
+	else:
+		_finish_drop_in()
+	super._ready()
 
 
 func die_from_spike_trap() -> void:
-    _die_from_rolling_ball()
+	_die_from_rolling_ball()
 
 
 func can_be_hit_by_spike_trap() -> bool:
-    return not is_dead
+	return not is_dead
 
 
 func get_spike_trap_position() -> Vector3:
-    return path_follow.global_position if path_follow != null else global_position
+	return path_follow.global_position if path_follow != null else global_position
 
 
 ## Returns the moving point the player's close-threat awareness should follow.
 func get_player_attention_position() -> Vector3:
-    return path_follow.global_position if path_follow != null else global_position
+	return path_follow.global_position if path_follow != null else global_position
 
 
 ## Reports whether this skeleton is active and visible enough to track.
 func is_available_for_player_attention() -> bool:
-    return has_dropped_in and not is_dead and drop_pivot != null \
-        and drop_pivot.is_visible_in_tree()
+	return has_dropped_in and not is_dead and drop_pivot != null and drop_pivot.is_visible_in_tree()
 
 
 func _physics_process(delta: float) -> void:
-    if path_follow == null or curve == null:
-        _update_animation(0.0)
-        return
+	if path_follow == null or curve == null:
+		_update_animation(0.0)
+		return
 
-    if is_dead:
-        return
+	if is_dead:
+		return
 
-    if not _update_fall(delta):
-        _update_animation(0.0)
-        return
+	if not _update_fall(delta):
+		_update_animation(0.0)
+		return
 
-    if not _update_drop_in(delta):
-        _update_animation(0.0)
-        return
+	if not _update_drop_in(delta):
+		_update_animation(0.0)
+		return
 
-    var previous_position := path_follow.global_position
-    _advance_patrol(delta)
+	var previous_position := path_follow.global_position
+	_advance_patrol(delta)
 
-    var displacement := path_follow.global_position - previous_position
-    var horizontal_displacement := Vector3(displacement.x, 0.0, displacement.z)
-    var horizontal_speed := horizontal_displacement.length() / maxf(delta, 0.001)
+	var displacement := path_follow.global_position - previous_position
+	var horizontal_displacement := Vector3(displacement.x, 0.0, displacement.z)
+	var horizontal_speed := horizontal_displacement.length() / maxf(delta, 0.001)
 
-    _update_facing(horizontal_displacement, delta)
-    _update_animation(horizontal_speed)
-    _update_footsteps(delta, horizontal_speed)
-    _update_kill_overlaps(delta)
-    _update_rolling_ball_death()
+	_update_facing(horizontal_displacement, delta)
+	_update_animation(horizontal_speed)
+	_update_footsteps(delta, horizontal_speed)
+	_update_kill_overlaps(delta)
+	_update_rolling_ball_death()
 
 
 func _update_fall(delta: float) -> bool:
-    if has_landed:
-        return true
+	if has_landed:
+		return true
 
-    if not spawn_floor_checked:
-        spawn_floor_checked = true
-        if GROUND_SPAWN.snap_to_nearby_floor(
-            self,
-            path_follow,
-            self,
-            map_collision_mask,
-            map_collision_floor_normal_y
-        ):
-            fall_velocity = 0.0
-            has_landed = true
-            return false
+	if not spawn_floor_checked:
+		spawn_floor_checked = true
+		if GROUND_SPAWN.snap_to_nearby_floor(self, path_follow, self, map_collision_mask, map_collision_floor_normal_y):
+			fall_velocity = 0.0
+			has_landed = true
+			return false
 
-    var world := get_world_3d()
-    if world == null:
-        return false
+	var world := get_world_3d()
+	if world == null:
+		return false
 
-    var gravity := float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
-    fall_velocity -= gravity * delta
-    var current_floor_position := path_follow.global_position
-    var probe_start := current_floor_position + Vector3.UP * FLOOR_PROBE_MARGIN
-    var fall_distance := maxf(-fall_velocity * delta, 0.0) + FLOOR_PROBE_MARGIN + FLOOR_SNAP_DISTANCE
-    var query := PhysicsRayQueryParameters3D.create(
-        probe_start,
-        probe_start + Vector3.DOWN * fall_distance,
-        map_collision_mask
-    )
-    query.collide_with_areas = false
-    query.collide_with_bodies = true
-    var hit := world.direct_space_state.intersect_ray(query)
-    if not hit.is_empty():
-        var floor_position := hit.get("position", current_floor_position) as Vector3
-        var landing_speed := -fall_velocity
-        global_position.y += floor_position.y - current_floor_position.y
-        fall_velocity = 0.0
-        has_landed = true
-        if has_dropped_in and landing_speed >= MINIMUM_AUDIBLE_LANDING_SPEED:
-            _play_landing_sound()
-        return false
+	var gravity := float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
+	fall_velocity -= gravity * delta
+	var current_floor_position := path_follow.global_position
+	var probe_start := current_floor_position + Vector3.UP * FLOOR_PROBE_MARGIN
+	var fall_distance := maxf(-fall_velocity * delta, 0.0) + FLOOR_PROBE_MARGIN + FLOOR_SNAP_DISTANCE
+	var query := PhysicsRayQueryParameters3D.create(
+		probe_start, probe_start + Vector3.DOWN * fall_distance, map_collision_mask
+	)
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	var hit := world.direct_space_state.intersect_ray(query)
+	if not hit.is_empty():
+		var floor_position := hit.get("position", current_floor_position) as Vector3
+		var landing_speed := -fall_velocity
+		global_position.y += floor_position.y - current_floor_position.y
+		fall_velocity = 0.0
+		has_landed = true
+		if has_dropped_in and landing_speed >= MINIMUM_AUDIBLE_LANDING_SPEED:
+			_play_landing_sound()
+		return false
 
-    global_position.y += fall_velocity * delta
-    return false
+	global_position.y += fall_velocity * delta
+	return false
 
 
 func _apply_start_progress() -> void:
-    if path_follow == null or curve == null:
-        return
+	if path_follow == null or curve == null:
+		return
 
-    var path_length := curve.get_baked_length()
-    if path_length <= 0.001:
-        return
+	var path_length := curve.get_baked_length()
+	if path_length <= 0.001:
+		return
 
-    path_follow.progress = clampf(start_progress_ratio, 0.0, 1.0) * path_length
+	path_follow.progress = clampf(start_progress_ratio, 0.0, 1.0) * path_length
 
 
 func _update_drop_in(delta: float) -> bool:
-    if has_dropped_in:
-        return true
+	if has_dropped_in:
+		return true
 
-    elapsed_time += delta
-    if not is_dropping_in and elapsed_time < spawn_time:
-        return false
+	elapsed_time += delta
+	if not is_dropping_in and elapsed_time < spawn_time:
+		return false
 
-    if not is_dropping_in:
-        _start_drop_in()
+	if not is_dropping_in:
+		_start_drop_in()
 
-    drop_elapsed += delta
-    var duration := maxf(drop_duration, 0.001)
-    var ratio := clampf(drop_elapsed / duration, 0.0, 1.0)
-    var fall_ratio := ratio * ratio
-    if drop_pivot != null:
-        drop_pivot.position.y = lerpf(maxf(drop_height, 0.0), 0.0, fall_ratio)
+	drop_elapsed += delta
+	var duration := maxf(drop_duration, 0.001)
+	var ratio := clampf(drop_elapsed / duration, 0.0, 1.0)
+	var fall_ratio := ratio * ratio
+	if drop_pivot != null:
+		drop_pivot.position.y = lerpf(maxf(drop_height, 0.0), 0.0, fall_ratio)
 
-    if ratio >= 1.0:
-        _finish_drop_in()
-        return true
+	if ratio >= 1.0:
+		_finish_drop_in()
+		return true
 
-    return false
+	return false
 
 
 func _start_drop_in() -> void:
-    is_dropping_in = true
-    drop_elapsed = 0.0
-    if drop_pivot != null:
-        drop_pivot.position.y = maxf(drop_height, 0.0)
-    _set_active_visible(true)
-    _set_kill_area_enabled(false)
+	is_dropping_in = true
+	drop_elapsed = 0.0
+	if drop_pivot != null:
+		drop_pivot.position.y = maxf(drop_height, 0.0)
+	_set_active_visible(true)
+	_set_kill_area_enabled(false)
 
 
 func _uses_custom_placeable_spawn() -> bool:
-    return true
+	return true
 
 
 func is_placeable_spawned() -> bool:
-    return has_dropped_in
+	return has_dropped_in
 
 
 func _finish_drop_in() -> void:
-    var completed_visible_drop := is_dropping_in
-    has_dropped_in = true
-    is_dropping_in = false
-    if drop_pivot != null:
-        drop_pivot.position.y = 0.0
-    _set_skeleton_transparency(0.0)
-    _set_active_visible(true)
-    _set_kill_area_enabled(true)
-    _update_animation(shuffle_speed)
-    if completed_visible_drop:
-        _play_landing_sound()
+	var completed_visible_drop := is_dropping_in
+	has_dropped_in = true
+	is_dropping_in = false
+	if drop_pivot != null:
+		drop_pivot.position.y = 0.0
+	_set_skeleton_transparency(0.0)
+	_set_active_visible(true)
+	_set_kill_area_enabled(true)
+	_update_animation(shuffle_speed)
+	if completed_visible_drop:
+		_play_landing_sound()
 
 
 func _set_active_visible(active: bool) -> void:
-    if drop_pivot != null:
-        drop_pivot.visible = active
-    if shadow != null:
-        shadow.visible = active
-    if skeleton_light != null:
-        skeleton_light.visible = active and skeleton_light_enabled
-    _set_skeleton_body_enabled(active and has_dropped_in and not is_dead)
-    _set_kill_area_enabled(active and has_dropped_in)
+	if drop_pivot != null:
+		drop_pivot.visible = active
+	if shadow != null:
+		shadow.visible = active
+	if skeleton_light != null:
+		skeleton_light.visible = active and skeleton_light_enabled
+	_set_skeleton_body_enabled(active and has_dropped_in and not is_dead)
+	_set_kill_area_enabled(active and has_dropped_in)
 
 
 func _set_kill_area_enabled(enabled: bool) -> void:
-    kill_overlap_times.clear()
-    if kill_area != null:
-        kill_area.monitoring = enabled
+	kill_overlap_times.clear()
+	if kill_area != null:
+		kill_area.monitoring = enabled
 
 
 func _set_skeleton_body_enabled(enabled: bool) -> void:
-    if skeleton_body == null:
-        return
+	if skeleton_body == null:
+		return
 
-    skeleton_body.collision_layer = SKELETON_COLLISION_LAYER if enabled else 0
+	skeleton_body.collision_layer = SKELETON_COLLISION_LAYER if enabled else 0
 
 
 func _set_skeleton_transparency(transparency: float) -> void:
-    if drop_pivot != null:
-        _set_geometry_transparency(drop_pivot, transparency)
-    if shadow != null:
-        _set_geometry_transparency(shadow, transparency)
+	if drop_pivot != null:
+		_set_geometry_transparency(drop_pivot, transparency)
+	if shadow != null:
+		_set_geometry_transparency(shadow, transparency)
 
 
 func _set_geometry_transparency(node: Node, transparency: float) -> void:
-    if node is GeometryInstance3D:
-        (node as GeometryInstance3D).transparency = transparency
+	if node is GeometryInstance3D:
+		(node as GeometryInstance3D).transparency = transparency
 
-    for child in node.get_children():
-        _set_geometry_transparency(child, transparency)
+	for child in node.get_children():
+		_set_geometry_transparency(child, transparency)
 
 
 func _configure_shadow_casting() -> void:
-    if character == null:
-        return
+	if character == null:
+		return
 
-    _set_shadow_casting(character)
+	_set_shadow_casting(character)
 
 
 func _configure_skeleton_light() -> void:
-    if skeleton_light == null:
-        return
+	if skeleton_light == null:
+		return
 
-    skeleton_light.light_color = skeleton_light_color
-    skeleton_light.light_energy = skeleton_light_energy
-    skeleton_light.omni_range = skeleton_light_range
-    skeleton_light.omni_attenuation = skeleton_light_attenuation
-    skeleton_light.light_cull_mask = ALL_VISUAL_LAYERS
-    skeleton_light.shadow_caster_mask = ENEMY_LIGHT_SHADOW_CASTER_MASK
-    skeleton_light.shadow_enabled = true
-    skeleton_light.visible = skeleton_light_enabled
+	skeleton_light.light_color = skeleton_light_color
+	skeleton_light.light_energy = skeleton_light_energy
+	skeleton_light.omni_range = skeleton_light_range
+	skeleton_light.omni_attenuation = skeleton_light_attenuation
+	skeleton_light.light_cull_mask = ALL_VISUAL_LAYERS
+	skeleton_light.shadow_caster_mask = ENEMY_LIGHT_SHADOW_CASTER_MASK
+	skeleton_light.shadow_enabled = true
+	skeleton_light.visible = skeleton_light_enabled
 
 
 func _set_shadow_casting(node: Node) -> void:
-    if node is VisualInstance3D:
-        (node as VisualInstance3D).layers = ENEMY_GEOMETRY_VISUAL_LAYER
+	if node is VisualInstance3D:
+		(node as VisualInstance3D).layers = ENEMY_GEOMETRY_VISUAL_LAYER
 
-    if node is GeometryInstance3D:
-        (node as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	if node is GeometryInstance3D:
+		(node as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 
-    for child in node.get_children():
-        _set_shadow_casting(child)
+	for child in node.get_children():
+		_set_shadow_casting(child)
 
 
 func _advance_patrol(delta: float) -> void:
-    var path_length := curve.get_baked_length()
-    if path_length <= 0.001 or shuffle_speed <= 0.0:
-        return
+	var path_length := curve.get_baked_length()
+	if path_length <= 0.001 or shuffle_speed <= 0.0:
+		return
 
-    var next_progress := path_follow.progress + shuffle_speed * patrol_direction * delta
-    var should_loop := loop_patrol or curve.closed
-    path_follow.loop = should_loop
+	var next_progress := path_follow.progress + shuffle_speed * patrol_direction * delta
+	var should_loop := loop_patrol or curve.closed
+	path_follow.loop = should_loop
 
-    if should_loop:
-        var wrapped_progress := wrapf(next_progress, 0.0, path_length)
-        if _would_hit_map_collision(wrapped_progress, absf(shuffle_speed * delta)):
-            _reverse_patrol_direction()
-            return
+	if should_loop:
+		var wrapped_progress := wrapf(next_progress, 0.0, path_length)
+		if _would_hit_map_collision(wrapped_progress, absf(shuffle_speed * delta)):
+			_reverse_patrol_direction()
+			return
 
-        path_follow.progress = wrapped_progress
-        return
+		path_follow.progress = wrapped_progress
+		return
 
-    path_follow.loop = false
+	path_follow.loop = false
 
-    if reverse_at_path_ends:
-        while next_progress < 0.0 or next_progress > path_length:
-            if next_progress > path_length:
-                next_progress = path_length - (next_progress - path_length)
-                patrol_direction = -1.0
-            elif next_progress < 0.0:
-                next_progress = -next_progress
-                patrol_direction = 1.0
+	if reverse_at_path_ends:
+		while next_progress < 0.0 or next_progress > path_length:
+			if next_progress > path_length:
+				next_progress = path_length - (next_progress - path_length)
+				patrol_direction = -1.0
+			elif next_progress < 0.0:
+				next_progress = -next_progress
+				patrol_direction = 1.0
 
-    var target_progress := clampf(next_progress, 0.0, path_length)
-    if _would_hit_map_collision(target_progress, absf(shuffle_speed * delta)):
-        _reverse_patrol_direction()
-        return
+	var target_progress := clampf(next_progress, 0.0, path_length)
+	if _would_hit_map_collision(target_progress, absf(shuffle_speed * delta)):
+		_reverse_patrol_direction()
+		return
 
-    path_follow.progress = target_progress
+	path_follow.progress = target_progress
 
 
 func _would_hit_map_collision(target_progress: float, travel_distance: float) -> bool:
-    if path_follow == null or curve == null:
-        return false
+	if path_follow == null or curve == null:
+		return false
 
-    var world := get_world_3d()
-    if world == null:
-        return false
+	var world := get_world_3d()
+	if world == null:
+		return false
 
-    var current_position := path_follow.global_position
-    var target_position := to_global(curve.sample_baked(target_progress, true))
-    var horizontal_displacement := target_position - current_position
-    horizontal_displacement.y = 0.0
+	var current_position := path_follow.global_position
+	var target_position := to_global(curve.sample_baked(target_progress, true))
+	var horizontal_displacement := target_position - current_position
+	horizontal_displacement.y = 0.0
 
-    if horizontal_displacement.length_squared() <= 0.000001:
-        return false
+	if horizontal_displacement.length_squared() <= 0.000001:
+		return false
 
-    var probe_direction := horizontal_displacement.normalized()
-    var probe_origin := current_position + Vector3.UP * map_collision_probe_height
-    var probe_distance := map_collision_probe_distance + maxf(horizontal_displacement.length(), travel_distance)
-    if _would_hit_enemy_collision(world, probe_origin, probe_direction, probe_distance):
-        return true
-    if map_collision_mask == 0:
-        return false
+	var probe_direction := horizontal_displacement.normalized()
+	var probe_origin := current_position + Vector3.UP * map_collision_probe_height
+	var probe_distance := map_collision_probe_distance + maxf(horizontal_displacement.length(), travel_distance)
+	if _would_hit_enemy_collision(world, probe_origin, probe_direction, probe_distance):
+		return true
+	if map_collision_mask == 0:
+		return false
 
-    var query := PhysicsRayQueryParameters3D.create(
-        probe_origin,
-        probe_origin + probe_direction * probe_distance,
-        map_collision_mask
-    )
-    query.collide_with_areas = false
-    query.collide_with_bodies = true
+	var query := PhysicsRayQueryParameters3D.create(
+		probe_origin, probe_origin + probe_direction * probe_distance, map_collision_mask
+	)
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
 
-    var hit := world.direct_space_state.intersect_ray(query)
-    if hit.is_empty():
-        return _would_hit_pushable_collision(world, current_position, probe_direction, probe_distance)
+	var hit := world.direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return _would_hit_pushable_collision(world, current_position, probe_direction, probe_distance)
 
-    var hit_normal := hit.get("normal", Vector3.ZERO) as Vector3
-    if hit_normal.y < map_collision_floor_normal_y:
-        return true
+	var hit_normal := hit.get("normal", Vector3.ZERO) as Vector3
+	if hit_normal.y < map_collision_floor_normal_y:
+		return true
 
-    return _would_hit_pushable_collision(world, current_position, probe_direction, probe_distance)
+	return _would_hit_pushable_collision(world, current_position, probe_direction, probe_distance)
 
 
 func _would_hit_enemy_collision(
-    world: World3D,
-    probe_origin: Vector3,
-    probe_direction: Vector3,
-    probe_distance: float
+	world: World3D, probe_origin: Vector3, probe_direction: Vector3, probe_distance: float
 ) -> bool:
-    if enemy_collision_mask == 0:
-        return false
+	if enemy_collision_mask == 0:
+		return false
 
-    var probe_shape := SphereShape3D.new()
-    probe_shape.radius = map_collision_pushable_probe_radius
-    var query := PhysicsShapeQueryParameters3D.new()
-    query.shape = probe_shape
-    query.collision_mask = enemy_collision_mask
-    query.collide_with_areas = false
-    query.collide_with_bodies = true
-    if skeleton_body != null:
-        query.exclude = [skeleton_body.get_rid()]
+	var probe_shape := SphereShape3D.new()
+	probe_shape.radius = map_collision_pushable_probe_radius
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = probe_shape
+	query.collision_mask = enemy_collision_mask
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	if skeleton_body != null:
+		query.exclude = [skeleton_body.get_rid()]
 
-    var sample_count := maxi(map_collision_pushable_probe_steps, 1)
-    for sample_index in range(sample_count):
-        var sample_ratio := float(sample_index + 1) / float(sample_count)
-        query.transform = Transform3D(
-            Basis.IDENTITY,
-            probe_origin + probe_direction * probe_distance * sample_ratio
-        )
-        for hit: Dictionary in world.direct_space_state.intersect_shape(query, 8):
-            var collider := hit.get("collider") as Object
-            if _is_enemy_collision(collider) \
-                    and _is_enemy_ahead(collider, probe_origin, probe_direction):
-                return true
+	var sample_count := maxi(map_collision_pushable_probe_steps, 1)
+	for sample_index in range(sample_count):
+		var sample_ratio := float(sample_index + 1) / float(sample_count)
+		query.transform = Transform3D(Basis.IDENTITY, probe_origin + probe_direction * probe_distance * sample_ratio)
+		for hit: Dictionary in world.direct_space_state.intersect_shape(query, 8):
+			var collider := hit.get("collider") as Object
+			if _is_enemy_collision(collider) and _is_enemy_ahead(collider, probe_origin, probe_direction):
+				return true
 
-    return false
+	return false
 
 
 func _is_enemy_collision(collider: Object) -> bool:
-    if collider == null or not collider is Node:
-        return false
+	if collider == null or not collider is Node:
+		return false
 
-    var node := collider as Node
-    while node != null and node != self:
-        if node.is_in_group(SKELETON_GROUP) or node.is_in_group(SMART_ZOMBIE_GROUP):
-            return true
-        node = node.get_parent()
-    return false
+	var node := collider as Node
+	while node != null and node != self:
+		if node.is_in_group(SKELETON_GROUP) or node.is_in_group(SMART_ZOMBIE_GROUP):
+			return true
+		node = node.get_parent()
+	return false
 
 
-func _is_enemy_ahead(
-    collider: Object,
-    probe_origin: Vector3,
-    probe_direction: Vector3
-) -> bool:
-    var collider_node := collider as Node3D
-    if collider_node == null:
-        return false
+func _is_enemy_ahead(collider: Object, probe_origin: Vector3, probe_direction: Vector3) -> bool:
+	var collider_node := collider as Node3D
+	if collider_node == null:
+		return false
 
-    var direction_to_enemy := collider_node.global_position - probe_origin
-    direction_to_enemy.y = 0.0
-    return direction_to_enemy.dot(probe_direction) > 0.001
+	var direction_to_enemy := collider_node.global_position - probe_origin
+	direction_to_enemy.y = 0.0
+	return direction_to_enemy.dot(probe_direction) > 0.001
 
 
 func _would_hit_pushable_collision(
-    world: World3D,
-    current_position: Vector3,
-    probe_direction: Vector3,
-    probe_distance: float
+	world: World3D, current_position: Vector3, probe_direction: Vector3, probe_distance: float
 ) -> bool:
-    var probe_shape := SphereShape3D.new()
-    probe_shape.radius = map_collision_pushable_probe_radius
+	var probe_shape := SphereShape3D.new()
+	probe_shape.radius = map_collision_pushable_probe_radius
 
-    var query := PhysicsShapeQueryParameters3D.new()
-    query.shape = probe_shape
-    query.collision_mask = map_collision_mask
-    query.collide_with_areas = false
-    query.collide_with_bodies = true
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = probe_shape
+	query.collision_mask = map_collision_mask
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
 
-    var sample_count := maxi(map_collision_pushable_probe_steps, 1)
-    for sample_index in range(sample_count):
-        var sample_ratio := float(sample_index + 1) / float(sample_count)
-        query.transform = Transform3D(
-            Basis.IDENTITY,
-            current_position
-                + Vector3.UP * map_collision_pushable_probe_height
-                + probe_direction * probe_distance * sample_ratio
-        )
+	var sample_count := maxi(map_collision_pushable_probe_steps, 1)
+	for sample_index in range(sample_count):
+		var sample_ratio := float(sample_index + 1) / float(sample_count)
+		query.transform = Transform3D(
+			Basis.IDENTITY,
+			(
+				current_position
+				+ Vector3.UP * map_collision_pushable_probe_height
+				+ probe_direction * probe_distance * sample_ratio
+			)
+		)
 
-        var hits := world.direct_space_state.intersect_shape(query, 8)
-        for hit: Dictionary in hits:
-            var collider := hit.get("collider") as Object
-            if _is_pushable_blocker(collider):
-                return true
+		var hits := world.direct_space_state.intersect_shape(query, 8)
+		for hit: Dictionary in hits:
+			var collider := hit.get("collider") as Object
+			if _is_pushable_blocker(collider):
+				return true
 
-    return false
+	return false
 
 
 func _is_pushable_blocker(collider: Object) -> bool:
-    if collider == null or not collider is Node:
-        return false
+	if collider == null or not collider is Node:
+		return false
 
-    var node := collider as Node
-    return node.is_in_group("pushable") or node.has_method("push_from_character")
+	var node := collider as Node
+	return node.is_in_group("pushable") or node.has_method("push_from_character")
 
 
 func _reverse_patrol_direction() -> void:
-    patrol_direction *= -1.0
+	patrol_direction *= -1.0
 
 
 func _update_facing(horizontal_displacement: Vector3, delta: float) -> void:
-    if pivot == null or horizontal_displacement.length_squared() <= 0.000001:
-        return
+	if pivot == null or horizontal_displacement.length_squared() <= 0.000001:
+		return
 
-    var direction := horizontal_displacement.normalized()
-    var target_yaw := atan2(direction.x, direction.z) + MODEL_FORWARD_YAW_OFFSET
-    pivot.rotation.y = lerp_angle(pivot.rotation.y, target_yaw, turn_speed * delta)
+	var direction := horizontal_displacement.normalized()
+	var target_yaw := atan2(direction.x, direction.z) + MODEL_FORWARD_YAW_OFFSET
+	pivot.rotation.y = lerp_angle(pivot.rotation.y, target_yaw, turn_speed * delta)
 
 
 func _update_animation(horizontal_speed: float) -> void:
-    if animation_player == null or is_dead:
-        return
+	if animation_player == null or is_dead:
+		return
 
-    if horizontal_speed >= footstep_speed_threshold:
-        animation_player.speed_scale = walk_animation_speed_scale
-        _play_animation(walk_animation_name)
-    else:
-        animation_player.speed_scale = 1.0
-        _play_animation(idle_animation_name)
+	if horizontal_speed >= footstep_speed_threshold:
+		animation_player.speed_scale = walk_animation_speed_scale
+		_play_animation(walk_animation_name)
+	else:
+		animation_player.speed_scale = 1.0
+		_play_animation(idle_animation_name)
 
 
 func _play_animation(animation_name: String) -> void:
-    var resolved_animation_name := _resolve_animation_name(animation_name)
-    if resolved_animation_name.is_empty():
-        return
+	var resolved_animation_name := _resolve_animation_name(animation_name)
+	if resolved_animation_name.is_empty():
+		return
 
-    if current_animation == resolved_animation_name and animation_player.is_playing():
-        return
+	if current_animation == resolved_animation_name and animation_player.is_playing():
+		return
 
-    current_animation = resolved_animation_name
-    animation_player.play(resolved_animation_name, 0.15)
+	current_animation = resolved_animation_name
+	animation_player.play(resolved_animation_name, 0.15)
 
 
 func _resolve_animation_names() -> void:
-    resolved_walk_animation = _resolve_animation_name(walk_animation_name)
-    resolved_death_animation = _resolve_animation_name(death_animation_name)
-    if resolved_walk_animation.is_empty():
-        push_warning("Skeleton character has no walk animation.")
-    if resolved_death_animation.is_empty():
-        push_warning("Skeleton character has no death animation.")
+	resolved_walk_animation = _resolve_animation_name(walk_animation_name)
+	resolved_death_animation = _resolve_animation_name(death_animation_name)
+	if resolved_walk_animation.is_empty():
+		push_warning("Skeleton character has no walk animation.")
+	if resolved_death_animation.is_empty():
+		push_warning("Skeleton character has no death animation.")
 
 
 func _resolve_animation_name(animation_name: String) -> String:
-    return SkeletonPresentation.resolve_animation_name(animation_player, animation_name)
+	return SkeletonPresentation.resolve_animation_name(animation_player, animation_name)
 
 
 func _load_footstep_sounds() -> void:
-    footstep_sounds = GDAudio.load_streams(FOOTSTEP_SOUND_PATHS)
+	footstep_sounds = GDAudio.load_streams(FOOTSTEP_SOUND_PATHS)
 
 
 func _update_footsteps(_delta: float, horizontal_speed: float) -> void:
-    if footstep_sounds.is_empty():
-        return
+	if footstep_sounds.is_empty():
+		return
 
-    if horizontal_speed < footstep_speed_threshold:
-        footstep_distance_accumulator = 0.0
-        _reset_footstep_phase()
-        return
+	if horizontal_speed < footstep_speed_threshold:
+		footstep_distance_accumulator = 0.0
+		_reset_footstep_phase()
+		return
 
-    if not _did_cross_footstep_phase():
-        return
+	if not _did_cross_footstep_phase():
+		return
 
-    _play_footstep(horizontal_speed)
+	_play_footstep(horizontal_speed)
 
 
 func _did_cross_footstep_phase() -> bool:
-    if animation_player == null or current_animation != resolved_walk_animation or resolved_walk_animation.is_empty():
-        _reset_footstep_phase()
-        return false
+	if animation_player == null or current_animation != resolved_walk_animation or resolved_walk_animation.is_empty():
+		_reset_footstep_phase()
+		return false
 
-    var animation := animation_player.get_animation(resolved_walk_animation)
-    if animation == null or animation.length <= 0.0:
-        _reset_footstep_phase()
-        return false
+	var animation := animation_player.get_animation(resolved_walk_animation)
+	if animation == null or animation.length <= 0.0:
+		_reset_footstep_phase()
+		return false
 
-    var current_phase := animation_player.current_animation_position / animation.length
-    var crossed_phase := GDAudio.did_cross_footstep_animation_phase(previous_walk_animation_phase, current_phase)
-    previous_walk_animation_phase = current_phase
-    return crossed_phase
+	var current_phase := animation_player.current_animation_position / animation.length
+	var crossed_phase := GDAudio.did_cross_footstep_animation_phase(previous_walk_animation_phase, current_phase)
+	previous_walk_animation_phase = current_phase
+	return crossed_phase
 
 
 func _reset_footstep_phase() -> void:
-    previous_walk_animation_phase = -1.0
+	previous_walk_animation_phase = -1.0
 
 
 func _randomize_next_footstep_distance() -> void:
-    var variance := maxf(footstep_distance_variance, 0.0)
-    next_footstep_distance = maxf(0.1, footstep_distance + footstep_rng.randf_range(-variance, variance))
+	var variance := maxf(footstep_distance_variance, 0.0)
+	next_footstep_distance = maxf(0.1, footstep_distance + footstep_rng.randf_range(-variance, variance))
 
 
 func _play_footstep(horizontal_speed: float) -> void:
-    if is_dead:
-        return
+	if is_dead:
+		return
 
-    var audio_parent: Node = path_follow as Node if path_follow != null else self as Node
-    GDAudio.play_random_footstep_3d(
-        audio_parent,
-        footstep_sounds,
-        "FootstepAudio",
-        horizontal_speed,
-        footstep_speed_threshold,
-        shuffle_speed,
-        footstep_volume_min_db,
-        footstep_volume_max_db,
-        footstep_pitch_min,
-        footstep_pitch_max,
-        footstep_rng,
-        footstep_volume_variance_db,
-        GDAudio.FootstepSoundProfile.Enemy
-    )
+	var audio_parent: Node = path_follow as Node if path_follow != null else self as Node
+	GDAudio.play_random_footstep_3d(
+		audio_parent,
+		footstep_sounds,
+		"FootstepAudio",
+		horizontal_speed,
+		footstep_speed_threshold,
+		shuffle_speed,
+		footstep_volume_min_db,
+		footstep_volume_max_db,
+		footstep_pitch_min,
+		footstep_pitch_max,
+		footstep_rng,
+		footstep_volume_variance_db,
+		GDAudio.FootstepSoundProfile.Enemy
+	)
 
 
 func _play_landing_sound() -> void:
-    var audio_parent: Node = path_follow as Node if path_follow != null else self as Node
-    GDAudio.play_one_shot_3d(
-        audio_parent,
-        landing_sound,
-        LANDING_AUDIO_NAME,
-        LANDING_AUDIO_VOLUME_DB,
-        1.0,
-        LANDING_AUDIO_MAX_DISTANCE,
-        LANDING_AUDIO_UNIT_SIZE
-    )
+	var audio_parent: Node = path_follow as Node if path_follow != null else self as Node
+	GDAudio.play_one_shot_3d(
+		audio_parent,
+		landing_sound,
+		LANDING_AUDIO_NAME,
+		LANDING_AUDIO_VOLUME_DB,
+		1.0,
+		LANDING_AUDIO_MAX_DISTANCE,
+		LANDING_AUDIO_UNIT_SIZE
+	)
 
 
 func _update_rolling_ball_death() -> void:
-    if not rolling_ball_death_enabled or is_dead or kill_area == null:
-        return
+	if not rolling_ball_death_enabled or is_dead or kill_area == null:
+		return
 
-    var world := get_world_3d()
-    if world == null:
-        return
+	var world := get_world_3d()
+	if world == null:
+		return
 
-    var detection_center := _get_detection_center()
-    var query_shape := SphereShape3D.new()
-    query_shape.radius = rolling_ball_death_detection_radius
+	var detection_center := _get_detection_center()
+	var query_shape := SphereShape3D.new()
+	query_shape.radius = rolling_ball_death_detection_radius
 
-    var query := PhysicsShapeQueryParameters3D.new()
-    query.shape = query_shape
-    query.transform = Transform3D(Basis.IDENTITY, detection_center)
-    query.collision_mask = map_collision_mask
-    query.collide_with_areas = false
-    query.collide_with_bodies = true
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = query_shape
+	query.transform = Transform3D(Basis.IDENTITY, detection_center)
+	query.collision_mask = map_collision_mask
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
 
-    var hits := world.direct_space_state.intersect_shape(query, 8)
-    for hit: Dictionary in hits:
-        var collider := hit.get("collider") as Object
-        if not _is_rolling_ball_body(collider, detection_center):
-            continue
+	var hits := world.direct_space_state.intersect_shape(query, 8)
+	for hit: Dictionary in hits:
+		var collider := hit.get("collider") as Object
+		if not _is_rolling_ball_body(collider, detection_center):
+			continue
 
-        var collider_3d := collider as Node3D
-        if collider_3d == null:
-            continue
+		var collider_3d := collider as Node3D
+		if collider_3d == null:
+			continue
 
-        var encroachment_percent := _get_rolling_ball_encroachment_percent(
-            detection_center,
-            collider_3d.global_position
-        )
-        if encroachment_percent >= rolling_ball_death_encroachment_percent:
-            _die_from_rolling_ball()
-            return
+		var encroachment_percent := _get_rolling_ball_encroachment_percent(
+			detection_center, collider_3d.global_position
+		)
+		if encroachment_percent >= rolling_ball_death_encroachment_percent:
+			_die_from_rolling_ball()
+			return
 
 
 func _get_detection_center() -> Vector3:
-    var collision_shape := _find_collision_shape(kill_area)
-    if collision_shape != null:
-        return collision_shape.global_position
+	var collision_shape := _find_collision_shape(kill_area)
+	if collision_shape != null:
+		return collision_shape.global_position
 
-    return path_follow.global_position if path_follow != null else global_position
+	return path_follow.global_position if path_follow != null else global_position
 
 
 func _get_rolling_ball_encroachment_percent(detection_center: Vector3, ball_position: Vector3) -> float:
-    var horizontal_delta := ball_position - detection_center
-    horizontal_delta.y = 0.0
+	var horizontal_delta := ball_position - detection_center
+	horizontal_delta.y = 0.0
 
-    var overlap_depth := rolling_ball_death_detection_radius + rolling_ball_death_radius - horizontal_delta.length()
-    if overlap_depth <= 0.0:
-        return 0.0
+	var overlap_depth := rolling_ball_death_detection_radius + rolling_ball_death_radius - horizontal_delta.length()
+	if overlap_depth <= 0.0:
+		return 0.0
 
-    var detection_radius := maxf(rolling_ball_death_detection_radius, 0.001)
-    return clampf(overlap_depth / detection_radius * 100.0, 0.0, 100.0)
+	var detection_radius := maxf(rolling_ball_death_detection_radius, 0.001)
+	return clampf(overlap_depth / detection_radius * 100.0, 0.0, 100.0)
 
 
 func _die_from_rolling_ball() -> void:
-    if is_dead:
-        return
+	if is_dead:
+		return
 
-    is_dead = true
-    footstep_distance_accumulator = 0.0
-    _set_skeleton_body_enabled(false)
-    _set_kill_area_enabled(false)
-    _play_death_scream()
-    _play_death_animation()
+	is_dead = true
+	footstep_distance_accumulator = 0.0
+	_set_skeleton_body_enabled(false)
+	_set_kill_area_enabled(false)
+	_play_death_scream()
+	_play_death_animation()
 
-    if skeleton_light != null:
-        skeleton_light.visible = false
+	if skeleton_light != null:
+		skeleton_light.visible = false
 
-    _disappear_after_death()
+	_disappear_after_death()
 
 
 func _play_death_scream() -> void:
-    var audio_parent: Node = path_follow as Node if path_follow != null else self as Node
-    GDAudio.play_one_shot_3d(audio_parent, WILHELM_SCREAM, "SkeletonDeathScreamAudio", death_scream_volume_db)
+	var audio_parent: Node = path_follow as Node if path_follow != null else self as Node
+	GDAudio.play_one_shot_3d(audio_parent, WILHELM_SCREAM, "SkeletonDeathScreamAudio", death_scream_volume_db)
 
 
 func _play_death_animation() -> void:
-    if animation_player == null or resolved_death_animation.is_empty():
-        return
+	if animation_player == null or resolved_death_animation.is_empty():
+		return
 
-    animation_player.speed_scale = death_animation_speed_scale
-    current_animation = resolved_death_animation
-    animation_player.play(resolved_death_animation, 0.1)
+	animation_player.speed_scale = death_animation_speed_scale
+	current_animation = resolved_death_animation
+	animation_player.play(resolved_death_animation, 0.1)
 
 
 func _disappear_after_death() -> void:
-    await get_tree().create_timer(maxf(death_disappear_delay, 0.0)).timeout
+	await get_tree().create_timer(maxf(death_disappear_delay, 0.0)).timeout
 
-    if not is_inside_tree() or is_disappearing:
-        return
+	if not is_inside_tree() or is_disappearing:
+		return
 
-    is_disappearing = true
-    var disappear_duration := maxf(death_disappear_duration, 0.0)
-    var fade_delay := disappear_duration * clampf(death_fade_start_ratio, 0.0, 1.0)
-    var fade_duration := maxf(disappear_duration - fade_delay, 0.0)
-    var tween := create_tween()
-    tween.set_parallel(true)
-    tween.set_trans(Tween.TRANS_SINE)
-    tween.set_ease(Tween.EASE_IN)
+	is_disappearing = true
+	var disappear_duration := maxf(death_disappear_duration, 0.0)
+	var fade_delay := disappear_duration * clampf(death_fade_start_ratio, 0.0, 1.0)
+	var fade_duration := maxf(disappear_duration - fade_delay, 0.0)
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.set_trans(Tween.TRANS_SINE)
+	tween.set_ease(Tween.EASE_IN)
 
-    if drop_pivot != null:
-        tween.tween_property(
-            drop_pivot,
-            "position:y",
-            drop_pivot.position.y - death_sink_depth,
-            disappear_duration
-        )
+	if drop_pivot != null:
+		tween.tween_property(drop_pivot, "position:y", drop_pivot.position.y - death_sink_depth, disappear_duration)
 
-    for geometry in _get_fade_geometry():
-        tween.tween_property(
-            geometry,
-            "transparency",
-            1.0,
-            fade_duration
-        ).set_delay(fade_delay)
+	for geometry in _get_fade_geometry():
+		tween.tween_property(geometry, "transparency", 1.0, fade_duration).set_delay(fade_delay)
 
-    await tween.finished
-    _set_active_visible(false)
+	await tween.finished
+	_set_active_visible(false)
 
 
 func _get_fade_geometry() -> Array[GeometryInstance3D]:
-    var geometry_instances: Array[GeometryInstance3D] = []
-    if drop_pivot != null:
-        _collect_geometry(drop_pivot, geometry_instances)
-    if shadow != null:
-        _collect_geometry(shadow, geometry_instances)
+	var geometry_instances: Array[GeometryInstance3D] = []
+	if drop_pivot != null:
+		_collect_geometry(drop_pivot, geometry_instances)
+	if shadow != null:
+		_collect_geometry(shadow, geometry_instances)
 
-    return geometry_instances
+	return geometry_instances
 
 
 func _collect_geometry(node: Node, geometry_instances: Array[GeometryInstance3D]) -> void:
-    geometry_instances.append_array(SkeletonPresentation.collect_geometry(node))
+	geometry_instances.append_array(SkeletonPresentation.collect_geometry(node))
 
 
 func _is_rolling_ball_body(collider: Object, target_position := Vector3.INF) -> bool:
-    if collider == null or not collider is Node:
-        return false
+	if collider == null or not collider is Node:
+		return false
 
-    var node := collider as Node
-    if node is RollingRock:
-        return (node as RollingRock).can_kill_enemy_by_rolling(target_position)
+	var node := collider as Node
+	if node is RollingRock:
+		return (node as RollingRock).can_kill_enemy_by_rolling(target_position)
 
-    return String(node.name).contains("RollingRock")
+	return String(node.name).contains("RollingRock")
 
 
 func _update_kill_overlaps(delta: float) -> void:
-    if kill_area == null:
-        return
+	if kill_area == null:
+		return
 
-    var overlapping_bodies := kill_area.get_overlapping_bodies()
-    for tracked_body in kill_overlap_times.keys():
-        if not overlapping_bodies.has(tracked_body):
-            kill_overlap_times.erase(tracked_body)
+	var overlapping_bodies := kill_area.get_overlapping_bodies()
+	for tracked_body in kill_overlap_times.keys():
+		if not overlapping_bodies.has(tracked_body):
+			kill_overlap_times.erase(tracked_body)
 
-    for body in kill_area.get_overlapping_bodies():
-        if body == null or not _is_live_player_body(body):
-            continue
+	for body in kill_area.get_overlapping_bodies():
+		if body == null or not _is_live_player_body(body):
+			continue
 
-        var overlap_time := float(kill_overlap_times.get(body, 0.0)) + delta
-        kill_overlap_times[body] = overlap_time
-        if overlap_time >= kill_confirmation_time:
-            _kill_body_if_player(body)
+		var overlap_time := float(kill_overlap_times.get(body, 0.0)) + delta
+		kill_overlap_times[body] = overlap_time
+		if overlap_time >= kill_confirmation_time:
+			_kill_body_if_player(body)
 
 
 func _on_kill_area_body_entered(body: Node3D) -> void:
-    if _is_live_player_body(body):
-        kill_overlap_times[body] = 0.0
+	if _is_live_player_body(body):
+		kill_overlap_times[body] = 0.0
 
 
 func _kill_body_if_player(body: Node) -> void:
-    if not _is_live_player_body(body):
-        return
+	if not _is_live_player_body(body):
+		return
 
-    body.die_from_enemy()
+	body.die_from_enemy()
 
 
 func _is_live_player_body(body: Node) -> bool:
-    if body == null:
-        return false
+	if body == null:
+		return false
 
-    if body.has_method("is_dead") and body.is_dead():
-        return false
+	if body.has_method("is_dead") and body.is_dead():
+		return false
 
-    return body.has_method("die_from_enemy")
+	return body.has_method("die_from_enemy")
 
 
 func _find_collision_shape(node: Node) -> CollisionShape3D:
-    if node == null:
-        return null
+	if node == null:
+		return null
 
-    if node is CollisionShape3D:
-        return node
+	if node is CollisionShape3D:
+		return node
 
-    for child in node.get_children():
-        var result := _find_collision_shape(child)
-        if result != null:
-            return result
+	for child in node.get_children():
+		var result := _find_collision_shape(child)
+		if result != null:
+			return result
 
-    return null
+	return null
 
 
 func _find_animation_player(node: Node) -> AnimationPlayer:
-    return SkeletonPresentation.find_animation_player(node)
+	return SkeletonPresentation.find_animation_player(node)

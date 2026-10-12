@@ -1,7 +1,6 @@
 extends ShapeCast3D
 class_name GDVampireSenses
 
-
 signal player_visibility_changed(visible: bool)
 
 const GAMEPLAY_PROCESS_GROUP: StringName = &"deterministic_gameplay_process"
@@ -77,8 +76,7 @@ func set_wall_grid_map(grid_map: GridMap) -> void:
 ## Returns clear forward and side passages that the vampire can inspect with its head.
 func get_clear_scan_directions(probe_distance: float) -> Array[Vector3]:
 	var clear_directions: Array[Vector3] = []
-	var horizontal_forward := travel_facing_node.global_basis.z \
-		if travel_facing_node != null else Vector3.FORWARD
+	var horizontal_forward := travel_facing_node.global_basis.z if travel_facing_node != null else Vector3.FORWARD
 	horizontal_forward.y = 0.0
 	horizontal_forward = horizontal_forward.normalized()
 	var cardinal_directions: Array[Vector3] = [
@@ -119,14 +117,9 @@ func can_see_player() -> bool:
 	if player == null or settings == null or not is_instance_valid(player):
 		return false
 
-	var sight_target := Vector3(
-		player.global_position.x,
-		global_position.y,
-		player.global_position.z
-	)
+	var sight_target := Vector3(player.global_position.x, global_position.y, player.global_position.z)
 	var sight_offset: Vector3 = sight_target - global_position
-	if sight_offset.length() > settings.sight_distance \
-			or not _is_inside_visibility_cone(sight_offset):
+	if sight_offset.length() > settings.sight_distance or not _is_inside_visibility_cone(sight_offset):
 		return false
 
 	if _grid_corridor_is_clear(sight_target):
@@ -146,22 +139,19 @@ func can_verify_position_is_empty(world_position: Vector3) -> bool:
 	if settings == null or visual_sight_ray == null:
 		return false
 
-	var sight_target := Vector3(
-		world_position.x,
-		global_position.y,
-		world_position.z
-	)
+	var sight_target := Vector3(world_position.x, global_position.y, world_position.z)
 	var sight_offset := sight_target - global_position
 	sight_offset.y = 0.0
-	if sight_offset.length() > float(settings.sight_distance) \
-			or not _is_inside_visibility_cone(sight_offset) \
-			or not _grid_visual_line_is_clear(sight_target):
+	if (
+		sight_offset.length() > float(settings.sight_distance)
+		or not _is_inside_visibility_cone(sight_offset)
+		or not _grid_visual_line_is_clear(sight_target)
+	):
 		return false
 
 	visual_sight_ray.target_position = visual_sight_ray.to_local(sight_target)
 	visual_sight_ray.force_raycast_update()
-	if visual_sight_ray.is_colliding() \
-			and _collider_belongs_to_player(visual_sight_ray.get_collider() as Node):
+	if visual_sight_ray.is_colliding() and _collider_belongs_to_player(visual_sight_ray.get_collider() as Node):
 		return false
 	return not visual_sight_ray.is_colliding()
 
@@ -205,19 +195,13 @@ func _is_inside_visibility_cone(sight_offset: Vector3) -> bool:
 	horizontal_forward.y = 0.0
 	if horizontal_forward.is_zero_approx():
 		return false
-	var minimum_alignment := cos(deg_to_rad(clampf(
-		float(settings.sight_field_of_view_degrees) * 0.5,
-		0.0,
-		180.0
-	)))
-	return horizontal_forward.normalized().dot(horizontal_offset.normalized()) \
-		>= minimum_alignment
+	var minimum_alignment := cos(deg_to_rad(clampf(float(settings.sight_field_of_view_degrees) * 0.5, 0.0, 180.0)))
+	return horizontal_forward.normalized().dot(horizontal_offset.normalized()) >= minimum_alignment
 
 
 func _grid_corridor_is_clear(sight_target: Vector3) -> bool:
 	return _grid_line_is_clear(
-		sight_target,
-		[-_get_direct_path_clearance_radius(), 0.0, _get_direct_path_clearance_radius()]
+		sight_target, [-_get_direct_path_clearance_radius(), 0.0, _get_direct_path_clearance_radius()]
 	)
 
 
@@ -232,9 +216,7 @@ func _grid_visual_line_is_clear(sight_target: Vector3) -> bool:
 
 
 func _grid_line_is_clear(
-		sight_target: Vector3,
-		clearance_offsets: Array[float],
-		ignored_cells: Array[Vector3i] = []
+	sight_target: Vector3, clearance_offsets: Array[float], ignored_cells: Array[Vector3i] = []
 ) -> bool:
 	if wall_grid_map == null:
 		return true
@@ -247,10 +229,7 @@ func _grid_line_is_clear(
 
 	var direction := sight_offset / sight_distance
 	var perpendicular := Vector3(-direction.z, 0.0, direction.x)
-	var minimum_cell_size := minf(
-		wall_grid_map.cell_size.x,
-		wall_grid_map.cell_size.z
-	)
+	var minimum_cell_size := minf(wall_grid_map.cell_size.x, wall_grid_map.cell_size.z)
 	var sample_spacing := maxf(minimum_cell_size * 0.2, 0.05)
 	var sample_count := maxi(ceili(sight_distance / sample_spacing), 1)
 	for sample_index in range(sample_count + 1):
@@ -283,11 +262,7 @@ func _cast_reaches_player_without_blockers() -> bool:
 func _get_direct_path_clearance_radius() -> float:
 	if settings == null:
 		return 0.0
-	return maxf(
-		float(settings.sight_clearance_radius) \
-			+ float(settings.direct_path_clearance_margin),
-		0.0
-	)
+	return maxf(float(settings.sight_clearance_radius) + float(settings.direct_path_clearance_margin), 0.0)
 
 
 func _visual_sight_reaches_player(sight_target: Vector3) -> bool:
@@ -296,15 +271,8 @@ func _visual_sight_reaches_player(sight_target: Vector3) -> bool:
 	if sight_offset.is_zero_approx():
 		return _sight_ray_hits_player(sight_target)
 
-	var perpendicular := Vector3(
-		-sight_offset.z,
-		0.0,
-		sight_offset.x
-	).normalized()
-	var sample_half_width := maxf(
-		float(settings.visual_sight_sample_half_width),
-		0.0
-	)
+	var perpendicular := Vector3(-sight_offset.z, 0.0, sight_offset.x).normalized()
+	var sample_half_width := maxf(float(settings.visual_sight_sample_half_width), 0.0)
 	var sight_targets: Array[Vector3] = [
 		sight_target,
 		sight_target + perpendicular * sample_half_width,
@@ -326,14 +294,10 @@ func _sight_ray_hits_player(sight_target: Vector3) -> bool:
 	if not ray_offset.is_zero_approx():
 		# Side samples end inside the player's rounded capsule. Extending through it
 		# ensures the ray crosses the visible body instead of stopping at its edge.
-		ray_target += ray_offset.normalized() * maxf(
-			float(settings.visual_sight_sample_half_width),
-			0.0
-		)
+		ray_target += ray_offset.normalized() * maxf(float(settings.visual_sight_sample_half_width), 0.0)
 	visual_sight_ray.target_position = visual_sight_ray.to_local(ray_target)
 	visual_sight_ray.force_raycast_update()
-	return visual_sight_ray.is_colliding() \
-		and _collider_belongs_to_player(visual_sight_ray.get_collider() as Node)
+	return visual_sight_ray.is_colliding() and _collider_belongs_to_player(visual_sight_ray.get_collider() as Node)
 
 
 func _collider_belongs_to_player(collider: Node) -> bool:
@@ -374,6 +338,8 @@ func _get_wall_grid_y(grid_map: GridMap) -> int:
 
 
 func _is_wall_item(grid_map: GridMap, item_id: int) -> bool:
-	return item_id != GridMap.INVALID_CELL_ITEM \
-		and grid_map.mesh_library != null \
+	return (
+		item_id != GridMap.INVALID_CELL_ITEM
+		and grid_map.mesh_library != null
 		and grid_map.mesh_library.get_item_name(item_id).to_lower().contains("wall")
+	)

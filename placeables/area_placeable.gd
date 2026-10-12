@@ -3,7 +3,6 @@ extends Area3D
 
 ## Native Area3D adapter for the shared map-item spawn contract.
 
-
 @warning_ignore("unused_signal")
 signal placeable_spawned
 
@@ -19,14 +18,14 @@ var placeable_spawn_controller: Node
 
 
 func _ready() -> void:
-    add_to_group(MAP_PLACEABLE_GROUP)
-    if Engine.is_editor_hint() or spawn_time <= 0.0:
-        return
-    placeable_spawn_controller = SPAWN_CONTROLLER.new() as Node
-    placeable_spawn_controller.name = "PlaceableSpawnController"
-    add_child(placeable_spawn_controller)
-    placeable_spawn_controller.configure(self, self, spawn_time, 0.0, false)
+	add_to_group(MAP_PLACEABLE_GROUP)
+	if Engine.is_editor_hint() or spawn_time <= 0.0:
+		return
+	placeable_spawn_controller = SPAWN_CONTROLLER.new() as Node
+	placeable_spawn_controller.name = "PlaceableSpawnController"
+	add_child(placeable_spawn_controller)
+	placeable_spawn_controller.configure(self, self, spawn_time, 0.0, false)
 
 
 func is_placeable_spawned() -> bool:
-    return placeable_spawn_controller == null or placeable_spawn_controller.is_spawned()
+	return placeable_spawn_controller == null or placeable_spawn_controller.is_spawned()

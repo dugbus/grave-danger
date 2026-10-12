@@ -10,14 +10,8 @@ func run(_tree: SceneTree) -> void:
 	var boundary := ExactBoundaryStub.new()
 	minimap.kill_boundary = boundary
 	var bounds := minimap._get_playable_bounds()
-	expect_equal(
-		bounds.position.x, -3.0, "Minimap exact bounds preserve the world perimeter minimum X."
-	)
-	expect_equal(
-		bounds.size,
-		Vector3(8.0, 2.0, 6.0),
-		"Minimap derives its fallback AABB from exact world points."
-	)
+	expect_equal(bounds.position.x, -3.0, "Minimap exact bounds preserve the world perimeter minimum X.")
+	expect_equal(bounds.size, Vector3(8.0, 2.0, 6.0), "Minimap derives its fallback AABB from exact world points.")
 	minimap.free()
 	boundary.free()
 

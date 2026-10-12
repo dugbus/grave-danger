@@ -14,10 +14,7 @@ func run(_tree: SceneTree) -> void:
 		"The lightweight gameplay shell does not synchronously embed its fallback level."
 	)
 	var music_player := game_scene.get_node("GameRuntime/MusicPlayer") as AudioStreamPlayer
-	expect(
-		not music_player.autoplay,
-		"Gameplay music waits until level and navigation initialization have completed."
-	)
+	expect(not music_player.autoplay, "Gameplay music waits until level and navigation initialization have completed.")
 	expect(
 		game_scene.get_node_or_null("PlaythroughPositionCapture/Sampler") != null,
 		"Only the live gameplay host composes playthrough position capture."
@@ -39,9 +36,7 @@ func run(_tree: SceneTree) -> void:
 	new_provider.add_to_group(&"kill_boundary")
 	level.add_child(new_provider)
 	expect_equal(
-		game._get_kill_boundary(),
-		new_provider,
-		"Boundary discovery accepts a grouped Kill Boundary 2 provider."
+		game._get_kill_boundary(), new_provider, "Boundary discovery accepts a grouped Kill Boundary 2 provider."
 	)
 	expect(
 		(SUBJECT as Script).get_source_code().contains("exactly one is supported"),

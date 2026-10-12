@@ -19,11 +19,7 @@ var wall_grid_y := 0
 
 
 func configure(
-	vampire_settings: Resource,
-	grid_map: GridMap,
-	wall_ids: Dictionary,
-	bounds: Rect2i,
-	grid_y: int
+	vampire_settings: Resource, grid_map: GridMap, wall_ids: Dictionary, bounds: Rect2i, grid_y: int
 ) -> void:
 	settings = vampire_settings
 	wall_grid_map = grid_map
@@ -58,8 +54,7 @@ func find_cell_route(start_cell: Vector3i, end_cell: Vector3i) -> Dictionary:
 			open_cells.append(neighbor)
 	return {
 		"route": [],
-		"status": SearchStatus.SearchBudgetExhausted \
-			if read_index < open_cells.size() else SearchStatus.Unreachable,
+		"status": SearchStatus.SearchBudgetExhausted if read_index < open_cells.size() else SearchStatus.Unreachable,
 	}
 
 
@@ -71,10 +66,7 @@ func get_cell_route_between_world_positions(origin: Vector3, destination: Vector
 	origin_cell.y = wall_grid_y
 	destination_cell.y = wall_grid_y
 	origin_cell = find_nearest_open_cell(origin_cell, wall_grid_map.to_local(origin))
-	destination_cell = find_nearest_open_cell(
-		destination_cell,
-		wall_grid_map.to_local(destination)
-	)
+	destination_cell = find_nearest_open_cell(destination_cell, wall_grid_map.to_local(destination))
 	if origin_cell == INVALID_CELL or destination_cell == INVALID_CELL:
 		return {"route": [], "status": SearchStatus.Unreachable}
 	return find_cell_route(origin_cell, destination_cell)
@@ -145,34 +137,25 @@ func _reconstruct_route(came_from: Dictionary, end_cell: Vector3i) -> Array[Vect
 	return route
 
 
-func _get_closest_open_cell(
-	open_candidates: Array[Vector3i],
-	reference_local_position: Vector3
-) -> Vector3i:
+func _get_closest_open_cell(open_candidates: Array[Vector3i], reference_local_position: Vector3) -> Vector3i:
 	var selected_cell := open_candidates[0]
 	var selected_distance := _get_horizontal_cell_distance_squared(selected_cell, reference_local_position)
 	for candidate_index in range(1, open_candidates.size()):
 		var candidate := open_candidates[candidate_index]
-		var candidate_distance := _get_horizontal_cell_distance_squared(
-			candidate,
-			reference_local_position
+		var candidate_distance := _get_horizontal_cell_distance_squared(candidate, reference_local_position)
+		var wins_distance_tie := (
+			is_equal_approx(candidate_distance, selected_distance) and _cell_sorts_before(candidate, selected_cell)
 		)
-		var wins_distance_tie := is_equal_approx(candidate_distance, selected_distance) \
-			and _cell_sorts_before(candidate, selected_cell)
 		if candidate_distance < selected_distance or wins_distance_tie:
 			selected_cell = candidate
 			selected_distance = candidate_distance
 	return selected_cell
 
 
-func _get_horizontal_cell_distance_squared(
-	cell: Vector3i,
-	reference_local_position: Vector3
-) -> float:
+func _get_horizontal_cell_distance_squared(cell: Vector3i, reference_local_position: Vector3) -> float:
 	var cell_position := wall_grid_map.map_to_local(cell)
 	var horizontal_offset := Vector2(
-		cell_position.x - reference_local_position.x,
-		cell_position.z - reference_local_position.z
+		cell_position.x - reference_local_position.x, cell_position.z - reference_local_position.z
 	)
 	return horizontal_offset.length_squared()
 

@@ -33,9 +33,7 @@ func apply_geometry(points: PackedVector2Array) -> void:
 		return
 	_ensure_count()
 	var center_offset := (
-		settings.flame_thickness * 0.5
-		+ settings.player_blocking_outset
-		+ settings.player_blocking_thickness * 0.5
+		settings.flame_thickness * 0.5 + settings.player_blocking_outset + settings.player_blocking_thickness * 0.5
 	)
 	for index in points.size():
 		var start := points[index]
@@ -44,15 +42,11 @@ func apply_geometry(points: PackedVector2Array) -> void:
 		var outward := Vector2(delta.y, -delta.x).normalized()
 		var midpoint := (start + finish) * 0.5 + outward * center_offset
 		var blocker := blockers[index]
-		blocker.position = Vector3(
-			midpoint.x, settings.flame_y + settings.player_blocking_height * 0.5, midpoint.y
-		)
+		blocker.position = Vector3(midpoint.x, settings.flame_y + settings.player_blocking_height * 0.5, midpoint.y)
 		blocker.rotation = Vector3(0.0, atan2(-delta.y, delta.x), 0.0)
 		var collision := blocker.get_node(^"CollisionShape3D") as CollisionShape3D
 		(collision.shape as BoxShape3D).size = Vector3(
-			delta.length() + center_offset * 2.0,
-			settings.player_blocking_height,
-			settings.player_blocking_thickness
+			delta.length() + center_offset * 2.0, settings.player_blocking_height, settings.player_blocking_thickness
 		)
 	update_enabled_state()
 

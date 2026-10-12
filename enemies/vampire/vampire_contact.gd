@@ -1,7 +1,6 @@
 extends Area3D
 class_name GDVampireContact
 
-
 ## Collision shape expanded to match the doubled Vampire's visible body.
 @export var collision_shape_path: NodePath = ^"CollisionShape3D"
 ## World and player layers tested so instant-kill contact remains blocked by walls.
@@ -43,9 +42,11 @@ func _on_body_entered(body: Node3D) -> void:
 
 func _try_kill_body(body: Node3D) -> void:
 	var vampire := get_parent()
-	if vampire != null \
-			and vampire.has_method(&"is_disabled_for_testing") \
-			and bool(vampire.call(&"is_disabled_for_testing")):
+	if (
+		vampire != null
+		and vampire.has_method(&"is_disabled_for_testing")
+		and bool(vampire.call(&"is_disabled_for_testing"))
+	):
 		return
 	if body == null or not body.is_in_group(&"player"):
 		return
@@ -66,12 +67,7 @@ func _has_clear_contact_line(body: Node3D) -> bool:
 	var target := body.global_position + Vector3.UP * 0.4
 	if origin.is_equal_approx(target):
 		return true
-	var query := PhysicsRayQueryParameters3D.create(
-		origin,
-		target,
-		contact_occlusion_mask,
-		exclude
-	)
+	var query := PhysicsRayQueryParameters3D.create(origin, target, contact_occlusion_mask, exclude)
 	query.collide_with_areas = false
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)
 	if hit.is_empty():

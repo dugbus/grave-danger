@@ -1,11 +1,15 @@
 extends RefCounted
 class_name GDGeneratedContentCellSelector
 
-const GRAPH_SCRIPT := preload(
-	"res://levels/vampire-maze/generated_maze/generated_maze_graph.gd"
-)
+const GRAPH_SCRIPT := preload("res://levels/vampire-maze/generated_maze/generated_maze_graph.gd")
 const TREASURE_TYPES: Array[StringName] = [
-	&"gold_coin", &"diamond", &"ruby", &"sapphire", &"emerald", &"amethyst", &"gold_bar",
+	&"gold_coin",
+	&"diamond",
+	&"ruby",
+	&"sapphire",
+	&"emerald",
+	&"amethyst",
+	&"gold_bar",
 ]
 const GEM_TYPES: Array[StringName] = [&"diamond", &"ruby", &"sapphire", &"emerald", &"amethyst"]
 
@@ -25,27 +29,16 @@ static func has_gem_budget(budgets: Dictionary) -> bool:
 
 
 static func get_deterministic_pile_coin_count(
-	cell: Vector2i,
-	seed_value: int,
-	pile_index: int,
-	minimum_coins: int,
-	maximum_coins: int
+	cell: Vector2i, seed_value: int, pile_index: int, minimum_coins: int, maximum_coins: int
 ) -> int:
 	var count_range := maximum_coins - minimum_coins + 1
 	if count_range <= 1:
 		return minimum_coins
-	return minimum_coins + posmod(
-		GRAPH_SCRIPT.coordinate_score(cell, seed_value, pile_index + 401),
-		count_range
-	)
+	return minimum_coins + posmod(GRAPH_SCRIPT.coordinate_score(cell, seed_value, pile_index + 401), count_range)
 
 
 static func new_treasure_cache(
-	cell: Vector2i,
-	placement_band: int,
-	route_progress: float,
-	walkable: Dictionary,
-	map_size: Vector2i
+	cell: Vector2i, placement_band: int, route_progress: float, walkable: Dictionary, map_size: Vector2i
 ) -> Dictionary:
 	var counts := {}
 	for item_type in TREASURE_TYPES:
@@ -63,10 +56,7 @@ static func new_treasure_cache(
 
 
 static func distribute_treasure_count(
-	caches: Array[Dictionary],
-	preferred_indices: Array[int],
-	item_type: StringName,
-	count: int
+	caches: Array[Dictionary], preferred_indices: Array[int], item_type: StringName, count: int
 ) -> void:
 	if count <= 0 or caches.is_empty():
 		return
@@ -84,11 +74,7 @@ static func distribute_treasure_count(
 		caches[cache_index] = cache
 
 
-static func build_region_targets(
-	count: int,
-	map_size: Vector2i,
-	random_seed: int
-) -> Array[Vector2]:
+static func build_region_targets(count: int, map_size: Vector2i, random_seed: int) -> Array[Vector2]:
 	var targets: Array[Vector2] = []
 	if count <= 0:
 		return targets
@@ -113,18 +99,18 @@ static func build_region_targets(
 		var region_index := region_indices[slot_index]
 		var column_index := region_index % column_count
 		var row_index := floori(float(region_index) / float(column_count))
-		targets.append(Vector2(
-			lerpf(
-				minimum_coordinate.x,
-				maximum_coordinate.x,
-				(float(column_index) + random.randf()) / float(column_count)
-			),
-			lerpf(
-				minimum_coordinate.y,
-				maximum_coordinate.y,
-				(float(row_index) + random.randf()) / float(row_count)
+		targets.append(
+			Vector2(
+				lerpf(
+					minimum_coordinate.x,
+					maximum_coordinate.x,
+					(float(column_index) + random.randf()) / float(column_count)
+				),
+				lerpf(
+					minimum_coordinate.y, maximum_coordinate.y, (float(row_index) + random.randf()) / float(row_count)
+				)
 			)
-		))
+		)
 	return targets
 
 
@@ -167,10 +153,9 @@ static func find_nearest_free_path_cell(
 			if candidate_index < minimum_index or candidate_index > maximum_index:
 				continue
 			var cell := main_path[candidate_index]
-			if not occupied.has(cell) and GRAPH_SCRIPT.has_minimum_cell_separation(
-				cell,
-				separation_cells,
-				minimum_separation_tiles
+			if (
+				not occupied.has(cell)
+				and GRAPH_SCRIPT.has_minimum_cell_separation(cell, separation_cells, minimum_separation_tiles)
 			):
 				return cell
 	return Vector2i(-1, -1)
@@ -193,12 +178,17 @@ static func select_exploration_cells(
 		var path_distance := int(distance_from_main_path.get(cell, 0))
 		if occupied.has(cell) or path_distance <= 0:
 			continue
-		candidates.append({
-			"cell": cell,
-			"path_distance": path_distance,
-			"route_progress": float(route_progress_by_cell.get(cell, 0.0)),
-			"random_score": GRAPH_SCRIPT.coordinate_score(cell, seed_value, salt),
-		})
+		(
+			candidates
+			. append(
+				{
+					"cell": cell,
+					"path_distance": path_distance,
+					"route_progress": float(route_progress_by_cell.get(cell, 0.0)),
+					"random_score": GRAPH_SCRIPT.coordinate_score(cell, seed_value, salt),
+				}
+			)
+		)
 	if route_progress_by_cell.is_empty():
 		candidates.sort_custom(GRAPH_SCRIPT.sort_exploration_candidate_depth_descending)
 	var selected: Array[Vector2i] = []
@@ -206,9 +196,7 @@ static func select_exploration_cells(
 	if route_progress_by_cell.is_empty():
 		for candidate in candidates:
 			var cell := candidate["cell"] as Vector2i
-			if not GRAPH_SCRIPT.has_minimum_cell_separation(
-				cell, all_separation_cells, minimum_separation_tiles
-			):
+			if not GRAPH_SCRIPT.has_minimum_cell_separation(cell, all_separation_cells, minimum_separation_tiles):
 				continue
 			selected.append(cell)
 			all_separation_cells.append(cell)
@@ -221,13 +209,11 @@ static func select_exploration_cells(
 	for slot_index in count:
 		var target_progress := float(slot_index + 1) / float(count + 1)
 		var selected_candidate := _select_exploration_progress_candidate(
-			candidates, occupied, all_separation_cells, minimum_separation_tiles,
-			target_progress, progress_band_radius
+			candidates, occupied, all_separation_cells, minimum_separation_tiles, target_progress, progress_band_radius
 		)
 		if selected_candidate.is_empty():
 			selected_candidate = _select_exploration_progress_candidate(
-				candidates, occupied, all_separation_cells, minimum_separation_tiles,
-				target_progress, 1.0
+				candidates, occupied, all_separation_cells, minimum_separation_tiles, target_progress, 1.0
 			)
 		if selected_candidate.is_empty():
 			continue
@@ -250,15 +236,19 @@ static func _select_exploration_progress_candidate(
 	var best_score := -INF
 	for candidate in candidates:
 		var cell := candidate["cell"] as Vector2i
-		if occupied.has(cell) or not GRAPH_SCRIPT.has_minimum_cell_separation(
-			cell, separation_cells, minimum_separation_tiles
+		if (
+			occupied.has(cell)
+			or not GRAPH_SCRIPT.has_minimum_cell_separation(cell, separation_cells, minimum_separation_tiles)
 		):
 			continue
 		var progress_difference := absf(float(candidate["route_progress"]) - target_progress)
 		if progress_difference > maximum_progress_difference:
 			continue
-		var candidate_score := float(candidate["path_distance"]) * 1000000.0 \
-			- progress_difference * 100000.0 + float(candidate["random_score"])
+		var candidate_score := (
+			float(candidate["path_distance"]) * 1000000.0
+			- progress_difference * 100000.0
+			+ float(candidate["random_score"])
+		)
 		if candidate_score > best_score:
 			best_candidate = candidate
 			best_score = candidate_score

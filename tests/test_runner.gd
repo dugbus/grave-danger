@@ -45,10 +45,7 @@ func _run() -> void:
 		passed_count += suite.get_passed_count()
 		failed_count += suite.get_failed_count()
 
-	print(
-		"Co-located tests: %d suites, %d passed, %d failed." \
-		% [test_paths.size(), passed_count, failed_count]
-	)
+	print("Co-located tests: %d suites, %d passed, %d failed." % [test_paths.size(), passed_count, failed_count])
 	await _settle_engine_teardown()
 	quit(1 if failed_count > 0 else 0)
 

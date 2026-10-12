@@ -5,23 +5,20 @@ const LEVEL_MAPPING := preload("res://levels/level_mapping.tres")
 
 func run(_tree: SceneTree) -> void:
 	expect_equal(
-		LEVEL_MAPPING.get_level_count(),
-		25,
-		"The level lookup exposes the existing levels, demo, and Close Escape."
+		LEVEL_MAPPING.get_level_count(), 25, "The level lookup exposes the existing levels, demo, and Close Escape."
 	)
 	expect_equal(LEVEL_MAPPING.get_level_id(0), "tutorial_1", "Tutorial 1 appears first.")
 	expect_equal(LEVEL_MAPPING.get_level_id(5), "debug_level", "The debug level has a stable ID.")
 	expect_equal(LEVEL_MAPPING.get_level_id(6), "level_01", "Level 1 has a stable ID.")
 	expect(
-		LEVEL_MAPPING.find_level_index("Vampire Boss") == 14 \
-			and LEVEL_MAPPING.find_level_index("vampire-maze") == 14,
+		LEVEL_MAPPING.find_level_index("Vampire Boss") == 14 and LEVEL_MAPPING.find_level_index("vampire-maze") == 14,
 		"Level lookup resolves CLI references by display name and folder."
 	)
 	expect(
-		bool(LEVEL_MAPPING.get_level_data(14).get("run_playback_enabled", true)) \
-			and not LEVEL_MAPPING.get_level_data(14).has(
-				"run_playback_background_load_enabled"
-			),
+		(
+			bool(LEVEL_MAPPING.get_level_data(14).get("run_playback_enabled", true))
+			and not LEVEL_MAPPING.get_level_data(14).has("run_playback_background_load_enabled")
+		),
 		"Vampire Boss recordings use the shared safe preview loader."
 	)
 	expect_equal(
@@ -36,9 +33,11 @@ func run(_tree: SceneTree) -> void:
 	)
 	var demo_data := LEVEL_MAPPING.get_level_data(23)
 	expect(
-		demo_data.get("name") == "Kill Boundary 2 Demo" \
-			and bool(demo_data.get("available", false)) \
-			and bool(demo_data.get("run_playback_enabled", false)),
+		(
+			demo_data.get("name") == "Kill Boundary 2 Demo"
+			and bool(demo_data.get("available", false))
+			and bool(demo_data.get("run_playback_enabled", false))
+		),
 		"The Kill Boundary 2 approval demo is selectable and replay-enabled."
 	)
 	expect_equal(
@@ -48,9 +47,11 @@ func run(_tree: SceneTree) -> void:
 	)
 	var close_escape_data := LEVEL_MAPPING.get_level_data(24)
 	expect(
-		close_escape_data.get("id") == "close_escape" \
-			and close_escape_data.get("name") == "Close Escape" \
-			and bool(close_escape_data.get("available", false)),
+		(
+			close_escape_data.get("id") == "close_escape"
+			and close_escape_data.get("name") == "Close Escape"
+			and bool(close_escape_data.get("available", false))
+		),
 		"Close Escape is selectable under its stable level identity."
 	)
 	expect_equal(
@@ -62,37 +63,27 @@ func run(_tree: SceneTree) -> void:
 	for tutorial_number in range(1, 6):
 		var tutorial_index := tutorial_number - 1
 		var tutorial_data := LEVEL_MAPPING.get_level_data(tutorial_index)
-		var tutorial_scene_path := (
-			"res://levels/tutorial-%d/level.tscn" % tutorial_number
-		)
-		var tutorial_scene_text := FileAccess.get_file_as_string(
-			tutorial_scene_path
-		)
-		var live_generator_matches := tutorial_scene_text.contains(
-			"res://levels/tutorial-%d/generated_maze_config.tres" \
-				% tutorial_number
-		) and tutorial_scene_text.contains(
-			"maze_seed = %d" % tutorial_number
+		var tutorial_scene_path := "res://levels/tutorial-%d/level.tscn" % tutorial_number
+		var tutorial_scene_text := FileAccess.get_file_as_string(tutorial_scene_path)
+		var live_generator_matches := (
+			tutorial_scene_text.contains("res://levels/tutorial-%d/generated_maze_config.tres" % tutorial_number)
+			and tutorial_scene_text.contains("maze_seed = %d" % tutorial_number)
 		)
 		# A generated tutorial remains valid after its generator is frozen into
 		# an inspectable Layout for hand-authored level editing.
-		var frozen_layout_matches := tutorial_scene_text.contains(
-			'[node name="Layout" parent="."'
-		)
+		var frozen_layout_matches := tutorial_scene_text.contains('[node name="Layout" parent="."')
 		var scene_matches_scaffold := (
-			live_generator_matches or frozen_layout_matches
-		) and FileAccess.file_exists(
-			"res://levels/tutorial-%d/generated_maze_config.tres" % tutorial_number
+			(live_generator_matches or frozen_layout_matches)
+			and FileAccess.file_exists("res://levels/tutorial-%d/generated_maze_config.tres" % tutorial_number)
 		)
-		tutorials_are_registered = tutorials_are_registered \
-			and tutorial_data.get("id") == "tutorial_%d" % tutorial_number \
-			and tutorial_data.get("name") == "Tutorial %d" % tutorial_number \
-			and tutorial_data.get("folder_name") == "tutorial-%d" % tutorial_number \
-			and bool(tutorial_data.get("available", false)) \
-			and bool(tutorial_data.get("tutorial", false)) \
-			and FileAccess.file_exists(tutorial_scene_path) \
+		tutorials_are_registered = (
+			tutorials_are_registered
+			and tutorial_data.get("id") == "tutorial_%d" % tutorial_number
+			and tutorial_data.get("name") == "Tutorial %d" % tutorial_number
+			and tutorial_data.get("folder_name") == "tutorial-%d" % tutorial_number
+			and bool(tutorial_data.get("available", false))
+			and bool(tutorial_data.get("tutorial", false))
+			and FileAccess.file_exists(tutorial_scene_path)
 			and scene_matches_scaffold
-	expect(
-		tutorials_are_registered,
-		"Tutorial 1 through 5 resolve to their distinct selectable scenes."
-	)
+		)
+	expect(tutorials_are_registered, "Tutorial 1 through 5 resolve to their distinct selectable scenes.")

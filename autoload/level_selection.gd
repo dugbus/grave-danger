@@ -82,8 +82,11 @@ func remember_highlighted_level(index: int) -> bool:
 
 
 func get_last_highlighted_level_index() -> int:
-	if last_highlighted_level_index < 0 or last_highlighted_level_index >= get_level_count() \
-			or not is_level_available(last_highlighted_level_index):
+	if (
+		last_highlighted_level_index < 0
+		or last_highlighted_level_index >= get_level_count()
+		or not is_level_available(last_highlighted_level_index)
+	):
 		return -1
 	return last_highlighted_level_index
 
@@ -155,18 +158,9 @@ func mark_torch_lit(torch_id: StringName, level_index: int = selected_level_inde
 
 
 func record_selected_level_result(
-	score: int,
-	percentage: int,
-	escaped: bool = true,
-	collected_treasure: Dictionary = {}
+	score: int, percentage: int, escaped: bool = true, collected_treasure: Dictionary = {}
 ) -> Dictionary:
-	return record_level_result(
-		selected_level_index,
-		score,
-		percentage,
-		escaped,
-		collected_treasure
-	)
+	return record_level_result(selected_level_index, score, percentage, escaped, collected_treasure)
 
 
 func get_treasure_count(treasure_type: StringName) -> int:
@@ -196,12 +190,7 @@ func get_shop_item_purchase_count(item_id: StringName) -> int:
 	return player_progress.get_shop_item_purchase_count(item_id)
 
 
-func purchase_shop_item(
-	item_id: StringName,
-	treasure_type: StringName,
-	amount: int,
-	stock_count: int
-) -> bool:
+func purchase_shop_item(item_id: StringName, treasure_type: StringName, amount: int, stock_count: int) -> bool:
 	if not player_progress.purchase_shop_item(item_id, treasure_type, amount, stock_count):
 		return false
 	_save_results()
@@ -209,21 +198,13 @@ func purchase_shop_item(
 
 
 func record_level_result(
-	index: int,
-	score: int,
-	percentage: int,
-	escaped: bool = true,
-	collected_treasure: Dictionary = {}
+	index: int, score: int, percentage: int, escaped: bool = true, collected_treasure: Dictionary = {}
 ) -> Dictionary:
 	if index < 0 or index >= get_level_count():
 		return {}
 
 	var newly_recovered: Dictionary = player_progress.record_level_result(
-		_get_result_key(index),
-		score,
-		percentage,
-		escaped,
-		collected_treasure
+		_get_result_key(index), score, percentage, escaped, collected_treasure
 	)
 	_save_results()
 	return newly_recovered

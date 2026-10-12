@@ -10,9 +10,7 @@ func run(_tree: SceneTree) -> void:
 	var boundary := ExactBoundaryStub.new()
 	camera.kill_boundary = boundary
 	var points := camera._get_boundary_fit_points(Vector2(20.0, 20.0))
-	expect_equal(
-		points.size(), 8, "Camera fitting uses exact perimeter points at the base and top."
-	)
+	expect_equal(points.size(), 8, "Camera fitting uses exact perimeter points at the base and top.")
 	expect(points[0].x < -1.0, "Camera padding expands exact points around the boundary centre.")
 	camera.free()
 	boundary.free()

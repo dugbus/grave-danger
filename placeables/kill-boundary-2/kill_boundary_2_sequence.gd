@@ -191,15 +191,18 @@ func set_pose_easing(index: int, easing: GDKillBoundary2Pose.TransitionEasing) -
 func create_snapshot() -> Array[Dictionary]:
 	var snapshot: Array[Dictionary] = []
 	for pose in get_poses():
-		snapshot.append(
-			{
-				"position": pose.position,
-				"yaw_radians": pose.yaw_radians,
-				"size": pose.size,
-				"rounding": pose.rounding,
-				"time_seconds": pose.time_seconds,
-				"outgoing_easing": pose.outgoing_easing,
-			}
+		(
+			snapshot
+			. append(
+				{
+					"position": pose.position,
+					"yaw_radians": pose.yaw_radians,
+					"size": pose.size,
+					"rounding": pose.rounding,
+					"time_seconds": pose.time_seconds,
+					"outgoing_easing": pose.outgoing_easing,
+				}
+			)
 		)
 	return snapshot
 
@@ -226,10 +229,7 @@ func restore_snapshot(snapshot: Array[Dictionary]) -> void:
 
 
 func _apply_snapshot_values(pose: GDKillBoundary2Pose, values: Dictionary) -> void:
-	pose.set_authored_transform(
-		values.get("position", Vector3.ZERO) as Vector3,
-		float(values.get("yaw_radians", 0.0))
-	)
+	pose.set_authored_transform(values.get("position", Vector3.ZERO) as Vector3, float(values.get("yaw_radians", 0.0)))
 	pose.size = values.get("size", Vector2(8.0, 8.0)) as Vector2
 	pose.rounding = float(values.get("rounding", 0.0))
 	pose.time_seconds = float(values.get("time_seconds", 0.0))
@@ -268,8 +268,7 @@ func _sanitize_all_poses() -> void:
 			poses[index].time_seconds = 0.0
 		else:
 			poses[index].time_seconds = maxf(
-				poses[index].time_seconds,
-				poses[index - 1].time_seconds + MINIMUM_INTERVAL_SECONDS
+				poses[index].time_seconds, poses[index - 1].time_seconds + MINIMUM_INTERVAL_SECONDS
 			)
 	_is_sanitizing = false
 	_rename_poses()

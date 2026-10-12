@@ -1,11 +1,8 @@
 extends "res://inventory/inventory_pickup.gd"
 class_name GDGoldCoin
 
-
 const GOLD_COIN_ITEM := preload("res://placeables/treasure/gold_coin_inventory.tres")
-const TREASURE_OUTLINE_MATERIAL := preload(
-    "res://placeables/treasure/treasure_outline_material.tres"
-)
+const TREASURE_OUTLINE_MATERIAL := preload("res://placeables/treasure/treasure_outline_material.tres")
 const RECOVERY_FLOOR_COLLISION_MASK := 1
 const RECOVERY_RAY_START_HEIGHT := 0.5
 const RECOVERY_SURFACE_CLEARANCE := 0.1
@@ -64,9 +61,7 @@ func _ready() -> void:
 ## Rebuilds dynamic-body collision from every visual mesh under the configured coin root.
 func rebuild_physics_shape_from_visual() -> bool:
 	var mesh_root := get_node_or_null(physics_mesh_root_path) as Node3D
-	var collision_shape := get_node_or_null(
-		physics_collision_shape_path
-	) as CollisionShape3D
+	var collision_shape := get_node_or_null(physics_collision_shape_path) as CollisionShape3D
 	if mesh_root == null or collision_shape == null:
 		push_warning("Gold coin cannot build mesh collision; visual or collision node is missing.")
 		return false
@@ -140,12 +135,7 @@ func _find_floor_recovery_position() -> Vector3:
 	for offset in RECOVERY_SEARCH_OFFSETS:
 		var ray_start := fall_recovery_origin + offset + Vector3.UP * RECOVERY_RAY_START_HEIGHT
 		var ray_end := Vector3(ray_start.x, despawn_below_y, ray_start.z)
-		var query := PhysicsRayQueryParameters3D.create(
-			ray_start,
-			ray_end,
-			RECOVERY_FLOOR_COLLISION_MASK,
-			[get_rid()]
-		)
+		var query := PhysicsRayQueryParameters3D.create(ray_start, ray_end, RECOVERY_FLOOR_COLLISION_MASK, [get_rid()])
 		var hit := world.direct_space_state.intersect_ray(query)
 		if hit.is_empty():
 			continue
@@ -163,8 +153,7 @@ func _find_floor_recovery_position() -> Vector3:
 func _limit_edge_roll_distance() -> void:
 	var coin_up_alignment := absf(global_transform.basis.y.normalized().dot(Vector3.UP))
 	var horizontal_velocity := Vector2(linear_velocity.x, linear_velocity.z)
-	var is_edge_rolling := coin_up_alignment < edge_roll_up_dot \
-		and horizontal_velocity.length() > edge_roll_min_speed
+	var is_edge_rolling := coin_up_alignment < edge_roll_up_dot and horizontal_velocity.length() > edge_roll_min_speed
 
 	if not is_edge_rolling:
 		is_tracking_edge_roll = false
@@ -207,16 +196,11 @@ func _after_collection_deactivated() -> void:
 	remove_from_group("gold_coin")
 
 
-func _append_collision_points(
-	node: Node,
-	collision_shape: CollisionShape3D,
-	hull_points: PackedVector3Array
-) -> void:
+func _append_collision_points(node: Node, collision_shape: CollisionShape3D, hull_points: PackedVector3Array) -> void:
 	if node is MeshInstance3D:
 		var mesh_instance := node as MeshInstance3D
 		if mesh_instance.mesh != null:
-			var mesh_to_collision := collision_shape.global_transform.affine_inverse() \
-				* mesh_instance.global_transform
+			var mesh_to_collision := collision_shape.global_transform.affine_inverse() * mesh_instance.global_transform
 			for mesh_point in mesh_instance.mesh.get_faces():
 				hull_points.append(mesh_to_collision * mesh_point)
 
@@ -237,30 +221,28 @@ func _apply_outline_recursive(node: Node) -> void:
 		_apply_outline_recursive(child)
 
 
-func _get_collision_cache_key(
-	mesh_root: Node,
-	collision_shape: CollisionShape3D
-) -> String:
+func _get_collision_cache_key(mesh_root: Node, collision_shape: CollisionShape3D) -> String:
 	var mesh_signatures := PackedStringArray()
 	_append_mesh_signatures(mesh_root, collision_shape, mesh_signatures)
 	return "|".join(mesh_signatures)
 
 
-func _append_mesh_signatures(
-	node: Node,
-	collision_shape: CollisionShape3D,
-	mesh_signatures: PackedStringArray
-) -> void:
+func _append_mesh_signatures(node: Node, collision_shape: CollisionShape3D, mesh_signatures: PackedStringArray) -> void:
 	if node is MeshInstance3D:
 		var mesh_instance := node as MeshInstance3D
 		if mesh_instance.mesh != null:
-			var mesh_to_collision := collision_shape.global_transform.affine_inverse() \
-				* mesh_instance.global_transform
-			mesh_signatures.append(
-				"%d:%s" % [
-					mesh_instance.mesh.get_instance_id(),
-					mesh_to_collision,
-				]
+			var mesh_to_collision := collision_shape.global_transform.affine_inverse() * mesh_instance.global_transform
+			(
+				mesh_signatures
+				. append(
+					(
+						"%d:%s"
+						% [
+							mesh_instance.mesh.get_instance_id(),
+							mesh_to_collision,
+						]
+					)
+				)
 			)
 	for child in node.get_children():
 		_append_mesh_signatures(child, collision_shape, mesh_signatures)

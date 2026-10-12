@@ -4,12 +4,8 @@ extends Node3D
 
 ## Flame and ghost presentation driven by canonical geometry.
 
-const FLAME_SHADER := preload(
-	"res://placeables/kill_boundary/effects/kill_boundary_flame_effect.gdshader"
-)
-const GHOST_SHADER := preload(
-	"res://placeables/kill_boundary/effects/kill_boundary_ghost_effect.gdshader"
-)
+const FLAME_SHADER := preload("res://placeables/kill_boundary/effects/kill_boundary_flame_effect.gdshader")
+const GHOST_SHADER := preload("res://placeables/kill_boundary/effects/kill_boundary_ghost_effect.gdshader")
 const GHOST_TEXTURE := preload("res://Assets/placeables/kill_boundary/ghost.png")
 const VISUAL_SEGMENT := preload("res://placeables/kill-boundary-2/boundary_visual_segment.tscn")
 const GHOST_RIBBON_SEGMENTS := 18
@@ -31,9 +27,7 @@ var effects_enabled := true
 var _ghost_random := RandomNumberGenerator.new()
 
 
-func configure(
-	new_settings: GDKillBoundary2Settings, new_effect: GDKillBoundary2Settings.RenderEffect
-) -> void:
+func configure(new_settings: GDKillBoundary2Settings, new_effect: GDKillBoundary2Settings.RenderEffect) -> void:
 	settings = new_settings
 	render_effect = new_effect
 	_create_materials()
@@ -78,9 +72,7 @@ func apply_geometry(points: PackedVector2Array) -> void:
 			&"noise_along_offset", (float(index) + 0.5) * reference_segment_spacing
 		)
 		mesh_instance.position = Vector3(
-			(start.x + finish.x) * 0.5,
-			settings.flame_y + settings.flame_height * 0.5,
-			(start.y + finish.y) * 0.5
+			(start.x + finish.x) * 0.5, settings.flame_y + settings.flame_height * 0.5, (start.y + finish.y) * 0.5
 		)
 		mesh_instance.rotation = Vector3(0.0, atan2(-delta.y, delta.x), 0.0)
 	_update_ghosts()
@@ -117,29 +109,17 @@ func _apply_material_parameters() -> void:
 		flame_material.set_shader_parameter(&"opacity_multiplier", settings.flame_effect_opacity)
 		flame_material.set_shader_parameter(&"emission_strength", settings.flame_effect_emission)
 		flame_material.set_shader_parameter(&"time_scale", settings.flame_effect_time_scale)
-		flame_material.set_shader_parameter(
-			&"color_core", _color_vector(settings.flame_effect_core_color)
-		)
-		flame_material.set_shader_parameter(
-			&"color_mid", _color_vector(settings.flame_effect_mid_color)
-		)
-		flame_material.set_shader_parameter(
-			&"color_outer", _color_vector(settings.flame_effect_outer_color)
-		)
+		flame_material.set_shader_parameter(&"color_core", _color_vector(settings.flame_effect_core_color))
+		flame_material.set_shader_parameter(&"color_mid", _color_vector(settings.flame_effect_mid_color))
+		flame_material.set_shader_parameter(&"color_outer", _color_vector(settings.flame_effect_outer_color))
 	if ghost_material != null:
 		ghost_material.set_shader_parameter(&"boundary_time", effect_time)
+		ghost_material.set_shader_parameter(&"ghost_color", _color_vector(settings.ghost_effect_color))
 		ghost_material.set_shader_parameter(
-			&"ghost_color", _color_vector(settings.ghost_effect_color)
+			&"emission_strength", resolve_ghost_emission(settings.ghost_effect_emission, Engine.is_editor_hint())
 		)
 		ghost_material.set_shader_parameter(
-			&"emission_strength",
-			resolve_ghost_emission(settings.ghost_effect_emission, Engine.is_editor_hint())
-		)
-		ghost_material.set_shader_parameter(
-			&"edge_softness",
-			resolve_ghost_edge_softness(
-				settings.ghost_effect_edge_softness, Engine.is_editor_hint()
-			)
+			&"edge_softness", resolve_ghost_edge_softness(settings.ghost_effect_edge_softness, Engine.is_editor_hint())
 		)
 
 
@@ -182,57 +162,36 @@ func _update_ghosts() -> void:
 			var ghost := ghosts[ghost_index]
 			_ghost_random.seed = 918273 + ghost_index * 104729
 			var along := (
-				(float(slot) + _ghost_random.randf_range(0.12, 0.88))
-				/ float(settings.ghost_ribbons_per_segment)
+				(float(slot) + _ghost_random.randf_range(0.12, 0.88)) / float(settings.ghost_ribbons_per_segment)
 			)
 			var ground := start.lerp(finish, along) + outward * _ghost_random.randf_range(-0.2, 0.2)
 			ghost.position = Vector3(ground.x, settings.flame_y, ground.y)
 			ghost.set_instance_shader_parameter(
-				&"ghost_width",
-				_ghost_random.randf_range(
-					settings.ghost_width_range.x, settings.ghost_width_range.y
-				)
+				&"ghost_width", _ghost_random.randf_range(settings.ghost_width_range.x, settings.ghost_width_range.y)
 			)
 			ghost.set_instance_shader_parameter(
-				&"ghost_height",
-				_ghost_random.randf_range(
-					settings.ghost_height_range.x, settings.ghost_height_range.y
-				)
+				&"ghost_height", _ghost_random.randf_range(settings.ghost_height_range.x, settings.ghost_height_range.y)
 			)
 			ghost.set_instance_shader_parameter(&"rise_distance", settings.ghost_rise_distance)
+			ghost.set_instance_shader_parameter(&"rise_speed", _ghost_random.randf_range(0.075, 0.18))
 			ghost.set_instance_shader_parameter(
-				&"rise_speed", _ghost_random.randf_range(0.075, 0.18)
-			)
-			ghost.set_instance_shader_parameter(
-				&"cycle_offset",
-				EDITOR_GHOST_CYCLE_OFFSET if Engine.is_editor_hint() else _ghost_random.randf()
+				&"cycle_offset", EDITOR_GHOST_CYCLE_OFFSET if Engine.is_editor_hint() else _ghost_random.randf()
 			)
 			ghost.set_instance_shader_parameter(&"wave_phase", _ghost_random.randf_range(0.0, TAU))
 			ghost.set_instance_shader_parameter(&"wave_amplitude", settings.ghost_wave_amplitude)
-			ghost.set_instance_shader_parameter(
-				&"wave_frequency", _ghost_random.randf_range(3.4, 8.6)
-			)
+			ghost.set_instance_shader_parameter(&"wave_frequency", _ghost_random.randf_range(3.4, 8.6))
 			ghost.set_instance_shader_parameter(&"wave_speed", _ghost_random.randf_range(0.7, 1.9))
 			ghost.set_instance_shader_parameter(&"lean", _ghost_random.randf_range(-0.28, 0.28))
 			ghost.set_instance_shader_parameter(
-				&"opacity",
-				resolve_ghost_opacity(
-					_ghost_random.randf_range(0.92, 1.18), Engine.is_editor_hint()
-				)
+				&"opacity", resolve_ghost_opacity(_ghost_random.randf_range(0.92, 1.18), Engine.is_editor_hint())
 			)
-			ghost.set_instance_shader_parameter(
-				&"emerge_depth", _ghost_random.randf_range(0.72, 1.02)
-			)
+			ghost.set_instance_shader_parameter(&"emerge_depth", _ghost_random.randf_range(0.72, 1.02))
 			ghost_index += 1
 
 
 func _apply_visibility() -> void:
-	var show_flames := (
-		effects_enabled and render_effect == GDKillBoundary2Settings.RenderEffect.Flame
-	)
-	var show_ghosts := (
-		effects_enabled and render_effect == GDKillBoundary2Settings.RenderEffect.Ghost
-	)
+	var show_flames := effects_enabled and render_effect == GDKillBoundary2Settings.RenderEffect.Flame
+	var show_ghosts := effects_enabled and render_effect == GDKillBoundary2Settings.RenderEffect.Ghost
 	for segment in segments:
 		segment.visible = show_flames
 	for ghost in ghosts:
@@ -268,9 +227,7 @@ func _get_ghost_mesh() -> ArrayMesh:
 		uvs.append(Vector2(1.0, y))
 	for index in GHOST_RIBBON_SEGMENTS:
 		var base := index * 2
-		indices.append_array(
-			PackedInt32Array([base, base + 1, base + 2, base + 1, base + 3, base + 2])
-		)
+		indices.append_array(PackedInt32Array([base, base + 1, base + 2, base + 1, base + 3, base + 2]))
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
 	arrays[Mesh.ARRAY_VERTEX] = vertices

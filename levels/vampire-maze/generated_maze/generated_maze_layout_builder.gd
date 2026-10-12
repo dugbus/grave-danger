@@ -47,8 +47,7 @@ static func _make_layout_inspectable(host: Node3D, layout: Node3D) -> void:
 	if not Engine.is_editor_hint() or not host.is_inside_tree():
 		return
 	var edited_scene_root := host.get_tree().edited_scene_root
-	if edited_scene_root == null \
-			or (edited_scene_root != layout and not edited_scene_root.is_ancestor_of(layout)):
+	if edited_scene_root == null or (edited_scene_root != layout and not edited_scene_root.is_ancestor_of(layout)):
 		return
 	layout.owner = edited_scene_root
 	if not layout.scene_file_path.is_empty():

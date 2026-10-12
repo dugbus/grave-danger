@@ -8,8 +8,7 @@ const TEST_SCENE_PATH := "res://ui/screens/level_select_item_row.tscn"
 func run(tree: SceneTree) -> void:
 	expect_script_contract(SUBJECT, SUBJECT_PATH)
 	expect(
-		not SUBJECT.USE_SUB_THREADS,
-		"Scene dependencies load on one worker so production UI frames remain responsive."
+		not SUBJECT.USE_SUB_THREADS, "Scene dependencies load on one worker so production UI frames remain responsive."
 	)
 	await _expect_scene_dependencies_load_without_blocking(tree)
 	_expect_missing_scenes_fail_immediately()

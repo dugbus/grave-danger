@@ -1,19 +1,18 @@
 extends "res://placeables/placeable.gd"
 class_name GDSpikeTrap
 
-
 enum SpikeTrapState {
-    Ready,
-    Arming,
-    Rising,
-    Active,
-    Resetting,
+	Ready,
+	Arming,
+	Rising,
+	Active,
+	Resetting,
 }
 
 enum SpawnPresentationState {
-    Present,
-    Waiting,
-    Rising,
+	Present,
+	Waiting,
+	Rising,
 }
 
 const PLAYER_COLLISION_LAYER := 2
@@ -84,336 +83,317 @@ var spawn_motion_tween: Tween
 
 
 func _ready() -> void:
-    add_to_group("spike_trap")
-    _load_sounds()
-    _configure_area(trigger_area)
-    _configure_area(strike_area)
+	add_to_group("spike_trap")
+	_load_sounds()
+	_configure_area(trigger_area)
+	_configure_area(strike_area)
 
-    if trigger_area != null:
-        trigger_area.body_entered.connect(_on_trigger_area_body_entered)
+	if trigger_area != null:
+		trigger_area.body_entered.connect(_on_trigger_area_body_entered)
 
-    if spikes_pivot != null:
-        spikes_pivot.position.y = hidden_position_y
+	if spikes_pivot != null:
+		spikes_pivot.position.y = hidden_position_y
 
-    authored_spawn_global_position = global_position
-    if not Engine.is_editor_hint() and spawn_time > 0.0:
-        spawn_presentation_state = SpawnPresentationState.Waiting
-        visible = false
-        _set_trigger_areas_enabled(false)
-    super._ready()
+	authored_spawn_global_position = global_position
+	if not Engine.is_editor_hint() and spawn_time > 0.0:
+		spawn_presentation_state = SpawnPresentationState.Waiting
+		visible = false
+		_set_trigger_areas_enabled(false)
+	super._ready()
 
 
 func _physics_process(delta: float) -> void:
-    if spawn_presentation_state == SpawnPresentationState.Waiting:
-        spawn_elapsed_seconds += maxf(delta, 0.0)
-        if spawn_elapsed_seconds >= spawn_time:
-            _begin_spawn_presentation()
-        return
-    if spawn_presentation_state == SpawnPresentationState.Rising:
-        return
+	if spawn_presentation_state == SpawnPresentationState.Waiting:
+		spawn_elapsed_seconds += maxf(delta, 0.0)
+		if spawn_elapsed_seconds >= spawn_time:
+			_begin_spawn_presentation()
+		return
+	if spawn_presentation_state == SpawnPresentationState.Rising:
+		return
 
-    if state != SpikeTrapState.Ready:
-        return
+	if state != SpikeTrapState.Ready:
+		return
 
-    if not _get_targets_in_box(trigger_area_size).is_empty():
-        trigger()
+	if not _get_targets_in_box(trigger_area_size).is_empty():
+		trigger()
 
 
 func trigger() -> void:
-    if state != SpikeTrapState.Ready:
-        return
+	if state != SpikeTrapState.Ready:
+		return
 
-    state = SpikeTrapState.Arming
-    _run_cycle.call_deferred()
+	state = SpikeTrapState.Arming
+	_run_cycle.call_deferred()
 
 
 func get_spike_trap_state() -> SpikeTrapState:
-    return state
+	return state
 
 
 func is_ready() -> bool:
-    return state == SpikeTrapState.Ready
+	return state == SpikeTrapState.Ready
 
 
 func _uses_custom_placeable_spawn() -> bool:
-    return true
+	return true
 
 
 func is_placeable_spawned() -> bool:
-    return spawn_presentation_state == SpawnPresentationState.Present
+	return spawn_presentation_state == SpawnPresentationState.Present
 
 
 func _begin_spawn_presentation() -> void:
-    if spawn_presentation_state != SpawnPresentationState.Waiting:
-        return
+	if spawn_presentation_state != SpawnPresentationState.Waiting:
+		return
 
-    spawn_presentation_state = SpawnPresentationState.Rising
-    global_position = authored_spawn_global_position - Vector3.UP * maxf(spawn_buried_depth, 0.0)
-    visible = true
-    _play_sound(reset_sound, "SpikeTrapResetAudio", reset_volume_db)
+	spawn_presentation_state = SpawnPresentationState.Rising
+	global_position = authored_spawn_global_position - Vector3.UP * maxf(spawn_buried_depth, 0.0)
+	visible = true
+	_play_sound(reset_sound, "SpikeTrapResetAudio", reset_volume_db)
 
-    spawn_motion_tween = create_tween()
-    spawn_motion_tween.set_trans(Tween.TRANS_SINE)
-    spawn_motion_tween.set_ease(Tween.EASE_OUT)
-    spawn_motion_tween.tween_property(
-        self,
-        "global_position:y",
-        authored_spawn_global_position.y,
-        maxf(spawn_rise_seconds, 0.01)
-    )
-    spawn_motion_tween.finished.connect(_finish_spawn_presentation)
+	spawn_motion_tween = create_tween()
+	spawn_motion_tween.set_trans(Tween.TRANS_SINE)
+	spawn_motion_tween.set_ease(Tween.EASE_OUT)
+	spawn_motion_tween.tween_property(
+		self, "global_position:y", authored_spawn_global_position.y, maxf(spawn_rise_seconds, 0.01)
+	)
+	spawn_motion_tween.finished.connect(_finish_spawn_presentation)
 
 
 func _finish_spawn_presentation() -> void:
-    global_position = authored_spawn_global_position
-    spawn_motion_tween = null
-    spawn_presentation_state = SpawnPresentationState.Present
-    _set_trigger_areas_enabled(true)
-    placeable_spawned.emit()
+	global_position = authored_spawn_global_position
+	spawn_motion_tween = null
+	spawn_presentation_state = SpawnPresentationState.Present
+	_set_trigger_areas_enabled(true)
+	placeable_spawned.emit()
 
 
 func _run_cycle() -> void:
-    if state != SpikeTrapState.Arming:
-        return
+	if state != SpikeTrapState.Arming:
+		return
 
-    await get_tree().create_timer(maxf(arming_delay, 0.0)).timeout
-    if not is_inside_tree():
-        return
+	await get_tree().create_timer(maxf(arming_delay, 0.0)).timeout
+	if not is_inside_tree():
+		return
 
-    state = SpikeTrapState.Rising
-    var hit_count := _damage_targets_in_strike_area()
-    if hit_count > 0:
-        _play_sound(hit_sound, "SpikeTrapHitAudio", hit_volume_db)
-    else:
-        _play_sound(trigger_sound, "SpikeTrapTriggerAudio", trigger_volume_db)
+	state = SpikeTrapState.Rising
+	var hit_count := _damage_targets_in_strike_area()
+	if hit_count > 0:
+		_play_sound(hit_sound, "SpikeTrapHitAudio", hit_volume_db)
+	else:
+		_play_sound(trigger_sound, "SpikeTrapTriggerAudio", trigger_volume_db)
 
-    _animate_rise()
+	_animate_rise()
 
-    await get_tree().create_timer(maxf(rise_seconds + bounce_seconds, 0.01)).timeout
-    if not is_inside_tree():
-        return
+	await get_tree().create_timer(maxf(rise_seconds + bounce_seconds, 0.01)).timeout
+	if not is_inside_tree():
+		return
 
-    state = SpikeTrapState.Active
-    await get_tree().create_timer(maxf(raised_hold_seconds, 0.0)).timeout
-    if not is_inside_tree():
-        return
+	state = SpikeTrapState.Active
+	await get_tree().create_timer(maxf(raised_hold_seconds, 0.0)).timeout
+	if not is_inside_tree():
+		return
 
-    state = SpikeTrapState.Resetting
-    _play_sound(reset_sound, "SpikeTrapResetAudio", reset_volume_db)
-    await _animate_reset()
-    if not is_inside_tree():
-        return
+	state = SpikeTrapState.Resetting
+	_play_sound(reset_sound, "SpikeTrapResetAudio", reset_volume_db)
+	await _animate_reset()
+	if not is_inside_tree():
+		return
 
-    state = SpikeTrapState.Ready
+	state = SpikeTrapState.Ready
 
 
 func _damage_targets_in_strike_area() -> int:
-    var damaged_count := 0
-    for target in _get_targets_in_box(strike_area_size):
-        if _damage_target(target):
-            damaged_count += 1
+	var damaged_count := 0
+	for target in _get_targets_in_box(strike_area_size):
+		if _damage_target(target):
+			damaged_count += 1
 
-    return damaged_count
+	return damaged_count
 
 
 func _damage_target(target: Node) -> bool:
-    if not _is_live_target(target):
-        return false
+	if not _is_live_target(target):
+		return false
 
-    if target.has_method("apply_spike_trap_damage"):
-        target.call("apply_spike_trap_damage", damage_percent_of_max_energy)
-        return true
+	if target.has_method("apply_spike_trap_damage"):
+		target.call("apply_spike_trap_damage", damage_percent_of_max_energy)
+		return true
 
-    if enemy_spike_damage_enabled and target.has_method("die_from_spike_trap"):
-        target.call("die_from_spike_trap")
-        return true
+	if enemy_spike_damage_enabled and target.has_method("die_from_spike_trap"):
+		target.call("die_from_spike_trap")
+		return true
 
-    if target.has_method("die_from_enemy"):
-        target.call("die_from_enemy")
-        return true
+	if target.has_method("die_from_enemy"):
+		target.call("die_from_enemy")
+		return true
 
-    return false
+	return false
 
 
 func _get_targets_in_box(box_size: Vector3) -> Array[Node]:
-    var targets: Array[Node] = []
+	var targets: Array[Node] = []
 
-    if trigger_area != null:
-        for body in trigger_area.get_overlapping_bodies():
-            _append_target_if_inside(targets, body, box_size)
+	if trigger_area != null:
+		for body in trigger_area.get_overlapping_bodies():
+			_append_target_if_inside(targets, body, box_size)
 
-    if strike_area != null:
-        for body in strike_area.get_overlapping_bodies():
-            _append_target_if_inside(targets, body, box_size)
+	if strike_area != null:
+		for body in strike_area.get_overlapping_bodies():
+			_append_target_if_inside(targets, body, box_size)
 
-    var tree := get_tree()
-    if tree == null:
-        return targets
+	var tree := get_tree()
+	if tree == null:
+		return targets
 
-    for target_group in target_groups:
-        for node in tree.get_nodes_in_group(target_group):
-            _append_target_if_inside(targets, node, box_size)
+	for target_group in target_groups:
+		for node in tree.get_nodes_in_group(target_group):
+			_append_target_if_inside(targets, node, box_size)
 
-    return targets
+	return targets
 
 
 func _append_target_if_inside(targets: Array[Node], candidate: Object, box_size: Vector3) -> void:
-    var target := _resolve_target_node(candidate)
-    if target == null or targets.has(target) or not _is_live_target(target):
-        return
+	var target := _resolve_target_node(candidate)
+	if target == null or targets.has(target) or not _is_live_target(target):
+		return
 
-    var target_position := _get_target_world_position(target)
-    if _is_position_inside_local_box(target_position, box_size):
-        targets.append(target)
+	var target_position := _get_target_world_position(target)
+	if _is_position_inside_local_box(target_position, box_size):
+		targets.append(target)
 
 
 func _resolve_target_node(candidate: Object) -> Node:
-    if candidate == null or not candidate is Node:
-        return null
+	if candidate == null or not candidate is Node:
+		return null
 
-    var node := candidate as Node
-    while node != null:
-        if _can_damage_node(node):
-            return node
-        node = node.get_parent()
+	var node := candidate as Node
+	while node != null:
+		if _can_damage_node(node):
+			return node
+		node = node.get_parent()
 
-    return null
+	return null
 
 
 func _can_damage_node(node: Node) -> bool:
-    return (
-        node.has_method("apply_spike_trap_damage")
-        or node.has_method("die_from_spike_trap")
-        or node.has_method("die_from_enemy")
-    )
+	return (
+		node.has_method("apply_spike_trap_damage")
+		or node.has_method("die_from_spike_trap")
+		or node.has_method("die_from_enemy")
+	)
 
 
 func _is_live_target(target: Node) -> bool:
-    if target == null:
-        return false
+	if target == null:
+		return false
 
-    if target.has_method("can_be_hit_by_spike_trap"):
-        return bool(target.call("can_be_hit_by_spike_trap"))
+	if target.has_method("can_be_hit_by_spike_trap"):
+		return bool(target.call("can_be_hit_by_spike_trap"))
 
-    if target.has_method("is_dead"):
-        return not bool(target.call("is_dead"))
+	if target.has_method("is_dead"):
+		return not bool(target.call("is_dead"))
 
-    return _can_damage_node(target)
+	return _can_damage_node(target)
 
 
 func _get_target_world_position(target: Node) -> Vector3:
-    if target.has_method("get_spike_trap_position"):
-        var target_position: Variant = target.call("get_spike_trap_position")
-        if target_position is Vector3:
-            return target_position
+	if target.has_method("get_spike_trap_position"):
+		var target_position: Variant = target.call("get_spike_trap_position")
+		if target_position is Vector3:
+			return target_position
 
-    if target is Node3D:
-        return (target as Node3D).global_position
+	if target is Node3D:
+		return (target as Node3D).global_position
 
-    return Vector3.INF
+	return Vector3.INF
 
 
 func _is_position_inside_local_box(world_position: Vector3, box_size: Vector3) -> bool:
-    var local_position := global_transform.affine_inverse() * world_position
-    var half_size := box_size * 0.5
+	var local_position := global_transform.affine_inverse() * world_position
+	var half_size := box_size * 0.5
 
-    return (
-        absf(local_position.x) <= half_size.x
-        and absf(local_position.z) <= half_size.z
-        and local_position.y >= target_vertical_min
-        and local_position.y <= target_vertical_max
-    )
+	return (
+		absf(local_position.x) <= half_size.x
+		and absf(local_position.z) <= half_size.z
+		and local_position.y >= target_vertical_min
+		and local_position.y <= target_vertical_max
+	)
 
 
 func _animate_rise() -> void:
-    _stop_motion_tween()
-    if spikes_pivot == null:
-        return
+	_stop_motion_tween()
+	if spikes_pivot == null:
+		return
 
-    spikes_pivot.position.y = hidden_position_y
-    motion_tween = create_tween()
-    motion_tween.set_trans(Tween.TRANS_QUART)
-    motion_tween.set_ease(Tween.EASE_OUT)
-    motion_tween.tween_property(
-        spikes_pivot,
-        "position:y",
-        raised_position_y + maxf(rise_bounce_height, 0.0),
-        maxf(rise_seconds, 0.01)
-    )
-    motion_tween.set_trans(Tween.TRANS_SINE)
-    motion_tween.set_ease(Tween.EASE_IN_OUT)
-    motion_tween.tween_property(
-        spikes_pivot,
-        "position:y",
-        raised_position_y,
-        maxf(bounce_seconds, 0.01)
-    )
+	spikes_pivot.position.y = hidden_position_y
+	motion_tween = create_tween()
+	motion_tween.set_trans(Tween.TRANS_QUART)
+	motion_tween.set_ease(Tween.EASE_OUT)
+	motion_tween.tween_property(
+		spikes_pivot, "position:y", raised_position_y + maxf(rise_bounce_height, 0.0), maxf(rise_seconds, 0.01)
+	)
+	motion_tween.set_trans(Tween.TRANS_SINE)
+	motion_tween.set_ease(Tween.EASE_IN_OUT)
+	motion_tween.tween_property(spikes_pivot, "position:y", raised_position_y, maxf(bounce_seconds, 0.01))
 
 
 func _animate_reset() -> void:
-    _stop_motion_tween()
-    if spikes_pivot == null:
-        return
+	_stop_motion_tween()
+	if spikes_pivot == null:
+		return
 
-    motion_tween = create_tween()
-    motion_tween.set_trans(Tween.TRANS_SINE)
-    motion_tween.set_ease(Tween.EASE_IN_OUT)
-    motion_tween.tween_property(
-        spikes_pivot,
-        "position:y",
-        raised_position_y + maxf(reset_tension_lift, 0.0),
-        maxf(reset_tension_seconds, 0.0)
-    )
-    motion_tween.set_trans(Tween.TRANS_QUAD)
-    motion_tween.set_ease(Tween.EASE_IN)
-    motion_tween.tween_property(
-        spikes_pivot,
-        "position:y",
-        hidden_position_y,
-        maxf(reset_seconds, 0.01)
-    )
-    await motion_tween.finished
+	motion_tween = create_tween()
+	motion_tween.set_trans(Tween.TRANS_SINE)
+	motion_tween.set_ease(Tween.EASE_IN_OUT)
+	motion_tween.tween_property(
+		spikes_pivot, "position:y", raised_position_y + maxf(reset_tension_lift, 0.0), maxf(reset_tension_seconds, 0.0)
+	)
+	motion_tween.set_trans(Tween.TRANS_QUAD)
+	motion_tween.set_ease(Tween.EASE_IN)
+	motion_tween.tween_property(spikes_pivot, "position:y", hidden_position_y, maxf(reset_seconds, 0.01))
+	await motion_tween.finished
 
 
 func _stop_motion_tween() -> void:
-    if motion_tween != null and motion_tween.is_valid():
-        motion_tween.kill()
-    motion_tween = null
+	if motion_tween != null and motion_tween.is_valid():
+		motion_tween.kill()
+	motion_tween = null
 
 
 func _configure_area(area: Area3D) -> void:
-    if area == null:
-        return
+	if area == null:
+		return
 
-    area.collision_layer = 0
-    area.collision_mask = target_collision_mask
-    area.monitoring = true
-    area.monitorable = false
+	area.collision_layer = 0
+	area.collision_mask = target_collision_mask
+	area.monitoring = true
+	area.monitorable = false
 
 
 func _set_trigger_areas_enabled(enabled: bool) -> void:
-    var areas: Array[Area3D] = [trigger_area, strike_area]
-    for area in areas:
-        if area == null:
-            continue
-        area.collision_mask = target_collision_mask if enabled else 0
-        area.set_deferred(&"monitoring", enabled)
+	var areas: Array[Area3D] = [trigger_area, strike_area]
+	for area in areas:
+		if area == null:
+			continue
+		area.collision_mask = target_collision_mask if enabled else 0
+		area.set_deferred(&"monitoring", enabled)
 
 
 func _load_sounds() -> void:
-    trigger_sound = GDAudio.load_stream(trigger_sound_path)
-    hit_sound = GDAudio.load_stream(hit_sound_path)
-    reset_sound = GDAudio.load_stream(reset_sound_path)
+	trigger_sound = GDAudio.load_stream(trigger_sound_path)
+	hit_sound = GDAudio.load_stream(hit_sound_path)
+	reset_sound = GDAudio.load_stream(reset_sound_path)
 
 
 func _play_sound(stream: AudioStream, sound_name: String, volume_db: float) -> void:
-    GDAudio.play_one_shot_3d(self, stream, sound_name, volume_db)
+	GDAudio.play_one_shot_3d(self, stream, sound_name, volume_db)
 
 
 func _on_trigger_area_body_entered(body: Node3D) -> void:
-    if state != SpikeTrapState.Ready:
-        return
+	if state != SpikeTrapState.Ready:
+		return
 
-    var target := _resolve_target_node(body)
-    if target != null and _is_position_inside_local_box(_get_target_world_position(target), trigger_area_size):
-        trigger()
+	var target := _resolve_target_node(body)
+	if target != null and _is_position_inside_local_box(_get_target_world_position(target), trigger_area_size):
+		trigger()

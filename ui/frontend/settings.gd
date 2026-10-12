@@ -9,24 +9,15 @@ const SCENE_LOADER_SCRIPT := preload("res://autoload/scene_loader.gd")
 var is_transitioning := false
 
 @onready var music_slider := (
-	get_node(
-		"ScreenContainer/SettingsFrame/Content/SettingsPanel/MusicRow/MusicContent/MusicSlider"
-	)
-	as HSlider
+	get_node("ScreenContainer/SettingsFrame/Content/SettingsPanel/MusicRow/MusicContent/MusicSlider") as HSlider
 )
 @onready var music_value_label := (
-	get_node(
-		"ScreenContainer/SettingsFrame/Content/SettingsPanel/MusicRow/MusicContent/MusicValueLabel"
-	)
-	as Label
+	get_node("ScreenContainer/SettingsFrame/Content/SettingsPanel/MusicRow/MusicContent/MusicValueLabel") as Label
 )
-@onready var music_focus_border := (
-	get_node("ScreenContainer/SettingsFrame/Content/SettingsPanel/MusicRow/FocusBorder") as Panel
-)
+@onready
+var music_focus_border := get_node("ScreenContainer/SettingsFrame/Content/SettingsPanel/MusicRow/FocusBorder") as Panel
 @onready var sound_effect_slider := (
-	get_node(
-		"ScreenContainer/SettingsFrame/Content/SettingsPanel/SoundEffectRow/SoundEffectContent/SoundEffectSlider"
-	)
+	get_node("ScreenContainer/SettingsFrame/Content/SettingsPanel/SoundEffectRow/SoundEffectContent/SoundEffectSlider")
 	as HSlider
 )
 @onready var sound_effect_value_label := (
@@ -36,27 +27,18 @@ var is_transitioning := false
 	as Label
 )
 @onready var sound_effect_focus_border := (
-	get_node("ScreenContainer/SettingsFrame/Content/SettingsPanel/SoundEffectRow/FocusBorder")
-	as Panel
+	get_node("ScreenContainer/SettingsFrame/Content/SettingsPanel/SoundEffectRow/FocusBorder") as Panel
 )
-@onready var reset_button := (
-	get_node("ScreenContainer/SettingsFrame/Content/SettingsPanel/ResetProgressButton") as Button
-)
-@onready var status_label := (
-	get_node("ScreenContainer/SettingsFrame/Content/SettingsPanel/StatusLabel") as Label
-)
+@onready
+var reset_button := get_node("ScreenContainer/SettingsFrame/Content/SettingsPanel/ResetProgressButton") as Button
+@onready var status_label := get_node("ScreenContainer/SettingsFrame/Content/SettingsPanel/StatusLabel") as Label
 @onready var back_button := get_node("ScreenContainer/BottomActions/BackButton") as Button
 @onready var confirmation_shade := get_node("ScreenContainer/ResetConfirmationShade") as ColorRect
+@onready var confirmation_frame := get_node("ScreenContainer/ResetConfirmationFrame") as NinePatchRect
 @onready
-var confirmation_frame := get_node("ScreenContainer/ResetConfirmationFrame") as NinePatchRect
-@onready var no_button := (
-	get_node("ScreenContainer/ResetConfirmationFrame/Content/ConfirmationActions/NoButton")
-	as Button
-)
-@onready var yes_button := (
-	get_node("ScreenContainer/ResetConfirmationFrame/Content/ConfirmationActions/YesButton")
-	as Button
-)
+var no_button := get_node("ScreenContainer/ResetConfirmationFrame/Content/ConfirmationActions/NoButton") as Button
+@onready
+var yes_button := get_node("ScreenContainer/ResetConfirmationFrame/Content/ConfirmationActions/YesButton") as Button
 
 
 func _ready() -> void:
@@ -66,9 +48,7 @@ func _ready() -> void:
 		scene_loader.request_scene(LEVEL_SELECT_SCENE_PATH)
 	var game_settings := _get_game_settings()
 	music_slider.value = game_settings.music_volume_percent if game_settings != null else 80.0
-	sound_effect_slider.value = (
-		game_settings.sound_effect_volume_percent if game_settings != null else 80.0
-	)
+	sound_effect_slider.value = (game_settings.sound_effect_volume_percent if game_settings != null else 80.0)
 	_update_volume_labels()
 	music_slider.value_changed.connect(_on_music_volume_changed)
 	sound_effect_slider.value_changed.connect(_on_sound_effect_volume_changed)
@@ -76,12 +56,8 @@ func _ready() -> void:
 	sound_effect_slider.drag_ended.connect(_on_volume_drag_ended)
 	music_slider.focus_entered.connect(_set_focus_border_visible.bind(music_focus_border, true))
 	music_slider.focus_exited.connect(_set_focus_border_visible.bind(music_focus_border, false))
-	sound_effect_slider.focus_entered.connect(
-		_set_focus_border_visible.bind(sound_effect_focus_border, true)
-	)
-	sound_effect_slider.focus_exited.connect(
-		_set_focus_border_visible.bind(sound_effect_focus_border, false)
-	)
+	sound_effect_slider.focus_entered.connect(_set_focus_border_visible.bind(sound_effect_focus_border, true))
+	sound_effect_slider.focus_exited.connect(_set_focus_border_visible.bind(sound_effect_focus_border, false))
 	reset_button.button_down.connect(_show_reset_confirmation)
 	# button_down responds immediately for mouse, keyboard, and joypad activation.
 	back_button.button_down.connect(_return_to_level_select)
@@ -205,13 +181,14 @@ func _return_to_level_select() -> void:
 		game_settings.flush_pending_save()
 	is_transitioning = true
 	var scene_loader := get_node_or_null("/root/SceneLoader") as SCENE_LOADER_SCRIPT
-	var change_error := await scene_loader.change_scene_to_file(LEVEL_SELECT_SCENE_PATH) \
-		if scene_loader != null else get_tree().change_scene_to_file(LEVEL_SELECT_SCENE_PATH)
+	var change_error := (
+		await scene_loader.change_scene_to_file(LEVEL_SELECT_SCENE_PATH)
+		if scene_loader != null
+		else get_tree().change_scene_to_file(LEVEL_SELECT_SCENE_PATH)
+	)
 	if change_error != OK:
 		is_transitioning = false
-		push_error(
-			"Could not return from Settings to Level Select: %s" % error_string(change_error)
-		)
+		push_error("Could not return from Settings to Level Select: %s" % error_string(change_error))
 
 
 func _get_game_settings() -> GDGameSettings:

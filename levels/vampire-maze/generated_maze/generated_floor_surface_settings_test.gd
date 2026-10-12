@@ -1,10 +1,7 @@
 extends "res://tests/test_case.gd"
 
-const SUBJECT := preload(
-	"res://levels/vampire-maze/generated_maze/generated_floor_surface_settings.gd"
-)
-const SUBJECT_PATH := \
-	"res://levels/vampire-maze/generated_maze/generated_floor_surface_settings.gd"
+const SUBJECT := preload("res://levels/vampire-maze/generated_maze/generated_floor_surface_settings.gd")
+const SUBJECT_PATH := "res://levels/vampire-maze/generated_maze/generated_floor_surface_settings.gd"
 
 
 func run(_tree: SceneTree) -> void:

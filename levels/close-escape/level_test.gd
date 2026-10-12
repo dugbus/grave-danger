@@ -81,33 +81,27 @@ func run(_tree: SceneTree) -> void:
 
 	var district_one := _find_reachable_cells(START_CELL, walkable_cells, all_locks)
 	expect(
-		district_one.has(SILVER_KEY_CELLS[0])
-			and not district_one.has(SILVER_KEY_CELLS[1]),
+		district_one.has(SILVER_KEY_CELLS[0]) and not district_one.has(SILVER_KEY_CELLS[1]),
 		"The first district contains only the silver key needed for its sealed exit."
 	)
 
 	all_locks.erase(SILVER_DOOR_CELLS[0])
 	var district_two := _find_reachable_cells(START_CELL, walkable_cells, all_locks)
 	expect(
-		district_two.has(SILVER_KEY_CELLS[1])
-			and not district_two.has(SILVER_KEY_CELLS[2]),
+		district_two.has(SILVER_KEY_CELLS[1]) and not district_two.has(SILVER_KEY_CELLS[2]),
 		"Opening the first door exposes the second key without bypassing the next lock."
 	)
 
 	all_locks.erase(SILVER_DOOR_CELLS[1])
 	var district_three := _find_reachable_cells(START_CELL, walkable_cells, all_locks)
 	expect(
-		district_three.has(SILVER_KEY_CELLS[2])
-			and not district_three.has(GOLD_KEY_CELL),
+		district_three.has(SILVER_KEY_CELLS[2]) and not district_three.has(GOLD_KEY_CELL),
 		"Opening the second door exposes the third key while the vault remains sealed."
 	)
 
 	all_locks.erase(SILVER_DOOR_CELLS[2])
 	var unlocked_vault := _find_reachable_cells(START_CELL, walkable_cells, all_locks)
-	expect(
-		unlocked_vault.has(GOLD_KEY_CELL),
-		"The third silver door exposes the spike-vault route to the gold key."
-	)
+	expect(unlocked_vault.has(GOLD_KEY_CELL), "The third silver door exposes the spike-vault route to the gold key.")
 
 	all_locks.erase(FINAL_GATE_CELL)
 	var complete_route := _find_reachable_cells(START_CELL, walkable_cells, all_locks)
@@ -139,29 +133,37 @@ func run(_tree: SceneTree) -> void:
 		"Every open skeleton path reverses at its endpoints instead of teleporting to its start."
 	)
 	expect(
-		level_scene_text.count("instance=ExtResource(\"12_spike\")") == 6
-			and level_scene_text.count("instance=ExtResource(\"13_skeleton\")") == 5
-			and level_scene_text.count("instance=ExtResource(\"14_zombie\")") == 3
-			and level_scene_text.count("instance=ExtResource(\"15_bat_nest\")") == 4,
+		(
+			level_scene_text.count('instance=ExtResource("12_spike")') == 6
+			and level_scene_text.count('instance=ExtResource("13_skeleton")') == 5
+			and level_scene_text.count('instance=ExtResource("14_zombie")') == 3
+			and level_scene_text.count('instance=ExtResource("15_bat_nest")') == 4
+		),
 		"The authored gauntlet includes a concentrated spike vault, five patrols, three hunters, and four bat nests."
 	)
 	expect(
-		level_scene_text.count("instance=ExtResource(\"8_door\")") == 3
-			and level_scene_text.count("instance=ExtResource(\"16_treasure\")") == 10
-			and level_scene_text.count("instance=ExtResource(\"17_deposit\")") == 4,
+		(
+			level_scene_text.count('instance=ExtResource("8_door")') == 3
+			and level_scene_text.count('instance=ExtResource("16_treasure")') == 10
+			and level_scene_text.count('instance=ExtResource("17_deposit")') == 4
+		),
 		"Close Escape keeps three silver locks, ten treasure caches, and four deposit points."
 	)
 	expect(
-		level_scene_text.count("instance=ExtResource(\"24_rolling_rock\")") == 2
-			and level_scene_text.count("instance=ExtResource(\"25_millstone\")") == 1
-			and level_scene_text.count("instance=ExtResource(\"26_hay_bale\")") == 2
-			and level_scene_text.count("instance=ExtResource(\"27_breakable_wall\")") == 1,
+		(
+			level_scene_text.count('instance=ExtResource("24_rolling_rock")') == 2
+			and level_scene_text.count('instance=ExtResource("25_millstone")') == 1
+			and level_scene_text.count('instance=ExtResource("26_hay_bale")') == 2
+			and level_scene_text.count('instance=ExtResource("27_breakable_wall")') == 1
+		),
 		"Distinct districts use rolling obstacles and a breakable shortcut instead of repeating entrance spikes."
 	)
 	expect(
-		_has_only_coin_caches(level)
+		(
+			_has_only_coin_caches(level)
 			and level.get_node_or_null(^"EscapeWarning") == null
-			and not level_scene_text.contains("text_trigger.tscn"),
+			and not level_scene_text.contains("text_trigger.tscn")
+		),
 		"Every cache contains only coins and the opening message has been removed."
 	)
 	var boundary := level.get_node(^"KillBoundary2") as GDKillBoundary2
@@ -182,11 +184,7 @@ func _find_walkable_cells(wall_grid: GridMap) -> Dictionary:
 	return walkable_cells
 
 
-func _find_reachable_cells(
-	start: Vector2i,
-	walkable_cells: Dictionary,
-	blocked_cells: Dictionary
-) -> Dictionary:
+func _find_reachable_cells(start: Vector2i, walkable_cells: Dictionary, blocked_cells: Dictionary) -> Dictionary:
 	var reachable_cells: Dictionary = {}
 	var frontier: Array[Vector2i] = [start]
 	reachable_cells[start] = true
@@ -244,10 +242,7 @@ func _has_correct_lock_requirements(level: Node3D) -> bool:
 		if door.key_requirement != GDLockableHingedPassage.KeyRequirement.SilverKey:
 			return false
 	var gate := progression.get_node(^"FinalGate") as GDLockableHingedPassage
-	return (
-		gate.key_requirement == GDLockableHingedPassage.KeyRequirement.GoldKey
-		and gate.completes_level
-	)
+	return gate.key_requirement == GDLockableHingedPassage.KeyRequirement.GoldKey and gate.completes_level
 
 
 func _has_reversing_skeleton_patrols(level: Node3D) -> bool:
@@ -270,7 +265,9 @@ func _has_only_coin_caches(level: Node3D) -> bool:
 
 
 func _has_directed_room_phases(boundary: GDKillBoundary2) -> bool:
-	var expected_times: Array[float] = [0.0, 32.0, 55.0, 105.0, 122.0, 140.0, 155.0, 170.0, 200.0, 215.0, 228.0, 239.0, 246.0]
+	var expected_times: Array[float] = [
+		0.0, 32.0, 55.0, 105.0, 122.0, 140.0, 155.0, 170.0, 200.0, 215.0, 228.0, 239.0, 246.0
+	]
 	if (
 		boundary.playback_mode != GDKillBoundary2Animator.PlaybackMode.SingleShot
 		or not boundary.player_blocking_enabled
@@ -279,10 +276,7 @@ func _has_directed_room_phases(boundary: GDKillBoundary2) -> bool:
 	):
 		return false
 	for pose_index in expected_times.size():
-		if not is_equal_approx(
-			boundary.sequence.get_pose(pose_index).time_seconds,
-			expected_times[pose_index]
-		):
+		if not is_equal_approx(boundary.sequence.get_pose(pose_index).time_seconds, expected_times[pose_index]):
 			return false
 
 	# Forward access must not depend on waiting for an expansion. The east and north edges
@@ -314,10 +308,6 @@ func _has_directed_room_phases(boundary: GDKillBoundary2) -> bool:
 
 func _pose_contains(boundary: GDKillBoundary2, pose_index: int, point: Vector2) -> bool:
 	var pose := boundary.sequence.get_pose(pose_index)
-	var perimeter := GDKillBoundary2Geometry.build_points(
-		pose.size,
-		pose.rounding,
-		boundary.settings.boundary_segments
-	)
+	var perimeter := GDKillBoundary2Geometry.build_points(pose.size, pose.rounding, boundary.settings.boundary_segments)
 	var local_point := point - Vector2(pose.position.x, pose.position.z)
 	return GDKillBoundary2Geometry.get_signed_distance(local_point, perimeter) >= 0.0

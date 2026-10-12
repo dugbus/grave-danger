@@ -1,7 +1,6 @@
 extends Node
 class_name GDVampirePresentation
 
-
 var animation_player: AnimationPlayer
 var idle_animation := ""
 var run_animation := ""

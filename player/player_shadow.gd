@@ -1,7 +1,6 @@
 extends MeshInstance3D
 class_name GDPlayerShadow
 
-
 ## Node used as the world-space source for the projected contact shadow.
 @export var source_path: NodePath = ^".."
 ## Physics layers treated as ground by the contact shadow probe.
@@ -37,11 +36,7 @@ func _update_projected_shadow() -> void:
 		return
 
 	var projected_position := _get_projected_position()
-	var shadow_basis := Basis.IDENTITY.scaled(Vector3(
-		maxf(shadow_size.x, 0.01),
-		1.0,
-		maxf(shadow_size.y, 0.01)
-	))
+	var shadow_basis := Basis.IDENTITY.scaled(Vector3(maxf(shadow_size.x, 0.01), 1.0, maxf(shadow_size.y, 0.01)))
 	global_transform = Transform3D(shadow_basis, projected_position)
 
 
@@ -66,12 +61,7 @@ func _probe_ground(origin: Vector3, target: Vector3) -> Variant:
 	if source is CollisionObject3D:
 		excluded_rids.append((source as CollisionObject3D).get_rid())
 
-	var query := PhysicsRayQueryParameters3D.create(
-		origin,
-		target,
-		ground_collision_mask,
-		excluded_rids
-	)
+	var query := PhysicsRayQueryParameters3D.create(origin, target, ground_collision_mask, excluded_rids)
 	query.collide_with_areas = false
 	query.collide_with_bodies = true
 
