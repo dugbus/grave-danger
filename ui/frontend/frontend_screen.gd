@@ -9,7 +9,7 @@ extends Control
 		reference_screen_size = Vector2(maxf(value.x, 1.0), maxf(value.y, 1.0))
 		_sync_screen_container()
 ## Canvas containing controls authored in reference-screen coordinates.
-@export var screen_container_path: NodePath = ^"ScreenContainer"
+@export_storage var screen_container_path: NodePath = ^"ScreenContainer"
 
 var screen_container: Control
 var observed_viewport: Viewport

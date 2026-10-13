@@ -2,9 +2,9 @@ extends CanvasLayer
 class_name GDElapsedTimeHud
 
 ## Node that provides the elapsed time value through get_elapsed_time().
-@export var time_source_path: NodePath
+@export_storage var time_source_path: NodePath
 ## Existing label to update. If missing, a fallback label is created.
-@export var elapsed_label_path: NodePath = ^"ElapsedLabel"
+@export_storage var elapsed_label_path: NodePath = ^"ElapsedLabel"
 ## Screen position of the top-left corner of the elapsed time label.
 @export var label_position := Vector2(16.0, 128.0)
 ## Font size used for the elapsed time label.

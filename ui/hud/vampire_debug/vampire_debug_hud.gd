@@ -2,9 +2,9 @@ extends CanvasLayer
 class_name GDVampireDebugHud
 
 ## Vampire whose live AI state is displayed by this development HUD.
-@export var vampire_path: NodePath = ^"../Vampire"
+@export_storage var vampire_path: NodePath = ^"../Vampire"
 ## Authored HUD label updated with the Vampire state and confirmed sight result.
-@export var state_label_path: NodePath = ^"Screen/StateLabel"
+@export_storage var state_label_path: NodePath = ^"Screen/StateLabel"
 
 @onready var state_label := get_node_or_null(state_label_path) as Label
 

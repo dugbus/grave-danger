@@ -3,12 +3,10 @@ class_name GDPlaythroughPositionDebuggerReporter
 
 const MESSAGE_NAME: StringName = &"playthrough_position_markers:sample"
 const RUN_PLAYBACK_SESSION_GROUP: StringName = &"run_playback_session"
-const PositionSampler := preload(
-	"res://addons/playthrough_position_markers/position_sampler.gd"
-)
+const PositionSampler := preload("res://addons/playthrough_position_markers/position_sampler.gd")
 
 ## Sampler within the capture scene whose neutral sample signal is sent to the editor debugger.
-@export var sampler_path := NodePath("Sampler")
+@export_storage var sampler_path := NodePath("Sampler")
 
 @onready var sampler := get_node_or_null(sampler_path) as PositionSampler
 
@@ -21,8 +19,7 @@ func _ready() -> void:
 
 ## Starts capture only for the live gameplay host's explicitly configured player and level.
 func capture_playthrough_positions(tracked_node: Node3D, level_root: Node3D) -> bool:
-	if is_frontend_playback(tracked_node) \
-			or sampler == null or not EngineDebugger.is_active():
+	if is_frontend_playback(tracked_node) or sampler == null or not EngineDebugger.is_active():
 		return false
 	return sampler.start(tracked_node, level_root)
 
@@ -37,12 +34,5 @@ func is_frontend_playback(tracked_node: Node) -> bool:
 	return false
 
 
-func _on_position_sampled(
-	level_scene_path: String,
-	elapsed_seconds: float,
-	local_position: Vector3
-) -> void:
-	EngineDebugger.send_message(
-		MESSAGE_NAME,
-		[level_scene_path, elapsed_seconds, local_position]
-	)
+func _on_position_sampled(level_scene_path: String, elapsed_seconds: float, local_position: Vector3) -> void:
+	EngineDebugger.send_message(MESSAGE_NAME, [level_scene_path, elapsed_seconds, local_position])

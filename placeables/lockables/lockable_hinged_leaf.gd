@@ -6,12 +6,18 @@ const PLAYER_COLLISION_LAYER := 2
 const MIN_PUSH_SPEED_SQUARED := 0.01
 const MIN_HINGE_DISTANCE_SQUARED := 0.001
 
+## Maximum door opening angle from its closed pose, in degrees.
 @export_range(0.0, 180.0, 1.0, "degrees") var open_limit_degrees := 105.0
+## Turning force applied when a character pushes the door.
 @export_range(0.0, 50.0, 0.1) var push_torque := 16.0
+## Strength of the restoring force when the door moves beyond its opening limit.
 @export_range(0.0, 20.0, 0.1) var limit_spring_strength := 9.0
+## Strength of the force that holds the door near its closed pose.
 @export_range(0.0, 10.0, 0.1) var closed_latch_strength := 1.2
-@export_range(0.0, 5.0, 0.05) var closed_latch_angle_degrees := 4.0
-@export var push_area_path: NodePath = ^"PushArea"
+## Angle in degrees within which the closed-door latch applies.
+@export_storage var closed_latch_angle_degrees := 4.0
+## Area used to detect characters pushing this hinged leaf.
+@export_storage var push_area_path: NodePath = ^"PushArea"
 
 var closed_transform := Transform3D.IDENTITY
 var closed_yaw := 0.0

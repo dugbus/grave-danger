@@ -35,6 +35,7 @@ const EDITOR_SCRUB_TIME_EPSILON := 0.05
 const EDITOR_GHOST_PREVIEW_CYCLE_OFFSET := 0.38
 const EDITOR_PATH_MARKER_REFRESH_DELAY := 0.75
 const MINIMUM_EDITOR_PREVIEW_PATH_LENGTH := 0.001
+## Inspector group for Animation settings.
 @export_group("Animation")
 ## Animation controlling path progress, scale, shape morph, and future properties.
 @export var boundary_animation: Animation:
@@ -114,6 +115,7 @@ const MINIMUM_EDITOR_PREVIEW_PATH_LENGTH := 0.001
 		boundary_rotation_z_radians = value
 		_apply_boundary_scale_rotation()
 
+## Inspector group for Boundary settings.
 @export_group("Boundary")
 ## Legacy combined size retained so existing scenes deserialize without changing dimensions.
 @export_storage var bounds_size: Vector2:
@@ -171,6 +173,7 @@ const MINIMUM_EDITOR_PREVIEW_PATH_LENGTH := 0.001
 		flame_y = value
 		_sync_boundary()
 
+## Inspector group for Flame Effect settings.
 @export_group("Flame Effect")
 ## Opacity multiplier for the flame effect only.
 @export_range(0.0, 1.0, 0.01) var flame_effect_opacity := 1.0:
@@ -196,32 +199,41 @@ const MINIMUM_EDITOR_PREVIEW_PATH_LENGTH := 0.001
 		flame_effect_time_scale = maxf(value, 0.0)
 		_sync_boundary()
 
+## Sets the colour of the hottest, brightest part of each flame.
 @export var flame_effect_core_color := Color(1.0, 0.92, 0.42):
 	set(value):
 		flame_effect_core_color = value
 		_sync_boundary()
 
+## Sets the main colour between the bright core and dark outer edge of each flame.
 @export var flame_effect_mid_color := Color(1.0, 0.28, 0.015):
 	set(value):
 		flame_effect_mid_color = value
 		_sync_boundary()
 
+## Sets the colour around the cooler outside edge of each flame.
 @export var flame_effect_outer_color := Color(0.48, 0.008, 0.001):
 	set(value):
 		flame_effect_outer_color = value
 		_sync_boundary()
 
+## Inspector group for Ghost Effect settings.
 @export_group("Ghost Effect")
+## Tints every ghost on the boundary. Change this to match the level's mood or lighting.
 @export var ghost_effect_color := Color(0.58, 0.9, 1.0):
 	set(value):
 		ghost_effect_color = value
 		_sync_boundary()
 
+## Controls how brightly ghosts glow, especially in dark areas. This changes appearance only,
+## not damage.
 @export_range(0.0, 20.0, 0.1) var ghost_effect_emission := 6.2:
 	set(value):
 		ghost_effect_emission = maxf(value, 0.0)
 		_sync_boundary()
 
+## Controls how softly ghosts fade at their edges. Raise it for mistier ghosts or lower it for
+## sharper silhouettes.
 @export_range(0.0, 1.0, 0.01) var ghost_effect_edge_softness := 0.28:
 	set(value):
 		ghost_effect_edge_softness = clampf(value, 0.0, 1.0)
@@ -257,36 +269,43 @@ const MINIMUM_EDITOR_PREVIEW_PATH_LENGTH := 0.001
 		ghost_wave_amplitude = maxf(value, 0.0)
 		_sync_boundary()
 
+## Minimum and maximum opacity multipliers randomly assigned to boundary ghosts.
 @export var ghost_opacity_range := Vector2(0.92, 1.18):
 	set(value):
 		ghost_opacity_range = _sanitize_positive_range(value, 0.0)
 		_sync_boundary()
 
+## Minimum and maximum shader rise speeds randomly assigned to boundary ghosts.
 @export var ghost_rise_speed_range := Vector2(0.075, 0.18):
 	set(value):
 		ghost_rise_speed_range = _sanitize_positive_range(value, 0.0)
 		_sync_boundary()
 
+## Minimum and maximum wave frequencies randomly assigned to boundary ghosts.
 @export var ghost_wave_frequency_range := Vector2(3.4, 8.6):
 	set(value):
 		ghost_wave_frequency_range = _sanitize_positive_range(value, 0.01)
 		_sync_boundary()
 
+## Minimum and maximum wave animation speeds randomly assigned to boundary ghosts.
 @export var ghost_wave_speed_range := Vector2(0.7, 1.9):
 	set(value):
 		ghost_wave_speed_range = _sanitize_positive_range(value, 0.0)
 		_sync_boundary()
 
+## Minimum and maximum sideways lean values randomly assigned to boundary ghosts.
 @export var ghost_lean_range := Vector2(-0.28, 0.28):
 	set(value):
 		ghost_lean_range = Vector2(minf(value.x, value.y), maxf(value.x, value.y))
 		_sync_boundary()
 
+## Minimum and maximum emergence depths as a fraction of each ghost's height.
 @export var ghost_emerge_depth_ratio_range := Vector2(0.72, 1.02):
 	set(value):
 		ghost_emerge_depth_ratio_range = _sanitize_positive_range(value, 0.0)
 		_sync_boundary()
 
+## Inspector group for Player Blocking settings.
 @export_group("Player Blocking")
 ## Enables invisible collision walls around the kill boundary.
 @export var player_blocking_enabled := true:
@@ -312,6 +331,7 @@ const MINIMUM_EDITOR_PREVIEW_PATH_LENGTH := 0.001
 		player_blocking_height = maxf(value, 0.05)
 		_sync_boundary()
 
+## Inspector group for Flame Damage settings.
 @export_group("Flame Damage")
 ## Flame energy drained per second while the player is inside the flames.
 @export var flame_damage_per_second := 35.0
@@ -324,6 +344,7 @@ const MINIMUM_EDITOR_PREVIEW_PATH_LENGTH := 0.001
 ## Extra vertical tolerance above and below the flame damage volume.
 @export var flame_damage_vertical_margin := 0.75
 
+## Inspector group for Near Flame Audio settings.
 @export_group("Near Flame Audio")
 ## Distance from flames where the near-flame audio starts fading in.
 @export var near_flame_audio_distance := 4.0

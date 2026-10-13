@@ -5,13 +5,13 @@ const ActiveFlaskHudScene := preload("res://ui/hud/active_flask_hud.gd")
 const HudPanelScene := preload("res://ui/hud/panel.tscn")
 
 ## Node that owns flame energy and death state values for the HUD panel.
-@export var death_controller_path: NodePath = ^"../Player/PlayerDeath"
+@export_storage var death_controller_path: NodePath = ^"../Player/PlayerDeath"
 ## Node that owns carried-item capacity for the HUD panel.
-@export var inventory_path: NodePath = ^"../Player/PlayerInventory"
+@export_storage var inventory_path: NodePath = ^"../Player/PlayerInventory"
 ## Existing editor-placed full HUD panel. If missing, a fallback panel is created.
-@export var hud_panel_path: NodePath = ^"HudPanel"
+@export_storage var hud_panel_path: NodePath = ^"HudPanel"
 ## Existing editor-placed low-health vignette. If missing, this HUD skips the screen-edge warning.
-@export var low_health_vignette_path: NodePath = ^"../LowHealthVignette"
+@export_storage var low_health_vignette_path: NodePath = ^"../LowHealthVignette"
 
 var death_controller: GDPlayerDeath
 var player_inventory: GDPlayerInventory

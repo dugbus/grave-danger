@@ -1,0 +1,1902 @@
+{
+  "addons/floor_surface/floor_elevation_profile.gd": {
+    "designer": [
+      "elevation_unit",
+      "walkable_step_units",
+      "normal_jump_units",
+      "unencumbered_jump_units",
+      "ordinary_drop_units"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "addons/floor_surface/floor_map.gd": {
+    "designer": [
+      "minimum_cell",
+      "dimensions",
+      "default_present",
+      "default_elevation",
+      "default_style_index"
+    ],
+    "stored": [
+      "style_overrides",
+      "low_edge_overrides",
+      "presence_exceptions",
+      "elevation_overrides",
+      "transition_overrides"
+    ],
+    "runtime": []
+  },
+  "addons/floor_surface/floor_style.gd": {
+    "designer": [
+      "display_name",
+      "world_uv_metres",
+      "top_uv_mapping",
+      "wall_uv_metres",
+      "top_material",
+      "wall_material",
+      "pit_bottom_material",
+      "pit_depth"
+    ],
+    "stored": [
+      "edge_material"
+    ],
+    "runtime": []
+  },
+  "addons/floor_surface/floor_surface.gd": {
+    "designer": [
+      "floor_map",
+      "elevation_profile",
+      "styles",
+      "cell_size",
+      "world_origin_xz",
+      "placement_grid_map_path"
+    ],
+    "stored": [
+      "top_mesh_path",
+      "collision_shape_path"
+    ],
+    "runtime": []
+  },
+  "addons/floor_surface/floor_surface_grounding.gd": {
+    "designer": [
+      "surface_path",
+      "grounding_mode",
+      "height_offset",
+      "heading_radians"
+    ],
+    "stored": [
+      "grounding_stale"
+    ],
+    "runtime": []
+  },
+  "addons/floor_surface/test/floor_surface_camera_settings.gd": {
+    "designer": [
+      "overview_position",
+      "overview_target",
+      "overview_size",
+      "close_position",
+      "close_target",
+      "close_size",
+      "side_position",
+      "side_target",
+      "side_size"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "addons/floor_surface/test/floor_surface_playground.gd": {
+    "designer": [
+      "camera_settings",
+      "show_diagnostics_on_start",
+      "trial_names"
+    ],
+    "stored": [
+      "camera_path",
+      "player_path",
+      "surface_path",
+      "status_label_path",
+      "visibility_path",
+      "hud_path",
+      "trial_start_paths"
+    ],
+    "runtime": []
+  },
+  "addons/floor_surface/test/floor_surface_test_player.gd": {
+    "designer": [
+      "settings",
+      "floor_surface_path"
+    ],
+    "stored": [
+      "movement_camera_path",
+      "reset_marker_path"
+    ],
+    "runtime": []
+  },
+  "addons/floor_surface/test/floor_surface_test_player_settings.gd": {
+    "designer": [
+      "movement_speed",
+      "acceleration",
+      "deceleration",
+      "gravity",
+      "normal_jump_height",
+      "unencumbered_jump_height",
+      "floor_snap_length",
+      "maximum_step_height",
+      "step_probe_distance",
+      "maximum_floor_angle_degrees",
+      "fall_reset_y"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "addons/playthrough_position_markers/debugger_reporter.gd": {
+    "designer": [],
+    "stored": [
+      "sampler_path"
+    ],
+    "runtime": []
+  },
+  "addons/playthrough_position_markers/playthrough_position_sampling_settings.gd": {
+    "designer": [
+      "sample_interval_seconds"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "addons/playthrough_position_markers/position_sampler.gd": {
+    "designer": [
+      "settings"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "addons/png_to_gridmap/png_to_gridmap_autotile_alternative.gd": {
+    "designer": [
+      "item_ref",
+      "connection_shape",
+      "rotation_offset"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "addons/png_to_gridmap/png_to_gridmap_color_mapping.gd": {
+    "designer": [
+      "colour",
+      "display_name",
+      "base_item_ref",
+      "base_rotation_offset",
+      "autotile_enabled",
+      "autotile_connectivity_group",
+      "solo_item_ref",
+      "solo_rotation_offset",
+      "end_item_ref",
+      "end_rotation_offset",
+      "corner_item_ref",
+      "corner_rotation_offset",
+      "tee_item_ref",
+      "tee_rotation_offset",
+      "cross_item_ref",
+      "cross_rotation_offset",
+      "autotile_alternatives"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "addons/png_to_gridmap/png_to_gridmap_settings.gd": {
+    "designer": [
+      "png_path",
+      "export_png_path",
+      "target_gridmap_path",
+      "mesh_library_path",
+      "gridmap_name",
+      "cell_size",
+      "colour_match_tolerance",
+      "auto_repair",
+      "autotile_vertical_connection_metres",
+      "export_origin",
+      "export_size",
+      "color_mappings",
+      "floor_surface_path",
+      "floor_material_path",
+      "floor_materials_folder"
+    ],
+    "stored": [
+      "ignored_colour_keys"
+    ],
+    "runtime": []
+  },
+  "enemies/bat_nest.gd": {
+    "designer": [
+      "bat_scene",
+      "bat_count",
+      "cluster_radius",
+      "cluster_height",
+      "bat_scale",
+      "trigger_radius",
+      "player_spawn_height",
+      "player_spawn_radius",
+      "swarm_seconds",
+      "fly_off_seconds",
+      "fly_off_turn_seconds",
+      "swarm_height",
+      "swarm_radius",
+      "swarm_speed",
+      "fly_off_speed",
+      "fly_off_rise_speed",
+      "fly_off_spread_degrees",
+      "player_attraction_weight",
+      "orbit_weight",
+      "annoyance_weight",
+      "flap_animation_speed_scale",
+      "flap_sound_path",
+      "flap_sound_volume_db",
+      "flap_sound_pitch_min",
+      "flap_sound_pitch_max",
+      "flap_sound_interval_min",
+      "flap_sound_interval_max",
+      "flap_sound_max_distance",
+      "flap_sound_unit_size",
+      "squeak_sound_paths",
+      "squeak_sound_volume_db",
+      "squeak_sound_pitch_min",
+      "squeak_sound_pitch_max",
+      "squeak_sound_interval_min",
+      "squeak_sound_interval_max",
+      "squeak_sound_chance_percent",
+      "squeak_sound_max_distance",
+      "squeak_sound_unit_size",
+      "fly_off_audio_fade_seconds",
+      "camera_scare_chance_percent",
+      "camera_scare_duration",
+      "camera_scare_distance",
+      "camera_scare_speed",
+      "camera_scare_scale_multiplier"
+    ],
+    "stored": [
+      "player_group",
+      "cohesion_weight",
+      "alignment_weight",
+      "separation_weight",
+      "separation_distance",
+      "flap_sound_max_concurrent",
+      "squeak_sound_max_concurrent"
+    ],
+    "runtime": []
+  },
+  "enemies/ground_enemy_editor_placement.gd": {
+    "designer": [],
+    "stored": [
+      "floor_sample_path",
+      "collision_mask",
+      "minimum_floor_normal_y"
+    ],
+    "runtime": []
+  },
+  "enemies/ground_spawn_settings.gd": {
+    "designer": [
+      "below_floor_search_distance",
+      "above_floor_search_distance"
+    ],
+    "stored": [
+      "floor_contact_epsilon"
+    ],
+    "runtime": []
+  },
+  "enemies/skeleton.gd": {
+    "designer": [
+      "kill_confirmation_time",
+      "drop_height",
+      "drop_duration",
+      "start_progress_ratio",
+      "shuffle_speed",
+      "loop_patrol",
+      "reverse_at_path_ends",
+      "turn_speed",
+      "walk_animation_speed_scale",
+      "death_animation_speed_scale",
+      "footstep_speed_threshold",
+      "footstep_distance",
+      "footstep_distance_variance",
+      "footstep_pitch_min",
+      "footstep_pitch_max",
+      "footstep_volume_min_db",
+      "footstep_volume_max_db",
+      "footstep_volume_variance_db",
+      "rolling_ball_death_enabled",
+      "rolling_ball_death_encroachment_percent",
+      "death_disappear_delay",
+      "death_disappear_duration",
+      "death_sink_depth",
+      "death_fade_start_ratio",
+      "death_scream_volume_db",
+      "skeleton_light_enabled",
+      "skeleton_light_color",
+      "skeleton_light_energy",
+      "skeleton_light_range",
+      "skeleton_light_attenuation"
+    ],
+    "stored": [
+      "path_follow_path",
+      "drop_pivot_path",
+      "skeleton_body_path",
+      "pivot_path",
+      "character_path",
+      "kill_area_path",
+      "shadow_path",
+      "skeleton_light_path",
+      "drop_in_time",
+      "map_collision_mask",
+      "enemy_collision_mask",
+      "map_collision_probe_height",
+      "map_collision_probe_distance",
+      "map_collision_floor_normal_y",
+      "map_collision_pushable_probe_radius",
+      "map_collision_pushable_probe_height",
+      "map_collision_pushable_probe_steps",
+      "walk_animation_name",
+      "idle_animation_name",
+      "death_animation_name",
+      "rolling_ball_death_detection_radius",
+      "rolling_ball_death_radius"
+    ],
+    "runtime": []
+  },
+  "enemies/vampire/effects/vampire_proximity_fog.gd": {
+    "designer": [],
+    "stored": [
+      "fog_rect_path"
+    ],
+    "runtime": []
+  },
+  "enemies/vampire/senses/vampire_senses.gd": {
+    "designer": [],
+    "stored": [
+      "visual_sight_ray_path",
+      "facing_node_path",
+      "travel_facing_node_path"
+    ],
+    "runtime": []
+  },
+  "enemies/vampire/vampire.gd": {
+    "designer": [
+      "settings"
+    ],
+    "stored": [
+      "pivot_path",
+      "character_path",
+      "navigation_path",
+      "look_path",
+      "presentation_path",
+      "contact_path",
+      "senses_path",
+      "hunt_path",
+      "layout_knowledge_path",
+      "proximity_fog_path",
+      "disable_vampire_for_testing"
+    ],
+    "runtime": []
+  },
+  "enemies/vampire/vampire_contact.gd": {
+    "designer": [],
+    "stored": [
+      "collision_shape_path",
+      "contact_occlusion_mask"
+    ],
+    "runtime": []
+  },
+  "enemies/vampire/vampire_look.gd": {
+    "designer": [],
+    "stored": [
+      "travel_pivot_path",
+      "look_direction_path",
+      "character_path",
+      "headlamp_path"
+    ],
+    "runtime": []
+  },
+  "enemies/vampire/vampire_settings.gd": {
+    "designer": [
+      "model_scale",
+      "max_speed",
+      "acceleration",
+      "deceleration",
+      "turn_speed",
+      "sight_distance",
+      "sight_field_of_view_degrees",
+      "sight_loss_grace_seconds",
+      "instant_kill_contact_radius",
+      "proximity_fog_distance",
+      "proximity_fog_max_intensity",
+      "obstacle_stride_vertical_speed",
+      "last_seen_prediction_seconds",
+      "last_seen_prediction_max_distance",
+      "last_seen_prediction_minimum_speed",
+      "prediction_followup_distance",
+      "prediction_followup_max_distance",
+      "prediction_followup_search_count",
+      "junction_scan_seconds_per_direction",
+      "assumed_player_max_speed",
+      "layout_knowledge_minimum_search_distance",
+      "noise_evidence_half_life_seconds",
+      "proximity_fog_full_distance",
+      "proximity_fog_response_speed"
+    ],
+    "stored": [
+      "waypoint_reached_distance",
+      "target_reached_distance",
+      "maximum_route_search_cells",
+      "noise_search_seed",
+      "wall_stall_recovery_seconds",
+      "wall_stall_minimum_speed",
+      "wall_stall_minimum_progress_speed",
+      "sight_origin_height",
+      "sight_clearance_radius",
+      "direct_path_clearance_margin",
+      "visual_sight_sample_half_width",
+      "chase_branch_change_alignment",
+      "visible_target_reached_distance",
+      "visible_route_contact_distance",
+      "last_seen_velocity_sample_weight",
+      "last_seen_prediction_alignment",
+      "junction_scan_probe_distance",
+      "noise_retarget_distance",
+      "noise_search_minimum_distance_fraction",
+      "noise_path_hint_minimum_distance",
+      "noise_path_hint_minimum_alignment",
+      "layout_landmark_noise_match_distance"
+    ],
+    "runtime": []
+  },
+  "enemies/zombie/zombie_base.gd": {
+    "designer": [
+      "ai_enabled_on_ready",
+      "kill_confirmation_time",
+      "drop_height",
+      "drop_duration",
+      "start_progress_ratio",
+      "shuffle_speed",
+      "loop_patrol",
+      "reverse_at_path_ends",
+      "turn_speed",
+      "movement_acceleration",
+      "movement_deceleration",
+      "sharp_turn_slow_angle_degrees",
+      "sharp_turn_speed_multiplier",
+      "vision_range",
+      "fov_degrees",
+      "attack_range",
+      "lost_sight_seconds",
+      "search_duration",
+      "idle_scan_min_seconds",
+      "idle_scan_max_seconds",
+      "idle_scan_max_turn_degrees",
+      "stuck_seconds_before_sit",
+      "attack_damage",
+      "attack_cooldown",
+      "attack_hit_start_ratio",
+      "attack_hit_end_ratio",
+      "punch_hit_sound_path",
+      "punch_hit_volume_db",
+      "rolling_ball_death_enabled",
+      "rolling_ball_death_encroachment_percent",
+      "death_disappear_delay",
+      "death_disappear_duration",
+      "death_sink_depth",
+      "death_fade_start_ratio",
+      "death_scream_volume_db",
+      "walk_animation_speed_scale",
+      "run_animation_speed_scale",
+      "death_animation_speed_scale",
+      "footstep_speed_threshold",
+      "footstep_distance",
+      "footstep_distance_variance",
+      "footstep_pitch_min",
+      "footstep_pitch_max",
+      "footstep_volume_min_db",
+      "footstep_volume_max_db",
+      "footstep_volume_variance_db",
+      "zombie_light_enabled",
+      "zombie_light_color",
+      "zombie_light_energy",
+      "zombie_light_range",
+      "zombie_light_attenuation"
+    ],
+    "stored": [
+      "path_follow_path",
+      "zombie_body_path",
+      "navigation_agent_path",
+      "drop_pivot_path",
+      "pivot_path",
+      "character_path",
+      "vision_origin_path",
+      "kill_area_path",
+      "shadow_path",
+      "zombie_light_path",
+      "attack_hitbox_right_path",
+      "attack_hitbox_left_path",
+      "crush_check_area_path",
+      "drop_in_time",
+      "patrol_point_reached_distance",
+      "player_target_height",
+      "attack_continue_range",
+      "attack_position_slot_count",
+      "attack_position_clearance",
+      "attack_position_reached_distance",
+      "repath_interval",
+      "vision_interval",
+      "sit_repath_interval",
+      "sit_vision_interval",
+      "stuck_min_move_distance",
+      "grid_navigation_padding_cells",
+      "grid_navigation_max_search_cells",
+      "direct_navigation_fallback_enabled",
+      "vision_collision_mask",
+      "map_collision_mask",
+      "player_touch_attack_probe_margin",
+      "attack_hit_start_seconds",
+      "attack_hit_end_seconds",
+      "navigation_collision_floor_normal_y",
+      "rolling_ball_death_detection_radius",
+      "rolling_ball_death_radius",
+      "crush_confirm_seconds",
+      "static_animation_name",
+      "walk_animation_name",
+      "run_animation_name",
+      "idle_animation_name",
+      "sit_animation_name",
+      "death_animation_name",
+      "attack_animation_names"
+    ],
+    "runtime": [
+      "navigation_ready"
+    ]
+  },
+  "game/character_look_settings.gd": {
+    "designer": [
+      "maximum_head_turn_degrees",
+      "focused_head_turn_degrees",
+      "enemy_attention_distance",
+      "enemy_attention_half_arc_degrees",
+      "head_turn_speed",
+      "glance_hold_seconds",
+      "focused_glance_hold_seconds",
+      "idle_glance_interval_min_seconds",
+      "idle_glance_interval_max_seconds",
+      "focused_glance_interval_min_seconds",
+      "focused_glance_interval_max_seconds",
+      "movement_focus_exponent",
+      "continuous_idle_strength_threshold",
+      "upper_body_turn_fraction"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "game/follow_camera.gd": {
+    "designer": [
+      "camera_profile"
+    ],
+    "stored": [
+      "target_path",
+      "kill_boundary_path",
+      "camera_offset",
+      "view_elevation_degrees",
+      "look_ahead",
+      "forward_look_ahead",
+      "follow_lag",
+      "zoom_distance",
+      "min_zoom_distance",
+      "max_zoom_distance",
+      "manual_zoom_speed",
+      "field_of_view",
+      "boundary_padding",
+      "boundary_zoom_lag",
+      "max_boundary_zoom_distance",
+      "boundary_fit_iterations",
+      "rotation_speed",
+      "camera_input_deadzone",
+      "death_zoom_distance",
+      "death_look_offset",
+      "death_zoom_lag"
+    ],
+    "runtime": []
+  },
+  "game/follow_camera_profile.gd": {
+    "designer": [
+      "camera_offset",
+      "view_elevation_degrees",
+      "look_ahead",
+      "forward_look_ahead",
+      "follow_lag",
+      "zoom_distance",
+      "min_zoom_distance",
+      "max_zoom_distance",
+      "manual_zoom_speed",
+      "field_of_view",
+      "boundary_padding",
+      "boundary_zoom_lag",
+      "max_boundary_zoom_distance",
+      "rotation_speed",
+      "camera_input_deadzone",
+      "death_zoom_distance",
+      "death_look_offset",
+      "death_zoom_lag"
+    ],
+    "stored": [
+      "boundary_fit_iterations"
+    ],
+    "runtime": []
+  },
+  "game/graveyard.gd": {
+    "designer": [
+      "win_fade_out_duration",
+      "default_level_scene_path"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "inventory/carried_item.gd": {
+    "designer": [
+      "item_type",
+      "display_name",
+      "max_count",
+      "weight",
+      "treasure_value",
+      "drop_order",
+      "world_scene_path",
+      "require_facing_for_pickup",
+      "pickup_sound",
+      "drop_sound",
+      "landing_sound"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "inventory/inventory_pickup.gd": {
+    "designer": [
+      "carried_item",
+      "pickup_delay"
+    ],
+    "stored": [
+      "pickup_area_path",
+      "pickup_collision_mask",
+      "generated_pickup_radius"
+    ],
+    "runtime": []
+  },
+  "inventory/key.gd": {
+    "designer": [
+      "key_material"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "levels/close-escape/boundary_progression.gd": {
+    "designer": [
+      "boundary",
+      "passages",
+      "checkpoints",
+      "catch_up_rate"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "levels/graveyard/level.gd": {
+    "designer": [
+      "floor_size",
+      "tree_surround_seed",
+      "generate_tree_surround",
+      "enable_direct_run_camera",
+      "direct_run_camera_profile"
+    ],
+    "stored": [
+      "disable_legacy_grid_map",
+      "direct_run_camera_offset"
+    ],
+    "runtime": []
+  },
+  "levels/graveyard/level_select_crypt.gd": {
+    "designer": [
+      "openable",
+      "locked",
+      "open_limit_degrees",
+      "push_torque",
+      "limit_spring_strength",
+      "closed_latch_strength",
+      "target_level_number",
+      "trigger_fade_out_duration"
+    ],
+    "stored": [
+      "door_path",
+      "closed_latch_angle_degrees",
+      "collision_padding",
+      "push_area_padding",
+      "level_trigger_path"
+    ],
+    "runtime": []
+  },
+  "levels/graveyard/level_tree_surround.gd": {
+    "designer": [
+      "tree_scenes",
+      "tree_spacing",
+      "inner_gap",
+      "surround_depth",
+      "placement_jitter",
+      "minimum_tree_scale",
+      "maximum_tree_scale",
+      "far_row_keep_chance",
+      "blocker_thickness",
+      "blocker_height"
+    ],
+    "stored": [
+      "chunk_size"
+    ],
+    "runtime": []
+  },
+  "levels/kill-boundary-2-demo/kill_boundary_2_demo_controls.gd": {
+    "designer": [],
+    "stored": [
+      "boundary_path"
+    ],
+    "runtime": []
+  },
+  "levels/level_definition.gd": {
+    "designer": [
+      "id",
+      "display_name",
+      "folder_name",
+      "available",
+      "tutorial",
+      "run_playback_enabled"
+    ],
+    "stored": [
+      "legacy_result_key"
+    ],
+    "runtime": []
+  },
+  "levels/level_mapping.gd": {
+    "designer": [
+      "level_entries"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "levels/level_settings.gd": {
+    "designer": [
+      "show_minimap"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "levels/vampire-maze/generated_maze/generated_bat_noise.gd": {
+    "designer": [],
+    "stored": [
+      "bat_nest_path"
+    ],
+    "runtime": []
+  },
+  "levels/vampire-maze/generated_maze/generated_content_config.gd": {
+    "designer": [
+      "treasure_pile_count",
+      "minimum_coins_per_pile",
+      "maximum_coins_per_pile",
+      "minimum_treasure_pile_spacing_tiles",
+      "main_path_treasure_percent",
+      "grass_enabled",
+      "grass_coverage_percent",
+      "grass_patch_size_tiles",
+      "grass_blades_per_cell",
+      "grass_route_clearance_tiles",
+      "diamond_budget",
+      "ruby_budget",
+      "sapphire_budget",
+      "emerald_budget",
+      "amethyst_budget",
+      "gold_bar_budget",
+      "assumed_carry_capacity",
+      "target_carry_load_percent",
+      "minimum_coffin_count",
+      "minimum_coffin_spacing_tiles",
+      "preferred_coffin_treasure_clearance_tiles",
+      "door_count",
+      "key_off_path_percent",
+      "minimum_door_spacing",
+      "bat_nest_count",
+      "bat_off_path_percent"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "levels/vampire-maze/generated_maze/generated_grass.gd": {
+    "designer": [],
+    "stored": [
+      "generated_transforms"
+    ],
+    "runtime": []
+  },
+  "levels/vampire-maze/generated_maze/generated_maze.gd": {
+    "designer": [
+      "maze_seed",
+      "configuration",
+      "floor_material",
+      "floor_texture_tiles",
+      "floor_tile_route_destination",
+      "floor_tile_route_percent",
+      "character_spawn_height",
+      "generate_in_editor",
+      "freeze_generated_level_action"
+    ],
+    "stored": [
+      "wall_grid_map_path",
+      "floor_surface_path",
+      "player_path",
+      "vampire_path",
+      "generated_content_path",
+      "authored_content_path",
+      "baked_generation_version",
+      "baked_maze_seed",
+      "baked_width",
+      "baked_height"
+    ],
+    "runtime": []
+  },
+  "levels/vampire-maze/generated_maze/generated_maze_config.gd": {
+    "designer": [
+      "width",
+      "height",
+      "hallway_width",
+      "internal_connection_percent",
+      "carve_spawn_sightline",
+      "carve_end_gate_opening",
+      "wall_repair_settings",
+      "content_configuration"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "levels/vampire-maze/minimap_route_overlay.gd": {
+    "designer": [
+      "route_height"
+    ],
+    "stored": [
+      "player_path",
+      "end_gate_path",
+      "wall_grid_map_path",
+      "floor_surface_path"
+    ],
+    "runtime": []
+  },
+  "levels/vampire-maze/vampire_development_view.gd": {
+    "designer": [
+      "development_ambient_energy"
+    ],
+    "stored": [
+      "camera_path",
+      "world_environment_path"
+    ],
+    "runtime": []
+  },
+  "levels/vampire-maze/vampire_maze.gd": {
+    "designer": [],
+    "stored": [
+      "player_path",
+      "vampire_path",
+      "end_gate_path",
+      "generated_content_path",
+      "wall_grid_map_path"
+    ],
+    "runtime": []
+  },
+  "lighting/gd_indoor_lighting.gd": {
+    "designer": [
+      "shadow_opacity",
+      "shadow_bias",
+      "shadow_normal_bias"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "placeables/area_placeable.gd": {
+    "designer": [
+      "spawn_time"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "placeables/character_placeable.gd": {
+    "designer": [
+      "spawn_time"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "placeables/collectibles/flask_base.gd": {
+    "designer": [
+      "liquid_color",
+      "liquid_emission_energy",
+      "spin_speed",
+      "bob_height",
+      "bob_speed",
+      "collect_shrink_duration",
+      "pickup_volume_db",
+      "hud_effect_id",
+      "show_hud_countdown"
+    ],
+    "stored": [],
+    "runtime": [
+      "global_flask_properties"
+    ]
+  },
+  "placeables/collectibles/global_flask_properties.gd": {
+    "designer": [
+      "health_heal_duration",
+      "health_heal_percent_of_max",
+      "bigger_sack_extra_inventory_space",
+      "bigger_sack_display_seconds",
+      "breathing_space_expansion_percent",
+      "breathing_space_seconds",
+      "breathing_space_expansion_transition_seconds",
+      "breathing_space_contraction_transition_seconds",
+      "no_boundary_sink_seconds",
+      "no_boundary_sink_distance",
+      "no_boundary_display_seconds",
+      "pause_boundary_seconds",
+      "pickup_radius_percent",
+      "pickup_radius_seconds",
+      "poison_damage_points",
+      "poison_duration"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "placeables/kill-boundary-2/kill_boundary_2.gd": {
+    "designer": [
+      "autoplay_boundary_animation",
+      "playback_mode",
+      "playback_speed",
+      "loop_return_seconds",
+      "render_effect",
+      "player_blocking_enabled",
+      "camera_fit_scale_limit",
+      "retiming_mode",
+      "settings"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "placeables/kill-boundary-2/kill_boundary_2_pose.gd": {
+    "designer": [
+      "size",
+      "rounding",
+      "time_seconds",
+      "outgoing_easing"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "placeables/kill-boundary-2/kill_boundary_2_settings.gd": {
+    "designer": [
+      "boundary_segments",
+      "flame_height",
+      "flame_y",
+      "flame_thickness",
+      "flame_visual_depth",
+      "flame_effect_opacity",
+      "flame_effect_density",
+      "flame_effect_emission",
+      "flame_effect_time_scale",
+      "flame_effect_core_color",
+      "flame_effect_mid_color",
+      "flame_effect_outer_color",
+      "ghost_effect_color",
+      "ghost_effect_emission",
+      "ghost_effect_edge_softness",
+      "ghost_ribbons_per_segment",
+      "ghost_height_range",
+      "ghost_width_range",
+      "ghost_rise_distance",
+      "ghost_wave_amplitude",
+      "player_blocking_outset",
+      "player_blocking_thickness",
+      "player_blocking_height",
+      "flame_damage_per_second",
+      "flame_damage_inner_depth",
+      "outside_damage_ramp_depth",
+      "max_outside_damage_multiplier",
+      "flame_damage_vertical_margin",
+      "near_flame_audio_distance",
+      "near_flame_audio_min_db",
+      "near_flame_audio_max_db",
+      "near_flame_audio_curve",
+      "near_flame_audio_lag"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "placeables/kill_boundary/kill_boundary_base.gd": {
+    "designer": [
+      "boundary_animation",
+      "autoplay_boundary_animation",
+      "ping_pong_boundary_animation",
+      "loop_boundary_path",
+      "movement_speed",
+      "ripple_retime_after_speed_key_edit",
+      "boundary_size_x",
+      "boundary_size_y",
+      "boundary_scale_x",
+      "boundary_scale_z",
+      "boundary_rotation_z_radians",
+      "camera_fit_scale_limit",
+      "shape_morph",
+      "boundary_segments",
+      "render_effect",
+      "flame_thickness",
+      "flame_visual_depth",
+      "flame_height",
+      "flame_y",
+      "flame_effect_opacity",
+      "flame_effect_density",
+      "flame_effect_emission",
+      "flame_effect_time_scale",
+      "flame_effect_core_color",
+      "flame_effect_mid_color",
+      "flame_effect_outer_color",
+      "ghost_effect_color",
+      "ghost_effect_emission",
+      "ghost_effect_edge_softness",
+      "ghost_ribbons_per_segment",
+      "ghost_height_range",
+      "ghost_width_range",
+      "ghost_rise_distance",
+      "ghost_wave_amplitude",
+      "ghost_opacity_range",
+      "ghost_rise_speed_range",
+      "ghost_wave_frequency_range",
+      "ghost_wave_speed_range",
+      "ghost_lean_range",
+      "ghost_emerge_depth_ratio_range",
+      "player_blocking_enabled",
+      "player_blocking_outset",
+      "player_blocking_thickness",
+      "player_blocking_height",
+      "flame_damage_per_second",
+      "flame_damage_inner_depth",
+      "outside_damage_ramp_depth",
+      "max_outside_damage_multiplier",
+      "flame_damage_vertical_margin",
+      "near_flame_audio_distance",
+      "near_flame_audio_min_db",
+      "near_flame_audio_max_db",
+      "near_flame_audio_curve",
+      "near_flame_audio_lag"
+    ],
+    "stored": [
+      "bounds_size"
+    ],
+    "runtime": []
+  },
+  "placeables/lockables/lockable_hinged_leaf.gd": {
+    "designer": [
+      "open_limit_degrees",
+      "push_torque",
+      "limit_spring_strength",
+      "closed_latch_strength"
+    ],
+    "stored": [
+      "closed_latch_angle_degrees",
+      "push_area_path"
+    ],
+    "runtime": []
+  },
+  "placeables/lockables/lockable_hinged_passage.gd": {
+    "designer": [
+      "key_requirement",
+      "starts_locked",
+      "completes_level",
+      "unlock_sound_path"
+    ],
+    "stored": [
+      "leaf_root_path",
+      "unlock_area_path",
+      "completion_area_path",
+      "unlock_audio_player_path"
+    ],
+    "runtime": []
+  },
+  "placeables/path_placeable.gd": {
+    "designer": [
+      "spawn_time"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "placeables/physics_placeable.gd": {
+    "designer": [
+      "spawn_time",
+      "spawn_drop_height",
+      "spawn_spin_speed"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "placeables/placeable.gd": {
+    "designer": [
+      "spawn_time"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "placeables/pushables/gd_box_pushable.gd": {
+    "designer": [
+      "effective_mass",
+      "push_force",
+      "stop_acceleration",
+      "max_character_push_speed",
+      "max_planar_speed",
+      "lock_movement_to_axis"
+    ],
+    "stored": [
+      "add_to_pushable_group",
+      "add_to_navigation_blocker_group",
+      "use_world_collision_layer",
+      "collide_with_player",
+      "constrain_to_starting_height",
+      "lock_rotation_to_upright",
+      "stop_below_speed",
+      "character_push_memory_seconds"
+    ],
+    "runtime": []
+  },
+  "placeables/pushables/gd_millstone.gd": {
+    "designer": [
+      "local_roll_direction",
+      "push_alignment_assist_acceleration",
+      "enemy_crush_speed",
+      "enemy_crush_path_half_width"
+    ],
+    "stored": [
+      "source_collision_path",
+      "rolling_side_alignment",
+      "enemy_crush_min_forward_offset",
+      "rolling_audio_ground_normal_y"
+    ],
+    "runtime": []
+  },
+  "placeables/pushables/gd_pushable.gd": {
+    "designer": [
+      "character_push_force",
+      "max_character_push_speed",
+      "max_planar_speed",
+      "wall_slide_enabled",
+      "corner_recovery_enabled"
+    ],
+    "stored": [
+      "add_to_pushable_group",
+      "add_to_navigation_blocker_group",
+      "use_world_collision_layer",
+      "collide_with_player",
+      "constrain_to_starting_height",
+      "lock_rotation_to_upright",
+      "stop_below_speed",
+      "character_push_interval",
+      "character_push_memory_seconds",
+      "character_contact_push_bias",
+      "wall_slide_collision_mask",
+      "wall_contact_min_horizontal_normal",
+      "blocked_push_wall_dot_threshold",
+      "same_wall_normal_min_dot",
+      "corner_distinct_normal_max_dot",
+      "wall_slide_latch_enabled",
+      "wall_slide_latch_seconds",
+      "wall_slide_parallel_dot_threshold",
+      "corner_stuck_after_seconds",
+      "corner_recovery_distance",
+      "corner_recovery_velocity",
+      "corner_stuck_speed_threshold",
+      "corner_recovery_wall_bias"
+    ],
+    "runtime": []
+  },
+  "placeables/pushables/gd_rolling_rock.gd": {
+    "designer": [
+      "visual_roll_radius",
+      "visual_roll_enabled",
+      "min_audio_speed",
+      "rolling_volume_db",
+      "silent_volume_db",
+      "audio_fade_in_seconds",
+      "audio_fade_out_seconds"
+    ],
+    "stored": [
+      "visual_rock_path",
+      "rolling_audio_path",
+      "max_audio_speed",
+      "movement_sound_threshold",
+      "trapped_audio_speed_threshold",
+      "trapped_audio_hold_seconds",
+      "trapped_audio_fade_seconds"
+    ],
+    "runtime": []
+  },
+  "placeables/spike_trap/spike_trap.gd": {
+    "designer": [
+      "trigger_area_size",
+      "strike_area_size",
+      "damage_percent_of_max_energy",
+      "enemy_spike_damage_enabled",
+      "arming_delay",
+      "raised_hold_seconds",
+      "rise_seconds",
+      "bounce_seconds",
+      "reset_tension_seconds",
+      "reset_seconds",
+      "hidden_position_y",
+      "raised_position_y",
+      "rise_bounce_height",
+      "reset_tension_lift",
+      "spawn_buried_depth",
+      "spawn_rise_seconds",
+      "trigger_sound_path",
+      "hit_sound_path",
+      "reset_sound_path",
+      "trigger_volume_db",
+      "hit_volume_db",
+      "reset_volume_db"
+    ],
+    "stored": [
+      "spikes_pivot_path",
+      "trigger_area_path",
+      "strike_area_path",
+      "target_collision_mask",
+      "target_groups",
+      "target_vertical_min",
+      "target_vertical_max"
+    ],
+    "runtime": []
+  },
+  "placeables/spike_trap/spike_trap_editor_placement.gd": {
+    "designer": [
+      "fixed_height"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "placeables/stairs/procedural_staircase.gd": {
+    "designer": [
+      "step_count",
+      "steepness_degrees",
+      "step_depth",
+      "stair_material"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "placeables/text_trigger/text_trigger.gd": {
+    "designer": [
+      "heading",
+      "text",
+      "minimum_time_on_screen",
+      "pause_game_with_text",
+      "trigger_size",
+      "heading_font_size",
+      "body_font_size",
+      "heading_characters_per_line",
+      "body_characters_per_line",
+      "pixel_size",
+      "text_depth",
+      "camera_distance",
+      "viewport_x_offset",
+      "viewport_y_offset",
+      "heading_y_offset",
+      "body_y_offset",
+      "perspective_yaw_degrees",
+      "perspective_pitch_degrees",
+      "text_color",
+      "text_opacity",
+      "light_offset",
+      "light_energy",
+      "light_range",
+      "light_color",
+      "light_sweep_padding",
+      "light_sweep_speed",
+      "dim_opacity"
+    ],
+    "stored": [
+      "player_group"
+    ],
+    "runtime": []
+  },
+  "placeables/torch/torch.gd": {
+    "designer": [
+      "torch_id",
+      "activation_duration_seconds",
+      "activation_distance",
+      "activation_still_speed",
+      "outline_activation_distance",
+      "outline_full_intensity_distance"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "placeables/treasure/collectible_pile.gd": {
+    "designer": [
+      "pile_radius",
+      "spawn_height",
+      "spawn_interval",
+      "random_seed",
+      "spawn_when_near_camera"
+    ],
+    "stored": [
+      "trigger_time",
+      "preview_base_height",
+      "preview_center_height",
+      "preview_item_spacing",
+      "spawn_screen_margin",
+      "spawn_visibility_radius",
+      "visibility_check_interval"
+    ],
+    "runtime": []
+  },
+  "placeables/treasure/gems/gem.gd": {
+    "designer": [],
+    "stored": [
+      "despawn_below_y"
+    ],
+    "runtime": []
+  },
+  "placeables/treasure/gems/gem_visual.gd": {
+    "designer": [
+      "gem_material",
+      "edge_glow_material",
+      "cut"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "placeables/treasure/gold-coin.gd": {
+    "designer": [
+      "max_edge_roll_distance",
+      "edge_roll_horizontal_damping"
+    ],
+    "stored": [
+      "physics_mesh_root_path",
+      "physics_collision_shape_path",
+      "despawn_below_y",
+      "edge_roll_up_dot",
+      "edge_roll_min_speed"
+    ],
+    "runtime": []
+  },
+  "placeables/treasure/gold_bar.gd": {
+    "designer": [
+      "gold_material",
+      "edge_glow_material"
+    ],
+    "stored": [
+      "despawn_below_y"
+    ],
+    "runtime": []
+  },
+  "placeables/treasure/gold_coin_pile.gd": {
+    "designer": [
+      "coin_count"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "placeables/treasure/treasure_pile.gd": {
+    "designer": [
+      "gold_coin_count",
+      "diamond_count",
+      "ruby_count",
+      "sapphire_count",
+      "emerald_count",
+      "amethyst_count",
+      "gold_bar_count"
+    ],
+    "stored": [
+      "treasure_counts"
+    ],
+    "runtime": []
+  },
+  "placeables/treasure_deposit/treasure_deposit.gd": {
+    "designer": [
+      "detection_radius",
+      "deposit_interval",
+      "jump_bonus_coin_count",
+      "launch_height",
+      "flight_time",
+      "landing_spread_radius",
+      "wobble_angle_degrees",
+      "wobble_duration"
+    ],
+    "stored": [
+      "player_collision_mask",
+      "wobble_node_path"
+    ],
+    "runtime": []
+  },
+  "placeables/wall_breakable/wall_breakable.gd": {
+    "designer": [
+      "minimum_collapse_speed"
+    ],
+    "stored": [
+      "minimum_collapse_displacement",
+      "settling_delay_seconds",
+      "collapse_audio_player_path"
+    ],
+    "runtime": []
+  },
+  "player/blood_splatter_decal.gd": {
+    "designer": [
+      "target",
+      "diameter"
+    ],
+    "stored": [],
+    "runtime": [
+      "projection_depth"
+    ]
+  },
+  "player/player_animation.gd": {
+    "designer": [
+      "hit_reaction_height",
+      "hit_reaction_up_seconds",
+      "hit_reaction_down_seconds"
+    ],
+    "stored": [
+      "character_path",
+      "fallback_character_path",
+      "pivot_path"
+    ],
+    "runtime": []
+  },
+  "player/player_attention.gd": {
+    "designer": [],
+    "stored": [
+      "travel_pivot_path",
+      "look_direction_path",
+      "character_path",
+      "headlamp_path",
+      "sight_ray_path"
+    ],
+    "runtime": []
+  },
+  "player/player_death.gd": {
+    "designer": [
+      "return_delay",
+      "fade_out_duration",
+      "max_flame_energy"
+    ],
+    "stored": [
+      "animation_controller_path",
+      "death_effects_path",
+      "attention_path",
+      "lose_scene"
+    ],
+    "runtime": []
+  },
+  "player/player_death_effects.gd": {
+    "designer": [
+      "blackened_material",
+      "environment_splatter_delay"
+    ],
+    "stored": [
+      "visual_pivot_path",
+      "head_path",
+      "character_path",
+      "attention_path"
+    ],
+    "runtime": []
+  },
+  "player/player_face_anchor.gd": {
+    "designer": [
+      "face_settings"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "player/player_face_settings.gd": {
+    "designer": [
+      "mouth_offset",
+      "nose_offset",
+      "left_eye_offset",
+      "right_eye_offset",
+      "splatter_offset",
+      "splatter_diameter"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "player/player_foot_plant.gd": {
+    "designer": [],
+    "stored": [
+      "modification_pass",
+      "preparation_path"
+    ],
+    "runtime": []
+  },
+  "player/player_gait_settings.gd": {
+    "designer": [
+      "stagger_interrupt_fraction",
+      "cycle_distance",
+      "maximum_cycles_per_second",
+      "transfer_height",
+      "legacy_cycle_distance",
+      "left_contact_start",
+      "left_contact_end",
+      "right_contact_start",
+      "right_contact_end",
+      "foot_plant_blend_fraction"
+    ],
+    "stored": [
+      "maximum_phase_step",
+      "stationary_speed"
+    ],
+    "runtime": []
+  },
+  "player/player_inventory.gd": {
+    "designer": [
+      "max_carry_weight"
+    ],
+    "stored": [
+      "pivot_path"
+    ],
+    "runtime": []
+  },
+  "player/player_jump_settings.gd": {
+    "designer": [
+      "wall_height",
+      "jump_wall_height_multiplier",
+      "min_weight_jump_multiplier",
+      "jump_sound_path",
+      "jump_volume_db",
+      "jump_pitch_min",
+      "jump_pitch_max",
+      "landing_sound_path",
+      "landing_volume_db",
+      "landing_pitch_min",
+      "landing_pitch_max",
+      "landing_minimum_speed"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "player/player_light.gd": {
+    "designer": [
+      "base_energy",
+      "dip_amount",
+      "peak_amount",
+      "flicker_speed",
+      "noise_fast",
+      "noise_slow",
+      "dim_color",
+      "bright_color"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "player/player_movement.gd": {
+    "designer": [
+      "footstep_speed_threshold",
+      "footstep_distance",
+      "footstep_distance_variance",
+      "footstep_pitch_min",
+      "footstep_pitch_max",
+      "footstep_volume_min_db",
+      "footstep_volume_max_db",
+      "footstep_volume_variance_db",
+      "squeeze_min_gap_width",
+      "squeeze_full_speed_gap_width",
+      "squeeze_min_speed_multiplier"
+    ],
+    "stored": [
+      "pivot_path",
+      "squeeze_probe_height",
+      "squeeze_probe_distance"
+    ],
+    "runtime": []
+  },
+  "player/player_shadow.gd": {
+    "designer": [
+      "shadow_size",
+      "projected_local_offset"
+    ],
+    "stored": [
+      "source_path",
+      "ground_collision_mask",
+      "probe_up_distance",
+      "probe_down_distance",
+      "surface_offset",
+      "fallback_height_offset"
+    ],
+    "runtime": []
+  },
+  "player/visibility/player_occlusion_blocker.gd": {
+    "designer": [
+      "blocking_enabled"
+    ],
+    "stored": [
+      "occluder_visual_root_path"
+    ],
+    "runtime": []
+  },
+  "player/visibility/player_occlusion_silhouette.gd": {
+    "designer": [
+      "visibility_enabled",
+      "silhouette_fill_colour",
+      "silhouette_outline_colour",
+      "outline_width"
+    ],
+    "stored": [
+      "player_visual_root_path",
+      "occlusion_depth_bias"
+    ],
+    "runtime": []
+  },
+  "ui/frontend/focus_scroll_list.gd": {
+    "designer": [
+      "focus_scroll_margin",
+      "focus_scroll_duration",
+      "navigation_repeat_delay",
+      "navigation_repeat_interval"
+    ],
+    "stored": [
+      "analog_trigger_threshold",
+      "analog_rearm_threshold"
+    ],
+    "runtime": []
+  },
+  "ui/frontend/frontend_screen.gd": {
+    "designer": [
+      "reference_screen_size"
+    ],
+    "stored": [
+      "screen_container_path"
+    ],
+    "runtime": []
+  },
+  "ui/frontend/shop.gd": {
+    "designer": [
+      "catalog",
+      "initial_item_id"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "ui/frontend/shop_catalog.gd": {
+    "designer": [
+      "items"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "ui/frontend/shop_item_definition.gd": {
+    "designer": [
+      "item_id",
+      "display_name",
+      "list_summary_bbcode",
+      "description",
+      "price",
+      "payment_treasure_type",
+      "payment_treasure_name",
+      "payment_icon",
+      "stock_count",
+      "availability",
+      "icon",
+      "detail_texture",
+      "stat_modifiers"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "ui/frontend/shop_stat_modifier.gd": {
+    "designer": [
+      "display_name",
+      "value_text",
+      "icon",
+      "display_color"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "ui/hud/active_flask_hud.gd": {
+    "designer": [
+      "top_margin",
+      "right_margin",
+      "max_width",
+      "flask_spin_speed"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "ui/hud/elapsed_time_hud.gd": {
+    "designer": [
+      "label_position",
+      "font_size"
+    ],
+    "stored": [
+      "time_source_path",
+      "elapsed_label_path"
+    ],
+    "runtime": []
+  },
+  "ui/hud/energy_hud.gd": {
+    "designer": [],
+    "stored": [
+      "death_controller_path",
+      "inventory_path",
+      "hud_panel_path",
+      "low_health_vignette_path"
+    ],
+    "runtime": []
+  },
+  "ui/hud/flask_effect_text.gd": {
+    "designer": [
+      "text_opacity",
+      "font_size",
+      "pixel_size",
+      "text_depth",
+      "camera_distance",
+      "viewport_x_offset",
+      "viewport_y_offset",
+      "perspective_yaw_degrees",
+      "perspective_pitch_degrees",
+      "light_offset",
+      "light_energy",
+      "light_range",
+      "light_color",
+      "light_sweep_padding",
+      "light_sweep_speed"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "ui/hud/low_health_vignette.gd": {
+    "designer": [
+      "start_health_ratio",
+      "full_health_ratio",
+      "response_speed"
+    ],
+    "stored": [
+      "vignette_rect_path"
+    ],
+    "runtime": []
+  },
+  "ui/hud/minimap/minimap_view.gd": {
+    "designer": [
+      "settings"
+    ],
+    "stored": [],
+    "runtime": []
+  },
+  "ui/hud/minimap/minimap_view_settings.gd": {
+    "designer": [
+      "viewport_width_fraction",
+      "minimum_panel_width",
+      "panel_aspect_ratio",
+      "screen_margin",
+      "expanded_screen_margin",
+      "content_padding",
+      "expanded_status_font_size",
+      "expanded_status_height",
+      "expanded_marker_scale",
+      "fallback_orthographic_size",
+      "background_color",
+      "ambient_light_color",
+      "ambient_light_energy"
+    ],
+    "stored": [
+      "top_down_camera_height"
+    ],
+    "runtime": []
+  },
+  "ui/hud/minimap/vampire_minimap_overlay.gd": {
+    "designer": [
+      "vampire_color",
+      "belief_color",
+      "player_color",
+      "target_color"
+    ],
+    "stored": [
+      "status_label_path",
+      "status_backdrop_path"
+    ],
+    "runtime": []
+  },
+  "ui/hud/panel.gd": {
+    "designer": [
+      "reference_screen_size",
+      "remaining_health_texture",
+      "lost_health_texture",
+      "locked_health_texture"
+    ],
+    "stored": [
+      "screen_container_path",
+      "treasure_lifted_label_path",
+      "treasure_total_label_path",
+      "sack_contents_label_path",
+      "sack_max_label_path",
+      "health_segments_path"
+    ],
+    "runtime": [
+      "placement_help"
+    ]
+  },
+  "ui/hud/player_feedback/player_feedback.gd": {
+    "designer": [
+      "settings"
+    ],
+    "stored": [
+      "note_panel_path",
+      "note_field_path",
+      "confirmation_label_path",
+      "prompt_label_path",
+      "instructions_label_path",
+      "proceed_button_path",
+      "cancel_button_path"
+    ],
+    "runtime": []
+  },
+  "ui/hud/player_feedback/player_feedback_settings.gd": {
+    "designer": [
+      "report_button",
+      "text_button",
+      "maximum_note_characters",
+      "note_offer_seconds"
+    ],
+    "stored": [
+      "debounce_seconds",
+      "repository_report_directory",
+      "repository_archive_directory",
+      "maximum_repository_reports",
+      "maximum_repository_mebibytes",
+      "maximum_playback_mebibytes"
+    ],
+    "runtime": []
+  },
+  "ui/hud/score_hud.gd": {
+    "designer": [
+      "label_position",
+      "font_size"
+    ],
+    "stored": [
+      "score_label_path"
+    ],
+    "runtime": []
+  },
+  "ui/hud/vampire_debug/vampire_debug_hud.gd": {
+    "designer": [],
+    "stored": [
+      "vampire_path",
+      "state_label_path"
+    ],
+    "runtime": []
+  },
+  "ui/screens/level_select_screen.gd": {
+    "designer": [
+      "fade_in_duration"
+    ],
+    "stored": [
+      "game_scene",
+      "shop_scene_path"
+    ],
+    "runtime": []
+  },
+  "ui/screens/result_screen.gd": {
+    "designer": [
+      "fade_duration"
+    ],
+    "stored": [
+      "outcome"
+    ],
+    "runtime": []
+  },
+  "ui/screens/title_screen.gd": {
+    "designer": [
+      "title_texture",
+      "fade_in_duration"
+    ],
+    "stored": [],
+    "runtime": []
+  }
+}

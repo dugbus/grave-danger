@@ -22,49 +22,81 @@ const DEFAULT_TRIGGER_SOUND_PATH := "res://Assets/audio/spike-trigger.mp3"
 const DEFAULT_HIT_SOUND_PATH := "res://Assets/audio/spike-trigger-hits.mp3"
 const DEFAULT_RESET_SOUND_PATH := "res://Assets/audio/spike-going-back-down.mp3"
 
-@export var spikes_pivot_path: NodePath = ^"SpikesPivot"
-@export var trigger_area_path: NodePath = ^"TriggerArea"
-@export var strike_area_path: NodePath = ^"StrikeArea"
+## Pivot node moved to raise and retract the spikes.
+@export_storage var spikes_pivot_path: NodePath = ^"SpikesPivot"
+## Area used to detect characters that activate the trap.
+@export_storage var trigger_area_path: NodePath = ^"TriggerArea"
+## Area used to detect characters struck by raised spikes.
+@export_storage var strike_area_path: NodePath = ^"StrikeArea"
 
+## Inspector group for Targeting settings.
 @export_group("Targeting")
-@export_flags_3d_physics var target_collision_mask := PLAYER_COLLISION_LAYER | ZOMBIE_COLLISION_LAYER
+## Physics layers containing characters that can trigger and be struck by the trap.
+@export_storage var target_collision_mask := PLAYER_COLLISION_LAYER | ZOMBIE_COLLISION_LAYER
 ## Groups whose members can trigger and be damaged by this trap.
-@export var target_groups: Array[StringName] = [CHARACTER_GROUP]
+@export_storage var target_groups: Array[StringName] = [CHARACTER_GROUP]
+## Dimensions in world units of the trap activation volume.
 @export var trigger_area_size := Vector3(1.4, 1.2, 1.4)
+## Dimensions in world units of the spike damage volume.
 @export var strike_area_size := Vector3(1.05, 1.4, 1.05)
-@export var target_vertical_min := -0.25
-@export var target_vertical_max := 1.9
+## Lowest target height relative to the trap origin eligible for a strike.
+@export_storage var target_vertical_min := -0.25
+## Highest target height relative to the trap origin eligible for a strike.
+@export_storage var target_vertical_max := 1.9
 
+## Inspector group for Damage settings.
 @export_group("Damage")
+## Percentage of the player's maximum energy removed by a spike hit.
 @export_range(0.0, 100.0, 0.5, "suffix:%") var damage_percent_of_max_energy := 25.0
+## Allows the spikes to damage enemy targets.
 @export var enemy_spike_damage_enabled := true
 
+## Inspector group for Timing settings.
 @export_group("Timing")
+## Seconds between detecting a target and starting to raise the spikes.
 @export_range(0.0, 2.0, 0.01, "suffix:s") var arming_delay := 0.24
+## Seconds the spikes stay raised before resetting.
 @export_range(0.0, 5.0, 0.01, "suffix:s") var raised_hold_seconds := 1.5
+## Seconds taken to raise the spikes.
 @export_range(0.01, 2.0, 0.01, "suffix:s") var rise_seconds := 0.18
+## Seconds taken by the bounce at the top of the spike rise.
 @export_range(0.0, 1.0, 0.01, "suffix:s") var bounce_seconds := 0.12
+## Seconds spent lifting the spikes slightly before retraction.
 @export_range(0.0, 1.0, 0.01, "suffix:s") var reset_tension_seconds := 0.42
+## Seconds taken to retract the spikes.
 @export_range(0.01, 4.0, 0.01, "suffix:s") var reset_seconds := 1.8
 
+## Inspector group for Motion settings.
 @export_group("Motion")
+## Local vertical position of the retracted spike pivot.
 @export var hidden_position_y := 0.0
+## Local vertical position of the raised spike pivot.
 @export var raised_position_y := 1.0
+## Extra height in world units reached by the spike rise bounce.
 @export var rise_bounce_height := 0.13
+## Extra height in world units applied before the spikes retract.
 @export var reset_tension_lift := 0.08
 
+## Inspector group for Spawn Presentation settings.
 @export_group("Spawn Presentation")
 ## Distance below the authored position where a delayed trap begins appearing.
 @export_range(0.0, 2.0, 0.01, "suffix:m") var spawn_buried_depth := 0.35
 ## Seconds the trap takes to wind upward into its authored position.
 @export_range(0.01, 4.0, 0.01, "suffix:s") var spawn_rise_seconds := 0.75
 
+## Inspector group for Audio settings.
 @export_group("Audio")
+## Audio sample played when the trap activates.
 @export_file("*.mp3", "*.wav", "*.ogg") var trigger_sound_path := DEFAULT_TRIGGER_SOUND_PATH
+## Audio sample played when the spikes hit a target.
 @export_file("*.mp3", "*.wav", "*.ogg") var hit_sound_path := DEFAULT_HIT_SOUND_PATH
+## Audio sample played when the trap resets.
 @export_file("*.mp3", "*.wav", "*.ogg") var reset_sound_path := DEFAULT_RESET_SOUND_PATH
+## Volume of the trap activation sound, in decibels.
 @export var trigger_volume_db := 0.0
+## Volume of the spike hit sound, in decibels.
 @export var hit_volume_db := 1.5
+## Volume of the trap reset sound, in decibels.
 @export var reset_volume_db := -1.5
 
 @onready var spikes_pivot := get_node_or_null(spikes_pivot_path) as Node3D

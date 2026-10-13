@@ -5,15 +5,15 @@ const RUN_PLAYBACK_SESSION_GROUP: StringName = &"run_playback_session"
 const MAXIMUM_GENERATED_CONTENT_STARTUP_FRAMES := 120
 
 ## Player whose successful pickups alert the vampire in this level.
-@export var player_path: NodePath = ^"Player"
+@export_storage var player_path: NodePath = ^"Player"
 ## Vampire boss that receives last-heard noise targets in this level.
-@export var vampire_path: NodePath = ^"Vampire"
+@export_storage var vampire_path: NodePath = ^"Vampire"
 ## Level-completion gate used by the vampire when it searches after losing the player.
-@export var end_gate_path: NodePath = ^"GeneratedMaze/Layout/GeneratedContent/GeneratedLockedGate"
+@export_storage var end_gate_path: NodePath = ^"GeneratedMaze/Layout/GeneratedContent/GeneratedLockedGate"
 ## Generated dungeon content that reports bat disturbances at the player's position.
-@export var generated_content_path: NodePath = ^"GeneratedMaze/Layout/GeneratedContent"
+@export_storage var generated_content_path: NodePath = ^"GeneratedMaze/Layout/GeneratedContent"
 ## Wall GridMap explicitly used for Vampire navigation and sight occlusion.
-@export var wall_grid_map_path: NodePath = ^"GeneratedMaze/Layout/PNGGridMap"
+@export_storage var wall_grid_map_path: NodePath = ^"GeneratedMaze/Layout/PNGGridMap"
 
 @onready var player := get_node_or_null(player_path) as Node3D
 @onready var vampire: Node = get_node_or_null(vampire_path)

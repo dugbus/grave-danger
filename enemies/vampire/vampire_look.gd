@@ -11,13 +11,13 @@ const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const LOOK_SETTINGS := preload("res://game/character_look_settings.tres")
 
 ## Visual pivot that continues to face the Vampire's direction of travel.
-@export var travel_pivot_path: NodePath = ^"../Pivot"
+@export_storage var travel_pivot_path: NodePath = ^"../Pivot"
 ## Child pivot whose positive Z axis drives gameplay sight and the headlamp.
-@export var look_direction_path: NodePath = ^"../Pivot/LookDirection"
+@export_storage var look_direction_path: NodePath = ^"../Pivot/LookDirection"
 ## Imported character containing the separately turnable head mesh.
-@export var character_path: NodePath = ^"../Pivot/Character"
+@export_storage var character_path: NodePath = ^"../Pivot/Character"
 ## Existing spotlight that follows the Vampire's procedural head turn.
-@export var headlamp_path: NodePath = ^"../Pivot/VampireHeadlampLight"
+@export_storage var headlamp_path: NodePath = ^"../Pivot/VampireHeadlampLight"
 
 @onready var travel_pivot := get_node_or_null(travel_pivot_path) as Node3D
 @onready var look_direction := get_node_or_null(look_direction_path) as Node3D

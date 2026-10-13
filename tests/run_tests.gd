@@ -4595,6 +4595,7 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
 	level_run_playback.call("_create_preview", loop_level_scene)
 	level_run_playback.load_state = GDLevelRunPlayback.LoadState.Idle
 	var first_loop_instance := level_run_playback.playback_level as Node3D
+	var first_loop_session := level_run_playback.playback_session_root as Node3D
 	var first_loop_player := first_loop_instance.get_node("Player") as GDLevelRunPlaybackPlayer
 	var first_loop_inventory := first_loop_player.inventory as GDPlayerInventory
 	var collected_loop_coin := first_loop_instance.get_node("LoopCoin") as GDInventoryPickup
@@ -4608,11 +4609,15 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
 	var reset_loop_player := reset_loop_instance.get_node("Player") as GDLevelRunPlaybackPlayer
 	var reset_loop_inventory := reset_loop_player.inventory as GDPlayerInventory
 	var reset_loop_particles := reset_loop_instance.get_node("LoopParticles") as GPUParticles3D
+	# Keep this manually advanced fixture still while deferred teardown reaches the frame boundary.
+	level_run_playback.load_state = GDLevelRunPlayback.LoadState.Idle
 	passed = (
 		_expect(
 			(
 				loop_pack_error == OK
-				and not is_instance_valid(first_loop_instance)
+				and is_instance_valid(first_loop_instance)
+				and first_loop_session.is_queued_for_deletion()
+				and first_loop_session.process_mode == Node.PROCESS_MODE_DISABLED
 				and reset_loop_instance != first_loop_instance
 				and playback_viewport.own_world_3d
 				and reset_loop_coin != null
@@ -4622,6 +4627,11 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
 			),
 			"looping a last-run playback replaces its isolated session and replay inventory"
 		)
+		and passed
+	)
+	await process_frame
+	passed = (
+		_expect(not is_instance_valid(first_loop_instance), "the retired playback world is freed at the frame boundary")
 		and passed
 	)
 	passed = (
@@ -6345,13 +6355,8 @@ func _test_vampire_settings_prioritize_core_controls() -> bool:
 		&"proximity_fog_max_intensity",
 	]
 	var advanced_property_names: Array[StringName] = [
-		&"waypoint_reached_distance",
-		&"wall_stall_recovery_seconds",
-		&"sight_clearance_radius",
 		&"last_seen_prediction_seconds",
 		&"junction_scan_seconds_per_direction",
-		&"noise_retarget_distance",
-		&"layout_landmark_noise_match_distance",
 		&"proximity_fog_response_speed",
 	]
 	var property_list := settings.get_property_list()
@@ -6382,12 +6387,13 @@ func _test_vampire_settings_prioritize_core_controls() -> bool:
 		(
 			core_controls_are_before_advanced
 			and complex_controls_are_inside_advanced
-			and advanced_subgroups.has(&"Movement")
-			and advanced_subgroups.has(&"Sight")
+			and not advanced_subgroups.has(&"Movement")
+			and not advanced_subgroups.has(&"Sight")
+			and advanced_subgroups.has(&"Last Seen Prediction")
 			and advanced_subgroups.has(&"Noise Search")
 			and advanced_subgroups.has(&"Proximity Fog")
 		),
-		"Vampire settings keep core controls above grouped advanced tuning"
+		"Vampire settings group designer controls and omit internal movement and sight sections"
 	)
 
 

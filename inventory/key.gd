@@ -8,6 +8,7 @@ const MINIMUM_AUDIBLE_LANDING_SPEED := 1.5
 const LANDING_MAX_DISTANCE := 32.0
 const LANDING_UNIT_SIZE := 8.0
 
+## Material applied to this key's visible mesh.
 @export var key_material: Material
 
 var previous_linear_velocity := Vector3.ZERO

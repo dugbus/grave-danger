@@ -10,9 +10,7 @@ const STYLE_SCRIPT := preload("res://addons/floor_surface/floor_style.gd")
 const SAMPLE_SCRIPT := preload("res://addons/floor_surface/floor_surface_sample.gd")
 const BUILDER_SCRIPT := preload("res://addons/floor_surface/floor_surface_geometry_builder.gd")
 const RAMP_RESOLVER_SCRIPT := preload("res://addons/floor_surface/floor_surface_ramp_resolver.gd")
-const EDITOR_MATERIAL_PREVIEW := preload(
-	"res://addons/floor_surface/editor/floor_surface_editor_material_preview.gd"
-)
+const EDITOR_MATERIAL_PREVIEW := preload("res://addons/floor_surface/editor/floor_surface_editor_material_preview.gd")
 
 signal surface_rebuilt(cell_count: int)
 
@@ -55,9 +53,9 @@ signal surface_rebuilt(cell_count: int)
 			align_with_placement_grid_map()
 			update_configuration_warnings()
 ## Derived batched mesh replaced during every rebuild.
-@export var top_mesh_path: NodePath = ^"Derived/TopMesh"
+@export_storage var top_mesh_path: NodePath = ^"Derived/TopMesh"
 ## Derived static collision replaced during every rebuild.
-@export var collision_shape_path: NodePath = ^"Derived/StaticBody3D/CollisionShape3D"
+@export_storage var collision_shape_path: NodePath = ^"Derived/StaticBody3D/CollisionShape3D"
 
 @onready var top_mesh := get_node_or_null(top_mesh_path) as MeshInstance3D
 @onready var collision_shape := get_node_or_null(collision_shape_path) as CollisionShape3D
@@ -101,13 +99,7 @@ func rebuild() -> int:
 		_generated_cell_count = 0
 		return 0
 	var rebuild_started := Time.get_ticks_usec()
-	var result := _builder.build(
-		floor_map,
-		elevation_profile,
-		styles,
-		cell_size,
-		world_origin_xz
-	)
+	var result := _builder.build(floor_map, elevation_profile, styles, cell_size, world_origin_xz)
 	top_mesh.mesh = result["mesh"] as ArrayMesh
 	collision_shape.shape = result["collision_shape"] as ConcavePolygonShape3D
 	_generated_cell_count = result["cell_count"] as int
@@ -140,24 +132,18 @@ func get_world_height_at_cell(cell: Vector2i) -> float:
 
 
 ## Classifies a directed neighbour edge from its local integer elevation difference.
-func classify_edge(
-	from_cell: Vector2i,
-	to_cell: Vector2i
-) -> PROFILE_SCRIPT.TraversalClass:
-	if floor_map == null or elevation_profile == null \
-			or not floor_map.has_floor(from_cell) or not floor_map.has_floor(to_cell):
-		return PROFILE_SCRIPT.TraversalClass.BlockedLedge
-	if _ramp_resolver.is_continuous_connection(
-		floor_map,
-		elevation_profile,
-		from_cell,
-		to_cell,
-		cell_size
+func classify_edge(from_cell: Vector2i, to_cell: Vector2i) -> PROFILE_SCRIPT.TraversalClass:
+	if (
+		floor_map == null
+		or elevation_profile == null
+		or not floor_map.has_floor(from_cell)
+		or not floor_map.has_floor(to_cell)
 	):
+		return PROFILE_SCRIPT.TraversalClass.BlockedLedge
+	if _ramp_resolver.is_continuous_connection(floor_map, elevation_profile, from_cell, to_cell, cell_size):
 		return PROFILE_SCRIPT.TraversalClass.Flat
 	return elevation_profile.classify_edge(
-		floor_map.get_cell_elevation(from_cell),
-		floor_map.get_cell_elevation(to_cell)
+		floor_map.get_cell_elevation(from_cell), floor_map.get_cell_elevation(to_cell)
 	)
 
 
@@ -202,8 +188,7 @@ func align_with_placement_grid_map() -> Array[String]:
 		return errors
 	var grid_to_surface := _transform_relative_to(grid_map, self)
 	var zero_cell_centre := grid_to_surface * grid_map.map_to_local(Vector3i.ZERO)
-	var aligned_origin := Vector2(zero_cell_centre.x, zero_cell_centre.z) \
-		- Vector2.ONE * grid_map.cell_size.x * 0.5
+	var aligned_origin := Vector2(zero_cell_centre.x, zero_cell_centre.z) - Vector2.ONE * grid_map.cell_size.x * 0.5
 	if not is_equal_approx(cell_size, grid_map.cell_size.x):
 		cell_size = grid_map.cell_size.x
 	if not world_origin_xz.is_equal_approx(aligned_origin):
@@ -360,8 +345,7 @@ func _is_placement_grid_map_aligned(grid_map: GridMap) -> bool:
 		return false
 	var grid_to_surface := _transform_relative_to(grid_map, self)
 	var zero_cell_centre := grid_to_surface * grid_map.map_to_local(Vector3i.ZERO)
-	var expected_origin := Vector2(zero_cell_centre.x, zero_cell_centre.z) \
-		- Vector2.ONE * grid_map.cell_size.x * 0.5
+	var expected_origin := Vector2(zero_cell_centre.x, zero_cell_centre.z) - Vector2.ONE * grid_map.cell_size.x * 0.5
 	return world_origin_xz.is_equal_approx(expected_origin)
 
 
@@ -389,13 +373,7 @@ func _rebuild_editor_preview() -> int:
 		_generated_cell_count = 0
 		return 0
 	var rebuild_started := Time.get_ticks_usec()
-	var result := _builder.build(
-		floor_map,
-		elevation_profile,
-		styles,
-		cell_size,
-		world_origin_xz
-	)
+	var result := _builder.build(floor_map, elevation_profile, styles, cell_size, world_origin_xz)
 	var preview_mesh := result["mesh"] as ArrayMesh
 	EDITOR_MATERIAL_PREVIEW.apply_to_mesh(preview_mesh)
 	preview.mesh = preview_mesh

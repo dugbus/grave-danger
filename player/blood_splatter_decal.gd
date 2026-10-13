@@ -17,8 +17,8 @@ const PLAYER_PROJECTION_DEPTH := 0.22
 @export var target := SplatterTarget.Environment
 ## Visible width and depth of the irregular blood mark.
 @export_range(0.05, 2.0, 0.01, "suffix:m") var diameter := 0.65
-## Distance through which the decal projects onto the receiving surface.
-@export_range(0.01, 0.5, 0.01, "suffix:m") var projection_depth := 0.28
+## Projection depth computed from the receiving geometry category during configuration.
+var projection_depth := 0.28
 
 @onready var decal := $Decal as Decal
 @onready var surface_mark := $SurfaceMark as MeshInstance3D

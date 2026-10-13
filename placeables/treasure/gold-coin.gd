@@ -19,20 +19,20 @@ const RECOVERY_SEARCH_OFFSETS: Array[Vector3] = [
 ]
 
 ## Visual root whose mesh vertices define this coin's convex physics hull.
-@export var physics_mesh_root_path: NodePath = ^"CoinMesh"
+@export_storage var physics_mesh_root_path: NodePath = ^"CoinMesh"
 ## CollisionShape3D that receives the convex hull generated from the visual mesh.
-@export var physics_collision_shape_path: NodePath = ^"CollisionShape3D"
+@export_storage var physics_collision_shape_path: NodePath = ^"CollisionShape3D"
 
 ## World Y position below which the coin is recovered instead of being lost.
-@export var despawn_below_y := -5.0
+@export_storage var despawn_below_y := -5.0
 
 ## Distance a tipped coin may roll on its edge before being settled flat.
 @export var max_edge_roll_distance := 1.0
 
 ## Maximum up-axis alignment still considered edge rolling; lower is more tipped.
-@export_range(0.0, 1.0, 0.01) var edge_roll_up_dot := 0.45
+@export_storage var edge_roll_up_dot := 0.45
 ## Minimum horizontal speed required before edge-roll limiting starts tracking.
-@export var edge_roll_min_speed := 0.08
+@export_storage var edge_roll_min_speed := 0.08
 ## Horizontal velocity multiplier applied when an edge-rolling coin is settled.
 @export var edge_roll_horizontal_damping := 0.25
 

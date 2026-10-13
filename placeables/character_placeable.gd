@@ -9,9 +9,11 @@ signal placeable_spawned
 const SPAWN_CONTROLLER := preload("res://placeables/placeable_spawn_controller.gd")
 const MAP_PLACEABLE_GROUP: StringName = &"map_placeable"
 
+## Inspector group for Spawn settings.
 @export_group("Spawn")
 ## Seconds after level start before this item appears; zero means it was already present.
 @export_range(0.0, 300.0, 0.05, "suffix:s") var spawn_time := 0.0
+## Ends the preceding Inspector group.
 @export_group("")
 
 var placeable_spawn_controller: Node

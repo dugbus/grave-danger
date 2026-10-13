@@ -18,7 +18,7 @@ enum ResultOutcome {
 }
 
 ## Selects successful banking or unsuccessful loss behaviour and presentation.
-@export var outcome := ResultOutcome.Win
+@export_storage var outcome := ResultOutcome.Win
 ## Seconds used for transitions into and out of the result screen.
 @export_range(0.0, 3.0, 0.05) var fade_duration := 0.5
 

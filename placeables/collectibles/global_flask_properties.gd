@@ -1,6 +1,7 @@
 extends Resource
 class_name GDGlobalFlaskProperties
 
+## Inspector group for Health Flask settings.
 @export_group("Health Flask")
 ## Seconds over which the health flask restores health after pickup.
 ## Higher values make the recovery feel slower and safer to tune than an instant heal.
@@ -9,6 +10,7 @@ class_name GDGlobalFlaskProperties
 ## For example, 25 restores one quarter of max health over health_heal_duration.
 @export_range(0.0, 100.0, 0.5, "or_greater", "suffix:%") var health_heal_percent_of_max := 25.0
 
+## Inspector group for Bigger Sack settings.
 @export_group("Bigger Sack")
 ## Extra inventory capacity granted while the bigger sack flask effect is active.
 ## This is added on top of the player's normal carry limit.
@@ -16,6 +18,7 @@ class_name GDGlobalFlaskProperties
 ## Seconds the bigger sack flask message stays visible on the HUD after the flask is collected.
 @export_range(0.1, 120.0, 0.1, "or_greater", "suffix:s") var bigger_sack_display_seconds := 5.0
 
+## Inspector group for Breathing Space settings.
 @export_group("Breathing Space")
 ## Percent increase applied to the kill boundary's current size while the breathing space flask effect is active.
 @export_range(0.0, 500.0, 0.5, "or_greater", "suffix:%") var breathing_space_expansion_percent := 25.0
@@ -26,6 +29,7 @@ class_name GDGlobalFlaskProperties
 ## Seconds used to ease the boundary back after the breathing-space effect expires.
 @export_range(0.05, 40.0, 0.05, "or_greater", "suffix:s") var breathing_space_contraction_transition_seconds := 4.0
 
+## Inspector group for No Boundary settings.
 @export_group("No Boundary")
 ## Seconds the boundary takes to sink out of view when the no boundary flask starts.
 @export_range(0.05, 5.0, 0.05, "suffix:s") var no_boundary_sink_seconds := 1.0
@@ -34,16 +38,19 @@ class_name GDGlobalFlaskProperties
 ## Seconds the no boundary flask message stays visible on the HUD after the flask is collected.
 @export_range(0.1, 120.0, 0.1, "or_greater", "suffix:s") var no_boundary_display_seconds := 5.0
 
+## Inspector group for Pause Boundary settings.
 @export_group("Pause Boundary")
 ## Seconds the kill boundary's movement and pressure are paused after collecting a pause boundary flask.
 @export_range(0.1, 120.0, 0.1, "or_greater", "suffix:s") var pause_boundary_seconds := 5.0
 
+## Inspector group for Pickup Radius settings.
 @export_group("Pickup Radius")
 ## Percent increase contributed by each active pickup radius flask stack.
 @export_range(0.0, 500.0, 0.5, "or_greater", "suffix:%") var pickup_radius_percent := 50.0
 ## Seconds each pickup radius flask stack remains active after it is collected.
 @export_range(0.1, 120.0, 0.1, "or_greater", "suffix:s") var pickup_radius_seconds := 15.0
 
+## Inspector group for Poison settings.
 @export_group("Poison")
 ## Total damage dealt by a poison flask effect across poison_duration.
 ## This drains health gradually rather than all at once.

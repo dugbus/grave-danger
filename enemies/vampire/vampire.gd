@@ -21,29 +21,29 @@ const VAMPIRE_PROCESS_PRIORITY := 50
 ## Shared tuning resource for the vampire's scale, speed, and maze route following.
 @export var settings: Resource
 ## Visual pivot turned toward the active maze route.
-@export var pivot_path: NodePath = ^"Pivot"
+@export_storage var pivot_path: NodePath = ^"Pivot"
 ## Imported vampire character used for animation lookup and model scaling.
-@export var character_path: NodePath = ^"Pivot/Character"
+@export_storage var character_path: NodePath = ^"Pivot/Character"
 ## Component that builds and follows routes to last-heard noise positions.
-@export var navigation_path: NodePath = ^"VampireNavigation"
+@export_storage var navigation_path: NodePath = ^"VampireNavigation"
 ## Component that independently aims the Vampire's head, sight, and headlamp.
-@export var look_path: NodePath = ^"VampireLook"
+@export_storage var look_path: NodePath = ^"VampireLook"
 ## Component that selects idle and run animations from the imported character.
-@export var presentation_path: NodePath = ^"VampirePresentation"
+@export_storage var presentation_path: NodePath = ^"VampirePresentation"
 ## Wall-occluded instant-kill area surrounding the doubled Vampire model.
-@export var contact_path: NodePath = ^"VampireContact"
+@export_storage var contact_path: NodePath = ^"VampireContact"
 ## Body-width floor-level sight cast used to acquire only physically reachable players.
-@export var senses_path: NodePath = ^"VampireSenses"
+@export_storage var senses_path: NodePath = ^"VampireSenses"
 ## Hunt component that switches between confirmed sight, noise, prediction, and strategic search.
-@export var hunt_path: NodePath = ^"VampireHunt"
+@export_storage var hunt_path: NodePath = ^"VampireHunt"
 ## Strategic memory of known treasure, key, coffin, door, and gate locations.
-@export var layout_knowledge_path: NodePath = ^"VampireLayoutKnowledge"
+@export_storage var layout_knowledge_path: NodePath = ^"VampireLayoutKnowledge"
 ## Full-screen purple fog controller driven by the player's distance from this vampire.
-@export var proximity_fog_path: NodePath = ^"VampireProximityFog"
+@export_storage var proximity_fog_path: NodePath = ^"VampireProximityFog"
 
-@export_group("Development")
+# Internal Development settings; hidden from the Inspector.
 ## Disables this vampire's AI, movement, collisions, lights, fog, and instant-kill contact for testing.
-@export var disable_vampire_for_testing := false:
+@export_storage var disable_vampire_for_testing := false:
 	set(value):
 		disable_vampire_for_testing = value
 		if is_node_ready():

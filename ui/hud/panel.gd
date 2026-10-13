@@ -14,16 +14,15 @@ const ACTIVE_HEALTH_SEGMENTS := 6
 const TOTAL_HEALTH_SEGMENTS := 12
 const DEFAULT_LEVEL_TREASURE_TOTAL := 0
 
-@export_group("Placement Help")
+# Internal Placement Help settings; hidden from the Inspector.
 ## Inspector note: edit ScreenContainer/PanelPlacement to move or resize the panel inside the reference canvas.
 ## HudPanel scales ScreenContainer uniformly to the actual viewport, so child aspect ratios are preserved.
-@export_multiline var placement_help := (
+var placement_help := (
 	"Edit ScreenContainer/PanelPlacement to position and scale the HUD panel inside the 1920x1080 "
 	+ "reference canvas. HudPanel scales ScreenContainer uniformly to fit the real viewport, so child "
 	+ "aspect ratios stay unchanged. ScreenGuide shows the reference canvas in the editor. PlacementGuide "
 	+ "shows the panel placement rectangle and is hidden at runtime."
 )
-@export_group("")
 
 ## Reference canvas size used to position HUD elements before uniform screen scaling.
 @export var reference_screen_size := Vector2(1920.0, 1080.0):
@@ -31,17 +30,17 @@ const DEFAULT_LEVEL_TREASURE_TOTAL := 0
 		reference_screen_size = Vector2(maxf(value.x, 1.0), maxf(value.y, 1.0))
 		_sync_screen_container()
 ## Canvas that contains HUD elements in reference-screen coordinates.
-@export var screen_container_path: NodePath = ^"ScreenContainer"
+@export_storage var screen_container_path: NodePath = ^"ScreenContainer"
 ## Label that displays deposited treasure against the level total.
-@export var treasure_lifted_label_path: NodePath = ^"ScreenContainer/PanelPlacement/PanelArt/TreasureLifted"
+@export_storage var treasure_lifted_label_path: NodePath = ^"ScreenContainer/PanelPlacement/PanelArt/TreasureLifted"
 ## Label that displays the total treasure available on the level.
-@export var treasure_total_label_path: NodePath = ^"ScreenContainer/PanelPlacement/PanelArt/TreasureOnLevel"
+@export_storage var treasure_total_label_path: NodePath = ^"ScreenContainer/PanelPlacement/PanelArt/TreasureOnLevel"
 ## Label that displays carried treasure in the current sack.
-@export var sack_contents_label_path: NodePath = ^"ScreenContainer/PanelPlacement/PanelArt/SackContents"
+@export_storage var sack_contents_label_path: NodePath = ^"ScreenContainer/PanelPlacement/PanelArt/SackContents"
 ## Label that displays the current sack capacity.
-@export var sack_max_label_path: NodePath = ^"ScreenContainer/PanelPlacement/PanelArt/SackMax"
+@export_storage var sack_max_label_path: NodePath = ^"ScreenContainer/PanelPlacement/PanelArt/SackMax"
 ## Container that owns the health segment TextureRects.
-@export var health_segments_path: NodePath = ^"ScreenContainer/PanelPlacement/PanelArt/HealthSegments"
+@export_storage var health_segments_path: NodePath = ^"ScreenContainer/PanelPlacement/PanelArt/HealthSegments"
 ## Texture used for remaining health segments.
 @export var remaining_health_texture: Texture2D
 ## Texture used for lost health segments.

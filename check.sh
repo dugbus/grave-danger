@@ -2,6 +2,8 @@
 set -euo pipefail
 
 ./format.sh --check --all
+python3 -B -m unittest discover -s tools -p 'check_export_docs_test.py'
+python3 tools/check_export_docs.py
 
 readonly teardown_diagnostic_pattern='ObjectDB instances were leaked at exit|resources still in use at exit|RID allocations .* were leaked at exit|Pages in use exist at exit'
 readonly dummy_shader_diagnostic_pattern='RID allocations of type .*RendererDummy.*DummyShader.* were leaked at exit'

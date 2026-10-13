@@ -8,9 +8,9 @@ enum ModificationPass { PrepareTargets, PreserveFootPose }
 const SETTINGS := preload("res://player/player_gait_settings.tres")
 
 ## Place this modifier before IK to prepare targets, or after IK to preserve foot pose.
-@export var modification_pass := ModificationPass.PrepareTargets
+@export_storage var modification_pass := ModificationPass.PrepareTargets
 ## Target-preparation modifier read by the final foot-pose pass.
-@export var preparation_path: NodePath = ^"../FootPlant"
+@export_storage var preparation_path: NodePath = ^"../FootPlant"
 
 # A native base type avoids a self-script reference cycle through the preloaded settings resource.
 @onready var preparation := get_node_or_null(preparation_path) as SkeletonModifier3D

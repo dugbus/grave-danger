@@ -21,7 +21,7 @@ extends Resource
 @export var export_size := Vector2i.ZERO
 @export var color_mappings: Array[Resource] = []
 ## PNG colours deliberately removed from the shared mapping list by a level editor.
-@export var ignored_colour_keys: Array[String] = []
+@export_storage var ignored_colour_keys: Array[String] = []
 ## Editable FloorSurface path rebuilt by later PNG floor imports in this level.
 @export var floor_surface_path: NodePath
 ## Optional top material applied without replacing the FloorSurface wall material.

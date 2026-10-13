@@ -8,7 +8,7 @@ const MASK_SHADER_PATH := "res://player/visibility/player_occlusion_mask.gdshade
 const OUTLINE_SHADER_PATH := "res://player/visibility/player_occlusion_outline.gdshader"
 
 ## Imported character subtree within the owning Player whose meshes supply the silhouette.
-@export var player_visual_root_path: NodePath = ^"../Pivot/Character"
+@export_storage var player_visual_root_path: NodePath = ^"../Pivot/Character"
 ## Enables the obstruction-only silhouette for immediate with/without comparison.
 @export var visibility_enabled := true
 ## Dark flat fill that remains readable against pale obstructions.
@@ -18,7 +18,7 @@ const OUTLINE_SHADER_PATH := "res://player/visibility/player_occlusion_outline.g
 ## World-space expansion used to form the bright border around the player.
 @export_range(0.005, 0.15, 0.005, "or_greater", "suffix:m") var outline_width := 0.035
 ## Minimum world-space separation before scenery counts as being in front of the player.
-@export_range(0.0, 0.2, 0.001, "or_greater", "suffix:m") var occlusion_depth_bias := 0.015
+@export_storage var occlusion_depth_bias := 0.015
 
 @onready var player_visual_root := get_node_or_null(player_visual_root_path) as Node3D
 

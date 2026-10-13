@@ -11,9 +11,9 @@ const MINIMUM_UNCERTAINTY_RADIUS_PIXELS := 3.0
 const SIGHT_CONE_SEGMENTS := 24
 
 ## Label that displays the Vampire's live perception, search, and route diagnostics.
-@export var status_label_path: NodePath = ^"StatusBackdrop/StatusLabel"
+@export_storage var status_label_path: NodePath = ^"StatusBackdrop/StatusLabel"
 ## Panel behind the Vampire's live diagnostics.
-@export var status_backdrop_path: NodePath = ^"StatusBackdrop"
+@export_storage var status_backdrop_path: NodePath = ^"StatusBackdrop"
 ## Purple map marker used for the Vampire and its current facing direction.
 @export var vampire_color := Color(0.78, 0.32, 1.0, 1.0)
 ## Pink map marker used for the position where the Vampire believes the player is.

@@ -6,11 +6,11 @@ signal player_visibility_changed(visible: bool)
 const GAMEPLAY_PROCESS_GROUP: StringName = &"deterministic_gameplay_process"
 
 ## Low occlusion ray used when the body-width sight sweep brushes a wall edge.
-@export var visual_sight_ray_path: NodePath = ^"VisualSightRay"
+@export_storage var visual_sight_ray_path: NodePath = ^"VisualSightRay"
 ## Node whose positive Z axis represents the Vampire's gameplay facing direction.
-@export var facing_node_path: NodePath = ^"../Pivot/LookDirection"
+@export_storage var facing_node_path: NodePath = ^"../Pivot/LookDirection"
 ## Travel pivot used to decide which corridors remain reachable by a safe head turn.
-@export var travel_facing_node_path: NodePath = ^"../Pivot"
+@export_storage var travel_facing_node_path: NodePath = ^"../Pivot"
 
 var player: Node3D
 var settings: Resource

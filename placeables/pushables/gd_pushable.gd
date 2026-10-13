@@ -6,41 +6,72 @@ const WORLD_COLLISION_LAYER := 1
 const MIN_PUSH_SPEED := 0.05
 const WALL_INTO_NORMAL_EPSILON := -0.01
 
-@export_group("Collision")
-@export var add_to_pushable_group := true
-@export var add_to_navigation_blocker_group := true
-@export var use_world_collision_layer := true
-@export var collide_with_player := true
-@export var constrain_to_starting_height := true
-@export var lock_rotation_to_upright := true
+# Internal Collision settings; hidden from the Inspector.
+## Registers this object as pushable so character movement can push it.
+@export_storage var add_to_pushable_group := true
+## Registers this object as an obstacle for character navigation.
+@export_storage var add_to_navigation_blocker_group := true
+## Includes this object in the world collision layer.
+@export_storage var use_world_collision_layer := true
+## Enables physical collision with the player.
+@export_storage var collide_with_player := true
+## Keeps the object at its initial height so it moves only horizontally.
+@export_storage var constrain_to_starting_height := true
+## Locks physical rotation so the object retains its authored orientation.
+@export_storage var lock_rotation_to_upright := true
 
+## Inspector group for Motion settings.
 @export_group("Motion")
+## Force applied by an active character push.
 @export_range(0.0, 5000.0, 10.0) var character_push_force := 650.0
+## Maximum speed in world units per second requested by character pushes.
 @export_range(0.0, 20.0, 0.1) var max_character_push_speed := 2.2
+## Maximum horizontal object speed, in world units per second.
 @export_range(0.0, 20.0, 0.1) var max_planar_speed := 3.0
-@export_range(0.0, 1.0, 0.01) var stop_below_speed := 0.04
-@export_range(0.01, 0.5, 0.01) var character_push_interval := 0.08
-@export_range(0.01, 0.5, 0.01) var character_push_memory_seconds := 0.14
-@export_range(0.0, 1.0, 0.01) var character_contact_push_bias := 0.08
+## Horizontal speed below which the object is brought to a complete stop.
+@export_storage var stop_below_speed := 0.04
+## Legacy push interval in seconds; continuous physics-step pushing currently ignores this setting.
+@export_storage var character_push_interval := 0.08
+## Seconds a character push remains active after the last contact update.
+@export_storage var character_push_memory_seconds := 0.14
+## Weight given to the contact direction when combining it with the character's movement direction.
+@export_storage var character_contact_push_bias := 0.08
 
+## Inspector group for Wall Sliding settings.
 @export_group("Wall Sliding")
+## Redirects pushes along walls instead of pushing into them.
 @export var wall_slide_enabled := true
-@export_flags_3d_physics var wall_slide_collision_mask := WORLD_COLLISION_LAYER
-@export_range(0.0, 1.0, 0.01) var wall_contact_min_horizontal_normal := 0.35
-@export_range(0.0, 1.0, 0.01) var blocked_push_wall_dot_threshold := 0.2
-@export_range(-1.0, 1.0, 0.01) var same_wall_normal_min_dot := 0.5
-@export_range(-1.0, 1.0, 0.01) var corner_distinct_normal_max_dot := 0.35
-@export var wall_slide_latch_enabled := true
-@export_range(0.01, 0.5, 0.01) var wall_slide_latch_seconds := 0.16
-@export_range(0.0, 1.0, 0.01) var wall_slide_parallel_dot_threshold := 0.35
+## Physics layers treated as walls when redirecting pushes.
+@export_storage var wall_slide_collision_mask := WORLD_COLLISION_LAYER
+## Minimum horizontal normal magnitude needed for a contact to count as a wall.
+@export_storage var wall_contact_min_horizontal_normal := 0.35
+## Minimum alignment with a wall normal that identifies a push into the wall.
+@export_storage var blocked_push_wall_dot_threshold := 0.2
+## Minimum normal alignment for two contacts to count as the same wall.
+@export_storage var same_wall_normal_min_dot := 0.5
+## Maximum normal alignment for two contacts to count as distinct corner walls.
+@export_storage var corner_distinct_normal_max_dot := 0.35
+## Briefly remembers a wall direction to stabilize sliding across changing contacts.
+@export_storage var wall_slide_latch_enabled := true
+## Seconds a wall-slide direction remains latched after contact changes.
+@export_storage var wall_slide_latch_seconds := 0.16
+## Maximum push alignment with the wall normal that still counts as sliding along the wall.
+@export_storage var wall_slide_parallel_dot_threshold := 0.35
 
+## Inspector group for Corner Recovery settings.
 @export_group("Corner Recovery")
+## Helps the object escape a corner when a character's push cannot move it.
 @export var corner_recovery_enabled := true
-@export_range(0.01, 1.0, 0.01) var corner_stuck_after_seconds := 0.08
-@export_range(0.0001, 0.2, 0.0001) var corner_recovery_distance := 0.025
-@export_range(0.0, 4.0, 0.01) var corner_recovery_velocity := 0.65
-@export_range(0.0, 1.0, 0.01) var corner_stuck_speed_threshold := 0.12
-@export_range(0.0, 3.0, 0.01) var corner_recovery_wall_bias := 0.7
+## Seconds of blocked pushing before corner recovery begins.
+@export_storage var corner_stuck_after_seconds := 0.08
+## Distance in world units used for a corner recovery position adjustment.
+@export_storage var corner_recovery_distance := 0.025
+## Speed in world units per second applied during corner recovery.
+@export_storage var corner_recovery_velocity := 0.65
+## Horizontal speed below which a pushed object can count as stuck in a corner.
+@export_storage var corner_stuck_speed_threshold := 0.12
+## Weight given to wall normals when choosing a corner recovery direction.
+@export_storage var corner_recovery_wall_bias := 0.7
 
 var starting_height := 0.0
 

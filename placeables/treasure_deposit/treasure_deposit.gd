@@ -28,9 +28,9 @@ signal treasure_item_absorbed(item_type: StringName, value: int)
 ## Random landing offset radius around the deposit target point.
 @export var landing_spread_radius := 0.16
 ## Physics mask used by the generated deposit trigger area to detect players.
-@export var player_collision_mask := 2
+@export_storage var player_collision_mask := 2
 ## Node that wobbles when treasure is absorbed; defaults to the parent.
-@export var wobble_node_path: NodePath = ^".."
+@export_storage var wobble_node_path: NodePath = ^".."
 ## Peak wobble rotation, in degrees, applied when treasure lands.
 @export var wobble_angle_degrees := 5.0
 ## Total seconds for the deposit wobble animation.

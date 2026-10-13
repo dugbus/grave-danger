@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://cx1gj06246clp"]
 
 [ext_resource type="Script" uid="uid://7bfauhcxwwv" path="res://placeables/collectibles/flask_base.gd" id="1_flask_base"]
-[ext_resource type="Resource" path="res://placeables/collectibles/global_flask_properties.tres" id="2_4vqv1"]
 [ext_resource type="PackedScene" uid="uid://dgasx6n7tceql" path="res://Assets/placeables/collectibles/flask.glb" id="2_flask"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_flask_pickup"]
@@ -43,7 +42,6 @@ contact_monitor = true
 max_contacts_reported = 8
 script = ExtResource("1_flask_base")
 spawn_spin_speed = 9.0
-global_flask_properties = ExtResource("2_4vqv1")
 
 [node name="BaseCollisionShape" type="CollisionShape3D" parent="."]
 position = Vector3(0, 0.008, 0)

@@ -18,29 +18,44 @@ const GAME_SCENE := "res://game/graveyard.tscn"
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 const SCENE_LOADER_SCRIPT := preload("res://autoload/scene_loader.gd")
 
+## Inspector group for Door settings.
 @export_group("Door")
+## Allows the crypt door to open when it is unlocked.
 @export var openable := true:
 	set(value):
 		openable = value
 		_apply_lock_state()
 
+## Prevents the crypt door from opening until it is unlocked.
 @export var locked := false:
 	set(value):
 		locked = value
 		_apply_lock_state()
 
-@export var door_path: NodePath = DEFAULT_DOOR_PATH
+## Hinged door node controlled by this crypt.
+@export_storage var door_path: NodePath = DEFAULT_DOOR_PATH
+## Maximum door opening angle from its closed pose, in degrees.
 @export_range(0.0, 180.0, 1.0, "degrees") var open_limit_degrees := 105.0
+## Turning force applied when a character pushes the door.
 @export_range(0.0, 50.0, 0.1) var push_torque := 16.0
+## Strength of the restoring force when the door moves beyond its opening limit.
 @export_range(0.0, 20.0, 0.1) var limit_spring_strength := 9.0
+## Strength of the force that holds the door near its closed pose.
 @export_range(0.0, 10.0, 0.1) var closed_latch_strength := 1.2
-@export_range(0.0, 5.0, 0.05) var closed_latch_angle_degrees := 4.0
-@export_range(0.0, 1.0, 0.01) var collision_padding := 0.04
-@export_range(0.0, 1.5, 0.05) var push_area_padding := 0.35
+## Angle in degrees within which the closed-door latch applies.
+@export_storage var closed_latch_angle_degrees := 4.0
+## Extra thickness in world units added to the door's collision bounds.
+@export_storage var collision_padding := 0.04
+## Extra size in world units added around the door for detecting character pushes.
+@export_storage var push_area_padding := 0.35
 
+## Inspector group for Level Trigger settings.
 @export_group("Level Trigger")
-@export var level_trigger_path: NodePath = DEFAULT_LEVEL_TRIGGER_PATH
+## Trigger node used to enter the selected level through this crypt.
+@export_storage var level_trigger_path: NodePath = DEFAULT_LEVEL_TRIGGER_PATH
+## Level number entered when the player activates this crypt's trigger.
 @export_range(1, 8, 1) var target_level_number := 1
+## Seconds taken to fade out before entering the selected level.
 @export_range(0.0, 4.0, 0.05) var trigger_fade_out_duration := 0.8
 
 var door_body: RigidBody3D

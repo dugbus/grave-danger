@@ -2,9 +2,9 @@ extends Node3D
 class_name GDVampireDevelopmentView
 
 ## Level-only camera used while the development view node is visible.
-@export var camera_path: NodePath = ^"Camera3D"
+@export_storage var camera_path: NodePath = ^"Camera3D"
 ## Vampire-maze indoor environment whose ambient energy is raised for development.
-@export var world_environment_path: NodePath = ^"../IndoorLighting/WorldEnvironment"
+@export_storage var world_environment_path: NodePath = ^"../IndoorLighting/WorldEnvironment"
 ## Ambient energy applied only while this development view node is visible.
 @export_range(0.0, 2.0, 0.01) var development_ambient_energy := 0.24
 

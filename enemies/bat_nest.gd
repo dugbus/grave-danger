@@ -52,7 +52,7 @@ const MIN_SPEED := 0.05
 ## Player distance that causes the nest to take flight.
 @export_range(0.1, 20.0, 0.1, "suffix:m") var trigger_radius := 4.0
 ## Group used to find the player at runtime.
-@export var player_group: StringName = PLAYER_GROUP
+@export_storage var player_group: StringName = PLAYER_GROUP
 ## Height above the player where bats appear when triggered.
 @export_range(0.0, 4.0, 0.05, "suffix:m") var player_spawn_height := 1.15
 ## Horizontal radius around the player where bats appear when triggered.
@@ -76,13 +76,13 @@ const MIN_SPEED := 0.05
 ## Maximum sideways spread from the shared group fly-off direction.
 @export_range(0.0, 90.0, 0.5, "suffix:deg") var fly_off_spread_degrees := 18.0
 ## Strength used to pull bats toward their local flock center.
-@export_range(0.0, 20.0, 0.05) var cohesion_weight := 0.55
+@export_storage var cohesion_weight := 0.55
 ## Strength used to align each bat with nearby bat velocity.
-@export_range(0.0, 20.0, 0.05) var alignment_weight := 0.25
+@export_storage var alignment_weight := 0.25
 ## Strength used to keep bats from visually stacking in one spot.
-@export_range(0.0, 20.0, 0.05) var separation_weight := 2.6
+@export_storage var separation_weight := 2.6
 ## Distance where separation starts pushing bats apart.
-@export_range(0.05, 5.0, 0.05, "suffix:m") var separation_distance := 0.65
+@export_storage var separation_distance := 0.65
 ## Strength used to pull bats toward erratic targets above the player.
 @export_range(0.0, 30.0, 0.05) var player_attraction_weight := 12.0
 ## Strength of the sideways darting that makes the swarm feel irritating.
@@ -91,6 +91,7 @@ const MIN_SPEED := 0.05
 @export_range(0.0, 20.0, 0.05) var annoyance_weight := 5.5
 ## Animation playback speed used for frantic wing flapping.
 @export_range(0.1, 8.0, 0.05) var flap_animation_speed_scale := 3.0
+## Inspector group for Audio settings.
 @export_group("Audio")
 ## Bat wing flap one-shot sample used by the nest.
 @export_file("*.mp3", "*.wav", "*.ogg") var flap_sound_path := DEFAULT_FLAP_SOUND_PATH
@@ -109,7 +110,7 @@ const MIN_SPEED := 0.05
 ## Distance scale for 3D attenuation; higher values keep flaps audible from the follow camera.
 @export_range(0.1, 30.0, 0.1, "suffix:m") var flap_sound_unit_size := 8.0
 ## Maximum bat flap one-shots allowed to overlap for this nest.
-@export_range(1, 8, 1) var flap_sound_max_concurrent := 3
+@export_storage var flap_sound_max_concurrent := 3
 ## Bat squeak one-shot samples randomly played by the nest.
 @export var squeak_sound_paths: Array[String] = DEFAULT_SQUEAK_SOUND_PATHS
 ## Volume for each bat squeak one-shot.
@@ -129,10 +130,12 @@ const MIN_SPEED := 0.05
 ## Distance scale for 3D attenuation; higher values keep squeaks audible from the follow camera.
 @export_range(0.1, 30.0, 0.1, "suffix:m") var squeak_sound_unit_size := 8.0
 ## Maximum bat squeak one-shots allowed to overlap for this nest.
-@export_range(1, 8, 1) var squeak_sound_max_concurrent := 4
+@export_storage var squeak_sound_max_concurrent := 4
 ## Seconds after fly-off starts for bat sounds to fade out.
 @export_range(0.0, 10.0, 0.05, "suffix:s") var fly_off_audio_fade_seconds := 1.35
+## Ends the preceding Inspector group.
 @export_group("")
+## Inspector group for Camera Scare settings.
 @export_group("Camera Scare")
 ## Percent chance that one bat flies toward the active camera when the nest triggers.
 @export_range(0.0, 100.0, 1.0, "suffix:%") var camera_scare_chance_percent := 18.0
@@ -144,6 +147,7 @@ const MIN_SPEED := 0.05
 @export_range(0.1, 50.0, 0.1, "suffix:m/s") var camera_scare_speed := 16.0
 ## Scale multiplier used to make the scare bat loom larger near the camera.
 @export_range(1.0, 12.0, 0.1) var camera_scare_scale_multiplier := 4.0
+## Ends the preceding Inspector group.
 @export_group("")
 
 var state := BatNestState.Roosting

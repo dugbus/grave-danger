@@ -6,11 +6,11 @@ class_name GDInventoryPickup
 ## Seconds a newly spawned or dropped item waits before pickup is allowed.
 @export var pickup_delay := 0.35
 ## Existing pickup area. If missing, a small sphere area is created at runtime.
-@export var pickup_area_path: NodePath = ^"PickupArea"
+@export_storage var pickup_area_path: NodePath = ^"PickupArea"
 ## Physics mask used by the generated pickup area to detect players.
-@export var pickup_collision_mask := 2
+@export_storage var pickup_collision_mask := 2
 ## Radius used when this pickup creates its own area.
-@export var generated_pickup_radius := 0.42
+@export_storage var generated_pickup_radius := 0.42
 
 var pickup_area: Area3D
 var can_be_collected := false

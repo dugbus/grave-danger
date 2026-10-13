@@ -11,15 +11,25 @@ const COLLISION_BODY_NAME := "TreeBlockers"
 	preload("res://Assets/kenney-graveyard/pine-crooked.glb"),
 	preload("res://Assets/kenney-graveyard/pine-fall.glb"),
 ]
+## Distance in world units between candidate tree placements.
 @export_range(0.5, 16.0, 0.1) var tree_spacing := 2.0
+## Inset in world units from the level's outer edge to the tree surround.
 @export_range(0.0, 8.0, 0.1) var inner_gap := 1.8
+## Depth in world units of the tree band extending inward from its outer edge.
 @export_range(4.0, 80.0, 0.5) var surround_depth := 20.0
+## Maximum random horizontal offset in world units from each tree's grid position.
 @export_range(0.0, 4.0, 0.1) var placement_jitter := 1.1
+## Smallest random uniform scale applied to a surrounding tree.
 @export_range(0.1, 4.0, 0.05) var minimum_tree_scale := 1.35
+## Largest random uniform scale applied to a surrounding tree.
 @export_range(0.1, 4.0, 0.05) var maximum_tree_scale := 4.2
-@export_range(8.0, 64.0, 1.0) var chunk_size := 18.0
+## Width in world units of tree rendering chunks used for culling.
+@export_storage var chunk_size := 18.0
+## Chance of retaining a tree at the deepest edge of the surround band.
 @export_range(0.0, 1.0, 0.01) var far_row_keep_chance := 0.72
+## Thickness in world units of the collision walls around the tree surround.
 @export_range(0.5, 12.0, 0.1) var blocker_thickness := 3.0
+## Height in world units of the collision walls around the tree surround.
 @export_range(2.0, 32.0, 0.5) var blocker_height := 14.0
 
 

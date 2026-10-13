@@ -6,22 +6,37 @@ const WORLD_COLLISION_LAYER := 1
 const MIN_PUSH_SPEED := 0.05
 const TOP_CONTACT_MIN_NORMAL_Y := 0.65
 
-@export_group("Collision")
-@export var add_to_pushable_group := true
-@export var add_to_navigation_blocker_group := true
-@export var use_world_collision_layer := true
-@export var collide_with_player := true
-@export var constrain_to_starting_height := true
-@export var lock_rotation_to_upright := true
+# Internal Collision settings; hidden from the Inspector.
+## Registers this object as pushable so character movement can push it.
+@export_storage var add_to_pushable_group := true
+## Registers this object as an obstacle for character navigation.
+@export_storage var add_to_navigation_blocker_group := true
+## Includes this object in the world collision layer.
+@export_storage var use_world_collision_layer := true
+## Enables physical collision with the player.
+@export_storage var collide_with_player := true
+## Keeps the object at its initial height so it moves only horizontally.
+@export_storage var constrain_to_starting_height := true
+## Locks physical rotation so the object retains its authored orientation.
+@export_storage var lock_rotation_to_upright := true
 
+## Inspector group for Motion settings.
 @export_group("Motion")
+## Mass used to convert character push force into acceleration.
 @export_range(1.0, 500.0, 1.0) var effective_mass := 46.0
+## Force used to accelerate the box while a character pushes it.
 @export_range(0.0, 5000.0, 10.0) var push_force := 740.0
+## Deceleration applied when the box is no longer being pushed.
 @export_range(0.0, 50.0, 0.1) var stop_acceleration := 24.0
+## Maximum speed in world units per second requested by character pushes.
 @export_range(0.0, 20.0, 0.1) var max_character_push_speed := 2.2
+## Maximum horizontal object speed, in world units per second.
 @export_range(0.0, 20.0, 0.1) var max_planar_speed := 3.0
-@export_range(0.0, 1.0, 0.01) var stop_below_speed := 0.04
-@export_range(0.01, 0.5, 0.01) var character_push_memory_seconds := 0.14
+## Horizontal speed below which the object is brought to a complete stop.
+@export_storage var stop_below_speed := 0.04
+## Seconds a character push remains active after the last contact update.
+@export_storage var character_push_memory_seconds := 0.14
+## Restricts box movement to the selected horizontal push axis.
 @export var lock_movement_to_axis := true
 
 var starting_height := 0.0

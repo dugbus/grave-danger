@@ -24,11 +24,11 @@ const STAGGER_ANIMATION_CANDIDATES = ["stagger"]
 const DEATH_ANIMATION_CANDIDATES = ["death", "die", "fall"]
 
 ## New character subtree preferred whenever it supplies the requested animation.
-@export var character_path: NodePath = ^"../Pivot/Character/NewCharacter"
+@export_storage var character_path: NodePath = ^"../Pivot/Character/NewCharacter"
 ## Legacy character subtree shown only when the new character lacks a requested animation.
-@export var fallback_character_path: NodePath = ^"../Pivot/Character/LegacyCharacter"
+@export_storage var fallback_character_path: NodePath = ^"../Pivot/Character/LegacyCharacter"
 ## Visual pivot used for quick hit reactions.
-@export var pivot_path: NodePath = ^"../Pivot"
+@export_storage var pivot_path: NodePath = ^"../Pivot"
 ## Local Y offset used for the non-physics hit hop.
 @export var hit_reaction_height := 0.16
 ## Seconds used to lift the visual on hit.

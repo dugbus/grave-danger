@@ -18,9 +18,13 @@ const EFFECT_LABELS := {
 	&"no_boundary": "Safety",
 }
 
+## Distance in pixels between the flask HUD and the top of the screen.
 @export var top_margin := 20.0
+## Distance in pixels between the flask HUD and the right of the screen.
 @export var right_margin := 24.0
+## Maximum width in pixels available to the active flask HUD.
 @export var max_width := 1500.0
+## Rotation speed in radians per second of the flask shown in the HUD.
 @export var flask_spin_speed := 1.4
 
 var container: HBoxContainer

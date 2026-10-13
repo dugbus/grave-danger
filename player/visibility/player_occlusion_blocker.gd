@@ -6,7 +6,7 @@ const BLOCKER_SHADER_PATH := "res://player/visibility/player_occlusion_blocker.g
 const BLOCKER_RENDER_PRIORITY := -1
 
 ## Visual subtree whose meshes should remain in front of the occluded player silhouette.
-@export var occluder_visual_root_path: NodePath = ^"../Character"
+@export_storage var occluder_visual_root_path: NodePath = ^"../Character"
 ## Enables stencil blocking without changing the visual's authored materials.
 @export var blocking_enabled := true
 

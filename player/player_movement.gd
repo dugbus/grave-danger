@@ -30,7 +30,7 @@ const FOOTSTEP_SOUND_PATHS: Array[String] = [
 ]
 
 ## Visual pivot rotated toward the current movement direction.
-@export var pivot_path: NodePath = ^"../Pivot"
+@export_storage var pivot_path: NodePath = ^"../Pivot"
 ## Minimum horizontal speed required to play footstep sounds.
 @export var footstep_speed_threshold := 0.35
 ## Base travel distance between footstep sounds.
@@ -48,9 +48,9 @@ const FOOTSTEP_SOUND_PATHS: Array[String] = [
 ## Random volume variation applied to each footstep, in decibels.
 @export var footstep_volume_variance_db := 0.35
 ## Height above the player origin used by sideways squeeze probes.
-@export var squeeze_probe_height := 0.35
+@export_storage var squeeze_probe_height := 0.35
 ## Maximum side clearance distance checked while moving through gaps.
-@export var squeeze_probe_distance := 0.85
+@export_storage var squeeze_probe_distance := 0.85
 ## Gap width that applies the minimum squeeze speed multiplier.
 @export var squeeze_min_gap_width := 0.72
 ## Gap width at which no squeeze speed reduction is applied.

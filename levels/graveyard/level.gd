@@ -38,11 +38,12 @@ const DEFAULT_SKY_COLOR := Color(0.52, 0.46, 0.66, 1.0)
 		generate_tree_surround = value
 		_queue_rebuild()
 ## Keeps the retired PNG wall-layout preview hidden and non-colliding.
-@export var disable_legacy_grid_map := true:
+@export_storage var disable_legacy_grid_map := true:
 	set(value):
 		disable_legacy_grid_map = value
 		_queue_rebuild()
 
+## Inspector group for Direct Run Preview settings.
 @export_group("Direct Run Preview")
 ## Enables the reusable gameplay camera when this level is run directly.
 @export var enable_direct_run_camera := true:
@@ -50,7 +51,7 @@ const DEFAULT_SKY_COLOR := Color(0.52, 0.46, 0.66, 1.0)
 		enable_direct_run_camera = value
 		_queue_rebuild()
 ## Direct-run camera offset used when no shared camera profile overrides it.
-@export var direct_run_camera_offset := Vector3(0.0, 9.0, 12.0):
+@export_storage var direct_run_camera_offset := Vector3(0.0, 9.0, 12.0):
 	set(value):
 		direct_run_camera_offset = value
 		_queue_rebuild()

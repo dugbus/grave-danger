@@ -9,6 +9,7 @@ signal placeable_spawned
 const SPAWN_CONTROLLER := preload("res://placeables/placeable_spawn_controller.gd")
 const MAP_PLACEABLE_GROUP: StringName = &"map_placeable"
 
+## Inspector group for Spawn settings.
 @export_group("Spawn")
 ## Seconds after level start before this item drops in; zero means it was already present.
 @export_range(0.0, 300.0, 0.05, "suffix:s") var spawn_time := 0.0
@@ -16,6 +17,7 @@ const MAP_PLACEABLE_GROUP: StringName = &"map_placeable"
 @export_range(0.0, 20.0, 0.05, "suffix:m") var spawn_drop_height := 3.2
 ## Initial angular speed applied around a deterministic varied axis when this item drops in.
 @export_range(0.0, 30.0, 0.1, "suffix:rad/s") var spawn_spin_speed := 0.0
+## Ends the preceding Inspector group.
 @export_group("")
 
 var placeable_spawn_controller: Node

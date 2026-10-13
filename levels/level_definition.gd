@@ -8,7 +8,7 @@ class_name GDLevelDefinition
 ## Folder below `res://levels` that owns the level scene.
 @export var folder_name := ""
 ## Legacy result key used while migrating older saved progress.
-@export var legacy_result_key := ""
+@export_storage var legacy_result_key := ""
 ## Whether the level can currently be selected and launched.
 @export var available := false
 ## Whether the level should be presented as a tutorial.

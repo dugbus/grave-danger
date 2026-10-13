@@ -45,6 +45,7 @@ const CURRENT_GENERATION_VERSION := 20
 		configuration = value
 		_connect_configuration_changes()
 		_queue_regeneration()
+## Inspector group for Generated Floor settings.
 @export_group("Generated Floor")
 ## Material applied to every generated floor tile.
 @export var floor_material: BaseMaterial3D:
@@ -56,7 +57,9 @@ const CURRENT_GENERATION_VERSION := 20
 	set(value):
 		floor_texture_tiles = Vector2i(maxi(value.x, 1), maxi(value.y, 1))
 		_queue_regeneration()
+## Ends the preceding Inspector group.
 @export_group("")
+## Inspector group for Routed Floor settings.
 @export_group("Routed Floor")
 ## Objective followed by the generated Road-tile corridor.
 @export_enum("Gate", "Gate Key") var floor_tile_route_destination: int = FloorRoute.Destination.GateKey:
@@ -73,19 +76,20 @@ const CURRENT_GENERATION_VERSION := 20
 			return
 		floor_tile_route_percent = clamped_value
 		_queue_regeneration()
+## Ends the preceding Inspector group.
 @export_group("")
 ## Child GridMap that receives generated and repaired wall cells.
-@export var wall_grid_map_path: NodePath = ^"Layout/PNGGridMap"
+@export_storage var wall_grid_map_path: NodePath = ^"Layout/PNGGridMap"
 ## Child FloorSurface that receives the complete editable floor below the maze.
-@export var floor_surface_path: NodePath = ^"Layout/FloorSurface"
+@export_storage var floor_surface_path: NodePath = ^"Layout/FloorSurface"
 ## Player placed in the generated entrance corner.
-@export var player_path: NodePath = ^"../Player"
+@export_storage var player_path: NodePath = ^"../Player"
 ## Optional vampire placed two cells inside the locked gate opposite the player.
-@export var vampire_path: NodePath
+@export_storage var vampire_path: NodePath
 ## Child responsible for planning and instancing generated dungeon content.
-@export var generated_content_path: NodePath = ^"Layout/GeneratedContent"
+@export_storage var generated_content_path: NodePath = ^"Layout/GeneratedContent"
 ## Optional authored-content root disabled when generated budgets are active.
-@export var authored_content_path: NodePath
+@export_storage var authored_content_path: NodePath
 ## Height added above the generated floor for both character roots.
 @export_range(0.0, 4.0, 0.05) var character_spawn_height := 0.05
 ## Allows live generation while editing; disable it to preserve manual level edits.

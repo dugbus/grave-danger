@@ -6,7 +6,7 @@ class_name GDScoreHud
 ## Font size used for the score label.
 @export var font_size := 90
 ## Existing label to update. If missing, a fallback label is created.
-@export var score_label_path: NodePath = ^"ScoreLabel"
+@export_storage var score_label_path: NodePath = ^"ScoreLabel"
 
 var score := 0
 var score_label: Label

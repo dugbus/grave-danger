@@ -19,6 +19,7 @@ const MAX_TREASURE_COUNT := 500
 const TREASURE_PILE_COMPATIBLE_GROUP: StringName = &"treasure_pile_compatible"
 const TREASURE_PILE_SCENE_PATH := "res://placeables/treasure/treasure_pile.tscn"
 
+## Inspector group for Pile Contents settings.
 @export_group("Pile Contents")
 ## Number of individual gold coins spawned by this pile.
 @export_range(0, MAX_TREASURE_COUNT, 1) var gold_coin_count := 5:
@@ -55,6 +56,7 @@ const TREASURE_PILE_SCENE_PATH := "res://placeables/treasure/treasure_pile.tscn"
 	set(value):
 		gold_bar_count = clampi(value, 0, MAX_TREASURE_COUNT)
 		_on_treasure_count_changed()
+## Ends the preceding Inspector group.
 @export_group("")
 
 ## Persisted counts for compatible treasure types discovered after the built-in types.

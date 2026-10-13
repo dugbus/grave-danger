@@ -15,33 +15,49 @@ const TEXT_VISUAL_LAYER := 1 << 19
 const FADE_IN_DURATION := 0.3
 const FLASK_EFFECT_TEXT_GROUP := &"flask_effect_text"
 
+## Opacity of the displayed text; lower values make it more transparent.
 @export_range(0.1, 1.0, 0.01) var text_opacity := 0.5:
 	set(value):
 		text_opacity = clampf(value, 0.1, 1.0)
 		_apply_effect_color(current_color)
+## Font size used for the active flask effect message.
 @export_range(16, 180, 1) var font_size := 92:
 	set(value):
 		font_size = maxi(value, 16)
 		_configure_text_mesh()
+## World size of a text pixel; larger values make the displayed text larger.
 @export_range(0.001, 0.05, 0.001) var pixel_size := 0.009:
 	set(value):
 		pixel_size = maxf(value, 0.001)
 		_configure_text_mesh()
+## Extrusion depth of the text mesh, in world units.
 @export_range(0.0, 0.25, 0.005, "suffix:m") var text_depth := 0.08:
 	set(value):
 		text_depth = maxf(value, 0.0)
 		_configure_text_mesh()
+## Distance in world units from the camera at which the text is displayed.
 @export_range(0.5, 20.0, 0.1, "suffix:m") var camera_distance := 10.0
+## Horizontal offset of the displayed text relative to the viewport center.
 @export_range(-1.0, 1.0, 0.01) var viewport_x_offset := 0.0
+## Vertical offset of the displayed text relative to the viewport center.
 @export_range(-1.0, 1.0, 0.01) var viewport_y_offset := 0.36
+## Horizontal tilt of the text display, in degrees.
 @export_range(-25.0, 25.0, 0.5, "suffix:deg") var perspective_yaw_degrees := -12.0
+## Vertical tilt of the text display, in degrees.
 @export_range(-25.0, 25.0, 0.5, "suffix:deg") var perspective_pitch_degrees := 6.0
+## Inspector group for Text Light settings.
 @export_group("Text Light")
+## Local position of the light illuminating the displayed text.
 @export var light_offset := Vector3(-1.15, 0.9, 1.35)
+## Brightness of the light illuminating the displayed text.
 @export_range(0.0, 40.0, 0.1) var light_energy := 6.5
+## Reach of the light illuminating the displayed text, in world units.
 @export_range(0.1, 20.0, 0.1, "suffix:m") var light_range := 5.5
+## Color of the light illuminating the displayed text.
 @export var light_color := Color(1.0, 0.88, 0.68)
+## Extra distance in world units added to the text light's sweep across the message.
 @export_range(0.0, 4.0, 0.05, "suffix:m") var light_sweep_padding := 0.5
+## Frequency in hertz of the light's sweep across the displayed text.
 @export_range(0.0, 6.0, 0.05, "suffix:Hz") var light_sweep_speed := 0.42
 
 var active_effects: Array[Dictionary] = []

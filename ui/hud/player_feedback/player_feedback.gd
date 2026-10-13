@@ -21,19 +21,19 @@ const JOYPAD_AXIS_RELEASE_THRESHOLD := 0.3
 ## Shared default mapping and debounce timing for the feedback controls.
 @export var settings: Resource
 ## Authored panel containing the optional written feedback field.
-@export var note_panel_path: NodePath = ^"NotePanel"
+@export_storage var note_panel_path: NodePath = ^"NotePanel"
 ## Multiline text area used to attach an optional explanation to a feedback marker.
-@export var note_field_path: NodePath = ^"NotePanel/Center/Panel/Margin/VBox/NoteField"
+@export_storage var note_field_path: NodePath = ^"NotePanel/Center/Panel/Margin/VBox/NoteField"
 ## Short confirmation shown after a feedback marker is accepted.
-@export var confirmation_label_path: NodePath = ^"Confirmation"
+@export_storage var confirmation_label_path: NodePath = ^"Confirmation"
 ## Large title shown at the top of the centered feedback form.
-@export var prompt_label_path: NodePath = ^"NotePanel/Center/Panel/Margin/VBox/Prompt"
+@export_storage var prompt_label_path: NodePath = ^"NotePanel/Center/Panel/Margin/VBox/Prompt"
 ## Player-facing instructions shown above the feedback entry field.
-@export var instructions_label_path: NodePath = ^"NotePanel/Center/Panel/Margin/VBox/Instructions"
+@export_storage var instructions_label_path: NodePath = ^"NotePanel/Center/Panel/Margin/VBox/Instructions"
 ## Joypad-focusable action that attaches the entered note to the marker.
-@export var proceed_button_path: NodePath = ^"NotePanel/Center/Panel/Margin/VBox/Actions/ProceedButton"
+@export_storage var proceed_button_path: NodePath = ^"NotePanel/Center/Panel/Margin/VBox/Actions/ProceedButton"
 ## Joypad-focusable action that dismisses the form without attaching a note.
-@export var cancel_button_path: NodePath = ^"NotePanel/Center/Panel/Margin/VBox/Actions/CancelButton"
+@export_storage var cancel_button_path: NodePath = ^"NotePanel/Center/Panel/Margin/VBox/Actions/CancelButton"
 
 @onready var note_panel := get_node_or_null(note_panel_path) as Control
 @onready var note_field := get_node_or_null(note_field_path) as TextEdit

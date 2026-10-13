@@ -13,7 +13,7 @@ enum WatchedBatState {
 }
 
 ## Bat nest whose first take-off triggers the generated dungeon noise.
-@export var bat_nest_path: NodePath = ^"BatNest"
+@export_storage var bat_nest_path: NodePath = ^"BatNest"
 
 var _previous_state := WatchedBatState.Roosting
 var _noise_emitted := false

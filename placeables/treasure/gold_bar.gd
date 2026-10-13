@@ -7,7 +7,7 @@ const WORLD_COLLISION_LAYER := 1
 const LANDING_AUDIO_NAME := "GoldBarLandingAudio"
 
 ## World Y position below which a fallen gold bar is removed.
-@export var despawn_below_y := -5.0
+@export_storage var despawn_below_y := -5.0
 ## Shared reflective and gently emissive finish applied to every surface in the imported model.
 @export var gold_material: Material
 ## Shared outline overlay that keeps this treasure visible in dark spaces.

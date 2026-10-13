@@ -22,13 +22,13 @@ enum DeathCause {
 # component owns the one-way transition into the death state.
 
 ## Node that receives death animation playback requests.
-@export var animation_controller_path: NodePath = ^"../PlayerAnimation"
+@export_storage var animation_controller_path: NodePath = ^"../PlayerAnimation"
 ## Node that adds cause-specific fire or blood effects and visible twitching to the death animation.
-@export var death_effects_path: NodePath = ^"../PlayerDeathEffects"
+@export_storage var death_effects_path: NodePath = ^"../PlayerDeathEffects"
 ## Attention controller released before the death animation takes ownership of the head.
-@export var attention_path: NodePath = ^"../PlayerAttention"
+@export_storage var attention_path: NodePath = ^"../PlayerAttention"
 ## Scene loaded after the death delay and fade complete.
-@export var lose_scene := "res://ui/screens/lose_screen.tscn"
+@export_storage var lose_scene := "res://ui/screens/lose_screen.tscn"
 ## Seconds to wait after death before starting the lose-screen fade.
 @export var return_delay := 1.5
 ## Seconds used for the black fade before loading the lose screen.

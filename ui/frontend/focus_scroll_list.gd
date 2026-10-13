@@ -10,9 +10,9 @@ signal row_focused(index: int)
 ## Duration of the eased scroll used after focus changes.
 @export_range(0.0, 1.0, 0.01) var focus_scroll_duration := 0.18
 ## Stick travel required to perform one menu movement.
-@export_range(0.0, 1.0, 0.01) var analog_trigger_threshold := 0.62
+@export_storage var analog_trigger_threshold := 0.62
 ## Partial stick release that permits the next deliberate menu movement.
-@export_range(0.0, 1.0, 0.01) var analog_rearm_threshold := 0.50
+@export_storage var analog_rearm_threshold := 0.50
 ## Seconds a direction is held before menu movement begins repeating.
 @export_range(0.0, 2.0, 0.01) var navigation_repeat_delay := 0.42
 ## Seconds between repeated menu movements while a direction remains held.

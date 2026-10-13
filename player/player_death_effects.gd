@@ -12,13 +12,13 @@ const BLOOD_SPLATTER_DECAL := preload("res://player/blood_splatter_decal.tscn")
 const BLOOD_SPLATTER_SCRIPT := preload("res://player/blood_splatter_decal.gd")
 
 ## Visual pivot rotated additively over the imported death animation.
-@export var visual_pivot_path: NodePath = ^"../Pivot"
+@export_storage var visual_pivot_path: NodePath = ^"../Pivot"
 ## Fallback face anchor when the active character has no animated head attachment.
-@export var head_path: NodePath = ^"../Pivot/PlayerEffectHead"
+@export_storage var head_path: NodePath = ^"../Pivot/PlayerEffectHead"
 ## Imported character root whose visible meshes become charred after a fire death.
-@export var character_path: NodePath = ^"../Pivot/Character"
+@export_storage var character_path: NodePath = ^"../Pivot/Character"
 ## Attention controller disabled at death so its live head turn cannot fight the final pose.
-@export var attention_path: NodePath = ^"../PlayerAttention"
+@export_storage var attention_path: NodePath = ^"../PlayerAttention"
 ## Shared opaque material laid over every character mesh after a fire death.
 @export var blackened_material: Material = preload("res://player/fire_death_blackened_material.tres")
 ## Seconds before the floor mark appears beneath the settling body.

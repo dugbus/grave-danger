@@ -11,15 +11,21 @@ const SILVER_KEY_ITEM_TYPE := &"silver_key"
 const WORLD_COLLISION_LAYER := 1
 const PLAYER_COLLISION_LAYER := 2
 
+## Key type required to unlock this passage.
 @export var key_requirement := KeyRequirement.GoldKey
+## Keeps the passage locked until the player meets its key requirement.
 @export var starts_locked := true
+## Allows crossing the unlocked passage to complete the current level.
 @export var completes_level := false
-@export var leaf_root_path: NodePath = ^"Leaves"
-@export var unlock_area_path: NodePath = ^"UnlockArea"
+## Parent node containing the passage's hinged door leaves.
+@export_storage var leaf_root_path: NodePath = ^"Leaves"
+## Area used to detect a player attempting to unlock the passage.
+@export_storage var unlock_area_path: NodePath = ^"UnlockArea"
 ## Optional area that completes a level after an unlocked passage is crossed.
-@export var completion_area_path: NodePath
+@export_storage var completion_area_path: NodePath
 ## Optional authored audio player; empty paths use the shared one-shot fallback.
-@export var unlock_audio_player_path: NodePath
+@export_storage var unlock_audio_player_path: NodePath
+## Audio sample played when the passage unlocks; leave empty to disable the sound.
 @export_file("*.mp3", "*.wav") var unlock_sound_path := ""
 
 var locked := true

@@ -360,9 +360,25 @@ func _apply_recorded_run_settings() -> void:
 
 
 func _report_playback_drift() -> void:
+	if not drift_warned_paths.is_empty():
+		return
 	drift_checkpoint_index = PlaybackDrift.report_due(
 		recording, playback_level, playback_time, drift_checkpoint_index, drift_warned_paths
 	)
+	if not drift_warned_paths.is_empty():
+		_discard_drifted_playback()
+
+
+## A stale aesthetic preview is expendable. Remove its recording so returning to the
+## frontend cannot reload it, then stop processing and release the simulated world.
+func _discard_drifted_playback() -> void:
+	_remove_drifted_recording()
+	clear_level_run()
+
+
+func _remove_drifted_recording() -> void:
+	if not active_level_id.is_empty():
+		RUN_RECORDING.remove_for_level(active_level_id)
 
 
 func _report_checkpoint_drift(checkpoint: Dictionary, recorded_level_id: String) -> void:
@@ -422,12 +438,20 @@ func _remove_preview_world() -> void:
 	drift_checkpoint_index = 0
 
 	if previous_session != null and is_instance_valid(previous_session):
-		previous_session.free()
+		_queue_preview_world_removal(previous_session)
 	else:
 		if previous_level != null and is_instance_valid(previous_level):
-			previous_level.free()
+			_queue_preview_world_removal(previous_level)
 		if previous_camera != null and is_instance_valid(previous_camera):
-			previous_camera.free()
+			_queue_preview_world_removal(previous_camera)
+
+
+## Drift is detected inside a processing callback. Hide and stop the old simulation
+## immediately, but let Godot release its physics/rendering objects at the frame boundary.
+func _queue_preview_world_removal(world: Node3D) -> void:
+	world.hide()
+	world.process_mode = Node.PROCESS_MODE_DISABLED
+	world.queue_free()
 
 
 func _clear_preview() -> void:

@@ -1,13 +1,14 @@
 class_name Millstone
 extends RollingRock
 
+## Inspector group for Millstone Rolling settings.
 @export_group("Millstone Rolling")
 ## Local horizontal direction in which this millstone can roll when placed in a level.
 @export var local_roll_direction := Vector3.RIGHT
 ## Collision from the source model that is disabled in favour of the rigid-body cylinder.
-@export var source_collision_path: NodePath = ^"Millstone/MeshInstance3D/StaticBody3D/CollisionShape3D"
+@export_storage var source_collision_path: NodePath = ^"Millstone/MeshInstance3D/StaticBody3D/CollisionShape3D"
 ## Minimum alignment with either rolling side required for a character push to move the millstone.
-@export_range(0.0, 1.0, 0.01) var rolling_side_alignment := 0.7
+@export_storage var rolling_side_alignment := 0.7
 ## Maximum sideways player speed removed each second while actively pushing a rolling side.
 @export_range(0.0, 20.0, 0.1, "suffix:m/s²") var push_alignment_assist_acceleration := 8.0
 ## Minimum rolling speed required for this millstone to kill an enemy on contact.
@@ -15,9 +16,10 @@ extends RollingRock
 ## Maximum sideways distance from the millstone's travel line that still counts as a crush.
 @export_range(0.05, 2.0, 0.01) var enemy_crush_path_half_width := 0.4
 ## Minimum distance ahead of the millstone centre required so side and trailing contacts are safe.
-@export_range(0.0, 1.0, 0.01) var enemy_crush_min_forward_offset := 0.04
+@export_storage var enemy_crush_min_forward_offset := 0.04
 ## Minimum upward contact normal treated as supporting ground for rolling audio.
-@export_range(0.0, 1.0, 0.01) var rolling_audio_ground_normal_y := 0.65
+@export_storage var rolling_audio_ground_normal_y := 0.65
+## Ends the preceding Inspector group.
 @export_group("")
 
 var has_rolling_audio_ground_contact := false

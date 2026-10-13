@@ -1,6 +1,7 @@
 extends Resource
 class_name GDPlayerJumpSettings
 
+## Inspector group for Height settings.
 @export_group("Height")
 ## World-space height of the common cemetery wall used as the player jump reference.
 @export_range(0.01, 20.0, 0.001, "or_greater", "suffix:m") var wall_height := 0.725
@@ -9,6 +10,7 @@ class_name GDPlayerJumpSettings
 ## Lowest jump velocity multiplier applied when the player is carrying maximum weight.
 @export_range(0.0, 1.0, 0.01) var min_weight_jump_multiplier := 0.4
 
+## Inspector group for Audio settings.
 @export_group("Audio")
 ## Audio sample played when the player starts a jump.
 @export_file("*.mp3") var jump_sound_path := "res://Assets/audio/player-jump.mp3"

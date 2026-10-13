@@ -47,51 +47,53 @@ const MINIMUM_IMPACT_SPEED := 1.0
 const LIQUID_MATERIAL_NAME := "FlaskLiquidMaterial"
 const FLASK_PROPERTIES := preload("res://placeables/collectibles/global_flask_properties.tres")
 
-@export_group("Global Properties")
-# Shared flask configuration resource.
-@export var global_flask_properties: GDGlobalFlaskProperties:
+# Internal Global Properties settings; hidden from the Inspector.
+## Shared flask configuration resource; read-only and common to every flask type.
+var global_flask_properties: GDGlobalFlaskProperties:
 	get:
 		return FLASK_PROPERTIES
 	set(_value):
 		pass
 
+## Inspector group for Visuals settings.
 @export_group("Visuals")
 
-# Colour applied to the liquid material.
+## Colour applied to the liquid material.
 @export var liquid_color := Color.WHITE:
 	set(value):
 		liquid_color = value
 		if is_inside_tree():
 			_apply_liquid_color()
 
-# Emission intensity of the liquid material.
+## Emission intensity of the liquid material.
 @export_range(0.0, 8.0, 0.05) var liquid_emission_energy := 1.35:
 	set(value):
 		liquid_emission_energy = maxf(value, 0.0)
 		if is_inside_tree():
 			_apply_liquid_color()
 
-# Rotation speed of the floating flask.
+## Rotation speed of the floating flask, in radians per second.
 @export var spin_speed := 0.9
 
-# Vertical bobbing distance for flasks that are present from level start.
+## Vertical bobbing distance in world units for flasks that are present from level start.
 @export var bob_height := 0.045
 
-# Bobbing animation speed for flasks that are present from level start.
+## Bobbing angular frequency in radians per second for flasks that are present from level start.
 @export var bob_speed := 2.8
 
-# Time taken for the pickup shrink animation.
+## Time in seconds taken for the pickup shrink animation.
 @export var collect_shrink_duration := 0.24
 
-# Pickup sound volume.
+## Pickup sound volume, in decibels.
 @export var pickup_volume_db := 8.0
 
+## Inspector group for HUD settings.
 @export_group("HUD")
 
-# Identifier used when displaying timed effects on the HUD.
+## Identifier used when displaying timed effects on the HUD.
 @export var hud_effect_id: StringName = &""
 
-# Whether this flask should display a countdown timer.
+## Whether this flask should display a countdown timer for its effect.
 @export var show_hud_countdown := false
 
 # Root visual node that is animated.

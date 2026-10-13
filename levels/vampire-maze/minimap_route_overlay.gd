@@ -13,13 +13,13 @@ const CARDINAL_DIRECTIONS: Array[Vector3i] = [
 ]
 
 ## Player whose current maze cell starts the displayed routes.
-@export var player_path: NodePath = ^"../Player"
+@export_storage var player_path: NodePath = ^"../Player"
 ## End gate whose nearest walkable cell finishes the displayed routes.
-@export var end_gate_path: NodePath = ^"../LockedGate"
+@export_storage var end_gate_path: NodePath = ^"../LockedGate"
 ## GridMap containing maze walls that routes cannot cross.
-@export var wall_grid_map_path: NodePath = ^"../PNGGridMap"
+@export_storage var wall_grid_map_path: NodePath = ^"../PNGGridMap"
 ## FloorSurface containing the cells on which route tiles are drawn.
-@export var floor_surface_path: NodePath = ^"../FloorSurface"
+@export_storage var floor_surface_path: NodePath = ^"../FloorSurface"
 ## Height above the floor used to prevent the coloured route from flickering.
 @export_range(0.01, 0.5, 0.01) var route_height := 0.04
 

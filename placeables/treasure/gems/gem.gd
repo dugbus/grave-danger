@@ -7,7 +7,7 @@ const GEM_GROUP: StringName = &"gem"
 const PICKUP_RADIUS_SCALABLE_GROUP: StringName = &"pickup_radius_scalable"
 
 ## World Y position below which a fallen gem is removed.
-@export var despawn_below_y := -5.0
+@export_storage var despawn_below_y := -5.0
 
 var item_group: StringName
 

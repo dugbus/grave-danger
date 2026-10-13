@@ -2,10 +2,10 @@ extends Camera3D
 class_name GDFollowCamera
 
 ## Character or focus node this camera normally follows.
-@export var target_path: NodePath = ^"../Player"
+@export_storage var target_path: NodePath = ^"../Player"
 
 ## Optional kill boundary used to auto-zoom until the safe area stays visible.
-@export var kill_boundary_path: NodePath
+@export_storage var kill_boundary_path: NodePath
 
 ## Optional reusable set of camera tuning values for level-specific cameras.
 @export var camera_profile: Resource:
@@ -15,52 +15,52 @@ class_name GDFollowCamera
 			_apply_camera_profile_values(camera_profile)
 
 ## Base 2.5D offset before rotation and zoom scaling are applied.
-@export var camera_offset := Vector3(0.0, 5.2, 5.6)
+@export_storage var camera_offset := Vector3(0.0, 5.2, 5.6)
 
 ## Optional camera elevation angle above the ground plane. Negative uses camera_offset.
-@export_range(-1.0, 89.0, 0.5) var view_elevation_degrees := -1.0
+@export_storage var view_elevation_degrees := -1.0
 
 ## Offset added to the followed position before the camera looks at it.
-@export var look_ahead := Vector3(0.0, 0.55, 0.0)
+@export_storage var look_ahead := Vector3(0.0, 0.55, 0.0)
 
 ## Extra distance to look past the target in the camera's forward direction.
-@export var forward_look_ahead := 0.0
+@export_storage var forward_look_ahead := 0.0
 
 ## Responsiveness of camera follow smoothing; higher values track faster.
-@export var follow_lag := 4.0
+@export_storage var follow_lag := 4.0
 
 ## Current camera distance along the offset direction.
-@export var zoom_distance := 18.0
+@export_storage var zoom_distance := 18.0
 ## Closest manual or boundary-driven camera distance.
-@export var min_zoom_distance := 4.2
+@export_storage var min_zoom_distance := 4.2
 ## Farthest manual camera distance when no boundary controls zoom.
-@export var max_zoom_distance := 18.0
+@export_storage var max_zoom_distance := 18.0
 ## Manual zoom speed in distance units per second.
-@export var manual_zoom_speed := 8.0
+@export_storage var manual_zoom_speed := 8.0
 
 ## Camera field of view, in degrees.
-@export var field_of_view := 34.0
+@export_storage var field_of_view := 34.0
 ## Multiplier applied to kill-boundary bounds before fitting them on screen.
-@export var boundary_padding := 1.25
+@export_storage var boundary_padding := 1.25
 ## Responsiveness of boundary auto-zoom; higher values settle faster.
-@export var boundary_zoom_lag := 3.0
+@export_storage var boundary_zoom_lag := 3.0
 ## Farthest distance allowed while trying to fit the kill boundary.
 ## Keep this near max_zoom_distance so large flames do not force excessive zoom-out.
-@export var max_boundary_zoom_distance := 18.0
+@export_storage var max_boundary_zoom_distance := 18.0
 ## Binary-search iterations used to solve the boundary fit distance.
-@export_range(4, 24, 1) var boundary_fit_iterations := 12
+@export_storage var boundary_fit_iterations := 12
 
 ## Camera yaw rotation speed in radians per second from right-stick input.
-@export var rotation_speed := 1.8
+@export_storage var rotation_speed := 1.8
 ## Input magnitude ignored for camera rotation and manual zoom.
-@export var camera_input_deadzone := 0.35
+@export_storage var camera_input_deadzone := 0.35
 
 ## Camera distance used while focusing on a dead player.
-@export var death_zoom_distance := 2.4
+@export_storage var death_zoom_distance := 2.4
 ## Focus offset from the dead player's origin during the death close-up.
-@export var death_look_offset := Vector3(0.0, 0.38, 0.0)
+@export_storage var death_look_offset := Vector3(0.0, 0.38, 0.0)
 ## Responsiveness of death camera zoom and focus smoothing.
-@export var death_zoom_lag := 4.5
+@export_storage var death_zoom_lag := 4.5
 
 # Cached scene references.
 @onready var target: Node3D = _get_node_3d_or_null(target_path)

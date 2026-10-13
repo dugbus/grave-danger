@@ -47,32 +47,38 @@ const ENEMY_LIGHT_SHADOW_CASTER_MASK := ALL_SHADOW_CASTER_LAYERS & ~ENEMY_GEOMET
 const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 
 ## Compatibility sampler for existing level `PathFollow3D` overrides.
-@export var path_follow_path: NodePath = ^"PathFollow3D"
+@export_storage var path_follow_path: NodePath = ^"PathFollow3D"
 ## CharacterBody3D that owns movement and navigation.
-@export var zombie_body_path: NodePath = ^"ZombieBody"
+@export_storage var zombie_body_path: NodePath = ^"ZombieBody"
 ## NavigationAgent3D used for all smart-zombie target following.
-@export var navigation_agent_path: NodePath = ^"ZombieBody/NavigationAgent3D"
+@export_storage var navigation_agent_path: NodePath = ^"ZombieBody/NavigationAgent3D"
 ## Node moved vertically while the zombie drops in.
-@export var drop_pivot_path: NodePath = ^"ZombieBody/DropPivot"
+@export_storage var drop_pivot_path: NodePath = ^"ZombieBody/DropPivot"
 ## Visual pivot rotated toward the zombie's current shuffle direction.
-@export var pivot_path: NodePath = ^"ZombieBody/DropPivot/Pivot"
+@export_storage var pivot_path: NodePath = ^"ZombieBody/DropPivot/Pivot"
 ## Imported zombie character subtree containing the AnimationPlayer.
-@export var character_path: NodePath = ^"ZombieBody/DropPivot/Pivot/Character"
+@export_storage var character_path: NodePath = ^"ZombieBody/DropPivot/Pivot/Character"
 ## Raycast origin for player vision.
-@export var vision_origin_path: NodePath = ^"ZombieBody/VisionOrigin"
+@export_storage var vision_origin_path: NodePath = ^"ZombieBody/VisionOrigin"
 ## Legacy contact area retained for crush detection placement only. Zombies damage through attack hitboxes.
-@export var kill_area_path: NodePath = ^"ZombieBody/DropPivot/KillArea"
+@export_storage var kill_area_path: NodePath = ^"ZombieBody/DropPivot/KillArea"
 ## Ground shadow shown while the zombie is active.
-@export var shadow_path: NodePath = ^"ZombieBody/ZombieShadow"
+@export_storage var shadow_path: NodePath = ^"ZombieBody/ZombieShadow"
 ## Light used to make the zombie readable before the player gets close.
-@export var zombie_light_path: NodePath = ^"ZombieBody/DropPivot/Pivot/ZombieLight"
-@export var attack_hitbox_right_path: NodePath = ^"ZombieBody/AttackHitboxRight"
-@export var attack_hitbox_left_path: NodePath = ^"ZombieBody/AttackHitboxLeft"
-@export var crush_check_area_path: NodePath = ^"ZombieBody/CrushCheckArea"
+@export_storage var zombie_light_path: NodePath = ^"ZombieBody/DropPivot/Pivot/ZombieLight"
+## Area used to detect player hits during right-side attacks.
+@export_storage var attack_hitbox_right_path: NodePath = ^"ZombieBody/AttackHitboxRight"
+## Area used to detect player hits during left-side attacks.
+@export_storage var attack_hitbox_left_path: NodePath = ^"ZombieBody/AttackHitboxLeft"
+## Area used to detect rolling balls that can crush this zombie.
+@export_storage var crush_check_area_path: NodePath = ^"ZombieBody/CrushCheckArea"
 
+## Inspector group for Startup settings.
 @export_group("Startup")
+## Starts the zombie's AI automatically when it enters the scene.
 @export var ai_enabled_on_ready := true
-@export var navigation_ready := false
+## Runtime readiness managed by startup and navigation bootstrap; never authored in a level.
+var navigation_ready := false
 ## Seconds a player must remain inside the contact area before death triggers.
 @export var kill_confirmation_time := 0.08
 ## Legacy serialized enemy delay; new level editing uses the shared Spawn Time field.
@@ -85,8 +91,10 @@ const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 @export var drop_height := 3.2
 ## Seconds taken to fall from drop_height to the path.
 @export var drop_duration := 0.55
+## Ends the preceding Inspector group.
 @export_group("")
 
+## Inspector group for Patrol settings.
 @export_group("Patrol")
 ## Starting position along the patrol path, where 0 is the path start and 1 is the path end.
 @export_range(0.0, 1.0, 0.001) var start_progress_ratio := 0.0
@@ -98,7 +106,8 @@ const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 @export var reverse_at_path_ends := true
 ## How quickly the visual turns toward the current movement direction.
 @export var turn_speed := 6.0
-@export var patrol_point_reached_distance := 0.35
+## Distance in world units at which the next patrol point counts as reached.
+@export_storage var patrol_point_reached_distance := 0.35
 ## World units per second squared used when a zombie starts moving from a stop.
 @export var movement_acceleration := 8.0
 ## World units per second squared used when a zombie needs to slow for a turn.
@@ -107,102 +116,176 @@ const INVALID_GRID_CELL := Vector3i(2147483647, 2147483647, 2147483647)
 @export_range(0.0, 180.0, 1.0) var sharp_turn_slow_angle_degrees := 70.0
 ## Fraction of requested speed used while the visual is still making a sharp turn.
 @export_range(0.0, 1.0, 0.01) var sharp_turn_speed_multiplier := 0.45
+## Ends the preceding Inspector group.
 @export_group("")
 
+## Inspector group for Smart AI settings.
 @export_group("Smart AI")
+## Maximum distance in world units at which the zombie can see the player.
 @export var vision_range := 5.0
+## Total width of the zombie's vision cone, in degrees.
 @export var fov_degrees := 70.0
-@export var player_target_height := 0.65
+## Height above the player origin used for sight checks, in world units.
+@export_storage var player_target_height := 0.65
 ## Body-center distance where an extended arm can reach the player capsule.
 @export var attack_range := 0.6
 ## Small hysteresis margin before a missed punch resumes chasing the player.
-@export var attack_continue_range := 0.65
+@export_storage var attack_continue_range := 0.65
 ## Number of candidate positions checked around the player when another zombie blocks the chase.
-@export var attack_position_slot_count := 8
+@export_storage var attack_position_slot_count := 8
 ## Minimum spacing kept from other zombies when choosing a melee attack position.
-@export var attack_position_clearance := 0.7
+@export_storage var attack_position_clearance := 0.7
 ## Distance from the chosen attack position where the zombie resumes normal attack checks.
-@export var attack_position_reached_distance := 0.25
+@export_storage var attack_position_reached_distance := 0.25
+## Seconds the zombie remembers the player after losing sight.
 @export var lost_sight_seconds := 7.0
-@export var repath_interval := 0.25
-@export var vision_interval := 0.2
+## Seconds between route updates while pursuing the player.
+@export_storage var repath_interval := 0.25
+## Seconds between player sight checks while active.
+@export_storage var vision_interval := 0.2
+## Seconds spent searching near the last known player position.
 @export var search_duration := 2.0
+## Shortest pause in seconds between idle look directions.
 @export var idle_scan_min_seconds := 1.2
+## Longest pause in seconds between idle look directions.
 @export var idle_scan_max_seconds := 2.8
+## Maximum angle in degrees for an idle look away from the current heading.
 @export_range(0.0, 180.0, 1.0) var idle_scan_max_turn_degrees := 140.0
-@export var sit_repath_interval := 1.0
-@export var sit_vision_interval := 0.35
+## Seconds between route updates while the zombie is sitting.
+@export_storage var sit_repath_interval := 1.0
+## Seconds between player sight checks while the zombie is sitting.
+@export_storage var sit_vision_interval := 0.35
+## Seconds without useful movement before the zombie sits down.
 @export var stuck_seconds_before_sit := 2.0
-@export var stuck_min_move_distance := 0.03
-@export var grid_navigation_padding_cells := 3
-@export var grid_navigation_max_search_cells := 4096
-@export var direct_navigation_fallback_enabled := true
-@export_flags_3d_physics var vision_collision_mask := WORLD_COLLISION_LAYER | PLAYER_COLLISION_LAYER
-@export_flags_3d_physics var map_collision_mask := WORLD_COLLISION_LAYER
+## Minimum movement in world units that counts as progress when detecting a stuck zombie.
+@export_storage var stuck_min_move_distance := 0.03
+## Extra grid cells around the route search area to allow detours.
+@export_storage var grid_navigation_padding_cells := 3
+## Maximum number of grid cells searched when finding a route.
+@export_storage var grid_navigation_max_search_cells := 4096
+## Allows direct movement toward the target when a grid route cannot be found.
+@export_storage var direct_navigation_fallback_enabled := true
+## Physics layers checked for the player and obstacles that block sight.
+@export_storage var vision_collision_mask := WORLD_COLLISION_LAYER | PLAYER_COLLISION_LAYER
+## Physics layers checked for static obstacles when planning and following zombie routes.
+@export_storage var map_collision_mask := WORLD_COLLISION_LAYER
+## Ends the preceding Inspector group.
 @export_group("")
 
+## Inspector group for Attack settings.
 @export_group("Attack")
+## Energy removed from the player by a successful attack.
 @export var attack_damage := 10.0
+## Minimum seconds between attacks.
 @export var attack_cooldown := 1.0
-@export var player_touch_attack_probe_margin := 0.04
+## Extra distance in world units used when checking close contact for an attack.
+@export_storage var player_touch_attack_probe_margin := 0.04
+## Fraction of the attack animation elapsed before its hitbox becomes active.
 @export_range(0.0, 1.0, 0.01) var attack_hit_start_ratio := 0.78
+## Fraction of the attack animation elapsed when its hitbox stops being active.
 @export_range(0.0, 1.0, 0.01) var attack_hit_end_ratio := 0.94
-@export var attack_hit_start_seconds := 0.78
-@export var attack_hit_end_seconds := 0.94
-@export var navigation_collision_floor_normal_y := 0.65
+## Fallback hitbox start time in seconds when the attack animation has no known duration.
+@export_storage var attack_hit_start_seconds := 0.78
+## Fallback hitbox end time in seconds when the attack animation has no known duration.
+@export_storage var attack_hit_end_seconds := 0.94
+## Minimum upward collision normal component treated as floor rather than a navigation obstacle.
+@export_storage var navigation_collision_floor_normal_y := 0.65
+## Audio sample played when a zombie attack lands on the player.
 @export_file("*.mp3", "*.wav", "*.ogg") var punch_hit_sound_path := DEFAULT_PUNCH_HIT_SOUND_PATH
+## Volume of a successful zombie attack sound, in decibels.
 @export var punch_hit_volume_db := 0.0
+## Ends the preceding Inspector group.
 @export_group("")
 
+## Inspector group for Crush settings.
 @export_group("Crush")
+## Enables rolling balls to kill the zombie when they push far enough into its detection area.
 @export var rolling_ball_death_enabled := true
+## Percentage of the detection radius the ball must encroach before killing the zombie.
 @export_range(0.0, 100.0, 1.0) var rolling_ball_death_encroachment_percent := 25.0
-@export_range(0.05, 2.0, 0.01) var rolling_ball_death_detection_radius := 0.65
-@export_range(0.05, 2.0, 0.01) var rolling_ball_death_radius := 0.52
-@export_range(0.0, 1.0, 0.01) var crush_confirm_seconds := 0.1
+## Radius around the zombie contact area used for rolling ball death checks.
+@export_storage var rolling_ball_death_detection_radius := 0.65
+## Approximate rolling ball radius used to calculate encroachment percentage.
+@export_storage var rolling_ball_death_radius := 0.52
+## Seconds a crushing contact must persist before the zombie dies.
+@export_storage var crush_confirm_seconds := 0.1
+## Seconds after death before the zombie fades and sinks underground.
 @export_range(0.0, 10.0, 0.1) var death_disappear_delay := 3.0
+## Seconds used for the underground movement.
 @export_range(0.0, 5.0, 0.05) var death_disappear_duration := 1.35
+## Local Y distance the zombie moves underground while disappearing.
 @export_range(0.0, 5.0, 0.05) var death_sink_depth := 2.4
+## Portion of the sink animation completed before fading starts.
 @export_range(0.0, 1.0, 0.05) var death_fade_start_ratio := 0.55
+## Volume of the zombie death scream, in decibels.
 @export var death_scream_volume_db := 2.0
+## Ends the preceding Inspector group.
 @export_group("")
 
+## Inspector group for Animation settings.
 @export_group("Animation")
-@export var static_animation_name := "static"
-@export var walk_animation_name := "walk"
-@export var run_animation_name := "run"
-@export var idle_animation_name := "idle"
-@export var sit_animation_name := "sit"
-@export var death_animation_name := "die"
+## Animation clip used for the zombie's static pose.
+@export_storage var static_animation_name := "static"
+## Animation played while the zombie is moving.
+@export_storage var walk_animation_name := "walk"
+## Animation clip used while the zombie runs.
+@export_storage var run_animation_name := "run"
+## Animation played if the zombie has no usable movement.
+@export_storage var idle_animation_name := "idle"
+## Animation clip used while the zombie sits.
+@export_storage var sit_animation_name := "sit"
+## Animation played when a rolling ball crushes the zombie.
+@export_storage var death_animation_name := "die"
+## Keeps the walk cycle at a shuffling pace even if path speed is adjusted.
 @export var walk_animation_speed_scale := 0.45
+## Playback speed multiplier for the running animation.
 @export var run_animation_speed_scale := 1.0
+## Speed scale used for the zombie death animation.
 @export var death_animation_speed_scale := 0.5
-@export var attack_animation_names: Array[String] = [
+## Ordered attack animation clips cycled through when the zombie attacks.
+@export_storage var attack_animation_names: Array[String] = [
 	"attack-kick-right",
 	"attack-kick-left",
 	"attack-melee-right",
 	"attack-melee-left",
 ]
+## Ends the preceding Inspector group.
 @export_group("")
 
+## Inspector group for Footsteps settings.
 @export_group("Footsteps")
+## Minimum horizontal speed required to play footstep sounds.
 @export var footstep_speed_threshold := 0.1
+## Base travel distance between footstep sounds.
 @export var footstep_distance := 0.7
+## Random distance added or subtracted from each footstep interval.
 @export var footstep_distance_variance := 0.08
+## Lowest random pitch scale used for each footstep.
 @export var footstep_pitch_min := 0.92
+## Highest random pitch scale used for each footstep.
 @export var footstep_pitch_max := 1.08
+## Footstep volume at the speed threshold, in decibels.
 @export var footstep_volume_min_db := 0.0
+## Footstep volume near full walking speed, in decibels.
 @export var footstep_volume_max_db := 4.0
 ## Random volume variation applied to each zombie footstep, in decibels.
 @export var footstep_volume_variance_db := 0.35
+## Ends the preceding Inspector group.
 @export_group("")
 
+## Inspector group for Light settings.
 @export_group("Light")
+## Enables the zombie's warning light.
 @export var zombie_light_enabled := true
+## Color of the zombie's warning light.
 @export var zombie_light_color := Color(0.85, 1.0, 0.62, 1.0)
+## Brightness of the zombie's warning light.
 @export var zombie_light_energy := 0.95
+## Reach of the zombie's warning light, in world units.
 @export var zombie_light_range := 4.2
+## Falloff curve for the zombie's warning light.
 @export var zombie_light_attenuation := 1.45
+## Ends the preceding Inspector group.
 @export_group("")
 
 @onready var path_follow := get_node_or_null(path_follow_path) as PathFollow3D

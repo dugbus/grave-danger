@@ -9,6 +9,10 @@ import subprocess
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[4]
 EXCLUDED_DIRECTORIES = {".git", ".godot", "addons"}
+FIRST_PARTY_ADDONS = {
+    "copy_all_errors", "floor_surface", "kill_boundary_2", "path3d_selected_gizmo",
+    "pile_selection_gizmo", "playthrough_position_markers", "png_to_gridmap",
+}
 
 
 def script_path(value: str) -> Path:
@@ -16,7 +20,15 @@ def script_path(value: str) -> Path:
     if not path.is_relative_to(REPOSITORY_ROOT):
         raise ValueError(f"Script must be inside the repository: {value}")
     relative = path.relative_to(REPOSITORY_ROOT)
-    if any(part in EXCLUDED_DIRECTORIES for part in relative.parts):
+    # Explicit selections can include project-owned editor tools. Broad --all passes
+    # keep their existing addon exclusion, and vendor code always stays read-only.
+    owned_addon = (
+        len(relative.parts) > 2 and relative.parts[0] == "addons"
+        and relative.parts[1] in FIRST_PARTY_ADDONS
+    )
+    if any(part in {".git", ".godot"} for part in relative.parts) or (
+        "addons" in relative.parts and not owned_addon
+    ):
         raise ValueError(f"Generated or third-party scripts are excluded: {value}")
     if path.suffix != ".gd" or not path.is_file():
         raise ValueError(f"Expected an existing .gd script file: {value}")

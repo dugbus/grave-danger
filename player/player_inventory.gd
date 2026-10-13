@@ -42,7 +42,7 @@ signal item_count_changed(item_type: StringName, carried_count: int)
 signal inventory_capacity_changed(max_units: int)
 
 ## Visual pivot used to determine pickup facing and drop direction.
-@export var pivot_path: NodePath = ^"../Pivot"
+@export_storage var pivot_path: NodePath = ^"../Pivot"
 ## Total carried item weight the bag can hold.
 @export var max_carry_weight := 100.0
 

@@ -34,33 +34,36 @@ const EDITOR_SELECTION_MINIMUM_HEIGHT := 0.25
 		random_seed = value
 		_refresh_preview_when_editing()
 
-@export_group("Editor Preview")
+# Internal Editor Preview settings; hidden from the Inspector.
 ## Base height used to rest preview items above the pile origin.
-@export_range(0.0, 2.0, 0.005) var preview_base_height := 0.018:
+@export_storage var preview_base_height := 0.018:
 	set(value):
 		preview_base_height = maxf(value, 0.0)
 		_refresh_preview_when_editing()
 ## Extra height applied near the center so preview items resemble a pile.
-@export_range(0.0, 2.0, 0.005) var preview_center_height := 0.18:
+@export_storage var preview_center_height := 0.18:
 	set(value):
 		preview_center_height = maxf(value, 0.0)
 		_refresh_preview_when_editing()
 ## Repeating vertical separation used to keep preview items readable.
-@export_range(0.0, 1.0, 0.005) var preview_item_spacing := 0.012:
+@export_storage var preview_item_spacing := 0.012:
 	set(value):
 		preview_item_spacing = maxf(value, 0.0)
 		_refresh_preview_when_editing()
+## Ends the preceding Inspector group.
 @export_group("")
 
+## Inspector group for Runtime Culling settings.
 @export_group("Runtime Culling")
 ## Wait until the pile is close to the camera view before creating scheduled physics items.
 @export var spawn_when_near_camera := false
 ## Extra screen area around the camera frustum where piles may begin spawning.
-@export_range(0.0, 2000.0, 1.0, "suffix:px") var spawn_screen_margin := 420.0
+@export_storage var spawn_screen_margin := 420.0
 ## Extra world-space radius tested around the pile center for visibility checks.
-@export_range(0.0, 20.0, 0.05) var spawn_visibility_radius := 2.0
+@export_storage var spawn_visibility_radius := 2.0
 ## Seconds between visibility checks before this pile starts spawning.
-@export_range(0.02, 2.0, 0.01) var visibility_check_interval := 0.15
+@export_storage var visibility_check_interval := 0.15
+## Ends the preceding Inspector group.
 @export_group("")
 
 var spawn_elapsed_usec := 0

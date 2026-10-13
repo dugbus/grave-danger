@@ -4,6 +4,7 @@ extends Resource
 
 ## Strategic content budgets and difficulty controls for a generated maze.
 
+## Inspector group for Treasure Piles settings.
 @export_group("Treasure Piles")
 ## Exact number of separate treasure piles placed through the generated dungeon.
 @export_range(0, 256, 1) var treasure_pile_count := 8:
@@ -40,8 +41,10 @@ extends Resource
 			return
 		main_path_treasure_percent = value
 		emit_changed()
+## Ends the preceding Inspector group.
 @export_group("")
 
+## Inspector group for Grass Patches settings.
 @export_group("Grass Patches")
 ## Enables deterministic patches of Level 1-style grass across walkable maze cells.
 @export var grass_enabled := true:
@@ -82,8 +85,10 @@ extends Resource
 			return
 		grass_route_clearance_tiles = clamped_value
 		emit_changed()
+## Ends the preceding Inspector group.
 @export_group("")
 
+## Inspector group for Additional Treasure Budgets settings.
 @export_group("Additional Treasure Budgets")
 ## Number of diamonds distributed through the generated dungeon.
 @export_range(0, 500, 1) var diamond_budget := 3:
@@ -127,8 +132,10 @@ extends Resource
 			return
 		gold_bar_budget = value
 		emit_changed()
+## Ends the preceding Inspector group.
 @export_group("")
 
+## Inspector group for Encumbrance and Coffins settings.
 @export_group("Encumbrance and Coffins")
 ## Carry capacity assumed while deriving how many deposit coffins are required.
 @export_range(1.0, 500.0, 1.0) var assumed_carry_capacity := 100.0:
@@ -165,8 +172,10 @@ extends Resource
 			return
 		preferred_coffin_treasure_clearance_tiles = value
 		emit_changed()
+## Ends the preceding Inspector group.
 @export_group("")
 
+## Inspector group for Locked Doors settings.
 @export_group("Locked Doors")
 ## Number of sequential locked doors placed across guaranteed route cut points.
 @export_range(0, 12, 1) var door_count := 2:
@@ -189,8 +198,10 @@ extends Resource
 			return
 		minimum_door_spacing = value
 		emit_changed()
+## Ends the preceding Inspector group.
 @export_group("")
 
+## Inspector group for Bat Noise settings.
 @export_group("Bat Noise")
 ## Number of bat nests placed as player-noise hazards.
 @export_range(0, 24, 1) var bat_nest_count := 3:
@@ -206,4 +217,5 @@ extends Resource
 			return
 		bat_off_path_percent = value
 		emit_changed()
+## Ends the preceding Inspector group.
 @export_group("")

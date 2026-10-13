@@ -32,21 +32,21 @@ const LANDING_AUDIO_MAX_DISTANCE := 48.0
 const LANDING_AUDIO_UNIT_SIZE := 16.0
 
 ## PathFollow3D that carries the skeleton visual and contact area.
-@export var path_follow_path: NodePath = ^"PathFollow3D"
+@export_storage var path_follow_path: NodePath = ^"PathFollow3D"
 ## Node moved vertically while the skeleton drops in.
-@export var drop_pivot_path: NodePath = ^"PathFollow3D/DropPivot"
+@export_storage var drop_pivot_path: NodePath = ^"PathFollow3D/DropPivot"
 ## Body exposed to other enemies so skeletons and zombies cannot pass through this skeleton.
-@export var skeleton_body_path: NodePath = ^"PathFollow3D/DropPivot/SkeletonBody"
+@export_storage var skeleton_body_path: NodePath = ^"PathFollow3D/DropPivot/SkeletonBody"
 ## Visual pivot rotated toward the skeleton's current shuffle direction.
-@export var pivot_path: NodePath = ^"PathFollow3D/DropPivot/Pivot"
+@export_storage var pivot_path: NodePath = ^"PathFollow3D/DropPivot/Pivot"
 ## Imported skeleton character subtree containing the AnimationPlayer.
-@export var character_path: NodePath = ^"PathFollow3D/DropPivot/Pivot/Character"
+@export_storage var character_path: NodePath = ^"PathFollow3D/DropPivot/Pivot/Character"
 ## Area that kills the player on contact.
-@export var kill_area_path: NodePath = ^"PathFollow3D/DropPivot/KillArea"
+@export_storage var kill_area_path: NodePath = ^"PathFollow3D/DropPivot/KillArea"
 ## Ground shadow shown while the skeleton is active.
-@export var shadow_path: NodePath = ^"PathFollow3D/SkeletonShadow"
+@export_storage var shadow_path: NodePath = ^"PathFollow3D/SkeletonShadow"
 ## Light used to make the skeleton readable before the player gets close.
-@export var skeleton_light_path: NodePath = ^"PathFollow3D/DropPivot/Pivot/SkeletonLight"
+@export_storage var skeleton_light_path: NodePath = ^"PathFollow3D/DropPivot/Pivot/SkeletonLight"
 ## Seconds a player must remain inside the contact area before death triggers.
 @export var kill_confirmation_time := 0.08
 ## Legacy serialized enemy delay; new level editing uses the shared Spawn Time field.
@@ -70,27 +70,27 @@ const LANDING_AUDIO_UNIT_SIZE := 16.0
 ## How quickly the visual turns toward the current movement direction.
 @export var turn_speed := 1.5
 ## Physics layers that make the skeleton reverse when detected ahead on its path.
-@export_flags_3d_physics var map_collision_mask := WORLD_COLLISION_LAYER
+@export_storage var map_collision_mask := WORLD_COLLISION_LAYER
 ## Enemy body layers that make the skeleton reverse before overlapping another enemy.
-@export_flags_3d_physics var enemy_collision_mask := ZOMBIE_COLLISION_LAYER | SKELETON_COLLISION_LAYER
+@export_storage var enemy_collision_mask := ZOMBIE_COLLISION_LAYER | SKELETON_COLLISION_LAYER
 ## Height above the path used for the map collision probe.
-@export_range(0.0, 2.0, 0.01) var map_collision_probe_height := 0.45
+@export_storage var map_collision_probe_height := 0.45
 ## Extra distance ahead of the skeleton checked for map blockers.
-@export_range(0.0, 2.0, 0.01) var map_collision_probe_distance := 0.35
+@export_storage var map_collision_probe_distance := 0.35
 ## Ray hits with normals above this are treated as floors instead of blockers.
-@export_range(0.0, 1.0, 0.01) var map_collision_floor_normal_y := 0.65
+@export_storage var map_collision_floor_normal_y := 0.65
 ## Radius used to detect pushable map blockers such as rolling rocks.
-@export_range(0.05, 2.0, 0.01) var map_collision_pushable_probe_radius := 0.48
+@export_storage var map_collision_pushable_probe_radius := 0.48
 ## Height above the path used for pushable blocker overlap checks.
-@export_range(0.0, 2.0, 0.01) var map_collision_pushable_probe_height := 0.5
+@export_storage var map_collision_pushable_probe_height := 0.5
 ## Number of overlap samples checked ahead of the skeleton.
-@export_range(1, 8, 1) var map_collision_pushable_probe_steps := 3
+@export_storage var map_collision_pushable_probe_steps := 3
 ## Animation played while the skeleton is moving.
-@export var walk_animation_name := "walk"
+@export_storage var walk_animation_name := "walk"
 ## Animation played if the skeleton has no usable movement.
-@export var idle_animation_name := "idle"
+@export_storage var idle_animation_name := "idle"
 ## Animation played when a rolling ball crushes the skeleton.
-@export var death_animation_name := "die"
+@export_storage var death_animation_name := "die"
 ## Keeps the walk cycle at a shuffling pace even if path speed is adjusted.
 @export var walk_animation_speed_scale := 0.45
 ## Speed scale used for the skeleton death animation.
@@ -112,15 +112,16 @@ const LANDING_AUDIO_UNIT_SIZE := 16.0
 ## Random volume variation applied to each skeleton footstep, in decibels.
 @export var footstep_volume_variance_db := 0.35
 
+## Inspector group for Rolling Ball Death settings.
 @export_group("Rolling Ball Death")
 ## Enables rolling balls to kill the skeleton when they push far enough into its detection area.
 @export var rolling_ball_death_enabled := true
 ## Percentage of the detection radius the ball must encroach before killing the skeleton.
 @export_range(0.0, 100.0, 1.0) var rolling_ball_death_encroachment_percent := 25.0
 ## Radius around the skeleton contact area used for rolling ball death checks.
-@export_range(0.05, 2.0, 0.01) var rolling_ball_death_detection_radius := 0.65
+@export_storage var rolling_ball_death_detection_radius := 0.65
 ## Approximate rolling ball radius used to calculate encroachment percentage.
-@export_range(0.05, 2.0, 0.01) var rolling_ball_death_radius := 0.52
+@export_storage var rolling_ball_death_radius := 0.52
 ## Seconds after death before the skeleton fades and sinks underground.
 @export_range(0.0, 10.0, 0.1) var death_disappear_delay := 3.0
 ## Seconds used for the underground movement.
@@ -131,8 +132,10 @@ const LANDING_AUDIO_UNIT_SIZE := 16.0
 @export_range(0.0, 1.0, 0.05) var death_fade_start_ratio := 0.55
 ## Volume of the skeleton death scream, in decibels.
 @export var death_scream_volume_db := 2.0
+## Ends the preceding Inspector group.
 @export_group("")
 
+## Inspector group for Light settings.
 @export_group("Light")
 ## Enables the skeleton's warning light.
 @export var skeleton_light_enabled := true
@@ -144,6 +147,7 @@ const LANDING_AUDIO_UNIT_SIZE := 16.0
 @export var skeleton_light_range := 4.2
 ## Falloff curve for the skeleton's warning light.
 @export var skeleton_light_attenuation := 1.45
+## Ends the preceding Inspector group.
 @export_group("")
 
 @onready var path_follow := get_node_or_null(path_follow_path) as PathFollow3D

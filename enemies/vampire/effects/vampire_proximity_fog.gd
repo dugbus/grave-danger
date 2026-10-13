@@ -4,7 +4,7 @@ class_name GDVampireProximityFog
 const FOG_CANVAS_LAYER := 2
 
 ## Full-screen rectangle containing the purple fog shader material.
-@export var fog_rect_path: NodePath = ^"FogRect"
+@export_storage var fog_rect_path: NodePath = ^"FogRect"
 
 var vampire: Node3D
 var player: Node3D

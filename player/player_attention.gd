@@ -21,15 +21,15 @@ const COLLECTIBLE_GROUPS: Array[StringName] = [
 ]
 
 ## Visual pivot that faces the player's current travel direction.
-@export var travel_pivot_path: NodePath = ^"../Pivot"
+@export_storage var travel_pivot_path: NodePath = ^"../Pivot"
 ## Child pivot followed by the headlamp while the player glances.
-@export var look_direction_path: NodePath = ^"../Pivot/LookDirection"
+@export_storage var look_direction_path: NodePath = ^"../Pivot/LookDirection"
 ## Character containing a rigged head modifier or a separately turnable head mesh.
-@export var character_path: NodePath = ^"../Pivot/Character/NewCharacter"
+@export_storage var character_path: NodePath = ^"../Pivot/Character/NewCharacter"
 ## Existing spotlight that follows the player's procedural head turn.
-@export var headlamp_path: NodePath = ^"../Pivot/PlayerHeadlampLight"
+@export_storage var headlamp_path: NodePath = ^"../Pivot/PlayerHeadlampLight"
 ## Authored ray used to reject attention targets hidden by level geometry.
-@export var sight_ray_path: NodePath = ^"CollectibleSightRay"
+@export_storage var sight_ray_path: NodePath = ^"CollectibleSightRay"
 
 @onready var player := get_parent() as CharacterBody3D
 @onready var travel_pivot := get_node_or_null(travel_pivot_path) as Node3D

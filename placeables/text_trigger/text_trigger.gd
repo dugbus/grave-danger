@@ -9,75 +9,109 @@ const MIN_TRIGGER_SIZE := 0.05
 const FLASK_EFFECT_TEXT_GROUP := &"flask_effect_text"
 const DIM_OVERLAY_DISTANCE_PADDING := 0.35
 
+## Inspector group for Content settings.
 @export_group("Content")
+## Heading shown when the player enters the text trigger.
 @export_multiline var heading := "A Warning":
 	set(value):
 		heading = value
 		_update_text_content()
+## Body message shown when the player enters the text trigger.
 @export_multiline var text := "There is danger ahead.":
 	set(value):
 		text = value
 		_update_text_content()
+## Minimum seconds the message stays visible after activation.
 @export_range(0.1, 120.0, 0.1, "or_greater", "suffix:s") var minimum_time_on_screen := 3.0
+## Pauses gameplay while the triggered message is displayed.
 @export var pause_game_with_text := false
+## Inspector group for Trigger Volume settings.
 @export_group("Trigger Volume")
+## Dimensions in world units of the volume that activates the message.
 @export var trigger_size := Vector3.ONE:
 	set(value):
 		trigger_size = Vector3(
 			maxf(value.x, MIN_TRIGGER_SIZE), maxf(value.y, MIN_TRIGGER_SIZE), maxf(value.z, MIN_TRIGGER_SIZE)
 		)
 		_apply_trigger_size()
-@export_group("Detection")
-@export var player_group: StringName = &"player"
+# Internal Detection settings; hidden from the Inspector.
+## Group used to find the player at runtime.
+@export_storage var player_group: StringName = &"player"
+## Inspector group for Text Layout settings.
 @export_group("Text Layout")
+## Font size used for the message heading.
 @export_range(16, 120, 1) var heading_font_size := 54:
 	set(value):
 		heading_font_size = maxi(value, 16)
 		_configure_text_meshes()
+## Font size used for the message body.
 @export_range(12, 90, 1) var body_font_size := 34:
 	set(value):
 		body_font_size = maxi(value, 12)
 		_configure_text_meshes()
+## Character limit used when wrapping the heading into lines.
 @export_range(8, 100, 1) var heading_characters_per_line := 28:
 	set(value):
 		heading_characters_per_line = maxi(value, 8)
 		_update_text_content()
+## Character limit used when wrapping the body into lines.
 @export_range(12, 140, 1) var body_characters_per_line := 54:
 	set(value):
 		body_characters_per_line = maxi(value, 12)
 		_update_text_content()
+## World size of a text pixel; larger values make the displayed text larger.
 @export_range(0.001, 0.05, 0.001) var pixel_size := 0.009:
 	set(value):
 		pixel_size = maxf(value, 0.001)
 		_configure_text_meshes()
+## Extrusion depth of the text mesh, in world units.
 @export_range(0.0, 0.25, 0.005, "suffix:m") var text_depth := 0.08:
 	set(value):
 		text_depth = maxf(value, 0.0)
 		_configure_text_meshes()
+## Distance in world units from the camera at which the text is displayed.
 @export_range(0.5, 20.0, 0.1, "suffix:m") var camera_distance := 10.0
+## Horizontal offset of the displayed text relative to the viewport center.
 @export_range(-1.0, 1.0, 0.01) var viewport_x_offset := 0.0
+## Vertical offset of the displayed text relative to the viewport center.
 @export_range(-1.0, 1.0, 0.01) var viewport_y_offset := 0.42
+## Local vertical offset of the heading, in world units.
 @export_range(-2.0, 2.0, 0.01, "suffix:m") var heading_y_offset := 0.32
+## Local vertical offset of the body message, in world units.
 @export_range(-2.0, 2.0, 0.01, "suffix:m") var body_y_offset := -0.24
+## Horizontal tilt of the text display, in degrees.
 @export_range(-25.0, 25.0, 0.5, "suffix:deg") var perspective_yaw_degrees := -12.0
+## Vertical tilt of the text display, in degrees.
 @export_range(-25.0, 25.0, 0.5, "suffix:deg") var perspective_pitch_degrees := 6.0
+## Inspector group for Text Style settings.
 @export_group("Text Style")
+## Base color of the displayed message.
 @export var text_color := Color(1.0, 0.94, 0.78, 1.0):
 	set(value):
 		text_color = value
 		_apply_text_opacity()
+## Opacity of the displayed text; lower values make it more transparent.
 @export_range(0.1, 1.0, 0.01) var text_opacity := 0.72:
 	set(value):
 		text_opacity = clampf(value, 0.1, 1.0)
 		_apply_text_opacity()
+## Inspector group for Text Light settings.
 @export_group("Text Light")
+## Local position of the light illuminating the displayed text.
 @export var light_offset := Vector3(-1.15, 0.9, 1.35)
+## Brightness of the light illuminating the displayed text.
 @export_range(0.0, 40.0, 0.1) var light_energy := 6.5
+## Reach of the light illuminating the displayed text, in world units.
 @export_range(0.1, 20.0, 0.1, "suffix:m") var light_range := 5.5
+## Color of the light illuminating the displayed text.
 @export var light_color := Color(1.0, 0.88, 0.68)
+## Extra distance in world units added to the text light's sweep across the message.
 @export_range(0.0, 4.0, 0.05, "suffix:m") var light_sweep_padding := 0.5
+## Frequency in hertz of the light's sweep across the displayed text.
 @export_range(0.0, 6.0, 0.05, "suffix:Hz") var light_sweep_speed := 0.42
+## Inspector group for Pause Overlay settings.
 @export_group("Pause Overlay")
+## Opacity of the screen dimming overlay while the message pauses gameplay.
 @export_range(0.0, 1.0, 0.01) var dim_opacity := 0.5:
 	set(value):
 		dim_opacity = clampf(value, 0.0, 1.0)

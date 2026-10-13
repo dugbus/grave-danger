@@ -32,7 +32,7 @@ class_name GDMinimapViewSettings
 @export_range(1.0, 300.0, 0.5) var fallback_orthographic_size := 18.0
 
 ## Height of the top-down minimap camera above the level focus.
-@export_range(10.0, 600.0, 1.0) var top_down_camera_height := 220.0
+@export_storage var top_down_camera_height := 220.0
 
 ## Background color used only by the minimap camera environment.
 @export var background_color := Color(0.035, 0.04, 0.05, 1.0)

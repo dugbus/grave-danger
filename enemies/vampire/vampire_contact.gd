@@ -2,9 +2,9 @@ extends Area3D
 class_name GDVampireContact
 
 ## Collision shape expanded to match the doubled Vampire's visible body.
-@export var collision_shape_path: NodePath = ^"CollisionShape3D"
+@export_storage var collision_shape_path: NodePath = ^"CollisionShape3D"
 ## World and player layers tested so instant-kill contact remains blocked by walls.
-@export_flags_3d_physics var contact_occlusion_mask := 3
+@export_storage var contact_occlusion_mask := 3
 
 @onready var collision_shape := get_node_or_null(collision_shape_path) as CollisionShape3D
 

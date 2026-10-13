@@ -25,9 +25,9 @@ class_name GDPlayerGaitSettings
 ## Fraction of each foot contact eased in and out to preserve natural leg motion.
 @export_range(0.0, 0.5, 0.01) var foot_plant_blend_fraction := 0.25
 ## Maximum animation phase advanced in a single foot-plant update.
-@export var maximum_phase_step := 0.04
+@export_storage var maximum_phase_step := 0.04
 ## Motion below this world-space speed is treated as stationary.
-@export var stationary_speed := 0.01
+@export_storage var stationary_speed := 0.01
 
 
 func is_contact(phase: float, left: bool, stance_scale: float = 1.0) -> bool:

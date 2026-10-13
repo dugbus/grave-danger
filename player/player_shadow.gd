@@ -2,21 +2,21 @@ extends MeshInstance3D
 class_name GDPlayerShadow
 
 ## Node used as the world-space source for the projected contact shadow.
-@export var source_path: NodePath = ^".."
+@export_storage var source_path: NodePath = ^".."
 ## Physics layers treated as ground by the contact shadow probe.
-@export_flags_3d_physics var ground_collision_mask := 1
+@export_storage var ground_collision_mask := 1
 ## World-space footprint size of the projected contact shadow.
 @export var shadow_size := Vector2(1.0, 1.0)
 ## Height above the player origin where the ground probe starts.
-@export var probe_up_distance := 1.25
+@export_storage var probe_up_distance := 1.25
 ## Distance below the player origin searched for ground.
-@export var probe_down_distance := 4.0
+@export_storage var probe_down_distance := 4.0
 ## Small offset that keeps the fake shadow visibly above the floor surface.
-@export var surface_offset := 0.035
+@export_storage var surface_offset := 0.035
 ## Local offset applied after the shadow is projected onto the floor.
 @export var projected_local_offset := Vector3(0.0, 0.0, 0.06)
 ## Lowest world-space height used when no floor is found by the probe.
-@export var fallback_height_offset := 0.025
+@export_storage var fallback_height_offset := 0.025
 
 @onready var source := get_node_or_null(source_path) as Node3D
 

@@ -27,19 +27,19 @@ enum LowEdge {
 ## Baseline occupancy used by every in-bounds cell without an exception.
 @export var default_present := false
 ## Sorted cells whose occupancy is the opposite of the baseline.
-@export var presence_exceptions: Array[Vector2i] = []
+@export_storage var presence_exceptions: Array[Vector2i] = []
 ## Baseline absolute elevation, measured in FloorElevationProfile units.
 @export var default_elevation := 0
 ## Sparse absolute-elevation overrides, retained even for absent cells.
-@export var elevation_overrides: Dictionary[Vector2i, int] = {}
+@export_storage var elevation_overrides: Dictionary[Vector2i, int] = {}
 ## Baseline index into the owning FloorSurface style palette.
 @export_range(0, 1024, 1, "or_greater") var default_style_index := 0
 ## Sparse style overrides, including optional appearance intent for absent cells.
-@export var style_overrides: Dictionary[Vector2i, int] = {}
+@export_storage var style_overrides: Dictionary[Vector2i, int] = {}
 ## Sparse named transition overrides reserved for authored ramps.
-@export var transition_overrides: Dictionary[Vector2i, int] = {}
+@export_storage var transition_overrides: Dictionary[Vector2i, int] = {}
 ## Sparse named low-edge orientations reserved for authored transitions.
-@export var low_edge_overrides: Dictionary[Vector2i, int] = {}
+@export_storage var low_edge_overrides: Dictionary[Vector2i, int] = {}
 
 
 ## Returns whether a cell is inside the finite authored rectangle.
@@ -94,10 +94,7 @@ func apply_shape_snapshot(snapshot: Dictionary) -> bool:
 	restored_dimensions.x = maxi(restored_dimensions.x, 1)
 	restored_dimensions.y = maxi(restored_dimensions.y, 1)
 	var restored_default := snapshot.get("default_present", default_present) as bool
-	var restored_cells := snapshot.get(
-		"presence_exceptions",
-		presence_exceptions
-	) as Array[Vector2i]
+	var restored_cells := snapshot.get("presence_exceptions", presence_exceptions) as Array[Vector2i]
 	var bounds_changed := restored_minimum != minimum_cell or restored_dimensions != dimensions
 	var baseline_changed := restored_default != default_present
 	minimum_cell = restored_minimum
@@ -192,10 +189,12 @@ func compact_storage() -> bool:
 	else:
 		compact_exceptions = present_cells
 
-	if minimum_cell == compact_minimum \
-		and dimensions == compact_dimensions \
-		and default_present == compact_default \
-		and presence_exceptions == compact_exceptions:
+	if (
+		minimum_cell == compact_minimum
+		and dimensions == compact_dimensions
+		and default_present == compact_default
+		and presence_exceptions == compact_exceptions
+	):
 		return false
 	minimum_cell = compact_minimum
 	dimensions = compact_dimensions
@@ -323,10 +322,7 @@ func get_cell_low_edge(cell: Vector2i) -> LowEdge:
 
 ## Applies one transition intent and optional ramp anchor elevation as one map change.
 func set_cell_transition(
-	cell: Vector2i,
-	transition: Transition,
-	low_edge := LowEdge.None,
-	ramp_elevation := INVALID_ELEVATION
+	cell: Vector2i, transition: Transition, low_edge := LowEdge.None, ramp_elevation := INVALID_ELEVATION
 ) -> bool:
 	if not has_floor(cell):
 		return false
@@ -347,9 +343,11 @@ func set_cell_transition(
 				next_elevations.erase(cell)
 			else:
 				next_elevations[cell] = ramp_elevation
-	var changed := next_transitions != transition_overrides \
-		or next_low_edges != low_edge_overrides \
+	var changed := (
+		next_transitions != transition_overrides
+		or next_low_edges != low_edge_overrides
 		or next_elevations != elevation_overrides
+	)
 	if not changed:
 		return false
 	transition_overrides = _sort_integer_overrides(next_transitions)
@@ -370,18 +368,9 @@ func get_transition_snapshot() -> Dictionary:
 
 ## Restores complete transition intent while discarding absent and out-of-bounds entries.
 func apply_transition_snapshot(snapshot: Dictionary) -> bool:
-	var restored_elevations := snapshot.get(
-		"elevation_overrides",
-		elevation_overrides
-	) as Dictionary[Vector2i, int]
-	var restored_transitions := snapshot.get(
-		"transition_overrides",
-		transition_overrides
-	) as Dictionary[Vector2i, int]
-	var restored_low_edges := snapshot.get(
-		"low_edge_overrides",
-		low_edge_overrides
-	) as Dictionary[Vector2i, int]
+	var restored_elevations := snapshot.get("elevation_overrides", elevation_overrides) as Dictionary[Vector2i, int]
+	var restored_transitions := snapshot.get("transition_overrides", transition_overrides) as Dictionary[Vector2i, int]
+	var restored_low_edges := snapshot.get("low_edge_overrides", low_edge_overrides) as Dictionary[Vector2i, int]
 	var sanitized_transitions: Dictionary[Vector2i, int] = {}
 	var sanitized_low_edges: Dictionary[Vector2i, int] = {}
 	for cell in _sorted_override_cells(restored_transitions):
@@ -394,9 +383,11 @@ func apply_transition_snapshot(snapshot: Dictionary) -> bool:
 			if low_edge != LowEdge.None:
 				sanitized_low_edges[cell] = low_edge
 	var sanitized_elevations := _bounded_integer_overrides(restored_elevations)
-	var changed := sanitized_transitions != transition_overrides \
-		or sanitized_low_edges != low_edge_overrides \
+	var changed := (
+		sanitized_transitions != transition_overrides
+		or sanitized_low_edges != low_edge_overrides
 		or sanitized_elevations != elevation_overrides
+	)
 	if not changed:
 		return false
 	transition_overrides = sanitized_transitions
@@ -425,8 +416,7 @@ func validate_palette_size(palette_size: int) -> Array[String]:
 		return errors
 	if default_style_index < 0 or default_style_index >= palette_size:
 		errors.append(
-			"Default style index %d is outside the palette of %d styles."
-			% [default_style_index, palette_size]
+			"Default style index %d is outside the palette of %d styles." % [default_style_index, palette_size]
 		)
 	for cell in _sorted_override_cells(style_overrides):
 		var style_index := style_overrides[cell] as int
@@ -434,8 +424,7 @@ func validate_palette_size(palette_size: int) -> Array[String]:
 			errors.append("Style override %s is outside the authored bounds." % cell)
 		elif style_index < 0 or style_index >= palette_size:
 			errors.append(
-				"Cell %s uses style index %d outside the palette of %d styles."
-				% [cell, style_index, palette_size]
+				"Cell %s uses style index %d outside the palette of %d styles." % [cell, style_index, palette_size]
 			)
 	return errors
 
@@ -464,9 +453,7 @@ func get_low_edge_name(low_edge: LowEdge) -> String:
 			return "None"
 
 
-func _sort_integer_overrides(
-	overrides: Dictionary[Vector2i, int]
-) -> Dictionary[Vector2i, int]:
+func _sort_integer_overrides(overrides: Dictionary[Vector2i, int]) -> Dictionary[Vector2i, int]:
 	var sorted: Dictionary[Vector2i, int] = {}
 	for cell in _sorted_override_cells(overrides):
 		sorted[cell] = overrides[cell]
@@ -489,9 +476,7 @@ func _cells_from_lookup(lookup: Dictionary[Vector2i, bool]) -> Array[Vector2i]:
 	return cells
 
 
-func _bounded_integer_overrides(
-	overrides: Dictionary[Vector2i, int]
-) -> Dictionary[Vector2i, int]:
+func _bounded_integer_overrides(overrides: Dictionary[Vector2i, int]) -> Dictionary[Vector2i, int]:
 	var bounded: Dictionary[Vector2i, int] = {}
 	for cell in _sorted_override_cells(overrides):
 		if is_in_bounds(cell):

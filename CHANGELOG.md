@@ -1,6 +1,34 @@
 # Changelog
 
+## 2026-10-13
+
+### 1800
+
+- Burnt-player flames are taller and broader, retaining their soft transparency.
+  - Prompt: Make burnt-player flames larger while keeping their current opacity.
+- Burnt-player flames use layered Kenney textures with softer edges, varied flicker, cooling tips, and a gentler orange glow that keeps the charred body visible.
+  - Prompt: Improve the fire on the burnt dead player using the new Kenney particles.
+
+### 1300
+
+- Discarding a drifted level preview hides and stops its simulation immediately, then releases it safely at the frame boundary so the frontend can keep responding.
+  - Prompt: Fix the frontend freezing when a drifted playback is discarded.
+
+### 0100
+
+- Level previews log the first playback drift once, remove the stale recording, and hide the preview until a fresh run is recorded.
+  - Prompt: Log frontend playback drift once and discard the stale aesthetic recording.
+
 ## 2026-10-12
+
+### 1700
+
+- The Inspector keeps designer authoring controls, including new floor materials, while hiding runtime state, scene wiring, and technical settings without losing saved level data.
+  - Prompt: Audit exported properties for designer use and hide internal state while preserving floor material authoring.
+- Level editors can read documentation for every exported parameter and Inspector section, including units, timing, and configuration intent.
+  - Prompt: Run the export documentation checker and fix all reported problems.
+- Level editor parameters and export sections now require non-empty documentation comments during project validation.
+  - Prompt: Require editor documentation immediately before every export annotation during validation.
 
 ### 1600
 

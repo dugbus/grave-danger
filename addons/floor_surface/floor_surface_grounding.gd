@@ -28,8 +28,8 @@ enum GroundingMode {
 @export var height_offset := 0.0
 ## Deliberate world-space heading retained when Upright or Align Normal is conformed repeatedly.
 @export_range(-PI, PI, 0.001, "radians_as_degrees") var heading_radians := 0.0
-## Editor-visible warning state set when the supporting FloorSurface changes after conforming.
-@export var grounding_stale := true:
+## Saved invalidation state managed by floor edits and conforming; surfaced through configuration warnings.
+@export_storage var grounding_stale := true:
 	set(value):
 		grounding_stale = value
 		update_configuration_warnings()
@@ -135,14 +135,12 @@ func _connect_surface() -> void:
 		return
 	_disconnect_surface()
 	_connected_surface = surface
-	if _connected_surface != null \
-			and not _connected_surface.surface_rebuilt.is_connected(_on_surface_rebuilt):
+	if _connected_surface != null and not _connected_surface.surface_rebuilt.is_connected(_on_surface_rebuilt):
 		_connected_surface.surface_rebuilt.connect(_on_surface_rebuilt)
 
 
 func _disconnect_surface() -> void:
-	if _connected_surface != null \
-			and _connected_surface.surface_rebuilt.is_connected(_on_surface_rebuilt):
+	if _connected_surface != null and _connected_surface.surface_rebuilt.is_connected(_on_surface_rebuilt):
 		_connected_surface.surface_rebuilt.disconnect(_on_surface_rebuilt)
 	_connected_surface = null
 

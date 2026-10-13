@@ -7,7 +7,8 @@ const POSITION_TOLERANCE := 0.05
 static func report_due(
 	recording: Dictionary, playback_level: Node3D, playback_time: float, checkpoint_index: int, warned_paths: Dictionary
 ) -> int:
-	if not OS.is_debug_build() or playback_level == null:
+	# One mismatch invalidates the aesthetic recording; further nodes and loops add no value.
+	if playback_level == null or not warned_paths.is_empty():
 		return checkpoint_index
 	var run_metadata := recording.get("run_metadata", {}) as Dictionary
 	var checkpoints := run_metadata.get("drift_checkpoints", []) as Array
@@ -17,12 +18,16 @@ static func report_due(
 			return checkpoint_index
 		_report_checkpoint(playback_level, checkpoint, String(run_metadata.get("level_id", "unknown")), warned_paths)
 		checkpoint_index += 1
+		if not warned_paths.is_empty():
+			return checkpoint_index
 	return checkpoint_index
 
 
 static func _report_checkpoint(
 	playback_level: Node3D, checkpoint: Dictionary, recorded_level_id: String, warned_paths: Dictionary
 ) -> void:
+	if not warned_paths.is_empty():
+		return
 	var checkpoint_time := float(checkpoint.get("time", 0.0))
 	var states := checkpoint.get("states", []) as Array
 	for stored_state: Variant in states:
@@ -39,7 +44,7 @@ static func _report_checkpoint(
 				)
 			)
 			warned_paths[stored_path] = true
-			continue
+			return
 		var expected_position := _array_to_vector3(state.get("position", []))
 		var position_error := actual_node.global_position.distance_to(expected_position)
 		if position_error <= POSITION_TOLERANCE:
@@ -60,6 +65,7 @@ static func _report_checkpoint(
 		)
 		push_warning(warning_text)
 		warned_paths[stored_path] = true
+		return
 
 
 static func _array_to_vector3(value: Variant) -> Vector3:

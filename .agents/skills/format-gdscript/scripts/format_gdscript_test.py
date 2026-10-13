@@ -76,6 +76,13 @@ class FormatterTests(unittest.TestCase):
             self.run_formatter()
         self.assertEqual(self.script.read_text(), SOURCE)
 
+    def test_explicit_first_party_addon_selection_is_supported(self):
+        addon = self.root / "addons" / "floor_surface" / "sample.gd"
+        addon.parent.mkdir(parents=True)
+        addon.write_text(SOURCE)
+        self.assertEqual(self.run_formatter("addons/floor_surface/sample.gd"), 0)
+        self.assertIn("\tvar text", addon.read_text())
+
     def test_all_formats_sources_but_preserves_generated_and_addon_scripts(self):
         ignored_paths = ["addons/vendor.gd", ".godot/generated.gd"]
         for value in ignored_paths:

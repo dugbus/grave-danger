@@ -3,17 +3,19 @@ extends Node3D
 
 ## Plays a single spatial collapse sound once this wall's rigid bricks are genuinely dislodged.
 
+## Inspector group for Collapse Detection settings.
 @export_group("Collapse Detection")
 ## Minimum distance a brick must leave its settled position before the wall counts as breaking.
-@export_range(0.0, 1.0, 0.005, "suffix:m") var minimum_collapse_displacement := 0.025
+@export_storage var minimum_collapse_displacement := 0.025
 ## Minimum brick speed required to distinguish a collapse from a slow nudge or physics jitter.
 @export_range(0.0, 10.0, 0.05, "suffix:m/s") var minimum_collapse_speed := 0.5
 ## Time allowed for the stacked bricks to settle before collapse detection begins.
-@export_range(0.0, 5.0, 0.05, "suffix:s") var settling_delay_seconds := 0.75
+@export_storage var settling_delay_seconds := 0.75
 
-@export_group("Audio")
+# Internal Audio settings; hidden from the Inspector.
 ## Spatial audio player used for the one-shot collapse sound.
-@export var collapse_audio_player_path: NodePath = ^"CollapseAudioPlayer"
+@export_storage var collapse_audio_player_path: NodePath = ^"CollapseAudioPlayer"
+## Ends the preceding Inspector group.
 @export_group("")
 
 @onready var collapse_audio_player := get_node_or_null(collapse_audio_player_path) as AudioStreamPlayer3D

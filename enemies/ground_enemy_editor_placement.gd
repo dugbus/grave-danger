@@ -8,11 +8,11 @@ const GROUND_SPAWN := preload("res://enemies/ground_spawn.gd")
 const EDITOR_SNAP_RETRY_FRAMES := 30
 
 ## Node whose world position marks the enemy's intended contact point with the floor.
-@export_node_path("Node3D") var floor_sample_path := NodePath()
+@export_storage var floor_sample_path := NodePath()
 ## Physics layers treated as walkable editor geometry.
-@export_flags_3d_physics var collision_mask := 1
+@export_storage var collision_mask := 1
 ## Minimum upward surface normal accepted as walkable ground.
-@export_range(0.0, 1.0, 0.01) var minimum_floor_normal_y := 0.65
+@export_storage var minimum_floor_normal_y := 0.65
 
 var _last_placement_position := Vector3(INF, INF, INF)
 var _remaining_retry_frames := 0

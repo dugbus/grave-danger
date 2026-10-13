@@ -3,9 +3,7 @@ extends CharacterBody3D
 
 ## Deterministic standalone controller used only by the floor-surface playground.
 
-const SETTINGS_SCRIPT := preload(
-	"res://addons/floor_surface/test/floor_surface_test_player_settings.gd"
-)
+const SETTINGS_SCRIPT := preload("res://addons/floor_surface/test/floor_surface_test_player_settings.gd")
 const SURFACE_SCRIPT := preload("res://addons/floor_surface/floor_surface.gd")
 
 signal reset_performed
@@ -14,9 +12,9 @@ signal traversal_mode_changed(mode: int)
 ## Shared movement settings kept separate from the production player.
 @export var settings: SETTINGS_SCRIPT
 ## Camera used to translate input into screen-relative world movement.
-@export var movement_camera_path: NodePath
+@export_storage var movement_camera_path: NodePath
 ## Labelled playground marker used for automatic and manual resets.
-@export var reset_marker_path: NodePath
+@export_storage var reset_marker_path: NodePath
 ## Isolated FloorSurface used only for provisional walkable-step assistance.
 @export var floor_surface_path: NodePath = ^"../FloorSurface"
 
@@ -77,12 +75,7 @@ func get_camera_relative_direction(input_direction: Vector2) -> Vector3:
 
 
 ## Advances velocity from explicit inputs so controller behaviour can be tested without input events.
-func update_velocity(
-	move_direction: Vector3,
-	jump_requested: bool,
-	is_grounded: bool,
-	delta: float
-) -> void:
+func update_velocity(move_direction: Vector3, jump_requested: bool, is_grounded: bool, delta: float) -> void:
 	if settings == null:
 		return
 
@@ -90,15 +83,9 @@ func update_velocity(
 	var horizontal_direction := Vector2(move_direction.x, move_direction.z).limit_length(1.0)
 	if not horizontal_direction.is_zero_approx():
 		var target_velocity := horizontal_direction * settings.movement_speed
-		horizontal_velocity = horizontal_velocity.move_toward(
-			target_velocity,
-			settings.acceleration * delta
-		)
+		horizontal_velocity = horizontal_velocity.move_toward(target_velocity, settings.acceleration * delta)
 	else:
-		horizontal_velocity = horizontal_velocity.move_toward(
-			Vector2.ZERO,
-			settings.deceleration * delta
-		)
+		horizontal_velocity = horizontal_velocity.move_toward(Vector2.ZERO, settings.deceleration * delta)
 
 	velocity.x = horizontal_velocity.x
 	velocity.z = horizontal_velocity.y
@@ -138,16 +125,12 @@ func toggle_traversal_mode() -> void:
 
 ## Returns the human-readable test mode displayed by the playground HUD.
 func get_traversal_mode_name() -> String:
-	return "Unencumbered" \
-		if traversal_mode == SETTINGS_SCRIPT.TraversalMode.Unencumbered else "Normal"
+	return "Unencumbered" if traversal_mode == SETTINGS_SCRIPT.TraversalMode.Unencumbered else "Normal"
 
 
 ## Resolves a safe one-frame step lift from sampled heights and the body's current foot height.
 func resolve_walkable_step_height(
-	current_surface_height: float,
-	target_surface_height: float,
-	current_foot_height: float,
-	is_grounded: bool
+	current_surface_height: float, target_surface_height: float, current_foot_height: float, is_grounded: bool
 ) -> float:
 	if settings == null or not is_grounded:
 		return 0.0
@@ -199,10 +182,7 @@ func _apply_walkable_step(move_direction: Vector3, is_grounded: bool) -> void:
 	if not current_sample.valid or not target_sample.valid:
 		return
 	var step_height := resolve_walkable_step_height(
-		current_sample.world_height,
-		target_sample.world_height,
-		_get_current_foot_height(),
-		is_grounded
+		current_sample.world_height, target_sample.world_height, _get_current_foot_height(), is_grounded
 	)
 	if step_height > 0.0:
 		global_position.y += step_height
@@ -214,8 +194,11 @@ func _apply_traversal_gate(move_direction: Vector3) -> void:
 	var current_cell := floor_surface.world_to_cell(global_position)
 	var probe_position := global_position + move_direction.normalized() * settings.step_probe_distance
 	var target_cell := floor_surface.world_to_cell(probe_position)
-	if current_cell == target_cell or not floor_surface.has_floor(current_cell) \
-			or not floor_surface.has_floor(target_cell):
+	if (
+		current_cell == target_cell
+		or not floor_surface.has_floor(current_cell)
+		or not floor_surface.has_floor(target_cell)
+	):
 		return
 	if can_enter_traversal(floor_surface.classify_edge(current_cell, target_cell)):
 		return

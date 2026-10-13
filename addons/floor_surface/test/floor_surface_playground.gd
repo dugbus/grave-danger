@@ -7,38 +7,32 @@ const FIXTURE_ID := "M10 / complete-floor-surface-playground-v1"
 const CAMERA_VIEW_COUNT := 3
 const TRIAL_COUNT := 9
 const HUD_REFRESH_SECONDS := 0.1
-const CAMERA_SETTINGS_SCRIPT := preload(
-	"res://addons/floor_surface/test/floor_surface_camera_settings.gd"
-)
-const PLAYER_SCRIPT := preload(
-	"res://player/player.gd"
-)
+const CAMERA_SETTINGS_SCRIPT := preload("res://addons/floor_surface/test/floor_surface_camera_settings.gd")
+const PLAYER_SCRIPT := preload("res://player/player.gd")
 const CAMERA_SCRIPT := preload("res://game/follow_camera.gd")
 const SURFACE_SCRIPT := preload("res://addons/floor_surface/floor_surface.gd")
 const SAMPLE_SCRIPT := preload("res://addons/floor_surface/floor_surface_sample.gd")
 const MAP_SCRIPT := preload("res://addons/floor_surface/floor_map.gd")
-const VISIBILITY_SCRIPT := preload(
-	"res://player/visibility/player_occlusion_silhouette.gd"
-)
+const VISIBILITY_SCRIPT := preload("res://player/visibility/player_occlusion_silhouette.gd")
 
 ## Independent camera arrangements used by this playground only.
 @export var camera_settings: CAMERA_SETTINGS_SCRIPT
 ## Production follow camera switched between named evaluation angles.
-@export var camera_path: NodePath = ^"Camera3D"
+@export_storage var camera_path: NodePath = ^"Camera3D"
 ## Actual production player whose state appears in the diagnostics.
-@export var player_path: NodePath = ^"Player"
+@export_storage var player_path: NodePath = ^"Player"
 ## Isolated surface queried by the debug panel; production floors remain unrelated.
-@export var surface_path: NodePath = ^"FloorSurface"
+@export_storage var surface_path: NodePath = ^"FloorSurface"
 ## Label updated with live controller and future floor-surface information.
-@export var status_label_path: NodePath = ^"HUD/Panel/Margin/Rows/Status"
+@export_storage var status_label_path: NodePath = ^"HUD/Panel/Margin/Rows/Status"
 ## Player-owned silhouette shared with ordinary gameplay levels.
-@export var visibility_path: NodePath = ^"Player/PlayerOcclusionSilhouette"
+@export_storage var visibility_path: NodePath = ^"Player/PlayerOcclusionSilhouette"
 ## Diagnostics canvas that can be hidden during an unobstructed visual comparison.
-@export var hud_path: NodePath = ^"HUD"
+@export_storage var hud_path: NodePath = ^"HUD"
 ## Shows detailed diagnostics on launch; leave disabled for an unobstructed play view.
 @export var show_diagnostics_on_start := false
 ## Repeatable room, comparison-lane, pyramid-route and gradient-wall reset points cycled with T.
-@export var trial_start_paths: Array[NodePath] = []
+@export_storage var trial_start_paths: Array[NodePath] = []
 ## Human-readable trial names shown in the runtime HUD.
 @export var trial_names: Array[String] = []
 
@@ -93,9 +87,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif event.keycode == KEY_F:
 		if visibility_experiment != null:
-			visibility_experiment.set_visibility_enabled(
-				not visibility_experiment.visibility_enabled
-			)
+			visibility_experiment.set_visibility_enabled(not visibility_experiment.visibility_enabled)
 		_update_status()
 		get_viewport().set_input_as_handled()
 	elif event.keycode == KEY_H:
@@ -116,9 +108,7 @@ func apply_camera_view(view: CAMERA_SETTINGS_SCRIPT.CameraView) -> void:
 	current_camera_view = view
 	if evaluation_camera == null or camera_settings == null or player == null:
 		return
-	var authored_offset := (
-		camera_settings.get_view_position(view) - camera_settings.get_view_target(view)
-	)
+	var authored_offset := camera_settings.get_view_position(view) - camera_settings.get_view_target(view)
 	var horizontal_distance := Vector2(authored_offset.x, authored_offset.z).length()
 	evaluation_camera.camera_yaw = atan2(authored_offset.x, authored_offset.z)
 	evaluation_camera.view_elevation_degrees = rad_to_deg(
@@ -162,72 +152,80 @@ func _update_status() -> void:
 	var visibility_text := "Visibility: unavailable"
 	if visibility_experiment != null:
 		visibility_text = (
-			"Visibility: %s | player meshes: %d | FPS: %d\n"
-			+ "Solid fill: #%s | bright outline: #%s | edge: %.3f m | depth bias: %.3f m\n"
-			+ "Scene rendering: unchanged; overlay appears only behind opaque depth"
-		) % [
-			visibility_experiment.get_visibility_status_name(),
-			visibility_experiment.get_silhouette_mesh_count(),
-			Engine.get_frames_per_second(),
-			visibility_experiment.silhouette_fill_colour.to_html(false),
-			visibility_experiment.silhouette_outline_colour.to_html(false),
-			visibility_experiment.outline_width,
-			visibility_experiment.occlusion_depth_bias,
-		]
+			(
+				"Visibility: %s | player meshes: %d | FPS: %d\n"
+				+ "Solid fill: #%s | bright outline: #%s | edge: %.3f m | depth bias: %.3f m\n"
+				+ "Scene rendering: unchanged; overlay appears only behind opaque depth"
+			)
+			% [
+				visibility_experiment.get_visibility_status_name(),
+				visibility_experiment.get_silhouette_mesh_count(),
+				Engine.get_frames_per_second(),
+				visibility_experiment.silhouette_fill_colour.to_html(false),
+				visibility_experiment.silhouette_outline_colour.to_html(false),
+				visibility_experiment.outline_width,
+				visibility_experiment.occlusion_depth_bias,
+			]
+		)
 	status_label.text = (
-		"Fixture: %s\nTrial: %s\nCamera: %s\nPlayer: (%.2f, %.2f, %.2f) | grounded: %s\n"
-		+ "Controller: %s\n%s\n\n%s"
-	) % [
-		FIXTURE_ID,
-		get_trial_name(),
-		get_camera_view_name(),
-		player_position.x,
-		player_position.y,
-		player_position.z,
-		grounded_text,
-		controller_text,
-		visibility_text,
-		surface_text,
-	]
+		("Fixture: %s\nTrial: %s\nCamera: %s\nPlayer: (%.2f, %.2f, %.2f) | grounded: %s\n" + "Controller: %s\n%s\n\n%s")
+		% [
+			FIXTURE_ID,
+			get_trial_name(),
+			get_camera_view_name(),
+			player_position.x,
+			player_position.y,
+			player_position.z,
+			grounded_text,
+			controller_text,
+			visibility_text,
+			surface_text,
+		]
+	)
 
 
 func _format_surface_status(sample: SAMPLE_SCRIPT) -> String:
 	if floor_surface == null or sample == null:
 		return "Floor surface: unavailable"
-	var elevation_unit := floor_surface.elevation_profile.elevation_unit \
-		if floor_surface.elevation_profile != null else 0.0
+	var elevation_unit := (
+		floor_surface.elevation_profile.elevation_unit if floor_surface.elevation_profile != null else 0.0
+	)
 	if not sample.valid:
 		return (
-			"Floor surface: NO SURFACE\nCell: (%d, %d) | sampled height: unavailable\n"
-			+ "Unit: %.2f m | normal: unavailable | transition: unavailable"
-		) % [sample.cell.x, sample.cell.y, elevation_unit]
+			(
+				"Floor surface: NO SURFACE\nCell: (%d, %d) | sampled height: unavailable\n"
+				+ "Unit: %.2f m | normal: unavailable | transition: unavailable"
+			)
+			% [sample.cell.x, sample.cell.y, elevation_unit]
+		)
 	return (
-		"Floor surface: valid\nCell: (%d, %d) | sampled height: %.2f m\n"
-		+ "Elevation: %d units | unit: %.2f m | normal: (%.1f, %.1f, %.1f)\n"
-		+ "East edge: %s | delta: %s\nStyle: %d — %s | transition: %s | low edge: %s\n"
-		+ "Map: %d × %d / %d tops | last rebuild: %.2f ms"
-	) % [
-		sample.cell.x,
-		sample.cell.y,
-		sample.world_height,
-		floor_surface.get_cell_elevation(sample.cell),
-		elevation_unit,
-		sample.surface_normal.x,
-		sample.surface_normal.y,
-		sample.surface_normal.z,
-		_get_east_traversal_name(sample.cell),
-		_get_east_delta_text(sample.cell),
-		sample.style_index,
-		_get_style_name(sample.style_index),
-		floor_surface.floor_map.get_transition_name(sample.transition),
-		floor_surface.floor_map.get_low_edge_name(
-			floor_surface.floor_map.get_cell_low_edge(sample.cell)
-		),
-		floor_surface.floor_map.dimensions.x,
-		floor_surface.floor_map.dimensions.y,
-		floor_surface.get_generated_cell_count(),
-		float(floor_surface.get_last_rebuild_microseconds()) / 1000.0,
-	]
+		(
+			"Floor surface: valid\nCell: (%d, %d) | sampled height: %.2f m\n"
+			+ "Elevation: %d units | unit: %.2f m | normal: (%.1f, %.1f, %.1f)\n"
+			+ "East edge: %s | delta: %s\nStyle: %d — %s | transition: %s | low edge: %s\n"
+			+ "Map: %d × %d / %d tops | last rebuild: %.2f ms"
+		)
+		% [
+			sample.cell.x,
+			sample.cell.y,
+			sample.world_height,
+			floor_surface.get_cell_elevation(sample.cell),
+			elevation_unit,
+			sample.surface_normal.x,
+			sample.surface_normal.y,
+			sample.surface_normal.z,
+			_get_east_traversal_name(sample.cell),
+			_get_east_delta_text(sample.cell),
+			sample.style_index,
+			_get_style_name(sample.style_index),
+			floor_surface.floor_map.get_transition_name(sample.transition),
+			floor_surface.floor_map.get_low_edge_name(floor_surface.floor_map.get_cell_low_edge(sample.cell)),
+			floor_surface.floor_map.dimensions.x,
+			floor_surface.floor_map.dimensions.y,
+			floor_surface.get_generated_cell_count(),
+			float(floor_surface.get_last_rebuild_microseconds()) / 1000.0,
+		]
+	)
 
 
 func _get_style_name(style_index: int) -> String:
@@ -265,9 +263,7 @@ func _get_east_traversal_name(cell: Vector2i) -> String:
 	var east_cell := cell + Vector2i.RIGHT
 	if not floor_surface.has_floor(east_cell):
 		return "No neighbour"
-	return floor_surface.elevation_profile.get_traversal_name(
-		floor_surface.classify_edge(cell, east_cell)
-	)
+	return floor_surface.elevation_profile.get_traversal_name(floor_surface.classify_edge(cell, east_cell))
 
 
 func _get_east_delta_text(cell: Vector2i) -> String:

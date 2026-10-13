@@ -26,6 +26,7 @@ const PLAYER_COLLISION_LAYER := 2
 const WORLD_COLLISION_LAYER := 1
 const KILL_BOUNDARY_GROUP: StringName = &"kill_boundary"
 
+## Inspector group for Stair Construction settings.
 @export_group("Stair Construction")
 ## Number of treads generated in the single staircase mesh.
 @export_range(1, 64, 1) var step_count := 12:
@@ -43,12 +44,14 @@ const KILL_BOUNDARY_GROUP: StringName = &"kill_boundary"
 		step_depth = maxf(value, MIN_STEP_DEPTH)
 		_queue_rebuild()
 
+## Inspector group for Appearance settings.
 @export_group("Appearance")
 ## Material applied to the one generated staircase mesh.
 @export var stair_material: Material:
 	set(value):
 		stair_material = value
 		_queue_rebuild()
+## Ends the preceding Inspector group.
 @export_group("")
 
 var _rebuild_queued := false

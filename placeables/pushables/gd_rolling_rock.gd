@@ -4,23 +4,39 @@
 class_name RollingRock
 extends GDSpherePushable
 
+## Inspector group for Visual Rolling settings.
 @export_group("Visual Rolling")
-@export var visual_rock_path: NodePath = NodePath("RollingRock")
+## Visual rock node rotated to match the object's movement.
+@export_storage var visual_rock_path: NodePath = NodePath("RollingRock")
+## Radius in world units used to convert travel distance into visual rolling rotation.
 @export_range(0.01, 10.0, 0.01) var visual_roll_radius := 0.5
+## Rotates the rock visual as it moves.
 @export var visual_roll_enabled := true
 
+## Inspector group for Rolling Audio settings.
 @export_group("Rolling Audio")
-@export var rolling_audio_path: NodePath = NodePath("RollingRockAudio")
+## Audio player used for the continuous rolling sound.
+@export_storage var rolling_audio_path: NodePath = NodePath("RollingRockAudio")
+## Movement speed in world units per second at which rolling audio starts becoming audible.
 @export var min_audio_speed := 0.05
-@export var max_audio_speed := 3.0
+## Movement speed in world units per second at which rolling audio reaches full volume.
+@export_storage var max_audio_speed := 3.0
+## Volume of the rolling sound at full speed, in decibels.
 @export var rolling_volume_db := 12.0
+## Volume used for inaudible rolling audio, in decibels.
 @export var silent_volume_db := -80.0
-@export var movement_sound_threshold := 0.025
-@export_range(0.0, 1.0, 0.01) var trapped_audio_speed_threshold := 0.08
-@export_range(0.0, 0.5, 0.01) var trapped_audio_hold_seconds := 0.08
+## Minimum measured movement speed required for rolling audio.
+@export_storage var movement_sound_threshold := 0.025
+## Speed below which a blocked rock is considered trapped for audio fading.
+@export_storage var trapped_audio_speed_threshold := 0.08
+## Seconds a rock must remain trapped before its rolling audio fades.
+@export_storage var trapped_audio_hold_seconds := 0.08
+## Seconds taken to fade in the rolling sound.
 @export_range(0.001, 0.5, 0.001) var audio_fade_in_seconds := 0.035
+## Seconds taken to fade out the rolling sound after movement stops.
 @export_range(0.001, 0.5, 0.001) var audio_fade_out_seconds := 0.09
-@export_range(0.001, 0.5, 0.001) var trapped_audio_fade_seconds := 0.035
+## Seconds taken to silence the rolling sound when the rock becomes trapped.
+@export_storage var trapped_audio_fade_seconds := 0.035
 
 var visual_rock: Node3D
 var rolling_audio: AudioStreamPlayer3D

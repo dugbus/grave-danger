@@ -19,9 +19,9 @@ enum LevelResultState {
 }
 
 ## Scene loaded after a level slot is selected.
-@export var game_scene := "res://game/graveyard.tscn"
+@export_storage var game_scene := "res://game/graveyard.tscn"
 ## Shop scene opened from the button beneath the level list.
-@export_file("*.tscn") var shop_scene_path := "res://ui/frontend/shop.tscn"
+@export_storage var shop_scene_path := "res://ui/frontend/shop.tscn"
 ## Seconds used for the black overlay to fade out when the screen opens.
 @export var fade_in_duration := 0.35
 

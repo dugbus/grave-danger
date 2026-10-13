@@ -2,7 +2,7 @@ extends MarginContainer
 class_name GDKillBoundary2DemoControls
 
 ## Demo boundary controlled by this runtime validation HUD.
-@export var boundary_path: NodePath
+@export_storage var boundary_path: NodePath
 
 @onready var _boundary := get_node_or_null(boundary_path) as GDKillBoundary2
 @onready var _effect_option := get_node(^"Panel/VBox/EffectRow/Effect") as OptionButton
