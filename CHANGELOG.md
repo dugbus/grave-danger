@@ -2,6 +2,11 @@
 
 ## 2026-10-13
 
+### 1900
+
+- Fire deaths now leave body motion to the authored death animation while retaining flames and the charred appearance.
+  - Prompt: Remove procedural fire-death thrashing so an artist can animate it later.
+
 ### 1800
 
 - Burnt-player flames are taller and broader, retaining their soft transparency.

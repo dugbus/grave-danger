@@ -23,7 +23,7 @@ enum DeathCause {
 
 ## Node that receives death animation playback requests.
 @export_storage var animation_controller_path: NodePath = ^"../PlayerAnimation"
-## Node that adds cause-specific fire or blood effects and visible twitching to the death animation.
+## Node that adds fire effects or blood effects with non-fire twitching to the death animation.
 @export_storage var death_effects_path: NodePath = ^"../PlayerDeathEffects"
 ## Attention controller released before the death animation takes ownership of the head.
 @export_storage var attention_path: NodePath = ^"../PlayerAttention"

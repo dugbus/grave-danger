@@ -1,5 +1,6 @@
 extends "res://tests/test_case.gd"
 
+const PLAYER_SCENE := preload("res://player/player.tscn")
 const SUBJECT := preload("res://player/player_death_effects.gd")
 const ANDY_FACE_SETTINGS := preload("res://player/andy_face_settings.tres")
 const SUBJECT_PATH := "res://player/player_death_effects.gd"
@@ -51,11 +52,12 @@ func run(tree: SceneTree) -> void:
 	await tree.process_frame
 	await _test_rigged_death_face(tree)
 	_test_blood_stays_in_front_of_silhouette()
+	_test_fire_death_leaves_motion_to_animation()
 
 
 # Flow: All continuous facial blood draws in red and masks the through-scenery outline.
 func _test_blood_stays_in_front_of_silhouette() -> void:
-	var player := (load("res://player/player.tscn") as PackedScene).instantiate() as GDPlayer
+	var player := PLAYER_SCENE.instantiate() as GDPlayer
 	for emitter_name in [&"MouthBlood", &"NoseBlood", &"LeftEyeBlood", &"RightEyeBlood"]:
 		var emitter := player.get_node(NodePath("PlayerDeathEffects/" + emitter_name)) as GPUParticles3D
 		var material := emitter.draw_pass_1.surface_get_material(0) as StandardMaterial3D
@@ -164,3 +166,26 @@ func _test_face_mark_near_cheek(character: Node3D, skeleton: Skeleton3D, bone: i
 			),
 			"The facial decal projection reaches the actual cheek surface."
 		)
+
+
+# Flow: Fire keeps its visual effects while leaving body motion to the authored death animation.
+func _test_fire_death_leaves_motion_to_animation() -> void:
+	var player := PLAYER_SCENE.instantiate() as GDPlayer
+	var effects := player.get_node("PlayerDeathEffects") as GDPlayerDeathEffects
+	var pivot := player.get_node("Pivot") as Node3D
+	var initial_rotation := Vector3(0.1, 0.4, -0.2)
+	pivot.rotation = initial_rotation
+	effects.player = player
+	effects.visual_pivot = pivot
+	effects.character = player.get_node("Pivot/Character") as Node3D
+	effects.fire_particles = effects.get_node("FireParticles") as GPUParticles3D
+	effects.fire_light = effects.get_node("FireLight") as OmniLight3D
+	effects.play_death_throes(GDPlayerDeath.DeathCause.Fire)
+	expect(effects.throe_tween == null, "Fire death creates no procedural body-motion tween.")
+	expect(pivot.rotation.is_equal_approx(initial_rotation), "Fire death preserves the animation pivot rotation.")
+	expect(effects.fire_particles.visible and effects.fire_light.visible, "Fire death retains flames and light.")
+	for descendant in effects.character.find_children("*", "MeshInstance3D", true, false):
+		var mesh := descendant as MeshInstance3D
+		expect(mesh.material_overlay == effects.blackened_material, "Fire death retains the charred appearance.")
+	expect(not effects.uses_blood_effects, "Fire death does not start the non-fire presentation.")
+	player.free()

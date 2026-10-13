@@ -1,6 +1,6 @@
 class_name GDPlayerDeathEffects
 extends Node3D
-## Adds brief body spasms plus cause-specific fire or face-tracked blood to the player's death.
+## Adds fire effects or face-tracked blood with brief non-fire spasms to the player's death.
 
 const HEAD_LOOK := preload("res://player/player_head_look.gd")
 const FACE_ANCHOR := preload("res://player/player_face_anchor.gd")
@@ -91,7 +91,6 @@ func play_death_throes(death_cause: GDPlayerDeath.DeathCause) -> void:
 		_play_twitch_sequence()
 	else:
 		_play_fire_death()
-		_play_fire_twitch_sequence()
 
 
 ## Returns the mark attached to the player for tests and future presentation hooks.
@@ -262,32 +261,6 @@ func _play_twitch_sequence() -> void:
 	throe_tween.tween_interval(0.16)
 	_append_twitch_pose(Vector3(1.0, 0.0, 0.8), 0.05)
 	_append_twitch_pose(Vector3.ZERO, 0.15)
-
-
-func _play_fire_twitch_sequence() -> void:
-	if visual_pivot == null:
-		return
-
-	_start_throe_tween()
-	_append_twitch_pose(Vector3(18.0, -8.0, 22.0), 0.055)
-	_append_twitch_pose(Vector3(-15.0, 7.0, -19.0), 0.065)
-	_append_twitch_pose(Vector3(20.0, -5.0, 16.0), 0.055)
-	_append_twitch_pose(Vector3(-13.0, 4.0, -16.0), 0.07)
-	throe_tween.tween_interval(0.045)
-	_append_twitch_pose(Vector3(16.0, -6.0, 14.0), 0.06)
-	_append_twitch_pose(Vector3(-11.0, 3.0, -13.0), 0.075)
-	throe_tween.tween_interval(0.06)
-	_append_twitch_pose(Vector3(13.0, -4.0, 11.0), 0.06)
-	_append_twitch_pose(Vector3(-9.0, 2.0, -10.0), 0.075)
-	throe_tween.tween_interval(0.08)
-	_append_twitch_pose(Vector3(10.0, -3.0, 8.0), 0.06)
-	_append_twitch_pose(Vector3(-6.0, 1.0, -7.0), 0.085)
-	throe_tween.tween_interval(0.1)
-	_append_twitch_pose(Vector3(7.0, -2.0, 5.0), 0.07)
-	_append_twitch_pose(Vector3(-4.0, 1.0, -4.0), 0.09)
-	throe_tween.tween_interval(0.1)
-	_append_twitch_pose(Vector3(4.0, 0.0, 3.0), 0.07)
-	_append_twitch_pose(Vector3.ZERO, 0.18)
 
 
 func _start_throe_tween() -> void:

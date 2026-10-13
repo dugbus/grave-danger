@@ -2888,7 +2888,7 @@ func _test_fire_boundary_death_blackens_and_burns_player() -> bool:
 
 	player.apply_kill_boundary_damage(death_controller.max_flame_energy, true)
 	await create_timer(0.045).timeout
-	var pronounced_fire_throe_started := visual_pivot.rotation.distance_to(base_pivot_rotation) > deg_to_rad(10.0)
+	var fire_pivot_stayed_steady := visual_pivot.rotation.is_equal_approx(base_pivot_rotation)
 	await create_timer(0.305).timeout
 
 	var character_meshes := character.find_children("*", "MeshInstance3D", true, false)
@@ -2941,8 +2941,12 @@ func _test_fire_boundary_death_blackens_and_burns_player() -> bool:
 			"fire particles remain distributed over the fallen player's torso and head"
 		)
 		and _expect(
-			pronounced_fire_throe_started and death_effects.throe_tween.is_running(),
-			"burning player begins pronounced sustained death throes"
+			(
+				fire_pivot_stayed_steady
+				and visual_pivot.rotation.is_equal_approx(base_pivot_rotation)
+				and death_effects.throe_tween == null
+			),
+			"burning player leaves body motion to the authored animation"
 		)
 		and _expect(blood_was_suppressed, "fire kill-boundary death replaces the ordinary blood presentation")
 	)
