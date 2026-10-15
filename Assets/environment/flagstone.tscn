@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://dp3okefrxx6lg"]
+
+[ext_resource type="PackedScene" uid="uid://wrt8w0bbbmnm" path="res://Assets/environment/flagstone.glb" id="1_onc8n"]
+
+[node name="flagstone" unique_id=1476589743 instance=ExtResource("1_onc8n")]
