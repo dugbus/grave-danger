@@ -10,6 +10,7 @@ func run(_tree: SceneTree) -> void:
 	_test_presence_snapshots_and_unique_copy()
 	_test_bounds_expand_without_implicit_floor()
 	_test_elevation_snapshots()
+	_test_retained_hole_elevation()
 	_test_style_snapshots()
 	_test_transition_snapshots()
 	_test_sparse_authored_values_and_palette_validation()
@@ -89,10 +90,7 @@ func _test_style_snapshots() -> void:
 	expect_equal(floor_map.get_cell_style(Vector2i(2, 0)), 0, "Restoring removes later style overrides.")
 	styled[Vector2i(9, 9)] = 1
 	floor_map.apply_style_snapshot(styled)
-	expect(
-		not floor_map.style_overrides.has(Vector2i(9, 9)),
-		"Style snapshots cannot add data outside tile storage."
-	)
+	expect(not floor_map.style_overrides.has(Vector2i(9, 9)), "Style snapshots cannot add data outside tile storage.")
 
 
 func _test_transition_snapshots() -> void:
@@ -101,12 +99,7 @@ func _test_transition_snapshots() -> void:
 	floor_map.default_present = true
 	var before := floor_map.get_transition_snapshot()
 	expect(
-		floor_map.set_cell_transition(
-			Vector2i(1, 0),
-			SUBJECT.Transition.Ramp,
-			SUBJECT.LowEdge.West,
-			2
-		),
+		floor_map.set_cell_transition(Vector2i(1, 0), SUBJECT.Transition.Ramp, SUBJECT.LowEdge.West, 2),
 		"A ramp stores its named transition, low edge and low anchor elevation together."
 	)
 	expect_equal(
@@ -127,12 +120,17 @@ func _test_presence_snapshots_and_unique_copy() -> void:
 	floor_map.dimensions = Vector2i(3, 3)
 	floor_map.default_present = false
 	expect(
-		floor_map.apply_presence_snapshot([
-			Vector2i(1, 1),
-			Vector2i(-1, -1),
-			Vector2i(1, 1),
-			Vector2i(9, 9),
-		]),
+		(
+			floor_map
+			. apply_presence_snapshot(
+				[
+					Vector2i(1, 1),
+					Vector2i(-1, -1),
+					Vector2i(1, 1),
+					Vector2i(9, 9),
+				]
+			)
+		),
 		"An occupancy snapshot can be applied."
 	)
 	expect_equal(
@@ -147,10 +145,7 @@ func _test_presence_snapshots_and_unique_copy() -> void:
 	expect(unique_map != floor_map, "Make Unique returns a different resource instance.")
 	expect(unique_map.resource_local_to_scene, "A unique copy is marked scene-local.")
 	unique_map.set_floor_present(Vector2i.ZERO, true)
-	expect(
-		not floor_map.has_floor(Vector2i.ZERO),
-		"Editing the unique copy cannot change its source map."
-	)
+	expect(not floor_map.has_floor(Vector2i.ZERO), "Editing the unique copy cannot change its source map.")
 
 
 func _test_bounds_expand_without_implicit_floor() -> void:
@@ -202,11 +197,7 @@ func _test_text_resource_round_trip() -> void:
 	floor_map.set_cell_style(Vector2i(-1, 3), 1)
 	var save_error := ResourceSaver.save(floor_map, ROUND_TRIP_PATH)
 	expect_equal(save_error, OK, "FloorMap saves as a text resource.")
-	var restored := ResourceLoader.load(
-		ROUND_TRIP_PATH,
-		"",
-		ResourceLoader.CACHE_MODE_IGNORE
-	)
+	var restored := ResourceLoader.load(ROUND_TRIP_PATH, "", ResourceLoader.CACHE_MODE_IGNORE)
 	expect(restored != null, "A saved FloorMap reloads.")
 	if restored != null:
 		expect_equal(restored.minimum_cell, floor_map.minimum_cell, "Minimum cell survives reload.")
@@ -215,10 +206,7 @@ func _test_text_resource_round_trip() -> void:
 		expect_equal(restored.get_cell_elevation(Vector2i(-2, 2)), 7, "Elevation survives reload.")
 		expect_equal(restored.get_cell_style(Vector2i(-1, 3)), 1, "Absent style survives reload.")
 		var unique_map := restored.create_unique_copy() as SUBJECT
-		expect(
-			unique_map.resource_path.is_empty(),
-			"A unique copy no longer points at the shared resource file."
-		)
+		expect(unique_map.resource_path.is_empty(), "A unique copy no longer points at the shared resource file.")
 		unique_map.set_floor_present(Vector2i(-1, 3), true)
 		expect(
 			not restored.has_floor(Vector2i(-1, 3)),
@@ -228,6 +216,41 @@ func _test_text_resource_round_trip() -> void:
 
 
 func _is_in_compact_fixture(cell: Vector2i) -> bool:
-	return cell.x >= -6 and cell.x <= 5 \
-		and cell.y >= -5 and cell.y <= 4 \
+	return (
+		cell.x >= -6
+		and cell.x <= 5
+		and cell.y >= -5
+		and cell.y <= 4
 		and cell not in [Vector2i(-1, -1), Vector2i.ZERO, Vector2i(-1, 0), Vector2i(0, -1)]
+	)
+
+
+func _test_retained_hole_elevation() -> void:
+	var floor_map := SUBJECT.new()
+	floor_map.dimensions = Vector2i(3, 2)
+	floor_map.default_present = true
+	floor_map.default_elevation = 8
+	var hole := Vector2i.ONE
+	floor_map.set_cell_elevation(hole, 20)
+	floor_map.set_floor_present(hole, false)
+	expect_equal(
+		floor_map.get_authored_cell_elevation(hole),
+		20,
+		"A hole retains its elevated authoring intent for replacement objects."
+	)
+	expect_equal(
+		floor_map.get_cell_elevation(hole),
+		SUBJECT.INVALID_ELEVATION,
+		"Reading authoring intent does not make a hole into walkable floor."
+	)
+	expect_equal(
+		floor_map.get_authored_cell_elevation(Vector2i.ZERO),
+		8,
+		"Cells without an elevation override use the authored baseline."
+	)
+	expect_equal(
+		floor_map.get_authored_cell_elevation(Vector2i(3, 0)),
+		SUBJECT.INVALID_ELEVATION,
+		"Out-of-bounds cells never invent an authoring height."
+	)
+	expect(not floor_map.has_floor(hole), "Read-only authoring queries preserve hole occupancy.")

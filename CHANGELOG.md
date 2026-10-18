@@ -1,5 +1,59 @@
 # Changelog
 
+## 2026-10-18
+
+### 1900
+
+- Crumbling-floor placement now reconnects editor history and restores placement state after script reloads without changing authored positions or manual heights.
+  - Prompt: Fix the missing editor history error while crumbling-floor placement processes.
+- Frontend reliability review identifies remaining work in script-error detection, Tutorial 5 preview teardown, stalled-load recovery, and live renderer validation.
+  - Prompt: Assess whether frontend replay fixes are complete or further reliability work remains.
+- Level-select replay previews now share background scene loading with level prefetching, keeping navigation responsive while a preview is prepared and discarding cancelled preview requests.
+  - Prompt: Investigate the frontend hanging when highlighting Tutorial 5.
+
+### 1800
+
+- Crumbling floors now discover the level floor and snap new placements and horizontal moves to cell centres at the lowest adjacent flat floor height, while preserving manual height adjustments and saved placements.
+  - Prompt: Automatically snap placed and duplicated crumbling floors without a placement plugin, using the lowest surrounding floor height while allowing manual vertical adjustments.
+
+### 1700
+
+- Level editors have a step-by-step crumbling-floor guide covering hole creation, floor references, exact cell centres, snapping, and height matching.
+  - Prompt: Explain how to place a crumbling floor on the grid at the correct height.
+
+## 2026-10-16
+
+### 1400
+
+- Crumbling floors now stay as one node per intact tile, keeping large trap layouts manageable without changing their progressive collapse or falling debris.
+  - Prompt: Reduce the permanent scene cost of crumbling floors while preserving their falling physics.
+
+### 0200
+
+- Level editors can place crumbling floors with built-in X/Z snapping and an undoable Match Floor Height Inspector action that respects raised floors and retained hole elevations without changing floor cells.
+  - Prompt: Remove the custom crumbling-floor placement plugin and respect the floor module's elevations.
+
+## 2026-10-15
+
+### 2000
+
+- Crumbling floors now play the new floor-crack sound once when stepped or landed on, with separate creak and collapse cues removed.
+  - Prompt: Play the added floor-crack sound when crumbling floors trigger and remove the other sound triggers.
+
+### 1900
+
+- Crumbling floors shed blocks in varied, repeatable patterns with a much tighter escape window, and the debug level now inherits the faster collapse timing.
+  - Prompt: Randomize crumbling-floor collapse order and shorten the escape window.
+
+### 1800
+
+- Crumbling flagstones now give way block by block from the player's first step, reliably activate during normal walking, and remain intact when jumped over without landing.
+  - Prompt: Make crumbling floors break progressively on every grounded crossing while preserving jumping over them.
+- The debug level's fourteen hole cells now have individually editable crumbling flagstones for testing isolated collapses and a larger collapsing floor patch.
+  - Prompt: Add crumbling floors over the debug level's existing holes.
+- Players can escape a shaking flagstone before it collapses into its authored blocks; level editors can place reusable crumbling floors with undoable grid snapping and floor-cell replacement.
+  - Prompt: Implement the reusable crumbling floor plan using the pulled flagstone asset and its block count.
+
 ## 2026-10-13
 
 ### 1900

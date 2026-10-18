@@ -34,7 +34,6 @@
 [ext_resource type="PackedScene" path="res://placeables/environment/tombstone/tombstone.tscn" id="34_0qsyw"]
 [ext_resource type="PackedScene" path="res://placeables/pushables/millstone.tscn" id="35_ei3h4"]
 [ext_resource type="PackedScene" uid="uid://bsukaqxfm6nb3" path="res://placeables/wall_breakable/wall_breakable.tscn" id="36_y1ybh"]
-[ext_resource type="Script" uid="uid://dapd5yutddmj6" path="res://addons/playthrough_position_markers/editor_only_marker_group.gd" id="42_j7r8b"]
 [ext_resource type="PackedScene" uid="uid://b4rhshe713rs0" path="res://player/andy_rigged.tscn" id="42_khk1w"]
 [ext_resource type="PackedScene" path="res://lighting/gd_indoor_lighting.tscn" id="100_indoor"]
 [ext_resource type="PackedScene" path="res://addons/floor_surface/floor_surface.tscn" id="900_floor_surface"]
@@ -42,6 +41,7 @@
 [ext_resource type="Resource" path="res://addons/floor_surface/default_floor_elevation_profile.tres" id="902_floor_profile"]
 [ext_resource type="Resource" uid="uid://cq3ca1g2f5phj" path="res://levels/debug-level/floor_surface_style.tres" id="903_floor_style"]
 [ext_resource type="Script" uid="uid://q0ef7o077f24" path="res://addons/floor_surface/floor_style.gd" id="904_floor_style_script"]
+[ext_resource type="PackedScene" path="res://placeables/traps/crumbling_floor/crumbling_floor.tscn" id="905_crumbling_floor"]
 
 [sub_resource type="Curve3D" id="Curve3D_j7r8b"]
 resource_local_to_scene = true
@@ -500,7 +500,100 @@ _data = {
 &"kill_boundary": SubResource("Animation_khk1w")
 }
 
-[sub_resource type="Curve3D" id="Curve3D_lnbif"]
+[sub_resource type="BoxMesh" id="BoxMesh_lnbif"]
+
+[sub_resource type="MultiMesh" id="MultiMesh_46618"]
+transform_format = 1
+custom_aabb = AABB(-0.5, -0.25, -0.5, 1, 0.25, 1)
+instance_count = 1
+mesh = SubResource("BoxMesh_lnbif")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 0.25, 0, -0.125, 0, 0, 1, 0)
+
+[sub_resource type="MultiMesh" id="MultiMesh_3amwx"]
+transform_format = 1
+custom_aabb = AABB(-0.5, -0.25, -0.5, 1, 0.25, 1)
+instance_count = 1
+mesh = SubResource("BoxMesh_lnbif")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 0.25, 0, -0.125, 0, 0, 1, 0)
+
+[sub_resource type="MultiMesh" id="MultiMesh_mm5g7"]
+transform_format = 1
+custom_aabb = AABB(-0.5, -0.25, -0.5, 1, 0.25, 1)
+instance_count = 1
+mesh = SubResource("BoxMesh_lnbif")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 0.25, 0, -0.125, 0, 0, 1, 0)
+
+[sub_resource type="MultiMesh" id="MultiMesh_kfalc"]
+transform_format = 1
+custom_aabb = AABB(-0.5, -0.25, -0.5, 1, 0.25, 1)
+instance_count = 1
+mesh = SubResource("BoxMesh_lnbif")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 0.25, 0, -0.125, 0, 0, 1, 0)
+
+[sub_resource type="MultiMesh" id="MultiMesh_nglf8"]
+transform_format = 1
+custom_aabb = AABB(-0.5, -0.25, -0.5, 1, 0.25, 1)
+instance_count = 1
+mesh = SubResource("BoxMesh_lnbif")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 0.25, 0, -0.125, 0, 0, 1, 0)
+
+[sub_resource type="MultiMesh" id="MultiMesh_2yksf"]
+transform_format = 1
+custom_aabb = AABB(-0.5, -0.25, -0.5, 1, 0.25, 1)
+instance_count = 1
+mesh = SubResource("BoxMesh_lnbif")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 0.25, 0, -0.125, 0, 0, 1, 0)
+
+[sub_resource type="MultiMesh" id="MultiMesh_jm4gt"]
+transform_format = 1
+custom_aabb = AABB(-0.5, -0.25, -0.5, 1, 0.25, 1)
+instance_count = 1
+mesh = SubResource("BoxMesh_lnbif")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 0.25, 0, -0.125, 0, 0, 1, 0)
+
+[sub_resource type="MultiMesh" id="MultiMesh_0mes7"]
+transform_format = 1
+custom_aabb = AABB(-0.5, -0.25, -0.5, 1, 0.25, 1)
+instance_count = 1
+mesh = SubResource("BoxMesh_lnbif")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 0.25, 0, -0.125, 0, 0, 1, 0)
+
+[sub_resource type="MultiMesh" id="MultiMesh_6aaqi"]
+transform_format = 1
+custom_aabb = AABB(-0.5, -0.25, -0.5, 1, 0.25, 1)
+instance_count = 1
+mesh = SubResource("BoxMesh_lnbif")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 0.25, 0, -0.125, 0, 0, 1, 0)
+
+[sub_resource type="MultiMesh" id="MultiMesh_t4bn3"]
+transform_format = 1
+custom_aabb = AABB(-0.5, -0.25, -0.5, 1, 0.25, 1)
+instance_count = 1
+mesh = SubResource("BoxMesh_lnbif")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 0.25, 0, -0.125, 0, 0, 1, 0)
+
+[sub_resource type="MultiMesh" id="MultiMesh_uq3ab"]
+transform_format = 1
+custom_aabb = AABB(-0.5, -0.25, -0.5, 1, 0.25, 1)
+instance_count = 1
+mesh = SubResource("BoxMesh_lnbif")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 0.25, 0, -0.125, 0, 0, 1, 0)
+
+[sub_resource type="MultiMesh" id="MultiMesh_ijrn2"]
+transform_format = 1
+custom_aabb = AABB(-0.5, -0.25, -0.5, 1, 0.25, 1)
+instance_count = 1
+mesh = SubResource("BoxMesh_lnbif")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 0.25, 0, -0.125, 0, 0, 1, 0)
+
+[sub_resource type="MultiMesh" id="MultiMesh_7mi71"]
+transform_format = 1
+custom_aabb = AABB(-0.5, -0.25, -0.5, 1, 0.25, 1)
+instance_count = 1
+mesh = SubResource("BoxMesh_lnbif")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 0.25, 0, -0.125, 0, 0, 1, 0)
+
+[sub_resource type="Curve3D" id="Curve3D_kebrp"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
@@ -508,7 +601,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_46618"]
+[sub_resource type="Curve3D" id="Curve3D_ron3j"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
@@ -516,7 +609,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_3amwx"]
+[sub_resource type="Curve3D" id="Curve3D_dhv6f"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
@@ -524,7 +617,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_mm5g7"]
+[sub_resource type="Curve3D" id="Curve3D_ef6pm"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
@@ -532,7 +625,7 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_kfalc"]
+[sub_resource type="Curve3D" id="Curve3D_iy444"]
 resource_local_to_scene = true
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
@@ -540,13 +633,12 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_nglf8"]
-resource_local_to_scene = true
-_data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 114.929, 12, -0.62695503, 0, 0, 0, 0, 0, 0, 114.929, 0.0012148172, -0.62695503, 0, 0, 0, 0, 0, 0, 114.9159, 0.0012148172, -0.6223837, 0, 0, 0, 0, 0, 0, 113.51905, 0.0012148172, -0.27199304, 0, 0, 0, 0, 0, 0, 112.2762, 0.0012148172, -0.36447978, 0, 0, 0, 0, 0, 0, 110.37097, 0.0012148172, -0.70437336, 0, 0, 0, 0, 0, 0, 108.38556, 0.0012148172, -0.9858476, 0, 0, 0, 0, 0, 0, 105.720184, 0.0012148172, -0.62445813, 0, 0, 0, 0, 0, 0, 98.925095, 0.0012148172, -1.4516933, 0, 0, 0, 0, 0, 0, 95.9071, 0.0012148172, 0.8976165, 0, 0, 0, 0, 0, 0, 99.33798, 0.0012148172, 3.016629, 0, 0, 0, 0, 0, 0, 89.93478, 0.0012148172, 2.0847638, 0, 0, 0, 0, 0, 0, 80.18681, 0.0009012459, 2.7650545, 0, 0, 0, 0, 0, 0, 77.797386, 0.0009012459, 2.8319826, 0, 0, 0, 0, 0, 0, 71.44366, 0.0009012459, 1.3036429, 0, 0, 0, 0, 0, 0, 69.06624, 0.0009012459, 0.57620674, 0, 0, 0, 0, 0, 0, 61.982296, 0.0009835835, -1.4163582, 0, 0, 0, 0, 0, 0, 54.346264, 0.0009835835, -0.82315916, 0, 0, 0, 0, 0, 0, 48.0387, 0.0009835835, 0.4791668, 0, 0, 0, 0, 0, 0, 39.68935, 0.0009835835, 3.870737, 0, 0, 0, 0, 0, 0, 36.50127, 0.0009835835, 5.0747046, 0, 0, 0, 0, 0, 0, 33.683052, 0.0009835835, 5.147482),
-"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-}
-point_count = 22
+[sub_resource type="MultiMesh" id="MultiMesh_w1cp7"]
+transform_format = 1
+custom_aabb = AABB(-0.5, -0.25, -0.5, 1, 0.25, 1)
+instance_count = 1
+mesh = SubResource("BoxMesh_lnbif")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 0.25, 0, -0.125, 0, 0, 1, 0)
 
 [node name="DebugLevel" type="Node3D" unique_id=145450153]
 
@@ -580,6 +672,99 @@ libraries/ = SubResource("AnimationLibrary_88ebk")
 
 [node name="Tombstone" parent="Objects" unique_id=281438480 instance=ExtResource("34_0qsyw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.360085, 0.010619759, -0.15647633)
+
+[node name="CrumblingFloors" type="Node3D" parent="Objects" unique_id=1079542486]
+
+[node name="Cell_251_6" parent="Objects/CrumblingFloors" unique_id=1483636592 node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 124, 0, -1)
+multimesh = SubResource("MultiMesh_46618")
+auto_place = null
+floor_grid_map = NodePath("../../../PNGGridMap")
+floor_surface = NodePath("../../../FloorSurface")
+
+[node name="Cell_253_6" parent="Objects/CrumblingFloors" unique_id=782057750 node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 126, 0, -1)
+multimesh = SubResource("MultiMesh_3amwx")
+auto_place = null
+floor_grid_map = NodePath("../../../PNGGridMap")
+floor_surface = NodePath("../../../FloorSurface")
+
+[node name="Cell_251_8" parent="Objects/CrumblingFloors" unique_id=621519602 node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 124, 0, 1)
+multimesh = SubResource("MultiMesh_mm5g7")
+auto_place = null
+floor_grid_map = NodePath("../../../PNGGridMap")
+floor_surface = NodePath("../../../FloorSurface")
+
+[node name="Cell_253_8" parent="Objects/CrumblingFloors" unique_id=463943269 node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 126, 0, 1)
+multimesh = SubResource("MultiMesh_kfalc")
+auto_place = null
+floor_grid_map = NodePath("../../../PNGGridMap")
+floor_surface = NodePath("../../../FloorSurface")
+
+[node name="Cell_251_11" parent="Objects/CrumblingFloors" unique_id=1399947538 node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 124, 0, 4)
+multimesh = SubResource("MultiMesh_nglf8")
+auto_place = null
+floor_grid_map = NodePath("../../../PNGGridMap")
+floor_surface = NodePath("../../../FloorSurface")
+
+[node name="Cell_252_11" parent="Objects/CrumblingFloors" unique_id=1120669066 node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 125, 0, 4)
+multimesh = SubResource("MultiMesh_2yksf")
+auto_place = null
+floor_grid_map = NodePath("../../../PNGGridMap")
+floor_surface = NodePath("../../../FloorSurface")
+
+[node name="Cell_253_11" parent="Objects/CrumblingFloors" unique_id=1682716413 node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 126, 0, 4)
+multimesh = SubResource("MultiMesh_jm4gt")
+auto_place = null
+floor_grid_map = NodePath("../../../PNGGridMap")
+floor_surface = NodePath("../../../FloorSurface")
+
+[node name="Cell_251_12" parent="Objects/CrumblingFloors" unique_id=1097286529 node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 124, 0, 5)
+multimesh = SubResource("MultiMesh_0mes7")
+auto_place = null
+floor_grid_map = NodePath("../../../PNGGridMap")
+floor_surface = NodePath("../../../FloorSurface")
+
+[node name="Cell_252_12" parent="Objects/CrumblingFloors" unique_id=587758767 node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 125, 0, 5)
+multimesh = SubResource("MultiMesh_6aaqi")
+auto_place = null
+floor_grid_map = NodePath("../../../PNGGridMap")
+floor_surface = NodePath("../../../FloorSurface")
+
+[node name="Cell_253_12" parent="Objects/CrumblingFloors" unique_id=201654354 node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 126, 0, 5)
+multimesh = SubResource("MultiMesh_t4bn3")
+auto_place = null
+floor_grid_map = NodePath("../../../PNGGridMap")
+floor_surface = NodePath("../../../FloorSurface")
+
+[node name="Cell_251_13" parent="Objects/CrumblingFloors" unique_id=1833993658 node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 124, 0, 6)
+multimesh = SubResource("MultiMesh_uq3ab")
+auto_place = null
+floor_grid_map = NodePath("../../../PNGGridMap")
+floor_surface = NodePath("../../../FloorSurface")
+
+[node name="Cell_252_13" parent="Objects/CrumblingFloors" unique_id=464802902 node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 125, 0, 6)
+multimesh = SubResource("MultiMesh_ijrn2")
+auto_place = null
+floor_grid_map = NodePath("../../../PNGGridMap")
+floor_surface = NodePath("../../../FloorSurface")
+
+[node name="Cell_253_13" parent="Objects/CrumblingFloors" unique_id=1634925767 node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 126, 0, 6)
+multimesh = SubResource("MultiMesh_7mi71")
+auto_place = null
+floor_grid_map = NodePath("../../../PNGGridMap")
+floor_surface = NodePath("../../../FloorSurface")
 
 [node name="PNGGridMap" type="GridMap" parent="." unique_id=1128356203]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -127.5, 0, -7.5)
@@ -695,12 +880,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44.445827, 0, 0.18532312)
 
 [node name="Skeleton" parent="." unique_id=955868217 instance=ExtResource("32_dhv6f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.231255, -2.9802322e-08, 0.0104568)
-curve = SubResource("Curve3D_lnbif")
+curve = SubResource("Curve3D_kebrp")
 loop_patrol = false
 
 [node name="Zombie" parent="." unique_id=734149938 instance=ExtResource("33_ef6pm")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.092558, -2.9802322e-08, -0.024227142)
-curve = SubResource("Curve3D_46618")
+curve = SubResource("Curve3D_ron3j")
 loop_patrol = false
 
 [node name="GDFlaskBreathingSpace" parent="Zombie" unique_id=486637941 instance=ExtResource("7_y1ybh")]
@@ -810,13 +995,13 @@ spawn_time = 26.0
 
 [node name="Skeleton" parent="Zombie" unique_id=854635641 instance=ExtResource("32_dhv6f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.964327, 2.9802322e-08, 4.9696436)
-curve = SubResource("Curve3D_3amwx")
+curve = SubResource("Curve3D_dhv6f")
 loop_patrol = false
 spawn_time = 27.0
 
 [node name="Zombie" parent="Zombie" unique_id=550416171 instance=ExtResource("33_ef6pm")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17437172, 2.9802322e-08, 4.9349594)
-curve = SubResource("Curve3D_mm5g7")
+curve = SubResource("Curve3D_ef6pm")
 loop_patrol = false
 spawn_time = 28.0
 
@@ -831,7 +1016,7 @@ transform = Transform3D(0.019169781, 0, -0.99981624, 0, 1, 0, 0.99981624, 0, 0.0
 
 [node name="Skeleton2" parent="." unique_id=1099228950 instance=ExtResource("32_dhv6f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 121.485016, 0, 3.637745)
-curve = SubResource("Curve3D_kfalc")
+curve = SubResource("Curve3D_iy444")
 
 [node name="Node3D" parent="." unique_id=542482281 instance=ExtResource("36_y1ybh")]
 transform = Transform3D(-0.04726977, 0, 0.9988822, 0, 1, 0, -0.9988822, 0, -0.04726977, 111.41294, 0.15643682, 2.5413938)
@@ -839,387 +1024,9 @@ transform = Transform3D(-0.04726977, 0, 0.9988822, 0, 1, 0, -0.9988822, 0, -0.04
 [node name="andy_rigged" parent="." unique_id=214650687 instance=ExtResource("42_khk1w")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 120.79976, 0, 3.4195688)
 
-[node name="PlaythroughPositionMarkers" type="Node3D" parent="." unique_id=876200657]
-editor_description = "Editor-only positions sampled from the most recent debug playthrough."
-script = ExtResource("42_j7r8b")
-metadata/playthrough_position_markers = true
-
-[node name="WalkedPath" type="Path3D" parent="PlaythroughPositionMarkers" unique_id=2101119532]
-editor_description = "Sampled player route; select it to show the prominent directional path overlay."
-curve = SubResource("Curve3D_nglf8")
-
-[node name="Sample_000" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=11287505]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.929, 12, -0.62695503)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_000" unique_id=386690951]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_000" unique_id=1832047276]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:00"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_001" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1464016983]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.929, 0.0012148172, -0.62695503)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_001" unique_id=1520449438]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_001" unique_id=1209066260]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:02–0:06"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_002" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=747406280]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.9159, 0.0012148172, -0.6223837)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_002" unique_id=746850774]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_002" unique_id=1453593859]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:08"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_003" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=537101734]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 113.51905, 0.0012148172, -0.27199304)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_003" unique_id=759456571]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_003" unique_id=1585218090]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:10"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_004" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1693479901]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 112.2762, 0.0012148172, -0.36447978)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_004" unique_id=2107172480]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_004" unique_id=1139192902]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:12"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_005" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1824129436]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 110.37097, 0.0012148172, -0.70437336)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_005" unique_id=1454539403]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_005" unique_id=1896006881]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:14"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_006" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=460354017]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 108.38556, 0.0012148172, -0.9858476)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_006" unique_id=1286670167]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_006" unique_id=627196816]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:16"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_007" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1644366272]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 105.720184, 0.0012148172, -0.62445813)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_007" unique_id=1113343983]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_007" unique_id=1035911434]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:18"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_008" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1479469720]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98.925095, 0.0012148172, -1.4516933)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_008" unique_id=1184055550]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_008" unique_id=1067014734]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:20"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_009" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=629251818]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 95.9071, 0.0012148172, 0.8976165)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_009" unique_id=270295064]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_009" unique_id=1615148367]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:22"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_010" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1212011447]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 99.33798, 0.0012148172, 3.016629)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_010" unique_id=1283607359]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_010" unique_id=1391752938]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:24"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_011" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=809683068]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 89.93478, 0.0012148172, 2.0847638)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_011" unique_id=476198569]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_011" unique_id=311249698]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:26"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_012" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1537912947]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80.18681, 0.0009012459, 2.7650545)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_012" unique_id=877949186]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_012" unique_id=2102868834]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:28"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_013" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1650222414]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 77.797386, 0.0009012459, 2.8319826)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_013" unique_id=1098477337]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_013" unique_id=1484277850]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:30–0:32"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_014" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=2072739800]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.44366, 0.0009012459, 1.3036429)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_014" unique_id=659163989]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_014" unique_id=1568148873]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:34"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_015" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=2110122036]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 69.06624, 0.0009012459, 0.57620674)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_015" unique_id=2030366098]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_015" unique_id=181054835]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:36"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_016" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1524143678]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 61.982296, 0.0009835835, -1.4163582)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_016" unique_id=2002873091]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_016" unique_id=1484370516]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:38"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_017" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=503770300]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54.346264, 0.0009835835, -0.82315916)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_017" unique_id=1323924490]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_017" unique_id=602684911]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:40"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_018" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1561972191]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.0387, 0.0009835835, 0.4791668)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_018" unique_id=689181479]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_018" unique_id=1829715887]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:42"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_019" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1804616242]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.68935, 0.0009835835, 3.870737)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_019" unique_id=1591920252]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_019" unique_id=272896821]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:44"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_020" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=2049386510]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.50127, 0.0009835835, 5.0747046)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_020" unique_id=328913948]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_020" unique_id=128749154]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:46"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_021" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1594635859]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.683052, 0.0009835835, 5.147482)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_021" unique_id=22059972]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_021" unique_id=292350642]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:48–0:50"
-font_size = 28
-outline_size = 3
+[node name="CrumblingFloor" parent="." unique_id=1819226523 node_paths=PackedStringArray("floor_surface") instance=ExtResource("905_crumbling_floor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 125, 0, 0)
+multimesh = SubResource("MultiMesh_w1cp7")
+floor_surface = NodePath("../FloorSurface")
 
 [editable path="KillBoundary3D"]

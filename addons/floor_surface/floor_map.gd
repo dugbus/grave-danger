@@ -227,6 +227,13 @@ func get_cell_elevation(cell: Vector2i) -> int:
 	return elevation_overrides.get(cell, default_elevation) as int
 
 
+## Returns retained authoring height even for a hole; outside cells have no elevation intent.
+func get_authored_cell_elevation(cell: Vector2i) -> int:
+	if not is_in_bounds(cell):
+		return INVALID_ELEVATION
+	return elevation_overrides.get(cell, default_elevation) as int
+
+
 ## Stores absolute elevation intent for any in-bounds cell, including an absent one.
 func set_cell_elevation(cell: Vector2i, elevation: int) -> bool:
 	if not is_in_bounds(cell):

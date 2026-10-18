@@ -4544,9 +4544,20 @@ func _test_level_select_scrolls_focused_cards_into_view() -> bool:
 	)
 	var shutdown_scene_path := "res://levels/vampire-maze/level.tscn"
 	level_run_playback.active_scene_path = shutdown_scene_path
+	level_run_playback.active_generation = level_run_playback.request_generation
 	level_run_playback.recording = {"camera_fov": 34.0}
+	level_run_playback.set_process(true)
 	var constructed_preview_started_at := Time.get_ticks_msec()
-	var constructed_preview_loaded := bool(level_run_playback.call("_load_active_level_scene"))
+	var constructed_preview_requested := bool(level_run_playback.call("_load_active_level_scene"))
+	while (
+		level_run_playback.load_state == GDLevelRunPlayback.LoadState.LoadingScene
+		and Time.get_ticks_msec() - constructed_preview_started_at < 5000
+	):
+		await process_frame
+	var constructed_preview_loaded := (
+		(constructed_preview_requested and level_run_playback.load_state == GDLevelRunPlayback.LoadState.Playing)
+		as bool
+	)
 	var constructed_preview_load_duration := Time.get_ticks_msec() - constructed_preview_started_at
 	level_run_playback.pending_level_id = "queued_preview"
 	level_run_playback.pending_scene_path = shutdown_scene_path

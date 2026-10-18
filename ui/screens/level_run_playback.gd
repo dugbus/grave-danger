@@ -19,10 +19,12 @@ enum LoadState {
 	Idle,
 	WaitingForSave,
 	ReadingRecording,
+	LoadingScene,
 	Playing,
 }
 
 @onready var playback_viewport := get_node(^"PlaybackViewport") as SubViewport
+@onready var scene_loader := get_node_or_null(^"/root/SceneLoader") as GDSceneLoader
 
 var load_state := LoadState.Idle
 var request_generation := 0
@@ -99,6 +101,7 @@ func _process(delta: float) -> void:
 	request_delay_remaining = maxf(request_delay_remaining - delta, 0.0)
 	_poll_recording_read()
 	_poll_recording_save()
+	_poll_level_scene()
 	if (
 		load_state == LoadState.Idle
 		and recording_thread == null
@@ -195,13 +198,30 @@ func _poll_recording_read() -> void:
 		_start_recording_read()
 
 
+## Share the frontend's threaded request instead of synchronously loading a graph already owned by its worker.
 func _load_active_level_scene() -> bool:
-	var level_scene := load(active_scene_path) as PackedScene
-	if level_scene == null:
+	if scene_loader == null or scene_loader.request_scene(active_scene_path, true) != OK:
 		load_state = LoadState.Idle
 		return false
-	_create_preview(level_scene)
-	return load_state == LoadState.Playing
+	load_state = LoadState.LoadingScene
+	return true
+
+
+func _poll_level_scene() -> void:
+	if load_state != LoadState.LoadingScene:
+		return
+	if active_generation != request_generation or not is_instance_valid(scene_loader):
+		load_state = LoadState.Idle
+		return
+	match scene_loader.get_scene_state(active_scene_path):
+		GDSceneLoader.SceneLoadState.Loaded:
+			var level_scene := scene_loader.get_cached_scene(active_scene_path)
+			if level_scene == null:
+				load_state = LoadState.Idle
+			else:
+				_create_preview(level_scene)
+		GDSceneLoader.SceneLoadState.Failed, GDSceneLoader.SceneLoadState.NotRequested:
+			load_state = LoadState.Idle
 
 
 func _finish_recording_read() -> void:

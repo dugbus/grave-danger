@@ -148,14 +148,7 @@ func _start_next_request() -> void:
 		var scene_path := pending_scene_paths.pop_front() as String
 		if get_scene_state(scene_path) != SceneLoadState.Queued:
 			continue
-		if ResourceLoader.has_cached(scene_path):
-			var already_cached := (
-				ResourceLoader.load(scene_path, "PackedScene", ResourceLoader.CACHE_MODE_REUSE) as PackedScene
-			)
-			if already_cached != null:
-				_store_loaded_scene(scene_path, already_cached)
-				continue
-
+		# Even a cached scene may have dependencies in flight. Always use the threaded completion boundary.
 		var request_error := ResourceLoader.load_threaded_request(
 			scene_path, "PackedScene", USE_SUB_THREADS, ResourceLoader.CACHE_MODE_REUSE
 		)

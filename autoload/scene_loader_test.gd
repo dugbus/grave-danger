@@ -34,6 +34,13 @@ func _expect_scene_dependencies_load_without_blocking(tree: SceneTree) -> void:
 		SUBJECT.SceneLoadState.NotRequested,
 		"Callers can release levels that are no longer likely to be selected."
 	)
+	expect_equal(loader.request_scene(TEST_SCENE_PATH), OK, "A scene retained elsewhere can be requested again.")
+	expect(
+		loader.get_cached_scene(TEST_SCENE_PATH) == null,
+		"A cache hit still waits for the threaded completion boundary instead of calling load on the UI thread."
+	)
+	var reloaded_scene := await loader.load_scene(TEST_SCENE_PATH)
+	expect_equal(reloaded_scene, loaded_scene, "Threaded loading reuses the retained scene after dependencies finish.")
 	loader.queue_free()
 	await tree.process_frame
 
