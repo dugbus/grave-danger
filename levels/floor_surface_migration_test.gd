@@ -148,12 +148,17 @@ const BALANCED_PLACEMENT_LEVELS: Array[String] = [
 	"res://levels/graveyard/level.tscn",
 ]
 const PIT_LEVEL_REGION_COUNTS := {
-	"res://levels/debug-level/floor_surface_map.tres": 6,
+	"res://levels/debug-level/floor_surface_map.tres": 7,
 	"res://levels/7/floor_surface_map.tres": 2,
 }
 const PIT_LEVEL_CELL_COUNTS := {
-	"res://levels/debug-level/floor_surface_map.tres": 14,
+	"res://levels/debug-level/floor_surface_map.tres": 18,
 	"res://levels/7/floor_surface_map.tres": 2,
+}
+# Later level authoring may add heights without changing the migrated flat baseline elsewhere.
+# The debug station's detailed ramp geometry and rolling behavior have a sibling level test.
+const AUTHORED_HEIGHT_REGIONS := {
+	"res://levels/debug-level/floor_surface_map.tres": [Rect2i(229, 2, 10, 2), Rect2i(237, 4, 2, 3)],
 }
 const CARDINAL_DIRECTIONS: Array[Vector2i] = [
 	Vector2i.UP,
@@ -223,10 +228,25 @@ func _check_map(map_path: String, expected_dimensions: Vector2i) -> void:
 		floor_map.dimensions == expected_dimensions and not floor_map.get_present_cells().is_empty(),
 		"%s preserves the complete original floor footprint." % map_path
 	)
-	expect(
-		not source.contains("elevation_overrides") and not source.contains("transition_overrides"),
-		"%s preserves the original flat elevation." % map_path
-	)
+	if AUTHORED_HEIGHT_REGIONS.has(map_path):
+		var regions := AUTHORED_HEIGHT_REGIONS[map_path] as Array
+		var outside_is_flat := true
+		for cell in floor_map.get_present_cells():
+			var inside_authored_region := false
+			for region: Rect2i in regions:
+				inside_authored_region = inside_authored_region or region.has_point(cell)
+			if not inside_authored_region:
+				outside_is_flat = (
+					outside_is_flat
+					and floor_map.get_cell_elevation(cell) == 0
+					and floor_map.get_cell_transition(cell) == FloorMap.Transition.Flat
+				)
+		expect(outside_is_flat, "%s preserves the flat floor outside its authored height regions." % map_path)
+	else:
+		expect(
+			not source.contains("elevation_overrides") and not source.contains("transition_overrides"),
+			"%s preserves the original flat elevation." % map_path
+		)
 	var repainted_map := FloorMap.new()
 	var painter := ShapePainter.new()
 	expect(

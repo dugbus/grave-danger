@@ -1,7 +1,7 @@
 @tool
 extends MultiMeshInstance3D
 
-## A grounded step starts an irreversible collapse that removes authored blocks one at a time.
+## Support from a grounded player, boulder or millstone starts an irreversible block-by-block collapse.
 const SUPPORT := preload("res://placeables/traps/crumbling_floor/crumbling_floor_support.gd")
 const CONTACTS := preload("res://placeables/traps/crumbling_floor/crumbling_floor_contacts.gd")
 const GEOMETRY := preload("res://placeables/traps/crumbling_floor/crumbling_floor_geometry.gd")

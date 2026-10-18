@@ -2,6 +2,16 @@
 
 ## 2026-10-18
 
+### 2100
+
+- The debug level now has a two-wide rolling slope with a side approach, a boulder and millstone on the raised starting pad, and four crumbling tiles at the bottom.
+  - Prompt: Add a two-wide debug ramp for the boulder and millstone with crumbling floor below.
+
+### 2000
+
+- Boulders and millstones now collapse crumbling floors when they roll onto, land on, or rest on them; side contact and airborne passes leave tiles intact.
+  - Prompt: Make boulders and millstones trigger collapsing floors.
+
 ### 1900
 
 - Crumbling-floor placement now reconnects editor history and restores placement state after script reloads without changing authored positions or manual heights.

@@ -6,4 +6,75 @@
 script = ExtResource("1_5nm2r")
 dimensions = Vector2i(256, 16)
 default_present = true
-presence_exceptions = Array[Vector2i]([Vector2i(251, 6), Vector2i(253, 6), Vector2i(252, 7), Vector2i(251, 8), Vector2i(253, 8), Vector2i(251, 11), Vector2i(252, 11), Vector2i(253, 11), Vector2i(251, 12), Vector2i(252, 12), Vector2i(253, 12), Vector2i(251, 13), Vector2i(252, 13), Vector2i(253, 13)])
+presence_exceptions = Array[Vector2i]([Vector2i(226, 2), Vector2i(227, 2), Vector2i(226, 3), Vector2i(227, 3), Vector2i(251, 6), Vector2i(253, 6), Vector2i(252, 7), Vector2i(251, 8), Vector2i(253, 8), Vector2i(251, 11), Vector2i(252, 11), Vector2i(253, 11), Vector2i(251, 12), Vector2i(252, 12), Vector2i(253, 12), Vector2i(251, 13), Vector2i(252, 13), Vector2i(253, 13)])
+
+elevation_overrides = Dictionary[Vector2i, int]({
+Vector2i(229, 2): 1,
+Vector2i(230, 2): 2,
+Vector2i(231, 2): 3,
+Vector2i(232, 2): 4,
+Vector2i(233, 2): 5,
+Vector2i(234, 2): 6,
+Vector2i(235, 2): 6,
+Vector2i(236, 2): 6,
+Vector2i(237, 2): 6,
+Vector2i(238, 2): 6,
+Vector2i(229, 3): 1,
+Vector2i(230, 3): 2,
+Vector2i(231, 3): 3,
+Vector2i(232, 3): 4,
+Vector2i(233, 3): 5,
+Vector2i(234, 3): 6,
+Vector2i(235, 3): 6,
+Vector2i(236, 3): 6,
+Vector2i(237, 3): 6,
+Vector2i(238, 3): 6,
+Vector2i(237, 4): 6,
+Vector2i(238, 4): 6,
+Vector2i(237, 5): 4,
+Vector2i(238, 5): 4,
+Vector2i(237, 6): 2,
+Vector2i(238, 6): 2
+})
+
+transition_overrides = Dictionary[Vector2i, int]({
+Vector2i(229, 2): 1,
+Vector2i(230, 2): 1,
+Vector2i(231, 2): 1,
+Vector2i(232, 2): 1,
+Vector2i(233, 2): 1,
+Vector2i(234, 2): 1,
+Vector2i(229, 3): 1,
+Vector2i(230, 3): 1,
+Vector2i(231, 3): 1,
+Vector2i(232, 3): 1,
+Vector2i(233, 3): 1,
+Vector2i(234, 3): 1,
+Vector2i(237, 4): 1,
+Vector2i(238, 4): 1,
+Vector2i(237, 5): 1,
+Vector2i(238, 5): 1,
+Vector2i(237, 6): 1,
+Vector2i(238, 6): 1
+})
+
+low_edge_overrides = Dictionary[Vector2i, int]({
+Vector2i(229, 2): 4,
+Vector2i(230, 2): 4,
+Vector2i(231, 2): 4,
+Vector2i(232, 2): 4,
+Vector2i(233, 2): 4,
+Vector2i(234, 2): 4,
+Vector2i(229, 3): 4,
+Vector2i(230, 3): 4,
+Vector2i(231, 3): 4,
+Vector2i(232, 3): 4,
+Vector2i(233, 3): 4,
+Vector2i(234, 3): 4,
+Vector2i(237, 4): 3,
+Vector2i(238, 4): 3,
+Vector2i(237, 5): 3,
+Vector2i(238, 5): 3,
+Vector2i(237, 6): 3,
+Vector2i(238, 6): 3
+})

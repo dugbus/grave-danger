@@ -72,11 +72,16 @@ airborne overlap and support from neighboring floor do not count. **Jumping over
 the tile without landing leaves it intact.** Landing starts collapse, and the
 player can still jump away.
 
+Boulders and millstones also trigger collapse when they roll onto, land on, or
+rest on a tile. Their upward supporting physics contacts determine which tile
+breaks; brushing a tile's side or passing above it does not activate the trap.
+Other pushable objects do not gain this trigger behavior.
+
 After a brief warning, individual blocks fall in a shuffled order at staggered
 intervals. A local seeded random generator gives neighboring tiles different
 patterns while retaining repeatable replays. Each block loses its own collision
 and visual when it falls; remaining blocks still provide real support. Once a
-grounded step triggers the tile, leaving cannot cancel or reset the collapse.
+supported contact triggers the tile, leaving cannot cancel or reset the collapse.
 The existing player gravity and fall-death handling take over as support vanishes.
 
 The Inspector exposes collapse delay (0.05 seconds), time between falling blocks
@@ -90,7 +95,7 @@ is permanent until the level restarts. Falling fragments collide with environmen
 layer 1, but cannot obstruct players or one another.
 
 The single positional sound is `Assets/audio/floor-crack.mp3`. It plays once as
-soon as a grounded step or landing activates the tile, through the project's SFX
+soon as a supported player or stone activates the tile, through the project's SFX
 bus. Jumping over without landing plays no floor cue. There are currently no
 separate creak or collapse sound triggers.
 
@@ -112,8 +117,8 @@ shapes, allowing support to disappear progressively. Completing the collapse or
 removing the tile frees the support body. No collision-shape or trigger nodes
 remain attached to untouched tiles.
 
-One contact monitor per physics world checks player support; intact tiles have
-no individual runtime frame or physics callbacks. The monitor unregisters removed
+One contact monitor per physics world checks player and rolling-stone support;
+intact tiles have no individual runtime frame or physics callbacks. The monitor unregisters removed
 or activated tiles and frees itself after the last registration disappears.
 Layouts, source materials, meshes and shapes are shared while tiles exist and
 released when their owners disappear.

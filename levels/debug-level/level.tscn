@@ -766,6 +766,38 @@ auto_place = null
 floor_grid_map = NodePath("../../../PNGGridMap")
 floor_surface = NodePath("../../../FloorSurface")
 
+[node name="RollingSlope" type="Node3D" parent="Objects"]
+editor_description = "Two-wide downhill test: push west from the raised pad; approach from the south on the side ramp. Floor geometry is authored in FloorSurface."
+
+[node name="Boulder" parent="Objects/RollingSlope" instance=ExtResource("18_mm5g7")]
+position = Vector3(108, 2, -5)
+constrain_to_starting_height = false
+
+[node name="Millstone" parent="Objects/RollingSlope" instance=ExtResource("35_ei3h4")]
+position = Vector3(108, 2, -4)
+
+[node name="CrumblingLanding" type="Node3D" parent="Objects/RollingSlope"]
+
+[node name="Cell_226_2" parent="Objects/RollingSlope/CrumblingLanding" node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+position = Vector3(99, 0, -5)
+floor_grid_map = NodePath("../../../../PNGGridMap")
+floor_surface = NodePath("../../../../FloorSurface")
+
+[node name="Cell_227_2" parent="Objects/RollingSlope/CrumblingLanding" node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+position = Vector3(100, 0, -5)
+floor_grid_map = NodePath("../../../../PNGGridMap")
+floor_surface = NodePath("../../../../FloorSurface")
+
+[node name="Cell_226_3" parent="Objects/RollingSlope/CrumblingLanding" node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+position = Vector3(99, 0, -4)
+floor_grid_map = NodePath("../../../../PNGGridMap")
+floor_surface = NodePath("../../../../FloorSurface")
+
+[node name="Cell_227_3" parent="Objects/RollingSlope/CrumblingLanding" node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
+position = Vector3(100, 0, -4)
+floor_grid_map = NodePath("../../../../PNGGridMap")
+floor_surface = NodePath("../../../../FloorSurface")
+
 [node name="PNGGridMap" type="GridMap" parent="." unique_id=1128356203]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -127.5, 0, -7.5)
 mesh_library = ExtResource("4_vopjb")
