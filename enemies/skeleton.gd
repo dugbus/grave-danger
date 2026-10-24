@@ -14,7 +14,9 @@ const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 const DETERMINISTIC_SEED := preload("res://game/deterministic_seed.gd")
 const GROUND_SPAWN := preload("res://enemies/ground_spawn.gd")
 const GROUND_ENEMY_ORIENTATION := preload("res://enemies/ground_enemy_orientation.gd")
-const SkeletonPresentation := preload("res://enemies/skeleton_presentation.gd")
+const EnemyPresentation := preload("res://enemies/enemy_presentation.gd")
+const EnemyFootsteps := preload("res://enemies/enemy_footsteps.gd")
+const EnemyDeathPresentation := preload("res://enemies/enemy_death_presentation.gd")
 const WORLD_COLLISION_LAYER := 1
 const ZOMBIE_COLLISION_LAYER := 1 << 3
 const PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER := 1 << 4
@@ -165,7 +167,13 @@ var landing_sound: AudioStream
 var footstep_rng := RandomNumberGenerator.new()
 var footstep_distance_accumulator := 0.0
 var next_footstep_distance := 1.0
-var previous_walk_animation_phase := -1.0
+var _enemy_footsteps := EnemyFootsteps.new()
+# Preserve the existing phase property while the shared tracker owns its history.
+var previous_walk_animation_phase: float:
+	get:
+		return _enemy_footsteps.previous_phase
+	set(value):
+		_enemy_footsteps.previous_phase = value
 var animation_player: AnimationPlayer
 var current_animation := ""
 var resolved_walk_animation := ""
@@ -180,6 +188,7 @@ var is_disappearing := false
 var fall_velocity := 0.0
 var has_landed := false
 var spawn_floor_checked := false
+var _floor_query := PhysicsRayQueryParameters3D.new()
 
 
 func _ready() -> void:
@@ -189,6 +198,8 @@ func _ready() -> void:
 	map_collision_mask &= ~PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
 	enemy_collision_mask &= ~PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
 	if skeleton_body != null:
+		# The parent carriers drive patrol and falling; independent body syncing lags behind their motion.
+		skeleton_body.sync_to_physics = false
 		skeleton_body.collision_mask &= ~PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER
 	footstep_rng.seed = DETERMINISTIC_SEED.from_node(self, 0, &"skeleton_audio")
 	_load_footstep_sounds()
@@ -267,9 +278,6 @@ func _physics_process(delta: float) -> void:
 
 
 func _update_fall(delta: float) -> bool:
-	if has_landed:
-		return true
-
 	if not spawn_floor_checked:
 		spawn_floor_checked = true
 		if GROUND_SPAWN.snap_to_nearby_floor(self, path_follow, self, map_collision_mask, map_collision_floor_normal_y):
@@ -286,22 +294,25 @@ func _update_fall(delta: float) -> bool:
 	var current_floor_position := path_follow.global_position
 	var probe_start := current_floor_position + Vector3.UP * FLOOR_PROBE_MARGIN
 	var fall_distance := maxf(-fall_velocity * delta, 0.0) + FLOOR_PROBE_MARGIN + FLOOR_SNAP_DISTANCE
-	var query := PhysicsRayQueryParameters3D.create(
-		probe_start, probe_start + Vector3.DOWN * fall_distance, map_collision_mask
-	)
-	query.collide_with_areas = false
-	query.collide_with_bodies = true
-	var hit := world.direct_space_state.intersect_ray(query)
-	if not hit.is_empty():
+	_floor_query.from = probe_start
+	_floor_query.to = probe_start + Vector3.DOWN * fall_distance
+	_floor_query.collision_mask = map_collision_mask
+	var hit := world.direct_space_state.intersect_ray(_floor_query)
+	var floor_normal := hit.get("normal", Vector3.ZERO) as Vector3
+	if not hit.is_empty() and floor_normal.y >= map_collision_floor_normal_y:
 		var floor_position := hit.get("position", current_floor_position) as Vector3
 		var landing_speed := -fall_velocity
+		var was_grounded := has_landed
 		global_position.y += floor_position.y - current_floor_position.y
 		fall_velocity = 0.0
 		has_landed = true
 		if has_dropped_in and landing_speed >= MINIMUM_AUDIBLE_LANDING_SPEED:
 			_play_landing_sound()
-		return false
+		return was_grounded
 
+	# Patrol is allowed only while a walkable surface still supports the feet.
+	# Keep spawn snapping one-shot so a collapsing floor starts a fall instead of teleporting down.
+	has_landed = false
 	global_position.y += fall_velocity * delta
 	return false
 
@@ -405,11 +416,7 @@ func _set_skeleton_transparency(transparency: float) -> void:
 
 
 func _set_geometry_transparency(node: Node, transparency: float) -> void:
-	if node is GeometryInstance3D:
-		(node as GeometryInstance3D).transparency = transparency
-
-	for child in node.get_children():
-		_set_geometry_transparency(child, transparency)
+	EnemyPresentation.set_geometry_transparency(node, transparency)
 
 
 func _configure_shadow_casting() -> void:
@@ -420,28 +427,20 @@ func _configure_shadow_casting() -> void:
 
 
 func _configure_skeleton_light() -> void:
-	if skeleton_light == null:
-		return
-
-	skeleton_light.light_color = skeleton_light_color
-	skeleton_light.light_energy = skeleton_light_energy
-	skeleton_light.omni_range = skeleton_light_range
-	skeleton_light.omni_attenuation = skeleton_light_attenuation
-	skeleton_light.light_cull_mask = ALL_VISUAL_LAYERS
-	skeleton_light.shadow_caster_mask = ENEMY_LIGHT_SHADOW_CASTER_MASK
-	skeleton_light.shadow_enabled = true
-	skeleton_light.visible = skeleton_light_enabled
+	EnemyPresentation.configure_light(
+		skeleton_light,
+		skeleton_light_color,
+		skeleton_light_energy,
+		skeleton_light_range,
+		skeleton_light_attenuation,
+		skeleton_light_enabled,
+		ALL_VISUAL_LAYERS,
+		ENEMY_LIGHT_SHADOW_CASTER_MASK
+	)
 
 
 func _set_shadow_casting(node: Node) -> void:
-	if node is VisualInstance3D:
-		(node as VisualInstance3D).layers = ENEMY_GEOMETRY_VISUAL_LAYER
-
-	if node is GeometryInstance3D:
-		(node as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-
-	for child in node.get_children():
-		_set_shadow_casting(child)
+	EnemyPresentation.set_shadow_casting(node, ENEMY_GEOMETRY_VISUAL_LAYER)
 
 
 func _advance_patrol(delta: float) -> void:
@@ -660,7 +659,7 @@ func _resolve_animation_names() -> void:
 
 
 func _resolve_animation_name(animation_name: String) -> String:
-	return SkeletonPresentation.resolve_animation_name(animation_player, animation_name)
+	return EnemyPresentation.resolve_animation_name(animation_player, animation_name)
 
 
 func _load_footstep_sounds() -> void:
@@ -683,23 +682,11 @@ func _update_footsteps(_delta: float, horizontal_speed: float) -> void:
 
 
 func _did_cross_footstep_phase() -> bool:
-	if animation_player == null or current_animation != resolved_walk_animation or resolved_walk_animation.is_empty():
-		_reset_footstep_phase()
-		return false
-
-	var animation := animation_player.get_animation(resolved_walk_animation)
-	if animation == null or animation.length <= 0.0:
-		_reset_footstep_phase()
-		return false
-
-	var current_phase := animation_player.current_animation_position / animation.length
-	var crossed_phase := GDAudio.did_cross_footstep_animation_phase(previous_walk_animation_phase, current_phase)
-	previous_walk_animation_phase = current_phase
-	return crossed_phase
+	return _enemy_footsteps.did_cross_animation_phase(animation_player, current_animation, resolved_walk_animation)
 
 
 func _reset_footstep_phase() -> void:
-	previous_walk_animation_phase = -1.0
+	_enemy_footsteps.reset()
 
 
 func _randomize_next_footstep_distance() -> void:
@@ -837,36 +824,19 @@ func _disappear_after_death() -> void:
 		return
 
 	is_disappearing = true
-	var disappear_duration := maxf(death_disappear_duration, 0.0)
-	var fade_delay := disappear_duration * clampf(death_fade_start_ratio, 0.0, 1.0)
-	var fade_duration := maxf(disappear_duration - fade_delay, 0.0)
-	var tween := create_tween()
-	tween.set_parallel(true)
-	tween.set_trans(Tween.TRANS_SINE)
-	tween.set_ease(Tween.EASE_IN)
-
-	if drop_pivot != null:
-		tween.tween_property(drop_pivot, "position:y", drop_pivot.position.y - death_sink_depth, disappear_duration)
-
-	for geometry in _get_fade_geometry():
-		tween.tween_property(geometry, "transparency", 1.0, fade_duration).set_delay(fade_delay)
-
+	var tween := EnemyDeathPresentation.create_disappear_tween(
+		self, drop_pivot, _get_fade_geometry(), death_disappear_duration, death_sink_depth, death_fade_start_ratio
+	)
 	await tween.finished
 	_set_active_visible(false)
 
 
 func _get_fade_geometry() -> Array[GeometryInstance3D]:
-	var geometry_instances: Array[GeometryInstance3D] = []
-	if drop_pivot != null:
-		_collect_geometry(drop_pivot, geometry_instances)
-	if shadow != null:
-		_collect_geometry(shadow, geometry_instances)
-
-	return geometry_instances
+	return EnemyPresentation.collect_fade_geometry(drop_pivot, shadow)
 
 
 func _collect_geometry(node: Node, geometry_instances: Array[GeometryInstance3D]) -> void:
-	geometry_instances.append_array(SkeletonPresentation.collect_geometry(node))
+	geometry_instances.append_array(EnemyPresentation.collect_geometry(node))
 
 
 func _is_rolling_ball_body(collider: Object, target_position := Vector3.INF) -> bool:
@@ -937,4 +907,4 @@ func _find_collision_shape(node: Node) -> CollisionShape3D:
 
 
 func _find_animation_player(node: Node) -> AnimationPlayer:
-	return SkeletonPresentation.find_animation_player(node)
+	return EnemyPresentation.find_animation_player(node)

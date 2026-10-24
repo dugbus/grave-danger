@@ -7,6 +7,12 @@ const GEOMETRY := preload("res://placeables/traps/crumbling_floor/crumbling_floo
 var _geometry := GEOMETRY.shared(GEOMETRY) as GEOMETRY
 
 
+func _validate_property(property: Dictionary) -> void:
+	# The asset preview owns this transient batch; saving it would make resource reloads reset a populated format.
+	if property["name"] == &"multimesh":
+		property["usage"] = PROPERTY_USAGE_NONE
+
+
 func _ready() -> void:
 	rebuild(Vector3(1.0, GEOMETRY.THICKNESS, 1.0), null)
 

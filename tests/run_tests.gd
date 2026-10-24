@@ -6446,8 +6446,16 @@ func _test_characters_glance_and_return_with_safe_head_turns() -> bool:
 	await process_frame
 	player_attention.call("_process", 0.0)
 	var player_headlamp_follows_attention := (
-		(player_attention._rigged_head_transform().affine_inverse() * player_headlamp.global_transform)
-		. is_equal_approx(headlamp_offset)
+		player_headlamp.global_position.is_equal_approx(
+			(player_attention._rigged_head_transform() * headlamp_offset).origin
+		)
+		and player_headlamp.global_basis.is_equal_approx(
+			(
+				player_pivot.global_basis
+				* Basis(Vector3.UP, player_attention.get_current_head_yaw())
+				* player_attention.headlamp_rest_transform.basis
+			)
+		)
 	)
 	coin.queue_free()
 	await process_frame

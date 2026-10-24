@@ -36,11 +36,7 @@ func _set_zombie_transparency(transparency: float) -> void:
 
 
 func _set_geometry_transparency(node: Node, transparency: float) -> void:
-	if node is GeometryInstance3D:
-		(node as GeometryInstance3D).transparency = transparency
-
-	for child in node.get_children():
-		_set_geometry_transparency(child, transparency)
+	EnemyPresentation.set_geometry_transparency(node, transparency)
 
 
 func _configure_shadow_casting() -> void:
@@ -51,28 +47,20 @@ func _configure_shadow_casting() -> void:
 
 
 func _configure_zombie_light() -> void:
-	if zombie_light == null:
-		return
-
-	zombie_light.light_color = zombie_light_color
-	zombie_light.light_energy = zombie_light_energy
-	zombie_light.omni_range = zombie_light_range
-	zombie_light.omni_attenuation = zombie_light_attenuation
-	zombie_light.light_cull_mask = ALL_VISUAL_LAYERS
-	zombie_light.shadow_caster_mask = ENEMY_LIGHT_SHADOW_CASTER_MASK
-	zombie_light.shadow_enabled = true
-	zombie_light.visible = zombie_light_enabled
+	EnemyPresentation.configure_light(
+		zombie_light,
+		zombie_light_color,
+		zombie_light_energy,
+		zombie_light_range,
+		zombie_light_attenuation,
+		zombie_light_enabled,
+		ALL_VISUAL_LAYERS,
+		ENEMY_LIGHT_SHADOW_CASTER_MASK
+	)
 
 
 func _set_shadow_casting(node: Node) -> void:
-	if node is VisualInstance3D:
-		(node as VisualInstance3D).layers = ENEMY_GEOMETRY_VISUAL_LAYER
-
-	if node is GeometryInstance3D:
-		(node as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-
-	for child in node.get_children():
-		_set_shadow_casting(child)
+	EnemyPresentation.set_shadow_casting(node, ENEMY_GEOMETRY_VISUAL_LAYER)
 
 
 func _face_direction(direction: Vector3, delta: float) -> void:
@@ -136,20 +124,7 @@ func _resolve_animation_names() -> void:
 
 
 func _resolve_animation_name(animation_name: String) -> String:
-	if animation_player == null or animation_name.is_empty():
-		return ""
-
-	if animation_player.has_animation(animation_name):
-		return animation_name
-
-	var requested := animation_name.to_lower()
-	for imported_animation_name in animation_player.get_animation_list():
-		var imported := String(imported_animation_name)
-		var normalized := imported.to_lower()
-		if normalized == requested or normalized.ends_with("/" + requested):
-			return imported
-
-	return ""
+	return EnemyPresentation.resolve_animation_name(animation_player, animation_name)
 
 
 func _load_footstep_sounds() -> void:
@@ -180,24 +155,13 @@ func _update_footsteps(_delta: float, horizontal_speed: float) -> void:
 
 
 func _did_cross_footstep_phase() -> bool:
-	var resolved_walk_animation := _resolve_animation_name(walk_animation_name)
-	if animation_player == null or current_animation != resolved_walk_animation or resolved_walk_animation.is_empty():
-		_reset_footstep_phase()
-		return false
-
-	var animation := animation_player.get_animation(resolved_walk_animation)
-	if animation == null or animation.length <= 0.0:
-		_reset_footstep_phase()
-		return false
-
-	var current_phase := animation_player.current_animation_position / animation.length
-	var crossed_phase := GDAudio.did_cross_footstep_animation_phase(previous_walk_animation_phase, current_phase)
-	previous_walk_animation_phase = current_phase
-	return crossed_phase
+	return _enemy_footsteps.did_cross_animation_phase(
+		animation_player, current_animation, _resolve_animation_name(walk_animation_name)
+	)
 
 
 func _reset_footstep_phase() -> void:
-	previous_walk_animation_phase = -1.0
+	_enemy_footsteps.reset()
 
 
 func _randomize_next_footstep_distance() -> void:
@@ -271,37 +235,16 @@ func _disappear_after_death() -> void:
 		return
 
 	is_disappearing = true
-	var disappear_duration := maxf(death_disappear_duration, 0.0)
-	var fade_delay := disappear_duration * clampf(death_fade_start_ratio, 0.0, 1.0)
-	var fade_duration := maxf(disappear_duration - fade_delay, 0.0)
-	var tween := create_tween()
-	tween.set_parallel(true)
-	tween.set_trans(Tween.TRANS_SINE)
-	tween.set_ease(Tween.EASE_IN)
-
-	if drop_pivot != null:
-		tween.tween_property(drop_pivot, "position:y", drop_pivot.position.y - death_sink_depth, disappear_duration)
-
-	for geometry in _get_fade_geometry():
-		tween.tween_property(geometry, "transparency", 1.0, fade_duration).set_delay(fade_delay)
-
+	var tween := EnemyDeathPresentation.create_disappear_tween(
+		self, drop_pivot, _get_fade_geometry(), death_disappear_duration, death_sink_depth, death_fade_start_ratio
+	)
 	await tween.finished
 	_set_active_visible(false)
 
 
 func _get_fade_geometry() -> Array[GeometryInstance3D]:
-	var geometry_instances: Array[GeometryInstance3D] = []
-	if drop_pivot != null:
-		_collect_geometry(drop_pivot, geometry_instances)
-	if shadow != null:
-		_collect_geometry(shadow, geometry_instances)
-
-	return geometry_instances
+	return EnemyPresentation.collect_fade_geometry(drop_pivot, shadow)
 
 
 func _collect_geometry(node: Node, geometry_instances: Array[GeometryInstance3D]) -> void:
-	if node is GeometryInstance3D:
-		geometry_instances.append(node as GeometryInstance3D)
-
-	for child in node.get_children():
-		_collect_geometry(child, geometry_instances)
+	geometry_instances.append_array(EnemyPresentation.collect_geometry(node))

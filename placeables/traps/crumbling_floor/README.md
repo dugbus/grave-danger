@@ -65,12 +65,20 @@ disabled.
 
 ## Gameplay and settings
 
-A grounded step by an existing `player`-group CharacterBody3D starts the warning.
+A grounded step by the player, a zombie, or a skeleton starts the warning.
 A short ray beneath the feet confirms support from this tile, including during
-floor snapping when the player has no fresh slide collision. Side contact,
+floor snapping when a character has no fresh slide collision. Side contact,
 airborne overlap and support from neighboring floor do not count. **Jumping over
 the tile without landing leaves it intact.** Landing starts collapse, and the
 player can still jump away.
+
+Enemies use their live feet position, so a patrol triggers the tile it steps
+onto rather than the tile beneath its path origin. Hidden enemies, enemies waiting
+to spawn, airborne enemies, disabled enemies, and corpses do not trigger tiles.
+
+Support checks follow world-space feet and tile positions, including tiles under
+raised parents. A tile whose walkable top is at 2 metres activates at that height;
+a separate tile below it activates only when something reaches its own surface.
 
 Boulders and millstones also trigger collapse when they roll onto, land on, or
 rest on a tile. Their upward supporting physics contacts determine which tile
@@ -83,6 +91,8 @@ patterns while retaining repeatable replays. Each block loses its own collision
 and visual when it falls; remaining blocks still provide real support. Once a
 supported contact triggers the tile, leaving cannot cancel or reset the collapse.
 The existing player gravity and fall-death handling take over as support vanishes.
+Zombies and skeletons also fall when their support disappears, including on raised
+tiles, and can land on a lower floor without snapping back to their patrol height.
 
 The Inspector exposes collapse delay (0.05 seconds), time between falling blocks
 (0.015 seconds), debris lifetime per block (3 seconds), scatter (0.5), angular
@@ -95,8 +105,8 @@ is permanent until the level restarts. Falling fragments collide with environmen
 layer 1, but cannot obstruct players or one another.
 
 The single positional sound is `Assets/audio/floor-crack.mp3`. It plays once as
-soon as a supported player or stone activates the tile, through the project's SFX
-bus. Jumping over without landing plays no floor cue. There are currently no
+soon as a supported player, zombie, skeleton, or stone activates the tile, through
+the project's SFX bus. Jumping over without landing plays no floor cue. There are currently no
 separate creak or collapse sound triggers.
 
 Missing audio is silently skipped. The shared audio loader can read the supplied
@@ -117,8 +127,9 @@ shapes, allowing support to disappear progressively. Completing the collapse or
 removing the tile frees the support body. No collision-shape or trigger nodes
 remain attached to untouched tiles.
 
-One contact monitor per physics world checks player and rolling-stone support;
-intact tiles have no individual runtime frame or physics callbacks. The monitor unregisters removed
+One contact monitor per physics world checks player, zombie, skeleton, and
+rolling-stone support; intact tiles have no individual runtime frame or physics
+callbacks. The monitor unregisters removed
 or activated tiles and frees itself after the last registration disappears.
 Layouts, source materials, meshes and shapes are shared while tiles exist and
 released when their owners disappear.

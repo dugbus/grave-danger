@@ -1,0 +1,1693 @@
+{
+	"skeleton/Delayed": {
+		"cues": [
+			[
+				58.0,
+				"res://Assets/audio/skeleton-landing.mp3"
+			],
+			[
+				81.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				125.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				170.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				214.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				259.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				303.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				348.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			]
+		],
+		"samples": [
+			{
+				"animation": "idle",
+				"animation_speed": 1.0,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					0.0,
+					-0.0000000298023223876953,
+					0.0
+				],
+				"progress": 0.0,
+				"rng": "-910266993067359506",
+				"spawned": false,
+				"tick": 1,
+				"yaw": 0.0
+			},
+			{
+				"animation": "idle",
+				"animation_speed": 1.0,
+				"direction": 1.0,
+				"drop_elapsed": 0.0833333333333333,
+				"drop_y": 3.12653803825378,
+				"elapsed": 0.483333333333333,
+				"position": [
+					0.0,
+					0.00000000745058059692383,
+					0.0
+				],
+				"progress": 0.0,
+				"rng": "-910266993067359506",
+				"spawned": false,
+				"tick": 30,
+				"yaw": 0.0
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"position": [
+					0.0267560128122568,
+					0.00000000745058059692383,
+					0.0
+				],
+				"progress": 0.0375000014901161,
+				"rng": "-910266993067359506",
+				"spawned": true,
+				"tick": 60,
+				"yaw": 0.114889025688171
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"position": [
+					0.411132514476776,
+					0.00000000745058059692383,
+					0.0
+				],
+				"progress": 0.412499874830246,
+				"rng": "-1024388410846388414",
+				"spawned": true,
+				"tick": 90,
+				"yaw": 0.889600157737732
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"position": [
+					0.787615120410919,
+					0.00000000745058059692383,
+					0.0
+				],
+				"progress": 0.7874995470047,
+				"rng": "-1024388410846388414",
+				"spawned": true,
+				"tick": 120,
+				"yaw": 1.25207531452179
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"position": [
+					1.16278326511383,
+					0.00000000745058059692383,
+					0.0
+				],
+				"progress": 1.16249990463257,
+				"rng": "-1416659651282216746",
+				"spawned": true,
+				"tick": 150,
+				"yaw": 1.42167186737061
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"position": [
+					1.5032787322998,
+					0.00000000745058059692383,
+					0.0267573930323124
+				],
+				"progress": 1.53750133514404,
+				"rng": "2996794018632156074",
+				"spawned": true,
+				"tick": 180,
+				"yaw": 1.39049196243286
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					0.41113543510437
+				],
+				"progress": 1.91250276565552,
+				"rng": "2996794018632156074",
+				"spawned": true,
+				"tick": 210,
+				"yaw": 0.648155808448792
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					0.787619829177856
+				],
+				"progress": 2.28750419616699,
+				"rng": "-5570333057578585154",
+				"spawned": true,
+				"tick": 240,
+				"yaw": 0.303261935710907
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					1.16278898715973
+				],
+				"progress": 2.66250562667847,
+				"rng": "5346961812230470930",
+				"spawned": true,
+				"tick": 270,
+				"yaw": 0.141891494393349
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": -1.0,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					1.47323668003082
+				],
+				"progress": 2.96249294281006,
+				"rng": "5346961812230470930",
+				"spawned": true,
+				"tick": 300,
+				"yaw": 0.296166867017746
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": -1.0,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					1.08885884284973
+				],
+				"progress": 2.58749151229858,
+				"rng": "9121917944399279014",
+				"spawned": true,
+				"tick": 330,
+				"yaw": 1.81026256084442
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": -1.0,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					0.712374448776245
+				],
+				"progress": 2.21249008178711,
+				"rng": "4881433540528319354",
+				"spawned": true,
+				"tick": 360,
+				"yaw": 2.51868438720703
+			}
+		]
+	},
+	"skeleton/Immediate": {
+		"cues": [
+			[
+				25.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				69.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				114.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				158.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				203.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				247.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				292.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				336.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			]
+		],
+		"samples": [
+			{
+				"animation": "idle",
+				"animation_speed": 1.0,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					0.0,
+					-0.0000000298023223876953,
+					0.0
+				],
+				"progress": 0.0,
+				"rng": "-910266993067359506",
+				"spawned": true,
+				"tick": 1,
+				"yaw": 0.0
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					0.361853718757629,
+					0.00000000745058059692383,
+					0.0
+				],
+				"progress": 0.362499922513962,
+				"rng": "-1024388410846388414",
+				"spawned": true,
+				"tick": 30,
+				"yaw": 0.817000508308411
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					0.737483561038971,
+					0.00000000745058059692383,
+					0.0
+				],
+				"progress": 0.737499594688416,
+				"rng": "-1024388410846388414",
+				"spawned": true,
+				"tick": 60,
+				"yaw": 1.21810710430145
+			},
+			{
+				"animation": "",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.11376845836639,
+					0.00000000745058059692383,
+					0.0
+				],
+				"progress": 1.11249971389771,
+				"rng": "-1416659651282216746",
+				"spawned": true,
+				"tick": 90,
+				"yaw": 1.40577852725983
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.49316024780273,
+					0.00000000745058059692383,
+					-0.0040606427937746
+				],
+				"progress": 1.48750114440918,
+				"rng": "2996794018632156074",
+				"spawned": true,
+				"tick": 120,
+				"yaw": 1.49953782558441
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					0.361856281757355
+				],
+				"progress": 1.86250257492065,
+				"rng": "2996794018632156074",
+				"spawned": true,
+				"tick": 150,
+				"yaw": 0.717234134674072
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					0.737488090991974
+				],
+				"progress": 2.23750400543213,
+				"rng": "-5570333057578585154",
+				"spawned": true,
+				"tick": 180,
+				"yaw": 0.335582584142685
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					1.11377418041229
+				],
+				"progress": 2.6125054359436,
+				"rng": "5346961812230470930",
+				"spawned": true,
+				"tick": 210,
+				"yaw": 0.157013818621635
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					1.49316370487213
+				],
+				"progress": 2.98750686645508,
+				"rng": "5346961812230470930",
+				"spawned": true,
+				"tick": 240,
+				"yaw": 0.0734643042087555
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": -1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					1.13813817501068
+				],
+				"progress": 2.63749170303345,
+				"rng": "9121917944399279014",
+				"spawned": true,
+				"tick": 270,
+				"yaw": 1.6683737039566
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": -1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					0.762506246566772
+				],
+				"progress": 2.26249027252197,
+				"rng": "4881433540528319354",
+				"spawned": true,
+				"tick": 300,
+				"yaw": 2.45229697227478
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": -1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					0.386220246553421
+				],
+				"progress": 1.8874888420105,
+				"rng": "4881433540528319354",
+				"spawned": true,
+				"tick": 330,
+				"yaw": 2.81908202171326
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": -1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.50405871868134,
+					0.00000000745058059692383,
+					0.00683273328468204
+				],
+				"progress": 1.51248741149902,
+				"rng": "8067071773329651854",
+				"spawned": true,
+				"tick": 360,
+				"yaw": 2.98475050926208
+			}
+		]
+	},
+	"skeleton/Looping": {
+		"cues": [
+			[
+				25.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				69.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				114.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				158.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				203.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				247.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				292.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			],
+			[
+				336.0,
+				"res://Assets/audio/skeleton-footstep.mp3"
+			]
+		],
+		"samples": [
+			{
+				"animation": "idle",
+				"animation_speed": 1.0,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					0.0,
+					-0.0000000298023223876953,
+					0.0
+				],
+				"progress": 0.0,
+				"rng": "-910266993067359506",
+				"spawned": true,
+				"tick": 1,
+				"yaw": 0.0
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					0.361853718757629,
+					0.00000000745058059692383,
+					0.0
+				],
+				"progress": 0.362499922513962,
+				"rng": "-1024388410846388414",
+				"spawned": true,
+				"tick": 30,
+				"yaw": 0.817000508308411
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					0.737483561038971,
+					0.00000000745058059692383,
+					0.0
+				],
+				"progress": 0.737499594688416,
+				"rng": "-1024388410846388414",
+				"spawned": true,
+				"tick": 60,
+				"yaw": 1.21810710430145
+			},
+			{
+				"animation": "",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.11376845836639,
+					0.00000000745058059692383,
+					0.0
+				],
+				"progress": 1.11249971389771,
+				"rng": "-1416659651282216746",
+				"spawned": true,
+				"tick": 90,
+				"yaw": 1.40577852725983
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.49316024780273,
+					0.00000000745058059692383,
+					-0.0040606427937746
+				],
+				"progress": 1.48750114440918,
+				"rng": "2996794018632156074",
+				"spawned": true,
+				"tick": 120,
+				"yaw": 1.49953782558441
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					0.361856281757355
+				],
+				"progress": 1.86250257492065,
+				"rng": "2996794018632156074",
+				"spawned": true,
+				"tick": 150,
+				"yaw": 0.717234134674072
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					0.737488090991974
+				],
+				"progress": 2.23750400543213,
+				"rng": "-5570333057578585154",
+				"spawned": true,
+				"tick": 180,
+				"yaw": 0.335582584142685
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					1.11377418041229
+				],
+				"progress": 2.6125054359436,
+				"rng": "5346961812230470930",
+				"spawned": true,
+				"tick": 210,
+				"yaw": 0.157013818621635
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.5,
+					0.00000000745058059692383,
+					1.49316370487213
+				],
+				"progress": 2.98750686645508,
+				"rng": "5346961812230470930",
+				"spawned": true,
+				"tick": 240,
+				"yaw": 0.0734643042087555
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					0.361860364675522,
+					0.00000000745058059692383,
+					0.0
+				],
+				"progress": 0.362506806850433,
+				"rng": "9121917944399279014",
+				"spawned": true,
+				"tick": 270,
+				"yaw": 0.823133289813995
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					0.737490475177765,
+					0.00000000745058059692383,
+					0.0
+				],
+				"progress": 0.737506449222565,
+				"rng": "4881433540528319354",
+				"spawned": true,
+				"tick": 300,
+				"yaw": 1.22097647190094
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.1137752532959,
+					0.00000000745058059692383,
+					0.0
+				],
+				"progress": 1.1125066280365,
+				"rng": "4881433540528319354",
+				"spawned": true,
+				"tick": 330,
+				"yaw": 1.40712094306946
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1.0,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"position": [
+					1.49316453933716,
+					0.00000000745058059692383,
+					-0.00405947677791119
+				],
+				"progress": 1.48750805854797,
+				"rng": "8067071773329651854",
+				"spawned": true,
+				"tick": 360,
+				"yaw": 1.5001620054245
+			}
+		]
+	},
+	"zombie/Delayed": {
+		"cues": [
+			[
+				58.0,
+				"res://Assets/audio/enemy-landing.mp3"
+			],
+			[
+				81.0,
+				"res://Assets/audio/footstep2.mp3"
+			],
+			[
+				125.0,
+				"res://Assets/audio/footstep4.mp3"
+			],
+			[
+				181.0,
+				"res://Assets/audio/footstep2.mp3"
+			],
+			[
+				204.0,
+				"res://Assets/audio/footstep3.mp3"
+			],
+			[
+				248.0,
+				"res://Assets/audio/footstep3.mp3"
+			],
+			[
+				303.0,
+				"res://Assets/audio/footstep2.mp3"
+			],
+			[
+				326.0,
+				"res://Assets/audio/footstep3.mp3"
+			],
+			[
+				356.0,
+				"res://Assets/audio/footstep1.mp3"
+			]
+		],
+		"samples": [
+			{
+				"animation": "idle",
+				"animation_speed": 1.0,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 0,
+				"position": [
+					0.0,
+					-0.0000000298023223876953,
+					0.0
+				],
+				"rng": "-7865654461461976354",
+				"spawned": false,
+				"state": "Patrol",
+				"tick": 1,
+				"yaw": 0.0
+			},
+			{
+				"animation": "idle",
+				"animation_speed": 1.0,
+				"direction": 1,
+				"drop_elapsed": 0.0833333333333333,
+				"drop_y": 1.954709649086,
+				"elapsed": 0.483333333333333,
+				"patrol_index": 0,
+				"position": [
+					0.0,
+					-0.0000000298023223876953,
+					0.0
+				],
+				"rng": "-7865654461461976354",
+				"spawned": false,
+				"state": "Patrol",
+				"tick": 30,
+				"yaw": 0.0
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"patrol_index": 1,
+				"position": [
+					0.013333335518837,
+					-0.0000000298023223876953,
+					0.0
+				],
+				"rng": "-7865654461461976354",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 60,
+				"yaw": 0.425685793161392
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"patrol_index": 1,
+				"position": [
+					0.696666598320007,
+					-0.0000000298023223876953,
+					0.0
+				],
+				"rng": "-8681678665689659543",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 90,
+				"yaw": 1.52225375175476
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"patrol_index": 2,
+				"position": [
+					1.31822144985199,
+					-0.0000000298023223876953,
+					0.119172841310501
+				],
+				"rng": "-8681678665689659543",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 120,
+				"yaw": 0.600118041038513
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"patrol_index": 2,
+				"position": [
+					1.417356133461,
+					-0.0000000298023223876953,
+					0.858725070953369
+				],
+				"rng": "-4578060867815065144",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 150,
+				"yaw": 0.148191273212433
+			},
+			{
+				"animation": "idle",
+				"animation_speed": 1.0,
+				"direction": -1,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"patrol_index": 2,
+				"position": [
+					1.47860491275787,
+					-0.0000000298023223876953,
+					1.1551775932312
+				],
+				"rng": "-4384196600956334148",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 180,
+				"yaw": 2.39854288101196
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": -1,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"patrol_index": 1,
+				"position": [
+					1.4901168346405,
+					-0.0000000298023223876953,
+					0.533616960048676
+				],
+				"rng": "-5846119488764271210",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 210,
+				"yaw": 3.09235978126526
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": -1,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"patrol_index": 0,
+				"position": [
+					1.11015188694,
+					-0.0000000298023223876953,
+					0.146333023905754
+				],
+				"rng": "-5846119488764271210",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 240,
+				"yaw": 4.42943143844604
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": -1,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"patrol_index": 0,
+				"position": [
+					0.366583943367004,
+					-0.0000000298023223876953,
+					0.0483206771314144
+				],
+				"rng": "213554262898530113",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 270,
+				"yaw": 4.57489156723022
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"patrol_index": 1,
+				"position": [
+					0.658294498920441,
+					-0.0000000298023223876953,
+					0.0154182501137257
+				],
+				"rng": "213554262898530113",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 300,
+				"yaw": 1.73081970214844
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"patrol_index": 1,
+				"position": [
+					0.242573946714401,
+					-0.0000000298023223876953,
+					0.00467105349525809
+				],
+				"rng": "5154762857501552871",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 330,
+				"yaw": 3.06240177154541
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.55,
+				"drop_y": 0.0,
+				"elapsed": 0.950000000000001,
+				"patrol_index": 1,
+				"position": [
+					0.804840385913849,
+					-0.0000000298023223876953,
+					0.00168518337886781
+				],
+				"rng": "5753106762559245646",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 360,
+				"yaw": 1.63639116287231
+			}
+		]
+	},
+	"zombie/Immediate": {
+		"cues": [
+			[
+				25.0,
+				"res://Assets/audio/footstep2.mp3"
+			],
+			[
+				69.0,
+				"res://Assets/audio/footstep4.mp3"
+			],
+			[
+				125.0,
+				"res://Assets/audio/footstep2.mp3"
+			],
+			[
+				148.0,
+				"res://Assets/audio/footstep3.mp3"
+			],
+			[
+				192.0,
+				"res://Assets/audio/footstep3.mp3"
+			],
+			[
+				247.0,
+				"res://Assets/audio/footstep2.mp3"
+			],
+			[
+				270.0,
+				"res://Assets/audio/footstep3.mp3"
+			],
+			[
+				300.0,
+				"res://Assets/audio/footstep1.mp3"
+			],
+			[
+				344.0,
+				"res://Assets/audio/footstep3.mp3"
+			]
+		],
+		"samples": [
+			{
+				"animation": "idle",
+				"animation_speed": 1.0,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 0,
+				"position": [
+					0.0,
+					-0.0000000298023223876953,
+					0.0
+				],
+				"rng": "-7865654461461976354",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 1,
+				"yaw": 0.0
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 1,
+				"position": [
+					0.596666693687439,
+					-0.0000000298023223876953,
+					0.0
+				],
+				"rng": "-8681678665689659543",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 30,
+				"yaw": 1.49680984020233
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 2,
+				"position": [
+					1.28317070007324,
+					-0.0000000298023223876953,
+					0.0501206368207932
+				],
+				"rng": "-8681678665689659543",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 60,
+				"yaw": 0.841274559497833
+			},
+			{
+				"animation": "",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 2,
+				"position": [
+					1.40457451343536,
+					-0.0000000298023223876953,
+					0.75954532623291
+				],
+				"rng": "-4578060867815065144",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 90,
+				"yaw": 0.158686742186546
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": -1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 1,
+				"position": [
+					1.4771831035614,
+					-0.0000000298023223876953,
+					1.18763029575348
+				],
+				"rng": "-4578060867815065144",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 120,
+				"yaw": 2.43487024307251
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": -1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 1,
+				"position": [
+					1.48826503753662,
+					-0.0000000298023223876953,
+					0.633599936962128
+				],
+				"rng": "-5846119488764271210",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 150,
+				"yaw": 3.07626080513
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": -1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 0,
+				"position": [
+					1.20929443836212,
+					-0.0000000298023223876953,
+					0.159401342272758
+				],
+				"rng": "-5846119488764271210",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 180,
+				"yaw": 4.34981203079224
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": -1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 0,
+				"position": [
+					0.465726375579834,
+					-0.0000000298023223876953,
+					0.0613889805972576
+				],
+				"rng": "213554262898530113",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 210,
+				"yaw": 4.57151699066162
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 1,
+				"position": [
+					0.558311283588409,
+					-0.0000000298023223876953,
+					0.0172497294843197
+				],
+				"rng": "213554262898530113",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 240,
+				"yaw": 1.80509686470032
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 1,
+				"position": [
+					0.277556002140045,
+					-0.0000000298023223876953,
+					0.00597725016996264
+				],
+				"rng": "5154762857501552871",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 270,
+				"yaw": 3.84195685386658
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 1,
+				"position": [
+					0.70484071969986,
+					-0.0000000298023223876953,
+					0.0019275996601209
+				],
+				"rng": "5753106762559245646",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 300,
+				"yaw": 1.66950261592865
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 2,
+				"position": [
+					1.30788671970367,
+					-0.0000000298023223876953,
+					0.141874730587006
+				],
+				"rng": "5753106762559245646",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 330,
+				"yaw": 0.567845463752747
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 2,
+				"position": [
+					1.41324555873871,
+					-0.0000000298023223876953,
+					0.883416414260864
+				],
+				"rng": "4895825582144036889",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 360,
+				"yaw": 0.157933697104454
+			}
+		]
+	},
+	"zombie/Looping": {
+		"cues": [
+			[
+				25.0,
+				"res://Assets/audio/footstep2.mp3"
+			],
+			[
+				69.0,
+				"res://Assets/audio/footstep4.mp3"
+			],
+			[
+				114.0,
+				"res://Assets/audio/footstep3.mp3"
+			],
+			[
+				125.0,
+				"res://Assets/audio/footstep3.mp3"
+			],
+			[
+				148.0,
+				"res://Assets/audio/footstep3.mp3"
+			],
+			[
+				192.0,
+				"res://Assets/audio/footstep3.mp3"
+			],
+			[
+				237.0,
+				"res://Assets/audio/footstep4.mp3"
+			],
+			[
+				248.0,
+				"res://Assets/audio/footstep1.mp3"
+			],
+			[
+				271.0,
+				"res://Assets/audio/footstep3.mp3"
+			],
+			[
+				315.0,
+				"res://Assets/audio/footstep3.mp3"
+			],
+			[
+				360.0,
+				"res://Assets/audio/footstep2.mp3"
+			]
+		],
+		"samples": [
+			{
+				"animation": "idle",
+				"animation_speed": 1.0,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 0,
+				"position": [
+					0.0,
+					-0.0000000298023223876953,
+					0.0
+				],
+				"rng": "-7865654461461976354",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 1,
+				"yaw": 0.0
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 1,
+				"position": [
+					0.596666693687439,
+					-0.0000000298023223876953,
+					0.0
+				],
+				"rng": "-8681678665689659543",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 30,
+				"yaw": 1.49680984020233
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 2,
+				"position": [
+					1.28317070007324,
+					-0.0000000298023223876953,
+					0.0501206368207932
+				],
+				"rng": "-8681678665689659543",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 60,
+				"yaw": 0.841274559497833
+			},
+			{
+				"animation": "",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 2,
+				"position": [
+					1.40457451343536,
+					-0.0000000298023223876953,
+					0.75954532623291
+				],
+				"rng": "-4578060867815065144",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 90,
+				"yaw": 0.158686742186546
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 0,
+				"position": [
+					1.3760529756546,
+					-0.0000000298023223876953,
+					1.21400952339172
+				],
+				"rng": "-702962583253103957",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 120,
+				"yaw": -1.72764110565186
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 0,
+				"position": [
+					0.954786777496338,
+					-0.0000000298023223876953,
+					0.845169305801392
+				],
+				"rng": "213554262898530113",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 150,
+				"yaw": -2.25363922119141
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 0,
+				"position": [
+					0.393200159072876,
+					-0.0000000298023223876953,
+					0.348057627677917
+				],
+				"rng": "213554262898530113",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 180,
+				"yaw": -2.29360055923462
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 1,
+				"position": [
+					0.456889361143112,
+					-0.0000000298023223876953,
+					0.0888189896941185
+				],
+				"rng": "7380496413731359296",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 210,
+				"yaw": -4.38925933837891
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 2,
+				"position": [
+					1.19411194324493,
+					-0.0000000298023223876953,
+					0.0310740061104298
+				],
+				"rng": "-3682773972003382973",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 240,
+				"yaw": -4.88947439193726
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 2,
+				"position": [
+					1.33953130245209,
+					-0.0000000298023223876953,
+					0.50966876745224
+				],
+				"rng": "5753106762559245646",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 270,
+				"yaw": -6.04332256317139
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 0,
+				"position": [
+					1.45085167884827,
+					-0.0000000298023223876953,
+					1.22833824157715
+				],
+				"rng": "4895825582144036889",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 300,
+				"yaw": -6.775465965271
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 0,
+				"position": [
+					1.03072965145111,
+					-0.0000000298023223876953,
+					0.929668307304382
+				],
+				"rng": "7980614051061591992",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 330,
+				"yaw": -8.50985908508301
+			},
+			{
+				"animation": "walk",
+				"animation_speed": 0.449999988079071,
+				"direction": 1,
+				"drop_elapsed": 0.0,
+				"drop_y": 0.0,
+				"elapsed": 0.0,
+				"patrol_index": 0,
+				"position": [
+					0.473799407482147,
+					-0.0000000298023223876953,
+					0.4273442029953
+				],
+				"rng": "-785780713794262821",
+				"spawned": true,
+				"state": "Patrol",
+				"tick": 360,
+				"yaw": -8.58456707000732
+			}
+		]
+	}
+}

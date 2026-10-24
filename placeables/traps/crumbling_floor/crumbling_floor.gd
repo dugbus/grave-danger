@@ -1,7 +1,7 @@
 @tool
 extends MultiMeshInstance3D
 
-## Support from a grounded player, boulder or millstone starts an irreversible block-by-block collapse.
+## Support from a grounded player, zombie, skeleton, boulder or millstone starts a permanent block-by-block collapse.
 const SUPPORT := preload("res://placeables/traps/crumbling_floor/crumbling_floor_support.gd")
 const CONTACTS := preload("res://placeables/traps/crumbling_floor/crumbling_floor_contacts.gd")
 const GEOMETRY := preload("res://placeables/traps/crumbling_floor/crumbling_floor_geometry.gd")
@@ -71,6 +71,12 @@ var _placement_error := ""
 var _editor_history: Object
 
 var _geometry := GEOMETRY.shared(GEOMETRY) as GEOMETRY
+
+
+func _validate_property(property: Dictionary) -> void:
+	# Rebuild generated batches on load; reloading a saved populated MultiMesh cannot reset its format safely.
+	if property["name"] == &"multimesh":
+		property["usage"] = PROPERTY_USAGE_NONE
 
 
 func _enter_tree() -> void:

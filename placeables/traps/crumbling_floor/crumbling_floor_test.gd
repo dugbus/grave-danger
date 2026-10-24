@@ -41,6 +41,7 @@ class EditorHistoryProbe:
 
 func run(tree: SceneTree) -> void:
 	expect_script_contract(SUBJECT, "res://placeables/traps/crumbling_floor/crumbling_floor.gd")
+	await _test_scene_round_trip(tree)
 	await _test_editor_state_recovery(tree)
 	expect(
 		SUBJECT.load_optional_sound("res://Assets/audio/missing-floor-crack.mp3") == null,
@@ -57,6 +58,35 @@ func run(tree: SceneTree) -> void:
 	await _test_warning_survives_escape(tree)
 	await _test_side_and_airborne_contacts(tree)
 	await _test_adjacent_tiles_and_fall(tree)
+
+
+# Flow: Saving a live tile retains its authored controls and rebuilds its batch instead of serializing it.
+func _test_scene_round_trip(tree: SceneTree) -> void:
+	var tile := SCENE.instantiate() as SUBJECT
+	tile.auto_place = false
+	tile.collapse_delay = 0.75
+	tile.floor_material = StandardMaterial3D.new()
+	tree.root.add_child(tile)
+	var original_batch := tile.multimesh
+	var packed := PackedScene.new()
+	expect_equal(packed.pack(tile), OK, "A populated crumbling tile can be packed.")
+	var scene_state := packed.get_state()
+	var stores_batch := false
+	for index in scene_state.get_node_property_count(0):
+		stores_batch = stores_batch or scene_state.get_node_property_name(0, index) == &"multimesh"
+	expect(not stores_batch, "Generated MultiMeshes stay out of saved scenes and resource reloads.")
+	var restored := packed.instantiate() as SUBJECT
+	expect(restored.multimesh == null, "The saved tile contains no stale preview batch.")
+	tree.root.add_child(restored)
+	expect_equal(restored.multimesh.instance_count, 16, "Loading rebuilds all authored flagstone blocks.")
+	expect(restored.multimesh != original_batch, "Each live tile owns its independent generated batch.")
+	expect_equal(restored.floor_material, tile.floor_material, "The designer's floor material survives saving.")
+	expect_equal(restored.material_override, tile.floor_material, "The rebuilt batch uses the authored material.")
+	expect(is_equal_approx(restored.collapse_delay, 0.75), "The authored warning delay survives saving.")
+	expect(not restored.auto_place, "The authored placement setting survives saving.")
+	tile.free()
+	restored.free()
+	await tree.process_frame
 
 
 func _add_tile(root: Node3D, at: Vector3, delay: float = 0.25) -> SUBJECT:

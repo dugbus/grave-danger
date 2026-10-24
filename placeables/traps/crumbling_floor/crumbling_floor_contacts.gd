@@ -1,6 +1,6 @@
 extends Node
 
-## One monitor per physics world checks player and rolling-stone support; untouched tiles have no callbacks or areas.
+## One monitor per physics world checks player, zombie, skeleton and stone support; untouched tiles have no callbacks.
 const GEOMETRY := preload("res://placeables/traps/crumbling_floor/crumbling_floor_geometry.gd")
 const MONITOR_GROUP := &"crumbling_floor_contacts"
 const FLOOR_COLLISION_MASK := GEOMETRY.PhysicsLayer.Floor
@@ -16,6 +16,7 @@ const SUPPORT_OFFSETS: Array[Vector2] = [
 var _world_id := 0
 var _callbacks: Dictionary[RID, Callable] = {}
 var _players: Array[CharacterBody3D] = []
+var _enemies: Array[Path3D] = []
 var _rolling_bodies: Array[RollingRock] = []
 var _query := PhysicsRayQueryParameters3D.new()
 
@@ -43,12 +44,16 @@ func _ready() -> void:
 	get_tree().node_removed.connect(_on_node_removed)
 	for node in get_tree().get_nodes_in_group(&"player"):
 		_track_player(node.get_instance_id())
+	for node in get_tree().get_nodes_in_group(&"enemy"):
+		_track_enemy(node.get_instance_id())
 	for node in get_tree().get_nodes_in_group(&"pushable"):
 		_track_rolling_body(node.get_instance_id())
 
 
 func _on_node_added(node: Node) -> void:
-	if node is CharacterBody3D:
+	if node is GDZombiePath or node is GDSkeletonPath:
+		_track_enemy.call_deferred(node.get_instance_id())
+	elif node is CharacterBody3D:
 		# Groups declared in _ready are available after node_added, not during it.
 		_track_player.call_deferred(node.get_instance_id())
 	elif node is RollingRock:
@@ -64,10 +69,22 @@ func _track_player(instance_id: int) -> void:
 
 
 func _on_node_removed(node: Node) -> void:
-	if node is CharacterBody3D:
+	if node is GDZombiePath or node is GDSkeletonPath:
+		_enemies.erase(node as Path3D)
+	elif node is CharacterBody3D:
 		_players.erase(node as CharacterBody3D)
 	elif node is RollingRock:
 		_rolling_bodies.erase(node as RollingRock)
+
+
+func _track_enemy(instance_id: int) -> void:
+	var enemy := instance_from_id(instance_id) as Path3D
+	if not is_instance_valid(enemy) or not enemy.is_inside_tree():
+		return
+	if not (enemy is GDZombiePath or enemy is GDSkeletonPath):
+		return
+	if enemy.get_world_3d().get_instance_id() == _world_id and not _enemies.has(enemy):
+		_enemies.append(enemy)
 
 
 func _track_rolling_body(instance_id: int) -> void:
@@ -80,17 +97,45 @@ func _track_rolling_body(instance_id: int) -> void:
 
 func _physics_process(_delta: float) -> void:
 	for player in _players:
-		if (
-			not is_instance_valid(player)
-			or not player.can_process()
-			or not player.is_on_floor()
-			or player.velocity.dot(player.up_direction) > 0.01
-		):
+		_check_grounded_character(player)
+	for enemy in _enemies:
+		if not is_instance_valid(enemy) or not enemy.can_process():
 			continue
-		_check_support(player)
+		if enemy is GDZombiePath:
+			var zombie := enemy as GDZombiePath
+			if (
+				zombie.has_dropped_in
+				and not zombie.is_dead
+				and is_instance_valid(zombie.drop_pivot)
+				and zombie.drop_pivot.is_visible_in_tree()
+			):
+				_check_grounded_character(zombie.zombie_body)
+		elif enemy is GDSkeletonPath:
+			var skeleton := enemy as GDSkeletonPath
+			if (
+				skeleton.has_dropped_in
+				and skeleton.has_landed
+				and not skeleton.is_dead
+				and is_instance_valid(skeleton.drop_pivot)
+				and skeleton.drop_pivot.is_visible_in_tree()
+				and is_instance_valid(skeleton.skeleton_body)
+				and skeleton.skeleton_body.can_process()
+			):
+				# The drop carrier marks the skeleton's feet during both patrol and falling.
+				_check_support(skeleton.drop_pivot, Vector3.UP)
 	for body in _rolling_bodies:
 		if is_instance_valid(body) and body.can_process() and not body.freeze:
 			_check_rolling_support(body)
+
+
+func _check_grounded_character(body: CharacterBody3D) -> void:
+	if (
+		is_instance_valid(body)
+		and body.can_process()
+		and body.is_on_floor()
+		and body.velocity.dot(body.up_direction) <= 0.01
+	):
+		_check_support(body, body.up_direction)
 
 
 ## Real support contacts account for the sphere or cylinder footprint without triggering from nearby overlap.
@@ -107,14 +152,14 @@ func _check_rolling_support(body: RollingRock) -> void:
 			activate.call()
 
 
-func _check_support(player: CharacterBody3D) -> void:
+func _check_support(actor: Node3D, up_direction: Vector3) -> void:
 	for offset in SUPPORT_OFFSETS:
-		var foot := player.global_position + player.global_basis.x * offset.x + player.global_basis.z * offset.y
-		_query.from = foot + player.up_direction * 0.08
-		_query.to = foot - player.up_direction * 0.12
-		var hit := player.get_world_3d().direct_space_state.intersect_ray(_query)
+		var foot := actor.global_position + actor.global_basis.x * offset.x + actor.global_basis.z * offset.y
+		_query.from = foot + up_direction * 0.08
+		_query.to = foot - up_direction * 0.12
+		var hit := actor.get_world_3d().direct_space_state.intersect_ray(_query)
 		var normal := hit.get("normal", Vector3.ZERO) as Vector3
-		if normal.dot(player.up_direction) <= 0.65:
+		if normal.dot(up_direction) <= 0.65:
 			continue
 		var body := hit.get("rid", RID()) as RID
 		var activate := _callbacks.get(body, Callable()) as Callable
@@ -125,4 +170,5 @@ func _check_support(player: CharacterBody3D) -> void:
 func _exit_tree() -> void:
 	_callbacks.clear()
 	_players.clear()
+	_enemies.clear()
 	_rolling_bodies.clear()

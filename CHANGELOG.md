@@ -1,9 +1,63 @@
 # Changelog
 
+## 2026-10-24
+
+### 1600
+
+- The player's head light keeps a steady beam while walking and still turns with deliberate glances toward treasure and enemies.
+  - Prompt: Remove walk-animation wobble from the head light while preserving treasure and enemy glances.
+
+## 2026-10-22
+
+### 1200
+
+- Skeletons and zombies retain their patrol speeds, turns, spawn delays, animation rates, and footstep timing while their lighting and death fades stay consistent.
+  - Prompt: Reuse skeleton and zombie presentation without changing patrol timing.
+
+## 2026-10-20
+
+### 2000
+
+- Zombies trigger cracked floors and fall through as support disappears, at ground level and on raised platforms, then land on any floor below.
+  - Prompt: Ensure zombies have complete crumbling-floor support too.
+
+### 1900
+
+- Skeletons now fall when their supporting floor collapses, including on raised platforms, with their collision bodies following them into the hole.
+  - Prompt: Fix the skeleton remaining above a collapsed floor.
+
+### 1500
+
+- A raised platform beside the debug-level spawn now lets you watch a skeleton step onto and collapse a cracked tile after about five to six seconds, without moving the player.
+  - Prompt: Place a crumbling floor on a skeleton patrol close to the debug-level player spawn.
+
+### 1200
+
+- Confirmed that crumbling floors at 2 metres support and activate for the player, zombies, skeletons, boulders, and millstones independently of tiles below.
+  - Prompt: Check crumbling-floor activation when the floor is elevated to 2 metres.
+
+## 2026-10-19
+
+### 1800
+
+- Zombies and skeletons now trigger the same crumbling-floor warning and collapse when they step or land on a tile; airborne, hidden, inactive, and dead enemies leave it intact.
+  - Prompt: Let zombies and skeletons trigger crumbling floors like the player.
+
+### 0200
+
+- Live FPS now appears beside the elapsed timer on ordinary levels, with active boundary timing preserved below it.
+  - Prompt: Show FPS through the elapsed-time HUD because most levels disable the minimap.
+
 ## 2026-10-18
 
 ### 2100
 
+- Crumbling-floor previews no longer save generated render batches into level scenes, preventing repeated MultiMesh errors when the editor reloads them.
+  - Prompt: Fix repeated MultiMesh transform-format errors when editing or saving levels.
+- The debug header and expanded minimap diagnostics now show live FPS for checking performance during play.
+  - Prompt: Add FPS to the existing debug text to help assess frame rate.
+- The player now glances toward nearby visible treasure while idle or walking when no enemy holds attention, and stops watching it when line of sight is lost.
+  - Prompt: Let visible treasure attract the player's head when no enemy holds attention.
 - The debug level now has a two-wide rolling slope with a side approach, a boulder and millstone on the raised starting pad, and four crumbling tiles at the bottom.
   - Prompt: Add a two-wide debug ramp for the boulder and millstone with crumbling floor below.
 

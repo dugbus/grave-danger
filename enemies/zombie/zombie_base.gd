@@ -16,6 +16,10 @@ enum ZombieState {
 	Die,
 }
 
+const EnemyPresentation := preload("res://enemies/enemy_presentation.gd")
+const EnemyFootsteps := preload("res://enemies/enemy_footsteps.gd")
+const EnemyDeathPresentation := preload("res://enemies/enemy_death_presentation.gd")
+
 const FOOTSTEP_SOUND_PATHS: Array[String] = [
 	"res://Assets/audio/footstep1.mp3",
 	"res://Assets/audio/footstep2.mp3",
@@ -340,7 +344,13 @@ var landing_sound: AudioStream
 var footstep_distance_accumulator := 0.0
 var next_footstep_distance := 1.0
 var footstep_rng := RandomNumberGenerator.new()
-var previous_walk_animation_phase := -1.0
+var _enemy_footsteps := EnemyFootsteps.new()
+# Preserve the existing phase property while the shared tracker owns its history.
+var previous_walk_animation_phase: float:
+	get:
+		return _enemy_footsteps.previous_phase
+	set(value):
+		_enemy_footsteps.previous_phase = value
 var animation_player: AnimationPlayer
 var current_animation := ""
 var resolved_run_animation := ""
@@ -396,15 +406,7 @@ func _find_collision_shape(node: Node) -> CollisionShape3D:
 
 
 func _find_animation_player(node: Node) -> AnimationPlayer:
-	if node is AnimationPlayer:
-		return node as AnimationPlayer
-
-	for child in node.get_children():
-		var result := _find_animation_player(child)
-		if result != null:
-			return result
-
-	return null
+	return EnemyPresentation.find_animation_player(node)
 
 
 func _is_descendant_of(candidate: Object, ancestor: Node) -> bool:

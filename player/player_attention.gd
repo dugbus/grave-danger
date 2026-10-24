@@ -59,6 +59,7 @@ var torso: Node3D
 var head_rest_yaw := 0.0
 var torso_rest_yaw := 0.0
 var headlamp_head_offset := Transform3D.IDENTITY
+# Authored lamp placement in travel-pivot space, independent of animation.
 var headlamp_rest_transform := Transform3D.IDENTITY
 var glance_rng := RandomNumberGenerator.new()
 
@@ -79,6 +80,8 @@ func _ready() -> void:
 		torso_rest_yaw = torso.rotation.y
 	if headlamp != null:
 		headlamp_rest_transform = headlamp.global_transform
+		if travel_pivot != null:
+			headlamp_rest_transform = travel_pivot.global_transform.affine_inverse() * headlamp.global_transform
 		if head_skeleton != null and head_bone >= 0:
 			headlamp_head_offset = _rigged_head_transform().affine_inverse() * headlamp.global_transform
 		elif head != null:
@@ -98,16 +101,19 @@ func _process(_delta: float) -> void:
 		# The imported animation owns pitch and roll; this late process pass owns yaw.
 		head.rotation.y = head_rest_yaw + current_head_yaw - upper_body_yaw
 	if headlamp != null:
+		var travel_transform := travel_pivot.global_transform if travel_pivot != null else Transform3D.IDENTITY
+		var lamp_transform := travel_transform * headlamp_rest_transform
 		if head_skeleton != null and head_bone >= 0:
-			headlamp.global_transform = _rigged_head_transform() * headlamp_head_offset
+			lamp_transform.origin = (_rigged_head_transform() * headlamp_head_offset).origin
 		elif head != null:
-			# Preserve the authored lamp offset while following the complete animated head.
-			headlamp.global_transform = head.global_transform * headlamp_head_offset
-		else:
-			var fallback_rotation := (
-				Quaternion(Vector3.UP, current_head_yaw) * headlamp_rest_transform.basis.get_rotation_quaternion()
-			)
-			headlamp.global_transform = Transform3D(Basis(fallback_rotation), headlamp_rest_transform.origin)
+			# Preserve the authored attachment offset while following the animated head's position.
+			lamp_transform.origin = (head.global_transform * headlamp_head_offset).origin
+		# Aim with deliberate attention yaw only. Authored head pitch, roll and yaw
+		# still animate the character, but must not sweep the beam across the level.
+		lamp_transform.basis = (
+			travel_transform.basis * Basis(Vector3.UP, current_head_yaw) * headlamp_rest_transform.basis
+		)
+		headlamp.global_transform = lamp_transform
 
 
 ## Death releases procedural head control so the authored final pose owns the face.
@@ -144,11 +150,18 @@ func update_attention(delta: float, current_movement_focus_ratio: float = 0.0) -
 		target_enemy = nearby_enemy
 		target_collectible = null
 		phase = AttentionPhase.EnemyTracking
-	elif phase == AttentionPhase.EnemyTracking:
-		target_enemy = null
-		phase = AttentionPhase.Returning
 	else:
 		target_enemy = null
+		if phase == AttentionPhase.EnemyTracking:
+			phase = AttentionPhase.Returning
+		# Visible pickups can interrupt idle scanning or the return from an enemy glance.
+		if phase != AttentionPhase.CollectibleGlance:
+			var nearby_collectible := _find_nearby_collectible()
+			if nearby_collectible != null:
+				target_collectible = nearby_collectible
+				phase = AttentionPhase.CollectibleGlance
+				glance_elapsed = 0.0
+				acknowledged_collectible_ids.append(target_collectible.get_instance_id())
 	if phase == AttentionPhase.Travel and _uses_continuous_idle_scan():
 		next_glance_seconds = 0.0
 
@@ -156,22 +169,17 @@ func update_attention(delta: float, current_movement_focus_ratio: float = 0.0) -
 		AttentionPhase.EnemyTracking:
 			target_collectible = null
 		AttentionPhase.Travel:
-			target_collectible = _find_nearby_collectible()
-			if target_collectible != null:
-				phase = AttentionPhase.CollectibleGlance
+			target_collectible = null
+			glance_elapsed += maxf(delta, 0.0)
+			if glance_elapsed >= next_glance_seconds:
+				phase = AttentionPhase.WanderingGlance
 				glance_elapsed = 0.0
-				acknowledged_collectible_ids.append(target_collectible.get_instance_id())
-			else:
-				glance_elapsed += maxf(delta, 0.0)
-				if glance_elapsed >= next_glance_seconds:
-					phase = AttentionPhase.WanderingGlance
-					glance_elapsed = 0.0
-					_choose_wandering_glance()
+				_choose_wandering_glance()
 		AttentionPhase.CollectibleGlance:
 			glance_elapsed += maxf(delta, 0.0)
 			if (
 				not is_instance_valid(target_collectible)
-				or not _is_collectible_available(target_collectible)
+				or not _can_see_collectible(target_collectible)
 				or glance_elapsed >= float(LOOK_SETTINGS.get_wandering_hold_seconds(movement_focus_ratio))
 			):
 				phase = AttentionPhase.Returning
@@ -292,18 +300,15 @@ func _find_nearby_collectible() -> Node3D:
 	for candidate in candidates:
 		if acknowledged_collectible_ids.has(candidate.get_instance_id()):
 			continue
-		if (
-			_is_in_safe_head_arc(candidate)
-			and _has_line_of_sight(candidate, candidate.global_position + Vector3.UP * 0.25)
-		):
+		if _can_see_collectible(candidate):
 			return candidate
 	return null
 
 
 func _is_collectible_available(candidate: Node3D) -> bool:
-	if not is_instance_valid(candidate) or not candidate.is_inside_tree():
+	if not is_instance_valid(candidate) or not candidate.is_inside_tree() or candidate.is_queued_for_deletion():
 		return false
-	if not candidate.visible:
+	if not candidate.is_visible_in_tree():
 		return false
 	if bool(candidate.get("is_being_collected")):
 		return false
@@ -312,8 +317,12 @@ func _is_collectible_available(candidate: Node3D) -> bool:
 	return horizontal_offset.length() <= COLLECTIBLE_LOOK_DISTANCE
 
 
-func _is_in_safe_head_arc(candidate: Node3D) -> bool:
-	return absf(_raw_yaw_to_collectible(candidate)) <= _movement_scaled_head_turn_radians()
+func _can_see_collectible(candidate: Node3D) -> bool:
+	return (
+		_is_collectible_available(candidate)
+		and absf(_raw_yaw_to_collectible(candidate)) <= _maximum_head_turn_radians()
+		and _has_line_of_sight(candidate, candidate.global_position + Vector3.UP * 0.25)
+	)
 
 
 func _has_line_of_sight(candidate: Node3D, target_position: Vector3) -> bool:
@@ -328,9 +337,7 @@ func _has_line_of_sight(candidate: Node3D, target_position: Vector3) -> bool:
 
 
 func _yaw_to_collectible(candidate: Node3D) -> float:
-	return clampf(
-		_raw_yaw_to_collectible(candidate), -_movement_scaled_head_turn_radians(), _movement_scaled_head_turn_radians()
-	)
+	return clampf(_raw_yaw_to_collectible(candidate), -_maximum_head_turn_radians(), _maximum_head_turn_radians())
 
 
 func _raw_yaw_to_collectible(candidate: Node3D) -> float:

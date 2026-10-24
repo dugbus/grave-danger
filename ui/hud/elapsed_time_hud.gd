@@ -3,7 +3,7 @@ class_name GDElapsedTimeHud
 
 ## Node that provides the elapsed time value through get_elapsed_time().
 @export_storage var time_source_path: NodePath
-## Existing label to update. If missing, a fallback label is created.
+## Existing label for elapsed time, live FPS, and active boundary timing. Missing labels get a fallback.
 @export_storage var elapsed_label_path: NodePath = ^"ElapsedLabel"
 ## Screen position of the top-left corner of the elapsed time label.
 @export var label_position := Vector2(16.0, 128.0)
@@ -73,7 +73,9 @@ func _update_label() -> void:
 		return
 
 	elapsed_label.visible = true
-	elapsed_label.text = "Elapsed %s" % _format_elapsed_seconds(elapsed_seconds)
+	elapsed_label.text = (
+		"Elapsed %s  •  FPS %d" % [_format_elapsed_seconds(elapsed_seconds), Engine.get_frames_per_second()]
+	)
 	if _is_boundary_animation_active():
 		elapsed_label.text += (
 			"\nBoundary %s / %s"
