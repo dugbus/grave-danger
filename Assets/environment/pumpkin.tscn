@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://bxkrdnpkt8aff"]
+
+[ext_resource type="PackedScene" uid="uid://bhl5tv05j6a7x" path="res://Assets/environment/pumpkin.glb" id="1_3o16n"]
+
+[node name="pumpkin" unique_id=773297613 instance=ExtResource("1_3o16n")]

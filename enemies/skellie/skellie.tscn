@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://30gbox62ncsi"]
+
+[ext_resource type="PackedScene" uid="uid://bar3e352wggu5" path="res://enemies/skellie/skellie.glb" id="1_x4jr1"]
+
+[node name="skellie" unique_id=1688413779 instance=ExtResource("1_x4jr1")]

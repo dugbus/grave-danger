@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://dpx47hnag3p6o"]
+
+[ext_resource type="PackedScene" uid="uid://cgo8j68yy5uxi" path="res://Assets/environment/skull.glb" id="1_rea5l"]
+
+[node name="skull" unique_id=1645209879 instance=ExtResource("1_rea5l")]
