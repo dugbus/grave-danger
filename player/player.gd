@@ -46,6 +46,10 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if is_waiting_for_skeleton_attack():
+		update_skeleton_attack_wait(delta)
+		return
+
 	# Death owns the top-level state gate. A dead player still falls and slides to
 	# a stop, but input, pickup, dropping, and walk animation stop immediately.
 	if death_controller.is_dead:
@@ -214,6 +218,24 @@ func die_from_flames() -> void:
 func die_from_enemy() -> void:
 	# Ordinary enemy contact is immediately lethal without selecting fire effects.
 	death_controller.die_from_enemy()
+
+
+## Skeleton contact locks movement and facing before the enemy's attack plays.
+func begin_skeleton_attack(attacker: Node3D) -> bool:
+	return (death_controller as GDPlayerDeath).begin_enemy_attack(attacker)
+
+
+func finish_skeleton_attack() -> void:
+	(death_controller as GDPlayerDeath).finish_enemy_attack()
+
+
+func is_waiting_for_skeleton_attack() -> bool:
+	var death := death_controller as GDPlayerDeath
+	return death != null and death.is_waiting_for_enemy_attack()
+
+
+func update_skeleton_attack_wait(delta: float) -> void:
+	(death_controller as GDPlayerDeath).update_enemy_attack(delta)
 
 
 func die_from_fall() -> void:

@@ -313,6 +313,10 @@ func _update_animation(delta: float, frame_index: int) -> void:
 	var movement_inputs := recording.get("movement_inputs", PackedVector2Array()) as PackedVector2Array
 	var movement_strength := movement_inputs[frame_index].length() if frame_index < movement_inputs.size() else 0.0
 	var playback_actor := playback_player as GDLevelRunPlaybackPlayer
+	if playback_actor != null and playback_actor.is_waiting_for_skeleton_attack():
+		playback_actor.update_skeleton_attack_wait(delta)
+		if playback_actor.is_waiting_for_skeleton_attack():
+			return
 	var is_dead := playback_actor != null and playback_actor.is_dead()
 	if animation_controller != null and animation_controller.has_method(&"update_replay"):
 		animation_controller.call(&"update_replay", movement_strength, is_dead, delta)

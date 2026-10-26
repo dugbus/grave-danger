@@ -17,6 +17,7 @@ const GROUND_ENEMY_ORIENTATION := preload("res://enemies/ground_enemy_orientatio
 const EnemyPresentation := preload("res://enemies/enemy_presentation.gd")
 const EnemyFootsteps := preload("res://enemies/enemy_footsteps.gd")
 const EnemyDeathPresentation := preload("res://enemies/enemy_death_presentation.gd")
+const SkeletonAttack := preload("res://enemies/skeleton_attack.gd")
 const WORLD_COLLISION_LAYER := 1
 const ZOMBIE_COLLISION_LAYER := 1 << 3
 const PLAYER_BOUNDARY_BLOCKER_COLLISION_LAYER := 1 << 4
@@ -160,6 +161,7 @@ const LANDING_AUDIO_UNIT_SIZE := 16.0
 @onready var kill_area := get_node_or_null(kill_area_path) as Area3D
 @onready var shadow := get_node_or_null(shadow_path) as Node3D
 @onready var skeleton_light := get_node_or_null(skeleton_light_path) as OmniLight3D
+@onready var attack_controller := get_node_or_null(^"SkeletonAttack") as SkeletonAttack
 
 var patrol_direction := 1.0
 var footstep_sounds: Array[AudioStream] = []
@@ -253,6 +255,11 @@ func _physics_process(delta: float) -> void:
 		return
 
 	if is_dead:
+		return
+
+	if attack_controller != null and attack_controller.is_attacking():
+		attack_controller.update_attack()
+		_update_rolling_ball_death()
 		return
 
 	if not _update_fall(delta):
@@ -790,6 +797,8 @@ func _die_from_rolling_ball() -> void:
 	if is_dead:
 		return
 
+	if attack_controller != null:
+		attack_controller.finish_attack()
 	is_dead = true
 	footstep_distance_accumulator = 0.0
 	_set_skeleton_body_enabled(false)
@@ -878,6 +887,9 @@ func _kill_body_if_player(body: Node) -> void:
 	if not _is_live_player_body(body):
 		return
 
+	if body is GDPlayer and attack_controller != null:
+		if attack_controller.is_attacking() or attack_controller.try_start(body as GDPlayer):
+			return
 	body.die_from_enemy()
 
 

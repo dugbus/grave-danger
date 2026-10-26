@@ -1,12 +1,13 @@
 [gd_scene format=3 uid="uid://dnrl7nbrfvej3"]
 
-[ext_resource type="PackedScene" uid="uid://db4sw3igtono3" path="res://Assets/kenney-graveyard/character-skeleton.glb" id="1_skeleton"]
+[ext_resource type="PackedScene" uid="uid://30gbox62ncsi" path="res://enemies/skellie/skellie.tscn" id="1_skeleton"]
 [ext_resource type="Script" uid="uid://bh8agxh3numk6" path="res://enemies/skeleton.gd" id="2_skeleton"]
 [ext_resource type="Script" uid="uid://cs73qa7c0pcul" path="res://player/player_shadow.gd" id="3_shadow"]
 [ext_resource type="PlaneMesh" path="res://game/contact_shadow_mesh.tres" id="4_shadow_mesh"]
 [ext_resource type="Material" path="res://game/contact_shadow_material.tres" id="5_shadow_material"]
 [ext_resource type="Script" path="res://enemies/ground_enemy_editor_placement.gd" id="6_editor_placement"]
 [ext_resource type="PackedScene" path="res://player/visibility/player_occlusion_blocker.tscn" id="7_occlusion_blocker"]
+[ext_resource type="Script" path="res://enemies/skeleton_attack.gd" id="8_attack"]
 
 [sub_resource type="Curve3D" id="Curve3D_skeleton_patrol"]
 resource_local_to_scene = true
@@ -27,6 +28,10 @@ height = 0.74
 [node name="Skeleton" type="Path3D" unique_id=854635641]
 curve = SubResource("Curve3D_skeleton_patrol")
 script = ExtResource("2_skeleton")
+walk_animation_speed_scale = 0.9
+
+[node name="SkeletonAttack" type="Node" parent="."]
+script = ExtResource("8_attack")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="." unique_id=2104898397]
 rotation_mode = 0

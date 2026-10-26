@@ -228,6 +228,27 @@ func update_dead_animation(delta: float) -> void:
 		gait_skeleton.advance(0.0)
 
 
+## Clear live reactions and face a lethal attacker while waiting in the authored idle pose.
+func prepare_enemy_attack(attacker_position: Vector3) -> void:
+	playback_state = PlaybackState.Locomotion
+	stagger_remaining = 0.0
+	_stop_hit_reaction(true)
+	_clear_gait_lift()
+	if foot_plant != null:
+		foot_plant.reset()
+	if pivot != null:
+		var parent := pivot.get_parent() as Node3D
+		var direction := parent.to_local(attacker_position) - pivot.position
+		if Vector2(direction.x, direction.z).length_squared() > 0.000001:
+			pivot.rotation.y = atan2(direction.x, direction.z)
+	_play_selected_animation(idle_character, idle_animation_player, idle_animation)
+	if animation_player != null:
+		animation_player.speed_scale = 1.0
+		animation_player.advance(0.0)
+	_update_foot_plant(false, false, last_walk_phase)
+	_reset_footstep_phase()
+
+
 func play_death() -> void:
 	# Death animation is intentionally slower for readability during the camera
 	# close-up.

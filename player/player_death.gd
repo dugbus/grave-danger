@@ -18,6 +18,8 @@ enum DeathCause {
 	NonFireBoundary,
 }
 
+enum DeathPhase { Alive, EnemyAttack, DeathAnimation }
+
 # Death is isolated so hazards only need one public Player method while the
 # component owns the one-way transition into the death state.
 
@@ -42,6 +44,8 @@ enum DeathCause {
 @onready var attention := get_node_or_null(attention_path) as GDPlayerAttention
 
 var is_dead := false
+var death_phase := DeathPhase.Alive
+var enemy_attacker: Node3D
 var showing_lose_screen := false
 var flame_energy := 100.0
 var active_heal_tweens: Array[Tween] = []
@@ -134,6 +138,39 @@ func die_from_enemy() -> void:
 	_die(DeathCause.EnemyDamage)
 
 
+## Reserves a lethal contact while the enemy plays its attack before the death presentation.
+func begin_enemy_attack(attacker: Node3D) -> bool:
+	if is_dead or not is_instance_valid(attacker) or not attacker.is_inside_tree():
+		return false
+	enemy_attacker = attacker
+	death_phase = DeathPhase.EnemyAttack
+	_mark_dead()
+	if animation_controller != null:
+		animation_controller.prepare_enemy_attack(attacker.global_position)
+	return true
+
+
+func is_waiting_for_enemy_attack() -> bool:
+	return death_phase == DeathPhase.EnemyAttack
+
+
+## The player stays in place, including vertically, until the attack finishes or its owner disappears.
+func update_enemy_attack(delta: float) -> void:
+	if not is_instance_valid(enemy_attacker) or not enemy_attacker.is_inside_tree():
+		finish_enemy_attack()
+		return
+	player.velocity = Vector3.ZERO
+	if animation_controller != null:
+		animation_controller.update_movement(Vector3.ZERO, delta, player.is_on_floor())
+
+
+func finish_enemy_attack() -> void:
+	if not is_waiting_for_enemy_attack():
+		return
+	enemy_attacker = null
+	_start_death_presentation(DeathCause.EnemyDamage)
+
+
 func die_from_fall() -> void:
 	# A fall is lethal immediately, but otherwise follows the normal death flow.
 	_die(DeathCause.Fall)
@@ -150,21 +187,29 @@ func _die(death_cause: DeathCause) -> void:
 	if is_dead:
 		return
 
+	_mark_dead()
+	_start_death_presentation(death_cause)
+
+
+func _mark_dead() -> void:
 	is_dead = true
 	_emit_flame_energy_changed()
 	for tween in active_heal_tweens:
 		if tween != null and tween.is_valid():
 			tween.kill()
 	active_heal_tweens.clear()
-	_play_death_scream()
-
 	if player != null:
-		# Stop active movement immediately; movement component will handle later
-		# gravity/deceleration while the player remains dead.
+		# Stop active movement immediately. A pending enemy attack holds the player
+		# in place; movement resumes gravity/deceleration during the death presentation.
 		player.velocity = Vector3.ZERO
 
 	if attention != null:
 		attention.stop_tracking()
+
+
+func _start_death_presentation(death_cause: DeathCause) -> void:
+	death_phase = DeathPhase.DeathAnimation
+	_play_death_scream()
 	if animation_controller != null:
 		animation_controller.play_death()
 	if death_effects != null:

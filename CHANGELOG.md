@@ -2,6 +2,16 @@
 
 ## 2026-10-26
 
+### 1800
+
+- Confirmed skeleton contact now freezes the player facing the skeleton, plays its full attack, then starts the player's death animation and defeat sequence.
+  - Prompt: Freeze and face the player toward a contacting skeleton, play its attack, then show the player's death animation.
+
+### 1400
+
+- Skeleton enemies now use skellie's animated model at the original encounter positions, with the same patrol, spawn, and footstep timing and a visual fall on death.
+  - Prompt: Replace the Kenney skeleton with skellie from Halloween while preserving encounter positions and timing.
+
 ### 0000
 
 - PlacementGridMap scenery seated on the floor now follows completed height and ramp edits automatically, sharing one undo step with the floor while preserving manual height offsets.

@@ -1,5 +1,10 @@
 [gd_scene format=3 uid="uid://30gbox62ncsi"]
 
 [ext_resource type="PackedScene" uid="uid://bar3e352wggu5" path="res://enemies/skellie/skellie.glb" id="1_x4jr1"]
+[ext_resource type="Script" path="res://enemies/skellie/skellie.gd" id="2_presentation"]
+[ext_resource type="Animation" path="res://enemies/skellie/skellie_death.tres" id="3_death"]
 
 [node name="skellie" unique_id=1688413779 instance=ExtResource("1_x4jr1")]
+scale = Vector3(0.8, 0.8, 0.8)
+script = ExtResource("2_presentation")
+death_animation = ExtResource("3_death")
