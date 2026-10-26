@@ -1,11 +1,6 @@
-[gd_resource type="Resource" script_class="FloorElevationProfile" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="FloorElevationProfile" format=3 uid="uid://2u5wwlvf312"]
 
-[ext_resource type="Script" path="res://addons/floor_surface/floor_elevation_profile.gd" id="1_profile"]
+[ext_resource type="Script" uid="uid://bo2tuqmvj4263" path="res://addons/floor_surface/floor_elevation_profile.gd" id="1_profile"]
 
 [resource]
 script = ExtResource("1_profile")
-elevation_unit = 0.25
-walkable_step_units = 1
-normal_jump_units = 2
-unencumbered_jump_units = 3
-ordinary_drop_units = 3

@@ -1898,5 +1898,14 @@
     ],
     "stored": [],
     "runtime": []
+  },
+  "addons/floor_surface/floor_surface_placement_gridmap.gd": {
+    "designer": [
+      "floor_surface_path",
+      "follow_floor",
+      "floor_paint_layer"
+    ],
+    "stored": [],
+    "runtime": []
   }
 }

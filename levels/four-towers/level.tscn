@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://y1i75xfsafc7"]
+
+[ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://lighting/gd_outdoor_lighting.tscn" id="2_lighting"]
+[ext_resource type="Script" uid="uid://bvowj5mveddhm" path="res://levels/level_settings.gd" id="3_settings"]
+[ext_resource type="MeshLibrary" uid="uid://cunnj75ip2b7a" path="res://Assets/environment/graveyard.res" id="4_placement_library"]
+[ext_resource type="PackedScene" path="res://addons/floor_surface/floor_surface.tscn" id="5_floor_surface"]
+[ext_resource type="Resource" path="res://levels/four-towers/floor_surface_map.tres" id="6_floor_map"]
+[ext_resource type="Resource" path="res://addons/floor_surface/default_floor_elevation_profile.tres" id="7_floor_profile"]
+[ext_resource type="Resource" path="res://levels/four-towers/floor_surface_style.tres" id="8_floor_style"]
+[ext_resource type="Script" uid="uid://q0ef7o077f24" path="res://addons/floor_surface/floor_style.gd" id="9_floor_style_script"]
+[ext_resource type="Resource" path="res://levels/four-towers/flagstone_floor_style.tres" id="10_flagstone_style"]
+[ext_resource type="Script" path="res://addons/floor_surface/floor_surface_placement_gridmap.gd" id="11_placement"]
+
+[node name="FourTowers" type="Node3D" unique_id=417122488]
+
+[node name="Player" parent="." unique_id=1395604090 instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+
+[node name="OutdoorLighting" parent="." unique_id=580252348 instance=ExtResource("2_lighting")]
+
+[node name="LevelSettings" type="Node" parent="." unique_id=67755475]
+script = ExtResource("3_settings")
+
+[node name="PlacementGridMap" type="GridMap" parent="." unique_id=1000834806]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -16)
+mesh_library = ExtResource("4_placement_library")
+cell_size = Vector3(1, 0.01, 1)
+cell_center_y = false
+script = ExtResource("11_placement")
+floor_surface_path = NodePath("../FloorSurface")
+data = {
+"cells": PackedInt32Array(14, 15, 8, 13, 15, 8, 12, 15, 8, 11, 15, 8)
+}
+
+[node name="FloorSurface" parent="." unique_id=1983024325 instance=ExtResource("5_floor_surface")]
+floor_map = ExtResource("6_floor_map")
+elevation_profile = ExtResource("7_floor_profile")
+styles = Array[ExtResource("9_floor_style_script")]([ExtResource("8_floor_style"), ExtResource("10_flagstone_style")])
+world_origin_xz = Vector2(-16, -16)
+placement_grid_map_path = NodePath("../PlacementGridMap")
+
+[node name="Objects" type="Node3D" parent="." unique_id=607873180]
+
+[editable path="OutdoorLighting"]

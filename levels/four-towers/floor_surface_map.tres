@@ -1,0 +1,61 @@
+[gd_resource type="Resource" script_class="FloorMap" format=3 uid="uid://b3s3ahiulwluw"]
+
+[ext_resource type="Script" uid="uid://cdlus0vrv8r3u" path="res://addons/floor_surface/floor_map.gd" id="1_ja3o4"]
+
+[resource]
+script = ExtResource("1_ja3o4")
+dimensions = Vector2i(32, 32)
+default_present = true
+presence_exceptions = Array[Vector2i]([Vector2i(16, 15), Vector2i(17, 15), Vector2i(18, 15), Vector2i(16, 16), Vector2i(17, 16), Vector2i(18, 16), Vector2i(16, 17), Vector2i(17, 17), Vector2i(18, 17)])
+elevation_overrides = Dictionary[Vector2i, int]({
+Vector2i(11, 15): 6,
+Vector2i(11, 16): 6,
+Vector2i(11, 17): 6,
+Vector2i(15, 14): 8,
+Vector2i(15, 18): 9,
+Vector2i(19, 14): 9,
+Vector2i(19, 18): 9,
+Vector2i(23, 15): 6,
+Vector2i(23, 16): 6,
+Vector2i(23, 17): 6
+})
+transition_overrides = Dictionary[Vector2i, int]({
+Vector2i(12, 15): 1,
+Vector2i(12, 16): 1,
+Vector2i(12, 17): 1,
+Vector2i(13, 15): 1,
+Vector2i(13, 16): 1,
+Vector2i(13, 17): 1,
+Vector2i(14, 15): 1,
+Vector2i(14, 16): 1,
+Vector2i(14, 17): 1,
+Vector2i(20, 15): 1,
+Vector2i(20, 16): 1,
+Vector2i(20, 17): 1,
+Vector2i(21, 15): 1,
+Vector2i(21, 16): 1,
+Vector2i(21, 17): 1,
+Vector2i(22, 15): 1,
+Vector2i(22, 16): 1,
+Vector2i(22, 17): 1
+})
+low_edge_overrides = Dictionary[Vector2i, int]({
+Vector2i(12, 15): 2,
+Vector2i(12, 16): 2,
+Vector2i(12, 17): 2,
+Vector2i(13, 15): 2,
+Vector2i(13, 16): 2,
+Vector2i(13, 17): 2,
+Vector2i(14, 15): 2,
+Vector2i(14, 16): 2,
+Vector2i(14, 17): 2,
+Vector2i(20, 15): 4,
+Vector2i(20, 16): 4,
+Vector2i(20, 17): 4,
+Vector2i(21, 15): 4,
+Vector2i(21, 16): 4,
+Vector2i(21, 17): 4,
+Vector2i(22, 15): 4,
+Vector2i(22, 16): 4,
+Vector2i(22, 17): 4
+})

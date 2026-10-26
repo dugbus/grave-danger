@@ -5,7 +5,9 @@ const LEVEL_MAPPING := preload("res://levels/level_mapping.tres")
 
 func run(_tree: SceneTree) -> void:
 	expect_equal(
-		LEVEL_MAPPING.get_level_count(), 25, "The level lookup exposes the existing levels, demo, and Close Escape."
+		LEVEL_MAPPING.get_level_count(),
+		26,
+		"The level lookup exposes the existing levels and the Four Towers template."
 	)
 	expect_equal(LEVEL_MAPPING.get_level_id(0), "tutorial_1", "Tutorial 1 appears first.")
 	expect_equal(LEVEL_MAPPING.get_level_id(5), "debug_level", "The debug level has a stable ID.")
@@ -58,6 +60,17 @@ func run(_tree: SceneTree) -> void:
 		LEVEL_MAPPING.get_level_scene_path(24),
 		"res://levels/close-escape/level.tscn",
 		"Close Escape resolves to its original level scene."
+	)
+	var four_towers_index := LEVEL_MAPPING.find_level_index("four_towers")
+	expect_equal(four_towers_index, 25, "Four Towers has its own stable selectable identity.")
+	expect_equal(
+		LEVEL_MAPPING.get_level_scene_path(four_towers_index),
+		"res://levels/four-towers/level.tscn",
+		"Four Towers resolves to its editable blank scene."
+	)
+	expect(
+		bool(LEVEL_MAPPING.get_level_data(four_towers_index).get("available", false)),
+		"The Four Towers template is available from level selection."
 	)
 	var tutorials_are_registered := true
 	for tutorial_number in range(1, 6):

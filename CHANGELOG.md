@@ -1,6 +1,39 @@
 # Changelog
 
+## 2026-10-26
+
+### 0000
+
+- PlacementGridMap scenery seated on the floor now follows completed height and ramp edits automatically, sharing one undo step with the floor while preserving manual height offsets.
+  - Prompt: Recalculate scenery heights after floor edits without adding unnecessary complexity.
+- Painted fences and walls anchor their bases to the lowest floor under their rotated footprint, cutting into uphill terrain instead of floating above the downhill side; repainting lowers older floating placements.
+  - Prompt: Anchor fence bases to the lowest part of the slope, allowing the uphill floor to intersect them.
+
+## 2026-10-25
+
+### 2200
+
+- Terrain-following GridMap strokes now apply their floor-height correction reliably in the Godot editor, with undo and redo kept in the same stroke.
+  - Prompt: Fix painted fences remaining at a fixed height on the saved sloped floor.
+
+### 1900
+
+- Four Towers keeps its authored fence placements when enabling terrain-following GridMap painting.
+  - Prompt: Preserve the saved Four Towers edits while attaching the terrain-following brush.
+
+### 1800
+
+- Four Towers seats brushed fences and walls on the floor beneath them, including slopes, while preserving manual height layers and one-step undo, redo, and erasing.
+  - Prompt: Make fences painted with the PlacementGridMap brush follow sloping floor height.
+
 ## 2026-10-24
+
+### 2000
+
+- Four Towers offers editable Dirt and Flagstones floor types, with guidance for extending the starting floor and painting its appearance.
+  - Prompt: Restore floor painting and floor type selection in the Four Towers template.
+- Level editors can start building Four Towers from a blank 32 by 32 floor with a player start, lighting, and empty placement containers, available in level selection.
+  - Prompt: Set up a blank editable level named four-towers.
 
 ### 1600
 
