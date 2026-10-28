@@ -10,6 +10,10 @@ func run(tree: SceneTree) -> void:
 	var station := level.get_node(^"Objects/SkeletonCrumblingDemo") as Node3D
 	var skeleton := station.get_node(^"Skeleton") as GDSkeletonPath
 	var tile := station.get_node(^"CrumblingFloor") as TILE
+	var coins: Array[GDGoldCoin] = []
+	for coin in station.get_node(^"Coins").get_children():
+		coins.append(coin as GDGoldCoin)
+	expect_equal(coins.size(), 3, "The visible collapse demonstration includes three real physical coins.")
 	var player := level.get_node(^"Player") as GDPlayer
 	var surface := level.get_node(^"FloorSurface") as FloorSurface
 	var grid := level.get_node(^"PNGGridMap") as GridMap
@@ -62,9 +66,14 @@ func run(tree: SceneTree) -> void:
 	var triggered_at := -1.0
 	var collapsed := false
 	var starting_frame := Engine.get_physics_frames()
+	var coins_rested_on_tile := false
 	for frame in 540:
 		await tree.physics_frame
 		await tree.process_frame
+		if frame == 120:
+			coins_rested_on_tile = true
+			for coin in coins:
+				coins_rested_on_tile = coins_rested_on_tile and coin.global_position.y > station.global_position.y
 		if tile.state != TILE.State.Intact and triggered_at < 0.0:
 			triggered_at = float(Engine.get_physics_frames() - starting_frame) / float(Engine.physics_ticks_per_second)
 			expect(
@@ -84,6 +93,7 @@ func run(tree: SceneTree) -> void:
 		triggered_at >= 4.0 and triggered_at <= 8.0, "The skeleton triggers the tile within eight seconds of starting."
 	)
 	expect(collapsed, "The skeleton completes the raised tile's collapse without player contact.")
+	expect(coins_rested_on_tile, "The coins visibly rest on the raised tile before the skeleton arrives.")
 	expect(not tile._support.body.is_valid(), "Collapse opens the actual supporting physics geometry.")
 	for frame in 60:
 		await tree.physics_frame
@@ -103,6 +113,11 @@ func run(tree: SceneTree) -> void:
 		skeleton.skeleton_body.global_position.is_equal_approx(skeleton.drop_pivot.global_position),
 		"The skeleton's blocking body follows its visible carrier into the hole."
 	)
+	for coin in coins:
+		expect(
+			not is_instance_valid(coin) or coin.global_position.y < tile.global_position.y - 1.0,
+			"Each demonstration coin falls through the opening after the floor collapses."
+		)
 	level.free()
 	await tree.process_frame
 	await tree.process_frame

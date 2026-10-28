@@ -160,6 +160,17 @@ func is_recent_push_blocked_by_wall() -> bool:
 	return recent_push_timer > 0.0 and recent_push_blocked_by_wall
 
 
+## Floor collapse overrides the horizontal-only authoring constraint for this runtime instance.
+func release_floor_support() -> bool:
+	if not super.release_floor_support():
+		return false
+	if constrain_to_starting_height:
+		constrain_to_starting_height = false
+		gravity_scale = 1.0
+		axis_lock_linear_y = false
+	return true
+
+
 func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	_update_wall_contact_normals(state)
 

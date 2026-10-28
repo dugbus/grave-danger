@@ -3,6 +3,8 @@ class_name GDSkeletonAttack
 
 ## Coordinates the lethal contact presentation without moving either character's carrier.
 
+const SETTINGS := preload("res://enemies/skeleton_attack_settings.tres")
+
 enum AttackState { Idle, Playing }
 
 # The owning script preloads this component. Keep the parent as Node to avoid
@@ -34,7 +36,7 @@ func try_start(player: GDPlayer) -> bool:
 		pivot.rotation.y = atan2(direction.x, direction.z)
 	if not animation.animation_finished.is_connected(_on_animation_finished):
 		animation.animation_finished.connect(_on_animation_finished)
-	animation.speed_scale = 1.0
+	animation.speed_scale = SETTINGS.playback_speed
 	skeleton.current_animation = attack_animation
 	animation.play(attack_animation, 0.1)
 	return true

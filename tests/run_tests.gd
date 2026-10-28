@@ -1765,13 +1765,14 @@ func _test_debug_level_total_includes_authored_loose_treasure() -> bool:
 		+ RUBY_ITEM.treasure_value
 		+ SAPPHIRE_ITEM.treasure_value
 		+ GOLD_BAR_ITEM.treasure_value
+		+ 3 * GOLD_COIN_ITEM.treasure_value
 	)
 	var runtime_pickup := DIAMOND_SCENE.instantiate() as GDInventoryPickup
 	debug_level.add_child(runtime_pickup)
 	var total_with_runtime_pickup := graveyard._calculate_max_treasure_value()
 	var passed := (
 		_expect(
-			authored_total == 867 + loose_treasure_value and authored_total == 944,
+			authored_total == 867 + loose_treasure_value and authored_total == 947,
 			"debug level total includes every authored loose treasure pickup (got %d)" % authored_total
 		)
 		and _expect(

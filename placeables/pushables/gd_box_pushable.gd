@@ -86,18 +86,25 @@ func _physics_process(delta: float) -> void:
 		planar_velocity = Vector3.ZERO
 		movement_axis = Vector3.ZERO
 
-	velocity = Vector3(planar_velocity.x, 0.0, planar_velocity.z)
+	var vertical_velocity := 0.0 if constrain_to_starting_height else velocity.y + get_gravity().y * delta
+	velocity = Vector3(planar_velocity.x, vertical_velocity, planar_velocity.z)
 	move_and_slide()
 
 	if lock_movement_to_axis and not movement_axis.is_zero_approx():
 		var axis_velocity := _project_to_axis(Vector3(velocity.x, 0.0, velocity.z), movement_axis)
-		velocity = Vector3(axis_velocity.x, 0.0, axis_velocity.z)
+		velocity = Vector3(axis_velocity.x, velocity.y, axis_velocity.z)
 
 	if constrain_to_starting_height:
 		global_position.y = starting_height
 
 	if lock_rotation_to_upright:
 		rotation = Vector3.ZERO
+
+
+## A collapsed floor releases the height lock; horizontal pushing retains its existing rules.
+func release_floor_support() -> void:
+	if can_process() and is_visible_in_tree() and is_placeable_spawned():
+		constrain_to_starting_height = false
 
 
 func push(impulse: Vector3) -> void:

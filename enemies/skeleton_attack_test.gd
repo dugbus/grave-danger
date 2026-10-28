@@ -46,6 +46,7 @@ func _test_confirmed_contact_sequence(tree: SceneTree) -> void:
 	expect(not animation.is_staggering(), "Capture replaces a prior stagger with the waiting pose.")
 	expect((player.attention as GDPlayerAttention).tracking_stopped, "Live head glances release the captured facing.")
 	expect_equal(enemy.animation_player.assigned_animation, "attack", "Contact selects the animated attack clip.")
+	expect_equal(enemy.animation_player.speed_scale, 3.0, "Skeleton attacks play at three times the authored speed.")
 	player.die_from_flames()
 	player.apply_spike_trap_damage(100.0)
 	expect(death.is_waiting_for_enemy_attack(), "Other hazards cannot interrupt the reserved lethal contact.")
@@ -73,7 +74,8 @@ func _test_confirmed_contact_sequence(tree: SceneTree) -> void:
 	_expect_facing(animation.pivot, enemy.path_follow.global_position, "Held input cannot turn the player away.")
 
 	var clip := enemy.animation_player.get_animation(&"attack")
-	enemy.animation_player.advance(clip.length - 0.01)
+	var attack_duration := clip.length / 3.0
+	enemy.animation_player.advance(attack_duration - 0.01)
 	expect(death.is_waiting_for_enemy_attack(), "The player waits through the entire attack animation.")
 	expect_equal(death.scream_count, 0, "The death scream waits until the attack finishes.")
 	expect_equal(death.lose_count, 0, "The lose-screen countdown cannot obscure the attack.")
@@ -160,7 +162,7 @@ func _test_preview_attack_stays_inside_preview(tree: SceneTree) -> void:
 	expect_equal(animation.playback_state, GDPlayerAnimation.PlaybackState.Locomotion, "The preview waits in idle.")
 	player.die_from_enemy()
 	expect(player.is_waiting_for_skeleton_attack(), "Other preview damage cannot skip the attack.")
-	enemy.animation_player.advance(enemy.animation_player.get_animation(&"attack").length + 0.01)
+	enemy.animation_player.advance(enemy.animation_player.get_animation(&"attack").length / 3.0 + 0.01)
 	preview._update_animation(0.1, 0)
 	expect(
 		not player.is_waiting_for_skeleton_attack() and player.playback_dead,

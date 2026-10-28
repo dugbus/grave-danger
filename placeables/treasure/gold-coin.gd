@@ -114,6 +114,10 @@ func _recover_from_out_of_bounds() -> void:
 		_remember_fall_recovery_origin(global_position)
 
 	var recovery_position := _find_floor_recovery_position()
+	if not recovery_position.is_finite():
+		# A collapsed floor is a real opening, not a physics escape to repair by hovering above it.
+		queue_free()
+		return
 	global_position = recovery_position
 	linear_velocity = Vector3.ZERO
 	angular_velocity = Vector3.ZERO
@@ -147,7 +151,7 @@ func _find_floor_recovery_position() -> Vector3:
 		var surface_position := hit.get("position", fall_recovery_origin) as Vector3
 		return surface_position + Vector3.UP * RECOVERY_SURFACE_CLEARANCE
 
-	return fall_recovery_origin
+	return Vector3.INF if has_lost_floor_support else fall_recovery_origin
 
 
 func _limit_edge_roll_distance() -> void:

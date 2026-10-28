@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://pqtcng2uw3dw" path="res://player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://cw45377f21i2v" path="res://placeables/treasure/gold_coin_pile.tscn" id="3_coinpile"]
+[ext_resource type="PackedScene" path="res://placeables/treasure/gold_coin.tscn" id="3_collapse_coin"]
 [ext_resource type="PackedScene" path="res://placeables/kill_boundary/kill_boundary.tscn" id="4_flame"]
 [ext_resource type="MeshLibrary" uid="uid://cunnj75ip2b7a" path="res://Assets/environment/graveyard.res" id="4_vopjb"]
 [ext_resource type="PackedScene" uid="uid://djexa7jcg83vk" path="res://placeables/collectibles/flask_bigger_sack.tscn" id="6_ei3h4"]
@@ -693,7 +694,7 @@ floor_grid_map = NodePath("../../../../PNGGridMap")
 floor_surface = NodePath("../../../../FloorSurface")
 
 [node name="SkeletonCrumblingDemo" type="Node3D" parent="Objects" unique_id=321631070]
-editor_description = "Visible from spawn: the skeleton appears after four seconds and crosses the cracked centre tile on this 2m-high platform. Restart to repeat."
+editor_description = "Visible from spawn: three coins rest on the cracked tile. After four seconds the skeleton crosses it, collapsing the floor and dropping the coins into the opening. Restart to repeat."
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 117, 2, 2)
 
 [node name="Skeleton" parent="Objects/SkeletonCrumblingDemo" unique_id=136173148 instance=ExtResource("32_dhv6f")]
@@ -704,6 +705,17 @@ spawn_time = 4.0
 [node name="CrumblingFloor" parent="Objects/SkeletonCrumblingDemo" unique_id=594939346 node_paths=PackedStringArray("floor_grid_map", "floor_surface") instance=ExtResource("905_crumbling_floor")]
 floor_grid_map = NodePath("../../../PNGGridMap")
 floor_surface = NodePath("../../../FloorSurface")
+
+[node name="Coins" type="Node3D" parent="Objects/SkeletonCrumblingDemo"]
+
+[node name="CoinLeft" parent="Objects/SkeletonCrumblingDemo/Coins" instance=ExtResource("3_collapse_coin")]
+position = Vector3(-0.22, 0.08, 0.2)
+
+[node name="CoinCentre" parent="Objects/SkeletonCrumblingDemo/Coins" instance=ExtResource("3_collapse_coin")]
+position = Vector3(0, 0.08, -0.2)
+
+[node name="CoinRight" parent="Objects/SkeletonCrumblingDemo/Coins" instance=ExtResource("3_collapse_coin")]
+position = Vector3(0.22, 0.08, 0.2)
 
 [node name="PNGGridMap" type="GridMap" parent="." unique_id=1128356203]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -127.5, 0, -7.5)

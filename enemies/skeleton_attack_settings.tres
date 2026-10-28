@@ -1,0 +1,7 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://enemies/skeleton_attack_settings.gd" id="1_settings"]
+
+[resource]
+script = ExtResource("1_settings")
+playback_speed = 3.0

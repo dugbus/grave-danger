@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-28
+
+### 1400
+
+- Skeleton attacks now play three times faster, shortening the frozen wait before the player's death animation to about 0.44 seconds.
+  - Prompt: Triple skeleton attack animation playback speed to shorten the frozen pointing sequence.
+
+## 2026-10-27
+
+### 1700
+
+- Three coins on the raised debug skeleton platform demonstrate falling through the collapsed floor; potions, treasure, keys, coffins and pushables now lose their frozen or height-locked support when blocks give way.
+  - Prompt: Place coins on the debug collapsible floor and ensure potions, treasure and other loose objects fall when it collapses.
+
 ## 2026-10-26
 
 ### 1800

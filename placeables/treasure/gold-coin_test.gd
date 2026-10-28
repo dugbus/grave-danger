@@ -8,6 +8,25 @@ const GOLD_COIN_SCENE := preload("res://placeables/treasure/gold_coin.tscn")
 func run(tree: SceneTree) -> void:
 	expect_script_contract(SUBJECT, SUBJECT_PATH)
 	await _expect_out_of_bounds_coin_recovers_on_floor(tree)
+	await _expect_collapsed_floor_cannot_recover_coin_into_air(tree)
+
+
+# Flow: A coin released by floor collapse falls away instead of returning to a vanished support surface.
+func _expect_collapsed_floor_cannot_recover_coin_into_air(tree: SceneTree) -> void:
+	var viewport := SubViewport.new()
+	viewport.own_world_3d = true
+	var coin := GOLD_COIN_SCENE.instantiate() as GDGoldCoin
+	coin.position = Vector3(0.0, 2.0, 0.0)
+	viewport.add_child(coin)
+	tree.root.add_child(viewport)
+	coin.release_floor_support()
+	coin.set_physics_process(false)
+	await tree.physics_frame
+	coin.position.y = coin.despawn_below_y - 1.0
+	coin._physics_process(1.0 / 60.0)
+	expect(coin.is_queued_for_deletion(), "A collapsed floor without a valid landing cannot recover a hovering coin.")
+	viewport.free()
+	await tree.process_frame
 
 
 func _expect_out_of_bounds_coin_recovers_on_floor(tree: SceneTree) -> void:

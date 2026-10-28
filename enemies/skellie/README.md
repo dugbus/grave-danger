@@ -25,7 +25,9 @@ The controller continues restarting completed clips as before.
 
 Confirmed contact freezes the player in place and turns both characters toward
 each other. The skeleton pauses at that contact position while its attack plays
-at the authored speed. The player's death pose, effects, scream, camera focus,
+at three times the authored speed (about 0.44 seconds for the current clip),
+configured in `enemies/skeleton_attack_settings.tres`.
+The player's death pose, effects, scream, camera focus,
 and lose-screen countdown start when the attack finishes. Interrupted attacks
 complete the death flow so the player cannot remain frozen. Patrol positions
 and timing before contact retain the existing regression checkpoints.

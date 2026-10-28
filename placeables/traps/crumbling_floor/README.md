@@ -146,3 +146,16 @@ it can also be previewed before the new asset's first local import. No binary
 assets are changed. Prototype debris uses axis-aligned BoxMeshes and BoxShapes
 fitted to the authored mesh blocks; arbitrary non-box fracture meshes are outside
 this prototype's scope.
+
+During breakup, each released block checks the small contact region above its
+surface. Touching physical placeables are released from idle freezes and sleep;
+height-constrained pushables also regain vertical motion. This covers potion
+bottles, coins, bars, jewels, keys, deposit coffins, boulders, millstones and hay
+bales. Airborne items, neighboring support, paused objects and delayed spawns are
+left alone. Dense piles are queried in batches so every supported item is handled.
+These checks run only as blocks release and add no per-item idle polling.
+
+Potion visuals stop bobbing once their floor support is released. Coins that
+fall out of bounds after collapse can recover onto a surviving floor, but cannot
+recover into empty air above a vanished tile. The debug level's raised skeleton
+demonstration includes three individual coins to show the support loss near spawn.

@@ -152,7 +152,7 @@ func _process(delta: float) -> void:
 	elapsed += delta
 
 	visual.rotation.y += spin_speed * delta
-	if spawn_time > 0.0:
+	if spawn_time > 0.0 or has_lost_floor_support:
 		# A dropped flask's visual must remain aligned with its physical bottle shape.
 		visual.position.y = visual_base_y
 		return

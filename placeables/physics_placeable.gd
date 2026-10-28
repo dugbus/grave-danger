@@ -21,6 +21,7 @@ const MAP_PLACEABLE_GROUP: StringName = &"map_placeable"
 @export_group("")
 
 var placeable_spawn_controller: Node
+var has_lost_floor_support := false
 
 
 func _ready() -> void:
@@ -35,3 +36,13 @@ func _ready() -> void:
 
 func is_placeable_spawned() -> bool:
 	return placeable_spawn_controller == null or placeable_spawn_controller.is_spawned()
+
+
+## A disappearing floor releases idle presentation freezes as well as sleeping physics.
+func release_floor_support() -> bool:
+	if not can_process() or not is_visible_in_tree() or not is_placeable_spawned():
+		return false
+	has_lost_floor_support = true
+	freeze = false
+	sleeping = false
+	return true
