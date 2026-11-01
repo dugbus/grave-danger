@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-31
+
+### 1800
+
+- Level editors can choose automatic or boarding-activated travel, with seven labelled elevator combinations available in the debug level.
+  - Prompt: Add floor-matching elevators with configurable boarding behaviour and debug validation stations.
+- Players can ride and jump on floor-matching elevators that carry pickups and reverse safely around obstacles.
+  - Prompt: Add floor-matching elevators with configurable boarding behaviour and debug validation stations.
+
 ## 2026-10-28
 
 ### 1400

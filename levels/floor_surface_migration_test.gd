@@ -148,18 +148,18 @@ const BALANCED_PLACEMENT_LEVELS: Array[String] = [
 	"res://levels/graveyard/level.tscn",
 ]
 const PIT_LEVEL_REGION_COUNTS := {
-	"res://levels/debug-level/floor_surface_map.tres": 8,
+	"res://levels/debug-level/floor_surface_map.tres": 15,
 	"res://levels/7/floor_surface_map.tres": 2,
 }
 const PIT_LEVEL_CELL_COUNTS := {
-	"res://levels/debug-level/floor_surface_map.tres": 19,
+	"res://levels/debug-level/floor_surface_map.tres": 26,
 	"res://levels/7/floor_surface_map.tres": 2,
 }
 # Later level authoring may add heights without changing the migrated flat baseline elsewhere.
-# The debug stations' ramp and skeleton-platform geometry and behavior have sibling level tests.
+# The debug stations' ramp, skeleton platform and seven elevator shafts have sibling level tests.
 const AUTHORED_HEIGHT_REGIONS := {
 	"res://levels/debug-level/floor_surface_map.tres":
-	[Rect2i(229, 2, 10, 2), Rect2i(237, 4, 2, 3), Rect2i(243, 8, 3, 3)],
+	[Rect2i(229, 2, 10, 2), Rect2i(237, 4, 2, 3), Rect2i(243, 8, 3, 3), Rect2i(218, 11, 22, 3)],
 }
 const CARDINAL_DIRECTIONS: Array[Vector2i] = [
 	Vector2i.UP,
