@@ -1,6 +1,8 @@
 extends Node3D
 class_name GDPlayerAttention
 
+const SEPIA := preload("res://placeables/kill_boundary/sepia/sepia_boundary_mode.gd")
+
 enum AttentionPhase {
 	Travel,
 	EnemyTracking,
@@ -272,6 +274,8 @@ func _find_nearby_enemy() -> Node3D:
 func _is_enemy_available(candidate: Node3D) -> bool:
 	if not is_instance_valid(candidate) or not candidate.is_inside_tree():
 		return false
+	if SEPIA.is_sepia(player, _get_enemy_attention_position(candidate)):
+		return false
 	if candidate.has_method("is_available_for_player_attention"):
 		return bool(candidate.call("is_available_for_player_attention"))
 	return candidate.is_visible_in_tree()
@@ -318,6 +322,12 @@ func _is_collectible_available(candidate: Node3D) -> bool:
 
 
 func _can_see_collectible(candidate: Node3D) -> bool:
+	if (
+		is_instance_valid(candidate)
+		and candidate.is_inside_tree()
+		and SEPIA.is_sepia(player, candidate.global_position)
+	):
+		return false
 	return (
 		_is_collectible_available(candidate)
 		and absf(_raw_yaw_to_collectible(candidate)) <= _maximum_head_turn_radians()

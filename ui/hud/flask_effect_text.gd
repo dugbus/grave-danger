@@ -1,6 +1,7 @@
 extends MeshInstance3D
 class_name GDFlaskEffectText
 
+const OVERLAY_ORDER := preload("res://ui/hud/overlay_render_order.gd")
 const EFFECT_LABELS := {
 	&"health_flask": "Healing",
 	&"breathing_space": "Expand",
@@ -11,7 +12,7 @@ const EFFECT_LABELS := {
 	&"no_boundary": "Safety",
 }
 const TEXT_SHADER := preload("res://ui/hud/flask_effect_text.gdshader")
-const TEXT_VISUAL_LAYER := 1 << 19
+const TEXT_VISUAL_LAYER := OVERLAY_ORDER.SCREEN_TEXT_VISUAL_LAYER
 const FADE_IN_DURATION := 0.3
 const FLASK_EFFECT_TEXT_GROUP := &"flask_effect_text"
 
@@ -169,6 +170,7 @@ func _configure_material() -> void:
 			material_override = text_material
 
 	text_material.shader = TEXT_SHADER
+	text_material.render_priority = OVERLAY_ORDER.DrawPass.ScreenText
 	_apply_effect_color(current_color)
 
 

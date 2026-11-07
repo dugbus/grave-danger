@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://lighting/light_mist/light_mist_settings.gd" id="1_settings"]
+
+[resource]
+script = ExtResource("1_settings")
+density = 0.004
+albedo = Color(0.95, 0.97, 1, 1)
+noise_scale = 0.32
+noise_strength = 0.28
+drift_velocity = Vector3(0.018, 0.006, 0.012)
+fog_length = 32.0
+anisotropy = 0.2
+temporal_blend = 0.6

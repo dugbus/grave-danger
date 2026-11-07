@@ -36,6 +36,8 @@
 extends "res://placeables/physics_placeable.gd"
 class_name GDFlaskBase
 
+const SEPIA := preload("res://placeables/kill_boundary/sepia/sepia_boundary_mode.gd")
+
 const DRINKING_SOUND := preload("res://Assets/audio/drinking-liquid.mp3")
 const FLASK_IMPACT_SOUND_PATH := "res://Assets/audio/flask-hits-ground.mp3"
 const IMPACT_AUDIO_NAME := "FlaskImpactAudio"
@@ -255,6 +257,8 @@ func _on_physics_body_entered(body: Node) -> void:
 # Returns true if the pickup succeeds.
 ##
 func _try_collect(body: Node3D) -> bool:
+	if is_inside_tree() and not SEPIA.allows_interaction(body, global_position):
+		return false
 	if is_being_collected:
 		return false
 

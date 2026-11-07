@@ -37,10 +37,15 @@ const DEFAULT_SETTINGS := preload("res://placeables/kill-boundary-2/kill_boundar
 		playback_configuration_changed.emit()
 ## Choose how the boundary looks. Flame burns players, while Ghost and None remain deadly but do
 ## not report a fire death; None is useful for an invisible hazard.
+## Sepia uses the same animated perimeter to conceal threats and pickups, with no damage or blocking.
+## Its safe side is inside by default; Sepia Inverted swaps the sides.
 @export var render_effect := GDKillBoundary2Settings.RenderEffect.Flame:
 	set(value):
 		render_effect = value as GDKillBoundary2Settings.RenderEffect
 		_sync_render_effect()
+## Only affects Sepia: enable for colour inside and the safe, sepia view outside the boundary.
+@export var sepia_inverted := false
+
 ## Stop living players from crossing the boundary line. Turn this off when players should be able
 ## to pass through the hazard; touching or crossing it can still cause damage.
 @export var player_blocking_enabled := true:
@@ -228,6 +233,18 @@ func get_boundary_world_points() -> PackedVector3Array:
 	return geometry.get_world_points() if geometry != null and not boundary_removed_for_level else PackedVector3Array()
 
 
+func is_sepia_mode_active() -> bool:
+	return render_effect == GDKillBoundary2Settings.RenderEffect.Sepia and is_inside_tree() and _is_boundary_visible()
+
+
+func _sync_sepia_mode() -> void:
+	if not is_inside_tree() or Engine.is_editor_hint():
+		return
+	var mode := get_node_or_null(^"SepiaMode")
+	if mode != null:
+		mode.refresh_mode()
+
+
 func pause_runtime_for(seconds: float) -> bool:
 	if boundary_removed_for_level or animator == null or not _is_boundary_visible():
 		return false
@@ -392,6 +409,8 @@ func _sync_render_effect() -> void:
 		damage.set_render_effect(render_effect)
 	if proximity_audio != null:
 		proximity_audio.set_render_effect(render_effect)
+	if is_inside_tree():
+		_set_runtime_effects_enabled(_is_boundary_visible(), Engine.is_editor_hint())
 
 
 func _on_sequence_changed() -> void:
@@ -416,14 +435,16 @@ func _on_geometry_changed(points: PackedVector2Array) -> void:
 
 
 func _set_runtime_effects_enabled(enabled: bool, keep_visuals := false) -> void:
+	var lethal_enabled := enabled and render_effect != GDKillBoundary2Settings.RenderEffect.Sepia
 	if presentation != null:
 		presentation.set_effects_enabled(enabled, keep_visuals)
 	if damage != null:
-		damage.set_effects_enabled(enabled)
+		damage.set_effects_enabled(lethal_enabled)
 	if blockers != null:
-		blockers.set_effects_enabled(enabled)
+		blockers.set_effects_enabled(lethal_enabled)
 	if proximity_audio != null:
-		proximity_audio.set_effects_enabled(enabled)
+		proximity_audio.set_effects_enabled(lethal_enabled)
+	_sync_sepia_mode()
 
 
 func _is_boundary_visible() -> bool:

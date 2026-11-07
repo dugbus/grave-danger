@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix, depth_test_disabled, depth_draw_never, diffuse_lambert, specular_schlick_ggx;
+render_mode fog_disabled, blend_mix, depth_test_disabled, depth_draw_never, diffuse_lambert, specular_schlick_ggx;
 
 uniform vec4 text_color : source_color = vec4(1.0, 0.94, 0.78, 1.0);
 uniform float ambient_strength = 0.38;

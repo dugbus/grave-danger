@@ -563,13 +563,13 @@ _data = {
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="Curve3D_ijrn2"]
+[sub_resource type="Curve3D" id="Curve3D_nglf8"]
 resource_local_to_scene = true
 _data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 114.929, 12, -0.62695503, 0, 0, 0, 0, 0, 0, 114.929, 0.0012148172, -0.62695503, 0, 0, 0, 0, 0, 0, 115.201355, 0.0012148172, -1.1138934, 0, 0, 0, 0, 0, 0, 119.95717, 0.0012148172, 0.4944843, 0, 0, 0, 0, 0, 0, 118.78316, 0.00087223045, 2.8458145, 0, 0, 0, 0, 0, 0, 118.0264, 0.0010001755, 4.812589, 0, 0, 0, 0, 0, 0, 114.80243, 0.00087221316, 3.115733, 0, 0, 0, 0, 0, 0, 114.031166, 0.0008743929, 3.0797184, 0, 0, 0, 0, 0, 0, 113.42238, 0.0008743929, 4.0638657, 0, 0, 0, 0, 0, 0, 112.92386, 0.0004816222, 2.502388, 0, 0, 0, 0, 0, 0, 109.46676, 0.0010001906, 2.778849, 0, 0, 0, 0, 0, 0, 109.84914, 0.0010001906, 3.6795316, 0, 0, 0, 0, 0, 0, 110.03055, 0.0010001906, 3.7813594, 0, 0, 0, 0, 0, 0, 111.20979, 0.0010001906, 4.9109206, 0, 0, 0, 0, 0, 0, 111.20979, 1.2510004, 4.9109206, 0, 0, 0, 0, 0, 0, 111.20979, 0.66150403, 4.9109206, 0, 0, 0, 0, 0, 0, 111.218544, 0.08849862, 5.097617, 0, 0, 0, 0, 0, 0, 111.21909, 1.6581476, 4.006749, 0, 0, 0, 0, 0, 0, 111.22038, 0.49593464, 4.9849467, 0, 0, 0, 0, 0, 0, 111.218994, 1.3378552, 4.9849467, 0, 0, 0, 0, 0, 0, 111.219124, 0.39162937, 4.9695582, 0, 0, 0, 0, 0, 0, 111.0105, 0.0008743013, 1.8359774, 0, 0, 0, 0, 0, 0, 108.83514, 0.0008743013, 3.379181, 0, 0, 0, 0, 0, 0, 105.16039, 2.3639761e-05, 4.759322, 0, 0, 0, 0, 0, 0, 105.98912, 2.3639761e-05, 4.634959, 0, 0, 0, 0, 0, 0, 106.267914, 0.000984953, 4.6920595, 0, 0, 0, 0, 0, 0, 106.22034, 0.4268253, 4.6920595, 0, 0, 0, 0, 0, 0, 107.188545, 0.06315617, 5.4612675, 0, 0, 0, 0, 0, 0, 107.21913, 0.42258605, 5.9258423, 0, 0, 0, 0, 0, 0, 104.08556, 0.0009253692, 7.4496317, 0, 0, 0, 0, 0, 0, 103.13581, 0.0009253692, 4.8345747, 0, 0, 0, 0, 0, 0, 103.10485, 0.7500225, 3.864622, 0, 0, 0, 0, 0, 0, 102.99878, 0.9375223, 4.8550634, 0, 0, 0, 0, 0, 0, 104.03216, 2.000026, 4.6076736, 0, 0, 0, 0, 0, 0, 107.2195, 1.8075932, 4.681493, 0, 0, 0, 0, 0, 0, 107.21899, 0.0007330179, 4.6814885, 0, 0, 0, 0, 0, 0, 107.214386, 1.1757331, 5.014962, 0, 0, 0, 0, 0, 0, 108.017586, 2.0009685, 5.027018, 0, 0, 0, 0, 0, 0, 110.42082, 0.00020637678, 5.765965, 0, 0, 0, 0, 0, 0, 106.03368, 0.00020637678, 3.2118402, 0, 0, 0, 0, 0, 0, 98.69151, 0.00089796627, 5.519189, 0, 0, 0, 0, 0, 0, 98.92153, 0.2832254, 4.2211146, 0, 0, 0, 0, 0, 0, 98.98529, -2.0724075, 5.218489, 0, 0, 0, 0, 0, 0, 98.98529, -18.961067, 5.218489, 0, 0, 0, 0, 0, 0, 114.929, 12, -0.62695503, 0, 0, 0, 0, 0, 0, 114.69529, 0.0012148172, 0.008726075, 0, 0, 0, 0, 0, 0, 112.07369, 0.0008668556, 7.438511, 0, 0, 0, 0, 0, 0, 106.02945, 2.3614673e-05, 6.9112287, 0, 0, 0, 0, 0, 0, 96.21124, 0.00087427726, 6.8670053, 0, 0, 0, 0, 0, 0, 89.657135, 0.0010009038, 6.1767073, 0, 0, 0, 0, 0, 0, 89.5404, 0.0008743958, 5.119951, 0, 0, 0, 0, 0, 0, 90.7824, 0.5264348, 5.0451074, 0, 0, 0, 0, 0, 0, 91.38008, 0.6636044, 3.0936813, 0, 0, 0, 0, 0, 0, 94.726204, 0.0009887994, 4.8564825, 0, 0, 0, 0, 0, 0, 95.19867, 1.2250178, 5.2453613, 0, 0, 0, 0, 0, 0, 96.78084, 0.000342533, 4.962324, 0, 0, 0, 0, 0, 0, 98.2857, 0.000342533, 4.261908, 0, 0, 0, 0, 0, 0, 98.78097, -0.3370426, 5.2191143, 0, 0, 0, 0, 0, 0, 98.97451, -12.91371, 5.2191377, 0, 0, 0, 0, 0, 0, 114.929, 12, -0.62695503, 0, 0, 0, 0, 0, 0, 114.929, 0.0012148172, -0.62695503, 0, 0, 0, 0, 0, 0, 113.55947, 0.0012148172, 2.0104742, 0, 0, 0, 0, 0, 0, 111.87311, 0.00087430543, 3.1594284, 0, 0, 0, 0, 0, 0, 111.845924, 0.0010001796, 2.3838077, 0, 0, 0, 0, 0, 0, 110.0816, 0.0010001834, 4.1822414, 0, 0, 0, 0, 0, 0, 107.85305, 0.0010001834, 2.5257063, 0, 0, 0, 0, 0, 0, 103.322975, 0.0010001834, 2.4504614, 0, 0, 0, 0, 0, 0, 102.05363, 2.3620902e-05, 4.6108413, 0, 0, 0, 0, 0, 0, 101.97671, 2.3620902e-05, 4.806301, 0, 0, 0, 0, 0, 0, 102.33255, 2.3620902e-05, 4.954514, 0, 0, 0, 0, 0, 0, 102.53301, 0.7500232, 5.0482564, 0, 0, 0, 0, 0, 0, 103.219124, 0.8051456, 3.7406492, 0, 0, 0, 0, 0, 0, 100.779785, 0.061226692, 2.7442915, 0, 0, 0, 0, 0, 0, 98.890076, 0.00091219496, 4.8995156, 0, 0, 0, 0, 0, 0, 98.9954, 0.98841155, 4.915249, 0, 0, 0, 0, 0, 0, 102.221115, 1.3375882, 5.0209594, 0, 0, 0, 0, 0, 0, 103.219124, -11.810746, 4.7829423, 0, 0, 0, 0, 0, 0, 114.929, 12, -0.62695503, 0, 0, 0, 0, 0, 0, 114.203316, 0.0012148172, -0.5952527, 0, 0, 0, 0, 0, 0, 107.3414, 0.0012148172, 2.2466893, 0, 0, 0, 0, 0, 0, 98.1494, 0.0012148172, 2.0607972, 0, 0, 0, 0, 0, 0, 91.92893, 0.00023825467, 2.363802, 0, 0, 0, 0, 0, 0, 89.53233, 0.00023825467, 5.849843, 0, 0, 0, 0, 0, 0, 89.79422, 0.00023825467, 5.3036885, 0, 0, 0, 0, 0, 0, 89.87342, 0.00023825467, 5.1119175),
-"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 114.929, 12, -0.62695503, 0, 0, 0, 0, 0, 0, 114.929, 0.0012148172, -0.62695503, 0, 0, 0, 0, 0, 0, 114.75997, 0.0012148172, 0.8422689, 0, 0, 0, 0, 0, 0, 114.40856, 0.0012148172, 1.1858603, 0, 0, 0, 0, 0, 0, 114.01056, 0.0009881582, 3.5481424, 0, 0, 0, 0, 0, 0, 116.05055, 0.0010009566, 3.8013318, 0, 0, 0, 0, 0, 0, 116.72869, 0.0010009566, 4.477961, 0, 0, 0, 0, 0, 0, 111.058304, 0.0010009566, 6.8263245, 0, 0, 0, 0, 0, 0, 111.218994, 0.2508736, 4.926206, 0, 0, 0, 0, 0, 0, 111.218994, 1.6614223, 4.926206, 0, 0, 0, 0, 0, 0, 111.218994, 0.16142048, 4.926206, 0, 0, 0, 0, 0, 0, 108.22773, 0.00072774757, 2.1362529, 0, 0, 0, 0, 0, 0, 106.11259, 0.00072774757, 4.9787545, 0, 0, 0, 0, 0, 0, 105.696526, 0.00012813043, 4.498813, 0, 0, 0, 0, 0, 0, 105.93876, 0.00012813043, 4.8530827, 0, 0, 0, 0, 0, 0, 102.93571, 0.00012813043, 2.0137517, 0, 0, 0, 0, 0, 0, 101.338684, 0.00012813043, 4.2844477, 0, 0, 0, 0, 0, 0, 102.98255, 0.16262817, 4.9528766, 0, 0, 0, 0, 0, 0, 101.959114, 0.6530444, 3.35609, 0, 0, 0, 0, 0, 0, 98.6127, 0.0009133764, 3.9651272, 0, 0, 0, 0, 0, 0, 99.09062, 0.67591304, 4.8988385, 0, 0, 0, 0, 0, 0, 99.42172, 2.0010016, 5.026404, 0, 0, 0, 0, 0, 0, 96.780975, 0.001235526, 5.018473, 0, 0, 0, 0, 0, 0, 94.98929, 0.00087430124, 3.289226, 0, 0, 0, 0, 0, 0, 94.7774, 0.00087430124, 4.707805, 0, 0, 0, 0, 0, 0, 94.841835, 0.91337377, 4.844722, 0, 0, 0, 0, 0, 0, 96.37541, 2.0009868, 5.084357, 0, 0, 0, 0, 0, 0, 91.95803, 1.5009154, 5.0700994, 0, 0, 0, 0, 0, 0, 91.84761, 1.5009154, 5.0498843, 0, 0, 0, 0, 0, 0, 90.8375, 1.3143528, 5.0508122, 0, 0, 0, 0, 0, 0, 90.804825, 0.75025344, 5.0477853, 0, 0, 0, 0, 0, 0, 88.8999, 0.0010001833, 2.8805046, 0, 0, 0, 0, 0, 0, 95.218994, 0.0010001842, 6.2721825, 0, 0, 0, 0, 0, 0, 103.2234, 2.3621717e-05, 6.546505, 0, 0, 0, 0, 0, 0, 106.451126, 0.000864326, 5.934475, 0, 0, 0, 0, 0, 0, 107.0231, 0.000864326, 6.114536, 0, 0, 0, 0, 0, 0, 110.3505, 0.000983246, 5.3839827, 0, 0, 0, 0, 0, 0, 111.21911, 1.0236852, 5.533892, 0, 0, 0, 0, 0, 0, 113.647026, 0.0010004826, 4.5586643, 0, 0, 0, 0, 0, 0, 115.063225, 0.17600052, 2.039539, 0, 0, 0, 0, 0, 0, 115.21758, 1.6760023, 2.0672114, 0, 0, 0, 0, 0, 0, 117.009674, -1.9673157, 2.0300121, 0, 0, 0, 0, 0, 0, 117.009674, -19.819641, 2.0300121),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 }
-point_count = 85
+point_count = 43
 
 [node name="DebugLevel" type="Node3D" unique_id=145450153]
 
@@ -1177,22 +1177,22 @@ transform = Transform3D(0.665451, 0, -0.74644154, 0, 1, 0, 0.74644154, 0, 0.6654
 [node name="pumpkin" parent="." unique_id=773297613 instance=ExtResource("46_kfalc")]
 transform = Transform3D(0.93395543, 0, 0.3573895, 0, 1, 0, -0.3573895, 0, 0.93395543, 120.661995, -9.536743e-07, -0.7668171)
 
-[node name="PlaythroughPositionMarkers" type="Node3D" parent="." unique_id=848096189]
+[node name="PlaythroughPositionMarkers" type="Node3D" parent="." unique_id=1132634224]
 editor_description = "Editor-only positions sampled from the most recent debug playthrough."
 script = ExtResource("43_khk1w")
 metadata/playthrough_position_markers = true
 
-[node name="WalkedPath" type="Path3D" parent="PlaythroughPositionMarkers" unique_id=1264538367]
+[node name="WalkedPath" type="Path3D" parent="PlaythroughPositionMarkers" unique_id=1774229547]
 editor_description = "Sampled player route; select it to show the prominent directional path overlay."
-curve = SubResource("Curve3D_ijrn2")
+curve = SubResource("Curve3D_nglf8")
 
-[node name="Sample_000" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1635111471]
+[node name="Sample_000" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1203271379]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.929, 12, -0.62695503)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_000" unique_id=1376161823]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_000" unique_id=1805982550]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_000" unique_id=733618932]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_000" unique_id=2056982726]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1203,13 +1203,13 @@ text = "0:00"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_001" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1563627403]
+[node name="Sample_001" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1426657712]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.929, 0.0012148172, -0.62695503)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_001" unique_id=1176731344]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_001" unique_id=1004370733]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_001" unique_id=231077169]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_001" unique_id=1697025060]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1220,13 +1220,13 @@ text = "0:02"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_002" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=216076148]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 115.201355, 0.0012148172, -1.1138934)
+[node name="Sample_002" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=568620237]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.75997, 0.0012148172, 0.8422689)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_002" unique_id=940927614]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_002" unique_id=366276789]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_002" unique_id=349585254]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_002" unique_id=1760003844]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1237,13 +1237,13 @@ text = "0:04"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_003" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=2083298333]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 119.95717, 0.0012148172, 0.4944843)
+[node name="Sample_003" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1860827294]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.40856, 0.0012148172, 1.1858603)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_003" unique_id=374674746]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_003" unique_id=624932537]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_003" unique_id=2104815530]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_003" unique_id=1200002196]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1254,13 +1254,13 @@ text = "0:06"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_004" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=583282104]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 118.78316, 0.00087223045, 2.8458145)
+[node name="Sample_004" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1742419292]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.01056, 0.0009881582, 3.5481424)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_004" unique_id=2078094633]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_004" unique_id=1579200335]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_004" unique_id=1832998129]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_004" unique_id=716929606]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1271,13 +1271,13 @@ text = "0:08"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_005" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=304400774]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 118.0264, 0.0010001755, 4.812589)
+[node name="Sample_005" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1619083126]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 116.05055, 0.0010009566, 3.8013318)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_005" unique_id=1511620113]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_005" unique_id=1358152723]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_005" unique_id=988333147]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_005" unique_id=1466530781]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1288,13 +1288,13 @@ text = "0:10"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_006" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=918167955]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.80243, 0.00087221316, 3.115733)
+[node name="Sample_006" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1375659160]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 116.72869, 0.0010009566, 4.477961)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_006" unique_id=358076470]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_006" unique_id=818098717]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_006" unique_id=961076761]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_006" unique_id=254247507]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1305,30 +1305,47 @@ text = "0:12"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_007" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=441154935]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.031166, 0.0008743929, 3.0797184)
+[node name="Sample_007" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1371469560]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.058304, 0.0010009566, 6.8263245)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_007" unique_id=971237004]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_007" unique_id=59818434]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_007" unique_id=1437152452]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_007" unique_id=1470220691]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
 no_depth_test = true
 modulate = Color(1, 0.88, 0.4, 1)
 outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:14–0:16"
+text = "0:14"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_008" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=8439576]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 113.42238, 0.0008743929, 4.0638657)
+[node name="Sample_008" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1420030470]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.218994, 0.2508736, 4.926206)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_008" unique_id=945378712]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_008" unique_id=686416627]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_008" unique_id=1175138173]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_008" unique_id=1839820964]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
+pixel_size = 0.01
+billboard = 1
+no_depth_test = true
+modulate = Color(1, 0.88, 0.4, 1)
+outline_modulate = Color(0.08, 0.03, 0.01, 1)
+text = "0:16"
+font_size = 28
+outline_size = 3
+
+[node name="Sample_009" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1393216155]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.218994, 1.6614223, 4.926206)
+
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_009" unique_id=1787892784]
+gizmo_extents = 0.35
+
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_009" unique_id=1186784825]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1339,13 +1356,13 @@ text = "0:18"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_009" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=64797423]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 112.92386, 0.0004816222, 2.502388)
+[node name="Sample_010" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1970419309]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.218994, 0.16142048, 4.926206)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_009" unique_id=689913925]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_010" unique_id=117023570]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_009" unique_id=486102364]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_010" unique_id=1543717077]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1356,13 +1373,13 @@ text = "0:20"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_010" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1307923502]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 109.46676, 0.0010001906, 2.778849)
+[node name="Sample_011" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1998629311]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 108.22773, 0.00072774757, 2.1362529)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_010" unique_id=348225951]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_011" unique_id=797234940]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_010" unique_id=536507409]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_011" unique_id=166828527]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1373,13 +1390,13 @@ text = "0:22"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_011" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1648239690]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 109.84914, 0.0010001906, 3.6795316)
+[node name="Sample_012" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1798587896]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 106.11259, 0.00072774757, 4.9787545)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_011" unique_id=1128441604]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_012" unique_id=792662868]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_011" unique_id=1087281108]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_012" unique_id=1954902841]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1390,47 +1407,47 @@ text = "0:24"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_012" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1567132969]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 110.03055, 0.0010001906, 3.7813594)
+[node name="Sample_013" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1473845125]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 105.696526, 0.00012813043, 4.498813)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_012" unique_id=1490212035]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_013" unique_id=802000971]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_012" unique_id=2126906460]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_013" unique_id=511284869]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
 no_depth_test = true
 modulate = Color(1, 0.88, 0.4, 1)
 outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:26–0:28"
+text = "0:26"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_013" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1381311153]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.20979, 0.0010001906, 4.9109206)
+[node name="Sample_014" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1385306915]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 105.93876, 0.00012813043, 4.8530827)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_013" unique_id=1692607051]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_014" unique_id=122209787]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_013" unique_id=1974143565]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_014" unique_id=1090214072]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
 no_depth_test = true
 modulate = Color(1, 0.88, 0.4, 1)
 outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:30"
+text = "0:28–0:30"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_014" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=857087550]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.20979, 1.2510004, 4.9109206)
+[node name="Sample_015" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1964542258]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 102.93571, 0.00012813043, 2.0137517)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_014" unique_id=723657112]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_015" unique_id=328555200]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_014" unique_id=1679861873]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_015" unique_id=1888483889]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1441,13 +1458,13 @@ text = "0:32"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_015" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1798026855]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.20979, 0.66150403, 4.9109206)
+[node name="Sample_016" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=604369352]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 101.338684, 0.00012813043, 4.2844477)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_015" unique_id=1312432192]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_016" unique_id=2120550645]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_015" unique_id=262208211]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_016" unique_id=171002841]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1458,13 +1475,13 @@ text = "0:34"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_016" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=259059788]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.218544, 0.08849862, 5.097617)
+[node name="Sample_017" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1163648281]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 102.98255, 0.16262817, 4.9528766)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_016" unique_id=96734512]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_017" unique_id=177267760]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_016" unique_id=490009988]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_017" unique_id=1567574860]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1475,13 +1492,13 @@ text = "0:36"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_017" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1182347493]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.21909, 1.6581476, 4.006749)
+[node name="Sample_018" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=770509876]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 101.959114, 0.6530444, 3.35609)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_017" unique_id=1305923418]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_018" unique_id=842587009]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_017" unique_id=2046617854]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_018" unique_id=1284726372]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1492,13 +1509,13 @@ text = "0:38"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_018" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=20062041]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.22038, 0.49593464, 4.9849467)
+[node name="Sample_019" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=2076197552]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98.6127, 0.0009133764, 3.9651272)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_018" unique_id=1947570956]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_019" unique_id=1697534424]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_018" unique_id=1168236571]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_019" unique_id=1939622510]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1509,13 +1526,13 @@ text = "0:40"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_019" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1372920140]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.218994, 1.3378552, 4.9849467)
+[node name="Sample_020" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=921803409]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 99.09062, 0.67591304, 4.8988385)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_019" unique_id=2129579010]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_020" unique_id=128271834]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_019" unique_id=1268416250]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_020" unique_id=917191924]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1526,13 +1543,13 @@ text = "0:42"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_020" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1891780322]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.219124, 0.39162937, 4.9695582)
+[node name="Sample_021" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1809986488]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 99.42172, 2.0010016, 5.026404)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_020" unique_id=717606141]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_021" unique_id=748903061]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_020" unique_id=356017597]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_021" unique_id=1264774290]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1543,13 +1560,13 @@ text = "0:44"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_021" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1753675729]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.0105, 0.0008743013, 1.8359774)
+[node name="Sample_022" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=19065349]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 96.780975, 0.001235526, 5.018473)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_021" unique_id=2090544647]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_022" unique_id=1152681019]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_021" unique_id=2071146350]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_022" unique_id=76800713]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1560,13 +1577,13 @@ text = "0:46"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_022" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1936773024]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 108.83514, 0.0008743013, 3.379181)
+[node name="Sample_023" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1425160423]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 94.98929, 0.00087430124, 3.289226)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_022" unique_id=653700722]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_023" unique_id=1556631321]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_022" unique_id=112766469]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_023" unique_id=1252970059]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1577,13 +1594,13 @@ text = "0:48"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_023" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1324601627]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 105.16039, 2.3639761e-05, 4.759322)
+[node name="Sample_024" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1772591505]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 94.7774, 0.00087430124, 4.707805)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_023" unique_id=522483056]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_024" unique_id=1379805042]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_023" unique_id=963373551]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_024" unique_id=295415381]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1594,13 +1611,13 @@ text = "0:50"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_024" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=379146667]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 105.98912, 2.3639761e-05, 4.634959)
+[node name="Sample_025" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=545444633]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 94.841835, 0.91337377, 4.844722)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_024" unique_id=540386891]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_025" unique_id=550962535]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_024" unique_id=1747850419]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_025" unique_id=1849501718]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1611,13 +1628,13 @@ text = "0:52"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_025" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1159368364]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 106.267914, 0.000984953, 4.6920595)
+[node name="Sample_026" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=127393513]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 96.37541, 2.0009868, 5.084357)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_025" unique_id=1895586687]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_026" unique_id=32594581]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_025" unique_id=1299473234]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_026" unique_id=186501491]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1628,13 +1645,13 @@ text = "0:54"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_026" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1936474415]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 106.22034, 0.4268253, 4.6920595)
+[node name="Sample_027" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=617499905]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 91.95803, 1.5009154, 5.0700994)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_026" unique_id=1719661918]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_027" unique_id=675439249]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_026" unique_id=694011658]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_027" unique_id=465483625]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1645,13 +1662,13 @@ text = "0:56"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_027" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=579998230]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 107.188545, 0.06315617, 5.4612675)
+[node name="Sample_028" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1811314876]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 91.84761, 1.5009154, 5.0498843)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_027" unique_id=1711848437]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_028" unique_id=1869276474]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_027" unique_id=742995238]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_028" unique_id=1275222447]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1662,13 +1679,13 @@ text = "0:58"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_028" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=196289660]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 107.21913, 0.42258605, 5.9258423)
+[node name="Sample_029" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1210945326]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90.8375, 1.3143528, 5.0508122)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_028" unique_id=418339163]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_029" unique_id=1616758844]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_028" unique_id=203093301]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_029" unique_id=1902537213]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1679,81 +1696,30 @@ text = "1:00"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_029" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1260693598]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 104.08556, 0.0009253692, 7.4496317)
+[node name="Sample_030" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=41659372]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90.804825, 0.75025344, 5.0477853)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_029" unique_id=662616308]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_030" unique_id=1762067640]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_029" unique_id=154556334]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_030" unique_id=1602688580]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
 no_depth_test = true
 modulate = Color(1, 0.88, 0.4, 1)
 outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "1:02"
+text = "1:02–1:08"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_030" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=78580879]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 103.13581, 0.0009253692, 4.8345747)
+[node name="Sample_031" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1950116954]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 88.8999, 0.0010001833, 2.8805046)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_030" unique_id=300589125]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_031" unique_id=144593064]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_030" unique_id=1598409808]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "1:04"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_031" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=403807315]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 103.10485, 0.7500225, 3.864622)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_031" unique_id=318449152]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_031" unique_id=614857444]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "1:06"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_032" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=2084733634]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 102.99878, 0.9375223, 4.8550634)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_032" unique_id=1779193411]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_032" unique_id=38228104]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "1:08"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_033" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=137980779]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 104.03216, 2.000026, 4.6076736)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_033" unique_id=1646375316]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_033" unique_id=1465226875]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_031" unique_id=2017743368]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1764,13 +1730,13 @@ text = "1:10"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_034" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=998457807]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 107.2195, 1.8075932, 4.681493)
+[node name="Sample_032" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1430972645]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 95.218994, 0.0010001842, 6.2721825)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_034" unique_id=1850364204]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_032" unique_id=118935176]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_034" unique_id=1248884548]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_032" unique_id=926897620]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1781,13 +1747,13 @@ text = "1:12"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_035" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=828772579]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 107.21899, 0.0007330179, 4.6814885)
+[node name="Sample_033" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=704840407]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 103.2234, 2.3621717e-05, 6.546505)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_035" unique_id=1631517717]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_033" unique_id=824336227]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_035" unique_id=967685925]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_033" unique_id=897970314]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1798,13 +1764,13 @@ text = "1:14"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_036" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=2137823034]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 107.214386, 1.1757331, 5.014962)
+[node name="Sample_034" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=644779600]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 106.451126, 0.000864326, 5.934475)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_036" unique_id=163142546]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_034" unique_id=970864301]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_036" unique_id=1418578188]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_034" unique_id=1215068802]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1815,13 +1781,13 @@ text = "1:16"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_037" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1062272647]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 108.017586, 2.0009685, 5.027018)
+[node name="Sample_035" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=806920273]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 107.0231, 0.000864326, 6.114536)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_037" unique_id=1584114307]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_035" unique_id=1064059834]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_037" unique_id=5146902]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_035" unique_id=126919010]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1832,13 +1798,13 @@ text = "1:18"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_038" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=495605142]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 110.42082, 0.00020637678, 5.765965)
+[node name="Sample_036" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=2113408900]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 110.3505, 0.000983246, 5.3839827)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_038" unique_id=1178082769]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_036" unique_id=1651399833]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_038" unique_id=1563537747]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_036" unique_id=2006174556]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1849,13 +1815,13 @@ text = "1:20"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_039" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=267870144]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 106.03368, 0.00020637678, 3.2118402)
+[node name="Sample_037" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=519198301]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.21911, 1.0236852, 5.533892)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_039" unique_id=1512731676]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_037" unique_id=268164719]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_039" unique_id=164969707]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_037" unique_id=2105103072]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1866,13 +1832,13 @@ text = "1:22"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_040" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=637765641]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98.69151, 0.00089796627, 5.519189)
+[node name="Sample_038" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=448516344]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 113.647026, 0.0010004826, 4.5586643)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_040" unique_id=760061033]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_038" unique_id=908329828]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_040" unique_id=298606470]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_038" unique_id=2002316207]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1883,13 +1849,13 @@ text = "1:24"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_041" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=189202679]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98.92153, 0.2832254, 4.2211146)
+[node name="Sample_039" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=124169120]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 115.063225, 0.17600052, 2.039539)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_041" unique_id=1459475326]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_039" unique_id=198045554]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_041" unique_id=1334216666]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_039" unique_id=779842364]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1900,13 +1866,13 @@ text = "1:26"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_042" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1391912668]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98.98529, -2.0724075, 5.218489)
+[node name="Sample_040" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=345310081]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 115.21758, 1.6760023, 2.0672114)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_042" unique_id=1078661935]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_040" unique_id=407184905]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_042" unique_id=365206800]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_040" unique_id=1710179573]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1917,13 +1883,13 @@ text = "1:28"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_043" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=228726843]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98.98529, -18.961067, 5.218489)
+[node name="Sample_041" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=503961494]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 117.009674, -1.9673157, 2.0300121)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_043" unique_id=1984686452]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_041" unique_id=1619195716]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_043" unique_id=1581486123]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_041" unique_id=626951404]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
@@ -1934,700 +1900,20 @@ text = "1:30"
 font_size = 28
 outline_size = 3
 
-[node name="Sample_044" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=473713942]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.929, 12, -0.62695503)
+[node name="Sample_042" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=767824895]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 117.009674, -19.819641, 2.0300121)
 
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_044" unique_id=1551215940]
+[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_042" unique_id=88020467]
 gizmo_extents = 0.35
 
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_044" unique_id=187611798]
+[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_042" unique_id=142734723]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
 pixel_size = 0.01
 billboard = 1
 no_depth_test = true
 modulate = Color(1, 0.88, 0.4, 1)
 outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:00"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_045" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=828491124]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.69529, 0.0012148172, 0.008726075)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_045" unique_id=1594015508]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_045" unique_id=200684936]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:02"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_046" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1433835201]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 112.07369, 0.0008668556, 7.438511)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_046" unique_id=1509031853]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_046" unique_id=1450605131]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:04"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_047" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=337899650]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 106.02945, 2.3614673e-05, 6.9112287)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_047" unique_id=1558701598]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_047" unique_id=757204335]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:06"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_048" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=545068174]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 96.21124, 0.00087427726, 6.8670053)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_048" unique_id=370042716]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_048" unique_id=825893098]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:08"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_049" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1956138012]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 89.657135, 0.0010009038, 6.1767073)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_049" unique_id=1479988663]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_049" unique_id=1773166885]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:10"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_050" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=111710964]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 89.5404, 0.0008743958, 5.119951)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_050" unique_id=1716105188]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_050" unique_id=1415445349]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:12"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_051" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1001581220]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90.7824, 0.5264348, 5.0451074)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_051" unique_id=1995126309]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_051" unique_id=798610335]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:14"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_052" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=378170711]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 91.38008, 0.6636044, 3.0936813)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_052" unique_id=1513241803]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_052" unique_id=1110731307]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:16"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_053" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1443616651]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 94.726204, 0.0009887994, 4.8564825)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_053" unique_id=1083555126]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_053" unique_id=1728832620]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:18"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_054" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=2094461178]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 95.19867, 1.2250178, 5.2453613)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_054" unique_id=1229967225]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_054" unique_id=1072919651]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:20"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_055" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=136253674]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 96.78084, 0.000342533, 4.962324)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_055" unique_id=853054426]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_055" unique_id=976094614]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:22"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_056" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1497413843]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98.2857, 0.000342533, 4.261908)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_056" unique_id=775766295]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_056" unique_id=1600837356]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:24"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_057" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=646918763]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98.78097, -0.3370426, 5.2191143)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_057" unique_id=1468320663]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_057" unique_id=2140524834]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:26"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_058" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1896279494]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98.97451, -12.91371, 5.2191377)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_058" unique_id=1582170976]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_058" unique_id=153440093]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:28"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_059" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1436395107]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.929, 12, -0.62695503)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_059" unique_id=1279281460]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_059" unique_id=355562498]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:00"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_060" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=2109178346]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.929, 0.0012148172, -0.62695503)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_060" unique_id=580711887]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_060" unique_id=2128330817]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:02"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_061" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=851703053]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 113.55947, 0.0012148172, 2.0104742)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_061" unique_id=1970065158]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_061" unique_id=1371513750]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:04"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_062" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1262033570]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.87311, 0.00087430543, 3.1594284)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_062" unique_id=1686225291]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_062" unique_id=469737583]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:06"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_063" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=844653732]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 111.845924, 0.0010001796, 2.3838077)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_063" unique_id=1484618442]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_063" unique_id=523352625]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:08"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_064" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=347915329]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 110.0816, 0.0010001834, 4.1822414)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_064" unique_id=708076083]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_064" unique_id=626708119]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:10"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_065" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1261296325]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 107.85305, 0.0010001834, 2.5257063)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_065" unique_id=1680734671]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_065" unique_id=1602653746]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:12"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_066" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1322533150]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 103.322975, 0.0010001834, 2.4504614)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_066" unique_id=340997162]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_066" unique_id=449743377]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:14"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_067" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=574683230]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 102.05363, 2.3620902e-05, 4.6108413)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_067" unique_id=1290294700]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_067" unique_id=1808418748]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:16"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_068" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1308066617]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 101.97671, 2.3620902e-05, 4.806301)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_068" unique_id=1957311824]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_068" unique_id=75393004]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:18"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_069" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=765984672]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 102.33255, 2.3620902e-05, 4.954514)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_069" unique_id=1422271189]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_069" unique_id=1959350608]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:20"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_070" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1479424743]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 102.53301, 0.7500232, 5.0482564)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_070" unique_id=985322098]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_070" unique_id=33347179]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:22"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_071" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=960110096]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 103.219124, 0.8051456, 3.7406492)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_071" unique_id=835928332]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_071" unique_id=1609087359]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:24"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_072" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=2066501956]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 100.779785, 0.061226692, 2.7442915)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_072" unique_id=900736449]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_072" unique_id=925264012]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:26"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_073" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=2132757163]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98.890076, 0.00091219496, 4.8995156)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_073" unique_id=1084414459]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_073" unique_id=1444243064]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:28"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_074" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=2117583311]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98.9954, 0.98841155, 4.915249)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_074" unique_id=1710112131]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_074" unique_id=1351495006]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:30"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_075" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1148288749]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 102.221115, 1.3375882, 5.0209594)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_075" unique_id=188842624]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_075" unique_id=1942715522]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:32"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_076" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=715808574]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 103.219124, -11.810746, 4.7829423)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_076" unique_id=1192179467]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_076" unique_id=462855782]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:34"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_077" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=614799781]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.929, 12, -0.62695503)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_077" unique_id=1939831990]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_077" unique_id=941448754]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:00"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_078" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1158611378]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.203316, 0.0012148172, -0.5952527)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_078" unique_id=1335919226]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_078" unique_id=1909330929]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:02"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_079" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=1024896002]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 107.3414, 0.0012148172, 2.2466893)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_079" unique_id=602843786]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_079" unique_id=419497130]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:04"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_080" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=2094580253]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98.1494, 0.0012148172, 2.0607972)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_080" unique_id=653545984]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_080" unique_id=1399869467]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:06"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_081" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=305927061]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 91.92893, 0.00023825467, 2.363802)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_081" unique_id=1811600667]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_081" unique_id=1010090034]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:08"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_082" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=123266528]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 89.53233, 0.00023825467, 5.849843)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_082" unique_id=962490681]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_082" unique_id=467012111]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:10"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_083" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=683739750]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 89.79422, 0.00023825467, 5.3036885)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_083" unique_id=350839831]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_083" unique_id=243424514]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:12"
-font_size = 28
-outline_size = 3
-
-[node name="Sample_084" type="Node3D" parent="PlaythroughPositionMarkers" unique_id=2136612257]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 89.87342, 0.00023825467, 5.1119175)
-
-[node name="Position" type="Marker3D" parent="PlaythroughPositionMarkers/Sample_084" unique_id=1718883381]
-gizmo_extents = 0.35
-
-[node name="Time" type="Label3D" parent="PlaythroughPositionMarkers/Sample_084" unique_id=1494352156]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.2, 0.24)
-pixel_size = 0.01
-billboard = 1
-no_depth_test = true
-modulate = Color(1, 0.88, 0.4, 1)
-outline_modulate = Color(0.08, 0.03, 0.01, 1)
-text = "0:14–0:30"
+text = "1:32"
 font_size = 28
 outline_size = 3
 

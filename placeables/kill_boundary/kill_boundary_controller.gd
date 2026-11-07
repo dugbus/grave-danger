@@ -225,7 +225,12 @@ func _get_rectangle_profile_point(half_size: Vector2, perimeter_ratio: float) ->
 
 
 func _update_player_blockers_enabled() -> void:
-	var disabled := not _runtime_effects_enabled() or not player_blocking_enabled or _has_dead_flame_vulnerable_body()
+	var disabled := (
+		render_effect == RenderEffect.Sepia
+		or not _runtime_effects_enabled()
+		or not player_blocking_enabled
+		or _has_dead_flame_vulnerable_body()
+	)
 	for collision in blocker_collisions:
 		if is_instance_valid(collision):
 			collision.disabled = disabled
@@ -256,7 +261,8 @@ func _create_near_flame_audio() -> void:
 	near_flame_audio_player.stream = loop_stream
 	near_flame_audio_player.volume_db = _get_boundary_audio_volume_db(near_flame_audio_min_db)
 	add_child(near_flame_audio_player)
-	near_flame_audio_player.play()
+	if render_effect != RenderEffect.Sepia:
+		near_flame_audio_player.play()
 
 
 func _get_boundary_audio_path() -> String:
@@ -274,7 +280,7 @@ func _get_boundary_audio_volume_db(base_volume_db: float) -> float:
 
 
 func _apply_flame_heat(delta: float) -> void:
-	if not _runtime_effects_enabled():
+	if render_effect == RenderEffect.Sepia or not _runtime_effects_enabled():
 		return
 
 	for body in get_tree().get_nodes_in_group("flame_vulnerable"):
@@ -317,7 +323,8 @@ func _update_near_flame_audio(delta: float) -> void:
 	if near_flame_audio_player == null:
 		return
 
-	if not _runtime_effects_enabled():
+	if render_effect == RenderEffect.Sepia or not _runtime_effects_enabled():
+		near_flame_audio_player.stream_paused = true
 		near_flame_audio_player.volume_db = _get_boundary_audio_volume_db(near_flame_audio_min_db)
 		return
 

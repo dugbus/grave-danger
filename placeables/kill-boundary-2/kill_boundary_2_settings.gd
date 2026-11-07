@@ -7,6 +7,7 @@ enum RenderEffect {
 	Flame,
 	Ghost,
 	None,
+	Sepia,
 }
 
 ## Controls how smoothly rounded boundaries are drawn. Raise this when curves look faceted; lower

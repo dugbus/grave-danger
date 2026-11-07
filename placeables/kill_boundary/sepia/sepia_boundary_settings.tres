@@ -1,0 +1,6 @@
+[gd_resource type="Resource" format=3 uid="uid://bfyu7b7i41huf"]
+
+[ext_resource type="Script" uid="uid://bum06bpa4dmw6" path="res://placeables/kill_boundary/sepia/sepia_boundary_settings.gd" id="1_settings"]
+
+[resource]
+script = ExtResource("1_settings")

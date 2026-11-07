@@ -28,6 +28,9 @@ func configure(
 
 func set_render_effect(value: GDKillBoundary2Settings.RenderEffect) -> void:
 	render_effect = value
+	if value == GDKillBoundary2Settings.RenderEffect.Sepia:
+		stop()
+		return
 	var audio_path := (
 		GHOST_BOUNDARY_SOUND_PATH if value == GDKillBoundary2Settings.RenderEffect.Ghost else NEAR_FLAMES_SOUND_PATH
 	)

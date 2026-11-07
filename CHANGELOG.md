@@ -1,5 +1,73 @@
 # Changelog
 
+## 2026-11-03
+
+### 0100
+
+- Triggered messages and flask text now render clearly above the boundary's photo treatment and veil, with correct pause dimming even when attached to enemies.
+  - Prompt: Fix text trigger rendering broken by the boundary photo effect.
+
+## 2026-11-02
+
+### 1300
+
+- The aged-colour view now has a gentler fade with richer blacks and colours, faint stationary paper texture, and no moving scratches or flicker; Photo Strength controls the overall blend.
+  - Prompt: Remove the distracting film bars and reduce the washed-out aged-photo treatment after artist feedback.
+
+### 1200
+
+- The boundary's older view now retains material colours with faded print contrast and a mild paper cast, and empty map-edge background receives the same black point within the selected region.
+  - Prompt: Make the boundary view an aged colour photograph that retains the artwork's colour and handles black empty map edges.
+
+### 0000
+
+- Runtime mist settings now update the active shader and environment immediately, so Remote Inspector density and noise edits are visible without toggling the effect.
+  - Prompt: Changing mist density did not visibly affect the running scene.
+- Level 1 now leaves the full-level volumetric mist disabled by default after its poor visual and performance trade-off.
+  - Prompt: The fog hurts frame rate without a useful visible improvement.
+
+## 2026-11-01
+
+### 2300
+
+- Level 1 now has subtle light-reactive mist with gently drifting 3D noise; level editors can toggle Light Mist Enabled on IndoorLighting and tune its shared settings independently of boundary effects.
+  - Prompt: Try subtle whole-level fog that enhances existing lights, with 3D noise to avoid a flat layer.
+
+### 1900
+
+- Sepia areas now resemble faded film with washed brown blacks, creamy highlights, fine animated grain, gentle projector flicker and intermittent hairline scratches; the coloured world stays clear.
+  - Prompt: Differentiate the sepia area with more washed-out blacks and an old-movie effect.
+- The animated boundary veil is more transparent and less bright, making the separation gentler while retaining its height-following wisps.
+  - Prompt: Reduce the intensity of the boundary separation geometry.
+- Sepia areas now use warm brown midtones, aged cream highlights and softly faded ink blacks for an old-photograph appearance.
+  - Prompt: Make the sepia area look like an old photograph rather than black and white.
+
+### 1800
+
+- The Sepia boundary veil follows the player's elevation on platforms, jumps and falls, while the Sepia Inverted Inspector flag swaps the coloured and safe sepia sides, including threat and pickup interactions.
+  - Prompt: Make boundary opacity follow player height and add an editor flag to invert the sepia region.
+
+### 1600
+
+- Sepia kill boundaries now have a translucent gold veil with morphing wisps and a bright base ribbon that follows their exact moving perimeter; shared settings let level editors tune its appearance.
+  - Prompt: Make the Sepia kill boundary easier to see with animated procedural noise.
+
+### 1500
+
+- Level editors can select Sepia on either kill boundary; Level 1 uses its existing animated perimeter, with sepia inside and colour outside.
+  - Prompt: Make sepia a kill-boundary mode using its actual geometry, with sepia inside and colour outside.
+- Players can pass concealed threats without taking their damage or collecting hidden rewards, then interact normally on returning to colour.
+  - Prompt: Implement the sepia view on Level 1 while enemies and pickups keep simulating.
+- Level 1 now includes an editable sepia region that conceals threats and pickups while their simulation continues, with a spatial colour split across the player.
+  - Prompt: Implement the sepia view on Level 1 while enemies and pickups keep simulating.
+
+### 1400
+
+- The sepia boundary plan now keeps hidden threats and pickups simulating, uses two masked views, and targets Level 1 for testing.
+  - Prompt: Correct the sepia boundary plan to keep gameplay running, split rendering per surface, and target Level 1.
+- Level editors have a design plan for a sepia safe region, including local enemy suppression, treasure absence, and colour-to-sepia crossings.
+  - Prompt: Plan a local sepia safe boundary where hazards and treasure are absent.
+
 ## 2026-10-31
 
 ### 1800

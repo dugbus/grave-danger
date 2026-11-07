@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://lighting/gd_indoor_lighting.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://lighting/light_mist/light_mist.tscn" id="2_mist"]
 
 [sub_resource type="Environment" id="Environment_indoor"]
 background_mode = 1
@@ -17,3 +18,5 @@ script = ExtResource("1_script")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_indoor")
+
+[node name="LightMist" parent="." instance=ExtResource("2_mist")]

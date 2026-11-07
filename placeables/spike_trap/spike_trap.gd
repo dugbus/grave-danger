@@ -1,6 +1,8 @@
 extends "res://placeables/placeable.gd"
 class_name GDSpikeTrap
 
+const SEPIA := preload("res://placeables/kill_boundary/sepia/sepia_boundary_mode.gd")
+
 enum SpikeTrapState {
 	Ready,
 	Arming,
@@ -245,6 +247,8 @@ func _damage_targets_in_strike_area() -> int:
 
 
 func _damage_target(target: Node) -> bool:
+	if is_inside_tree() and target is GDPlayer and not SEPIA.allows_interaction(target, global_position):
+		return false
 	if not _is_live_target(target):
 		return false
 

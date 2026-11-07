@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://lighting/light_mist/light_mist.gd" id="1_script"]
+
+[node name="LightMist" type="FogVolume"]
+visible = false
+shape = 4
+script = ExtResource("1_script")

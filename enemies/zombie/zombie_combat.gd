@@ -1,5 +1,7 @@
 extends "res://enemies/zombie/zombie_navigation.gd"
 
+const SEPIA := preload("res://placeables/kill_boundary/sepia/sepia_boundary_mode.gd")
+
 
 func _resolve_player() -> void:
 	if is_instance_valid(player):
@@ -82,7 +84,7 @@ func _apply_attack_damage() -> bool:
 	var hit_landed := false
 
 	for target in targets:
-		if not _is_live_player_body(target):
+		if not _is_live_player_body(target) or not SEPIA.allows_interaction(target, _get_body_position()):
 			continue
 
 		if target.has_method("apply_zombie_damage"):

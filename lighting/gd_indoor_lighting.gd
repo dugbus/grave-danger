@@ -1,6 +1,7 @@
 class_name GDIndoorLighting
 extends Node3D
 
+const LIGHT_MIST := preload("res://lighting/light_mist/light_mist.gd")
 const GRID_MAP_SHADOW_CASTERS_NAME := "GridMapShadowCasters"
 const SHADOW_VOLUME_INSET := 0.01
 const WALL_SHADOW_PROXY_LAYER := 1 << 19
@@ -13,12 +14,30 @@ const AUTHORED_SHADOW_SETTINGS_GROUP: StringName = &"authored_shadow_settings"
 ## Normal bias used by indoor lights to prevent acne on faces near wall shadow volumes.
 @export_range(0.0, 10.0, 0.01) var shadow_normal_bias := 0.6
 
+## Add very light, noisy 3D haze that scatters existing lights across this level. Independent of boundary effects.
+@export var light_mist_enabled := false:
+	set(value):
+		light_mist_enabled = value
+		if is_node_ready():
+			_sync_light_mist()
+
+@onready var _world_environment := get_node_or_null(^"WorldEnvironment") as WorldEnvironment
+@onready var _light_mist := get_node_or_null(^"LightMist") as LIGHT_MIST
+
 var level_root: Node3D
 
 
 func _ready() -> void:
 	level_root = get_parent() as Node3D
 	strengthen_level_shadows()
+	if _light_mist != null:
+		_light_mist.configure_environment(_world_environment)
+	_sync_light_mist()
+
+
+func _sync_light_mist() -> void:
+	if _light_mist != null:
+		_light_mist.set_enabled(light_mist_enabled)
 
 
 ## Applies the indoor occlusion settings to every shadow-casting light in this level.

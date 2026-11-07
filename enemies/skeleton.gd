@@ -1,6 +1,8 @@
 extends "res://placeables/path_placeable.gd"
 class_name GDSkeletonPath
 
+const SEPIA := preload("res://placeables/kill_boundary/sepia/sepia_boundary_mode.gd")
+
 const FOOTSTEP_SOUND_PATHS: Array[String] = [
 	"res://Assets/audio/skeleton-footstep.mp3",
 ]
@@ -870,6 +872,7 @@ func _update_kill_overlaps(delta: float) -> void:
 
 	for body in kill_area.get_overlapping_bodies():
 		if body == null or not _is_live_player_body(body):
+			kill_overlap_times.erase(body)
 			continue
 
 		var overlap_time := float(kill_overlap_times.get(body, 0.0)) + delta
@@ -894,6 +897,8 @@ func _kill_body_if_player(body: Node) -> void:
 
 
 func _is_live_player_body(body: Node) -> bool:
+	if is_inside_tree() and not SEPIA.allows_interaction(body, get_spike_trap_position()):
+		return false
 	if body == null:
 		return false
 

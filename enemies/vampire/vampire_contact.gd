@@ -1,6 +1,8 @@
 extends Area3D
 class_name GDVampireContact
 
+const SEPIA := preload("res://placeables/kill_boundary/sepia/sepia_boundary_mode.gd")
+
 ## Collision shape expanded to match the doubled Vampire's visible body.
 @export_storage var collision_shape_path: NodePath = ^"CollisionShape3D"
 ## World and player layers tested so instant-kill contact remains blocked by walls.
@@ -41,6 +43,8 @@ func _on_body_entered(body: Node3D) -> void:
 
 
 func _try_kill_body(body: Node3D) -> void:
+	if is_inside_tree() and not SEPIA.allows_interaction(body, global_position):
+		return
 	var vampire := get_parent()
 	if (
 		vampire != null

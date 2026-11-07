@@ -2,6 +2,9 @@
 @abstract
 extends "res://placeables/kill_boundary/kill_boundary_base.gd"
 
+var _perimeter_signature := 0
+var _perimeter_world_points := PackedVector3Array()
+
 
 func _ready() -> void:
 	add_to_group("kill_boundary")
@@ -22,18 +25,21 @@ func _ready() -> void:
 		_sync_boundary()
 		set_process(true)
 		super._ready()
+		_sync_sepia_mode()
 		return
 
 	_sync_movement_to_animation()
 	if not _runtime_effects_enabled():
 		_set_runtime_effects_enabled(false)
 		super._ready()
+		_sync_sepia_mode()
 		return
 
 	_create_strips()
 	_create_near_flame_audio()
 	_sync_boundary()
 	super._ready()
+	_sync_sepia_mode()
 
 
 func _notification(what: int) -> void:
@@ -44,6 +50,7 @@ func _notification(what: int) -> void:
 		return
 
 	_set_runtime_effects_enabled(visible)
+	_sync_sepia_mode()
 
 
 func _process(delta: float) -> void:
@@ -96,6 +103,52 @@ func get_bounds_transform() -> Transform3D:
 	var bounds_transform := _get_center_node().global_transform
 	bounds_transform.origin = bounds_transform * Vector3(0.0, flame_y, 0.0)
 	return bounds_transform
+
+
+## Returns the same animated perimeter used by boundary meshes, collisions and distance damage.
+func get_boundary_world_points() -> PackedVector3Array:
+	if boundary_removed_for_level:
+		return PackedVector3Array()
+	var boundary_transform := get_bounds_transform() if is_inside_tree() else transform
+	var signature := hash(boundary_transform)
+	signature = signature * 31 + hash(bounds_size)
+	signature = signature * 31 + hash(runtime_bounds_multiplier)
+	signature = signature * 31 + hash(shape_morph)
+	signature = signature * 31 + boundary_segments
+	if signature == _perimeter_signature and not _perimeter_world_points.is_empty():
+		return _perimeter_world_points
+	_perimeter_signature = signature
+	var local_points := _get_boundary_points()
+	var points := PackedVector3Array()
+	points.resize(local_points.size())
+	for index in local_points.size():
+		points[index] = boundary_transform * Vector3(local_points[index].x, 0.0, local_points[index].y)
+	_perimeter_world_points = points
+	return points
+
+
+func is_sepia_mode_active() -> bool:
+	return render_effect == RenderEffect.Sepia and _runtime_effects_enabled()
+
+
+func _sync_sepia_mode() -> void:
+	if not is_inside_tree() or Engine.is_editor_hint():
+		return
+	var mode := get_node_or_null(^"SepiaMode")
+	if mode != null:
+		mode.refresh_mode()
+	var lethal_enabled := _runtime_effects_enabled() and render_effect != RenderEffect.Sepia
+	for area in strip_areas:
+		area.monitoring = lethal_enabled
+	for collision in strip_collisions:
+		collision.disabled = not lethal_enabled
+	if not lethal_enabled:
+		flame_touching_bodies.clear()
+	if near_flame_audio_player != null:
+		near_flame_audio_player.stream_paused = not lethal_enabled
+		if lethal_enabled and not near_flame_audio_player.playing and near_flame_audio_player.stream != null:
+			near_flame_audio_player.play()
+	_update_player_blockers_enabled()
 
 
 func get_camera_fit_transform() -> Transform3D:
@@ -197,6 +250,7 @@ func remove_for_level(sink_seconds := 1.0, sink_distance := 3.0) -> bool:
 	_sync_boundary()
 	boundary_removed_for_level = true
 	_set_runtime_effects_enabled(false, true)
+	_sync_sepia_mode()
 	set_process(false)
 	_sink_removed_boundary(sink_seconds, sink_distance)
 	return true
@@ -217,13 +271,14 @@ func _set_runtime_effects_enabled(enabled: bool, keep_visuals := false) -> void:
 	if boundary_removed_for_level and enabled:
 		return
 
+	var lethal_enabled := enabled and render_effect != RenderEffect.Sepia
 	for area in strip_areas:
 		if is_instance_valid(area):
-			area.monitoring = enabled
+			area.monitoring = lethal_enabled
 
 	for collision in strip_collisions:
 		if is_instance_valid(collision):
-			collision.disabled = not enabled
+			collision.disabled = not lethal_enabled
 
 	for mesh in strip_meshes:
 		if is_instance_valid(mesh):
@@ -238,7 +293,7 @@ func _set_runtime_effects_enabled(enabled: bool, keep_visuals := false) -> void:
 
 	for collision in blocker_collisions:
 		if is_instance_valid(collision):
-			collision.disabled = true if not enabled else not player_blocking_enabled
+			collision.disabled = true if not lethal_enabled else not player_blocking_enabled
 
 	var animation_player := get_node_or_null(ANIMATION_PLAYER_NAME) as AnimationPlayer
 	if animation_player != null:
@@ -261,7 +316,7 @@ func _set_runtime_effects_enabled(enabled: bool, keep_visuals := false) -> void:
 			animation_player.stop(true)
 
 	if near_flame_audio_player != null:
-		near_flame_audio_player.stream_paused = not enabled
+		near_flame_audio_player.stream_paused = not lethal_enabled
 		if not enabled:
 			near_flame_audio_player.volume_db = near_flame_audio_min_db
 

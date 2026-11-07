@@ -3,6 +3,7 @@ class_name GDPlayerDeath
 
 signal flame_energy_changed(current_energy: float, maximum_energy: float, dead: bool)
 
+const SEPIA := preload("res://placeables/kill_boundary/sepia/sepia_boundary_mode.gd")
 const SCREEN_FADE := preload("res://ui/screens/screen_fade.gd")
 const WILHELM_SCREAM := preload("res://Assets/audio/wilhelm-scream.mp3")
 const SCENE_LOADER_SCRIPT := preload("res://autoload/scene_loader.gd")
@@ -21,7 +22,8 @@ enum DeathCause {
 enum DeathPhase { Alive, EnemyAttack, DeathAnimation }
 
 # Death is isolated so hazards only need one public Player method while the
-# component owns the one-way transition into the death state.
+# component owns the one-way transition into the death presentation. A reserved
+# enemy attack can still be released by a moving sepia view before that presentation begins.
 
 ## Node that receives death animation playback requests.
 @export_storage var animation_controller_path: NodePath = ^"../PlayerAnimation"
@@ -159,6 +161,9 @@ func update_enemy_attack(delta: float) -> void:
 	if not is_instance_valid(enemy_attacker) or not enemy_attacker.is_inside_tree():
 		finish_enemy_attack()
 		return
+	if not SEPIA.allows_interaction(player, enemy_attacker.global_position):
+		cancel_enemy_attack()
+		return
 	player.velocity = Vector3.ZERO
 	if animation_controller != null:
 		animation_controller.update_movement(Vector3.ZERO, delta, player.is_on_floor())
@@ -167,8 +172,28 @@ func update_enemy_attack(delta: float) -> void:
 func finish_enemy_attack() -> void:
 	if not is_waiting_for_enemy_attack():
 		return
+	if (
+		is_instance_valid(enemy_attacker)
+		and enemy_attacker.is_inside_tree()
+		and not SEPIA.allows_interaction(player, enemy_attacker.global_position)
+	):
+		cancel_enemy_attack()
+		return
 	enemy_attacker = null
 	_start_death_presentation(DeathCause.EnemyDamage)
+
+
+## A moving sepia view releases a reserved encounter without restarting the enemy's animation.
+## Actual death presentations are irreversible; only the pending attack reservation can be released.
+func cancel_enemy_attack() -> void:
+	if not is_waiting_for_enemy_attack():
+		return
+	enemy_attacker = null
+	death_phase = DeathPhase.Alive
+	is_dead = false
+	if attention != null:
+		attention.tracking_stopped = false
+	_emit_flame_energy_changed()
 
 
 func die_from_fall() -> void:

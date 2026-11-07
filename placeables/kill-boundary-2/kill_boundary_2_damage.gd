@@ -55,7 +55,13 @@ func apply_geometry(points: PackedVector2Array) -> void:
 
 
 func apply_damage(delta: float) -> void:
-	if not effects_enabled or geometry == null or settings == null or not is_inside_tree():
+	if (
+		render_effect == GDKillBoundary2Settings.RenderEffect.Sepia
+		or not effects_enabled
+		or geometry == null
+		or settings == null
+		or not is_inside_tree()
+	):
 		return
 	for body_value in get_tree().get_nodes_in_group(FLAME_VULNERABLE_GROUP):
 		var body := body_value as Node3D

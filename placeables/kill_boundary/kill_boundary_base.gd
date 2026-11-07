@@ -28,9 +28,11 @@ const GHOST_TEXTURE := preload("res://Assets/placeables/kill_boundary/ghost.png"
 const SHAPE_RECTANGLE := 0
 const SHAPE_CIRCLE := 1
 const MAX_SHAPE_INDEX := 1
-const EFFECT_FLAME := 0
-const EFFECT_GHOST := 1
-const EFFECT_NONE := 2
+enum RenderEffect { Flame, Ghost, None, Sepia }
+
+const EFFECT_FLAME := RenderEffect.Flame
+const EFFECT_GHOST := RenderEffect.Ghost
+const EFFECT_NONE := RenderEffect.None
 const EDITOR_SCRUB_TIME_EPSILON := 0.05
 const EDITOR_GHOST_PREVIEW_CYCLE_OFFSET := 0.38
 const EDITOR_PATH_MARKER_REFRESH_DELAY := 0.75
@@ -143,11 +145,17 @@ const MINIMUM_EDITOR_PREVIEW_PATH_LENGTH := 0.001
 		boundary_segments = maxi(value, 8)
 		_sync_boundary()
 
-## Visual effect rendered around the kill boundary. Damage, audio, and blockers are independent of this.
-@export_enum("Flame", "Ghost", "None") var render_effect := EFFECT_FLAME:
+## Select Flame, Ghost or an invisible lethal boundary, or Sepia to turn its enclosed interior into
+## the abandoned view by default. Sepia Inverted swaps the sides.
+## Sepia disables this boundary's damage and walls while retaining its animation.
+@export var render_effect := RenderEffect.Flame:
 	set(value):
-		render_effect = clampi(value, EFFECT_FLAME, EFFECT_NONE)
+		render_effect = value as RenderEffect
 		_sync_boundary()
+		_sync_sepia_mode()
+
+## Only affects Sepia: enable for colour inside and the safe, sepia view outside the boundary.
+@export var sepia_inverted := false
 
 ## Thickness of each visible flame strip, in world units.
 @export_range(0.01, 5.0, 0.01) var flame_thickness := 0.18:
@@ -501,3 +509,6 @@ func _get_requested_animation_loop_mode() -> Animation.LoopMode:
 @abstract func _update_speed_change_ripple_retime(delta: float) -> void
 @abstract func _on_flame_body_entered(body: Node3D) -> void
 @abstract func _on_flame_body_exited(body: Node3D) -> void
+
+@abstract func _sync_sepia_mode() -> void
+@abstract func _get_boundary_points() -> PackedVector2Array

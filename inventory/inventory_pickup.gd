@@ -1,6 +1,8 @@
 extends "res://placeables/physics_placeable.gd"
 class_name GDInventoryPickup
 
+const SEPIA := preload("res://placeables/kill_boundary/sepia/sepia_boundary_mode.gd")
+
 ## Item definition added to the player's inventory when collected.
 @export var carried_item: Resource
 ## Seconds a newly spawned or dropped item waits before pickup is allowed.
@@ -103,6 +105,8 @@ func _on_pickup_area_body_exited(body: Node3D) -> void:
 
 
 func _try_collect(body: Node3D) -> bool:
+	if is_inside_tree() and not SEPIA.allows_interaction(body, global_position):
+		return false
 	if is_being_collected or not can_be_collected or carried_item == null:
 		return false
 	if not body.has_method("try_collect_carried_item"):

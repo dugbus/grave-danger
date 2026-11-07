@@ -1,6 +1,8 @@
 extends CharacterBody3D
 class_name GDPlayer
 
+const SEPIA := preload("res://placeables/kill_boundary/sepia/sepia_boundary_mode.gd")
+
 signal flask_effect_started(effect_id: StringName, liquid_color: Color, duration: float)
 ## Emitted when a grounded jump starts so nearby gameplay objects can react to it.
 signal jump_started
@@ -90,6 +92,10 @@ func _physics_process(delta: float) -> void:
 
 
 func try_collect_carried_item(pickup: Node3D) -> bool:
+	if not is_instance_valid(pickup):
+		return false
+	if is_inside_tree() and pickup.is_inside_tree() and not SEPIA.allows_interaction(self, pickup.global_position):
+		return false
 	if death_controller.is_dead:
 		return false
 
@@ -222,6 +228,10 @@ func die_from_enemy() -> void:
 
 ## Skeleton contact locks movement and facing before the enemy's attack plays.
 func begin_skeleton_attack(attacker: Node3D) -> bool:
+	if not is_instance_valid(attacker) or not attacker.is_inside_tree():
+		return false
+	if not SEPIA.allows_interaction(self, attacker.global_position):
+		return false
 	return (death_controller as GDPlayerDeath).begin_enemy_attack(attacker)
 
 
@@ -271,6 +281,8 @@ func apply_flame_damage(amount: float) -> void:
 
 
 func apply_kill_boundary_damage(amount: float, causes_fire_death: bool) -> void:
+	if is_inside_tree() and SEPIA.is_sepia(self, global_position):
+		return
 	var was_dead := is_dead()
 	death_controller.apply_kill_boundary_damage(amount, causes_fire_death)
 	if was_dead or is_dead() or amount <= 0.0:

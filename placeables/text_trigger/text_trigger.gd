@@ -2,8 +2,9 @@
 class_name GDTextTrigger
 extends "res://placeables/area_placeable.gd"
 
+const OVERLAY_ORDER := preload("res://ui/hud/overlay_render_order.gd")
 const TEXT_SHADER := preload("res://ui/hud/flask_effect_text.gdshader")
-const TEXT_VISUAL_LAYER := 1 << 19
+const TEXT_VISUAL_LAYER := OVERLAY_ORDER.SCREEN_TEXT_VISUAL_LAYER
 const FADE_IN_DURATION := 0.2
 const MIN_TRIGGER_SIZE := 0.05
 const FLASK_EFFECT_TEXT_GROUP := &"flask_effect_text"
@@ -262,6 +263,7 @@ func _get_or_create_text_material(mesh_instance: MeshInstance3D) -> ShaderMateri
 		mesh_instance.material_override = configured_material
 
 	configured_material.shader = TEXT_SHADER
+	configured_material.render_priority = OVERLAY_ORDER.DrawPass.ScreenText
 	return configured_material
 
 
@@ -283,6 +285,10 @@ func _configure_dim_overlay_mesh() -> void:
 	dim_overlay_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	dim_overlay_material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	dim_overlay_material.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+	# Camera-aligned message dimming belongs over the complete world image, regardless of scene depth.
+	dim_overlay_material.no_depth_test = true
+	dim_overlay_material.disable_fog = true
+	dim_overlay_material.render_priority = OVERLAY_ORDER.DrawPass.ScreenDim
 	_apply_dim_overlay_opacity()
 
 

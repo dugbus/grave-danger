@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://placeables/kill_boundary/sepia/sepia_boundary_mode.gd" id="1_mode"]
+[ext_resource type="Script" path="res://placeables/kill_boundary/sepia/sepia_view.gd" id="2_view"]
+[ext_resource type="Script" path="res://placeables/kill_boundary/sepia/sepia_contacts.gd" id="3_contacts"]
+[ext_resource type="Script" path="res://placeables/kill_boundary/sepia/sepia_veil.gd" id="4_veil"]
+
+[sub_resource type="QuadMesh" id="Quad_composite"]
+size = Vector2(2, 2)
+
+[node name="SepiaMode" type="Node3D"]
+script = ExtResource("1_mode")
+
+[node name="View" type="Node" parent="."]
+script = ExtResource("2_view")
+
+[node name="Composite" type="MeshInstance3D" parent="View"]
+visible = false
+layers = 65536
+cast_shadow = 0
+extra_cull_margin = 16384.0
+mesh = SubResource("Quad_composite")
+
+[node name="Contacts" type="Node" parent="View"]
+script = ExtResource("3_contacts")
+
+[node name="TimeVeil" type="MeshInstance3D" parent="View"]
+visible = false
+top_level = true
+cast_shadow = 0
+script = ExtResource("4_veil")

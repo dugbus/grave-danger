@@ -27,10 +27,17 @@ func run(tree: SceneTree) -> void:
 
 
 # Capture actual physics movement at a fixed tick rate; rendering cannot advance animations between samples.
-func record_patrol(tree: SceneTree, scene: PackedScene, patrol_case: PatrolCase) -> Dictionary:
+func record_patrol(tree: SceneTree, scene: PackedScene, patrol_case: PatrolCase, sepia_enabled := false) -> Dictionary:
 	var viewport := SubViewport.new()
 	viewport.name = "PatrolTiming"
 	viewport.own_world_3d = true
+	if sepia_enabled:
+		var region := preload("res://placeables/kill_boundary/kill_boundary.tscn").instantiate() as GDKillBoundary3D
+		region.boundary_animation = Animation.new()
+		region.autoplay_boundary_animation = false
+		region.bounds_size = Vector2(200.0, 200.0)
+		region.render_effect = region.RenderEffect.Sepia
+		viewport.add_child(region)
 	var floor_body := StaticBody3D.new()
 	floor_body.position.y = -0.25
 	var shape := BoxShape3D.new()
